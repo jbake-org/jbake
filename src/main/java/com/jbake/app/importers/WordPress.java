@@ -22,6 +22,20 @@ import com.jbake.main.Content;
 import com.jbake.main.Status;
 import com.jbake.main.Type;
 
+// Copyright 2012 Jonathan Bullock
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 public class WordPress {
 	
 	private static final String USAGE = "Usage: wordpress <host> <database> <user> <pass> <destination_path>";
@@ -131,7 +145,7 @@ public class WordPress {
 			conn = DriverManager.getConnection("jdbc:mysql://"+HOST+"/"+DATABASE+"?user="+USER+"&password="+PASS+"&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull");
 			
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery("select * from wp_posts where post_type = 'post' and (post_status = 'draft' or post_status = 'publish')");
+			rs = stmt.executeQuery("select * from wp_posts where post_type = 'post' and (post_status = 'draft' or post_status = 'publish') order by post_date");
 			while (rs.next()) {
 				Content content = new Content();
 				content.setTitle(rs.getString("post_title"));
@@ -147,19 +161,26 @@ public class WordPress {
 				if (status.equalsIgnoreCase("draft")) {
 					content.setStatus(Status.DRAFT);
 				}
-				content.setType(Type.PAGE);
-				content.setBody(rs.getString("post_content"));
+				content.setType(Type.POST);
+				content.setBody(rs.getString("post_content").replace("\n", "<br />"));
 				content.setTags(getTags(rs.getLong("ID")));
 				
 				String slug = rs.getString("post_name");
 				if (slug.equals("")) {
-					slug = rs.getString("post_title").toLowerCase().replaceAll("\\s", "-").replaceAll("[^a-z0-9-]", "");
+					slug = rs.getString("post_title").trim().toLowerCase().replaceAll("\\s+", "-").replaceAll("[^a-z0-9-]", "").replaceAll("-+", "-");
 				}
 				
 				SimpleDateFormat year = new SimpleDateFormat("yyyy");
 				SimpleDateFormat month = new SimpleDateFormat("MM");
 				SimpleDateFormat day = new SimpleDateFormat("dd");
-				File outputFile = new File(DESTINATION+File.separator+(year.format(date))+File.separator+(month.format(date))+File.separator+(day.format(date))+File.separator+slug+".html");
+				
+				String outputFilename = "";
+				if (content.getStatus().equals(Status.PUBLISHED)) {
+					outputFilename = DESTINATION+File.separator+(year.format(date))+File.separator+(month.format(date))+File.separator+slug+".html";
+				} else {
+					outputFilename = DESTINATION+File.separator+"drafts"+File.separator+slug+".html";
+				}
+				File outputFile = new File(outputFilename);
 				writeFile(outputFile, content);
 			}
 			
