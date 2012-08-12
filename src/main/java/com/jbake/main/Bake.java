@@ -86,6 +86,7 @@ public class Bake {
 	}
 	
 	private static void startBaking() {
+		long start = new Date().getTime();
 		System.out.println("Baking has started...");
 		File templates = new File(source.getPath()+File.separator+"templates");
 		if (templates.exists()) {
@@ -108,12 +109,12 @@ public class Bake {
 			System.err.println("Error: Required 'content' folder cannot be found!");
 		}
 		
-		// copy media files
-		File media = new File(source.getPath()+File.separator+"media");
-		if (media.exists()) {
-			copyMedia(media);
+		// copy assets files
+		File assets = new File(source.getPath()+File.separator+"assets");
+		if (assets.exists()) {
+			copyAssets(assets);
 		} else {
-			System.out.println("Warning: No 'media' folder was found!");
+			System.out.println("Warning: No 'assets' folder was found!");
 		}
 		
 		// sort posts
@@ -136,6 +137,8 @@ public class Bake {
 		}
 		
 		System.out.println("...finished!");
+		long end = new Date().getTime();
+		System.out.println("Baking took: " + (end-start) + "ms");
 	}
 
 	private static void crawl(File path) {
@@ -187,7 +190,7 @@ public class Bake {
 		File outputFile = new File(outputFilename+".html");
 		
 		if (content.getType().equals(Type.POST)) {
-			content.setUri(outputFile.getPath().replace(destination.getPath(), ""));
+			content.setUri(outputFilename.replace(destination.getPath(), "")+"/");
 		}
 		
 		Map model = new HashMap();
@@ -394,15 +397,15 @@ public class Bake {
 		return body.toString();
 	}
 	
-	private static void copyMedia(File media) {
-		File[] contents = media.listFiles();
+	private static void copyAssets(File assets) {
+		File[] contents = assets.listFiles();
 		if (contents != null) {
 			Arrays.sort(contents);
 			for (int i = 0; i < contents.length; i++) {
 				if (contents[i].isFile()) {
 					System.out.print("Copying [" + contents[i].getPath() + "]... ");
 					File sourceFile = contents[i];
-					File destFile = new File(sourceFile.getPath().replace(source.getPath(), destination.getPath()));
+					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
 					try {
 						FileUtils.copyFile(sourceFile, destFile);
 					} catch (IOException e) {
@@ -412,7 +415,7 @@ public class Bake {
 				} 
 				
 				if (contents[i].isDirectory()) {
-					copyMedia(contents[i]);
+					copyAssets(contents[i]);
 				}
 			}
 		}
