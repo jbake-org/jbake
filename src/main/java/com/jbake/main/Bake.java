@@ -181,7 +181,7 @@ public class Bake {
 	
 	private static void mix(File file, Content content) {
 		String outputFilename = file.getPath().replace(source.getPath()+File.separator+"content", destination.getPath());
-		outputFilename = outputFilename.substring(0, outputFilename.indexOf("."));
+		outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 		
 		if (content.getStatus().equals(Status.DRAFT)) {
 			outputFilename = outputFilename + "-draft";
