@@ -150,24 +150,28 @@ public class Bake {
 					System.out.print("Processing [" + contents[i].getPath() + "]... ");
 					Content content = processFile(contents[i]);
 					
-					if (content.getType().equals(Type.POST)) {
-						if (content.getStatus().equals(Status.PUBLISHED)) {
-							publishedPosts.add(content);
+					if (content.getType() != null && content.getStatus() != null) {
+						if (content.getType().equals(Type.POST)) {
+							if (content.getStatus().equals(Status.PUBLISHED)) {
+								publishedPosts.add(content);
+							}
+							if (content.getStatus().equals(Status.DRAFT)) {
+								draftPosts.add(content);
+							}
 						}
-						if (content.getStatus().equals(Status.DRAFT)) {
-							draftPosts.add(content);
+						if (content.getType().equals(Type.PAGE)) {
+							if (content.getStatus().equals(Status.PUBLISHED)) {
+								publishedPages.add(content);
+							}
+							if (content.getStatus().equals(Status.DRAFT)) {
+								draftPages.add(content);
+							}
 						}
+						
+						mix(contents[i], content);
+					} else {
+						System.out.print("\nPost has invalid type or status!\n");
 					}
-					if (content.getType().equals(Type.PAGE)) {
-						if (content.getStatus().equals(Status.PUBLISHED)) {
-							publishedPages.add(content);
-						}
-						if (content.getStatus().equals(Status.DRAFT)) {
-							draftPages.add(content);
-						}
-					}
-					
-					mix(contents[i], content);
 					
 					System.out.println("done!");
 				} 
