@@ -1,4 +1,4 @@
-package com.jbake.app.importers;
+package org.jbake.app.importer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
