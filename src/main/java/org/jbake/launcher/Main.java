@@ -13,7 +13,7 @@ import org.jbake.app.Oven;
 public class Main {
 
 	public static final String VERSION = "v2.0";
-	private static final String USAGE = "Usage: bake <source path> <destination path>";
+	private static final String USAGE = "Usage: java -jar jbake.jar <source path> <destination path>";
 	
 	/**
 	 * Runs the app with the given arguments.

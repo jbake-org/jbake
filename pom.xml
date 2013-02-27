@@ -93,11 +93,11 @@
 			<version>4.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.21</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.markdownj</groupId>
 			<artifactId>markdownj</artifactId>
