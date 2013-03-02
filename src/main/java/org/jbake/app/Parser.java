@@ -50,7 +50,6 @@ public class Parser {
 			if (validFile) {
 				processHeader(fileContents);
 				processBody(fileContents, file);
-				content.put("uri", file.getName());
 			} else {
 				return null;
 			}			

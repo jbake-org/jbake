@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+
 /**
  * Crawls a file system looking for content.
  * 
@@ -19,6 +21,9 @@ public class Crawler {
 	// TODO: to get back certain types of content (i.e. pages or posts), this allows for 
 	// TODO: support of extra types with very little extra dev 
 	
+	private File source;
+	private CompositeConfiguration config;
+	
 	private List<Map<String, Object>> pages = new ArrayList<Map<String, Object>>();
 	private List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
 	private Map<String, List<Map<String, Object>>> postsByTags = new HashMap<String, List<Map<String, Object>>>();
@@ -28,7 +33,9 @@ public class Crawler {
 	 * Creates new instance of Crawler.
 	 * 
 	 */
-	public Crawler() {
+	public Crawler(File source, CompositeConfiguration config) {
+		this.source = source;
+		this.config = config;
 	}
 	
 	/**
@@ -47,6 +54,7 @@ public class Crawler {
 					Map<String, Object> fileContents = parser.processFile(contents[i]);
 					if (fileContents != null) {
 						fileContents.put("file", contents[i].getPath());
+						fileContents.put("uri", contents[i].getPath().replace(source.getPath() + File.separator + config.getString("content.folder"), ""));
 						
 						if (fileContents.get("type").equals("page")) {
 							pages.add(fileContents);

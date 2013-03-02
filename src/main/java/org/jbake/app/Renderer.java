@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.launcher.Main;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -28,12 +30,34 @@ public class Renderer {
 	
 	private File source;
 	private File destination;
-	private Configuration cfg;
+	private Configuration templateCfg;
+	private CompositeConfiguration config;
+	
+	/**
+	 * Creates a new instance of Renderer with supplied references to folders.
+	 * 
+	 * @param source		The source folder
+	 * @param destination	The destination folder
+	 * @param templatesPath	The templates folder
+	 */
+	public Renderer(File source, File destination, File templatesPath, CompositeConfiguration config) {
+		this.source = source;
+		this.destination = destination;
+		this.config = config;
+		templateCfg = new Configuration();
+		try {
+			templateCfg.setDirectoryForTemplateLoading(templatesPath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		templateCfg.setObjectWrapper(new DefaultObjectWrapper());
+		
+	}
 	
 	private void render(Map<String, Object> model, String templateFilename, File outputFile) throws Exception {
 		model.put("version", Main.VERSION);
 		Template template = null;
-		template = cfg.getTemplate(templateFilename);
+		template = templateCfg.getTemplate(templateFilename);
 		
 		if (!outputFile.exists()) {
 			outputFile.getParentFile().mkdirs();
@@ -46,48 +70,29 @@ public class Renderer {
 	}
 	
 	/**
-	 * Creates a new instance of Renderer with supplied references to folders.
-	 * 
-	 * @param source		The source folder
-	 * @param destination	The destination folder
-	 * @param templatesPath	The templates folder
-	 */
-	public Renderer(File source, File destination, File templatesPath) {
-		this.source = source;
-		this.destination = destination;
-		cfg = new Configuration();
-		try {
-			cfg.setDirectoryForTemplateLoading(templatesPath);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		cfg.setObjectWrapper(new DefaultObjectWrapper());
-		
-	}
-	
-	/**
 	 * Render the supplied content to a file.
 	 * 
 	 * @param content	The content to render
 	 */
 	public void render(Map<String, Object> content) {
-		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
+//		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
+		String outputFilename = destination.getPath() + (String)content.get("uri");
 		outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 		
 		// delete existing versions if they exist in case status has changed either way
-		File draftFile = new File(outputFilename+"-draft.html");
+		File draftFile = new File(outputFilename + config.getString("draft.suffix") + config.getString("output.extension"));
 		if (draftFile.exists()) {
 			draftFile.delete();
 		}
-		File publishedFile = new File(outputFilename+".html");
+		File publishedFile = new File(outputFilename+config.getString("output.extension"));
 		if (publishedFile.exists()) {
 			publishedFile.delete();
 		}
 		
 		if (content.get("status").equals("draft")) {
-			outputFilename = outputFilename + "-draft";
+			outputFilename = outputFilename + config.getString("draft.suffix");
 		}		
-		File outputFile = new File(outputFilename+".html");
+		File outputFile = new File(outputFilename+config.getString("output.extension"));
 		
 		System.out.print("Rendering [" + outputFile + "]... ");		
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -115,7 +120,7 @@ public class Renderer {
 		model.put("posts", posts);
 		
 		try {
-			render(model, "index.ftl", outputFile);
+			render(model, config.getString("template.index.file"), outputFile);
 			System.out.println("done!");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -137,7 +142,7 @@ public class Renderer {
 		model.put("pubdate", new Date());
 		
 		try {
-			render(model, "feed.ftl", outputFile);
+			render(model, config.getString("template.feed.file"), outputFile);
 			System.out.println("done!");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,7 +163,7 @@ public class Renderer {
 		model.put("posts", posts);
 		
 		try {
-			render(model, "archive.ftl", outputFile);
+			render(model, config.getString("template.archive.file"), outputFile);
 			System.out.println("done!");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -181,11 +186,11 @@ public class Renderer {
 			model.put("posts", posts);
 			
 			tag = tag.trim().replace(" ", "-");
-			File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + ".html");
+			File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));
 			System.out.print("Rendering tags [" + outputFile + "]... ");
 			
 			try {
-				render(model, "tags.ftl", outputFile);
+				render(model, config.getString("template.tag.file"), outputFile);
 				System.out.println("done!");
 			} catch (Exception e) {
 				e.printStackTrace();

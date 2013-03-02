@@ -10,12 +10,19 @@
 
 	<div class="row-fluid marketing">
 		<div class="span12">
+			<h2>Archive</h2>
 			<#list posts as post>
-			<h4><a href="${post.uri}">${post.title}</a></h4>
-			<p>${post.date?string("dd MMMM yyyy")} - ${post.body?substring(0, 150)}...</p>
-			<#if post_index = 2><#break></#if>
+				<#if (last_month)??>
+					<#if post.date?string("MMMM yyyy") != last_month>
+						<h3>${post.date?string("MMMM yyyy")}</h3>
+					</#if>
+				<#else>
+					<h3>${post.date?string("MMMM yyyy")}</h3>
+				</#if> 
+				
+				<h4>${post.date?string("dd MMMM")} - <a href="${post.uri}">${post.title}</a></h4>
+				<#assign last_month = post.date?string("MMMM yyyy")>
 			</#list>
-			<a href="/archive.html">Archive</a>
 		</div>
 	</div>
 

@@ -53,7 +53,6 @@ public class Oven {
 	 * @throws Exception If template or contents folder don't exist
 	 */
 	public void setupPaths() throws Exception {
-//		System.out.println(config.getString("templates.folder"));
 		templatesPath = new File(source.getPath() + File.separator + config.getString("template.folder"));
 		if (!templatesPath.exists()) {
 			throw new Exception("Error: Required template folder cannot be found!");
@@ -78,7 +77,7 @@ public class Oven {
 		System.out.println("Baking has started...");
 				
 		// process source content
-		Crawler crawler = new Crawler();
+		Crawler crawler = new Crawler(source, config);
 		crawler.crawl(contentsPath);
 		List<Map<String, Object>> pages = crawler.getPages();
 		List<Map<String, Object>> posts = crawler.getPosts();
@@ -97,7 +96,7 @@ public class Oven {
 		});
 		Collections.reverse(posts);
 		
-		Renderer renderer = new Renderer(source, destination, templatesPath);
+		Renderer renderer = new Renderer(source, destination, templatesPath, config);
 		
 		// render all pages
 		for (Map<String, Object> page : pages) {
