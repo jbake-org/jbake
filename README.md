@@ -17,8 +17,10 @@ JBake is a Java based static site/blog generator for developers, bake your own w
 
 ## Getting Started
 
-- Get the code and run `mvn package` from the root folder to build an executable JAR file
-- Run `java -jar <jarfile> <source_folder> <destination_folder>` to do some baking
+- Get the source code
+- To start developing JBake run `mvn eclipse:eclipse` to build required Eclipse project files
+- To start using JBake run `mvn package` from the root folder to build an executable JAR file
+- Run `java -jar <jar-file-with-dependencies> <source_folder> <destination_folder>` to do some baking
 
 ## Usage
 
