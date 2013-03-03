@@ -2,7 +2,7 @@
 
 by **[Jonathan Bullock](http://jonathanbullock.com/)**
 
-JBake is a Java based static site/blog generator for developers, bake your own web site!
+JBake is a Java based open source static site/blog generator for developers, bake your own web site!
 
 ## Features
 
@@ -20,11 +20,12 @@ JBake is a Java based static site/blog generator for developers, bake your own w
 - Get the source code
 - To start developing JBake run `mvn eclipse:eclipse` to build required Eclipse project files
 - To start using JBake run `mvn package` from the root folder to build an executable JAR file
-- Run `java -jar <jar-file-with-dependencies> <source_folder> <destination_folder>` to do some baking
 
 ## Usage
 
-Example source structure:
+- Run `java -jar <jar-file-with-dependencies> <source_folder> <destination_folder>` to do some baking
+
+Example source folder structure:
 
 <pre>
 .
@@ -47,7 +48,9 @@ Example source structure:
 |-- custom.properties
 </pre>
 
-Provide link to exmaple site with templates (maybe my site?).
+A full example source folder is provided with the [source code](https://github.com/jonbullock/JBake/tree/master/misc).
+
+Both [http://jonathanbullock.com](http://jonathanbullock.com) and [http://jbake.org](http://jbake.org) are built using JBake.
 
 ### assets
 
@@ -85,7 +88,7 @@ And access it from the template like so:
 
 `<p>${content.summary}</p>`
 
-Drafts ........
+Drafts are rendered along with published posts however they are given a "-draft" suffix, for example `first-post-draft.html`.
 
 ### templates
 
@@ -109,8 +112,6 @@ The contents of the file is always available via `${content.body}`
 
 You can choose what template your content file will be "mixed" with by changing the *post* header field (i.e. type=post will use post.ftl, type=page will use page.ftl).
 
-Some example templates are included in the `/misc/templates/` folder.
-
 See the 
 [Freemarker Manual](http://freemarker.sourceforge.net/docs/index.html) for more information on what you can do in Freemarker templates.
 
@@ -124,16 +125,17 @@ The custom.properties file allows you to override the default configuration of J
 
 Licensed under the MIT License, see the LICENSE file.
 
-## Dependencies
+## Development Tools
 
-- Java v1.6 or above
-- Apache Maven v2.2 or above
+- Java v1.6 SDK
+- Eclipse Juno (Java EE Package)
+- Apache Maven v2.2.1
 
 ## Alternatives
 
-- Jekyll
-- Awestruct
-- Usermesh
+- [Jekyll - Ruby](http://jekyllrb.com/)
+- [Awestruct - Ruby](http://awestruct.org/)
+- [Usermesh - Perl](http://usermesh.org/)
 
 ## Contact
 
