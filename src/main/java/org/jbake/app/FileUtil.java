@@ -6,7 +6,7 @@ import java.io.FileFilter;
 /**
  * Provides File related functions
  * 
- * @author Jonathan Bullock <jonbullock
+ * @author Jonathan Bullock <jonbullock@gmail.com>
  *
  */
 public class FileUtil {

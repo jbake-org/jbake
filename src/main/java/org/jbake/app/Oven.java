@@ -83,17 +83,7 @@ public class Oven {
 		List<Map<String, Object>> posts = crawler.getPosts();
 		
 		// sort posts
-		Collections.sort(posts, new Comparator<Map<String, Object>>() {
-			@Override
-			public int compare(Map<String, Object> c1, Map<String, Object> c2) {
-				if (c1.get("date") != null && c2.get("date") != null) {
-					if (c1.get("date") instanceof Date && c2.get("Date") instanceof Date) {
-						return ((Date)c1.get("date")).compareTo((Date)c2.get("date"));
-					}
-				}
-				return 0;
-			}
-		});
+		Collections.sort(posts, SortUtil.getComparator());
 		Collections.reverse(posts);
 		
 		Renderer renderer = new Renderer(source, destination, templatesPath, config);
