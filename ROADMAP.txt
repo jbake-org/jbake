@@ -1,0 +1,20 @@
+ROADMAP
+----
+
+v2.1
+- Create unit tests using JUnit/TestNG
+- Add post baking stats (how many posts/pages baked)
+- Make more data available to the templates via the data model object (such as config options, all posts & pages)
+
+v2.2
+- Add logging support (Log4j or SLF4J), add logging options to configuration
+- Improve drafts/status system
+- Improve tag page rendering system 
+
+v2.3
+- Add support for incremental output, only render what has changed
+- Add Wordpress import script
+
+v2.4
+- Add support for plugins for getting external content (such as Twitter/FaceBook) and outputting it via the rendering pipeline
+- Generate index file per folder (i.e. /2012/index.html) with links to contents
