@@ -140,5 +140,5 @@ Licensed under the MIT License, see the LICENSE file.
 ## Contact
 
 - [http://jonathanbullock.com/](http://jonathanbullock.com/)
-- [jonbullock@gmail.com](jonbullock@gmail.com)
+- [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
 - [@jonbullock](http://twitter.com/jonbullock)
