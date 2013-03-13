@@ -21,17 +21,9 @@ public class FileUtil {
 			
 			@Override
 			public boolean accept(File pathname) {
-				if (pathname.isFile()) {
-					if (pathname.getPath().endsWith(".html")) {
-						return true;
-					} else if (pathname.getPath().endsWith(".md")) {
-						return true;
-					} else {
-						return false;
-					}
-				} else {
-					return true;
-				}
+				return !pathname.isFile()
+						|| pathname.getPath().endsWith(".html")
+						|| pathname.getPath().endsWith(".md");
 			}
 		};
 	}
