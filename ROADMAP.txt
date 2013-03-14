@@ -18,3 +18,6 @@ v2.3
 v2.4
 - Add support for plugins for getting external content (such as Twitter/FaceBook) and outputting it via the rendering pipeline
 - Generate index file per folder (i.e. /2012/index.html) with links to contents
+
+v3.0+
+- Photo album hosting support... so I can replace Gallery!
