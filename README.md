@@ -2,7 +2,7 @@
 
 by **[Jonathan Bullock](http://jonathanbullock.com/)**
 
-[![Build Status](https://travis-ci.org/mismatch/JBake.png)]
+![Build Status](https://travis-ci.org/mismatch/JBake.png)
 
 JBake is a Java based open source static site/blog generator for developers, bake your own web site!
 
