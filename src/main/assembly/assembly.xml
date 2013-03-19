@@ -28,7 +28,7 @@
             <directory>${project.build.scriptSourceDirectory}</directory>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>jbake</include>
+                <include>jbake*</include>
             </includes>
         </fileSet>
         <!-- adds jar package to the root directory of zip package -->
