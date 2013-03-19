@@ -1,0 +1,1 @@
+java -jar jbake-2.0.jar %*
