@@ -41,6 +41,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>org.jbake.launcher.Main</mainClass>
 							<packageName>org.jbake.launcher</packageName>
 						</manifest>
@@ -48,16 +49,45 @@
 				</configuration>
 			</plugin>
 			<plugin>
-	            <artifactId>maven-assembly-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>dist</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<excludeScope>test</excludeScope>
+							<includeScope>compile</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
 	            <configuration>
-	            	<archive>
-	                    <manifest>
-	                        <mainClass>org.jbake.launcher.Main</mainClass>
-	                    </manifest>
-	                </archive>
-	                <descriptorRefs>
-	                    <descriptorRef>jar-with-dependencies</descriptorRef>
-	                </descriptorRefs>
+					<outputDirectory>dist</outputDirectory>
+	                <descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+	                </descriptors>
 	            </configuration>
 	            <executions>
 					<execution>
