@@ -3,5 +3,6 @@
 /.settings
 /target
 /bin
+/dist
 /.idea
 *.iml
