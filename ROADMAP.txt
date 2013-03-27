@@ -8,12 +8,16 @@ v2.1
 
 v2.2
 - Add logging support (Log4j or SLF4J), add logging options to configuration
+- Add JBoss Forge support via a plugin...
+- Include support for using Jetty as local web server to serve up directly generated output
 - Improve drafts/status system
 - Improve tag page rendering system 
 
 v2.3
 - Add support for incremental output, only render what has changed
+- Add support for AsciiDoc formatted content
 - Add Wordpress import script
+- Add support for more template/scripting engines (Velocity, Mustache.java, StringTemplate...)
 
 v2.4
 - Add support for plugins for getting external content (such as Twitter/FaceBook) and outputting it via the rendering pipeline
