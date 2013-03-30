@@ -73,8 +73,9 @@ public class Renderer {
 	 * Render the supplied content to a file.
 	 * 
 	 * @param content	The content to render
+	 * @throws Exception 
 	 */
-	public void render(Map<String, Object> content) {
+	public void render(Map<String, Object> content) throws Exception {
 //		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
 		String outputFilename = destination.getPath() + (String)content.get("uri");
 		outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
@@ -104,6 +105,7 @@ public class Renderer {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("failed!");
+			throw new Exception("Failed to render file");
 		}
 	}
 	
