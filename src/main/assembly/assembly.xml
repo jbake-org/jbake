@@ -39,5 +39,12 @@
                 <include>*.jar</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>${basedir}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>LICENSE</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>

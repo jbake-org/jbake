@@ -89,16 +89,29 @@ public class Oven {
 
 		Renderer renderer = new Renderer(source, destination, templatesPath, config);
 
+		int renderedCount = 0;
+		int errorCount = 0;
+		
 		// render all pages
 		for (Map<String, Object> page : pages) {
 			// TODO: could add check here to see if rendering needs to be done again
-			renderer.render(page);
+			try {
+				renderer.render(page);
+				renderedCount++;
+			} catch (Exception e) {
+				errorCount++;
+			}
 		}
 
 		// render all posts
 		for (Map<String, Object> post : posts) {
 			// TODO: could add check here to see if rendering needs to be done again
-			renderer.render(post);
+			try {
+				renderer.render(post);
+				renderedCount++;
+			} catch (Exception e) {
+				errorCount++;
+			}
 		}
 
 		// only interested in published posts from here on
@@ -130,6 +143,10 @@ public class Oven {
 
 		System.out.println("...finished!");
 		long end = new Date().getTime();
-		System.out.println("Baking took: " + (end-start) + "ms");
+		System.out.println("Baked " + renderedCount + " items in " + (end-start) + "ms");
+		if (errorCount > 0) {
+			System.out.println("Failed to bake " + errorCount + " item(s)!");
+		}
+//		System.out.println("Baking took: " + (end-start) + "ms");
 	}
 }
