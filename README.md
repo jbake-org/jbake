@@ -1,5 +1,7 @@
 # JBake
 
+[![Build Status](https://travis-ci.org/jonbullock/JBake.png?branch=master)](https://travis-ci.org/jonbullock/JBake)
+
 by **[Jonathan Bullock](http://jonathanbullock.com/)**
 
 JBake is a Java based open source static site/blog generator for developers, bake your own web site!
