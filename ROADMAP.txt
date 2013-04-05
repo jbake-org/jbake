@@ -15,11 +15,12 @@ v2.2
 
 v2.3
 - Add support for incremental output, only render what has changed
-- Add support for AsciiDoc formatted content
+- Add support for AsciiDoc formatted content 
 - Add Wordpress import script
 - Add support for more template/scripting engines (Velocity, Mustache.java, StringTemplate...)
 
 v2.4
+- Add dependency injection support
 - Add support for plugins for getting external content (such as Twitter/FaceBook) and outputting it via the rendering pipeline
 - Generate index file per folder (i.e. /2012/index.html) with links to contents
 
