@@ -35,6 +35,7 @@ public class Main {
 			oven.setupPaths();
 			oven.bake();
 		} catch (Exception e) {
+			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -49,40 +50,11 @@ public class Main {
 			if (res.isHelpNeeded()) {
 				printUsage(parser);
 			}
-
-			checkIsSourceFolder(res.getSource());
-
-			processDestinationFolderArgument(res.getDestination());
-		} catch (IllegalArgumentException iae) {
-			System.err.println(iae.getMessage());
-			System.exit(0);
 		} catch (CmdLineException e) {
 			printUsage(parser);
 		}
 
 		return res;
-	}
-
-	private void processDestinationFolderArgument(File f) {
-		if (!f.exists()) {
-			f.mkdir();
-		}
-
-		checkIsFolder(f);
-	}
-
-	private void checkIsSourceFolder(File f) {
-		if (!f.exists()) {
-			throw new IllegalArgumentException("Source folder MUST exist");
-		}
-
-		checkIsFolder(f);
-	}
-
-	private void checkIsFolder(File f) {
-		if (!f.isDirectory()) {
-			throw new IllegalArgumentException("You should provide path to folder, not file");
-		}
 	}
 
 	private void printUsage(CmdLineParser parser) {
