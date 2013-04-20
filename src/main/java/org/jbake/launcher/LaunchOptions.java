@@ -10,7 +10,7 @@ class LaunchOptions {
 	private File source = new File(".");
 
 	@Argument(index = 1, usage = "destination folder for baked artifacts", metaVar = "destination_folder")
-	private File destination = new File("baked");
+	private File destination = null;
 
 	@Option(name = "-h", aliases = {"--help"}, usage="prints this message")
 	private boolean isHelpNeeded;

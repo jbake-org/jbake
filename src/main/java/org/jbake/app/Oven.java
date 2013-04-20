@@ -42,17 +42,43 @@ public class Oven {
 		this.source = source;
 		this.destination = destination;
 
-        if (!source.exists()) {
-            throw new Exception("Source folder MUST exist!");
-        }
+        ensureSource();
 
+        loadConfig();
+
+        ensureDestination();
+	}
+
+    private void loadConfig() throws ConfigurationException {
 		this.config = new CompositeConfiguration();
 		File customConfig = new File(source, "custom.properties");
 		if (customConfig.exists()) {
 			config.addConfiguration(new PropertiesConfiguration(customConfig));
 		}
 		config.addConfiguration(new PropertiesConfiguration("default.properties"));
-	}
+    }
+
+    private void ensureSource() throws Exception {
+        if (!FileUtil.isExistingFolder(source)) {
+            throw new Exception("Source folder MUST exist!");
+        }
+        if (!source.canRead()) {
+            throw new Exception("Source folder is not readable! Please, check");
+        }
+    }
+
+
+    private void ensureDestination() throws Exception {
+        if (null == destination) {
+            destination = new File(config.getString("destination.folder"));
+        }
+        if (!destination.exists()) {
+            destination.mkdirs();
+        }
+        if (!destination.canWrite()) {
+            throw new Exception("Destination folder is not writable! Please, check");
+        }
+    }
 
 	/**
 	 * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
@@ -60,10 +86,6 @@ public class Oven {
 	 * @throws Exception If template or contents folder don't exist
 	 */
 	public void setupPaths() throws Exception {
-        if (!destination.exists()) {
-            destination.mkdirs();
-        }
-
         templatesPath = setupRequiredFolderFromConfig("template.folder");
         contentsPath = setupRequiredFolderFromConfig("content.folder");
         assetsPath = setupPathFromConfig("asset.folder");
@@ -78,7 +100,7 @@ public class Oven {
 
     private File setupRequiredFolderFromConfig(String key) throws Exception {
         File path = setupPathFromConfig(key);
-        if (!path.exists() || !path.isDirectory()) {
+        if (!FileUtil.isExistingFolder(path)) {
             throw new Exception("Error: Required folder cannot be found! Config key is " + key);
         }
         return path;
