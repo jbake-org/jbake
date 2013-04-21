@@ -87,7 +87,7 @@ public class Oven {
 		// sort posts
 		Collections.sort(posts, SortUtil.getComparator(REVERSE));
 
-		Renderer renderer = new Renderer(source, destination, templatesPath, config);
+		Renderer renderer = new Renderer(source, destination, templatesPath, config, posts, pages);
 
 		int renderedCount = 0;
 		int errorCount = 0;

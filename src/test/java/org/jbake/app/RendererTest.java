@@ -81,6 +81,9 @@ public class RendererTest {
 			if (line.contains("Lorem ipsum dolor sit amet")) {
 				foundBody = true;
 			}
+			if (foundTitle && foundDate && foundBody) {
+				break;
+			}
 		}
 		
 		Assert.assertTrue(foundTitle);
@@ -90,9 +93,9 @@ public class RendererTest {
 	
 	@Test
 	public void renderIndex() throws Exception {
-		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config);
 		Crawler crawler = new Crawler(sourceFolder, config);
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
+		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
 		renderer.renderIndex(crawler.getPosts(), "index.html");
 		File outputFile = new File(destinationFolder, "index.html");
 		Assert.assertTrue(outputFile.exists());
@@ -108,6 +111,9 @@ public class RendererTest {
 			if (line.contains("<h4><a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
 				foundSecondTitle = true;
 			}
+			if (foundFirstTitle && foundSecondTitle) {
+				break;
+			}
 		}
 		
 		Assert.assertTrue(foundFirstTitle);
@@ -116,9 +122,9 @@ public class RendererTest {
 	
 	@Test
 	public void renderFeed() throws Exception {
-		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config);
 		Crawler crawler = new Crawler(sourceFolder, config);
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
+		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
 		renderer.renderFeed(crawler.getPosts(), "feed.xml");
 		File outputFile = new File(destinationFolder, "feed.xml");
 		Assert.assertTrue(outputFile.exists());
@@ -138,6 +144,9 @@ public class RendererTest {
 			if (line.contains("<title>First Post</title>")) {
 				foundSecondTitle = true;
 			}
+			if (foundDescription && foundFirstTitle && foundSecondTitle) {
+				break;
+			}
 		}
 		
 		Assert.assertTrue(foundDescription);
@@ -147,9 +156,9 @@ public class RendererTest {
 	
 	@Test
 	public void renderArchive() throws Exception {
-		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config);
 		Crawler crawler = new Crawler(sourceFolder, config);
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
+		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
 		renderer.renderArchive(crawler.getPosts(), "archive.html");
 		File outputFile = new File(destinationFolder, "archive.html");
 		Assert.assertTrue(outputFile.exists());
@@ -165,6 +174,9 @@ public class RendererTest {
 			if (line.contains("<h4>27 February - <a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
 				foundSecondPost = true;
 			}
+			if (foundFirstPost && foundSecondPost) {
+				break;
+			}
 		}
 		
 		Assert.assertTrue(foundFirstPost);
@@ -173,9 +185,9 @@ public class RendererTest {
 	
 	@Test
 	public void renderTags() throws Exception {
-		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config);
 		Crawler crawler = new Crawler(sourceFolder, config);
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
+		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
 		renderer.renderTags(crawler.getPostsByTags(), "tags");
 		File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
 		Assert.assertTrue(outputFile.exists());
@@ -190,6 +202,9 @@ public class RendererTest {
 			}
 			if (line.contains("<h4>27 February - <a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
 				foundSecondPost = true;
+			}
+			if (foundFirstPost && foundSecondPost) {
+				break;
 			}
 		}
 		

@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ public class Renderer {
 	private File destination;
 	private Configuration templateCfg;
 	private CompositeConfiguration config;
+	private List<Map<String, Object>> posts;
+	private List<Map<String, Object>> pages;
 	
 	/**
 	 * Creates a new instance of Renderer with supplied references to folders.
@@ -50,12 +53,36 @@ public class Renderer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		templateCfg.setObjectWrapper(new DefaultObjectWrapper());
-		
+		templateCfg.setObjectWrapper(new DefaultObjectWrapper());	
+	}
+	
+	/**
+	 * Creates a new instance of Renderer with supplied references to folders.
+	 * 
+	 * @param source		The source folder
+	 * @param destination	The destination folder
+	 * @param templatesPath	The templates folder
+	 * @param posts			The list of posts
+	 * @param pages			The list of pages
+	 */
+	public Renderer(File source, File destination, File templatesPath, CompositeConfiguration config, List<Map<String, Object>> posts, List<Map<String, Object>> pages) {
+		this(source, destination, templatesPath, config);
+		this.posts = posts;
+		this.pages = pages;
 	}
 	
 	private void render(Map<String, Object> model, String templateFilename, File outputFile) throws Exception {
 		model.put("version", Main.VERSION);
+		model.put("posts", posts);
+		model.put("pages", pages);
+		Map<String, Object> configModel = new HashMap<String, Object>();
+		Iterator<String> configKeys = config.getKeys();
+		while (configKeys.hasNext()) {
+			String key = configKeys.next();
+			//replace "." in key so you can use dot notation in templates
+			configModel.put(key.replace(".", "_"), config.getProperty(key));
+		}
+		model.put("config", configModel);
 		Template template = null;
 		template = templateCfg.getTemplate(templateFilename);
 		
@@ -119,7 +146,7 @@ public class Renderer {
 		File outputFile = new File(destination.getPath() + File.separator + indexFile);
 		System.out.print("Rendering index [" + outputFile + "]... ");
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("posts", posts);
+//		model.put("posts", posts);
 		
 		try {
 			render(model, config.getString("template.index.file"), outputFile);
@@ -140,7 +167,7 @@ public class Renderer {
 		File outputFile = new File(destination.getPath() + File.separator + feedFile);
 		System.out.print("Rendering feed [" + outputFile + "]... ");
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("posts", posts);
+//		model.put("posts", posts);
 		model.put("pubdate", new Date());
 		
 		try {
@@ -162,7 +189,7 @@ public class Renderer {
 		File outputFile = new File(destination.getPath() + File.separator + archiveFile);
 		System.out.print("Rendering archive [" + outputFile + "]... ");
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("posts", posts);
+//		model.put("posts", posts);
 		
 		try {
 			render(model, config.getString("template.archive.file"), outputFile);
@@ -185,7 +212,7 @@ public class Renderer {
 			model.put("tag", tag);
 			// TODO: sort posts here
 			List<Map<String, Object>> posts = Filter.getPublishedPosts(tags.get(tag));
-			model.put("posts", posts);
+			model.put("tag_posts", posts);
 			
 			tag = tag.trim().replace(" ", "-");
 			File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));

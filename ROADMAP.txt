@@ -5,7 +5,7 @@ v2.1
 - Create unit tests using JUnit/TestNG *
 - Add post baking stats (how many posts/pages baked) *
 - Make source folder arg optional, default to current directory
-- Make more data available to the templates via the data model object (such as config options, all posts & pages)
+- Make more data available to the templates via the data model object (such as config options, all posts & pages) *
 
 v2.2
 - Add logging support (Log4j or SLF4J), add logging options to configuration
