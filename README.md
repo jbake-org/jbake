@@ -50,7 +50,7 @@ Example source folder structure:
 |-- custom.properties
 </pre>
 
-A full example source folder is provided with the [source code](https://github.com/jonbullock/JBake/tree/master/misc).
+A full example source folder is provided with the [source code](https://github.com/jonbullock/JBake/tree/master/src/test/resources).
 
 Both [http://jonathanbullock.com](http://jonathanbullock.com) and [http://jbake.org](http://jbake.org) are built using JBake.
 

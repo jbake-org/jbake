@@ -11,8 +11,12 @@ import org.junit.Test;
 
 public class CrawlerTest {
 
+	
 	@Test
 	public void crawl() throws ConfigurationException {
+//		File test = new File("/content");
+//		System.out.println(test.exists());
+		
 		CompositeConfiguration config = new CompositeConfiguration();
 		URL defaultConfigFileUrl = this.getClass().getResource("/default.properties");
 		File defaultConfigFile = new File(defaultConfigFileUrl.getFile());
@@ -26,6 +30,6 @@ public class CrawlerTest {
 		crawler.crawl(new File(content.getPath() + File.separator + "content"));
 		
 		Assert.assertEquals(crawler.getPosts().size(), 2);
-		Assert.assertEquals(crawler.getPages().size(), 1);
+		Assert.assertEquals(crawler.getPages().size(), 3);
 	}
 }
