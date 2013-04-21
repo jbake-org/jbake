@@ -36,18 +36,49 @@ public class Oven {
 	 *
 	 * @param source		The source folder
 	 * @param destination	The destination folder
-	 * @throws ConfigurationException
+	 * @throws Exception
 	 */
-	public Oven(File source, File destination) throws ConfigurationException {
+	public Oven(File source, File destination) throws Exception {
 		this.source = source;
 		this.destination = destination;
+
+        ensureSource();
+
+        loadConfig();
+
+        ensureDestination();
+	}
+
+    private void loadConfig() throws ConfigurationException {
 		this.config = new CompositeConfiguration();
-		File customConfig = new File(source.getPath()+File.separator+"custom.properties");
+		File customConfig = new File(source, "custom.properties");
 		if (customConfig.exists()) {
 			config.addConfiguration(new PropertiesConfiguration(customConfig));
 		}
 		config.addConfiguration(new PropertiesConfiguration("default.properties"));
-	}
+    }
+
+    private void ensureSource() throws Exception {
+        if (!FileUtil.isExistingFolder(source)) {
+            throw new Exception("Source folder MUST exist!");
+        }
+        if (!source.canRead()) {
+            throw new Exception("Source folder is not readable! Please, check");
+        }
+    }
+
+
+    private void ensureDestination() throws Exception {
+        if (null == destination) {
+            destination = new File(config.getString("destination.folder"));
+        }
+        if (!destination.exists()) {
+            destination.mkdirs();
+        }
+        if (!destination.canWrite()) {
+            throw new Exception("Destination folder is not writable! Please, check");
+        }
+    }
 
 	/**
 	 * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
@@ -55,19 +86,25 @@ public class Oven {
 	 * @throws Exception If template or contents folder don't exist
 	 */
 	public void setupPaths() throws Exception {
-		templatesPath = new File(source.getPath() + File.separator + config.getString("template.folder"));
-		if (!templatesPath.exists()) {
-			throw new Exception("Error: Required template folder cannot be found!");
-		}
-		contentsPath = new File(source.getPath() + File.separator + config.getString("content.folder"));
-		if (!contentsPath.exists()) {
-			throw new Exception("Error: Required content folder cannot be found!");
-		}
-		assetsPath = new File(source.getPath() + File.separator + config.getString("asset.folder"));
+        templatesPath = setupRequiredFolderFromConfig("template.folder");
+        contentsPath = setupRequiredFolderFromConfig("content.folder");
+        assetsPath = setupPathFromConfig("asset.folder");
 		if (!assetsPath.exists()) {
 			System.out.println("Warning: No asset folder was found!");
 		}
 	}
+
+    private File setupPathFromConfig(String key) {
+        return new File(source, config.getString(key));
+    }
+
+    private File setupRequiredFolderFromConfig(String key) throws Exception {
+        File path = setupPathFromConfig(key);
+        if (!FileUtil.isExistingFolder(path)) {
+            throw new Exception("Error: Required folder cannot be found! Config key is " + key);
+        }
+        return path;
+    }
 
 	/**
 	 * All the good stuff happens in here...

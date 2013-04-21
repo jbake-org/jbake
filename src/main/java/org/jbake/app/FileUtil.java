@@ -27,4 +27,8 @@ public class FileUtil {
 			}
 		};
 	}
+
+    public static boolean isExistingFolder(File f) {
+        return null != f && f.exists() && f.isDirectory();
+    }
 }
