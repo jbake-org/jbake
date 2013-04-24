@@ -1,6 +1,6 @@
 # JBake
 
-[![Build Status](https://travis-ci.org/jonbullock/JBake.png?branch=master)](https://travis-ci.org/jonbullock/JBake)
+![Build Status](https://travis-ci.org/mismatch/JBake.png?branch=master)
 
 by **[Jonathan Bullock](http://jonathanbullock.com/)**
 
