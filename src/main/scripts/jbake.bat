@@ -1,1 +1,2 @@
-java -jar jbake-2.0.jar %*
+@echo off
+java -jar %~dp0\jbake.jar %*
