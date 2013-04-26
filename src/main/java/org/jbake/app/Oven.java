@@ -55,10 +55,10 @@ public class Oven {
 
     private void ensureSource() throws Exception {
         if (!FileUtil.isExistingFolder(source)) {
-            throw new Exception("Source folder MUST exist!");
+            throw new Exception("Error: Source folder must exist!");
         }
         if (!source.canRead()) {
-            throw new Exception("Source folder is not readable! Please, check");
+            throw new Exception("Error: Source folder is not readable!");
         }
     }
 
@@ -71,7 +71,7 @@ public class Oven {
             destination.mkdirs();
         }
         if (!destination.canWrite()) {
-            throw new Exception("Destination folder is not writable! Please, check");
+            throw new Exception("Error: Destination folder is not writable!");
         }
     }
 
@@ -98,7 +98,7 @@ public class Oven {
     private File setupRequiredFolderFromConfig(String key) throws Exception {
         File path = setupPathFromConfig(key);
         if (!FileUtil.isExistingFolder(path)) {
-            throw new Exception("Error: Required folder cannot be found! Config key is " + key);
+            throw new Exception("Error: Required folder cannot be found! Expected to find [" + key + "] at: " + path.getCanonicalPath());
         }
         return path;
     }

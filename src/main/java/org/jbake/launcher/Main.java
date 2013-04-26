@@ -35,7 +35,7 @@ public class Main {
 			oven.setupPaths();
 			oven.bake();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+//			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -62,6 +62,7 @@ public class Main {
 		sw.append(USAGE_PREFIX);
 		parser.printSingleLineUsage(sw, null);
 		System.out.println(sw.toString());
+		parser.setUsageWidth(100);
 		parser.printUsage(System.out);
 		System.exit(0);
 	}
