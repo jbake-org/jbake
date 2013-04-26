@@ -41,12 +41,7 @@ public class Oven {
 	public Oven(File source, File destination) throws Exception {
 		this.source = source;
 		this.destination = destination;
-
-        ensureSource();
-
         loadConfig();
-
-        ensureDestination();
 	}
 
     private void loadConfig() throws ConfigurationException {
@@ -86,12 +81,14 @@ public class Oven {
 	 * @throws Exception If template or contents folder don't exist
 	 */
 	public void setupPaths() throws Exception {
+		ensureSource();
         templatesPath = setupRequiredFolderFromConfig("template.folder");
         contentsPath = setupRequiredFolderFromConfig("content.folder");
         assetsPath = setupPathFromConfig("asset.folder");
 		if (!assetsPath.exists()) {
 			System.out.println("Warning: No asset folder was found!");
 		}
+		ensureDestination();
 	}
 
     private File setupPathFromConfig(String key) {
