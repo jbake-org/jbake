@@ -6,8 +6,8 @@
     <atom:link href="http://jonathanbullock.com/feed.xml" rel="self" type="application/rss+xml" />
     <description>My corner of the Internet</description>
     <language>en-gb</language>
-    <pubDate>${pubdate?string("EEE, d MMM yyyy HH:mm:ss Z")}</pubDate>
-    <lastBuildDate>${pubdate?string("EEE, d MMM yyyy HH:mm:ss Z")}</lastBuildDate>
+    <pubDate>${published_date?string("EEE, d MMM yyyy HH:mm:ss Z")}</pubDate>
+    <lastBuildDate>${published_date?string("EEE, d MMM yyyy HH:mm:ss Z")}</lastBuildDate>
 
     <#list posts as post>
     <item>
