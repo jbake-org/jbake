@@ -146,7 +146,7 @@ public class Renderer {
 		File outputFile = new File(destination.getPath() + File.separator + indexFile);
 		System.out.print("Rendering index [" + outputFile + "]... ");
 		Map<String, Object> model = new HashMap<String, Object>();
-//		model.put("posts", posts);
+		model.put("published_posts", posts);
 		
 		try {
 			render(model, config.getString("template.index.file"), outputFile);
@@ -167,8 +167,8 @@ public class Renderer {
 		File outputFile = new File(destination.getPath() + File.separator + feedFile);
 		System.out.print("Rendering feed [" + outputFile + "]... ");
 		Map<String, Object> model = new HashMap<String, Object>();
-//		model.put("posts", posts);
-		model.put("pubdate", new Date());
+		model.put("published_posts", posts);
+		model.put("published_date", new Date());
 		
 		try {
 			render(model, config.getString("template.feed.file"), outputFile);
@@ -189,7 +189,7 @@ public class Renderer {
 		File outputFile = new File(destination.getPath() + File.separator + archiveFile);
 		System.out.print("Rendering archive [" + outputFile + "]... ");
 		Map<String, Object> model = new HashMap<String, Object>();
-//		model.put("posts", posts);
+		model.put("published_posts", posts);
 		
 		try {
 			render(model, config.getString("template.archive.file"), outputFile);

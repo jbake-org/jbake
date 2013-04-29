@@ -54,7 +54,9 @@ public class Crawler {
 					Map<String, Object> fileContents = parser.processFile(contents[i]);
 					if (fileContents != null) {
 						fileContents.put("file", contents[i].getPath());
-						fileContents.put("uri", contents[i].getPath().replace(source.getPath() + File.separator + config.getString("content.folder"), ""));
+						String uri = contents[i].getPath().replace(source.getPath() + File.separator + config.getString("content.folder"), "");
+						uri = uri.substring(0, uri.lastIndexOf("."));
+						fileContents.put("uri", uri+config.getString("output.extension"));
 						
 						if (fileContents.get("type").equals("page")) {
 							pages.add(fileContents);
