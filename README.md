@@ -25,9 +25,12 @@ JBake is a Java based open source static site/blog generator for developers, bak
 
 ## Usage
 
-- Run `java -jar <jar-file-with-dependencies> <source_folder> <destination_folder>` to do some baking
+- Run `jbake` or `jbake.bat` (if you are on Windows) to do some baking, this will assume the current folder as the source and place any output into an `output` folder in the current folder
+- Alternatively run `jbake <source_folder> <destination_folder>` if you want full control over the source and destination folders
 
-Example source folder structure:
+## Source structure
+
+Here is an example source folder structure:
 
 <pre>
 .
@@ -54,18 +57,20 @@ A full example source folder is provided with the [source code](https://github.c
 
 Both [http://jonathanbullock.com](http://jonathanbullock.com) and [http://jbake.org](http://jbake.org) are built using JBake.
 
-### assets
+### Assets
 
 Place your static files in this folder and they will be copied to the root of the destination folder. Any folder structure you create will be maintained.
 
-### content
+### Content
 
 Place your dynamic content in this folder, the content in the files in this folder will be "mixed" with the templates to generate your site. Again any folder structure you create will be maintained in the destination folder.
 
 The extension of the file determines what content it contains:
 
-- .html = raw html
-- .md = Markdown
+- .html = HTML content
+- .md = Markdown content
+
+#### Header
 
 Each content file needs to have a meta-data header in it:
 
@@ -80,7 +85,17 @@ status=published
 
 The header MUST have at least the **status** & **type** fields, the rest are optional.
 
-You can also add extra meta data to the header:
+##### Status
+
+You have 2 options for the status field: `draft` and `published`, drafts are rendered along with published posts however they are given a "-draft" suffix, for example `first-post-draft.html`.
+
+##### Type
+
+You can choose what template your content file will be "mixed" with by changing the type field (i.e. type=post will use post.ftl, type=page will use page.ftl).
+
+#### Extra Header
+
+You can also add extra meta data in the header that is also exposed to the templates:
 
 <pre>
 summary=This is a summary of the larger post
@@ -90,38 +105,62 @@ And access it from the template like so:
 
 `<p>${content.summary}</p>`
 
-Drafts are rendered along with published posts however they are given a "-draft" suffix, for example `first-post-draft.html`.
+### Templates
 
-### templates
+This is the folder where your [Freemarker](http://freemarker.sourceforge.net) templates go. For more information on what you can do in Freemarker templates see the [Manual](http://freemarker.sourceforge.net/docs/index.html).
 
-This is where your [Freemarker](http://freemarker.sourceforge.net) templates go.
+Here is the data that is available to you in your template files:
 
-Here's whats available to you in what template files:
+#### Global
 
-**Common**
+This data is available to all templates regardless.
 
-`${version}` outputs the version of JBake
+- `${version}` = version of JBake
+- `${config.[options]}` = map of configuration data
 
-The contents of the file is always available via `${content.body}`
+All the configuration options in `default.properties` are available with any `.` in the property being replaced with `_`.
+For example `template.index.file=index.ftl` is available via `${config.template_index_file}`.
 
-**index.ftl / feed.ftl**
+- `${posts}` = collection of all posts (files that don't have `type=page`)
+- `${pages}` = collection of all pages (files that have `type=page`)
 
-`${posts}` is a collection of content which can be iterated through (this collection only has files which doesn't have type=page, i.e. posts)
+You can loop through the above collections using:
 
-**post.ftl / page.ftl**
+<pre>
+&lt;#list posts as post&gt;
+	..
+&lt;/#list&gt;
+</pre>
 
-`${content}` is an object that contains the the header & body of the file
+Within the loop you can then access the options for each post or page: `${post.[options]}` or `${page.[options]}`
 
-You can choose what template your content file will be "mixed" with by changing the *post* header field (i.e. type=post will use post.ftl, type=page will use page.ftl).
+All of the header fields are available such as `${post.title}` and the body of the file is available via `${post.body}`.
 
-See the 
-[Freemarker Manual](http://freemarker.sourceforge.net/docs/index.html) for more information on what you can do in Freemarker templates.
+#### Page / Post
 
-Why Freemarker? I've used them as part of the Hibernate reverse engineering system.
+These templates (page.ftl & post.ftl) as well as any custom templates you create yourself have the following data available to them:
 
-### custom.properties
+- `${content.[options]}` = map of file contents
 
-The custom.properties file allows you to override the default configuration of JBake. You can change the name of the folder that stores your content or templates, decide whether to generate a an RSS feed or not. See default.properties for what options are available.
+All of the header fields are available such as `${content.title}` and the body of the file is available via `${content.body}`.
+
+#### Index / Feed / Archive
+
+These templates (index.ftl, feed.ftl & archive.ftl) have the following extra data available to them:
+
+- `${published_posts}` = collection of published posts
+- `${published_date}` = date when file is generated (only available to Feed)
+
+#### Tags
+
+This template (tags.ftl) has the following extra data available to it:
+
+- `${tag}` = tag being rendered
+- `${tag_posts}` = collection posts for tag
+
+## Configuration
+
+The `custom.properties` file allows you to override the default configuration of JBake. You can change the name of the folder that stores your content or templates, decide whether to generate a an RSS feed or not. See [default.properties](https://github.com/jonbullock/JBake/blob/master/src/main/resources/default.properties) for what options are available.
 
 ## License
 
@@ -131,7 +170,7 @@ Licensed under the MIT License, see the LICENSE file.
 
 - Java v1.6 SDK
 - Eclipse Juno (Java EE Package)
-- Apache Maven v2.2.1
+- Apache Maven v3.0.3
 
 ## Alternatives
 
