@@ -15,9 +15,9 @@ import org.jbake.app.Oven;
  *
  */
 public class Main {
-	public static final String VERSION = "v2.0";
+	public static final String VERSION = "v2.1";
 
-	private final String USAGE_PREFIX = "Usage: java -jar jbake.jar";
+	private final String USAGE_PREFIX = "Usage: jbake";
 	
 	/**
 	 * Runs the app with the given arguments.
