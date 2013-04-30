@@ -21,7 +21,7 @@ JBake is a Java based open source static site/blog generator for developers, bak
 
 - Get the source code
 - To start developing JBake run `mvn eclipse:eclipse` to build required Eclipse project files
-- To start using JBake run `mvn package` from the root folder to build an executable JAR file
+- To start using JBake run `mvn package` from the root folder to build a release distribution
 
 ## Usage
 
