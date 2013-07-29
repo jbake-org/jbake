@@ -3,6 +3,7 @@ package org.jbake.app;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,14 @@ public class Crawler {
 										List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
 										posts.add(fileContents);
 										postsByTags.put(tag, posts);
+									}
+								}
+							}
+							
+							if (fileContents.get("status").equals("published-date")) {
+								if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
+									if (new Date().after((Date)fileContents.get("date"))) {
+										fileContents.put("status", "published");
 									}
 								}
 							}
