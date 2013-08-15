@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Asciidoctor.Factory;
 
 import com.petebevin.markdown.MarkdownProcessor;
 
@@ -153,6 +156,9 @@ public class Parser {
 		if (file.getPath().endsWith(".md")) {
 			MarkdownProcessor markdown = new MarkdownProcessor();
 			content.put("body", markdown.markdown(body.toString()));
+		} else if (file.getPath().endsWith(".ad") || file.getPath().endsWith(".asciidoc")) {
+			Asciidoctor asciidoctor = Factory.create();
+			content.put("body", asciidoctor.render(body.toString(), Collections.EMPTY_MAP));
 		} else {
 			content.put("body", body.toString());
 		}

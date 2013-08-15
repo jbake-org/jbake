@@ -23,7 +23,9 @@ public class FileUtil {
 			public boolean accept(File pathname) {
 				return !pathname.isFile()
 						|| pathname.getPath().endsWith(".html")
-						|| pathname.getPath().endsWith(".md");
+						|| pathname.getPath().endsWith(".md")
+						|| pathname.getPath().endsWith(".asciidoc")
+						|| pathname.getPath().endsWith(".ad");
 			}
 		};
 	}
