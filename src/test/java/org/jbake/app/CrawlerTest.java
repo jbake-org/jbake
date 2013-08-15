@@ -29,7 +29,7 @@ public class CrawlerTest {
 		Crawler crawler = new Crawler(content, config);
 		crawler.crawl(new File(content.getPath() + File.separator + "content"));
 		
-		Assert.assertEquals(crawler.getPosts().size(), 2);
-		Assert.assertEquals(crawler.getPages().size(), 3);
+		Assert.assertEquals(2, crawler.getPosts().size());
+		Assert.assertEquals(3, crawler.getPages().size());
 	}
 }

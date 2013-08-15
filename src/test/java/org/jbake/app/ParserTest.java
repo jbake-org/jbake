@@ -20,6 +20,8 @@ public class ParserTest {
 	private File invalidHTMLFile;
 	private File validMarkdownFile;
 	private File invalidMarkdownFile;
+	private File validAsciiDocFile;
+	private File invalidAsciiDocFile;
 	
 	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
@@ -48,6 +50,18 @@ public class ParserTest {
 		out.println(invalidHeader);
 		out.println("# This is a test");
 		out.close();
+		
+		validAsciiDocFile = folder.newFile("valid.ad");
+		out = new PrintWriter(validAsciiDocFile);
+		out.println(validHeader);
+		out.println("== Hello, AsciiDoc!");
+		out.close();
+		
+		invalidAsciiDocFile = folder.newFile("invalid.ad");
+		out = new PrintWriter(invalidAsciiDocFile);
+		out.println(invalidHeader);
+		out.println("== Hello, AsciiDoc!");
+		out.close();
 	}
 	
 	@Test
@@ -55,8 +69,8 @@ public class ParserTest {
 		Parser parser = new Parser();
 		Map<String, Object> map = parser.processFile(validHTMLFile);
 		Assert.assertNotNull(map);
-		Assert.assertEquals(map.get("status"), "draft");
-		Assert.assertEquals(map.get("type"), "post");
+		Assert.assertEquals("draft", map.get("status"));
+		Assert.assertEquals("post", map.get("type"));
 	}
 	
 	@Test
@@ -71,15 +85,32 @@ public class ParserTest {
 		Parser parser = new Parser();
 		Map<String, Object> map = parser.processFile(validMarkdownFile);
 		Assert.assertNotNull(map);
-		Assert.assertEquals(map.get("status"), "draft");
-		Assert.assertEquals(map.get("type"), "post");
-		Assert.assertEquals(map.get("body"), "<h1>This is a test</h1>\n");
+		Assert.assertEquals("draft", map.get("status"));
+		Assert.assertEquals("post", map.get("type"));
+		Assert.assertEquals("<h1>This is a test</h1>\n", map.get("body"));
 	}
 	
 	@Test
 	public void parseInvalidMarkdownFile() {
 		Parser parser = new Parser();
 		Map<String, Object> map = parser.processFile(invalidMarkdownFile);
+		Assert.assertNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFile() {
+		Parser parser = new Parser();
+		Map<String, Object> map = parser.processFile(validAsciiDocFile);
+		Assert.assertNotNull(map);
+		Assert.assertEquals("draft", map.get("status"));
+		Assert.assertEquals("post", map.get("type"));
+		Assert.assertEquals("<div class=\"sect1\">\n<h2 id=\"_hello_asciidoc\">Hello, AsciiDoc!</h2>\n<div class=\"sectionbody\">\n\n</div>\n</div>\n\n\n", map.get("body"));
+	}
+	
+	@Test
+	public void parseInvalidAsciiDocFile() {
+		Parser parser = new Parser();
+		Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
 		Assert.assertNull(map);
 	}
 }
