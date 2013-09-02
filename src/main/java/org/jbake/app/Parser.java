@@ -55,7 +55,7 @@ public class Parser {
 				processHeader(fileContents);
 				processBody(fileContents, file);
 			} else if (file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".ad")) {
-				validFile = validateAsciiDocHeader(file);
+				validFile = validateAsciiDoc(file);
 				if (validFile) {
 					processAsciiDocHeader(file);
 					processBody(fileContents, file);
@@ -99,13 +99,13 @@ public class Parser {
 		if (!headerFound || !statusFound || !typeFound) {
 			System.out.println("");
 			if (!headerFound) {
-				System.out.println("Missing required header");
+				System.out.println("Missing required JBake header");
 			}
 			if (!statusFound) {
-				System.out.println("Missing required header tag: status");
+				System.out.println("Missing required header value: status");
 			}
 			if (!typeFound) {
-				System.out.println("Missing required header tag: type");
+				System.out.println("Missing required header value: type");
 			}
 			
 			return false;
@@ -145,11 +145,11 @@ public class Parser {
 	}
 	
 	/**
-	 * Validate the header of an AsciiDoc file.
+	 * Validate if the AsciiDoc file has the required elements.
 	 * 
 	 * @param contents	Contents of file 
 	 */
-	private boolean validateAsciiDocHeader(File file) {
+	private boolean validateAsciiDoc(File file) {
 		Asciidoctor asciidoctor = Factory.create();
 		DocumentHeader header = asciidoctor.readDocumentHeader(file);
 		boolean statusFound = false;
@@ -167,15 +167,15 @@ public class Parser {
 		if (!statusFound || !typeFound) {
 			System.out.println("");
 			if (!statusFound) {
-				System.out.println("Missing required header tag: jbake-status");
+				System.out.println("Missing required header value: jbake-status");
 			}
 			if (!typeFound) {
-				System.out.println("Missing required header tag: jbake-type");
+				System.out.println("Missing required header value: jbake-type");
 			}
 			
 			return false;
 		}
-		return true;		
+		return true;
 	}
 	
 	/**
@@ -186,8 +186,6 @@ public class Parser {
 	private void processAsciiDocHeader(File file) {
 		Asciidoctor asciidoctor = Factory.create();
 		DocumentHeader header = asciidoctor.readDocumentHeader(file);
-//		header.getAttributes().get("docdate")
-//		header.getAttributes().get("awestruct-tags")
 		if (header.getDocumentTitle() != null) {
 			content.put("title", header.getDocumentTitle());
 		}

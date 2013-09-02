@@ -22,6 +22,8 @@ public class ParserTest {
 	private File invalidMarkdownFile;
 	private File validAsciiDocFile;
 	private File invalidAsciiDocFile;
+	private File validAsciiDocFileWithoutHeader;
+	private File invalidAsciiDocFileWithoutHeader;
 	
 	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
@@ -54,13 +56,40 @@ public class ParserTest {
 		validAsciiDocFile = folder.newFile("valid.ad");
 		out = new PrintWriter(validAsciiDocFile);
 		out.println(validHeader);
-		out.println("== Hello, AsciiDoc!");
+		out.println("= Hello, AsciiDoc!");
+		out.println("Test User <user@test.org>");
+		out.println("");
+		out.println("JBake now supports AsciiDoc.");
 		out.close();
 		
 		invalidAsciiDocFile = folder.newFile("invalid.ad");
 		out = new PrintWriter(invalidAsciiDocFile);
 		out.println(invalidHeader);
-		out.println("== Hello, AsciiDoc!");
+		out.println("= Hello, AsciiDoc!");
+		out.println("Test User <user@test.org>");
+		out.println("");
+		out.println("JBake now supports AsciiDoc.");
+		out.close();
+		
+		validAsciiDocFileWithoutHeader = folder.newFile("validwoheader.ad");
+		out = new PrintWriter(validAsciiDocFileWithoutHeader);
+		out.println("= Hello, AsciiDoc!");
+		out.println("Test User <user@test.org>");
+		out.println("2013-09-02");
+		out.println(":jbake-status: published");
+		out.println(":jbake-type: page");
+		out.println("");
+		out.println("JBake now supports AsciiDoc.");
+		out.close();
+		
+		invalidAsciiDocFileWithoutHeader = folder.newFile("invalidwoheader.ad");
+		out = new PrintWriter(invalidAsciiDocFileWithoutHeader);
+		out.println("= Hello, AsciiDoc!");
+		out.println("Test User <user@test.org>");
+		out.println("2013-09-02");
+		out.println(":jbake-status: published");
+		out.println("");
+		out.println("JBake now supports AsciiDoc.");
 		out.close();
 	}
 	
@@ -104,13 +133,30 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
 		Assert.assertEquals("post", map.get("type"));
-		Assert.assertEquals("<div class=\"sect1\">\n<h2 id=\"_hello_asciidoc\">Hello, AsciiDoc!</h2>\n<div class=\"sectionbody\">\n\n</div>\n</div>\n\n\n", map.get("body"));
+		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n\n</div>\n</div>\n\n\n", map.get("body"));
 	}
 	
 	@Test
 	public void parseInvalidAsciiDocFile() {
 		Parser parser = new Parser();
 		Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
+		Assert.assertNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFileWithoutHeader() {
+		Parser parser = new Parser();
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutHeader);
+		Assert.assertNotNull(map);
+		Assert.assertEquals("published", map.get("status"));
+		Assert.assertEquals("page", map.get("type"));
+		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n\n</div>\n</div>\n\n\n", map.get("body"));
+	}
+	
+	@Test
+	public void parseInvalidAsciiDocFileWithoutHeader() {
+		Parser parser = new Parser();
+		Map<String, Object> map = parser.processFile(invalidAsciiDocFileWithoutHeader);
 		Assert.assertNull(map);
 	}
 }
