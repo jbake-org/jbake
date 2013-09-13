@@ -1,7 +1,7 @@
 package br.com.ingenieux.mojo.jbake;
 
 /*
- * Copyright 2001-2005 The Apache Software Foundation.
+ * Copyright 2013 ingenieux Labs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ public class GenerateMojo extends AbstractMojo {
 	 * Location of the Output Directory.
 	 */
 	@Parameter(property = "jbake.outputDirectory", defaultValue = "${project.build.directory}/${project.build.finalName}", required = true)
-	private File outputDirectory;
+	protected File outputDirectory;
 	
 	/**
 	 * Location of the Output Directory.
 	 */
 	@Parameter(property = "jbake.inputDirectory", defaultValue = "${project.basedir}/src/main/jbake", required = true)
-	private File inputDirectory;
+	protected File inputDirectory;
 	
 	public void execute() throws MojoExecutionException {
 		try {
