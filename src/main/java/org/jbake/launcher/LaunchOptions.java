@@ -14,6 +14,9 @@ class LaunchOptions {
 
 	@Option(name = "-h", aliases = {"--help"}, usage="prints this message")
 	private boolean isHelpNeeded;
+	
+	@Option(name = "-s", aliases = {"--server"}, usage="serves out destination folder on port 8080")
+	private boolean isRunServer;
 
 	File getSource() {
 		return source;
@@ -25,5 +28,9 @@ class LaunchOptions {
 
 	boolean isHelpNeeded() {
 		return isHelpNeeded;
+	}
+	
+	boolean isRunServer() {
+		return isRunServer;
 	}
 }

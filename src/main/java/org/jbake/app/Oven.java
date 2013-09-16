@@ -32,6 +32,13 @@ public class Oven {
 	private File assetsPath;
 
 	/**
+	 * Creates a new instance of the Oven.
+	 *
+	 */
+	public Oven() {
+	}
+	
+	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
 	 *
 	 * @param source		The source folder
@@ -44,13 +51,14 @@ public class Oven {
         loadConfig();
 	}
 
-    private void loadConfig() throws ConfigurationException {
+    public CompositeConfiguration loadConfig() throws ConfigurationException {
 		this.config = new CompositeConfiguration();
 		File customConfig = new File(source, "custom.properties");
 		if (customConfig.exists()) {
 			config.addConfiguration(new PropertiesConfiguration(customConfig));
 		}
 		config.addConfiguration(new PropertiesConfiguration("default.properties"));
+		return config;
     }
 
     private void ensureSource() throws Exception {

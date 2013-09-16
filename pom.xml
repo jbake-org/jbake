@@ -145,5 +145,10 @@
 			<artifactId>asciidoctor-java-integration</artifactId>
 			<version>0.1.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>8.1.12.v20130726</version>
+		</dependency>
 	</dependencies>
 </project>
