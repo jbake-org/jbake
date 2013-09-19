@@ -3,20 +3,62 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.jbake.app</groupId>
-	<artifactId>jbake</artifactId>
-	<version>2.2</version>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<groupId>org.jbake</groupId>
+	<artifactId>jbake-core</artifactId>
+	<version>2.2-Beta</version>
 	<packaging>jar</packaging>
 
 	<name>jbake</name>
+	<description>JBake is a Java based open source static site/blog generator for developers.</description>
 	<url>http://jbake.org</url>
 	<developers>
 		<developer>
+			<id>jonbullock</id>
 			<name>Jonathan Bullock</name>
 			<email>jonbullock@gmail.com</email>
 			<url>http://jonathanbullock.com</url>
+			<timezone>0</timezone>
 		</developer>
 	</developers>
+
+	<scm>
+		<url>https://github.com/jonbullock/JBake/</url>
+		<connection>scm:git:git@github.com:jonbullock/JBake.git</connection>
+		<developerConnection>scm:git:git@github.com:jonbullock/JBake.git</developerConnection>
+	</scm>
+	
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/jonbullock/JBake/issues</url>
+	</issueManagement>
+
+	<mailingLists>
+		<mailingList>
+			<name>jbake-dev</name>
+			<subscribe>jbake-dev@googlegroups.com</subscribe>
+			<unsubscribe>jbake-dev+unsubscribe@googlegroups.com</unsubscribe>
+			<archive>http://groups.google.com/group/jbake-dev</archive>
+		</mailingList>
+		<mailingList>
+			<name>jbake-user</name>
+			<subscribe>jbake-user@googlegroups.com</subscribe>
+			<unsubscribe>jbake-user+unsubscribe@googlegroups.com</unsubscribe>
+			<archive>http://groups.google.com/group/jbake-user</archive>
+		</mailingList>
+	</mailingLists>
+
+	<licenses>
+		<license>
+			<name>The MIT License (MIT)</name>
+			<url>http://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
