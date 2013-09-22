@@ -1,7 +1,13 @@
 package org.jbake.launcher;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -55,24 +61,29 @@ public class Main {
 		try {
 			parser.parseArgument(args);
 
+			Oven oven = new Oven();
+			CompositeConfiguration config = null;
+			try {
+				config = oven.loadConfig();
+			} catch (ConfigurationException e) {
+				e.printStackTrace();
+			}
+			
 			if (res.isHelpNeeded()) {
 				printUsage(parser);
 			}
 			
 			if (res.isRunServer()) {
-				Oven oven = new Oven();
-				CompositeConfiguration config = null;
-				try {
-					config = oven.loadConfig();
-				} catch (ConfigurationException e) {
-					e.printStackTrace();
-				}
 				if (res.getSource().getPath().equals(".")) {
 					// use the default destination folder
 					runServer(config.getString("destination.folder"), config.getString("server.port"));
 				} else {
 					runServer(res.getSource().getPath(), config.getString("server.port"));
 				}
+			}
+			
+			if (res.isInit()) {
+				initStructure(config);
 			}
 		} catch (CmdLineException e) {
 			printUsage(parser);
@@ -116,5 +127,73 @@ public class Main {
 			e.printStackTrace();
 		}
         System.exit(0);
+	}
+	
+	private void initStructure(CompositeConfiguration config) {
+		File outputFolder = new File(".");
+		if (!outputFolder.canWrite()) {
+            System.err.println("Error: Folder is not writable!");
+            System.exit(1);
+        }
+		File[] contents = outputFolder.listFiles();
+		boolean safe = true;
+		if (contents != null) {
+			for (File content : contents) {
+				if (content.isDirectory()) {
+					if (content.getName().equalsIgnoreCase(config.getString("template.folder"))) {
+						safe = false;
+					}
+					if (content.getName().equalsIgnoreCase(config.getString("content.folder"))) {
+						safe = false;
+					}
+					if (content.getName().equalsIgnoreCase(config.getString("asset.folder"))) {
+						safe = false;
+					}
+				}
+			}
+		}
+		
+		if (!safe) {
+			System.err.println("Error: Folder already contains structure!");
+			System.exit(2);
+		}	
+		
+		InputStream is = getClass().getResourceAsStream("/base.zip");
+		if (is != null) {
+			ZipInputStream zis = new ZipInputStream(is);
+			ZipEntry entry;
+			byte[] buffer = new byte[1024];
+			
+			try {
+				while ((entry = zis.getNextEntry()) != null) {
+					File outputFile = new File(outputFolder.getCanonicalPath() + File.separatorChar + entry.getName());
+					File outputParent = new File(outputFile.getParent());
+					outputParent.mkdirs();
+					
+					if (entry.isDirectory()) {
+						if (!outputFile.exists()) {
+							outputFile.mkdir();
+						}
+					} else {
+						FileOutputStream fos = new FileOutputStream(outputFile);
+						
+						int len;
+						while ((len = zis.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+		
+						fos.close();
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("Error: Cannot locate base structure!");
+			System.exit(3);
+		}
+		
+		System.out.println("Base folder structure successfully created.");
+		System.exit(0);
 	}
 }

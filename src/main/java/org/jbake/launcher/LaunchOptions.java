@@ -13,10 +13,13 @@ class LaunchOptions {
 	private File destination = null;
 
 	@Option(name = "-h", aliases = {"--help"}, usage="prints this message")
-	private boolean isHelpNeeded;
+	private boolean helpNeeded;
 	
 	@Option(name = "-s", aliases = {"--server"}, usage="serves out destination folder on port 8080")
-	private boolean isRunServer;
+	private boolean runServer;
+	
+	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
+	private boolean init;
 
 	File getSource() {
 		return source;
@@ -27,10 +30,14 @@ class LaunchOptions {
 	}
 
 	boolean isHelpNeeded() {
-		return isHelpNeeded;
+		return helpNeeded;
 	}
 	
 	boolean isRunServer() {
-		return isRunServer;
+		return runServer;
+	}
+	
+	boolean isInit() {
+		return init;
 	}
 }
