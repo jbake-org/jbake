@@ -14,12 +14,14 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.jbake.app.ConfigUtil;
 import org.jbake.app.Oven;
 
 /**
@@ -61,12 +63,12 @@ public class Main {
 		try {
 			parser.parseArgument(args);
 
-			Oven oven = new Oven();
 			CompositeConfiguration config = null;
 			try {
-				config = oven.loadConfig();
+				config = ConfigUtil.load(res.getSource());
 			} catch (ConfigurationException e) {
 				e.printStackTrace();
+				System.exit(1);
 			}
 			
 			if (res.isHelpNeeded()) {

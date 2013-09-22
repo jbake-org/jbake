@@ -48,18 +48,8 @@ public class Oven {
 	public Oven(File source, File destination) throws Exception {
 		this.source = source;
 		this.destination = destination;
-        loadConfig();
+        this.config = ConfigUtil.load(source);
 	}
-
-    public CompositeConfiguration loadConfig() throws ConfigurationException {
-		this.config = new CompositeConfiguration();
-		File customConfig = new File(source, "custom.properties");
-		if (customConfig.exists()) {
-			config.addConfiguration(new PropertiesConfiguration(customConfig));
-		}
-		config.addConfiguration(new PropertiesConfiguration("default.properties"));
-		return config;
-    }
 
     private void ensureSource() throws Exception {
         if (!FileUtil.isExistingFolder(source)) {
