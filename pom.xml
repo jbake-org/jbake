@@ -62,8 +62,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.jbake.app</groupId>
-			<artifactId>jbake</artifactId>
+			<groupId>org.jbake</groupId>
+			<artifactId>jbake-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
