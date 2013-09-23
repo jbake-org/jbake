@@ -22,7 +22,9 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.jbake.app.ConfigUtil;
+import org.jbake.app.JettyServer;
 import org.jbake.app.Oven;
+import org.jbake.app.ZipUtil;
 
 /**
  * Launcher for JBake.
@@ -105,29 +107,7 @@ public class Main {
 	}
 
 	private void runServer(String path, String port) {
-		Server server = new Server();
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(Integer.parseInt(port));
-        server.addConnector(connector);
- 
-        ResourceHandler resource_handler = new ResourceHandler();
-        resource_handler.setDirectoriesListed(true);
-        resource_handler.setWelcomeFiles(new String[]{ "index.html" });
- 
-        resource_handler.setResourceBase(path);
- 
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
-        server.setHandler(handlers);
- 
-        System.out.println("Serving out: " + path + " on http://localhost:" + port + "/");
-        
-        try {
-			server.start();
-			server.join();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		JettyServer.run(path, port);
         System.exit(0);
 	}
 	
@@ -162,37 +142,16 @@ public class Main {
 		
 		InputStream is = getClass().getResourceAsStream("/base.zip");
 		if (is != null) {
-			ZipInputStream zis = new ZipInputStream(is);
-			ZipEntry entry;
-			byte[] buffer = new byte[1024];
-			
 			try {
-				while ((entry = zis.getNextEntry()) != null) {
-					File outputFile = new File(outputFolder.getCanonicalPath() + File.separatorChar + entry.getName());
-					File outputParent = new File(outputFile.getParent());
-					outputParent.mkdirs();
-					
-					if (entry.isDirectory()) {
-						if (!outputFile.exists()) {
-							outputFile.mkdir();
-						}
-					} else {
-						FileOutputStream fos = new FileOutputStream(outputFile);
-						
-						int len;
-						while ((len = zis.read(buffer)) > 0) {
-							fos.write(buffer, 0, len);
-						}
-		
-						fos.close();
-					}
-				}
+				ZipUtil.extract(is, outputFolder);
 			} catch (IOException e) {
+				System.err.println("Error: Error occurred while extracting base template!");
 				e.printStackTrace();
+				System.exit(3);
 			}
 		} else {
 			System.err.println("Error: Cannot locate base structure!");
-			System.exit(3);
+			System.exit(4);
 		}
 		
 		System.out.println("Base folder structure successfully created.");
