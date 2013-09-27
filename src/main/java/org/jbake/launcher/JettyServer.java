@@ -1,4 +1,4 @@
-package org.jbake.app;
+package org.jbake.launcher;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -25,7 +25,8 @@ public class JettyServer {
         handlers.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
         server.setHandler(handlers);
  
-        System.out.println("Serving out: " + path + " on http://localhost:" + port + "/");
+        System.out.println("Serving out contents of: [" + path + "] on http://localhost:" + port + "/");
+        System.out.println("(To stop server hit CTRL-C)");
         
         try {
 			server.start();

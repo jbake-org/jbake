@@ -1,11 +1,17 @@
 package org.jbake.launcher;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -22,7 +28,6 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.jbake.app.ConfigUtil;
-import org.jbake.app.JettyServer;
 import org.jbake.app.Oven;
 import org.jbake.app.ZipUtil;
 
@@ -117,6 +122,7 @@ public class Main {
             System.err.println("Error: Folder is not writable!");
             System.exit(1);
         }
+		
 		File[] contents = outputFolder.listFiles();
 		boolean safe = true;
 		if (contents != null) {
@@ -138,19 +144,51 @@ public class Main {
 		if (!safe) {
 			System.err.println("Error: Folder already contains structure!");
 			System.exit(2);
-		}	
+		}
 		
-		InputStream is = getClass().getResourceAsStream("/base.zip");
-		if (is != null) {
+		String codeLocation = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+		String decodedPath = null;
+		try {
+			decodedPath = URLDecoder.decode(codeLocation, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			System.err.println("Error: Cannot locate running location for JBake!");
+			e.printStackTrace();
+			System.exit(4);
+		}
+		File codeRef = new File(decodedPath);
+		if (!codeRef.exists()) {
+			System.err.println("Error: Cannot locate running location for JBake!");
+			System.exit(4);
+		}
+		File sourcePath = codeRef.getParentFile();
+		if (!sourcePath.exists()) {
+			System.err.println("Error: Cannot locate running location for JBake!");
+			System.exit(4);
+		}
+		File templateFile = new File(sourcePath, "base.zip");
+		if (!templateFile.exists()) {
+			System.err.println("Error: Cannot locate template file!");
+			System.exit(4);
+		}
+		
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(templateFile);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+			System.err.println("Error: Cannot locate template file!");
+			System.exit(4);
+		}
+		if (fis != null) {
 			try {
-				ZipUtil.extract(is, outputFolder);
+				ZipUtil.extract(fis, outputFolder);
 			} catch (IOException e) {
 				System.err.println("Error: Error occurred while extracting base template!");
 				e.printStackTrace();
 				System.exit(3);
 			}
 		} else {
-			System.err.println("Error: Cannot locate base structure!");
+			System.err.println("Error: Cannot locate template file!");
 			System.exit(4);
 		}
 		

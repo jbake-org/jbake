@@ -5,7 +5,7 @@ import java.io.File;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
-class LaunchOptions {
+public class LaunchOptions {
 	@Argument(index = 0, usage = "source folder of site content (with templates and assets), if not supplied will default to current working directory", metaVar = "source_folder")
 	private File source = new File(".");
 
@@ -21,23 +21,23 @@ class LaunchOptions {
 	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
 	private boolean init;
 
-	File getSource() {
+	public File getSource() {
 		return source;
 	}
 
-	File getDestination() {
+	public File getDestination() {
 		return destination;
 	}
 
-	boolean isHelpNeeded() {
+	public boolean isHelpNeeded() {
 		return helpNeeded;
 	}
 	
-	boolean isRunServer() {
+	public boolean isRunServer() {
 		return runServer;
 	}
 	
-	boolean isInit() {
+	public boolean isInit() {
 		return init;
 	}
 }
