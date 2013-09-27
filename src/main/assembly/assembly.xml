@@ -46,5 +46,12 @@
                 <include>LICENSE</include>
             </includes>
         </fileSet>
+        <fileSet>
+        	<directory>${basedir}/src/main/templates/</directory>
+        	<outputDirectory></outputDirectory>
+            <includes>
+                <include>base*</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>

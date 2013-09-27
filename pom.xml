@@ -30,7 +30,7 @@
 	<scm>
 		<url>https://github.com/jonbullock/JBake/</url>
 		<connection>scm:git:git@github.com:jonbullock/JBake.git</connection>
-		<developerConnection>scm:git:git@github.com:jonbullock/JBake.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/jonbullock/JBake.git</developerConnection>
 	</scm>
 	
 	<issueManagement>
