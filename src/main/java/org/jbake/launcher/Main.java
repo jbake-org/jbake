@@ -117,82 +117,15 @@ public class Main {
 	}
 	
 	private void initStructure(CompositeConfiguration config) {
-		File outputFolder = new File(".");
-		if (!outputFolder.canWrite()) {
-            System.err.println("Error: Folder is not writable!");
-            System.exit(1);
-        }
-		
-		File[] contents = outputFolder.listFiles();
-		boolean safe = true;
-		if (contents != null) {
-			for (File content : contents) {
-				if (content.isDirectory()) {
-					if (content.getName().equalsIgnoreCase(config.getString("template.folder"))) {
-						safe = false;
-					}
-					if (content.getName().equalsIgnoreCase(config.getString("content.folder"))) {
-						safe = false;
-					}
-					if (content.getName().equalsIgnoreCase(config.getString("asset.folder"))) {
-						safe = false;
-					}
-				}
-			}
-		}
-		
-		if (!safe) {
-			System.err.println("Error: Folder already contains structure!");
-			System.exit(2);
-		}
-		
-		String codeLocation = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-		String decodedPath = null;
+		Init init = new Init(config);
 		try {
-			decodedPath = URLDecoder.decode(codeLocation, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			System.err.println("Error: Cannot locate running location for JBake!");
+			init.run(new File("."));
+			System.out.println("Base folder structure successfully created.");
+			System.exit(0);
+		} catch (Exception e) {
+			System.err.println("Failed to initalise structure!");
 			e.printStackTrace();
-			System.exit(4);
+			System.exit(1);
 		}
-		File codeRef = new File(decodedPath);
-		if (!codeRef.exists()) {
-			System.err.println("Error: Cannot locate running location for JBake!");
-			System.exit(4);
-		}
-		File sourcePath = codeRef.getParentFile();
-		if (!sourcePath.exists()) {
-			System.err.println("Error: Cannot locate running location for JBake!");
-			System.exit(4);
-		}
-		File templateFile = new File(sourcePath, "base.zip");
-		if (!templateFile.exists()) {
-			System.err.println("Error: Cannot locate template file!");
-			System.exit(4);
-		}
-		
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(templateFile);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-			System.err.println("Error: Cannot locate template file!");
-			System.exit(4);
-		}
-		if (fis != null) {
-			try {
-				ZipUtil.extract(fis, outputFolder);
-			} catch (IOException e) {
-				System.err.println("Error: Error occurred while extracting base template!");
-				e.printStackTrace();
-				System.exit(3);
-			}
-		} else {
-			System.err.println("Error: Cannot locate template file!");
-			System.exit(4);
-		}
-		
-		System.out.println("Base folder structure successfully created.");
-		System.exit(0);
 	}
 }
