@@ -18,7 +18,14 @@ public class Init {
 		this.config = config;
 	}
 	
-	public void run(File outputFolder) throws Exception {
+	/**
+	 * Initialises specified folder with contents of template file located in supplied folder. 
+	 * 
+	 * @param outputFolder
+	 * @param templateLocationFolder
+	 * @throws Exception
+	 */
+	public void run(File outputFolder, File templateLocationFolder) throws Exception {
 		if (!outputFolder.canWrite()) {
             throw new Exception("Output folder is not writeable!");
         }
@@ -45,24 +52,10 @@ public class Init {
 			throw new Exception("Output folder already contains structure!");
 		}
 		
-		// work out where JBake is running from
-		String codePath = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-		String decodedPath = URLDecoder.decode(codePath, "UTF-8");
-		File codeFile = new File(decodedPath);
-		if (!codeFile.exists()) {
-			throw new Exception("Cannot locate running location of JBake!");
-		}
-		File codeFolder = codeFile.getParentFile();
-		if (!codeFolder.exists()) {
-			throw new Exception("Cannot locate running location of JBake!");
-		}
-
-		// get reference to template file from running location
-		File templateFile = new File(codeFolder, "base.zip");
+		File templateFile = new File(templateLocationFolder, config.getString("base.template"));
 		if (!templateFile.exists()) {
 			throw new Exception("Cannot locate template file: " + templateFile.getPath());
 		}
-		
 		ZipUtil.extract(new FileInputStream(templateFile), outputFolder);
 	}
 }

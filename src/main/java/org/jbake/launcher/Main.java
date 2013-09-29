@@ -28,6 +28,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.jbake.app.ConfigUtil;
+import org.jbake.app.FileUtil;
 import org.jbake.app.Oven;
 import org.jbake.app.ZipUtil;
 
@@ -119,7 +120,8 @@ public class Main {
 	private void initStructure(CompositeConfiguration config) {
 		Init init = new Init(config);
 		try {
-			init.run(new File("."));
+			File codeFolder = FileUtil.getRunningLocation();
+			init.run(new File("."), codeFolder);
 			System.out.println("Base folder structure successfully created.");
 			System.exit(0);
 		} catch (Exception e) {
