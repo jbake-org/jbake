@@ -10,6 +10,12 @@ import java.net.URLDecoder;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ZipUtil;
 
+/**
+ * Initialises sample folder structure with pre-defined template
+ * 
+ * @author Jonathan Bullock <jonbullock@gmail.com>
+ *
+ */
 public class Init {
 
 	private CompositeConfiguration config;
@@ -19,7 +25,7 @@ public class Init {
 	}
 	
 	/**
-	 * Initialises specified folder with contents of template file located in supplied folder. 
+	 * Performs checks on output folder before extracting template file
 	 * 
 	 * @param outputFolder
 	 * @param templateLocationFolder

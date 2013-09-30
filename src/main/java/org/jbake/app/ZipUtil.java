@@ -7,15 +7,28 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Provides Zip file related functions 
+ * 
+ * @author Jonathan Bullock <jonbullock@gmail.com>
+ *
+ */
 public class ZipUtil {
 
-	public static void extract(InputStream is, File outputPath) throws IOException {
+	/**
+	 * Extracts content of Zip file to specified output path.
+	 * 
+	 * @param is 			{@link InputStream} InputStream of Zip file
+	 * @param outputFolder	folder where Zip file should be extracted to
+	 * @throws IOException
+	 */
+	public static void extract(InputStream is, File outputFolder) throws IOException {
 		ZipInputStream zis = new ZipInputStream(is);
 		ZipEntry entry;
 		byte[] buffer = new byte[1024];
 		
 		while ((entry = zis.getNextEntry()) != null) {
-			File outputFile = new File(outputPath.getCanonicalPath() + File.separatorChar + entry.getName());
+			File outputFile = new File(outputFolder.getCanonicalPath() + File.separatorChar + entry.getName());
 			File outputParent = new File(outputFile.getParent());
 			outputParent.mkdirs();
 			

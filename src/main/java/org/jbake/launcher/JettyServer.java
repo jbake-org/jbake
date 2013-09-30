@@ -7,8 +7,20 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 
+/**
+ * Provides Jetty server related functions
+ * 
+ * @author Jonathan Bullock <jonbullock@gmail.com>
+ *
+ */
 public class JettyServer {
 
+	/**
+	 * Run Jetty web server serving out supplied path on supplied port
+	 * 
+	 * @param path
+	 * @param port
+	 */
 	public static void run(String path, String port) {
 		Server server = new Server();
         SelectChannelConnector connector = new SelectChannelConnector();
