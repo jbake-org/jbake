@@ -45,7 +45,7 @@ public class Crawler {
 	 * @param path	Folder to start from
 	 */
 	public void crawl(File path) {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		File[] contents = path.listFiles(FileUtil.getFileFilter());
 		if (contents != null) {
 			Arrays.sort(contents);

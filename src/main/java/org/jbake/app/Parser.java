@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
@@ -29,12 +30,17 @@ import com.petebevin.markdown.MarkdownProcessor;
  */
 public class Parser {
 	
+	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	
 	/**
 	 * Creates a new instance of Parser.
 	 */
 	public Parser() {
+	}
+	
+	public Parser(CompositeConfiguration config) {
+		this.config = config;
 	}
 	
 	/**
@@ -250,7 +256,11 @@ public class Parser {
 			content.put("body", markdown.markdown(body.toString()));
 		} else if (file.getPath().endsWith(".ad") || file.getPath().endsWith(".asciidoc")) {
 			Asciidoctor asciidoctor = Factory.create();
-			content.put("body", asciidoctor.render(body.toString(), Collections.EMPTY_MAP));
+			Map<String, Object> options = new HashMap<String, Object>();
+			Map<String, Object> attributes = new HashMap<String, Object>();
+			attributes.put("source-highlighter", config.getString("asciidoctor.highlighter"));
+			options.put("attributes", attributes);
+			content.put("body", asciidoctor.render(body.toString(), options));
 		} else {
 			content.put("body", body.toString());
 		}
