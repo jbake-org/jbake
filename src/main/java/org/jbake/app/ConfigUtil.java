@@ -32,4 +32,7 @@ public class ConfigUtil {
 		return config;
 	}
 	
+	public static void reset() {
+		config = null;
+	}
 }
