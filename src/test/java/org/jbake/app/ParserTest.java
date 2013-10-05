@@ -33,6 +33,7 @@ public class ParserTest {
 	
 	@Before
 	public void createSampleFile() throws Exception {
+		ConfigUtil.reset();
 		config = ConfigUtil.load(new File(this.getClass().getResource(".").getFile()));
 		
 		validHTMLFile = folder.newFile("valid.html");

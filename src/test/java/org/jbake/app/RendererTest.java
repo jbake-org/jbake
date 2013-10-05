@@ -49,9 +49,13 @@ public class RendererTest {
 			throw new Exception("Cannot find template folder!");
 		}
 
-		config = new CompositeConfiguration();
-		config.addConfiguration(new PropertiesConfiguration("default.properties"));
-		Assert.assertNotNull(config.getString("template.folder"));
+		ConfigUtil.reset();
+		config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+		Assert.assertEquals(".html", config.getString("output.extension"));
+		
+//		config = new CompositeConfiguration();
+//		config.addConfiguration(new PropertiesConfiguration("default.properties"));
+//		Assert.assertNotNull(config.getString("template.folder"));
 	}
 	
 	@Test
