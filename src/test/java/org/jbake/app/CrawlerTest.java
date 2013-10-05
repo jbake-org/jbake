@@ -10,19 +10,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class CrawlerTest {
-
 	
 	@Test
-	public void crawl() throws ConfigurationException {
-//		File test = new File("/content");
-//		System.out.println(test.exists());
-		
-		CompositeConfiguration config = new CompositeConfiguration();
-		URL defaultConfigFileUrl = this.getClass().getResource("/default.properties");
-		File defaultConfigFile = new File(defaultConfigFileUrl.getFile());
-		Assert.assertTrue(defaultConfigFile.exists());
-		config.addConfiguration(new PropertiesConfiguration(defaultConfigFile));
-		
+	public void crawl() throws ConfigurationException {		
+		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+		Assert.assertEquals(".html", config.getString("output.extension"));
+				
 		URL contentUrl = this.getClass().getResource("/");
 		File content = new File(contentUrl.getFile());
 		Assert.assertTrue(content.exists());
