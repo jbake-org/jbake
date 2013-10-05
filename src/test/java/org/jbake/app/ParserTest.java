@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,6 +16,8 @@ public class ParserTest {
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
+	
+	public CompositeConfiguration config;
 	
 	private File validHTMLFile;
 	private File invalidHTMLFile;
@@ -29,7 +32,9 @@ public class ParserTest {
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 	
 	@Before
-	public void createSampleFile() throws IOException {
+	public void createSampleFile() throws Exception {
+		config = ConfigUtil.load(new File(this.getClass().getResource(".").getFile()));
+		
 		validHTMLFile = folder.newFile("valid.html");
 		PrintWriter out = new PrintWriter(validHTMLFile);
 		out.println(validHeader);
@@ -95,7 +100,7 @@ public class ParserTest {
 	
 	@Test
 	public void parseValidHTMLFile() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(validHTMLFile);
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
@@ -104,14 +109,14 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidHTMLFile() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(invalidHTMLFile);
 		Assert.assertNull(map);
 	}
 	
 	@Test
-	public void parseValidMarkdownFile() {
-		Parser parser = new Parser();
+	public void parseValidMarkdownFile() throws Exception {
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(validMarkdownFile);
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
@@ -121,14 +126,14 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidMarkdownFile() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(invalidMarkdownFile);
 		Assert.assertNull(map);
 	}
 	
 	@Test
 	public void parseValidAsciiDocFile() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(validAsciiDocFile);
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
@@ -138,14 +143,14 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidAsciiDocFile() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
 		Assert.assertNull(map);
 	}
 	
 	@Test
 	public void parseValidAsciiDocFileWithoutHeader() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutHeader);
 		Assert.assertNotNull(map);
 		Assert.assertEquals("published", map.get("status"));
@@ -155,7 +160,7 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidAsciiDocFileWithoutHeader() {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(invalidAsciiDocFileWithoutHeader);
 		Assert.assertNull(map);
 	}
