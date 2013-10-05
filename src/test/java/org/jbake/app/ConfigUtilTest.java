@@ -15,6 +15,13 @@ public class ConfigUtilTest {
 		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
 		// check default.properties values exist
 		Assert.assertEquals("output", config.getString("destination.folder"));	
+		
+		File path = new File(this.getClass().getResource("/").getFile());
+		System.out.println(path.getPath());
+		for (File file : path.listFiles()) {
+			System.out.println(file.getPath());
+		}
+		
 		// check custom.properties values exist
 		Assert.assertEquals("testing123", config.getString("test.property"));
 	}
