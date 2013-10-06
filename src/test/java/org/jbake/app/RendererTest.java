@@ -28,13 +28,6 @@ public class RendererTest {
 		
 	@Before
 	public void setup() throws Exception, IOException, URISyntaxException {
-//		URL cwd = this.getClass().getResource("default.properties");
-//		URL refFileUrl = ClassLoader.getSystemResource("misc");
-//		System.out.println(refFileUrl);
-//		File refFile = new File(refFileUrl.toURI());
-//		source = refFile.getParentFile();
-//		System.out.println(source);
-//		String source = System.getProperty("user.dir") + File.separator + "misc";
 		URL sourceUrl = this.getClass().getResource("/");
 		
 		sourceFolder = new File(sourceUrl.getFile());
@@ -52,10 +45,6 @@ public class RendererTest {
 		ConfigUtil.reset();
 		config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
 		Assert.assertEquals(".html", config.getString("output.extension"));
-		
-//		config = new CompositeConfiguration();
-//		config.addConfiguration(new PropertiesConfiguration("default.properties"));
-//		Assert.assertNotNull(config.getString("template.folder"));
 	}
 	
 	@Test
