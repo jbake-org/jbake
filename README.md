@@ -28,6 +28,14 @@ JBake is a Java based open source static site/blog generator for developers, bak
 - Run `jbake` or `jbake.bat` (if you are on Windows) to do some baking, this will assume the current folder as the source and place any output into an `output` folder in the current folder
 - Alternatively run `jbake <source_folder> <destination_folder>` if you want full control over the source and destination folders
 
+## Run from maven
+
+You can run directly from sources using the maven exec plugin:
+
+```
+mvn exec:java -Dexec.mainClass=org.jbake.launcher.Main -Dexec.args="/fromFolder /tmp/toFolder/"
+```
+
 ## Source structure
 
 Here is an example source folder structure:
