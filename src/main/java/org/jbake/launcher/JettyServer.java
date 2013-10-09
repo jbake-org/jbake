@@ -6,9 +6,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector;
 
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Provides Jetty server related functions
