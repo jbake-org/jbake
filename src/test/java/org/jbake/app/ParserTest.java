@@ -139,7 +139,7 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
 		Assert.assertEquals("post", map.get("type"));
-		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n\n</div>\n</div>\n\n\n", map.get("body"));
+		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
 	}
 	
 	@Test
@@ -156,7 +156,7 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("published", map.get("status"));
 		Assert.assertEquals("page", map.get("type"));
-		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n\n</div>\n</div>\n\n\n", map.get("body"));
+		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
 	}
 	
 	@Test
