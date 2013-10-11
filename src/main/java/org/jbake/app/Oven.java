@@ -1,13 +1,22 @@
 package org.jbake.app;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -109,6 +118,9 @@ public class Oven {
 	public void bake() throws Exception {
 		long start = new Date().getTime();
 		System.out.println("Baking has started...");
+		
+		int availableProcessors = Runtime.getRuntime().availableProcessors();
+		ExecutorService exec = Executors.newFixedThreadPool(availableProcessors);
 
 		// process source content
 		Crawler crawler = new Crawler(source, config);
@@ -121,30 +133,24 @@ public class Oven {
 
 		Renderer renderer = new Renderer(source, destination, templatesPath, config, posts, pages);
 
-		int renderedCount = 0;
-		int errorCount = 0;
+		AtomicInteger renderedCount = new AtomicInteger(0);
+		AtomicInteger errorCount = new AtomicInteger(0);
 		
 		// render all pages
-		for (Map<String, Object> page : pages) {
+		for( final Map<String, Object> page : pages ) {
 			// TODO: could add check here to see if rendering needs to be done again
-			try {
-				renderer.render(page);
-				renderedCount++;
-			} catch (Exception e) {
-				errorCount++;
-			}
+			exec.submit(new RendererService(renderer, page, errorCount, renderedCount));
 		}
-
+		
 		// render all posts
-		for (Map<String, Object> post : posts) {
+		for( final Map<String, Object> post : posts ) {
 			// TODO: could add check here to see if rendering needs to be done again
-			try {
-				renderer.render(post);
-				renderedCount++;
-			} catch (Exception e) {
-				errorCount++;
-			}
+			exec.submit(new RendererService(renderer, post, errorCount, renderedCount));
 		}
+		
+		exec.shutdown();
+		long to = (pages.size() + posts.size()) / availableProcessors;
+		exec.awaitTermination(to, TimeUnit.SECONDS);
 
 		// only interested in published posts from here on
 		List<Map<String, Object>> publishedPosts = Filter.getPublishedPosts(posts);
@@ -176,7 +182,7 @@ public class Oven {
 		System.out.println("...finished!");
 		long end = new Date().getTime();
 		System.out.println("Baked " + renderedCount + " items in " + (end-start) + "ms");
-		if (errorCount > 0) {
+		if (errorCount.get() > 0) {
 			System.out.println("Failed to bake " + errorCount + " item(s)!");
 		}
 //		System.out.println("Baking took: " + (end-start) + "ms");
