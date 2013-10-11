@@ -26,7 +26,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.FileUtil;
 import org.jbake.app.Oven;
