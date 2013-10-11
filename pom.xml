@@ -62,7 +62,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<asciidoctor.java.version>0.1.3</asciidoctor.java.version>
+		<asciidoctor.java.version>0.1.4</asciidoctor.java.version>
 		<commons.io.version>2.4</commons.io.version>
 		<commons.configuration.version>1.9</commons.configuration.version>
 		<args4j.version>2.0.23</args4j.version>

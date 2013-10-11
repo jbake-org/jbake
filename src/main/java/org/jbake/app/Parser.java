@@ -18,7 +18,11 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
+import org.asciidoctor.Attributes;
+import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.DocumentHeader;
+import org.asciidoctor.Options;
+import org.asciidoctor.OptionsBuilder;
 
 import com.petebevin.markdown.MarkdownProcessor;
 
@@ -256,10 +260,12 @@ public class Parser {
 			content.put("body", markdown.markdown(body.toString()));
 		} else if (file.getPath().endsWith(".ad") || file.getPath().endsWith(".asciidoc")) {
 			Asciidoctor asciidoctor = Factory.create();
-			Map<String, Object> options = new HashMap<String, Object>();
-			Map<String, Object> attributes = new HashMap<String, Object>();
-			attributes.put("source-highlighter", config.getString("asciidoctor.highlighter"));
-			options.put("attributes", attributes);
+//			Map<String, Object> options = new HashMap<String, Object>();
+//			Map<String, Object> attributes = new HashMap<String, Object>();
+//			attributes.put("source-highlighter", config.getString("asciidoctor.highlighter"));
+//			options.put("attributes", attributes);
+			Attributes attributes = AttributesBuilder.attributes(config.getString("asciidoctor.options")).get();
+			Options options = OptionsBuilder.options().attributes(attributes).get();
 			content.put("body", asciidoctor.render(body.toString(), options));
 		} else {
 			content.put("body", body.toString());
