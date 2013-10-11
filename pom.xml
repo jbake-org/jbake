@@ -69,7 +69,7 @@
 		<freemarker.version>2.3.19</freemarker.version>
 		<junit.version>4.8.1</junit.version>
 		<markdownj.version>0.3.0-1.0.2b4</markdownj.version>
-		<jetty.version>8.1.12.v20130726</jetty.version>
+		<jetty.version>9.0.6.v20130930</jetty.version>
 	</properties>
 
 	<build>
@@ -201,5 +201,32 @@
 			<artifactId>jetty-server</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
+		<!-- sl4j Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-ext</artifactId>
+			<version>1.7.5</version>
+		</dependency>	
+		<!-- log4j Logging -->	
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.0-beta9</version>
+		</dependency>			
 	</dependencies>
 </project>
