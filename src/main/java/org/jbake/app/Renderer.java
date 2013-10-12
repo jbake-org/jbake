@@ -72,7 +72,7 @@ public class Renderer {
 	}
 	
 	private void render(Map<String, Object> model, String templateFilename, File outputFile) throws Exception {
-		model.put("version", Main.VERSION);
+		model.put("version", config.getString("version"));
 		model.put("posts", posts);
 		model.put("pages", pages);
 		Map<String, Object> configModel = new HashMap<String, Object>();

@@ -62,6 +62,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		
 		<asciidoctor.java.version>0.1.4</asciidoctor.java.version>
 		<commons.io.version>2.4</commons.io.version>
 		<commons.configuration.version>1.9</commons.configuration.version>
@@ -153,6 +156,12 @@
 				</executions>
         	</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 	</build>
 	<dependencies>
 		<dependency>
