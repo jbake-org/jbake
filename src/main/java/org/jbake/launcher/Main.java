@@ -39,7 +39,7 @@ import org.jbake.app.ZipUtil;
  *
  */
 public class Main {
-	public static final String VERSION = "v2.2";
+//	public static final String VERSION = "v2.2";
 
 	private final String USAGE_PREFIX = "Usage: jbake";
 	
@@ -78,6 +78,9 @@ public class Main {
 				e.printStackTrace();
 				System.exit(1);
 			}
+			
+			System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
+			System.out.println();
 			
 			if (res.isHelpNeeded()) {
 				printUsage(parser);

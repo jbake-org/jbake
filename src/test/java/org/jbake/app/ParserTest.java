@@ -27,6 +27,7 @@ public class ParserTest {
 	private File invalidAsciiDocFile;
 	private File validAsciiDocFileWithoutHeader;
 	private File invalidAsciiDocFileWithoutHeader;
+	private File validAsciiDocFileWithHeaderInContent;
 	
 	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
@@ -97,6 +98,26 @@ public class ParserTest {
 		out.println("");
 		out.println("JBake now supports AsciiDoc.");
 		out.close();
+		
+		validAsciiDocFileWithHeaderInContent = folder.newFile("validheaderincontent.ad");
+		out = new PrintWriter(validAsciiDocFileWithHeaderInContent);
+		out.println("= Hello, AsciiDoc!");
+		out.println("Test User <user@test.org>");
+		out.println("2013-09-02");
+		out.println(":jbake-status: published");
+		out.println(":jbake-type: page");
+		out.println("");
+		out.println("JBake now supports AsciiDoc.");
+		out.println("");
+		out.println("----");
+		out.println("title=Example Header");
+		out.println("date=2013-02-01");
+		out.println("type=post");
+		out.println("tags=tag1, tag2");
+		out.println("status=published");
+		out.println("~~~~~~");
+		out.println("----");
+		out.close();
 	}
 	
 	@Test
@@ -164,5 +185,15 @@ public class ParserTest {
 		Parser parser = new Parser(config);
 		Map<String, Object> map = parser.processFile(invalidAsciiDocFileWithoutHeader);
 		Assert.assertNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFileWithExampleHeaderInContent() {
+		Parser parser = new Parser(config);
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithHeaderInContent);
+		Assert.assertNotNull(map);
+		Assert.assertEquals("published", map.get("status"));
+		Assert.assertEquals("page", map.get("type"));
+		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
 	}
 }
