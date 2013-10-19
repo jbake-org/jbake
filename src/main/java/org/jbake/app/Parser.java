@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,23 +59,54 @@ public class Parser {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			List<String> fileContents = IOUtils.readLines(reader);
-			
-			boolean validFile = false;
-			validFile = validate(fileContents);
-			if (validFile) {
-				processHeader(fileContents);
-				processBody(fileContents, file);
-			} else if (file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".ad")) {
-				validFile = validateAsciiDoc(file);
-				if (validFile) {
-					processAsciiDocHeader(file);
+			boolean hasHeader = hasHeader(fileContents);
+			if (file.getPath().endsWith(".md") || file.getPath().endsWith(".html")) {
+				if (hasHeader) {
+					// process jbake header
+					processHeader(fileContents);
 					processBody(fileContents, file);
 				} else {
+					// throw error
+					
 					return null;
+				}
+			} else if (file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".ad")) {
+				if (hasHeader) {
+					// process jbake header
+					processHeader(fileContents);
+					processBody(fileContents, file);
+				} else {
+					// try extracting meta data out of asciidoc header instead
+					if (validateAsciiDoc(file)) {
+						processAsciiDocHeader(file);
+						processAsciiDoc(fileContents, file);
+					} else {
+						// throw error
+						
+						return null;
+					}
 				}
 			} else {
 				return null;
-			}			
+			}
+
+			
+//			boolean validFile = false;
+//			validFile = validate(fileContents);
+//			if (validFile) {
+//				processHeader(fileContents);
+//				processBody(fileContents, file);
+//			} else if (file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".ad")) {
+//				validFile = validateAsciiDoc(file);
+//				if (validFile) {
+//					processAsciiDocHeader(file);
+//					processBody(fileContents, file);
+//				} else {
+//					return null;
+//				}
+//			} else {
+//				return null;
+//			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -89,20 +121,96 @@ public class Parser {
 	 * @param contents	Contents of file	
 	 * @return true if valid, false if not
 	 */
-	private boolean validate(List<String> contents) {
+	private boolean hasHeader(List<String> contents) {
 		boolean headerFound = false;
+		boolean headerSeparatorFound = false;
 		boolean statusFound = false;
 		boolean typeFound = false;
 		
+		List<String> header = new ArrayList<String>();
+		
 		for (String line : contents) {
+			header.add(line);
+			if (line.contains("=")) {
+				if (line.startsWith("type=")) {
+					typeFound = true;
+				}
+				if (line.startsWith("status=")) {
+					statusFound = true;
+				}
+			}
 			if (line.equals("~~~~~~")) {
-				headerFound = true;
+				headerSeparatorFound = true;
+				header.remove(line);
+				break;
 			}
-			if (line.startsWith("type=")) {
-				typeFound = true;
+		}
+		
+		if (headerSeparatorFound) {
+			headerFound = true;
+			for (String headerLine : header) {
+				if (!headerLine.contains("=")) {
+					headerFound = false;
+					break;
+				}
 			}
-			if (line.startsWith("status=")) {
-				statusFound = true;
+		}
+		
+		if (!headerFound || !statusFound || !typeFound) {
+//			System.out.println("");
+//			if (!headerFound) {
+//				System.out.println("Missing required JBake header");
+//			}
+//			if (!statusFound) {
+//				System.out.println("Missing required header value: status");
+//			}
+//			if (!typeFound) {
+//				System.out.println("Missing required header value: type");
+//			}
+			
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Validates if the file has the required elements.
+	 * 
+	 * @param contents	Contents of file	
+	 * @return true if valid, false if not
+	 */
+	private boolean validate(List<String> contents) {
+		boolean headerFound = false;
+		boolean headerSeparatorFound = false;
+		boolean statusFound = false;
+		boolean typeFound = false;
+		
+		List<String> header = new ArrayList<String>();
+		
+		for (String line : contents) {
+			header.add(line);
+			if (line.contains("=")) {
+				if (line.startsWith("type=")) {
+					typeFound = true;
+				}
+				if (line.startsWith("status=")) {
+					statusFound = true;
+				}
+			}
+			if (line.equals("~~~~~~")) {
+				headerSeparatorFound = true;
+				header.remove(line);
+				break;
+			}
+		}
+		
+		if (headerSeparatorFound) {
+			headerFound = true;
+			for (String headerLine : header) {
+				if (!headerLine.contains("=")) {
+					headerFound = false;
+					break;
+				}
 			}
 		}
 		
@@ -270,5 +378,23 @@ public class Parser {
 		} else {
 			content.put("body", body.toString());
 		}
-	}	
+	}
+	
+	/**
+	 * Process the body of the file.
+	 * 
+	 * @param contents	Contents of file
+	 * @param file		Source file
+	 */
+	private void processAsciiDoc(List<String> contents, File file) {
+		StringBuffer body = new StringBuffer();
+		for (String line : contents) {
+			body.append(line + "\n");
+		}
+				
+		Asciidoctor asciidoctor = Factory.create();
+		Attributes attributes = AttributesBuilder.attributes(config.getString("asciidoctor.options")).get();
+		Options options = OptionsBuilder.options().attributes(attributes).get();
+		content.put("body", asciidoctor.render(body.toString(), options));
+	}
 }
