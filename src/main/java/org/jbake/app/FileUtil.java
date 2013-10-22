@@ -26,7 +26,8 @@ public class FileUtil {
 						|| pathname.getPath().endsWith(".html")
 						|| pathname.getPath().endsWith(".md")
 						|| pathname.getPath().endsWith(".asciidoc")
-						|| pathname.getPath().endsWith(".ad");
+						|| pathname.getPath().endsWith(".ad")
+						|| pathname.getPath().endsWith(".adoc");
 			}
 		};
 	}
