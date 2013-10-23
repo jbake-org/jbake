@@ -44,7 +44,7 @@ The version format is as follows:
 Talk to the developers behind JBake:
 
 * http://groups.google.com/group/jbake-dev[Mailing list]
-* irc://irc.freenode.net/#jbake[IRC - #jbake on Freenode]
+* link:irc://irc.freenode.net/#jbake[IRC - #jbake on Freenode]
 
 Talk to other users of JBake on the forum:
 
