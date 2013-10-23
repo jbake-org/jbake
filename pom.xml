@@ -139,7 +139,7 @@
 				<version>2.4</version>
 	            <configuration>
 					<outputDirectory>dist</outputDirectory>
-					<finalName>${project.artifactId}-${project.version}</finalName>
+					<finalName>jbake-${project.version}</finalName>
 	                <descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
 	                </descriptors>
