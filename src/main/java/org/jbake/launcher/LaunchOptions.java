@@ -15,7 +15,7 @@ public class LaunchOptions {
 	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
 	private boolean init;
 	
-	@Option(name = "-s", aliases = {"--server"}, usage="runs HTTP server to serve out destination folder (defaults to port 8080)")
+	@Option(name = "-s", aliases = {"--server"}, usage="runs HTTP server to serve out destination folder")
 	private boolean runServer;
 	
 	@Option(name = "-h", aliases = {"--help"}, usage="prints this message")
