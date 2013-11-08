@@ -60,11 +60,11 @@ public class Crawler {
 						uri = uri.substring(0, uri.lastIndexOf("."));
 						fileContents.put("uri", uri+config.getString("output.extension"));
 						
-						if (fileContents.get("type").equals("page")) {
-							pages.add(fileContents);
-						} else {
-							// everything else is considered a post
+						if (fileContents.get("type").equals("post")) {
 							posts.add(fileContents);
+						} else {
+							// everything else is considered a page
+							pages.add(fileContents);
 							
 							if (fileContents.get("tags") != null) {
 								String[] tags = (String[]) fileContents.get("tags");
