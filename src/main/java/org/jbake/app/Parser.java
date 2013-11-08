@@ -1,5 +1,9 @@
 package org.jbake.app;
 
+import static org.asciidoctor.AttributesBuilder.attributes;
+import static org.asciidoctor.OptionsBuilder.options;
+import static org.asciidoctor.SafeMode.UNSAFE;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +13,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +24,8 @@ import org.apache.commons.io.IOUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.Attributes;
-import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
-import org.asciidoctor.OptionsBuilder;
 
 import com.petebevin.markdown.MarkdownProcessor;
 
@@ -39,6 +40,7 @@ public class Parser {
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
+   private String contentPath;
 	
 	/**
 	 * Creates a new instance of Parser.
@@ -47,8 +49,9 @@ public class Parser {
 		asciidoctor = Factory.create();
 	}
 	
-	public Parser(CompositeConfiguration config) {
+	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
+		this.contentPath = contentPath;
 		asciidoctor = Factory.create();
 	}
 	
@@ -297,8 +300,10 @@ public class Parser {
 	}
 	
 	private void processAsciiDoc(StringBuffer contents) {
-		Attributes attributes = AttributesBuilder.attributes(config.getString("asciidoctor.options")).get();
-		Options options = OptionsBuilder.options().attributes(attributes).get();
+		Attributes attributes = attributes(config.getString("asciidoctor.options")).get();
+		Options options = options().attributes(attributes).get();
+		options.setSafe(UNSAFE);
+		options.setBaseDir(contentPath);
 		content.put("body", asciidoctor.render(contents.toString(), options));
 	}
 }
