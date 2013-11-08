@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.IOUtils;
@@ -194,14 +195,9 @@ public class Parser {
 		boolean statusFound = false;
 		boolean typeFound = false;
 		
-		for (String key : header.getAttributes().keySet()) {
-			if (key.equals("jbake-status")) {
-				statusFound = true;
-			}
-			if (key.equals("jbake-type")) {
-				typeFound = true;
-			}
-		}
+		Set<String> headerAttKeys = header.getAttributes().keySet();
+		statusFound = headerAttKeys.contains("jbake-status");
+		typeFound = headerAttKeys.contains("jbake-type");
 		
 		if (!statusFound || !typeFound) {
 			return false;
