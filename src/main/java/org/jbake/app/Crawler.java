@@ -24,6 +24,7 @@ public class Crawler {
 	
 	private File source;
 	private CompositeConfiguration config;
+	private Parser parser;
 	
 	private List<Map<String, Object>> pages = new ArrayList<Map<String, Object>>();
 	private List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
@@ -37,6 +38,7 @@ public class Crawler {
 	public Crawler(File source, CompositeConfiguration config) {
 		this.source = source;
 		this.config = config;
+		this.parser = new Parser(config);
 	}
 	
 	/**
@@ -45,7 +47,6 @@ public class Crawler {
 	 * @param path	Folder to start from
 	 */
 	public void crawl(File path) {
-		Parser parser = new Parser(config);
 		File[] contents = path.listFiles(FileUtil.getFileFilter());
 		if (contents != null) {
 			Arrays.sort(contents);

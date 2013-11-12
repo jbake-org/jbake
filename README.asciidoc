@@ -1,0 +1,67 @@
+= JBake
+Jonathan Bullock
+2013-10-20
+:idprefix:
+
+http://jbake.org[JBake] is a Java based open source static site/blog generator for developers.
+
+image::https://travis-ci.org/jonbullock/JBake.png?branch=master[Build Status, link="https://travis-ci.org/jonbullock/JBake"]
+
+== Documentation
+
+Full documentation is available on http://jbake.org/docs/[jbake.org].
+
+== Maven
+
+You can run directly from the source code using the Maven exec plugin:
+
+----
+mvn exec:java -Dexec.mainClass=org.jbake.launcher.Main -Dexec.args="/fromFolder /tmp/toFolder/"
+----
+
+== Contributing
+
+Coming soon...
+
+== Versioning
+
+The project has adopted the http://semver.org[Semantic Versioning] spec from v2.2.0 onwards to maintain an 
+understandable backwards compatibility strategy.
+
+The version format is as follows:
+
+----
+<major>.<minor>.<patch>-<label>
+----
+
+* An increment of the major version represents incompatible API changes.
+* An increment of the minor version represents additional functionality in a backwards-compatible manner.
+* An increment of the patch version represents backwards-compatible bug fixes.
+* Existence of a label represents a pre-release or build metadata.
+
+== Community
+
+Talk to the developers behind JBake:
+
+* http://groups.google.com/group/jbake-dev[Mailing list]
+* link:irc://irc.freenode.net/#jbake[IRC - #jbake on Freenode]
+
+Talk to other users of JBake on the forum:
+
+* http://groups.google.com/group/jbake-user[Forum]
+
+== Tools & Libraries Used
+
+* http://commons.apache.org/[Apache Commons IO, Configuration, Lang & Logging]
+* http://maven.apache.org/[Apache Maven]
+* http://args4j.kohsuke.org/[Args4j]
+* http://asciidoctor.org/[Asciidoctor]
+* http://www.eclipse.org/[Eclipse IDE]
+* http://freemarker.org/[Freemarker]
+* http://junit.org/[JUnit]
+* http://markdownj.org/[MarkdownJ]
+* http://www.eclipse.org/jetty/[Jetty Server]
+
+== Copyright & License
+
+Licensed under the MIT License, see the LICENSE file.

@@ -84,7 +84,7 @@ public class Parser {
 				System.err.println("Error parsing meta data from header!");
 				return null;
 			}
-		} else if (file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".ad")) {
+		} else if (file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".ad") || file.getPath().endsWith(".adoc")) {
 			if (hasHeader) {
 				// process jbake header
 				processHeader(fileContents);
@@ -229,7 +229,7 @@ public class Parser {
 				if (attributes.get(key) != null) {
 					content.put("type", attributes.get(key));
 				}
-			} else if (key.equals("docdate")) {
+			} else if (key.equals("revdate")) {
 				if (attributes.get(key) != null && attributes.get(key) instanceof String) {
 					
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -278,7 +278,7 @@ public class Parser {
 		if (file.getPath().endsWith(".md")) {
 			MarkdownProcessor markdown = new MarkdownProcessor();
 			content.put("body", markdown.markdown(body.toString()));
-		} else if (file.getPath().endsWith(".ad") || file.getPath().endsWith(".asciidoc")) {
+		} else if (file.getPath().endsWith(".ad") || file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".adoc")) {
 			processAsciiDoc(body);
 		} else {
 			content.put("body", body.toString());
