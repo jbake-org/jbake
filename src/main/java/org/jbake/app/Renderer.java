@@ -1,7 +1,5 @@
 package org.jbake.app;
 
-import com.google.common.collect.Lists;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
