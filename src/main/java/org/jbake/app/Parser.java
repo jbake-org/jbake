@@ -1,20 +1,6 @@
 package org.jbake.app;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.petebevin.markdown.MarkdownProcessor;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.asciidoctor.Asciidoctor;
@@ -25,7 +11,19 @@ import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
 import org.asciidoctor.OptionsBuilder;
 
-import com.petebevin.markdown.MarkdownProcessor;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Parses a File for content.
@@ -38,13 +36,7 @@ public class Parser {
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
-	
-	/**
-	 * Creates a new instance of Parser.
-	 */
-	public Parser() {
-		asciidoctor = Factory.create();
-	}
+
 	
 	public Parser(CompositeConfiguration config) {
 		this.config = config;
@@ -59,11 +51,11 @@ public class Parser {
 	 */
 	public Map<String, Object> processFile(File file) {
 		content = new HashMap<String, Object>();
-		BufferedReader reader = null;
-		List<String> fileContents = null;
-		try {
-			reader = new BufferedReader(new FileReader(file));
-			fileContents = IOUtils.readLines(reader);
+        InputStream is = null;
+        List<String> fileContents = null;
+        try {
+            is = new FileInputStream(file);
+            fileContents = IOUtils.readLines(is, config.getString("render.encoding"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
