@@ -1,20 +1,18 @@
 package org.jbake.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Scanner;
-
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Map;
+import java.util.Scanner;
 
 public class RendererTest {
 
@@ -49,7 +47,7 @@ public class RendererTest {
 	
 	@Test
 	public void render() throws Exception {
-		Parser parser = new Parser();
+		Parser parser = new Parser(config);
 		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config);
 		
 		File sampleFile = new File(sourceFolder.getPath()+File.separator+"content"+File.separator+"blog"+File.separator+"2013"+File.separator+"second-post.html");
