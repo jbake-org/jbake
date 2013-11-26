@@ -93,8 +93,7 @@ public class Parser {
 				// process jbake header
 				processHeader(fileContents);
 				processBody(fileContents, file);
-			} else {
-				// try extracting meta data out of asciidoc header instead
+			} else {// try extracting meta data out of asciidoc header instead
 				if (validateAsciiDoc(file)) {
 					processAsciiDocHeader(file);
 					processAsciiDoc(fileContents);
@@ -300,7 +299,7 @@ public class Parser {
 	}
 	
 	private void processAsciiDoc(StringBuffer contents) {
-		Attributes attributes = attributes(config.getString("asciidoctor.options")).get();
+		Attributes attributes = attributes(config.getStringArray("asciidoctor.options")).get();
 		Options options = options().attributes(attributes).get();
 		options.setSafe(UNSAFE);
 		options.setBaseDir(contentPath);
