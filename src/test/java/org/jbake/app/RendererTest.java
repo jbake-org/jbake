@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -146,7 +149,29 @@ public class RendererTest {
 		Assert.assertTrue(foundFirstTitle);
 		Assert.assertTrue(foundSecondTitle);
 	}
-	
+
+    @Test
+    public void renderSitemaps() throws Exception {
+        Crawler crawler = new Crawler(sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
+        Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
+        renderer.renderSitemap(ListUtils.union(crawler.getPages(), crawler.getPosts()));
+        File outputFile = new File(destinationFolder, "sitemap.xml");
+        Assert.assertTrue(outputFile.exists());
+
+        final String[] lines = FileUtils.readLines(outputFile).toArray(new String[0]);
+
+        Assert.assertTrue(lines[0].trim().equals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"));
+        Assert.assertTrue(lines[1].trim().startsWith("<urlset"));
+        Assert.assertTrue(lines[2].trim().equals("<url>"));
+        Assert.assertTrue(lines[3].trim().startsWith("<loc>"));
+        Assert.assertTrue(lines[4].trim().startsWith("<lastmod>"));
+
+        Assert.assertTrue(lines[lines.length - 2].trim().equals("</url>"));
+        Assert.assertTrue(lines[lines.length - 1].trim().equals("</urlset>"));
+
+    }
+
 	@Test
 	public void renderArchive() throws Exception {
 		Crawler crawler = new Crawler(sourceFolder, config);
