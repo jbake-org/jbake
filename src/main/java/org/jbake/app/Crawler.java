@@ -1,5 +1,7 @@
 package org.jbake.app;
 
+import static java.io.File.separator;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +32,7 @@ public class Crawler {
 	private List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
 	private Map<String, List<Map<String, Object>>> postsByTags = new HashMap<String, List<Map<String, Object>>>();
 //	private Map<String, List<Map<String, Object>>> postsByarchive = new HashMap<String, List<Map<String, Object>>>();
+   private String contentPath;
 	
 	/**
 	 * Creates new instance of Crawler.
@@ -38,7 +41,8 @@ public class Crawler {
 	public Crawler(File source, CompositeConfiguration config) {
 		this.source = source;
 		this.config = config;
-		this.parser = new Parser(config);
+		this.contentPath = source.getPath() + separator + config.getString("content.folder");
+		this.parser = new Parser(config,contentPath);
 	}
 	
 	/**
@@ -56,36 +60,33 @@ public class Crawler {
 					Map<String, Object> fileContents = parser.processFile(contents[i]);
 					if (fileContents != null) {
 						fileContents.put("file", contents[i].getPath());
-						String uri = contents[i].getPath().replace(source.getPath() + File.separator + config.getString("content.folder"), "");
+						String uri = contents[i].getPath().replace(contentPath, "");
 						uri = uri.substring(0, uri.lastIndexOf("."));
 						fileContents.put("uri", uri+config.getString("output.extension"));
 						
-						if (fileContents.get("type").equals("page")) {
+						if (fileContents.get("type").equals("post")) {
+						   posts.add(fileContents);
+                     if (fileContents.get("tags") != null) {
+                        String[] tags = (String[]) fileContents.get("tags");
+                        for (String tag : tags) {
+                           if (postsByTags.containsKey(tag)) {
+                              postsByTags.get(tag).add(fileContents);
+                           } else {
+                              List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
+                              posts.add(fileContents);
+                              postsByTags.put(tag, posts);
+                           }
+                        }
+                     }
+                     if (fileContents.get("status").equals("published-date")) {
+                        if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
+                           if (new Date().after((Date)fileContents.get("date"))) {
+                              fileContents.put("status", "published");
+                           }
+                        }
+                     }
+						} else {// everything else is considered a page
 							pages.add(fileContents);
-						} else {
-							// everything else is considered a post
-							posts.add(fileContents);
-							
-							if (fileContents.get("tags") != null) {
-								String[] tags = (String[]) fileContents.get("tags");
-								for (String tag : tags) {
-									if (postsByTags.containsKey(tag)) {
-										postsByTags.get(tag).add(fileContents);
-									} else {
-										List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
-										posts.add(fileContents);
-										postsByTags.put(tag, posts);
-									}
-								}
-							}
-							
-							if (fileContents.get("status").equals("published-date")) {
-								if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
-									if (new Date().after((Date)fileContents.get("date"))) {
-										fileContents.put("status", "published");
-									}
-								}
-							}
 						}
 						System.out.println("done!");
 					}

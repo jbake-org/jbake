@@ -1,20 +1,14 @@
 package org.jbake.app;
 
+import static org.jbake.app.SortUtil.REVERSE;
+
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
-
-import static org.jbake.app.SortUtil.REVERSE;
 
 /**
  * All the baking happens in the Oven!

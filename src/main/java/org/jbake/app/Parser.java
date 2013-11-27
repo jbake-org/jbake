@@ -1,5 +1,11 @@
 package org.jbake.app;
 
+import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
+import static org.apache.commons.lang.math.NumberUtils.*;
+import static org.asciidoctor.AttributesBuilder.attributes;
+import static org.asciidoctor.OptionsBuilder.options;
+import static org.asciidoctor.SafeMode.UNSAFE;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,18 +15,22 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.Attributes;
-import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
 import org.asciidoctor.OptionsBuilder;
@@ -38,6 +48,7 @@ public class Parser {
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
+   private String contentPath;
 	
 	/**
 	 * Creates a new instance of Parser.
@@ -46,8 +57,9 @@ public class Parser {
 		asciidoctor = Factory.create();
 	}
 	
-	public Parser(CompositeConfiguration config) {
+	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
+		this.contentPath = contentPath;
 		asciidoctor = Factory.create();
 	}
 	
@@ -89,8 +101,7 @@ public class Parser {
 				// process jbake header
 				processHeader(fileContents);
 				processBody(fileContents, file);
-			} else {
-				// try extracting meta data out of asciidoc header instead
+			} else {// try extracting meta data out of asciidoc header instead
 				if (validateAsciiDoc(file)) {
 					processAsciiDocHeader(file);
 					processAsciiDoc(fileContents);
@@ -194,14 +205,9 @@ public class Parser {
 		boolean statusFound = false;
 		boolean typeFound = false;
 		
-		for (String key : header.getAttributes().keySet()) {
-			if (key.equals("jbake-status")) {
-				statusFound = true;
-			}
-			if (key.equals("jbake-type")) {
-				typeFound = true;
-			}
-		}
+		Set<String> headerAttKeys = header.getAttributes().keySet();
+		statusFound = headerAttKeys.contains("jbake-status");
+		typeFound = headerAttKeys.contains("jbake-type");
 		
 		if (!statusFound || !typeFound) {
 			return false;
@@ -301,8 +307,33 @@ public class Parser {
 	}
 	
 	private void processAsciiDoc(StringBuffer contents) {
-		Attributes attributes = AttributesBuilder.attributes(config.getString("asciidoctor.options")).get();
-		Options options = OptionsBuilder.options().attributes(attributes).get();
+	   Options options = getAsciiDocOptionsAndAttributes();
+		
 		content.put("body", asciidoctor.render(contents.toString(), options));
 	}
+
+   private Options getAsciiDocOptionsAndAttributes() {
+      Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
+      Configuration optionsSubset = config.subset("asciidoctor.option");
+      Options options = options().attributes(attributes).get();
+      for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
+        String name = iterator.next();
+        options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
+      }
+      options.setBaseDir(contentPath);
+      return options;
+   }
+   
+   /**
+    * Guess the type by content it has. 
+    * @param value
+    * @return boolean,integer of string as fallback
+    */
+   Object guessTypeByContent(String value){
+      if (toBooleanObject(value)!=null)
+         return toBooleanObject(value);
+      if(isNumber(value))
+         return toInt(value);
+      return value;
+   }
 }

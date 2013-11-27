@@ -19,6 +19,7 @@ public class ParserTest {
 	
 	public CompositeConfiguration config;
 	public Parser parser;
+	private File rootPath;
 	
 	private File validHTMLFile;
 	private File invalidHTMLFile;
@@ -32,12 +33,15 @@ public class ParserTest {
 	
 	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
+
+  
 	
 	@Before
 	public void createSampleFile() throws Exception {
 		ConfigUtil.reset();
-		config = ConfigUtil.load(new File(this.getClass().getResource(".").getFile()));
-		parser = new Parser(config);
+		rootPath = new File(this.getClass().getResource(".").getFile());
+		config = ConfigUtil.load(rootPath);
+		parser = new Parser(config,rootPath.getPath());
 		
 		validHTMLFile = folder.newFile("valid.html");
 		PrintWriter out = new PrintWriter(validHTMLFile);
@@ -147,7 +151,7 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidMarkdownFile() {
-		Parser parser = new Parser(config);
+		Parser parser = new Parser(config,rootPath.getPath());
 		Map<String, Object> map = parser.processFile(invalidMarkdownFile);
 		Assert.assertNull(map);
 	}
@@ -163,7 +167,7 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidAsciiDocFile() {
-		Parser parser = new Parser(config);
+		Parser parser = new Parser(config,rootPath.getPath());
 		Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
 		Assert.assertNull(map);
 	}
@@ -179,7 +183,7 @@ public class ParserTest {
 	
 	@Test
 	public void parseInvalidAsciiDocFileWithoutHeader() {
-		Parser parser = new Parser(config);
+		Parser parser = new Parser(config,rootPath.getPath());
 		Map<String, Object> map = parser.processFile(invalidAsciiDocFileWithoutHeader);
 		Assert.assertNull(map);
 	}

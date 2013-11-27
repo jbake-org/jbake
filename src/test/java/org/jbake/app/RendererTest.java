@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -59,7 +60,6 @@ public class RendererTest {
 		File outputFile = new File(destinationFolder, "second-post.html");
 		Assert.assertTrue(outputFile.exists());
 		Scanner scanner = new Scanner(outputFile);
-		
 		boolean foundTitle = false;
 		boolean foundDate = false;
 		boolean foundBody = false;
@@ -68,7 +68,7 @@ public class RendererTest {
 			if (line.contains("<h2>Second Post</h2>")) {
 				foundTitle = true;
 			}
-			if (line.contains("<p class=\"post-date\">28 February 2013</p>")) {
+			if (line.trim().startsWith("<p class=\"post-date\">28") && line.endsWith("2013</p>")) {
 				foundDate = true;
 			}
 			if (line.contains("Lorem ipsum dolor sit amet")) {
@@ -86,10 +86,14 @@ public class RendererTest {
 	
 	@Test
 	public void renderIndex() throws Exception {
-		Crawler crawler = new Crawler(sourceFolder, config);
+		//setup
+	   Crawler crawler = new Crawler(sourceFolder, config);
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
 		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
+		//exec
 		renderer.renderIndex(crawler.getPosts(), "index.html");
+		
+		//validate
 		File outputFile = new File(destinationFolder, "index.html");
 		Assert.assertTrue(outputFile.exists());
 		Scanner scanner = new Scanner(outputFile);
@@ -161,10 +165,10 @@ public class RendererTest {
 		boolean foundSecondPost = false;
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			if (line.contains("<h4>28 February - <a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
+			if (line.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
 				foundFirstPost = true;
 			}
-			if (line.contains("<h4>27 February - <a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
+			if (line.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
 				foundSecondPost = true;
 			}
 			if (foundFirstPost && foundSecondPost) {
@@ -190,10 +194,10 @@ public class RendererTest {
 		boolean foundSecondPost = false;
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			if (line.contains("<h4>28 February - <a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
+			if (line.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
 				foundFirstPost = true;
 			}
-			if (line.contains("<h4>27 February - <a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
+			if (line.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
 				foundSecondPost = true;
 			}
 			if (foundFirstPost && foundSecondPost) {

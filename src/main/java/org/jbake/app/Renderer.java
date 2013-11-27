@@ -1,7 +1,6 @@
 package org.jbake.app;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -13,11 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.launcher.Main;
+
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 /**
  * Render output to a file.
