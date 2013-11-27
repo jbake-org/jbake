@@ -1,5 +1,7 @@
 package org.jbake.app;
 
+import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
+import static org.apache.commons.lang.math.NumberUtils.*;
 import static org.asciidoctor.AttributesBuilder.attributes;
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.SafeMode.UNSAFE;
@@ -23,6 +25,9 @@ import java.util.Set;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.Attributes;
@@ -313,9 +318,22 @@ public class Parser {
       Options options = options().attributes(attributes).get();
       for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
         String name = iterator.next();
-        options.setOption(name, optionsSubset.getString(name));
+        options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
       }
       options.setBaseDir(contentPath);
       return options;
+   }
+   
+   /**
+    * Guess the type by content it has. 
+    * @param value
+    * @return boolean,integer of string as fallback
+    */
+   Object guessTypeByContent(String value){
+      if (toBooleanObject(value)!=null)
+         return toBooleanObject(value);
+      if(isNumber(value))
+         return toInt(value);
+      return value;
    }
 }
