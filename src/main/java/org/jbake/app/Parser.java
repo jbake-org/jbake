@@ -15,17 +15,20 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.Attributes;
 import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
+import org.asciidoctor.OptionsBuilder;
 
 import com.petebevin.markdown.MarkdownProcessor;
 
@@ -299,10 +302,20 @@ public class Parser {
 	}
 	
 	private void processAsciiDoc(StringBuffer contents) {
-		Attributes attributes = attributes(config.getStringArray("asciidoctor.options")).get();
-		Options options = options().attributes(attributes).get();
-		options.setSafe(UNSAFE);
-		options.setBaseDir(contentPath);
+	   Options options = getAsciiDocOptionsAndAttributes();
+		
 		content.put("body", asciidoctor.render(contents.toString(), options));
 	}
+
+   private Options getAsciiDocOptionsAndAttributes() {
+      Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
+      Configuration optionsSubset = config.subset("asciidoctor.option");
+      Options options = options().attributes(attributes).get();
+      for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
+        String name = iterator.next();
+        options.setOption(name, optionsSubset.getString(name));
+      }
+      options.setBaseDir(contentPath);
+      return options;
+   }
 }
