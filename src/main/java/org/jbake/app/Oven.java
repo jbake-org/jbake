@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -158,6 +160,11 @@ public class Oven {
 		if (config.getBoolean("render.feed")) {
 			renderer.renderFeed(publishedPosts, config.getString("feed.file"));
 		}
+
+        // write sitemap file
+        if (config.getBoolean("render.sitemap")) {
+            renderer.renderSitemap(ListUtils.union(pages, publishedPosts));
+        }
 
 		// write master archive file
 		if (config.getBoolean("render.archive")) {

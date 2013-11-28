@@ -35,6 +35,8 @@ public class Renderer {
 	private CompositeConfiguration config;
 	private List<Map<String, Object>> posts;
 	private List<Map<String, Object>> pages;
+
+    public static final String SITEMAP_XML_FILE_NAME = "sitemap.xml";
 	
 	/**
 	 * Creates a new instance of Renderer with supplied references to folders.
@@ -178,8 +180,33 @@ public class Renderer {
 			System.out.println("failed!");
 		}
 	}
-	
-	/**
+
+    /**
+     * Render an XML sitemap file using the supplied content.
+     *
+     * @param pages     The combined list of pages and posts to render
+     *
+     * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
+     * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
+     */
+    public void renderSitemap(List<Map<String, Object>> pages) {
+
+        final File outputFile = new File(destination.getPath() + File.separator + SITEMAP_XML_FILE_NAME);
+        System.out.print("Rendering sitemap [" + outputFile + "]... ");
+
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("pages", pages);
+
+        try {
+            render(model, config.getString("template.sitemap.file"), outputFile);
+            System.out.println("done!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("failed!");
+        }
+    }
+
+    /**
 	 * Render an archive file using the supplied content.   
 	 * 
 	 * @param posts			The content to render
