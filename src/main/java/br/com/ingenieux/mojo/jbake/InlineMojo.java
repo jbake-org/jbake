@@ -38,7 +38,7 @@ public class InlineMojo extends WatchMojo {
 	private String listenAddress;
 
     /**
-     * Listen Port
+     * Index File
      */
     @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
     private String indexFile;
