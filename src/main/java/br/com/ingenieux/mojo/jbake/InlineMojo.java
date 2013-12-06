@@ -16,14 +16,15 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.VertxFactory;
+import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.platform.Verticle;
 
-import winstone.Launcher;
+import java.io.File;
 
 /**
  * Runs jbake on a folder while watching and serving a folder with it
@@ -36,29 +37,47 @@ public class InlineMojo extends WatchMojo {
 	@Parameter(property = "jbake.listenAddress", defaultValue = "127.0.0.1")
 	private String listenAddress;
 
-	/**
+    /**
+     * Listen Port
+     */
+    @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
+    private String indexFile;
+
+    /**
 	 * Listen Port
 	 */
 	@Parameter(property = "jbake.port", defaultValue = "8080")
 	private Integer port;
 
-	protected Launcher launcher = null;
+    Server server = new Server();
+
+    class Server extends Verticle {
+        {
+            vertx = VertxFactory.newVertx();
+        }
+
+        @Override
+        public void start() {
+            vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
+                @Override
+                public void handle(HttpServerRequest req) {
+                    String file = req.path().endsWith("/") ? req.path() + indexFile : req.path();
+
+                    if (new File(outputDirectory + file).isDirectory()) {
+                        req.response().setStatusCode(301).putHeader("Location", file + "/").close();
+                    } else {
+                        req.response().sendFile(outputDirectory.getAbsolutePath() + file);
+                    }
+                }
+            }).listen(port, listenAddress);
+        }
+    }
 
 	protected void stopServer() {
-		launcher.shutdown();
+        server.stop();
 	}
 
 	protected void initServer() throws MojoExecutionException {
-		try {
-			Map<String, String> args = new HashMap<String, String>();
-
-			args.put("webroot", outputDirectory.getAbsolutePath());
-			args.put("httpPort", port.toString());
-			args.put("httpListenAddress", listenAddress);
-
-			launcher = new Launcher(args);
-		} catch (Exception exc) {
-			throw new MojoExecutionException("Ooops", exc);
-		}
+        server.start();
 	}
 }
