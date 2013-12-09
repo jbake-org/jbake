@@ -24,7 +24,7 @@ public class Crawler {
 	
 	private File source;
 	private CompositeConfiguration config;
-	private Parser parser;
+	private final Parser parser;
 	
 	private List<Map<String, Object>> pages = new ArrayList<Map<String, Object>>();
 	private List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
@@ -40,7 +40,7 @@ public class Crawler {
 		this.config = config;
 		this.parser = new Parser(config);
 	}
-	
+
 	/**
 	 * Crawl all files and folders looking for content.
 	 * 
@@ -53,42 +53,7 @@ public class Crawler {
 			for (int i = 0; i < contents.length; i++) {
 				if (contents[i].isFile()) {
 					System.out.print("Processing [" + contents[i].getPath() + "]... ");
-					Map<String, Object> fileContents = parser.processFile(contents[i]);
-					if (fileContents != null) {
-						fileContents.put("file", contents[i].getPath());
-						String uri = contents[i].getPath().replace(source.getPath() + File.separator + config.getString("content.folder"), "");
-						uri = uri.substring(0, uri.lastIndexOf("."));
-						fileContents.put("uri", uri+config.getString("output.extension"));
-						
-						if (fileContents.get("type").equals("page")) {
-							pages.add(fileContents);
-						} else {
-							// everything else is considered a post
-							posts.add(fileContents);
-							
-							if (fileContents.get("tags") != null) {
-								String[] tags = (String[]) fileContents.get("tags");
-								for (String tag : tags) {
-									if (postsByTags.containsKey(tag)) {
-										postsByTags.get(tag).add(fileContents);
-									} else {
-										List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
-										posts.add(fileContents);
-										postsByTags.put(tag, posts);
-									}
-								}
-							}
-							
-							if (fileContents.get("status").equals("published-date")) {
-								if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
-									if (new Date().after((Date)fileContents.get("date"))) {
-										fileContents.put("status", "published");
-									}
-								}
-							}
-						}
-						System.out.println("done!");
-					}
+                    processSingleFile(contents[i]);
 				} 
 				
 				if (contents[i].isDirectory()) {
@@ -98,7 +63,46 @@ public class Crawler {
 		}
 	}
 
-	public List<Map<String, Object>> getPages() {
+    public void processSingleFile(File content) {
+        Map<String, Object> fileContents = parser.processFile(content);
+        if (fileContents != null) {
+            fileContents.put("file", content.getPath());
+            String uri = content.getPath().replace(source.getPath() + File.separator + config.getString("content.folder"), "");
+            uri = uri.substring(0, uri.lastIndexOf("."));
+            fileContents.put("uri", uri+config.getString("output.extension"));
+
+            if (fileContents.get("type").equals("page")) {
+                pages.add(fileContents);
+            } else {
+                // everything else is considered a post
+                posts.add(fileContents);
+
+                if (fileContents.get("tags") != null) {
+                    String[] tags = (String[]) fileContents.get("tags");
+                    for (String tag : tags) {
+                        if (postsByTags.containsKey(tag)) {
+                            postsByTags.get(tag).add(fileContents);
+                        } else {
+                            List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
+                            posts.add(fileContents);
+                            postsByTags.put(tag, posts);
+                        }
+                    }
+                }
+
+                if (fileContents.get("status").equals("published-date")) {
+                    if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
+                        if (new Date().after((Date)fileContents.get("date"))) {
+                            fileContents.put("status", "published");
+                        }
+                    }
+                }
+            }
+            System.out.println("done!");
+        }
+    }
+
+    public List<Map<String, Object>> getPages() {
 		return pages;
 	}
 

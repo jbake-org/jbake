@@ -1,36 +1,20 @@
 package org.jbake.launcher;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.jbake.app.*;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.ConfigurationUtils;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.NetworkTrafficSelectChannelConnector;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.FileUtil;
-import org.jbake.app.Oven;
-import org.jbake.app.ZipUtil;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * Launcher for JBake.
@@ -54,15 +38,73 @@ public class Main {
 	}
 	
 	private void run(LaunchOptions options) {
-		try {
-			Oven oven = new Oven(options.getSource(), options.getDestination());
-			oven.setupPaths();
-			oven.bake();
-		} catch (Exception e) {
-//			System.err.println(e.getMessage());
-			e.printStackTrace();
-		}
+            try {
+                CompositeConfiguration config = ConfigUtil.load(options.getSource());
+                Asset asset = new Asset(options.getSource(), options.getDestination());
+                Oven oven = new Oven(options.getSource(), options.getDestination(), config, asset);
+
+                if( options.isWatch() ) {
+                    watch(config, oven, options, asset);
+                } else {
+                    oven.bake();
+                }
+            } catch (Exception e) {
+    //			System.err.println(e.getMessage());
+                e.printStackTrace();
+            }
 	}
+
+    private void watch(CompositeConfiguration config, Oven oven, LaunchOptions options, Asset asset) throws Exception {
+        final WatchService watcher = FileSystems.getDefault().newWatchService();
+        final Map<WatchKey,Path> map = new HashMap<>();
+
+        Files.walkFileTree(options.getSource().toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                WatchKey register = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+                map.put(register, dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        System.out.println("Watching " + options.getSource() + " for changes...");
+
+        for(;;) {
+            WatchKey key = watcher.take();
+            Path dir = map.get(key);
+            for ( WatchEvent<?> event: key.pollEvents()){
+                Crawler crawler = new Crawler(options.getSource(), config);
+
+                WatchEvent.Kind kind = event.kind();
+
+                WatchEvent<Path> ev = (WatchEvent<Path>) event;
+
+                switch (kind.name()){
+                    case "ENTRY_MODIFY":
+                    case "ENTRY_CREATE":
+                        System.out.println("Modified or created: " + dir.resolve(ev.context()));
+                        if( asset.isAsset(dir.resolve(ev.context())) ) {
+                            asset.copySingleAsset(dir.resolve(ev.context()).toFile());
+                        } else {
+                            //crawler.processSingleFile(dir.resolve(ev.context()).toFile());
+                            //oven.bake(crawler.getPages(), crawler.getPosts(), crawler.getPostsByTags());
+                            crawler.crawl(options.getSource());
+                            oven.bake();
+                        }
+                        break;
+                    case "ENTRY_DELETE":
+                        System.out.println("Delete: "+ev.context());
+                        break;
+                    default:
+                        System.out.println("Unknown event: " +kind.name());
+                        break;
+                }
+            }
+            boolean valid = key.reset();
+
+            if (!valid) break;
+        }
+    }
 
 	private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();

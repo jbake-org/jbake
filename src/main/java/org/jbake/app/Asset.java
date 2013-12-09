@@ -2,6 +2,8 @@ package org.jbake.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
@@ -13,6 +15,8 @@ import org.apache.commons.io.FileUtils;
  *
  */
 public class Asset {
+
+    public static final String ASSET_FOLDER_NAME = "assets";
 
 	private File source;
 	private File destination;
@@ -27,8 +31,22 @@ public class Asset {
 		this.source = source;
 		this.destination = destination;
 	}
-	
-	/**
+
+    public boolean isAsset(Path child)
+            throws IOException {
+        Path base = Paths.get(destination.getPath(), File.separator, ASSET_FOLDER_NAME);
+
+        Path parentPath = child;
+        while ( parentPath != null) {
+            if (base.equals(parentPath)) {
+                return true;
+            }
+            parentPath = parentPath.getParent();
+        }
+        return false;
+    }
+
+    /**
 	 * Copy all files from supplied path. 
 	 * 
 	 * @param path	The starting path
@@ -39,15 +57,7 @@ public class Asset {
 			Arrays.sort(assets);
 			for (int i = 0; i < assets.length; i++) {
 				if (assets[i].isFile()) {
-					System.out.print("Copying [" + assets[i].getPath() + "]... ");
-					File sourceFile = assets[i];
-					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
-					try {
-						FileUtils.copyFile(sourceFile, destFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					System.out.println("done!");
+                    copySingleAsset(assets[i]);
 				} 
 				
 				if (assets[i].isDirectory()) {
@@ -56,4 +66,16 @@ public class Asset {
 			}
 		}
 	}
+
+    public void copySingleAsset(File asset) {
+        System.out.print("Copying [" + asset.getPath() + "]... ");
+        File sourceFile = asset;
+        File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+ASSET_FOLDER_NAME, destination.getPath()));
+        try {
+            FileUtils.copyFile(sourceFile, destFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("done!");
+    }
 }
