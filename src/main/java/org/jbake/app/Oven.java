@@ -1,19 +1,18 @@
 package org.jbake.app;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 
+import static java.util.Map.Entry;
 import static org.jbake.app.SortUtil.REVERSE;
 
 /**
@@ -24,20 +23,15 @@ import static org.jbake.app.SortUtil.REVERSE;
  */
 public class Oven {
 
-	private CompositeConfiguration config;
-	private File source;
-	private File destination;
-	private File templatesPath;
-	private File contentsPath;
-	private File assetsPath;
+    private CompositeConfiguration config;
+    private final Asset asset;
+    private File source;
+    private File destination;
+    private File templatesPath;
+    private File contentsPath;
+    private File assetsPath;
+    private final int availableProcessors;
 
-	/**
-	 * Creates a new instance of the Oven.
-	 *
-	 */
-	public Oven() {
-	}
-	
 	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
 	 *
@@ -45,11 +39,19 @@ public class Oven {
 	 * @param destination	The destination folder
 	 * @throws Exception
 	 */
-	public Oven(File source, File destination) throws Exception {
+	public Oven(File source
+            , File destination
+            , CompositeConfiguration config
+            , Asset asset) throws Exception {
 		this.source = source;
 		this.destination = destination;
-        this.config = ConfigUtil.load(source);
-	}
+        this.config = config;
+        this.asset = asset;
+
+        this.availableProcessors = Runtime.getRuntime().availableProcessors();
+
+        setupPaths();
+    }
 
     private void ensureSource() throws Exception {
         if (!FileUtil.isExistingFolder(source)) {
@@ -78,7 +80,7 @@ public class Oven {
 	 *
 	 * @throws Exception If template or contents folder don't exist
 	 */
-	public void setupPaths() throws Exception {
+	private void setupPaths() throws Exception {
 		ensureSource();
         templatesPath = setupRequiredFolderFromConfig("template.folder");
         contentsPath = setupRequiredFolderFromConfig("content.folder");
@@ -100,85 +102,88 @@ public class Oven {
         }
         return path;
     }
+    /**
+     * All the good stuff happens in here...
+     *
+     * @throws Exception
+     */
+    public void bake() throws Exception {
+        long start = new Date().getTime();
+        System.out.println("Baking has started...");
 
-	/**
-	 * All the good stuff happens in here...
-	 *
-	 * @throws Exception
-	 */
-	public void bake() throws Exception {
-		long start = new Date().getTime();
-		System.out.println("Baking has started...");
+        // process source content
+        Crawler crawler = new Crawler(source, config);
+        crawler.crawl(contentsPath);
+        List<Map<String, Object>> pages = crawler.getPages();
+        List<Map<String, Object>> posts = crawler.getPosts();
 
-		// process source content
-		Crawler crawler = new Crawler(source, config);
-		crawler.crawl(contentsPath);
-		List<Map<String, Object>> pages = crawler.getPages();
-		List<Map<String, Object>> posts = crawler.getPosts();
+        Map<String, Integer> stats = bake(pages, posts, crawler.getPostsByTags());
 
-		// sort posts
-		Collections.sort(posts, SortUtil.getComparator(REVERSE));
+        // copy assets
+        asset.copy(assetsPath);
 
-		Renderer renderer = new Renderer(source, destination, templatesPath, config, posts, pages);
-
-		int renderedCount = 0;
-		int errorCount = 0;
-		
-		// render all pages
-		for (Map<String, Object> page : pages) {
-			// TODO: could add check here to see if rendering needs to be done again
-			try {
-				renderer.render(page);
-				renderedCount++;
-			} catch (Exception e) {
-				errorCount++;
-			}
-		}
-
-		// render all posts
-		for (Map<String, Object> post : posts) {
-			// TODO: could add check here to see if rendering needs to be done again
-			try {
-				renderer.render(post);
-				renderedCount++;
-			} catch (Exception e) {
-				errorCount++;
-			}
-		}
-
-		// only interested in published posts from here on
-		List<Map<String, Object>> publishedPosts = Filter.getPublishedPosts(posts);
-
-		// write index file
-		if (config.getBoolean("render.index")) {
-			renderer.renderIndex(publishedPosts, config.getString("index.file"));
-		}
-
-		// write feed file
-		if (config.getBoolean("render.feed")) {
-			renderer.renderFeed(publishedPosts, config.getString("feed.file"));
-		}
-
-		// write master archive file
-		if (config.getBoolean("render.archive")) {
-			renderer.renderArchive(publishedPosts, config.getString("archive.file"));
-		}
-
-		// write tag files 
-		if (config.getBoolean("render.tags")) {
-			renderer.renderTags(crawler.getPostsByTags(), config.getString("tag.path"));
-		}
-
-		// copy assets
-		Asset asset = new Asset(source, destination);
-		asset.copy(assetsPath);
-
-		System.out.println("...finished!");
-		long end = new Date().getTime();
-		System.out.println("Baked " + renderedCount + " items in " + (end-start) + "ms");
-		if (errorCount > 0) {
-			System.out.println("Failed to bake " + errorCount + " item(s)!");
-		}
+        System.out.println("...finished!");
+        long end = new Date().getTime();
+        System.out.println("Baked " + stats.get("renderedCount") + " items in " + (end-start) + "ms");
+        if (stats.get("errorCount") > 0) {
+            System.out.println("Failed to bake " + stats.get("errorCount") + " item(s)!");
+        }
 //		System.out.println("Baking took: " + (end-start) + "ms");
-	}
+    }
+
+    public Map<String, Integer> bake(List<Map<String, Object>> pages, List<Map<String, Object>> posts, Map<String, List<Map<String, Object>>> postsByTags) throws Exception {
+        // sort posts
+        Collections.sort(posts, SortUtil.getComparator(REVERSE));
+
+        Renderer renderer = new Renderer(source, destination, templatesPath, config, posts, pages);
+
+        AtomicInteger renderedCount = new AtomicInteger(0);
+        AtomicInteger errorCount = new AtomicInteger(0);
+
+        ExecutorService exec = Executors.newFixedThreadPool(availableProcessors);
+
+        // render all pages
+        for( final Map<String, Object> page : pages ) {
+            // TODO: could add check here to see if rendering needs to be done again
+            exec.submit(new RendererService(renderer, page, errorCount, renderedCount));
+        }
+
+        // render all posts
+        for( final Map<String, Object> post : posts ) {
+            // TODO: could add check here to see if rendering needs to be done again
+            exec.submit(new RendererService(renderer, post, errorCount, renderedCount));
+        }
+
+        exec.shutdown();
+        long to = (pages.size() + posts.size()) / availableProcessors;
+        exec.awaitTermination(to, TimeUnit.SECONDS);
+
+        // only interested in published posts from here on
+        List<Map<String, Object>> publishedPosts = Filter.getPublishedPosts(posts);
+
+        // write index file
+        if (config.getBoolean("render.index")) {
+            renderer.renderIndex(publishedPosts, config.getString("index.file"));
+        }
+
+        // write feed file
+        if (config.getBoolean("render.feed")) {
+            renderer.renderFeed(publishedPosts, config.getString("feed.file"));
+        }
+
+        // write master archive file
+        if (config.getBoolean("render.archive")) {
+            renderer.renderArchive(publishedPosts, config.getString("archive.file"));
+        }
+
+        // write tag files
+        if (config.getBoolean("render.tags")) {
+            renderer.renderTags(postsByTags, config.getString("tag.path"));
+        }
+
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("errorCount", errorCount.get());
+        stats.put("renderedCount", renderedCount.get());
+        return stats;
+    }
 }

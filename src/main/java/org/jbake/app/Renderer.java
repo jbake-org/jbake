@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,12 +30,12 @@ public class Renderer {
 
 	// TODO: should all content be made available to all templates via this class??
 	
-	private File source;
-	private File destination;
-	private Configuration templateCfg;
-	private CompositeConfiguration config;
-	private List<Map<String, Object>> posts;
-	private List<Map<String, Object>> pages;
+	private final File source;
+	private final File destination;
+	private final Configuration templateCfg;
+	private final CompositeConfiguration config;
+	private final List<Map<String, Object>> posts;
+	private final List<Map<String, Object>> pages;
 	
 	/**
 	 * Creates a new instance of Renderer with supplied references to folders.
@@ -53,7 +54,9 @@ public class Renderer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		templateCfg.setObjectWrapper(new DefaultObjectWrapper());	
+		templateCfg.setObjectWrapper(new DefaultObjectWrapper());
+		this.posts = new ArrayList<Map<String,Object>>();
+		this.pages = new ArrayList<Map<String,Object>>();
 	}
 	
 	/**
@@ -67,8 +70,8 @@ public class Renderer {
 	 */
 	public Renderer(File source, File destination, File templatesPath, CompositeConfiguration config, List<Map<String, Object>> posts, List<Map<String, Object>> pages) {
 		this(source, destination, templatesPath, config);
-		this.posts = posts;
-		this.pages = pages;
+		this.posts.addAll(posts);
+		this.pages.addAll(pages);
 	}
 	
 	private void render(Map<String, Object> model, String templateFilename, File outputFile) throws Exception {
