@@ -6,11 +6,20 @@ import static org.asciidoctor.AttributesBuilder.attributes;
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.SafeMode.UNSAFE;
 
-import java.io.BufferedReader;
+import com.petebevin.markdown.MarkdownProcessor;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.IOUtils;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Asciidoctor.Factory;
+import org.asciidoctor.Attributes;
+import org.asciidoctor.DocumentHeader;
+import org.asciidoctor.Options;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,20 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Asciidoctor.Factory;
-import org.asciidoctor.Attributes;
-import org.asciidoctor.DocumentHeader;
-import org.asciidoctor.Options;
-import org.asciidoctor.OptionsBuilder;
-
-import com.petebevin.markdown.MarkdownProcessor;
 
 /**
  * Parses a File for content.
@@ -48,15 +44,11 @@ public class Parser {
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
-   private String contentPath;
+	private String contentPath;
 	
 	/**
 	 * Creates a new instance of Parser.
 	 */
-	public Parser() {
-		asciidoctor = Factory.create();
-	}
-	
 	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
 		this.contentPath = contentPath;
@@ -71,11 +63,11 @@ public class Parser {
 	 */
 	public Map<String, Object> processFile(File file) {
 		content = new HashMap<String, Object>();
-		BufferedReader reader = null;
-		List<String> fileContents = null;
-		try {
-			reader = new BufferedReader(new FileReader(file));
-			fileContents = IOUtils.readLines(reader);
+        InputStream is = null;
+        List<String> fileContents = null;
+        try {
+            is = new FileInputStream(file);
+            fileContents = IOUtils.readLines(is, config.getString("render.encoding"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;

@@ -1,5 +1,10 @@
 package org.jbake.app;
 
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.Template;
+import org.apache.commons.configuration.CompositeConfiguration;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,12 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.Template;
 
 /**
  * Render output to a file.
@@ -46,6 +45,7 @@ public class Renderer {
 		this.destination = destination;
 		this.config = config;
 		templateCfg = new Configuration();
+        templateCfg.setDefaultEncoding(config.getString("render.encoding"));
 		try {
 			templateCfg.setDirectoryForTemplateLoading(templatesPath);
 		} catch (IOException e) {
@@ -88,8 +88,8 @@ public class Renderer {
 			outputFile.getParentFile().mkdirs();
 			outputFile.createNewFile();
 		}
-		
-		Writer out = new OutputStreamWriter(new FileOutputStream(outputFile));
+
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), config.getString("render.encoding"));
 		template.process(model, out);
 		out.close();
 	}
