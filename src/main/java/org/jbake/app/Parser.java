@@ -307,21 +307,21 @@ public class Parser {
 	}
 	
 	private void processAsciiDoc(StringBuffer contents) {
-	   Options options = getAsciiDocOptionsAndAttributes();
-		
+		Options options = getAsciiDocOptionsAndAttributes();
 		content.put("body", asciidoctor.render(contents.toString(), options));
 	}
 
    private Options getAsciiDocOptionsAndAttributes() {
-      Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
-      Configuration optionsSubset = config.subset("asciidoctor.option");
-      Options options = options().attributes(attributes).get();
-      for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
-        String name = iterator.next();
-        options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
-      }
-      options.setBaseDir(contentPath);
-      return options;
+	   Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
+	   Configuration optionsSubset = config.subset("asciidoctor.option");
+	   Options options = options().attributes(attributes).get();
+	   for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
+		   String name = iterator.next();
+		   options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
+	   }
+	   options.setBaseDir(contentPath);
+	   options.setSafe(UNSAFE);
+	   return options;
    }
    
    /**
@@ -329,7 +329,7 @@ public class Parser {
     * @param value
     * @return boolean,integer of string as fallback
     */
-   Object guessTypeByContent(String value){
+   private Object guessTypeByContent(String value){
       if (toBooleanObject(value)!=null)
          return toBooleanObject(value);
       if(isNumber(value))

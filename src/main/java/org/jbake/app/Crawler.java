@@ -64,29 +64,31 @@ public class Crawler {
 						uri = uri.substring(0, uri.lastIndexOf("."));
 						fileContents.put("uri", uri+config.getString("output.extension"));
 						
-						if (fileContents.get("type").equals("post")) {
-						   posts.add(fileContents);
-                     if (fileContents.get("tags") != null) {
-                        String[] tags = (String[]) fileContents.get("tags");
-                        for (String tag : tags) {
-                           if (postsByTags.containsKey(tag)) {
-                              postsByTags.get(tag).add(fileContents);
-                           } else {
-                              List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
-                              posts.add(fileContents);
-                              postsByTags.put(tag, posts);
-                           }
-                        }
-                     }
-                     if (fileContents.get("status").equals("published-date")) {
-                        if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
-                           if (new Date().after((Date)fileContents.get("date"))) {
-                              fileContents.put("status", "published");
-                           }
-                        }
-                     }
-						} else {// everything else is considered a page
+						if (fileContents.get("type").equals("page")) {
 							pages.add(fileContents);
+						} else {
+							// everything else is considered a post
+							posts.add(fileContents);
+							if (fileContents.get("tags") != null) {
+								String[] tags = (String[]) fileContents.get("tags");
+								for (String tag : tags) {
+									if (postsByTags.containsKey(tag)) {
+										postsByTags.get(tag).add(fileContents);
+									} else {
+										List<Map<String, Object>> posts = new ArrayList<Map<String, Object>>();
+										posts.add(fileContents);
+										postsByTags.put(tag, posts);
+									}
+								}
+							}
+ 
+							if (fileContents.get("status").equals("published-date")) {
+								if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
+									if (new Date().after((Date)fileContents.get("date"))) {
+										fileContents.put("status", "published");
+									}
+								}
+							}
 						}
 						System.out.println("done!");
 					}
