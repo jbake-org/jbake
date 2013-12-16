@@ -70,7 +70,7 @@
 		<args4j.version>2.0.23</args4j.version>
 		<freemarker.version>2.3.19</freemarker.version>
 		<junit.version>4.8.1</junit.version>
-		<markdownj.version>0.3.0-1.0.2b4</markdownj.version>
+		<pegdown.version>1.4.1</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
 	</properties>
 
@@ -216,9 +216,9 @@
 			<version>5.1.21</version>
 		</dependency> -->
 		<dependency>
-			<groupId>org.markdownj</groupId>
-			<artifactId>markdownj</artifactId>
-			<version>${markdownj.version}</version>
+			<groupId>org.pegdown</groupId>
+			<artifactId>pegdown</artifactId>
+			<version>${pegdown.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.asciidoctor</groupId>
