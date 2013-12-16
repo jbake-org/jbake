@@ -1,7 +1,6 @@
 package org.jbake.app;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -23,8 +22,6 @@ public class ParserTest {
 	
 	private File validHTMLFile;
 	private File invalidHTMLFile;
-	private File validMarkdownFile;
-	private File invalidMarkdownFile;
 	private File validAsciiDocFile;
 	private File invalidAsciiDocFile;
 	private File validAsciiDocFileWithoutHeader;
@@ -52,18 +49,6 @@ public class ParserTest {
 		invalidHTMLFile = folder.newFile("invalid.html");
 		out = new PrintWriter(invalidHTMLFile);
 		out.println(invalidHeader);
-		out.close();
-		
-		validMarkdownFile = folder.newFile("valid.md");
-		out = new PrintWriter(validMarkdownFile);
-		out.println(validHeader);
-		out.println("# This is a test");
-		out.close();
-		
-		invalidMarkdownFile = folder.newFile("invalid.md");
-		out = new PrintWriter(invalidMarkdownFile);
-		out.println(invalidHeader);
-		out.println("# This is a test");
 		out.close();
 		
 		validAsciiDocFile = folder.newFile("valid.ad");
@@ -137,22 +122,6 @@ public class ParserTest {
 	@Test
 	public void parseInvalidHTMLFile() {
 		Map<String, Object> map = parser.processFile(invalidHTMLFile);
-		Assert.assertNull(map);
-	}
-	
-	@Test
-	public void parseValidMarkdownFile() throws Exception {
-		Map<String, Object> map = parser.processFile(validMarkdownFile);
-		Assert.assertNotNull(map);
-		Assert.assertEquals("draft", map.get("status"));
-		Assert.assertEquals("post", map.get("type"));
-		Assert.assertEquals("<h1>This is a test</h1>\n", map.get("body"));
-	}
-	
-	@Test
-	public void parseInvalidMarkdownFile() {
-		Parser parser = new Parser(config,rootPath.getPath());
-		Map<String, Object> map = parser.processFile(invalidMarkdownFile);
 		Assert.assertNull(map);
 	}
 	
