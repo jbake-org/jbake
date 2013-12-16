@@ -19,6 +19,7 @@ public class ConfigUtil {
 	public static CompositeConfiguration load(File source) throws ConfigurationException {
 		if (config == null) {
 			config = new CompositeConfiguration();
+			config.setListDelimiter(',');
 			File customConfigFile = new File(source, "custom.properties");
 			if (customConfigFile.exists()) {
 				config.addConfiguration(new PropertiesConfiguration(customConfigFile));
