@@ -166,7 +166,6 @@ public class Parser {
 	 * @param contents	Contents of file 
 	 */
 	private void processHeader(List<String> contents) {
-		DateFormat df = new SimpleDateFormat(config.getString(DATE_FORMAT));
 		for (String line : contents) {
 			if (line.equals("~~~~~~")) {
 				break;
