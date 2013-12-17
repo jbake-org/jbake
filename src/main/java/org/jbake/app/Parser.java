@@ -41,6 +41,9 @@ import org.apache.commons.configuration.Configuration;
  */
 public class Parser {
 	
+	private final static String DATE_FORMAT = "parser.dateformat";
+	private DateFormat dateFormat;
+	
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
@@ -51,6 +54,7 @@ public class Parser {
 	 */
 	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
+		dateFormat = new SimpleDateFormat(config.getString(DATE_FORMAT));
 		this.contentPath = contentPath;
 		asciidoctor = Factory.create();
 	}
@@ -162,6 +166,7 @@ public class Parser {
 	 * @param contents	Contents of file 
 	 */
 	private void processHeader(List<String> contents) {
+		DateFormat df = new SimpleDateFormat(config.getString(DATE_FORMAT));
 		for (String line : contents) {
 			if (line.equals("~~~~~~")) {
 				break;
@@ -169,10 +174,9 @@ public class Parser {
 				String[] parts = line.split("=");
 				if (parts.length == 2) {
 					if (parts[0].equalsIgnoreCase("date")) {
-						DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 						Date date = null;
 						try {
-							date = df.parse(parts[1]);
+							date = dateFormat.parse(parts[1]);
 							content.put(parts[0], date);
 						} catch (ParseException e) {
 							e.printStackTrace();
@@ -230,10 +234,9 @@ public class Parser {
 			} else if (key.equals("revdate")) {
 				if (attributes.get(key) != null && attributes.get(key) instanceof String) {
 					
-					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					Date date = null;
 					try {
-						date = df.parse((String)attributes.get(key));
+						date = dateFormat.parse((String)attributes.get(key));
 						content.put("date", date);
 					} catch (ParseException e) {
 						e.printStackTrace();
