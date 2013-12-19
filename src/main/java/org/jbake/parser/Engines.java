@@ -94,14 +94,14 @@ public class Engines {
             Class<? extends MarkupEngine> engineClass = (Class<? extends MarkupEngine>) Class.forName(engineClassName, false, Engines.class.getClassLoader());
             return engineClass.newInstance();
         } catch (ClassNotFoundException e) {
-            return null;
+            return new ErrorEngine(engineClassName);
         } catch (InstantiationException e) {
-            return null;
+            return new ErrorEngine(engineClassName);
         } catch (IllegalAccessException e) {
-            return null;
+            return new ErrorEngine(engineClassName);
         } catch (NoClassDefFoundError e) {
             // a dependency of the engine may not be found on classpath
-            return null;
+            return new ErrorEngine(engineClassName);
         }
     }
 
