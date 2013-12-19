@@ -1,5 +1,7 @@
 package org.jbake.app;
 
+import org.jbake.parser.Engines;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URLDecoder;
@@ -23,11 +25,7 @@ public class FileUtil {
 			@Override
 			public boolean accept(File pathname) {
 				return !pathname.isFile()
-						|| pathname.getPath().endsWith(".html")
-						|| pathname.getPath().endsWith(".md")
-						|| pathname.getPath().endsWith(".asciidoc")
-						|| pathname.getPath().endsWith(".ad")
-						|| pathname.getPath().endsWith(".adoc");
+						|| Engines.getRecognizedExtensions().contains(fileExt(pathname));
 			}
 		};
 	}
@@ -56,5 +54,15 @@ public class FileUtil {
 		}
 		
 		return codeFolder;
+    }
+
+    public static String fileExt(File src) {
+        String name = src.getName();
+        int idx = name.lastIndexOf('.');
+        if (idx > 0) {
+            return name.substring(idx + 1);
+        } else {
+            return "";
+        }
     }
 }

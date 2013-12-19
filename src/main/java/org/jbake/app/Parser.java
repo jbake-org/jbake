@@ -38,16 +38,6 @@ public class Parser {
         this.contentPath = contentPath;
     }
 
-    private static String fileExt(File src) {
-        String name = src.getName();
-        int idx = name.lastIndexOf('.');
-        if (idx > 0) {
-            return name.substring(idx + 1);
-        } else {
-            return "";
-        }
-    }
-
     /**
      * Process the file by parsing the contents.
      *
@@ -79,7 +69,7 @@ public class Parser {
                 content
         );
 
-        MarkupEngine engine = Engines.get(fileExt(file));
+        MarkupEngine engine = Engines.get(FileUtil.fileExt(file));
         if (engine==null) {
             System.err.println("Unable to find suitable markup engine for "+file);
             return null;

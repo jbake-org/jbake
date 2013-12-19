@@ -17,10 +17,12 @@ package org.jbake.parser;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * <p>A singleton class giving access to markup engines. Markup engines are loaded based on classpath.
@@ -64,6 +66,10 @@ public class Engines {
 
     public static void register(String fileExtension, MarkupEngine engine) {
         INSTANCE.registerEngine(fileExtension, engine);
+    }
+
+    public static Set<String> getRecognizedExtensions() {
+        return Collections.unmodifiableSet(INSTANCE.parsers.keySet());
     }
 
     private Engines() {
