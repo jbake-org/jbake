@@ -99,6 +99,9 @@ public class Engines {
             return null;
         } catch (IllegalAccessException e) {
             return null;
+        } catch (NoClassDefFoundError e) {
+            // a dependency of the engine may not be found on classpath
+            return null;
         }
     }
 
