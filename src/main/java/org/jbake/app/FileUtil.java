@@ -4,7 +4,11 @@ import org.jbake.parser.Engines;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
 
 /**
  * Provides File related functions
@@ -64,5 +68,25 @@ public class FileUtil {
         } else {
             return "";
         }
+    }
+
+    public static String sha1(File filename) throws Exception {
+        InputStream fis = new FileInputStream(filename);
+        byte[] buffer = new byte[1024];
+        MessageDigest complete = MessageDigest.getInstance("SHA-1");
+        int numRead;
+        do {
+            numRead = fis.read(buffer);
+            if (numRead > 0) {
+                complete.update(buffer, 0, numRead);
+            }
+        } while (numRead != -1);
+        fis.close();
+        byte[] bytes = complete.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }

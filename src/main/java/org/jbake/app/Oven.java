@@ -1,14 +1,12 @@
 package org.jbake.app;
 
-import static org.jbake.app.SortUtil.REVERSE;
-
 import java.io.File;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.model.DocumentTypes;
 
 /**
  * All the baking happens in the Oven!
@@ -18,12 +16,13 @@ import org.apache.commons.configuration.CompositeConfiguration;
  */
 public class Oven {
 
-	private CompositeConfiguration config;
+    private CompositeConfiguration config;
 	private File source;
 	private File destination;
 	private File templatesPath;
 	private File contentsPath;
 	private File assetsPath;
+    private boolean isClearCache;
 
 	/**
 	 * Creates a new instance of the Oven.
@@ -39,10 +38,11 @@ public class Oven {
 	 * @param destination	The destination folder
 	 * @throws Exception
 	 */
-	public Oven(File source, File destination) throws Exception {
+	public Oven(File source, File destination, boolean isClearCache) throws Exception {
 		this.source = source;
 		this.destination = destination;
         this.config = ConfigUtil.load(source);
+        this.isClearCache = isClearCache;
 	}
 
     private void ensureSource() throws Exception {
@@ -101,84 +101,95 @@ public class Oven {
 	 * @throws Exception
 	 */
 	public void bake() throws Exception {
-		long start = new Date().getTime();
-		System.out.println("Baking has started...");
+        ODatabaseDocumentTx db = DBUtil.createDB(config.getString("db.store"), config.getString("db.path"));
+        try {
+            long start = new Date().getTime();
+            System.out.println("Baking has started...");
+            clearCacheIfNeeded(db);
 
-		// process source content
-		Crawler crawler = new Crawler(source, config);
-		crawler.crawl(contentsPath);
-		List<Map<String, Object>> pages = crawler.getPages();
-		List<Map<String, Object>> posts = crawler.getPosts();
+            // process source content
+            Crawler crawler = new Crawler(db, source, config);
+            crawler.crawl(contentsPath);
+            System.out.println("Pages : " + crawler.getPageCount());
+            System.out.println("Posts : " + crawler.getPostCount());
 
-		// sort posts
-		Collections.sort(posts, SortUtil.getComparator(REVERSE));
+            Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
-		Renderer renderer = new Renderer(source, destination, templatesPath, config, posts, pages);
+            int renderedCount = 0;
+            int errorCount = 0;
 
-		int renderedCount = 0;
-		int errorCount = 0;
-		
-		// render all pages
-		for (Map<String, Object> page : pages) {
-			// TODO: could add check here to see if rendering needs to be done again
-			try {
-				renderer.render(page);
-				renderedCount++;
-			} catch (Exception e) {
-				errorCount++;
-			}
-		}
+            DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from page where rendered=false");
+            while (pagesIt.hasNext()) {
+                Map<String, Object> page = pagesIt.next();
+                try {
+                    renderer.renderDocument(page);
+                    renderedCount++;
+                } catch (Exception e) {
+                    errorCount++;
+                }
+            }
 
-		// render all posts
-		for (Map<String, Object> post : posts) {
-			// TODO: could add check here to see if rendering needs to be done again
-			try {
-				renderer.render(post);
-				renderedCount++;
-			} catch (Exception e) {
-				errorCount++;
-			}
-		}
+            DocumentIterator postIt = DBUtil.fetchDocuments(db,"select * from post where rendered=false");
+            while (postIt.hasNext()) {
+                Map<String, Object> post =  postIt.next();
+                try {
+                    renderer.renderDocument(post);
+                    renderedCount++;
+                } catch (Exception e) {
+                    errorCount++;
+                }
+            }
 
-		// only interested in published content from here on
-		List<Map<String, Object>> publishedPosts = Filter.getPublishedContent(posts);
-		List<Map<String, Object>> publishedPages = Filter.getPublishedContent(pages);
+            // write index file
+            if (config.getBoolean("render.index")) {
+                renderer.renderIndex(config.getString("index.file"));
+            }
 
-		// write index file
-		if (config.getBoolean("render.index")) {
-			renderer.renderIndex(publishedPosts, config.getString("index.file"));
-		}
+            // write feed file
+            if (config.getBoolean("render.feed")) {
+                renderer.renderFeed(config.getString("feed.file"));
+            }
 
-		// write feed file
-		if (config.getBoolean("render.feed")) {
-			renderer.renderFeed(publishedPosts, config.getString("feed.file"));
-		}
+            // write sitemap file
+            if (config.getBoolean("render.sitemap")) {
+                renderer.renderSitemap(config.getString("sitemap.file"));
+            }
 
-        // write sitemap file
-        if (config.getBoolean("render.sitemap")) {
-            renderer.renderSitemap(publishedPages, publishedPosts, config.getString("sitemap.file"));
-        }
+            // write master archive file
+            if (config.getBoolean("render.archive")) {
+                renderer.renderArchive(config.getString("archive.file"));
+            }
 
-		// write master archive file
-		if (config.getBoolean("render.archive")) {
-			renderer.renderArchive(publishedPosts, config.getString("archive.file"));
-		}
+            // write tag files
+            if (config.getBoolean("render.tags")) {
+                renderer.renderTags(crawler.getPostsByTags(), config.getString("tag.path"));
+            }
 
-		// write tag files 
-		if (config.getBoolean("render.tags")) {
-			renderer.renderTags(crawler.getPostsByTags(), config.getString("tag.path"));
-		}
+            // mark docs as rendered
+            for (String docType : DocumentTypes.getDocumentTypes()) {
+                DBUtil.update(db, "update "+docType+" set rendered=true where rendered=false");
+            }
+            // copy assets
+            Asset asset = new Asset(source, destination);
+            asset.copy(assetsPath);
 
-		// copy assets
-		Asset asset = new Asset(source, destination);
-		asset.copy(assetsPath);
-
-		System.out.println("...finished!");
-		long end = new Date().getTime();
-		System.out.println("Baked " + renderedCount + " items in " + (end-start) + "ms");
-		if (errorCount > 0) {
-			System.out.println("Failed to bake " + errorCount + " item(s)!");
-		}
+            System.out.println("...finished!");
+            long end = new Date().getTime();
+            System.out.println("Baked " + renderedCount + " items in " + (end-start) + "ms");
+            if (errorCount > 0) {
+                System.out.println("Failed to bake " + errorCount + " item(s)!");
+            }
 //		System.out.println("Baking took: " + (end-start) + "ms");
-	}
+        } finally {
+            db.close();
+        }
+    }
+
+    private void clearCacheIfNeeded(final ODatabaseDocumentTx db) {
+        if (isClearCache) {
+            for (String docType : DocumentTypes.getDocumentTypes()) {
+                DBUtil.update(db,"delete from "+docType);
+            }
+        }
+    }
 }

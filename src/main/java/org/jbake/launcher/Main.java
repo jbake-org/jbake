@@ -25,7 +25,7 @@ public class Main {
 	/**
 	 * Runs the app with the given arguments.
 	 * 
-	 * @param String[] args
+	 * @param args
 	 */
 	public static void main(String[] args) {
 		Main m = new Main();
@@ -34,7 +34,7 @@ public class Main {
 	
 	private void run(LaunchOptions options) {
 		try {
-			Oven oven = new Oven(options.getSource(), options.getDestination());
+			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
 			oven.setupPaths();
 			oven.bake();
 		} catch (Exception e) {

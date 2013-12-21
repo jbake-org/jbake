@@ -21,6 +21,9 @@ public class LaunchOptions {
 	@Option(name = "-h", aliases = {"--help"}, usage="prints this message")
 	private boolean helpNeeded;
 
+    @Option(name = "--reset", usage="clears the local cache, enforcing rendering from scratch")
+    private boolean clearCache;
+
 	public File getSource() {
 		return source;
 	}
@@ -40,4 +43,8 @@ public class LaunchOptions {
 	public boolean isInit() {
 		return init;
 	}
+
+    public boolean isClearCache() {
+        return clearCache;
+    }
 }
