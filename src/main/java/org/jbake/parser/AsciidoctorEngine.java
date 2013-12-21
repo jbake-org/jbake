@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
 import static org.apache.commons.lang.math.NumberUtils.isNumber;
@@ -43,14 +44,36 @@ import static org.asciidoctor.SafeMode.UNSAFE;
  * @author Cédric Champeau
  */
 public class AsciidoctorEngine extends MarkupEngine {
-    private final Asciidoctor asciidoctor;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public AsciidoctorEngine() {
-        asciidoctor = Asciidoctor.Factory.create();
+    private Asciidoctor engine;
+
+    private Asciidoctor getEngine() {
+        try {
+            lock.readLock().lock();
+            if (engine==null) {
+                lock.readLock().unlock();
+                try {
+                    lock.writeLock().lock();
+                    if (engine==null) {
+                        System.out.print("Initializing Asciidoctor engine...");
+                        engine = Asciidoctor.Factory.create();
+                        System.out.println(" ok");
+                    }
+                } finally {
+                    lock.readLock().lock();
+                    lock.writeLock().unlock();
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+        return engine;
     }
 
     @Override
     public void processHeader(final ParserContext context) {
+        final Asciidoctor asciidoctor = getEngine();
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         Map<String, Object> contents = context.getContents();
         if (header.getDocumentTitle() != null) {
@@ -101,6 +124,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private void processAsciiDoc(ParserContext context) {
+        final Asciidoctor asciidoctor = getEngine();
         Options options = getAsciiDocOptionsAndAttributes(context);
         context.setBody(asciidoctor.render(context.getBody(), options));
     }
