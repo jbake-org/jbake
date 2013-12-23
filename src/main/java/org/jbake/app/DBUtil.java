@@ -18,15 +18,19 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.record.OTrackedList;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import org.jbake.model.DocumentTypes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,11 +44,18 @@ public class DBUtil {
         db = ODatabaseDocumentPool.global().acquire(type + ":" + name, "admin", "admin");
         ODatabaseRecordThreadLocal.INSTANCE.set(db);
         if (!exists) {
-            OSchema schema = db.getMetadata().getSchema();
-            createDocType(schema, "page");
-            createDocType(schema, "post");
+            updateSchema(db);
         }
         return db;
+    }
+
+    public static void updateSchema(final ODatabaseDocumentTx db) {
+        OSchema schema = db.getMetadata().getSchema();
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            if (schema.getClass(docType)==null) {
+                createDocType(schema, docType);
+            }
+        }
     }
 
     private static void createDocType(final OSchema schema, final String doctype) {
@@ -79,6 +90,20 @@ public class DBUtil {
 
     public static DocumentIterator fetchDocuments(ODatabaseDocumentTx db, String query, Object... args) {
         return new DocumentIterator(query(db, query, args).iterator());
+    }
+
+    /**
+     * Converts a DB list into a String array
+     */
+    @SuppressWarnings("unchecked")
+    public static String[] toStringArray(Object entry) {
+        if (entry instanceof String[]) {
+            return (String[]) entry;
+        } else if (entry instanceof OTrackedList) {
+            OTrackedList<String> list = (OTrackedList<String>) entry;
+            return list.toArray(new String[list.size()]);
+        }
+        throw new IllegalArgumentException("Unable to convert object to String[]");
     }
 
 }

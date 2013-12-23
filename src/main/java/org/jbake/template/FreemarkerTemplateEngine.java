@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jbake.renderer;
+package org.jbake.template;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.SimpleDate;
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleSequence;
 import freemarker.template.Template;
+import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 
 import java.io.File;
@@ -35,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -45,11 +49,11 @@ import java.util.Map;
  *
  * @author Cédric Champeau
  */
-public class FreemarkerRenderer extends AbstractRenderer {
+public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
     private Configuration templateCfg;
 
-    public FreemarkerRenderer(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public FreemarkerTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
         createTemplateConfiguration(config, templatesPath);
     }
@@ -114,6 +118,15 @@ public class FreemarkerRenderer extends AbstractRenderer {
             }
             if ("pages".equals(key) || "posts".equals(key)) {
                 return new SimpleSequence(DocumentList.wrap(db.browseClass(key.substring(0, key.length() - 1))));
+            }
+            if ("tag_posts".equals(key)) {
+                String tag = eagerModel.get("tag").toString();
+                // fetch the tag posts from db
+                List<ODocument> query = DBUtil.query(db, "select * from post where status='published' where ? in tags", tag);
+                return new SimpleSequence(DocumentList.wrap(query.iterator()));
+            }
+            if ("published_date".equals(key)) {
+                return new SimpleDate(new Date(), TemplateDateModel.UNKNOWN);
             }
             return eagerModel.get(key);
         }

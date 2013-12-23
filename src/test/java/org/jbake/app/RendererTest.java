@@ -200,7 +200,7 @@ public class RendererTest {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
-        renderer.renderTags(crawler.getPostsByTags(), "tags");
+        renderer.renderTags(crawler.getTags(), "tags");
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
         Assert.assertTrue(outputFile.exists());
         Scanner scanner = new Scanner(outputFile);

@@ -118,25 +118,16 @@ public class Oven {
             int renderedCount = 0;
             int errorCount = 0;
 
-            DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from page where rendered=false");
-            while (pagesIt.hasNext()) {
-                Map<String, Object> page = pagesIt.next();
-                try {
-                    renderer.render(page);
-                    renderedCount++;
-                } catch (Exception e) {
-                    errorCount++;
-                }
-            }
-
-            DocumentIterator postIt = DBUtil.fetchDocuments(db,"select * from post where rendered=false");
-            while (postIt.hasNext()) {
-                Map<String, Object> post =  postIt.next();
-                try {
-                    renderer.render(post);
-                    renderedCount++;
-                } catch (Exception e) {
-                    errorCount++;
+            for (String docType : DocumentTypes.getDocumentTypes()) {
+                DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from "+docType+" where rendered=false");
+                while (pagesIt.hasNext()) {
+                    Map<String, Object> page = pagesIt.next();
+                    try {
+                        renderer.render(page);
+                        renderedCount++;
+                    } catch (Exception e) {
+                        errorCount++;
+                    }
                 }
             }
 
@@ -162,7 +153,7 @@ public class Oven {
 
             // write tag files
             if (config.getBoolean("render.tags")) {
-                renderer.renderTags(crawler.getPostsByTags(), config.getString("tag.path"));
+                renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
             }
 
             // mark docs as rendered
@@ -188,8 +179,13 @@ public class Oven {
     private void clearCacheIfNeeded(final ODatabaseDocumentTx db) {
         if (isClearCache) {
             for (String docType : DocumentTypes.getDocumentTypes()) {
-                DBUtil.update(db,"delete from "+docType);
+                try {
+                    DBUtil.update(db,"delete from "+docType);
+                } catch (Exception e) {
+                    // maybe a non existing document type
+                }
             }
+            DBUtil.updateSchema(db);
         }
     }
 }

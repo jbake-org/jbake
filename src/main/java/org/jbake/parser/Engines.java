@@ -30,7 +30,7 @@ import java.util.Set;
  * on classpath (recommanded).</p>
  *
  * <p>The descriptor file must be found in <i>META-INF</i> directory and named
- * <i>org.jbake.parser.Engines.properties</i>. The format of the file is easy:</p>
+ * <i>org.jbake.parser.MarkupEngines.properties</i>. The format of the file is easy:</p>
  * <code>
  * org.jbake.parser.RawMarkupEngine=html<br>
  * org.jbake.parser.AsciidoctorEngine=ad,adoc,asciidoc<br>
@@ -118,7 +118,7 @@ public class Engines {
     private static void loadEngines() {
         try {
             ClassLoader cl = Engines.class.getClassLoader();
-            Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.Engines.properties");
+            Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.MarkupEngines.properties");
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
                 Properties props = new Properties();

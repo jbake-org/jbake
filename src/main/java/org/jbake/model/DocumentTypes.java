@@ -23,7 +23,7 @@ package org.jbake.model;
  */
 public class DocumentTypes {
 
-    private static final String[] DEFAULT_DOC_TYPES = new String[]{"page", "post"};
+    private static final String[] DEFAULT_DOC_TYPES = new String[]{"page", "post", "index", "archive", "feed"};
 
     public static String[] getDocumentTypes() {
         return DEFAULT_DOC_TYPES;

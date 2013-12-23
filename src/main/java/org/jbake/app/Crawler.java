@@ -1,7 +1,6 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.record.OTrackedList;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -10,12 +9,12 @@ import org.jbake.model.DocumentTypes;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.io.File.separator;
 
@@ -144,34 +143,12 @@ public class Crawler {
         return getDocumentCount("page");
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, DocumentIterator> getPostsByTags() {
-        List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published'"));
-        Map<String, List<ODocument>> tmp = new HashMap<String, List<ODocument>>();
-        for (ODocument entry : query) {
-            Object field = entry.field("tags");
-            String[] tags;
-            if (field instanceof String[]) {
-                tags = (String[]) field;
-            } else if (field instanceof OTrackedList) {
-                tags = ((OTrackedList<String>) field).toArray(new String[((OTrackedList<String>) field).size()]);
-            } else {
-                tags = new String[0];
-            }
-            for (String tag : tags) {
-                List<ODocument> list = tmp.get(tag);
-                if (list == null) {
-                    list = new LinkedList<ODocument>();
-                    tmp.put(tag, list);
-                }
-                list.add(entry);
-            }
-        }
-        Map<String, DocumentIterator> result = new HashMap<String, DocumentIterator>();
-        for (Map.Entry<String, List<ODocument>> entry : tmp.entrySet()) {
-            final String tag = entry.getKey();
-            final Iterator<ODocument> it = entry.getValue().iterator();
-            result.put(tag, new DocumentIterator(it));
+    public Set<String> getTags() {
+        List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+        Set<String> result = new HashSet<String>();
+        for (ODocument document : query) {
+            String[] tags = DBUtil.toStringArray(document.field("tags"));
+            Collections.addAll(result, tags);
         }
         return result;
     }

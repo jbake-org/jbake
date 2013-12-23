@@ -2,12 +2,12 @@ package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.renderer.FreemarkerRenderer;
+import org.jbake.template.DelegatingTemplateEngine;
 
 import java.io.File;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Render output to a file.
@@ -20,7 +20,7 @@ public class Renderer {
 
     private File destination;
     private CompositeConfiguration config;
-    private final FreemarkerRenderer renderingEngine;
+    private final DelegatingTemplateEngine renderingEngine;
 
     /**
      * Creates a new instance of Renderer with supplied references to folders.
@@ -31,7 +31,11 @@ public class Renderer {
     public Renderer(ODatabaseDocumentTx db, File destination, File templatesPath, CompositeConfiguration config) {
         this.destination = destination;
         this.config = config;
-        this.renderingEngine = new FreemarkerRenderer(config, db, destination, templatesPath);
+        this.renderingEngine = new DelegatingTemplateEngine(config, db, destination, templatesPath);
+    }
+
+    private String findTemplateName(String docType) {
+        return config.getString("template."+docType+".file");
     }
 
     /**
@@ -65,7 +69,8 @@ public class Renderer {
         model.put("content", content);
 
         try {
-            renderingEngine.renderDocument(model, ((String) content.get("type")) + ".ftl", outputFile);
+            String docType = (String) content.get("type");
+            renderingEngine.renderDocument(model, findTemplateName(docType), outputFile);
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,11 +86,11 @@ public class Renderer {
      */
     public void renderIndex(String indexFile) {
         File outputFile = new File(destination.getPath() + File.separator + indexFile);
-        System.out.print("Rendering index [" + outputFile + "]... ");
+        System.out.print("Rendering index [" + outputFile + "]...");
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
-            renderingEngine.renderDocument(model, config.getString("template.index.file"), outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("index"), outputFile);
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,7 +111,7 @@ public class Renderer {
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
-            render(model, config.getString("template.sitemap.file"), outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("sitemap"), outputFile);
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,10 +128,9 @@ public class Renderer {
         File outputFile = new File(destination.getPath() + File.separator + feedFile);
         System.out.print("Rendering feed [" + outputFile + "]... ");
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("published_date", new Date());
 
         try {
-            renderingEngine.renderDocument(model, config.getString("template.feed.file"), outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("feed"), outputFile);
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,7 +149,7 @@ public class Renderer {
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
-            renderingEngine.renderDocument(model, config.getString("template.archive.file"), outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("archive"), outputFile);
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,20 +163,17 @@ public class Renderer {
      * @param tags    The content to renderDocument
      * @param tagPath The output path
      */
-    public void renderTags(Map<String, DocumentIterator> tags, String tagPath) {
-        for (String tag : tags.keySet()) {
+    public void renderTags(Set<String> tags, String tagPath) {
+        for (String tag : tags) {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("tag", tag);
-            // TODO: sort posts here
-            DocumentIterator posts = tags.get(tag);
-            model.put("tag_posts", posts);
 
             tag = tag.trim().replace(" ", "-");
             File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));
             System.out.print("Rendering tags [" + outputFile + "]... ");
 
             try {
-                renderingEngine.renderDocument(model, config.getString("template.tag.file"), outputFile);
+                renderingEngine.renderDocument(model, findTemplateName("tag"), outputFile);
                 System.out.println("done!");
             } catch (Exception e) {
                 e.printStackTrace();

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jbake.renderer;
+package org.jbake.template;
 
 /**
  * Thrown if rendering of a document failed.

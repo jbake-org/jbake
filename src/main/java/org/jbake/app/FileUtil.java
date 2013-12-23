@@ -62,6 +62,10 @@ public class FileUtil {
 
     public static String fileExt(File src) {
         String name = src.getName();
+        return fileExt(name);
+    }
+
+    public static String fileExt(String name) {
         int idx = name.lastIndexOf('.');
         if (idx > 0) {
             return name.substring(idx + 1);

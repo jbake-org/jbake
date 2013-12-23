@@ -204,6 +204,7 @@
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>${freemarker.version}</version>
+            <optional>true</optional>
 		</dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
@@ -243,6 +244,7 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>${jetty.version}</version>
+            <optional>true</optional>
 		</dependency>
 		<!-- sl4j Logging -->
 		<!-- <dependency>
