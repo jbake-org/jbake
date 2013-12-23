@@ -20,6 +20,8 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.FileUtil;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -38,6 +40,15 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
 
     @Override
     public void renderDocument(final Map<String, Object> model, final String templateName, final File outputFile) throws RenderingException {
+        model.put("version", config.getString("version"));
+        Map<String, Object> configModel = new HashMap<String, Object>();
+        Iterator<String> configKeys = config.getKeys();
+        while (configKeys.hasNext()) {
+            String key = configKeys.next();
+            //replace "." in key so you can use dot notation in templates
+            configModel.put(key.replace(".", "_"), config.getProperty(key));
+        }
+        model.put("config", configModel);
         String ext = FileUtil.fileExt(templateName);
         AbstractTemplateEngine engine = renderers.getEngine(ext);
         if (engine!=null) {

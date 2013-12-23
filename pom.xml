@@ -73,6 +73,7 @@
 		<pegdown.version>1.4.1</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
         <orientdb.version>1.6.2</orientdb.version>
+        <groovy.version>2.2.1</groovy.version>
     </properties>
 
 	<build>
@@ -246,6 +247,11 @@
 			<version>${jetty.version}</version>
             <optional>true</optional>
 		</dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+        </dependency>
 		<!-- sl4j Logging -->
 		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
