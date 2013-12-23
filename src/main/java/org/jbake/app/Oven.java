@@ -122,7 +122,7 @@ public class Oven {
             while (pagesIt.hasNext()) {
                 Map<String, Object> page = pagesIt.next();
                 try {
-                    renderer.renderDocument(page);
+                    renderer.render(page);
                     renderedCount++;
                 } catch (Exception e) {
                     errorCount++;
@@ -133,7 +133,7 @@ public class Oven {
             while (postIt.hasNext()) {
                 Map<String, Object> post =  postIt.next();
                 try {
-                    renderer.renderDocument(post);
+                    renderer.render(post);
                     renderedCount++;
                 } catch (Exception e) {
                     errorCount++;

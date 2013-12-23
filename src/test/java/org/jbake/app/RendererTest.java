@@ -71,7 +71,7 @@ public class RendererTest {
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "blog" + File.separator + "2013" + File.separator + "second-post.html");
         Map<String, Object> content = parser.processFile(sampleFile);
         content.put("uri", "/second-post.html");
-        renderer.renderDocument(content);
+        renderer.render(content);
         File outputFile = new File(destinationFolder, "second-post.html");
         Assert.assertTrue(outputFile.exists());
         Scanner scanner = new Scanner(outputFile);
