@@ -14,6 +14,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  */
 public class ConfigUtil {
 	
+	public final static String DATE_FORMAT = "date.format";
+	
 	private static CompositeConfiguration config;
 	
 	public static CompositeConfiguration load(File source) throws ConfigurationException {

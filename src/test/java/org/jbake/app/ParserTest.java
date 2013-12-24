@@ -3,6 +3,9 @@ package org.jbake.app;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -31,7 +34,7 @@ public class ParserTest {
 	private File invalidAsciiDocFileWithoutHeader;
 	private File validAsciiDocFileWithHeaderInContent;
 	
-	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\n~~~~~~";
+	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 
   
@@ -132,6 +135,13 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
 		Assert.assertEquals("post", map.get("type"));
+		Assert.assertNotNull(map.get("date"));
+		Calendar cal = Calendar.getInstance();
+		cal.setTime((Date) map.get("date"));
+		Assert.assertEquals(8, cal.get(Calendar.MONTH));
+		Assert.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH));
+		Assert.assertEquals(2013, cal.get(Calendar.YEAR));
+
 	}
 	
 	@Test

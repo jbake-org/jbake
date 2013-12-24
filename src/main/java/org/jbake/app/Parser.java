@@ -41,20 +41,18 @@ import org.apache.commons.configuration.Configuration;
  */
 public class Parser {
 	
-	private final static String DATE_FORMAT = "parser.dateformat";
-	private DateFormat dateFormat;
-	
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
 	private String contentPath;
+	private DateFormat dateFormat;
 	
 	/**
 	 * Creates a new instance of Parser.
 	 */
 	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
-		dateFormat = new SimpleDateFormat(config.getString(DATE_FORMAT));
+		dateFormat = new SimpleDateFormat(config.getString(ConfigUtil.DATE_FORMAT));
 		this.contentPath = contentPath;
 		asciidoctor = Factory.create();
 	}
