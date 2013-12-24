@@ -6,7 +6,10 @@ import static org.asciidoctor.AttributesBuilder.attributes;
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.SafeMode.UNSAFE;
 
-import com.petebevin.markdown.MarkdownProcessor;
+import org.pegdown.Extensions;
+
+import org.pegdown.PegDownProcessor;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.asciidoctor.Asciidoctor;
@@ -46,15 +49,69 @@ public class Parser {
 	private Asciidoctor asciidoctor;
 	private String contentPath;
 	private DateFormat dateFormat;
+	private PegDownProcessor pegdownProcessor;
 	
 	/**
 	 * Creates a new instance of Parser.
 	 */
 	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
-		dateFormat = new SimpleDateFormat(config.getString(ConfigUtil.DATE_FORMAT));
+		this.dateFormat = new SimpleDateFormat(config.getString(ConfigUtil.DATE_FORMAT));
 		this.contentPath = contentPath;
-		asciidoctor = Factory.create();
+		this.asciidoctor = Factory.create();
+
+		String[] mdExts = config.getStringArray("markdown.extensions");
+
+		if (mdExts.length > 0) {
+		    int extensions = Extensions.NONE;
+
+		    for (int index = 0; index < mdExts.length; index++) {
+		        if (mdExts[index].equals("HARDWRAPS")) {
+		            extensions |= Extensions.HARDWRAPS;
+		        }
+		        else if (mdExts[index].equals("AUTOLINKS")) {
+		            extensions |= Extensions.AUTOLINKS;
+		        }
+		        else if (mdExts[index].equals("FENCED_CODE_BLOCKS")) {
+		            extensions |= Extensions.FENCED_CODE_BLOCKS;
+		        }
+		        else if (mdExts[index].equals("DEFINITIONS")) {
+		            extensions |= Extensions.DEFINITIONS;
+		        }
+		        else if (mdExts[index].equals("ABBREVIATIONS")) {
+		            extensions |= Extensions.ABBREVIATIONS;
+		        }
+		        else if (mdExts[index].equals("QUOTES")) {
+		            extensions |= Extensions.QUOTES;
+		        }
+		        else if (mdExts[index].equals("SMARTS")) {
+		            extensions |= Extensions.SMARTS;
+		        }
+		        else if (mdExts[index].equals("SMARTYPANTS")) {
+		            extensions |= Extensions.SMARTYPANTS;
+		        }
+		        else if (mdExts[index].equals("SUPPRESS_ALL_HTML")) {
+		            extensions |= Extensions.SUPPRESS_ALL_HTML;
+		        }
+		        else if (mdExts[index].equals("SUPPRESS_HTML_BLOCKS")) {
+		            extensions |= Extensions.SUPPRESS_HTML_BLOCKS;
+		        }
+		        else if (mdExts[index].equals("SUPPRESS_INLINE_HTML")) {
+		            extensions |= Extensions.SUPPRESS_INLINE_HTML;
+		        }
+		        else if (mdExts[index].equals("TABLES")) {
+		            extensions |= Extensions.TABLES;
+		        }
+		        else if (mdExts[index].equals("WIKILINKS")) {
+		            extensions |= Extensions.WIKILINKS;
+		        }
+		        else if (mdExts[index].equals("ALL")) {
+		            extensions = Extensions.ALL;
+		        }
+		    }
+
+		    this.pegdownProcessor = new PegDownProcessor(extensions);
+		}
 	}
 	
 	/**
@@ -274,8 +331,12 @@ public class Parser {
 		}
 		
 		if (file.getPath().endsWith(".md")) {
-			MarkdownProcessor markdown = new MarkdownProcessor();
-			content.put("body", markdown.markdown(body.toString()));
+		    if (pegdownProcessor == null) {
+		        pegdownProcessor = new PegDownProcessor();
+		    }
+
+		    String markdown = pegdownProcessor.markdownToHtml(body.toString());
+		    content.put("body", markdown);
 		} else if (file.getPath().endsWith(".ad") || file.getPath().endsWith(".asciidoc") || file.getPath().endsWith(".adoc")) {
 			processAsciiDoc(body);
 		} else {
