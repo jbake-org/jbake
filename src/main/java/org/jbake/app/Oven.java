@@ -3,11 +3,13 @@ package org.jbake.app;
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.model.DocumentTypes;
 
@@ -192,7 +194,28 @@ public class Oven {
     }
 
     private void clearCacheIfNeeded(final ODatabaseDocumentTx db) {
-        if (isClearCache) {
+        boolean needed = isClearCache;
+        if (!needed) {
+            List<ODocument> docs = DBUtil.query(db, "select sha1 from Signatures where key='templates'");
+            String currentTemplatesSignature;
+            try {
+                currentTemplatesSignature = FileUtil.sha1(templatesPath);
+            } catch (Exception e) {
+                currentTemplatesSignature = "";
+            }
+            if (!docs.isEmpty()) {
+                String sha1 = docs.get(0).field("sha1");
+                needed = !sha1.equals(currentTemplatesSignature);
+                if (needed) {
+                    DBUtil.update(db, "update Signatures set sha1=? where key='templates'", currentTemplatesSignature);
+                }
+            } else {
+                // first computation of templates signature
+                DBUtil.update(db, "insert into Signatures(key,sha1) values('templates',?)", currentTemplatesSignature);
+                needed = true;
+            }
+        }
+        if (needed) {
             for (String docType : DocumentTypes.getDocumentTypes()) {
                 try {
                     DBUtil.update(db,"delete from "+docType);

@@ -56,6 +56,12 @@ public class DBUtil {
                 createDocType(schema, docType);
             }
         }
+        if (schema.getClass("Signatures")==null) {
+            // create the sha1 signatures class
+            OClass signatures = schema.createClass("Signatures");
+            signatures.createProperty("key", OType.STRING).setNotNull(true);
+            signatures.createProperty("sha1", OType.STRING).setNotNull(true);
+        }
     }
 
     private static void createDocType(final OSchema schema, final String doctype) {
