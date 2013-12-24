@@ -2,7 +2,10 @@ package org.jbake.app;
 
 import java.io.File;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -16,6 +19,8 @@ import org.jbake.model.DocumentTypes;
  */
 public class Oven {
 
+    private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9]+)(?:\\.file)");
+
     private CompositeConfiguration config;
 	private File source;
 	private File destination;
@@ -24,13 +29,6 @@ public class Oven {
 	private File assetsPath;
     private boolean isClearCache;
 
-	/**
-	 * Creates a new instance of the Oven.
-	 *
-	 */
-	public Oven() {
-	}
-	
 	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
 	 *
@@ -102,6 +100,8 @@ public class Oven {
 	 */
 	public void bake() throws Exception {
         ODatabaseDocumentTx db = DBUtil.createDB(config.getString("db.store"), config.getString("db.path"));
+        updateDocTypesFromConfiguration();
+        DBUtil.updateSchema(db);
         try {
             long start = new Date().getTime();
             System.out.println("Baking has started...");
@@ -173,6 +173,21 @@ public class Oven {
 //		System.out.println("Baking took: " + (end-start) + "ms");
         } finally {
             db.close();
+        }
+    }
+
+    /**
+     * Iterates over the configuration, searching for keys like "template.index.file=..."
+     * in order to register new document types.
+     */
+    private void updateDocTypesFromConfiguration() {
+        Iterator<String> keyIterator = config.getKeys();
+        while (keyIterator.hasNext()) {
+            String key = keyIterator.next();
+            Matcher matcher = TEMPLATE_DOC_PATTERN.matcher(key);
+            if (matcher.find()) {
+                DocumentTypes.addDocumentType(matcher.group(1));
+            }
         }
     }
 
