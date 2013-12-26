@@ -35,8 +35,6 @@ public class Renderer {
 	private CompositeConfiguration config;
 	private List<Map<String, Object>> posts;
 	private List<Map<String, Object>> pages;
-
-    public static final String SITEMAP_XML_FILE_NAME = "sitemap.xml";
 	
 	/**
 	 * Creates a new instance of Renderer with supplied references to folders.
@@ -189,13 +187,13 @@ public class Renderer {
      * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
-    public void renderSitemap(List<Map<String, Object>> pages) {
-
-        final File outputFile = new File(destination.getPath() + File.separator + SITEMAP_XML_FILE_NAME);
+    public void renderSitemap(List<Map<String, Object>> pages, List<Map<String, Object>> posts, String sitemapFile) {
+        File outputFile = new File(destination.getPath() + File.separator + sitemapFile);
         System.out.print("Rendering sitemap [" + outputFile + "]... ");
 
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("pages", pages);
+        model.put("published_pages", pages);
+        model.put("published_posts", posts);
 
         try {
             render(model, config.getString("template.sitemap.file"), outputFile);
@@ -238,7 +236,7 @@ public class Renderer {
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("tag", tag);
 			// TODO: sort posts here
-			List<Map<String, Object>> posts = Filter.getPublishedPosts(tags.get(tag));
+			List<Map<String, Object>> posts = Filter.getPublishedContent(tags.get(tag));
 			model.put("tag_posts", posts);
 			
 			tag = tag.trim().replace(" ", "-");

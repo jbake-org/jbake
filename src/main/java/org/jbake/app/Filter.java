@@ -18,16 +18,16 @@ public class Filter {
 	 * @param posts	The posts to filter
 	 * @return		Just the published posts
 	 */
-	public static List<Map<String, Object>> getPublishedPosts(List<Map<String, Object>> posts) {
-		List<Map<String, Object>> publishedPosts = new ArrayList<Map<String, Object>>();
-		for (Map<String, Object> post : posts) {
-			if (post.get("status") != null) {
-				if (((String)post.get("status")).equalsIgnoreCase("published")) {
-					publishedPosts.add(post);
+	public static List<Map<String, Object>> getPublishedContent(List<Map<String, Object>> contentList) {
+		List<Map<String, Object>> publishedContent = new ArrayList<Map<String, Object>>();
+		for (Map<String, Object> content : contentList) {
+			if (content.get("status") != null) {
+				if (((String)content.get("status")).equalsIgnoreCase("published")) {
+					publishedContent.add(content);
 				}
 			}
 		}
 		
-		return publishedPosts;
+		return publishedContent;
 	}
 }

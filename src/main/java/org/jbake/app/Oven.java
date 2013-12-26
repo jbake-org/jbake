@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -148,8 +146,9 @@ public class Oven {
 			}
 		}
 
-		// only interested in published posts from here on
-		List<Map<String, Object>> publishedPosts = Filter.getPublishedPosts(posts);
+		// only interested in published content from here on
+		List<Map<String, Object>> publishedPosts = Filter.getPublishedContent(posts);
+		List<Map<String, Object>> publishedPages = Filter.getPublishedContent(pages);
 
 		// write index file
 		if (config.getBoolean("render.index")) {
@@ -163,7 +162,7 @@ public class Oven {
 
         // write sitemap file
         if (config.getBoolean("render.sitemap")) {
-            renderer.renderSitemap(ListUtils.union(pages, publishedPosts));
+            renderer.renderSitemap(publishedPages, publishedPosts, config.getString("sitemap.file"));
         }
 
 		// write master archive file
