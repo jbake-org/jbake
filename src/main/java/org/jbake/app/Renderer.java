@@ -176,8 +176,33 @@ public class Renderer {
 			System.out.println("failed!");
 		}
 	}
-	
-	/**
+
+    /**
+     * Render an XML sitemap file using the supplied content.
+     *
+     * @param pages     The combined list of pages and posts to render
+     *
+     * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
+     * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
+     */
+    public void renderSitemap(List<Map<String, Object>> pages, List<Map<String, Object>> posts, String sitemapFile) {
+        File outputFile = new File(destination.getPath() + File.separator + sitemapFile);
+        System.out.print("Rendering sitemap [" + outputFile + "]... ");
+
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("published_pages", pages);
+        model.put("published_posts", posts);
+
+        try {
+            render(model, config.getString("template.sitemap.file"), outputFile);
+            System.out.println("done!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("failed!");
+        }
+    }
+
+    /**
 	 * Render an archive file using the supplied content.   
 	 * 
 	 * @param posts			The content to render
@@ -209,7 +234,7 @@ public class Renderer {
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("tag", tag);
 			// TODO: sort posts here
-			List<Map<String, Object>> posts = Filter.getPublishedPosts(tags.get(tag));
+			List<Map<String, Object>> posts = Filter.getPublishedContent(tags.get(tag));
 			model.put("tag_posts", posts);
 			
 			tag = tag.trim().replace(" ", "-");
