@@ -15,6 +15,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 public class ConfigUtil {
 	
 	public final static String DATE_FORMAT = "date.format";
+	public final static String DEFAULT_STATUS = "default.status";
 	
 	private static CompositeConfiguration config;
 	

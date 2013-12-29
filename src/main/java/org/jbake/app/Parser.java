@@ -221,6 +221,7 @@ public class Parser {
 	 * @param contents	Contents of file 
 	 */
 	private void processHeader(List<String> contents) {
+		content.put("status", config.getString(ConfigUtil.DEFAULT_STATUS));
 		for (String line : contents) {
 			if (line.equals("~~~~~~")) {
 				break;
