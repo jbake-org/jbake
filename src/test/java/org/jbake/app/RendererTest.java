@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import java.io.File;
+import static org.fest.assertions.Assertions.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
@@ -12,6 +13,7 @@ import java.util.Scanner;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -189,27 +191,15 @@ public class RendererTest {
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
 		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
 		renderer.renderArchive(crawler.getPosts(), "archive.html");
+		
+		// verify
 		File outputFile = new File(destinationFolder, "archive.html");
 		Assert.assertTrue(outputFile.exists());
-		Scanner scanner = new Scanner(outputFile);
-		
-		boolean foundFirstPost = false;
-		boolean foundSecondPost = false;
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
-				foundFirstPost = true;
-			}
-			if (line.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
-				foundSecondPost = true;
-			}
-			if (foundFirstPost && foundSecondPost) {
-				break;
-			}
-		}
-		
-		Assert.assertTrue(foundFirstPost);
-		Assert.assertTrue(foundSecondPost);
+
+		String output = FileUtils.readFileToString(outputFile);
+		assertThat(output) 
+			.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")
+			.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>");
 	}
 	
 	@Test
@@ -218,26 +208,14 @@ public class RendererTest {
 		crawler.crawl(new File(sourceFolder.getPath()+File.separator+"content"));
 		Renderer renderer = new Renderer(sourceFolder, destinationFolder, templateFolder, config, crawler.getPosts(), crawler.getPages());
 		renderer.renderTags(crawler.getPostsByTags(), "tags");
+
+		// verify
 		File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
 		Assert.assertTrue(outputFile.exists());
-		Scanner scanner = new Scanner(outputFile);
-		
-		boolean foundFirstPost = false;
-		boolean foundSecondPost = false;
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
-				foundFirstPost = true;
-			}
-			if (line.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
-				foundSecondPost = true;
-			}
-			if (foundFirstPost && foundSecondPost) {
-				break;
-			}
-		}
-		
-		Assert.assertTrue(foundFirstPost);
-		Assert.assertTrue(foundSecondPost);
+
+		String output = FileUtils.readFileToString(outputFile);
+		assertThat(output) 
+			.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")
+			.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>");
 	}
 }

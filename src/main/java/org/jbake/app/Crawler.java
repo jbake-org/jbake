@@ -60,7 +60,7 @@ public class Crawler {
 					Map<String, Object> fileContents = parser.processFile(contents[i]);
 					if (fileContents != null) {
 						fileContents.put("file", contents[i].getPath());
-						String uri = contents[i].getPath().replace(contentPath, "");
+						String uri = FileUtil.asPath(contents[i]).replace(FileUtil.asPath( contentPath), "");
 						uri = uri.substring(0, uri.lastIndexOf("."));
 						fileContents.put("uri", uri+config.getString("output.extension"));
 						

@@ -1,12 +1,12 @@
 package org.jbake.launcher;
 
 import java.io.File;
+import static org.fest.assertions.Assertions.*;
 
 import junit.framework.Assert;
 
 import org.jbake.launcher.LaunchOptions;
 import org.junit.Test;
-import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 public class LaunchOptionsTest {
@@ -39,7 +39,7 @@ public class LaunchOptionsTest {
 		parser.parseArgument(args);
 		
 		Assert.assertTrue(res.isRunServer());
-		Assert.assertEquals("/tmp", res.getSource().getPath());
+		assertThat(res.getSource()).isEqualTo(new File("/tmp"));
 	}
 	
 	@Test
@@ -76,7 +76,7 @@ public class LaunchOptionsTest {
 		Assert.assertFalse(res.isHelpNeeded());
 		Assert.assertFalse(res.isRunServer());
 		Assert.assertFalse(res.isInit());
-		Assert.assertEquals("/tmp/source", res.getSource().getPath());
-		Assert.assertEquals("/tmp/destination", res.getDestination().getPath());
+		assertThat(res.getSource()).isEqualTo(new File("/tmp/source"));
+		assertThat(res.getDestination()).isEqualTo(new File("/tmp/destination"));
 	}
 }
