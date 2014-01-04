@@ -69,8 +69,8 @@
 		<commons.configuration.version>1.9</commons.configuration.version>
 		<args4j.version>2.0.23</args4j.version>
 		<freemarker.version>2.3.19</freemarker.version>
-		<junit.version>4.8.1</junit.version>
-		<pegdown.version>1.4.1</pegdown.version>
+		<junit.version>4.10</junit.version>
+		<pegdown.version>1.4.2</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
 	</properties>
 
@@ -84,6 +84,14 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -208,6 +216,12 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-assert</artifactId>
+			<version>1.4</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- <dependency>
