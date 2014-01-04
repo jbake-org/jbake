@@ -12,6 +12,9 @@ public class LaunchOptions {
 	@Argument(index = 1, usage = "destination folder for output, if not supplied will default to a folder called \"output\" in the current working directory", metaVar = "destination_folder")
 	private File destination = null;
 	
+	@Option(name = "-b", aliases = {"--bake"}, usage="start baking")
+	private boolean bake;
+	
 	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
 	private boolean init;
 	
@@ -39,5 +42,9 @@ public class LaunchOptions {
 	
 	public boolean isInit() {
 		return init;
+	}
+
+	public boolean isBake() {
+		return bake;
 	}
 }
