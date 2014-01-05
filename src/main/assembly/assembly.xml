@@ -46,12 +46,12 @@
                 <include>LICENSE</include>
             </includes>
         </fileSet>
-        <fileSet>
-        	<directory>${basedir}/src/main/templates/</directory>
-        	<outputDirectory></outputDirectory>
-            <includes>
-                <include>base*</include>
-            </includes>
-        </fileSet>
-    </fileSets>
+        </fileSets>
+	<files>
+		<file>
+			<source>${project.build.directory}/base-base.zip</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>base.zip</destName>
+		</file>
+	</files>
 </assembly>

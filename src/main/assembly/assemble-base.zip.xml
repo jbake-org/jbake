@@ -1,0 +1,15 @@
+<assembly>
+    <id>base</id>
+     
+    <!-- Generates a zip package containing the needed files -->
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+        	<directory>${basedir}/src/main/templates/base/</directory>
+        	<outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>
