@@ -72,6 +72,8 @@
 		<junit.version>4.8.1</junit.version>
 		<pegdown.version>1.4.1</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
+		<cdi.weld.version>2.1.1.Final</cdi.weld.version>
+		<test.mockito.version>1.9.5</test.mockito.version>
 	</properties>
 
 	<build>
@@ -139,22 +141,22 @@
 	            <configuration>
 					<outputDirectory>dist</outputDirectory>
 					<finalName>jbake-${project.version}</finalName>
-	                <descriptors>
+						<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
-	                </descriptors>
-	                <attach>false</attach>
-	            </configuration>
-	            <executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-        	</plugin>
-        	<plugin>
+						</descriptors>
+						<attach>false</attach>
+					</configuration>
+					<executions>
+						<execution>
+							<id>make-assembly</id>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.6.3.201306030806</version>
@@ -229,6 +231,17 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.jboss.weld.se</groupId>
+		   <artifactId>weld-se</artifactId>
+			<version>${cdi.weld.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>  
+			<version>${test.mockito.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- sl4j Logging -->
 		<!-- <dependency>

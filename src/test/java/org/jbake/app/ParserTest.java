@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.utils.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,13 +35,10 @@ public class ParserTest {
 	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 
-  
-	
 	@Before
 	public void createSampleFile() throws Exception {
-		ConfigUtil.reset();
 		rootPath = new File(this.getClass().getResource(".").getFile());
-		config = ConfigUtil.load(rootPath);
+		config = TestUtils.loadTestConfig();
 		parser = new Parser(config,rootPath.getPath());
 		
 		validHTMLFile = folder.newFile("valid.html");

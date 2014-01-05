@@ -10,7 +10,7 @@ import java.net.URLDecoder;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  *
  */
-public class FileUtil {
+public abstract class FileUtil {
 	
 	/**
 	 * Filters files based on their file extension.

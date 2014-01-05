@@ -2,11 +2,17 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.MapConfiguration;
 
+import org.jbake.utils.TestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -67,11 +73,8 @@ public class MdParserTest {
 
     @Before
     public void createSampleFile() throws Exception {
-        ConfigUtil.reset();
-
         configFile = new File(this.getClass().getResource(".").getFile());
-        config = ConfigUtil.load(configFile);
-
+        config = TestUtils.loadTestConfig();
         validMdFileBasic = folder.newFile("validBasic.md");
         PrintWriter out = new PrintWriter(validMdFileBasic);
         out.println(validHeader);
