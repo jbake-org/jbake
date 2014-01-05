@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 
@@ -18,6 +19,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  *
  */
+@Singleton
 public class Oven {
 
 	private CompositeConfiguration config;
@@ -42,7 +44,7 @@ public class Oven {
 	 * @param destination	The destination folder
 	 * @throws Exception
 	 */
-	public Oven(File source, File destination) throws Exception {
+	public void prepare(File source, File destination) throws Exception {
 		this.source = source;
 		this.destination = destination;
         this.config = configUtil.load(source);

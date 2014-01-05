@@ -44,9 +44,11 @@ public class Main {
 		StartMain.main(args);
 	}
 	
+	@Inject Oven oven;
+	
 	private void bake(LaunchOptions options) {
 		try {
-			Oven oven = new Oven(options.getSource(), options.getDestination());
+			oven.prepare(options.getSource(), options.getDestination());
 			oven.setupPaths();
 			oven.bake();
 		} catch (Exception e) {
