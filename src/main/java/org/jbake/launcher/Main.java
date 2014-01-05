@@ -2,12 +2,22 @@ package org.jbake.launcher;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.List;
+
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.FileUtil;
 import org.jbake.app.Oven;
+import org.jboss.weld.environment.se.StartMain;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
+import org.jboss.weld.environment.se.bindings.Parameters;
+import org.jboss.weld.environment.se.events.ContainerInitialized;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -17,6 +27,7 @@ import org.kohsuke.args4j.CmdLineParser;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  *
  */
+@Singleton
 public class Main {
 
 	private final String USAGE_PREFIX = "Usage: jbake";
@@ -27,7 +38,10 @@ public class Main {
 	 * @param String[] args
 	 */
 	public static void main(String[] args) {
-		new Main().run(args);
+		// will 
+		// - create a CDI/Weld context (See META-INF/beans.xml)
+		// - and invoke Main#run()
+		StartMain.main(args);
 	}
 	
 	private void bake(LaunchOptions options) {
@@ -41,12 +55,14 @@ public class Main {
 		}
 	}
 
-	private void run(String[] args) {
+	@Inject ConfigUtil configUtil;
+	
+	void run(@Observes ContainerInitialized event, @Parameters String[] args) {
 		LaunchOptions res = parseArguments(args);
 
 		CompositeConfiguration config = null;
 		try {
-			config = ConfigUtil.load(res.getSource());
+			config = configUtil.load(res.getSource());
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 			System.exit(1);

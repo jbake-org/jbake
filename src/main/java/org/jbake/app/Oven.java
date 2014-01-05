@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 
 /**
@@ -24,6 +26,7 @@ public class Oven {
 	private File templatesPath;
 	private File contentsPath;
 	private File assetsPath;
+	@Inject ConfigUtil configUtil;
 
 	/**
 	 * Creates a new instance of the Oven.
@@ -42,7 +45,7 @@ public class Oven {
 	public Oven(File source, File destination) throws Exception {
 		this.source = source;
 		this.destination = destination;
-        this.config = ConfigUtil.load(source);
+        this.config = configUtil.load(source);
 	}
 
     private void ensureSource() throws Exception {

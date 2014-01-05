@@ -1,20 +1,20 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.jbake.utils.TestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class CrawlerTest {
 	
 	@Test
-	public void crawl() throws ConfigurationException {
-		ConfigUtil.reset();
-		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+	public void crawl() throws ConfigurationException, IOException {
+		CompositeConfiguration config = TestUtils.loadTestConfig();
 		Assert.assertEquals(".html", config.getString("output.extension"));
 				
 		URL contentUrl = this.getClass().getResource("/");

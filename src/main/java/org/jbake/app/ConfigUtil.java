@@ -2,6 +2,8 @@ package org.jbake.app;
 
 import java.io.File;
 
+import javax.inject.Singleton;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -12,13 +14,14 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  *
  */
+@Singleton
 public class ConfigUtil {
 	
 	public final static String DATE_FORMAT = "date.format";
 	
-	private static CompositeConfiguration config;
+	private CompositeConfiguration config;
 	
-	public static CompositeConfiguration load(File source) throws ConfigurationException {
+	public CompositeConfiguration load(File source) throws ConfigurationException {
 		if (config == null) {
 			config = new CompositeConfiguration();
 			config.setListDelimiter(',');
@@ -35,7 +38,7 @@ public class ConfigUtil {
 		return config;
 	}
 	
-	public static void reset() {
+	public void reset() {
 		config = null;
 	}
 }
