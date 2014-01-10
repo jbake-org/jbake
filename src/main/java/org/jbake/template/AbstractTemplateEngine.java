@@ -19,6 +19,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
 
 import java.io.File;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -32,7 +33,7 @@ import java.util.Map;
  * data access based on the underlying template engine capabilities.
  *
  * Note that some rendering engines may rely on a different rendering model than the one
- * provided by the first argument of {@link #renderDocument(java.util.Map, String, java.io.File)}.
+ * provided by the first argument of {@link #renderDocument(java.util.Map, String, java.io.Writer)}.
  * In this case, it is the responsability of the engine to convert it.
  *
  * @author Cédric Champeau
@@ -51,5 +52,5 @@ public abstract class AbstractTemplateEngine {
         this.templatesPath = templatesPath;
     }
 
-    public abstract void renderDocument(Map<String,Object> model, String templateName, File outputFile) throws RenderingException;
+    public abstract void renderDocument(Map<String,Object> model, String templateName, Writer writer) throws RenderingException;
 }

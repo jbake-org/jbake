@@ -61,15 +61,11 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final File outputFile) throws RenderingException {
+    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
-            outputFile.getParentFile().mkdirs();
             Template template = findTemplate(templateName);
-            Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), config.getString("render.encoding")));
             Writable writable = template.make(wrap(model));
-            writable.writeTo(out);
-            out.flush();
-            out.close();
+            writable.writeTo(writer);
         } catch (Exception e) {
             throw new RenderingException(e);
         }
@@ -121,11 +117,10 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
         };
     }
 
-    private String doInclude(Map<String, Object> model, String templateName) throws Exception {
-        Template tpl = findTemplate(templateName);
-        Object out = model.get("out");
-        String str = tpl.make(model).toString();
+    private void doInclude(Map<String, Object> model, String templateName) throws Exception {
+        AbstractTemplateEngine engine = (AbstractTemplateEngine) model.get("renderer");
+        Writer out = (Writer) model.get("out");
+        engine.renderDocument(model, templateName, out);
         model.put("out", out);
-        return str;
     }
 }

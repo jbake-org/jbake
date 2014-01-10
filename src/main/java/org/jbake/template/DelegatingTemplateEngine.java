@@ -20,6 +20,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.FileUtil;
 
 import java.io.File;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final File outputFile) throws RenderingException {
+    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         model.put("version", config.getString("version"));
         Map<String, Object> configModel = new HashMap<String, Object>();
         Iterator<String> configKeys = config.getKeys();
@@ -52,7 +53,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
         String ext = FileUtil.fileExt(templateName);
         AbstractTemplateEngine engine = renderers.getEngine(ext);
         if (engine!=null) {
-            engine.renderDocument(model, templateName, outputFile);
+            engine.renderDocument(model, templateName, writer);
         } else {
             System.err.println("Warning - No template engine found for template: "+templateName);
         }

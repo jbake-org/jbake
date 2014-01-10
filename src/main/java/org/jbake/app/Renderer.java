@@ -5,6 +5,10 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -67,16 +71,28 @@ public class Renderer {
         System.out.print("Rendering [" + outputFile + "]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("content", content);
+        model.put("renderer", renderingEngine);
 
         try {
             String docType = (String) content.get("type");
-            renderingEngine.renderDocument(model, findTemplateName(docType), outputFile);
+            Writer out = createWriter(outputFile);
+            renderingEngine.renderDocument(model, findTemplateName(docType), out);
+            out.close();
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("failed!");
             throw new Exception("Failed to render file");
         }
+    }
+
+    private Writer createWriter(File file) throws IOException {
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        }
+
+        return new OutputStreamWriter(new FileOutputStream(file), config.getString("render.encoding"));
     }
 
     /**
@@ -88,9 +104,12 @@ public class Renderer {
         File outputFile = new File(destination.getPath() + File.separator + indexFile);
         System.out.print("Rendering index [" + outputFile + "]...");
         Map<String, Object> model = new HashMap<String, Object>();
+        model.put("renderer", renderingEngine);
 
         try {
-            renderingEngine.renderDocument(model, findTemplateName("index"), outputFile);
+            Writer out = createWriter(outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("index"), out);
+            out.close();
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,9 +147,12 @@ public class Renderer {
         File outputFile = new File(destination.getPath() + File.separator + feedFile);
         System.out.print("Rendering feed [" + outputFile + "]... ");
         Map<String, Object> model = new HashMap<String, Object>();
+        model.put("renderer", renderingEngine);
 
         try {
-            renderingEngine.renderDocument(model, findTemplateName("feed"), outputFile);
+            Writer out = createWriter(outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("feed"), out);
+            out.close();
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,9 +169,12 @@ public class Renderer {
         File outputFile = new File(destination.getPath() + File.separator + archiveFile);
         System.out.print("Rendering archive [" + outputFile + "]... ");
         Map<String, Object> model = new HashMap<String, Object>();
+        model.put("renderer", renderingEngine);
 
         try {
-            renderingEngine.renderDocument(model, findTemplateName("archive"), outputFile);
+            Writer out = createWriter(outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("archive"), out);
+            out.close();
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,6 +191,7 @@ public class Renderer {
     public void renderTags(Set<String> tags, String tagPath) {
         for (String tag : tags) {
             Map<String, Object> model = new HashMap<String, Object>();
+            model.put("renderer", renderingEngine);
             model.put("tag", tag);
 
             tag = tag.trim().replace(" ", "-");
@@ -173,7 +199,9 @@ public class Renderer {
             System.out.print("Rendering tags [" + outputFile + "]... ");
 
             try {
-                renderingEngine.renderDocument(model, findTemplateName("tag"), outputFile);
+                Writer out = createWriter(outputFile);
+                renderingEngine.renderDocument(model, findTemplateName("tag"), out);
+                out.close();
                 System.out.println("done!");
             } catch (Exception e) {
                 e.printStackTrace();

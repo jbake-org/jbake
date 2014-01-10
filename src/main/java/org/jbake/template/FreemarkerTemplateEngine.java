@@ -39,8 +39,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -70,18 +68,10 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final File outputFile) throws RenderingException {
+    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateCfg.getTemplate(templateName);
-
-            if (!outputFile.exists()) {
-                outputFile.getParentFile().mkdirs();
-                outputFile.createNewFile();
-            }
-
-            Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), config.getString("render.encoding"));
-            template.process(new LazyLoadingModel(model, db), out);
-            out.close();
+            template.process(new LazyLoadingModel(model, db), writer);
         } catch (IOException e) {
             throw new RenderingException(e);
         } catch (TemplateException e) {
