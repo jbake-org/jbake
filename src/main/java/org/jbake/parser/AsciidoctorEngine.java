@@ -66,15 +66,14 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
         Map<String, Object> attributes = header.getAttributes();
         for (String key : attributes.keySet()) {
-            if (key.equals("jbake-status")) {
-                if (attributes.get(key) != null) {
-                    contents.put("status", attributes.get(key));
+            if (key.startsWith("jbake-")) {
+                Object val = attributes.get(key);
+                if (val!=null) {
+                    String pKey = key.substring(6);
+                    contents.put(pKey, val);
                 }
-            } else if (key.equals("jbake-type")) {
-                if (attributes.get(key) != null) {
-                    contents.put("type", attributes.get(key));
-                }
-            } else if (key.equals("revdate")) {
+            }
+            if (key.equals("revdate")) {
                 if (attributes.get(key) != null && attributes.get(key) instanceof String) {
 
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -86,7 +85,8 @@ public class AsciidoctorEngine extends MarkupEngine {
                         e.printStackTrace();
                     }
                 }
-            } else if (key.equals("jbake-tags")) {
+            }
+            if (key.equals("jbake-tags")) {
                 if (attributes.get(key) != null && attributes.get(key) instanceof String) {
                     contents.put("tags", ((String) attributes.get(key)).split(","));
                 }

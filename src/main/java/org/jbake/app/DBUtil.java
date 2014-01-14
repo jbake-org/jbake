@@ -54,6 +54,7 @@ public class DBUtil {
         page.createProperty("sha1", OType.STRING).setNotNull(true);
         page.createProperty("uri", OType.STRING).setNotNull(true);
         page.createProperty("rendered", OType.BOOLEAN).setNotNull(true);
+        page.createProperty("cached", OType.BOOLEAN).setNotNull(true);
 
         // commented out because for some reason index seems to be written
         // after the database is closed to this triggers an exception

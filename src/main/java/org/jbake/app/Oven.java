@@ -160,7 +160,7 @@ public class Oven {
 
             // mark docs as rendered
             for (String docType : DocumentTypes.getDocumentTypes()) {
-                DBUtil.update(db, "update "+docType+" set rendered=true where rendered=false");
+                DBUtil.update(db, "update "+docType+" set rendered=true where rendered=false and cached=true");
             }
             // copy assets
             Asset asset = new Asset(source, destination);

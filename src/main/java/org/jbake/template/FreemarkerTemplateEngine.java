@@ -17,6 +17,7 @@ import freemarker.template.TemplateModelException;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
+import org.jbake.model.DocumentTypes;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -82,8 +83,11 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published'"));
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("pages".equals(key) || "posts".equals(key)) {
-                return new SimpleSequence(DocumentList.wrap(db.browseClass(key.substring(0, key.length() - 1))));
+            String[] documentTypes = DocumentTypes.getDocumentTypes();
+            for (String docType : documentTypes) {
+                if ((docType+"s").equals(key)) {
+                    return new SimpleSequence(DocumentList.wrap(DBUtil.query(db, "select * from "+docType).iterator()));
+                }
             }
             if ("tag_posts".equals(key)) {
                 String tag = eagerModel.get("tag").toString();

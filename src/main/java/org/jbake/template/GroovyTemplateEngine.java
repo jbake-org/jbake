@@ -13,6 +13,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
+import org.jbake.model.DocumentTypes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -83,8 +84,11 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published'"));
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("pages".equals(key) || "posts".equals(key)) {
-                        return DocumentList.wrap(db.browseClass(key.substring(0, key.length() - 1)));
+                    String[] documentTypes = DocumentTypes.getDocumentTypes();
+                    for (String docType : documentTypes) {
+                        if ((docType+"s").equals(key)) {
+                            return DocumentList.wrap(DBUtil.query(db, "select * from "+docType).iterator());
+                        }
                     }
                     if ("tag_posts".equals(key)) {
                         String tag = model.get("tag").toString();

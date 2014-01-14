@@ -127,6 +127,8 @@ public class Crawler {
             }
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
+            boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String)fileContents.get("cached")):true;
+            doc.field("cached", cached);
             doc.save();
         }
     }
@@ -154,10 +156,11 @@ public class Crawler {
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
-        List<ODocument> match = DBUtil.query(db, "select sha1 from " + docType + " where uri=?", uri);
+        List<ODocument> match = DBUtil.query(db, "select sha1,rendered from " + docType + " where uri=?", uri);
         if (!match.isEmpty()) {
-            String oldHash = match.get(0).field("sha1");
-            if (!(oldHash.equals(sha1))) {
+            ODocument entries = match.get(0);
+            String oldHash = entries.field("sha1");
+            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field("rendered"))) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;
