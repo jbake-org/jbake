@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.SimpleCollection;
 import freemarker.template.SimpleDate;
 import freemarker.template.SimpleHash;
 import freemarker.template.SimpleSequence;
@@ -24,9 +25,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -82,6 +86,15 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             if ("published_posts".equals(key)) {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published'"));
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
+            }
+            if ("alltags".equals(key)) {
+                List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+                Set<String> result = new HashSet<String>();
+                for (ODocument document : query) {
+                    String[] tags = DBUtil.toStringArray(document.field("tags"));
+                    Collections.addAll(result, tags);
+                }
+                return new SimpleCollection(result);
             }
             String[] documentTypes = DocumentTypes.getDocumentTypes();
             for (String docType : documentTypes) {

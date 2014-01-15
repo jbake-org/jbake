@@ -26,10 +26,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Renders documents using a Groovy template engine. Depending on the file extension of the template, the template
@@ -83,6 +86,15 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     if ("published_posts".equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published'"));
                         return DocumentList.wrap(query.iterator());
+                    }
+                    if ("alltags".equals(key)) {
+                        List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+                        Set<String> result = new HashSet<String>();
+                        for (ODocument document : query) {
+                            String[] tags = DBUtil.toStringArray(document.field("tags"));
+                            Collections.addAll(result, tags);
+                        }
+                        return result;
                     }
                     String[] documentTypes = DocumentTypes.getDocumentTypes();
                     for (String docType : documentTypes) {
