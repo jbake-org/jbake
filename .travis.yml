@@ -7,3 +7,6 @@ jdk:
 
 after_success:
   - mvn jacoco:report coveralls:jacoco
+  
+notifications:
+  irc: "irc.freenode.org#jbake"
