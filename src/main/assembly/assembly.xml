@@ -40,6 +40,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>plugin</outputDirectory>
+            <excludes>
+              <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}</directory>
             <outputDirectory></outputDirectory>
             <includes>
