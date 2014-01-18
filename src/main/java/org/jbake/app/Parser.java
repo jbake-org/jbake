@@ -122,6 +122,7 @@ public class Parser {
 	 */
 	public Map<String, Object> processFile(File file) {
 		content = new HashMap<String, Object>();
+		contentPath = file.getParent();
         InputStream is = null;
         List<String> fileContents = null;
         try {
