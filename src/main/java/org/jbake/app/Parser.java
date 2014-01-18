@@ -48,6 +48,7 @@ public class Parser {
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
 	private String contentPath;
+	private String currentPath;
 	private DateFormat dateFormat;
 	private PegDownProcessor pegdownProcessor;
 	
@@ -122,7 +123,7 @@ public class Parser {
 	 */
 	public Map<String, Object> processFile(File file) {
 		content = new HashMap<String, Object>();
-		contentPath = file.getParent();
+		currentPath = file.getParent();
         InputStream is = null;
         List<String> fileContents = null;
         try {
@@ -373,7 +374,7 @@ public class Parser {
 		   String name = iterator.next();
 		   options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
 	   }
-	   options.setBaseDir(contentPath);
+	   options.setBaseDir(currentPath);
 	   options.setSafe(UNSAFE);
 	   return options;
    }
