@@ -1,12 +1,10 @@
 package org.jbake.app;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

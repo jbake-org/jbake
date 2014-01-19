@@ -2,29 +2,18 @@ package org.jbake.app;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Scanner;
 
 public class RendererTest {
 
@@ -87,6 +76,7 @@ public class RendererTest {
 				break;
 			}
 		}
+		scanner.close();
 		
 		Assert.assertTrue(foundTitle);
 		Assert.assertTrue(foundDate);
@@ -121,6 +111,7 @@ public class RendererTest {
 				break;
 			}
 		}
+		scanner.close();
 		
 		Assert.assertTrue(foundFirstTitle);
 		Assert.assertTrue(foundSecondTitle);
@@ -154,7 +145,8 @@ public class RendererTest {
 				break;
 			}
 		}
-		
+		scanner.close();
+
 		Assert.assertTrue(foundDescription);
 		Assert.assertTrue(foundFirstTitle);
 		Assert.assertTrue(foundSecondTitle);
