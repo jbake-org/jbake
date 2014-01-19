@@ -26,7 +26,6 @@ public class Renderer {
 
 	// TODO: should all content be made available to all templates via this class??
 	
-	private File source;
 	private File destination;
 	private Configuration templateCfg;
 	private CompositeConfiguration config;
@@ -41,7 +40,6 @@ public class Renderer {
 	 * @param templatesPath	The templates folder
 	 */
 	public Renderer(File source, File destination, File templatesPath, CompositeConfiguration config) {
-		this.source = source;
 		this.destination = destination;
 		this.config = config;
 		templateCfg = new Configuration();
