@@ -5,7 +5,6 @@ import java.net.URL;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
