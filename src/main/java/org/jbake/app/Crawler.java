@@ -24,7 +24,6 @@ public class Crawler {
 	// TODO: to get back certain types of content (i.e. pages or posts), this allows for 
 	// TODO: support of extra types with very little extra dev 
 	
-	private File source;
 	private CompositeConfiguration config;
 	private Parser parser;
 	
@@ -39,7 +38,6 @@ public class Crawler {
 	 * 
 	 */
 	public Crawler(File source, CompositeConfiguration config) {
-		this.source = source;
 		this.config = config;
 		this.contentPath = source.getPath() + separator + config.getString("content.folder");
 		this.parser = new Parser(config,contentPath);
