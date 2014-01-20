@@ -1,22 +1,11 @@
 package org.jbake.app;
 
 import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
-import static org.apache.commons.lang.math.NumberUtils.*;
+import static org.apache.commons.lang.math.NumberUtils.isNumber;
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 import static org.asciidoctor.AttributesBuilder.attributes;
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.SafeMode.UNSAFE;
-
-import org.pegdown.Extensions;
-
-import org.pegdown.PegDownProcessor;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.io.IOUtils;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Asciidoctor.Factory;
-import org.asciidoctor.Attributes;
-import org.asciidoctor.DocumentHeader;
-import org.asciidoctor.Options;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Asciidoctor.Factory;
+import org.asciidoctor.AttributesBuilder;
+import org.asciidoctor.DocumentHeader;
+import org.asciidoctor.Options;
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 
 /**
  * Parses a File for content.
@@ -363,19 +361,32 @@ public class Parser {
 		Options options = getAsciiDocOptionsAndAttributes();
 		content.put("body", asciidoctor.render(contents.toString(), options));
 	}
-
-   private Options getAsciiDocOptionsAndAttributes() {
-	   Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
-	   Configuration optionsSubset = config.subset("asciidoctor.option");
-	   Options options = options().attributes(attributes).get();
-	   for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
-		   String name = iterator.next();
-		   options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
-	   }
-	   options.setBaseDir(currentPath);
-	   options.setSafe(UNSAFE);
-	   return options;
-   }
+	
+	private Options getAsciiDocOptionsAndAttributes() {
+		final AttributesBuilder attributes = attributes(config
+				.getStringArray("asciidoctor.attributes"));
+		if (config.getBoolean("asciidoctor.attributes.export", false)) {
+			final String prefix = config.getString(
+					"asciidoctor.attributes.export.prefix", "");
+			for (final Iterator<String> it = config.getKeys(); it.hasNext();) {
+				final String key = it.next();
+				if (!key.startsWith("asciidoctor")) {
+					attributes.attribute(prefix + key, config.getProperty(key));
+				}
+			}
+		}
+		final Configuration optionsSubset = config.subset("asciidoctor.option");
+		final Options options = options().attributes(attributes.get()).get();
+		for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator
+				.hasNext();) {
+			final String name = iterator.next();
+			options.setOption(name,
+					guessTypeByContent(optionsSubset.getString(name)));
+		}
+		options.setBaseDir(currentPath);
+		options.setSafe(UNSAFE);
+		return options;
+	}
    
    /**
     * Guess the type by content it has. 
