@@ -55,11 +55,11 @@ Talk to other users of JBake on the forum:
 * http://commons.apache.org/[Apache Commons IO, Configuration, Lang & Logging]
 * http://maven.apache.org/[Apache Maven]
 * http://args4j.kohsuke.org/[Args4j]
-* http://asciidoctor.org/[Asciidoctor]
+* http://asciidoctor.org/[AsciidoctorJ]
 * http://www.eclipse.org/[Eclipse IDE]
 * http://freemarker.org/[Freemarker]
 * http://junit.org/[JUnit]
-* http://markdownj.org/[MarkdownJ]
+* http://pegdown.org/[Pegdown]
 * http://www.eclipse.org/jetty/[Jetty Server]
 
 == Copyright & License
