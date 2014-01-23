@@ -1,15 +1,10 @@
 package org.jbake.app;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.List;
 
 import junit.framework.Assert;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class ConfigUtilTest {

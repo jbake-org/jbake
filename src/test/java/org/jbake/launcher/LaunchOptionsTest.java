@@ -1,12 +1,8 @@
 package org.jbake.launcher;
 
-import java.io.File;
-
 import junit.framework.Assert;
 
-import org.jbake.launcher.LaunchOptions;
 import org.junit.Test;
-import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 public class LaunchOptionsTest {

@@ -47,7 +47,6 @@ public class Parser {
 	private CompositeConfiguration config;
 	private Map<String, Object> content = new HashMap<String, Object>();
 	private Asciidoctor asciidoctor;
-	private String contentPath;
 	private String currentPath;
 	private DateFormat dateFormat;
 	private PegDownProcessor pegdownProcessor;
@@ -58,7 +57,6 @@ public class Parser {
 	public Parser(CompositeConfiguration config, String contentPath) {
 		this.config = config;
 		this.dateFormat = new SimpleDateFormat(config.getString(ConfigUtil.DATE_FORMAT));
-		this.contentPath = contentPath;
 		this.asciidoctor = Factory.create();
 
 		String[] mdExts = config.getStringArray("markdown.extensions");
