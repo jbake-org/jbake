@@ -87,6 +87,10 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published'"));
                         return DocumentList.wrap(query.iterator());
                     }
+                    if ("published_pages".equals(key)) {
+                        List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from page where status='published'"));
+                        return DocumentList.wrap(query.iterator());
+                    }
                     if ("alltags".equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
                         Set<String> result = new HashSet<String>();
