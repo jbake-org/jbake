@@ -130,7 +130,8 @@ public class Renderer {
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
-            renderingEngine.renderDocument(model, findTemplateName("sitemap"), outputFile);
+            Writer out = createWriter(outputFile);
+            renderingEngine.renderDocument(model, findTemplateName("sitemap"), out);
             System.out.println("done!");
         } catch (Exception e) {
             e.printStackTrace();
