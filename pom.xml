@@ -171,9 +171,10 @@
 				<groupId>org.eluder.coveralls</groupId>
 				<artifactId>coveralls-maven-plugin</artifactId>
 				<version>2.0.1</version>
-				<!-- <configuration>
-					<repoToken>yourcoverallsprojectrepositorytoken</repoToken>
-				</configuration> -->
+				<configuration>
+					<!-- <repoToken>yourcoverallsprojectrepositorytoken</repoToken> -->
+					<timestamp>yyyy-MM-dd HH:mm:ssa</timestamp>
+				</configuration>
 			</plugin>
 		</plugins>
 		<resources>
