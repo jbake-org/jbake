@@ -3,9 +3,12 @@ Jonathan Bullock
 2013-10-20
 :idprefix:
 
+== JBake
+
 http://jbake.org[JBake] is a Java based open source static site/blog generator for developers.
 
 image::https://travis-ci.org/jonbullock/JBake.png?branch=master[Build Status, link="https://travis-ci.org/jonbullock/JBake"]
+image::https://coveralls.io/repos/jonbullock/JBake/badge.png?branch=master[Test Coverage, link="https://coveralls.io/r/jonbullock/JBake?branch=master"]
 
 == Documentation
 
