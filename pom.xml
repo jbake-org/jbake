@@ -62,7 +62,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
-		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssa</maven.build.timestamp.format>
 		
 		<asciidoctor.java.version>0.1.4</asciidoctor.java.version>
 		<commons.io.version>2.4</commons.io.version>
@@ -173,7 +173,7 @@
 				<version>2.0.1</version>
 				<configuration>
 					<!-- <repoToken>yourcoverallsprojectrepositorytoken</repoToken> -->
-					<timestamp>yyyy-MM-dd HH:mm:ssa</timestamp>
+					<!-- <timestamp>yyyy-MM-dd HH:mm:ssa</timestamp> -->
 				</configuration>
 			</plugin>
 		</plugins>
