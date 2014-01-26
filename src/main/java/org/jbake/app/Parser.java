@@ -5,6 +5,8 @@ import org.apache.commons.io.IOUtils;
 import org.jbake.parser.Engines;
 import org.jbake.parser.MarkupEngine;
 import org.jbake.parser.ParserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,6 +28,7 @@ import java.util.Map;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Parser {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
     private CompositeConfiguration config;
     private String contentPath;
@@ -71,7 +74,7 @@ public class Parser {
 
         MarkupEngine engine = Engines.get(FileUtil.fileExt(file));
         if (engine==null) {
-            System.err.println("Unable to find suitable markup engine for "+file);
+            LOGGER.error("Unable to find suitable markup engine for {}",file);
             return null;
         }
 
@@ -84,7 +87,7 @@ public class Parser {
 
         if (content.get("type")==null||content.get("status")==null) {
             // output error
-            System.err.println("Error parsing meta data from header!");
+            LOGGER.error("Error parsing meta data from header!");
             return null;
         }
 
@@ -95,7 +98,7 @@ public class Parser {
         if (engine.validate(context)) {
             engine.processBody(context);
         } else {
-            System.out.println("Incomplete source file (" + file + ") for markup engine:" + engine.getClass().getSimpleName());
+            LOGGER.error("Incomplete source file ({}) for markup engine:", file, engine.getClass().getSimpleName());
             return null;
         }
 

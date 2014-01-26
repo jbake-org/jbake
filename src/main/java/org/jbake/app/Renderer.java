@@ -3,6 +3,8 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +21,8 @@ import java.util.Set;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Renderer {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(Renderer.class);
 
     // TODO: should all content be made available to all templates via this class??
 
@@ -68,7 +72,8 @@ public class Renderer {
         }
         File outputFile = new File(outputFilename + config.getString("output.extension"));
 
-        System.out.print("Rendering [" + outputFile + "]... ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("content", content);
         model.put("renderer", renderingEngine);
@@ -78,10 +83,11 @@ public class Renderer {
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
-            System.out.println("done!");
+            sb.append("done!");
+            LOGGER.info(sb.toString());
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("failed!");
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
             throw new Exception("Failed to render file");
         }
     }
@@ -102,7 +108,8 @@ public class Renderer {
      */
     public void renderIndex(String indexFile) {
         File outputFile = new File(destination.getPath() + File.separator + indexFile);
-        System.out.print("Rendering index [" + outputFile + "]...");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering index [").append(outputFile).append("]...");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
 
@@ -110,10 +117,12 @@ public class Renderer {
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName("index"), out);
             out.close();
-            System.out.println("done!");
+            sb.append("done!");
+            LOGGER.info(sb.toString());
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("failed!");
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
+
         }
     }
 
@@ -125,17 +134,19 @@ public class Renderer {
      */
     public void renderSitemap(String sitemapFile) {
         File outputFile = new File(destination.getPath() + File.separator + sitemapFile);
-        System.out.print("Rendering sitemap [" + outputFile + "]... ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering sitemap [").append(outputFile).append("]... ");
 
         Map<String, Object> model = new HashMap<String, Object>();
 
         try {
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName("sitemap"), out);
-            System.out.println("done!");
+            sb.append("done!");
+            LOGGER.info(sb.toString());
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("failed!");
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
         }
     }
 
@@ -146,7 +157,8 @@ public class Renderer {
      */
     public void renderFeed(String feedFile) {
         File outputFile = new File(destination.getPath() + File.separator + feedFile);
-        System.out.print("Rendering feed [" + outputFile + "]... ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering feed [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
 
@@ -154,10 +166,11 @@ public class Renderer {
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName("feed"), out);
             out.close();
-            System.out.println("done!");
+            sb.append("done!");
+            LOGGER.info(sb.toString());
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("failed!");
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
         }
     }
 
@@ -168,7 +181,8 @@ public class Renderer {
      */
     public void renderArchive(String archiveFile) {
         File outputFile = new File(destination.getPath() + File.separator + archiveFile);
-        System.out.print("Rendering archive [" + outputFile + "]... ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering archive [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
 
@@ -176,10 +190,11 @@ public class Renderer {
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName("archive"), out);
             out.close();
-            System.out.println("done!");
+            sb.append("done!");
+            LOGGER.info(sb.toString());
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("failed!");
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
         }
     }
 
@@ -197,16 +212,18 @@ public class Renderer {
 
             tag = tag.trim().replace(" ", "-");
             File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));
-            System.out.print("Rendering tags [" + outputFile + "]... ");
+            StringBuilder sb = new StringBuilder();
+            sb.append("Rendering tags [").append(outputFile).append("]... ");
 
             try {
                 Writer out = createWriter(outputFile);
                 renderingEngine.renderDocument(model, findTemplateName("tag"), out);
                 out.close();
-                System.out.println("done!");
+                sb.append("done!");
+                LOGGER.info(sb.toString());
             } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("failed!");
+                sb.append("failed!");
+                LOGGER.error(sb.toString(), e);
             }
         }
     }

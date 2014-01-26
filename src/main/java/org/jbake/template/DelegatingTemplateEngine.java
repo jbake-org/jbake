@@ -3,6 +3,8 @@ package org.jbake.template;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Writer;
@@ -17,6 +19,8 @@ import java.util.Map;
  * @author Cédric Champeau
  */
 public class DelegatingTemplateEngine extends AbstractTemplateEngine {
+    private final static Logger LOGGER = LoggerFactory.getLogger(DelegatingTemplateEngine.class);
+
     private final TemplateEngines renderers;
 
     public DelegatingTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
@@ -40,7 +44,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
         if (engine!=null) {
             engine.renderDocument(model, templateName, writer);
         } else {
-            System.err.println("Warning - No template engine found for template: "+templateName);
+            LOGGER.error("Warning - No template engine found for template: {}",templateName);
         }
     }
 }

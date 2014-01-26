@@ -2,6 +2,8 @@ package org.jbake.template;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.util.Set;
  * @author Cédric Champeau
  */
 public class TemplateEngines {
+    private final static Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
 
     private final Map<String, AbstractTemplateEngine> templateEngines;
 
@@ -48,7 +51,7 @@ public class TemplateEngines {
     private void registerEngine(String fileExtension, AbstractTemplateEngine templateEngine) {
         AbstractTemplateEngine old = templateEngines.put(fileExtension, templateEngine);
         if (old != null) {
-            System.out.println("Registered a template engine for extension [." + fileExtension + "] but another one was already defined:" + old);
+            LOGGER.warn("Registered a template engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
         }
     }
 
