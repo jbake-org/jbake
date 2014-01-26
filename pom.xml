@@ -220,11 +220,13 @@
 			<groupId>org.pegdown</groupId>
 			<artifactId>pegdown</artifactId>
 			<version>${pegdown.version}</version>
+            <optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.asciidoctor</groupId>
 			<artifactId>asciidoctor-java-integration</artifactId>
 			<version>${asciidoctor.java.version}</version>
+            <optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
