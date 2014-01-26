@@ -72,7 +72,9 @@
 		<junit.version>4.8.1</junit.version>
 		<pegdown.version>1.4.1</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
-	</properties>
+        <orientdb.version>1.6.2</orientdb.version>
+        <groovy.version>2.2.1</groovy.version>
+    </properties>
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
@@ -204,7 +206,19 @@
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>${freemarker.version}</version>
+            <optional>true</optional>
 		</dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orient-commons</artifactId>
+            <version>${orientdb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+            <version>${orientdb.version}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -232,7 +246,14 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>${jetty.version}</version>
+            <optional>true</optional>
 		</dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+            <optional>true</optional>
+        </dependency>
 		<!-- sl4j Logging -->
 		<!-- <dependency>
 			<groupId>org.slf4j</groupId>

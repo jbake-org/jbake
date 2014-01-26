@@ -1,18 +1,3 @@
-/*
- * Copyright 2003-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.jbake.parser;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -29,6 +14,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
 import static org.apache.commons.lang.math.NumberUtils.isNumber;
@@ -43,14 +29,36 @@ import static org.asciidoctor.SafeMode.UNSAFE;
  * @author Cédric Champeau
  */
 public class AsciidoctorEngine extends MarkupEngine {
-    private final Asciidoctor asciidoctor;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public AsciidoctorEngine() {
-        asciidoctor = Asciidoctor.Factory.create();
+    private Asciidoctor engine;
+
+    private Asciidoctor getEngine() {
+        try {
+            lock.readLock().lock();
+            if (engine==null) {
+                lock.readLock().unlock();
+                try {
+                    lock.writeLock().lock();
+                    if (engine==null) {
+                        System.out.print("Initializing Asciidoctor engine...");
+                        engine = Asciidoctor.Factory.create();
+                        System.out.println(" ok");
+                    }
+                } finally {
+                    lock.readLock().lock();
+                    lock.writeLock().unlock();
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+        return engine;
     }
 
     @Override
     public void processHeader(final ParserContext context) {
+        final Asciidoctor asciidoctor = getEngine();
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         Map<String, Object> contents = context.getContents();
         if (header.getDocumentTitle() != null) {
@@ -58,15 +66,14 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
         Map<String, Object> attributes = header.getAttributes();
         for (String key : attributes.keySet()) {
-            if (key.equals("jbake-status")) {
-                if (attributes.get(key) != null) {
-                    contents.put("status", attributes.get(key));
+            if (key.startsWith("jbake-")) {
+                Object val = attributes.get(key);
+                if (val!=null) {
+                    String pKey = key.substring(6);
+                    contents.put(pKey, val);
                 }
-            } else if (key.equals("jbake-type")) {
-                if (attributes.get(key) != null) {
-                    contents.put("type", attributes.get(key));
-                }
-            } else if (key.equals("revdate")) {
+            }
+            if (key.equals("revdate")) {
                 if (attributes.get(key) != null && attributes.get(key) instanceof String) {
 
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -78,7 +85,8 @@ public class AsciidoctorEngine extends MarkupEngine {
                         e.printStackTrace();
                     }
                 }
-            } else if (key.equals("jbake-tags")) {
+            }
+            if (key.equals("jbake-tags")) {
                 if (attributes.get(key) != null && attributes.get(key) instanceof String) {
                     contents.put("tags", ((String) attributes.get(key)).split(","));
                 }
@@ -101,6 +109,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private void processAsciiDoc(ParserContext context) {
+        final Asciidoctor asciidoctor = getEngine();
         Options options = getAsciiDocOptionsAndAttributes(context);
         context.setBody(asciidoctor.render(context.getBody(), options));
     }

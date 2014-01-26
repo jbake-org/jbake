@@ -13,18 +13,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-public class RendererTest {
+public class GroovyRendererTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -46,13 +39,21 @@ public class RendererTest {
 
         destinationFolder = folder.getRoot();
 
-        templateFolder = new File(sourceFolder, "templates");
+        templateFolder = new File(sourceFolder, "groovyTemplates");
         if (!templateFolder.exists()) {
             throw new Exception("Cannot find template folder!");
         }
 
         ConfigUtil.reset();
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+        Iterator<String> keys = config.getKeys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (key.startsWith("template") && key.endsWith(".file")) {
+                String old = (String)config.getProperty(key);
+                config.setProperty(key, old.substring(0, old.length()-4)+".gsp");
+            }
+        }
         Assert.assertEquals(".html", config.getString("output.extension"));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
     }
@@ -223,4 +224,5 @@ public class RendererTest {
         Assert.assertTrue(foundFirstPost);
         Assert.assertTrue(foundSecondPost);
     }
+
 }
