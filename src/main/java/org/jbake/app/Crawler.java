@@ -6,6 +6,8 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,6 +26,7 @@ import static java.io.File.separator;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Crawler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
 
     private CompositeConfiguration config;
     private Parser parser;
@@ -51,7 +54,8 @@ public class Crawler {
             Arrays.sort(contents);
             for (File sourceFile : contents) {
                 if (sourceFile.isFile()) {
-                    System.out.print("Processing [" + sourceFile.getPath() + "]... ");
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
                     String sha1 = buildHash(sourceFile);
                     String uri = buildURI(sourceFile);
                     boolean process = true;
@@ -60,11 +64,11 @@ public class Crawler {
                         status = findDocumentStatus(docType, uri, sha1);
                         switch (status) {
                             case UPDATED:
-                                System.out.print(" : modified ");
+                                sb.append(" : modified ");
                                 DBUtil.update(db, "delete from " + docType + " where uri=?", uri);
                                 break;
                             case IDENTICAL:
-                                System.out.print(" : same ");
+                                sb.append(" : same ");
                                 process = false;
                         }
                         if (!process) {
@@ -72,16 +76,15 @@ public class Crawler {
                         }
                     }
                     if (DocumentStatus.NEW == status) {
-                        System.out.print(" : new ");
+                        sb.append(" : new ");
                     }
                     if (process) { // new or updated
                         crawlSourceFile(sourceFile, sha1, uri);
                     }
+                    LOGGER.info(sb.toString());
                 }
                 if (sourceFile.isDirectory()) {
                     crawl(sourceFile);
-                } else {
-                    System.out.println("done!");
                 }
             }
         }

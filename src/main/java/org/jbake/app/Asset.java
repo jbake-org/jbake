@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Deals with assets (static files such as css, js or image files).
@@ -14,7 +16,9 @@ import org.apache.commons.io.FileUtils;
  */
 public class Asset {
 
-	private File source;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
+
+    private File source;
 	private File destination;
 	
 	/**
@@ -39,7 +43,7 @@ public class Asset {
 			Arrays.sort(assets);
 			for (int i = 0; i < assets.length; i++) {
 				if (assets[i].isFile()) {
-					System.out.print("Copying [" + assets[i].getPath() + "]... ");
+					LOGGER.info("Copying [{}]...", assets[i].getPath());
 					File sourceFile = assets[i];
 					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
 					try {
@@ -47,7 +51,7 @@ public class Asset {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					System.out.println("done!");
+					LOGGER.info("done!");
 				} 
 				
 				if (assets[i].isDirectory()) {

@@ -6,6 +6,8 @@ import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Attributes;
 import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -29,6 +31,8 @@ import static org.asciidoctor.SafeMode.UNSAFE;
  * @author Cédric Champeau
  */
 public class AsciidoctorEngine extends MarkupEngine {
+    private final static Logger LOGGER = LoggerFactory.getLogger(AsciidoctorEngine.class);
+
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private Asciidoctor engine;
@@ -41,9 +45,9 @@ public class AsciidoctorEngine extends MarkupEngine {
                 try {
                     lock.writeLock().lock();
                     if (engine==null) {
-                        System.out.print("Initializing Asciidoctor engine...");
+                        LOGGER.info("Initializing Asciidoctor engine...");
                         engine = Asciidoctor.Factory.create();
-                        System.out.println(" ok");
+                        LOGGER.info("Asciidoctor engine initialized.");
                     }
                 } finally {
                     lock.readLock().lock();

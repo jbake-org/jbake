@@ -1,5 +1,8 @@
 package org.jbake.parser;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -36,6 +39,8 @@ import java.util.Set;
  *
  */
 public class Engines {
+    private final static Logger LOGGER = LoggerFactory.getLogger(Engines.class);
+
     private final static Engines INSTANCE;
 
     static {
@@ -64,7 +69,7 @@ public class Engines {
     private void registerEngine(String fileExtension, MarkupEngine markupEngine) {
         MarkupEngine old = parsers.put(fileExtension, markupEngine);
         if (old != null) {
-            System.out.println("Registered a markup engine for extension [." + fileExtension + "] but another one was already defined:" + old);
+            LOGGER.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
         }
     }
 

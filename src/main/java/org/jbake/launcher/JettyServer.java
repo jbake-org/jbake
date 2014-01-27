@@ -6,6 +6,8 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -15,6 +17,7 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
  *
  */
 public class JettyServer {
+    private final static Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);
 
 	/**
 	 * Run Jetty web server serving out supplied path on supplied port
@@ -38,8 +41,8 @@ public class JettyServer {
         handlers.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
         server.setHandler(handlers);
  
-        System.out.println("Serving out contents of: [" + path + "] on http://localhost:" + port + "/");
-        System.out.println("(To stop server hit CTRL-C)");
+        LOGGER.info("Serving out contents of: [{}] on http://localhost:{}/", path, port);
+        LOGGER.info("(To stop server hit CTRL-C)");
         
         try {
 			server.start();

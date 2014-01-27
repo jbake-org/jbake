@@ -12,6 +12,8 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * All the baking happens in the Oven!
@@ -20,6 +22,8 @@ import org.jbake.model.DocumentTypes;
  *
  */
 public class Oven {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
     private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9]+)(?:\\.file)");
 
@@ -78,7 +82,7 @@ public class Oven {
         contentsPath = setupRequiredFolderFromConfig("content.folder");
         assetsPath = setupPathFromConfig("asset.folder");
 		if (!assetsPath.exists()) {
-			System.out.println("Warning: No asset folder was found!");
+			LOGGER.warn("No asset folder was found!");
 		}
 		ensureDestination();
 	}
@@ -106,14 +110,14 @@ public class Oven {
         DBUtil.updateSchema(db);
         try {
             long start = new Date().getTime();
-            System.out.println("Baking has started...");
+            LOGGER.info("Baking has started...");
             clearCacheIfNeeded(db);
 
             // process source content
             Crawler crawler = new Crawler(db, source, config);
             crawler.crawl(contentsPath);
-            System.out.println("Pages : " + crawler.getPageCount());
-            System.out.println("Posts : " + crawler.getPostCount());
+            LOGGER.info("Pages : {}", crawler.getPageCount());
+            LOGGER.info("Posts : {}", crawler.getPostCount());
 
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
@@ -166,13 +170,12 @@ public class Oven {
             Asset asset = new Asset(source, destination);
             asset.copy(assetsPath);
 
-            System.out.println("...finished!");
+            LOGGER.info("Backing finished!");
             long end = new Date().getTime();
-            System.out.println("Baked " + renderedCount + " items in " + (end-start) + "ms");
+            LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
             if (errorCount > 0) {
-                System.out.println("Failed to bake " + errorCount + " item(s)!");
+                LOGGER.error("Failed to bake {} item(s)!", errorCount);
             }
-//		System.out.println("Baking took: " + (end-start) + "ms");
         } finally {
             db.close();
         }
