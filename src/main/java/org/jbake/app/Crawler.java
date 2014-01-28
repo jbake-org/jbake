@@ -109,9 +109,9 @@ public class Crawler {
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
-        fileContents.put("sha1", sha1);
-        fileContents.put("rendered", false);
         if (fileContents != null) {
+            fileContents.put("sha1", sha1);
+            fileContents.put("rendered", false);
             if (fileContents.get("tags") != null) {
                 // store them as a String[]
                 String[] tags = (String[]) fileContents.get("tags");
@@ -133,6 +133,8 @@ public class Crawler {
             boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String)fileContents.get("cached")):true;
             doc.field("cached", cached);
             doc.save();
+        } else {
+            LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
         }
     }
 
