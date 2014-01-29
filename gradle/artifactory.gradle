@@ -1,0 +1,62 @@
+apply plugin: 'artifactory-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'me.champeau.gradle'
+
+            from components.java
+            artifact sourceJar
+            artifact groovydocJar
+
+            pom.withXml {
+                asNode().with {
+                    appendNode('packaging', 'jar')
+                    appendNode('name', project.name)
+                    appendNode('description', 'JBake plugin for Gradle')
+                    appendNode('url', 'https://github.com/melix/jbake-gradle-plugin')
+                    appendNode('licenses').with {
+                        appendNode('license').with {
+                            appendNode('name', 'The Apache Software License, Version 2.0')
+                            appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0')
+                        }
+                    }
+                    appendNode('developers').with {
+                        appendNode('developer').with {
+                            appendNode('id', 'melix')
+                            appendNode('name', 'Cédric Champeau')
+                            appendNode('email', 'cedric.champeau@gmail.com')
+                        }
+                    }
+                    appendNode('scm').with {
+                        appendNode('connection', 'git@github.com:melix/jbake-gradle-plugin.git')
+                        appendNode('developerConnection', 'git@github.com:melix/jbake-gradle-plugin.git')
+                        appendNode('url', 'https://github.com/melix/jbake-gradle-plugin')
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'https://oss.jfrog.org'
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+        }
+    }
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local' //The Artifactory repository key to publish to
+            //when using oss.jfrog.org the credentials are from Bintray. For local build we expect them to be found in
+            //~/.gradle/gradle.properties, otherwise to be set in the build server
+            username = project.hasProperty('bintrayUser') ? project.bintrayUser : getenv('BINTRAY_USER')
+            password = project.hasProperty('bintrayKey') ? project.bintrayKey : getenv('BINTRAY_KEY')
+        }
+        defaults {
+            publications 'mavenJava'
+        }
+    }
+}

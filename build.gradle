@@ -1,6 +1,16 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
+apply from: 'gradle/artifactory.gradle'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.2'
+    }
+}
 
 repositories {
     mavenLocal()
@@ -24,14 +34,3 @@ task groovydocJar(type: Jar, dependsOn: groovydoc) {
     from groovydoc.destinationDir
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId = 'me.champeau.gradle'
-
-            from components.java
-            artifact sourceJar
-            artifact groovydocJar
-        }
-    }
-}
