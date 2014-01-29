@@ -44,7 +44,6 @@ public class GroovyRendererTest {
             throw new Exception("Cannot find template folder!");
         }
 
-        ConfigUtil.reset();
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {

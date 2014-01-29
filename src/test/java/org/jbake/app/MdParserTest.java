@@ -67,7 +67,6 @@ public class MdParserTest {
 
     @Before
     public void createSampleFile() throws Exception {
-        ConfigUtil.reset();
 
         configFile = new File(this.getClass().getResource(".").getFile());
         config = ConfigUtil.load(configFile);
