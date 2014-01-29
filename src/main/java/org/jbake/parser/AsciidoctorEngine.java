@@ -120,12 +120,21 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         CompositeConfiguration config = context.getConfig();
-        Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
-        Configuration optionsSubset = config.subset("asciidoctor.option");
-        Options options = options().attributes(attributes).get();
-        for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
-            String name = iterator.next();
-            options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
+        final AttributesBuilder attributes = attributes(config.getStringArray("asciidoctor.attributes"));
+        if (config.getBoolean("asciidoctor.attributes.export", false)) {
+            final String prefix = config.getString(  "asciidoctor.attributes.export.prefix", "");
+            for (final Iterator<String> it = config.getKeys(); it.hasNext();) {
+                final String key = it.next();
+                if (!key.startsWith("asciidoctor")) {
+                    attributes.attribute(prefix + key.replace(".", "_"), config.getProperty(key));
+                }
+            }
+        }
+        final Configuration optionsSubset = config.subset("asciidoctor.option");
+        final Options options = options().attributes(attributes.get()).get();
+        for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
+            final String name = iterator.next();
+            options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
         }
         options.setBaseDir(context.getContentPath());
         options.setSafe(UNSAFE);
