@@ -1,0 +1,56 @@
+= JBake plugin for Gradle image:https://secure.travis-ci.org/melix/jbake-gradle-plugin.png?branch=master["Build Status", link="https://travis-ci.org/melix/jbake-gradle-plugin"]
+
+This plugin allows rendering a site using http://www.jbake.org[JBake] directly from http://www.gradle.org[Gradle].
+
+== Usage
+
+*This is work in progress*
+
+[source,groovy]
+----
+buildscript {
+  repositories {
+      jcenter()
+  }
+
+  dependencies {
+    classpath 'me.champeau.gradle:jbake-gradle-plugin:0.1-SNAPSHOT'
+
+    // optional, if you use asciidoctor markup
+    classpath 'org.asciidoctor:asciidoctor-java-integration:0.1.4'
+
+    // optional, if you use freemarker template engine
+    classpath 'org.freemarker:freemarker:2.3.19'
+  }
+}
+
+apply plugin: 'jbake'
+----
+
+This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
+`src/jbake` and generate content into `$buildDir/jbake` (typically `build/jbake`).
+
+== Configuration
+=== Plugin configuration
+
+The default input and output directories can be changed using the `jbake` configuration block:
+
+[source,groovy]
+----
+jbake {
+    input = file('jbake-sources')
+    output = file("$buildDir/output")
+}
+----
+
+=== JBake configuration
+There are several options to configure http://www.jbake.org[JBake]. One is to have the regular `jbake.properties` file
+into the source directory. The other is to use the plugin configuration block:
+
+[source,groovy]
+----
+jbake {
+   configuration['template.post.file'] = 'mypost.ftl'
+}
+----
+

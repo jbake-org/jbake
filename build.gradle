@@ -1,0 +1,37 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+
+repositories {
+    mavenLocal()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'org.jbake:jbake-core:2.3.0-SNAPSHOT'
+}
+
+project.version = '0.1-SNAPSHOT'
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    classifier = 'groovydoc'
+    from groovydoc.destinationDir
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'me.champeau.gradle'
+
+            from components.java
+            artifact sourceJar
+            artifact groovydocJar
+        }
+    }
+}
