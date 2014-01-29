@@ -37,6 +37,11 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     private Asciidoctor engine;
 
+    public AsciidoctorEngine() {
+        Class engineClass = Asciidoctor.class;
+        assert engineClass!=null;
+    }
+
     private Asciidoctor getEngine() {
         try {
             lock.readLock().lock();
