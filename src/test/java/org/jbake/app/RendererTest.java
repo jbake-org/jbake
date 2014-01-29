@@ -51,7 +51,6 @@ public class RendererTest {
             throw new Exception("Cannot find template folder!");
         }
 
-        ConfigUtil.reset();
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString("output.extension"));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());

@@ -49,6 +49,14 @@ public class Oven {
         this.isClearCache = isClearCache;
 	}
 
+    public CompositeConfiguration getConfig() {
+        return config;
+    }
+
+    public void setConfig(final CompositeConfiguration config) {
+        this.config = config;
+    }
+
     private void ensureSource() throws Exception {
         if (!FileUtil.isExistingFolder(source)) {
             throw new Exception("Error: Source folder must exist!");
