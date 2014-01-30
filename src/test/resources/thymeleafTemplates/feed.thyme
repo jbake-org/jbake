@@ -1,0 +1,21 @@
+<rss version="2.0" xmlns="http://www.w3.org/1999/xhtml"
+                   xmlns:th="http://www.thymeleaf.org"
+    xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>JonathanBullock.com</title>
+    <link>http://jonathanbullock.com/</link>
+    <atom:link href="http://jonathanbullock.com/feed.xml" rel="self" type="application/rss+xml" />
+    <description>My corner of the Internet</description>
+    <language>en-gb</language>
+    <pubDate th:text='${#dates.format(published_date,"EEE, d MMM yyyy HH:mm:ss Z")}'>2014-01-30</pubDate>
+    <lastBuildDate th:text='${#dates.format(published_date,"EEE, d MMM yyyy HH:mm:ss Z")}'>2014-01-30</lastBuildDate>
+
+    <item th:each="post: ${posts}">
+      <title th:text='${post.title}'>Title of the post</title>
+      <link th:text='${"http://jonathanbullock.com"+post.uri}'>http://jonathanbullock.com/blog/foo.html</link>
+      <pubDate th:text='${#dates.format(post.date,"EEE, d MMM yyyy HH:mm:ss Z")}'>2014-01-30</pubDate>
+      <guid isPermaLink="false" th:text="${post.uri}">http://jonathanbullock.com/blog/foo.html</guid>
+      	<description th:text='${#strings.escapeXml(post.body)}'>Body of the post</description>
+    </item>
+  </channel> 
+</rss>
