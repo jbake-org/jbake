@@ -18,14 +18,22 @@ package me.champeau.gradle
 import org.apache.commons.configuration.CompositeConfiguration
 import org.apache.commons.configuration.MapConfiguration
 import org.gradle.api.internal.AbstractTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jbake.app.Oven
 
 class JBakeTask extends AbstractTask {
+    @InputDirectory File input
+    @OutputDirectory File output
+    @Input Map<String, Object> configuration = [:]
+    boolean clearCache = false
+
     @TaskAction
     void bake() {
-        new Oven(project.jbake.input, project.jbake.output, project.jbake.clearCache).with {
-            config = new CompositeConfiguration([new MapConfiguration(project.jbake.configuration), config])
+        new Oven(input, output, clearCache).with {
+            config = new CompositeConfiguration([new MapConfiguration(configuration), config])
             setupPaths()
             bake()
         }
