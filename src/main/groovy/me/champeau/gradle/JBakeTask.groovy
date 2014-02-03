@@ -25,8 +25,8 @@ import org.gradle.api.tasks.TaskAction
 import org.jbake.app.Oven
 
 class JBakeTask extends AbstractTask {
-    @InputDirectory File input
-    @OutputDirectory File output
+    @InputDirectory File input = new File("$project.projectDir/src/jbake")
+    @OutputDirectory File output = new File("$project.buildDir/jbake")
     @Input Map<String, Object> configuration = [:]
     boolean clearCache = false
 
