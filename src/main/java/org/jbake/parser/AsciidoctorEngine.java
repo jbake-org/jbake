@@ -142,7 +142,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             final String name = iterator.next();
             options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
         }
-        options.setBaseDir(context.getContentPath());
+        options.setBaseDir(context.getFile().getParent());
         options.setSafe(UNSAFE);
         return options;
     }
