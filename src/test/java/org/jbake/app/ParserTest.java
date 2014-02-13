@@ -37,7 +37,6 @@ public class ParserTest {
 	
 	@Before
 	public void createSampleFile() throws Exception {
-		ConfigUtil.reset();
 		rootPath = new File(this.getClass().getResource(".").getFile());
 		config = ConfigUtil.load(rootPath);
 		parser = new Parser(config,rootPath.getPath());

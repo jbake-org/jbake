@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -129,6 +130,9 @@ public class Engines {
         if (engine != null) {
             for (String extension : extensions) {
                 register(extension, engine);
+            }
+            if (engine instanceof ErrorEngine) {
+                LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", Arrays.toString(extensions));
             }
         }
     }

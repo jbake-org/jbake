@@ -10,6 +10,11 @@ import org.pegdown.PegDownProcessor;
  */
 public class MarkdownEngine extends MarkupEngine {
 
+    public MarkdownEngine() {
+        Class engineClass = PegDownProcessor.class;
+        assert engineClass!=null;
+    }
+
     @Override
     public void processBody(final ParserContext context) {
         String[] mdExts = context.getConfig().getStringArray("markdown.extensions");

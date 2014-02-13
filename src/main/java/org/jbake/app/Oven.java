@@ -49,6 +49,14 @@ public class Oven {
         this.isClearCache = isClearCache;
 	}
 
+    public CompositeConfiguration getConfig() {
+        return config;
+    }
+
+    public void setConfig(final CompositeConfiguration config) {
+        this.config = config;
+    }
+
     private void ensureSource() throws Exception {
         if (!FileUtil.isExistingFolder(source)) {
             throw new Exception("Error: Source folder must exist!");
@@ -170,7 +178,7 @@ public class Oven {
             Asset asset = new Asset(source, destination);
             asset.copy(assetsPath);
 
-            LOGGER.info("Backing finished!");
+            LOGGER.info("Baking finished!");
             long end = new Date().getTime();
             LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
             if (errorCount > 0) {

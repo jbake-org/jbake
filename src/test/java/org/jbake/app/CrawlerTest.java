@@ -13,7 +13,6 @@ public class CrawlerTest {
 	
 	@Test
 	public void crawl() throws ConfigurationException {
-		ConfigUtil.reset();
 		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
 		Assert.assertEquals(".html", config.getString("output.extension"));
 				

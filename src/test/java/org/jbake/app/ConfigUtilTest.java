@@ -11,7 +11,6 @@ public class ConfigUtilTest {
 
 	@Test
 	public void load() throws Exception {
-		ConfigUtil.reset();
 		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
 		
 		// check default.properties values exist

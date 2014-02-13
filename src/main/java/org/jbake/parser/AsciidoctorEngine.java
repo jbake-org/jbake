@@ -4,8 +4,10 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Attributes;
+import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
+import org.jbake.app.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,11 @@ public class AsciidoctorEngine extends MarkupEngine {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private Asciidoctor engine;
+
+    public AsciidoctorEngine() {
+        Class engineClass = Asciidoctor.class;
+        assert engineClass!=null;
+    }
 
     private Asciidoctor getEngine() {
         try {
@@ -80,7 +87,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             if (key.equals("revdate")) {
                 if (attributes.get(key) != null && attributes.get(key) instanceof String) {
 
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    DateFormat df = new SimpleDateFormat(context.getConfig().getString(ConfigUtil.DATE_FORMAT));
                     Date date = null;
                     try {
                         date = df.parse((String)attributes.get(key));
@@ -120,14 +127,23 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         CompositeConfiguration config = context.getConfig();
-        Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
-        Configuration optionsSubset = config.subset("asciidoctor.option");
-        Options options = options().attributes(attributes).get();
-        for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
-            String name = iterator.next();
-            options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
+        final AttributesBuilder attributes = attributes(config.getStringArray("asciidoctor.attributes"));
+        if (config.getBoolean("asciidoctor.attributes.export", false)) {
+            final String prefix = config.getString(  "asciidoctor.attributes.export.prefix", "");
+            for (final Iterator<String> it = config.getKeys(); it.hasNext();) {
+                final String key = it.next();
+                if (!key.startsWith("asciidoctor")) {
+                    attributes.attribute(prefix + key.replace(".", "_"), config.getProperty(key));
+                }
+            }
         }
-        options.setBaseDir(context.getContentPath());
+        final Configuration optionsSubset = config.subset("asciidoctor.option");
+        final Options options = options().attributes(attributes.get()).get();
+        for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
+            final String name = iterator.next();
+            options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
+        }
+        options.setBaseDir(context.getFile().getParent());
         options.setSafe(UNSAFE);
         return options;
     }
