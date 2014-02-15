@@ -18,7 +18,6 @@ import org.kohsuke.args4j.CmdLineParser;
  *
  */
 public class Main {
-//	public static final String VERSION = "v2.2";
 
 	private final String USAGE_PREFIX = "Usage: jbake";
 	
@@ -38,8 +37,8 @@ public class Main {
 			oven.setupPaths();
 			oven.bake();
 		} catch (Exception e) {
-//			System.err.println(e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
