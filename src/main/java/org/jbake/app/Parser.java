@@ -166,7 +166,7 @@ public class Parser {
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
                     if (parts[0].equalsIgnoreCase("date")) {
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        DateFormat df = new SimpleDateFormat(config.getString(ConfigUtil.DATE_FORMAT));
                         Date date = null;
                         try {
                             date = df.parse(parts[1]);
