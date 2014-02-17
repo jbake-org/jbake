@@ -36,6 +36,9 @@ public class Main {
 			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
 			oven.setupPaths();
 			oven.bake();
+			if (oven.getErrorCount() > 0) {
+				System.exit(1);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);

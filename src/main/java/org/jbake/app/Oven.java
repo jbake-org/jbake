@@ -34,6 +34,8 @@ public class Oven {
 	private File contentsPath;
 	private File assetsPath;
     private boolean isClearCache;
+    private int errorCount = 0;
+    private int renderedCount = 0;
 
 	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
@@ -129,8 +131,8 @@ public class Oven {
 
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
-            int renderedCount = 0;
-            int errorCount = 0;
+//            int renderedCount = 0;
+//            int errorCount = 0;
 
             for (String docType : DocumentTypes.getDocumentTypes()) {
                 DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from "+docType+" where rendered=false");
@@ -147,27 +149,47 @@ public class Oven {
 
             // write index file
             if (config.getBoolean("render.index")) {
-                renderer.renderIndex(config.getString("index.file"));
+            	try {
+            		renderer.renderIndex(config.getString("index.file"));
+            	} catch (Exception e) {
+                    errorCount++;
+                }
             }
 
             // write feed file
             if (config.getBoolean("render.feed")) {
-                renderer.renderFeed(config.getString("feed.file"));
+            	try {
+            		renderer.renderFeed(config.getString("feed.file"));
+            	} catch (Exception e) {
+                    errorCount++;
+                }
             }
 
             // write sitemap file
             if (config.getBoolean("render.sitemap")) {
-                renderer.renderSitemap(config.getString("sitemap.file"));
+            	try {
+            		renderer.renderSitemap(config.getString("sitemap.file"));
+            	} catch (Exception e) {
+                    errorCount++;
+                }
             }
 
             // write master archive file
             if (config.getBoolean("render.archive")) {
-                renderer.renderArchive(config.getString("archive.file"));
+            	try {
+            		renderer.renderArchive(config.getString("archive.file"));
+            	} catch (Exception e) {
+                    errorCount++;
+                }
             }
 
             // write tag files
             if (config.getBoolean("render.tags")) {
-                renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
+            	try {
+            		renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
+            	} catch (Exception e) {
+                    errorCount++;
+                }
             }
 
             // mark docs as rendered
@@ -177,7 +199,10 @@ public class Oven {
             // copy assets
             Asset asset = new Asset(source, destination);
             asset.copy(assetsPath);
-
+            if (asset.getErrorCount() > 0) {
+            	errorCount += asset.getErrorCount();
+            }
+            
             LOGGER.info("Baking finished!");
             long end = new Date().getTime();
             LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
@@ -237,4 +262,9 @@ public class Oven {
             DBUtil.updateSchema(db);
         }
     }
+
+	public int getErrorCount() {
+		return errorCount;
+	}
+    
 }
