@@ -105,8 +105,9 @@ public class Renderer {
      * Render an index file using the supplied content.
      *
      * @param indexFile The name of the output file
+     * @throws Exception 
      */
-    public void renderIndex(String indexFile) {
+    public void renderIndex(String indexFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + indexFile);
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering index [").append(outputFile).append("]...");
@@ -122,17 +123,18 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-
+            throw new Exception("Failed to render index");
         }
     }
 
     /**
      * Render an XML sitemap file using the supplied content.
+     * @throws Exception 
      *
      * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
-    public void renderSitemap(String sitemapFile) {
+    public void renderSitemap(String sitemapFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + sitemapFile);
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering sitemap [").append(outputFile).append("]... ");
@@ -147,6 +149,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
+            throw new Exception("Failed to render sitemap");
         }
     }
 
@@ -154,8 +157,9 @@ public class Renderer {
      * Render an XML feed file using the supplied content.
      *
      * @param feedFile The name of the output file
+     * @throws Exception 
      */
-    public void renderFeed(String feedFile) {
+    public void renderFeed(String feedFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + feedFile);
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering feed [").append(outputFile).append("]... ");
@@ -171,6 +175,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
+            throw new Exception("Failed to render feed");
         }
     }
 
@@ -178,8 +183,9 @@ public class Renderer {
      * Render an archive file using the supplied content.
      *
      * @param archiveFile The name of the output file
+     * @throws Exception 
      */
-    public void renderArchive(String archiveFile) {
+    public void renderArchive(String archiveFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + archiveFile);
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering archive [").append(outputFile).append("]... ");
@@ -195,6 +201,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
+            throw new Exception("Failed to render archive");
         }
     }
 
@@ -203,8 +210,10 @@ public class Renderer {
      *
      * @param tags    The content to renderDocument
      * @param tagPath The output path
+     * @throws Exception 
      */
-    public void renderTags(Set<String> tags, String tagPath) {
+    public void renderTags(Set<String> tags, String tagPath) throws Exception {
+    	int errors = 0;
         for (String tag : tags) {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
@@ -224,8 +233,11 @@ public class Renderer {
             } catch (Exception e) {
                 sb.append("failed!");
                 LOGGER.error(sb.toString(), e);
+                errors++;
             }
         }
+        if (errors > 0) {
+        	throw new Exception("Failed to render tags");
+        }
     }
-
 }

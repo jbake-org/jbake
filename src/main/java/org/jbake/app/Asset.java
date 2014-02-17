@@ -20,6 +20,7 @@ public class Asset {
 
     private File source;
 	private File destination;
+	private int errorCount = 0;
 	
 	/**
 	 * Creates an instance of Asset.
@@ -50,6 +51,7 @@ public class Asset {
 						FileUtils.copyFile(sourceFile, destFile);
 					} catch (IOException e) {
 						e.printStackTrace();
+						errorCount++;
 					}
 					LOGGER.info("done!");
 				} 
@@ -59,5 +61,9 @@ public class Asset {
 				}
 			}
 		}
+	}
+
+	public int getErrorCount() {
+		return errorCount;
 	}
 }
