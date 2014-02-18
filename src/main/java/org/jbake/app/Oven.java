@@ -1,8 +1,10 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -33,9 +35,9 @@ public class Oven {
 	private File templatesPath;
 	private File contentsPath;
 	private File assetsPath;
-    private boolean isClearCache;
-    private int errorCount = 0;
-    private int renderedCount = 0;
+	private boolean isClearCache;
+	private List<String> errors = new LinkedList<String>();
+	private int renderedCount = 0;
 
 	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
@@ -134,85 +136,90 @@ public class Oven {
 //            int renderedCount = 0;
 //            int errorCount = 0;
 
-            for (String docType : DocumentTypes.getDocumentTypes()) {
-                DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from "+docType+" where rendered=false");
-                while (pagesIt.hasNext()) {
-                    Map<String, Object> page = pagesIt.next();
-                    try {
-                        renderer.render(page);
-                        renderedCount++;
-                    } catch (Exception e) {
-                        errorCount++;
-                    }
-                }
-            }
+			for (String docType : DocumentTypes.getDocumentTypes()) {
+				DocumentIterator pagesIt = DBUtil.fetchDocuments(db,
+						"select * from " + docType + " where rendered=false");
+				while (pagesIt.hasNext()) {
+					Map<String, Object> page = pagesIt.next();
+					try {
+						renderer.render(page);
+						renderedCount++;
+					} catch (Exception e) {
+						errors.add(e.getMessage());
+					}
+				}
+			}
 
-            // write index file
-            if (config.getBoolean("render.index")) {
-            	try {
-            		renderer.renderIndex(config.getString("index.file"));
-            	} catch (Exception e) {
-                    errorCount++;
-                }
-            }
+			// write index file
+			if (config.getBoolean("render.index")) {
+				try {
+					renderer.renderIndex(config.getString("index.file"));
+				} catch (Exception e) {
+					errors.add(e.getMessage());
+				}
+			}
 
-            // write feed file
-            if (config.getBoolean("render.feed")) {
-            	try {
-            		renderer.renderFeed(config.getString("feed.file"));
-            	} catch (Exception e) {
-                    errorCount++;
-                }
-            }
+			// write feed file
+			if (config.getBoolean("render.feed")) {
+				try {
+					renderer.renderFeed(config.getString("feed.file"));
+				} catch (Exception e) {
+					errors.add(e.getMessage());
+				}
+			}
 
-            // write sitemap file
-            if (config.getBoolean("render.sitemap")) {
-            	try {
-            		renderer.renderSitemap(config.getString("sitemap.file"));
-            	} catch (Exception e) {
-                    errorCount++;
-                }
-            }
+			// write sitemap file
+			if (config.getBoolean("render.sitemap")) {
+				try {
+					renderer.renderSitemap(config.getString("sitemap.file"));
+				} catch (Exception e) {
+					errors.add(e.getMessage());
+				}
+			}
 
-            // write master archive file
-            if (config.getBoolean("render.archive")) {
-            	try {
-            		renderer.renderArchive(config.getString("archive.file"));
-            	} catch (Exception e) {
-                    errorCount++;
-                }
-            }
+			// write master archive file
+			if (config.getBoolean("render.archive")) {
+				try {
+					renderer.renderArchive(config.getString("archive.file"));
+				} catch (Exception e) {
+					errors.add(e.getMessage());
+				}
+			}
 
-            // write tag files
-            if (config.getBoolean("render.tags")) {
-            	try {
-            		renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
-            	} catch (Exception e) {
-                    errorCount++;
-                }
-            }
+			// write tag files
+			if (config.getBoolean("render.tags")) {
+				try {
+					renderer.renderTags(crawler.getTags(),
+							config.getString("tag.path"));
+				} catch (Exception e) {
+					errors.add(e.getMessage());
+				}
+			}
 
-            // mark docs as rendered
-            for (String docType : DocumentTypes.getDocumentTypes()) {
-                DBUtil.update(db, "update "+docType+" set rendered=true where rendered=false and cached=true");
-            }
-            // copy assets
-            Asset asset = new Asset(source, destination);
-            asset.copy(assetsPath);
-            if (asset.getErrorCount() > 0) {
-            	errorCount += asset.getErrorCount();
-            }
-            
-            LOGGER.info("Baking finished!");
-            long end = new Date().getTime();
-            LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
-            if (errorCount > 0) {
-                LOGGER.error("Failed to bake {} item(s)!", errorCount);
-            }
-        } finally {
-            db.close();
-        }
-    }
+			// mark docs as rendered
+			for (String docType : DocumentTypes.getDocumentTypes()) {
+				DBUtil.update(
+						db,
+						"update "
+								+ docType
+								+ " set rendered=true where rendered=false and cached=true");
+			}
+			// copy assets
+			Asset asset = new Asset(source, destination);
+			asset.copy(assetsPath);
+			errors.addAll(asset.getErrors());
+
+			LOGGER.info("Baking finished!");
+			long end = new Date().getTime();
+			LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
+			if (errors.size() > 0) {
+				LOGGER.error("Failed to bake {} item(s)!", errors.size());
+			}
+			
+		} finally {
+			db.close();
+		}
+	}
 
     /**
      * Iterates over the configuration, searching for keys like "template.index.file=..."
@@ -263,8 +270,8 @@ public class Oven {
         }
     }
 
-	public int getErrorCount() {
-		return errorCount;
+	public List<String> getErrors() {
+		return new ArrayList<String>(errors);
 	}
     
 }

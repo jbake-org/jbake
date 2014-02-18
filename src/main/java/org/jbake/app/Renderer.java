@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,7 +90,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render file");
+            throw new Exception("Failed to render file. Cause: " + e.getMessage());
         }
     }
 
@@ -123,7 +125,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render index");
+            throw new Exception("Failed to render index. Cause: " + e.getMessage());
         }
     }
 
@@ -149,7 +151,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render sitemap");
+            throw new Exception("Failed to render sitemap. Cause: " + e.getMessage());
         }
     }
 
@@ -175,7 +177,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render feed");
+            throw new Exception("Failed to render feed. Cause: " + e.getMessage());
         }
     }
 
@@ -201,7 +203,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render archive");
+            throw new Exception("Failed to render archive. Cause: " + e.getMessage());
         }
     }
 
@@ -213,7 +215,7 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderTags(Set<String> tags, String tagPath) throws Exception {
-    	int errors = 0;
+    	final List<String> errors = new LinkedList<String>();
         for (String tag : tags) {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
@@ -233,11 +235,15 @@ public class Renderer {
             } catch (Exception e) {
                 sb.append("failed!");
                 LOGGER.error(sb.toString(), e);
-                errors++;
+                errors.add(e.getMessage());
             }
         }
-        if (errors > 0) {
-        	throw new Exception("Failed to render tags");
+        if (!errors.isEmpty()) {
+        	String msg = "Failed to render tags. Cause(s):";
+        	for(String error: errors) {
+        		msg += "\n" + error;
+        	}
+        	throw new Exception(msg);
         }
     }
 }

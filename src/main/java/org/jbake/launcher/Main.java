@@ -2,6 +2,8 @@ package org.jbake.launcher;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.text.MessageFormat;
+import java.util.List;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -36,7 +38,15 @@ public class Main {
 			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
 			oven.setupPaths();
 			oven.bake();
-			if (oven.getErrorCount() > 0) {
+			final List<String> errors = oven.getErrors();
+			if (!errors.isEmpty()) {
+				// TODO: decide, if we want the all error here
+				System.err.println(MessageFormat.format("JBake failed with {0} errors:", errors.size()));
+				int errNr = 1;
+				for (String msg : errors) {
+					System.err.println(MessageFormat.format("{0}. {1}", errNr, msg));
+					++errNr;
+				}
 				System.exit(1);
 			}
 		} catch (Exception e) {

@@ -2,7 +2,10 @@ package org.jbake.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -20,8 +23,8 @@ public class Asset {
 
     private File source;
 	private File destination;
-	private int errorCount = 0;
-	
+	private final List<String> errors = new LinkedList<String>();
+
 	/**
 	 * Creates an instance of Asset.
 	 * 
@@ -51,7 +54,7 @@ public class Asset {
 						FileUtils.copyFile(sourceFile, destFile);
 					} catch (IOException e) {
 						e.printStackTrace();
-						errorCount++;
+						errors.add(e.getMessage());
 					}
 					LOGGER.info("done!");
 				} 
@@ -63,7 +66,8 @@ public class Asset {
 		}
 	}
 
-	public int getErrorCount() {
-		return errorCount;
+	public List<String> getErrors() {
+		return new ArrayList<String>(errors);
 	}
+
 }
