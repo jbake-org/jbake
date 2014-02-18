@@ -133,9 +133,6 @@ public class Oven {
 
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
-//            int renderedCount = 0;
-//            int errorCount = 0;
-
 			for (String docType : DocumentTypes.getDocumentTypes()) {
 				DocumentIterator pagesIt = DBUtil.fetchDocuments(db,
 						"select * from " + docType + " where rendered=false");
