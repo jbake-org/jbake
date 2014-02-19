@@ -29,11 +29,10 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Main m = new Main();
-		m.run(m.parseArguments(args));
+		new Main().run(args);
 	}
 	
-	private void run(LaunchOptions options) {
+	private void bake(LaunchOptions options) {
 		try {
 			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
 			oven.setupPaths();
@@ -55,48 +54,65 @@ public class Main {
 		}
 	}
 
+	private void run(String[] args) {
+		LaunchOptions res = parseArguments(args);
+
+		CompositeConfiguration config = null;
+		try {
+			config = ConfigUtil.load(res.getSource());
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
+		System.out.println();
+		boolean didSomething=false;
+		
+		if (res.isHelpNeeded()) {
+			didSomething=true;
+			printUsage(res);
+		}
+		
+		if(res.isBake()) {
+			didSomething=true;
+			bake(res);
+		}
+
+		if (res.isRunServer()) {
+			didSomething=true;
+			if (res.getSource().getPath().equals(".")) {
+				// use the default destination folder
+				runServer(config.getString("destination.folder"), config.getString("server.port"));
+			} else {
+				runServer(res.getSource().getPath(), config.getString("server.port"));
+			}
+		}
+		
+		if (res.isInit()) {
+			didSomething=true;
+			initStructure(config);
+		}
+		
+		if(!didSomething) {
+			bake(res);
+		}
+	}
 	private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();
 		CmdLineParser parser = new CmdLineParser(res);
 
 		try {
 			parser.parseArgument(args);
-
-			CompositeConfiguration config = null;
-			try {
-				config = ConfigUtil.load(res.getSource());
-			} catch (ConfigurationException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-			
-			System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
-			System.out.println();
-			
-			if (res.isHelpNeeded()) {
-				printUsage(parser);
-			}
-			
-			if (res.isRunServer()) {
-				if (res.getSource().getPath().equals(".")) {
-					// use the default destination folder
-					runServer(config.getString("destination.folder"), config.getString("server.port"));
-				} else {
-					runServer(res.getSource().getPath(), config.getString("server.port"));
-				}
-			}
-			
-			if (res.isInit()) {
-				initStructure(config);
-			}
 		} catch (CmdLineException e) {
-			printUsage(parser);
+			printUsage(res);
 		}
 
 		return res;
 	}
 
-	private void printUsage(CmdLineParser parser) {
+	private void printUsage(Object options) {
+		CmdLineParser parser = new CmdLineParser(options);
 		StringWriter sw = new StringWriter();
 		sw.append(USAGE_PREFIX);
 		parser.printSingleLineUsage(sw, null);
@@ -108,7 +124,7 @@ public class Main {
 
 	private void runServer(String path, String port) {
 		JettyServer.run(path, port);
-        System.exit(0);
+		System.exit(0);
 	}
 	
 	private void initStructure(CompositeConfiguration config) {
