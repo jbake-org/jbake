@@ -52,6 +52,6 @@ public class LaunchOptions {
     }
 
     public boolean isBake() {
-		return bake;
+		return bake || !(isHelpNeeded() || isRunServer() || isInit());
 	}
 }

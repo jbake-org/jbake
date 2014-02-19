@@ -67,20 +67,20 @@ public class Main {
 		
 		System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
 		System.out.println();
-		boolean didSomething=false;
 		
 		if (res.isHelpNeeded()) {
-			didSomething=true;
 			printUsage(res);
 		}
 		
 		if(res.isBake()) {
-			didSomething=true;
 			bake(res);
 		}
 
+		if (res.isInit()) {
+			initStructure(config);
+		}
+		
 		if (res.isRunServer()) {
-			didSomething=true;
 			if (res.getSource().getPath().equals(".")) {
 				// use the default destination folder
 				runServer(config.getString("destination.folder"), config.getString("server.port"));
@@ -89,14 +89,6 @@ public class Main {
 			}
 		}
 		
-		if (res.isInit()) {
-			didSomething=true;
-			initStructure(config);
-		}
-		
-		if(!didSomething) {
-			bake(res);
-		}
 	}
 	private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();

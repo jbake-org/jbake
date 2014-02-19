@@ -49,6 +49,16 @@ public class LaunchOptionsTest {
 	}
 	
 	@Test
+	public void bake() throws Exception {
+		String[] args = {"-b"};
+		LaunchOptions res = new LaunchOptions();
+		CmdLineParser parser = new CmdLineParser(res);
+		parser.parseArgument(args);
+		
+		Assert.assertTrue(res.isBake());
+	}
+	
+	@Test
 	public void bakeNoArgs() throws Exception {
 		String[] args = {};
 		LaunchOptions res = new LaunchOptions();
@@ -58,6 +68,7 @@ public class LaunchOptionsTest {
 		Assert.assertFalse(res.isHelpNeeded());
 		Assert.assertFalse(res.isRunServer());
 		Assert.assertFalse(res.isInit());
+		Assert.assertTrue(res.isBake());
 		Assert.assertEquals(".", res.getSource().getPath());
 		Assert.assertEquals(null, res.getDestination());
 	}
@@ -72,6 +83,7 @@ public class LaunchOptionsTest {
 		Assert.assertFalse(res.isHelpNeeded());
 		Assert.assertFalse(res.isRunServer());
 		Assert.assertFalse(res.isInit());
+		Assert.assertTrue(res.isBake());
 		Assert.assertEquals("/tmp/source", res.getSource().getPath());
 		Assert.assertEquals("/tmp/destination", res.getDestination().getPath());
 	}
