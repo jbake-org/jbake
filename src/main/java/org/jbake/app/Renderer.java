@@ -239,11 +239,12 @@ public class Renderer {
             }
         }
         if (!errors.isEmpty()) {
-        	String msg = "Failed to render tags. Cause(s):";
+        	StringBuilder sb = new StringBuilder();
+        	sb.append("Failed to render tags. Cause(s):");
         	for(String error: errors) {
-        		msg += "\n" + error;
+        		sb.append("\n" + error);
         	}
-        	throw new Exception(msg);
+        	throw new Exception(sb.toString());
         }
     }
 }

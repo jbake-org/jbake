@@ -134,8 +134,7 @@ public class Oven {
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
 			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DocumentIterator pagesIt = DBUtil.fetchDocuments(db,
-						"select * from " + docType + " where rendered=false");
+				DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from " + docType + " where rendered=false");
 				while (pagesIt.hasNext()) {
 					Map<String, Object> page = pagesIt.next();
 					try {
@@ -186,8 +185,7 @@ public class Oven {
 			// write tag files
 			if (config.getBoolean("render.tags")) {
 				try {
-					renderer.renderTags(crawler.getTags(),
-							config.getString("tag.path"));
+					renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
@@ -195,11 +193,7 @@ public class Oven {
 
 			// mark docs as rendered
 			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DBUtil.update(
-						db,
-						"update "
-								+ docType
-								+ " set rendered=true where rendered=false and cached=true");
+				DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
 			}
 			// copy assets
 			Asset asset = new Asset(source, destination);
