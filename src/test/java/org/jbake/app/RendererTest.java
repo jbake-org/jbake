@@ -1,7 +1,7 @@
 package org.jbake.app;
 
 import java.io.File;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;

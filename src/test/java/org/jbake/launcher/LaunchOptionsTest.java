@@ -1,7 +1,7 @@
 package org.jbake.launcher;
 
 import java.io.File;
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import junit.framework.Assert;
 

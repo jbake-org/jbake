@@ -72,6 +72,7 @@
 		<junit.version>4.10</junit.version>
 		<pegdown.version>1.4.2</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
+		<assertj.version>1.5.0</assertj.version>
 	</properties>
 
 	<build>
@@ -219,9 +220,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert</artifactId>
-			<version>1.4</version>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- <dependency>
