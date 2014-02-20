@@ -112,4 +112,31 @@ public class FileUtil {
             }
         }
     }
+
+	/**
+	 * platform independent file.getPath() 
+	 * 
+	 * @param file the file to transform, or {@code null}
+	 * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null} 
+	 *         Needed to transform Windows path separators into slashes.
+	 */
+	public static String asPath(File file) {
+		if(file == null) {
+			return null;
+		}
+	    return asPath(file.getPath());
+	}
+	
+	/**
+	 * platform independent file.getPath() 
+	 * 
+	 * @param path the path to transform, or {@code null}
+	 * @return The result will have alle platform path separators replaced by "/".
+	 */
+	public static String asPath(String path) {
+		if(path == null) {
+			return null;
+		}
+		return path.replace(File.separator, "/");
+	}
 }

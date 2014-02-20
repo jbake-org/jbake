@@ -102,7 +102,7 @@ public class Crawler {
     }
 
     private String buildURI(final File sourceFile) {
-        String uri = sourceFile.getPath().replace(contentPath, "");
+    	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
         uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString("output.extension");
         return uri;
     }

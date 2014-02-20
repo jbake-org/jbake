@@ -69,13 +69,14 @@
 		<commons.configuration.version>1.9</commons.configuration.version>
 		<args4j.version>2.0.23</args4j.version>
 		<freemarker.version>2.3.19</freemarker.version>
-		<junit.version>4.8.1</junit.version>
-		<pegdown.version>1.4.1</pegdown.version>
+		<junit.version>4.10</junit.version>
+		<pegdown.version>1.4.2</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
         <orientdb.version>1.6.2</orientdb.version>
         <groovy.version>2.2.1</groovy.version>
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.9</logback.version>
+        <assertj.version>1.5.0</assertj.version>
     </properties>
 
 	<build>
@@ -88,6 +89,14 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -225,6 +234,12 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- <dependency>
