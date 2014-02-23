@@ -31,8 +31,8 @@
                 <include>jbake*</include>
             </includes>
         </fileSet>
-        <!-- adds jar package to the root directory of zip package -->
         <fileSet>
+        	<!-- adds jar package to the root directory of zip package -->
             <directory>${project.build.directory}</directory>
             <outputDirectory></outputDirectory>
             <includes>
@@ -46,11 +46,19 @@
                 <include>LICENSE</include>
             </includes>
         </fileSet>
-        <fileSet>
+        <!-- <fileSet>
         	<directory>${basedir}/src/main/templates/</directory>
         	<outputDirectory></outputDirectory>
             <includes>
                 <include>base*</include>
+            </includes>
+        </fileSet> -->
+        <fileSet>
+        	<!-- adds base template file to the root directory of zip package -->
+        	<directory>${project.build.directory}</directory>
+        	<outputDirectory></outputDirectory>
+            <includes>
+                <include>base.zip</include>
             </includes>
         </fileSet>
     </fileSets>

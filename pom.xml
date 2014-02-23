@@ -27,14 +27,14 @@
 	</developers>
 
 	<scm>
-		<url>https://github.com/jonbullock/JBake/</url>
-		<connection>scm:git:git@github.com:jonbullock/JBake.git</connection>
-		<developerConnection>scm:git:https://github.com/jonbullock/JBake.git</developerConnection>
+		<url>https://github.com/jbake-org/jbake/</url>
+		<connection>scm:git:git@github.com:jbake-org/jbake.git</connection>
+		<developerConnection>scm:git:https://github.com/jbake-org/jbake.git</developerConnection>
 	</scm>
 	
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/jonbullock/JBake/issues</url>
+		<url>https://github.com/jbake-org/jbake/issues</url>
 	</issueManagement>
 
 	<mailingLists>
@@ -102,6 +102,23 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<configuration>
+							<checkoutDirectory>${project.build.directory}/base</checkoutDirectory>
+							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-template-bootstrap.git</connectionUrl>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
@@ -150,21 +167,36 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4</version>
-	            <configuration>
-					<outputDirectory>dist</outputDirectory>
-					<finalName>jbake-${project.version}</finalName>
-	                <descriptors>
-						<descriptor>src/main/assembly/assembly.xml</descriptor>
-	                </descriptors>
-	                <attach>false</attach>
-	            </configuration>
-	            <executions>
+				<executions>
+					<execution>
+						<id>make-base-template</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>base</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-base-template.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+						</configuration>
+					</execution>
 					<execution>
 						<id>make-assembly</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
+						<configuration>
+							<outputDirectory>dist</outputDirectory>
+							<finalName>jbake-${project.version}</finalName>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+						</configuration>
 					</execution>
 				</executions>
         	</plugin>
