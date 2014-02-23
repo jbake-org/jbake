@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,6 +116,7 @@ public class Renderer {
         sb.append("Rendering index [").append(outputFile).append("]...");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
+        model.put("content", Collections.singletonMap("type","index"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -142,6 +144,7 @@ public class Renderer {
         sb.append("Rendering sitemap [").append(outputFile).append("]... ");
 
         Map<String, Object> model = new HashMap<String, Object>();
+        model.put("content", Collections.singletonMap("type","sitemap"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -167,6 +170,7 @@ public class Renderer {
         sb.append("Rendering feed [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
+        model.put("content", Collections.singletonMap("type","feed"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -193,6 +197,7 @@ public class Renderer {
         sb.append("Rendering archive [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
+        model.put("content", Collections.singletonMap("type","archive"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -220,6 +225,7 @@ public class Renderer {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
             model.put("tag", tag);
+            model.put("content", Collections.singletonMap("type","tag"));
 
             tag = tag.trim().replace(" ", "-");
             File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));

@@ -77,6 +77,7 @@
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.9</logback.version>
         <assertj.version>1.5.0</assertj.version>
+        <thymeleaf.version>2.1.2.RELEASE</thymeleaf.version>
     </properties>
 
 	<build>
@@ -269,6 +270,12 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>${thymeleaf.version}</version>
             <optional>true</optional>
         </dependency>
 		<!-- sl4j Logging -->
