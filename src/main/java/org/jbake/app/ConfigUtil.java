@@ -29,5 +29,4 @@ public class ConfigUtil {
         config.addConfiguration(new PropertiesConfiguration("default.properties"));
         return config;
     }
-
 }

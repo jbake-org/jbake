@@ -84,6 +84,14 @@ public class Parser {
         }
         // then read engine specific headers
         engine.processHeader(context);
+        
+        if (config.getString("default.status") != null) {
+        	// default status has been set
+        	if (content.get("status") == null) {
+        		// file hasn't got status so use default
+        		content.put("status", config.getString("default.status"));
+        	}
+        }
 
         if (content.get("type")==null||content.get("status")==null) {
             // output error
@@ -207,7 +215,7 @@ public class Parser {
                 body.append(line).append("\n");
             }
         }
-
+        
         content.put("body", body.toString());
     }
 
