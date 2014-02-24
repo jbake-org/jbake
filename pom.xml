@@ -69,7 +69,7 @@
 		<commons.configuration.version>1.9</commons.configuration.version>
 		<args4j.version>2.0.23</args4j.version>
 		<freemarker.version>2.3.19</freemarker.version>
-		<junit.version>4.10</junit.version>
+		<junit.version>4.11</junit.version>
 		<pegdown.version>1.4.2</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
         <orientdb.version>1.6.2</orientdb.version>

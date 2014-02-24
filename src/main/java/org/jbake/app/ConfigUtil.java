@@ -1,10 +1,10 @@
 package org.jbake.app;
 
+import java.io.File;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-
-import java.io.File;
 
 /**
  * Provides Configuration related functions.
@@ -14,6 +14,7 @@ import java.io.File;
 public class ConfigUtil {
 
     public final static String DATE_FORMAT = "date.format";
+    public final static String URI_NO_EXTENSION = "uri.noExtension";
 
     public static CompositeConfiguration load(File source) throws ConfigurationException {
         CompositeConfiguration config = new CompositeConfiguration();

@@ -1,13 +1,6 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.model.DocumentStatus;
-import org.jbake.model.DocumentTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Arrays;
@@ -18,7 +11,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.io.File.separator;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FilenameUtils;
+import org.jbake.model.DocumentStatus;
+import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 /**
  * Crawls a file system looking for content.
@@ -103,7 +105,13 @@ public class Crawler {
 
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-        uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString("output.extension");
+        String noExtensionUrlFolder = config.getString(ConfigUtil.URI_NO_EXTENSION);
+        if (!noExtensionUrlFolder.equals("false") && uri.startsWith(noExtensionUrlFolder)) {
+            uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getString("output.extension");
+        } else {
+            uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString("output.extension");
+        }
+
         return uri;
     }
 
@@ -119,6 +127,10 @@ public class Crawler {
             }
             fileContents.put("file", sourceFile.getPath());
             fileContents.put("uri", uri);
+
+            if (!config.getString(ConfigUtil.URI_NO_EXTENSION).equals("false")) {
+                fileContents.put("noExtensionUri", uri.replace("/index.html", "/"));
+            }
 
             String documentType = (String) fileContents.get("type");
             if (fileContents.get("status").equals("published-date")) {
