@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -90,6 +91,24 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             if ("published_pages".equals(key)) {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
+            }
+            if ("published_content".equals(key)) {
+            	List<ODocument> publishedContent = new ArrayList<ODocument>();
+            	String[] documentTypes = DocumentTypes.getDocumentTypes();
+            	for (String docType : documentTypes) {
+            		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
+            		publishedContent.addAll(query);
+            	}
+            	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
+            }
+            if ("all_content".equals(key)) {
+            	List<ODocument> allContent = new ArrayList<ODocument>();
+            	String[] documentTypes = DocumentTypes.getDocumentTypes();
+            	for (String docType : documentTypes) {
+            		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" order by date desc"));
+            		allContent.addAll(query);
+            	}
+            	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
             }
             if ("alltags".equals(key)) {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));

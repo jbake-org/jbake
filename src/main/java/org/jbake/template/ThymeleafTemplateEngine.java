@@ -15,6 +15,7 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -104,6 +105,8 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
                 put(docType + "s", DocumentList.wrap(DBUtil.query(db, "select * from " + docType + " order by date desc").iterator()));
                 put("published_" + docType + "s", DocumentList.wrap(DBUtil.query(db, "select * from " + docType + " where status='published' order by date desc").iterator()));
             }
+            put("published_content", getPublishedContent());
+            put("all_content", getAllContent());
         }
 
         private Object getTagPosts() {
@@ -126,6 +129,26 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
                 Collections.addAll(result, tags);
             }
             return result;
+        }
+        
+        private Object getPublishedContent() {
+        	List<ODocument> publishedContent = new ArrayList<ODocument>();
+        	String[] documentTypes = DocumentTypes.getDocumentTypes();
+        	for (String docType : documentTypes) {
+        		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
+        		publishedContent.addAll(query);
+        	}
+        	return DocumentList.wrap(publishedContent.iterator());
+        }
+        
+        private Object getAllContent() {
+        	List<ODocument> allContent = new ArrayList<ODocument>();
+        	String[] documentTypes = DocumentTypes.getDocumentTypes();
+        	for (String docType : documentTypes) {
+        		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" order by date desc"));
+        		allContent.addAll(query);
+        	}
+        	return DocumentList.wrap(allContent.iterator());
         }
     }
 }
