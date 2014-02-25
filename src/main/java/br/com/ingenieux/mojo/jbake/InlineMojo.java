@@ -29,7 +29,7 @@ import java.io.File;
 /**
  * Runs jbake on a folder while watching and serving a folder with it
  */
-@Mojo(name = "inline", requiresDirectInvocation = true)
+@Mojo(name = "inline", requiresDirectInvocation = true, requiresProject = false)
 public class InlineMojo extends WatchMojo {
 	/**
 	 * Listen Port

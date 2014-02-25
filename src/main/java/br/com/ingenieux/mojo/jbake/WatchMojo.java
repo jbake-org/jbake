@@ -16,20 +16,19 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
+import br.com.ingenieux.mojo.jbake.util.DirWatcher;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-
-import br.com.ingenieux.mojo.jbake.util.DirWatcher;
-
 /**
  * Runs jbake on a folder while watching for changes
  */
-@Mojo(name = "watch", requiresDirectInvocation = true)
+@Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 public class WatchMojo extends GenerateMojo {
 	public void execute() throws MojoExecutionException {
 		super.execute();

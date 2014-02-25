@@ -16,18 +16,18 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.jbake.app.Oven;
 
+import java.io.File;
+
 /**
  * Runs jbake on a folder
  */
-@Mojo(name = "generate")
+@Mojo(name = "generate", requiresProject = false)
 public class GenerateMojo extends AbstractMojo {
 	/**
 	 * Location of the Output Directory.
