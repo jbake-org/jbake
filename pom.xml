@@ -65,6 +65,12 @@
         <dependency>
             <groupId>org.jbake</groupId>
             <artifactId>jbake-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
