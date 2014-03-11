@@ -2,9 +2,14 @@ package org.jbake.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Deals with assets (static files such as css, js or image files).
@@ -14,9 +19,12 @@ import org.apache.commons.io.FileUtils;
  */
 public class Asset {
 
-	private File source;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
+
+    private File source;
 	private File destination;
-	
+	private final List<String> errors = new LinkedList<String>();
+
 	/**
 	 * Creates an instance of Asset.
 	 * 
@@ -39,15 +47,16 @@ public class Asset {
 			Arrays.sort(assets);
 			for (int i = 0; i < assets.length; i++) {
 				if (assets[i].isFile()) {
-					System.out.print("Copying [" + assets[i].getPath() + "]... ");
+					LOGGER.info("Copying [{}]...", assets[i].getPath());
 					File sourceFile = assets[i];
 					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
 					try {
 						FileUtils.copyFile(sourceFile, destFile);
 					} catch (IOException e) {
 						e.printStackTrace();
+						errors.add(e.getMessage());
 					}
-					System.out.println("done!");
+					LOGGER.info("done!");
 				} 
 				
 				if (assets[i].isDirectory()) {
@@ -56,4 +65,9 @@ public class Asset {
 			}
 		}
 	}
+
+	public List<String> getErrors() {
+		return new ArrayList<String>(errors);
+	}
+
 }
