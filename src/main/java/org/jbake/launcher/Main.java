@@ -10,28 +10,29 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.FileUtil;
 import org.jbake.app.Oven;
+import org.jbake.app.creator.FileCreators;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 /**
  * Launcher for JBake.
- * 
+ *
  * @author Jonathan Bullock <jonbullock@gmail.com>
  *
  */
 public class Main {
 
 	private final String USAGE_PREFIX = "Usage: jbake";
-	
+
 	/**
 	 * Runs the app with the given arguments.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		new Main().run(args);
 	}
-	
+
 	private void bake(LaunchOptions options) {
 		try {
 			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
@@ -64,14 +65,18 @@ public class Main {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
+
 		System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
 		System.out.println();
-		
+
 		if (res.isHelpNeeded()) {
 			printUsage(res);
 		}
-		
+
+		if (res.isCreate()) {
+		    create(res);
+		}
+
 		if(res.isBake()) {
 			bake(res);
 		}
@@ -79,7 +84,7 @@ public class Main {
 		if (res.isInit()) {
 			initStructure(config);
 		}
-		
+
 		if (res.isRunServer()) {
 			if (res.getSource().getPath().equals(".")) {
 				// use the default destination folder
@@ -88,9 +93,10 @@ public class Main {
 				runServer(res.getSource().getPath(), config.getString("server.port"));
 			}
 		}
-		
+
 	}
-	private LaunchOptions parseArguments(String[] args) {
+
+    private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();
 		CmdLineParser parser = new CmdLineParser(res);
 
@@ -114,11 +120,15 @@ public class Main {
 		System.exit(0);
 	}
 
+	private void create(LaunchOptions res) {
+	    FileCreators.create(res.getCreatedFileName());
+	}
+
 	private void runServer(String path, String port) {
 		JettyServer.run(path, port);
 		System.exit(0);
 	}
-	
+
 	private void initStructure(CompositeConfiguration config) {
 		Init init = new Init(config);
 		try {
