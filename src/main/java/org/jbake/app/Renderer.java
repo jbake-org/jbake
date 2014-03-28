@@ -48,15 +48,17 @@ public class Renderer {
     private String findTemplateName(String docType) {
         return config.getString("template."+docType+".file");
     }
-
+    
     /**
      * Render the supplied content to a file.
      *
      * @param content The content to renderDocument
      * @throws Exception
      */
+    
     public void render(Map<String, Object> content) throws Exception {
 //		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
+        String docType = (String) content.get("type");
         String outputFilename = destination.getPath() + (String) content.get("uri");
         outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 
@@ -82,7 +84,7 @@ public class Renderer {
         model.put("renderer", renderingEngine);
 
         try {
-            String docType = (String) content.get("type");
+            
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
@@ -111,16 +113,21 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderIndex(String indexFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + indexFile);
+        renderIndex(indexFile, null);
+    }
+    
+    public void renderIndex(String indexFile, String locale) throws Exception {
+        File outputFile = new File(destination.getPath() + LocaleUtil.getPathLocalePart(locale) + File.separator + indexFile);
+        String docType = LocaleUtil.getLocaleSuffix(locale) + "index";
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering index [").append(outputFile).append("]...");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","index"));
+        model.put("content", Collections.singletonMap("type", docType));
 
         try {
             Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("index"), out);
+            renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
             sb.append("done!");
             LOGGER.info(sb.toString());
@@ -165,16 +172,21 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderFeed(String feedFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + feedFile);
+        renderFeed(feedFile, null);
+    }
+    
+    public void renderFeed(String feedFile, String locale) throws Exception {
+        File outputFile = new File(destination.getPath() + LocaleUtil.getPathLocalePart(locale) + File.separator + feedFile);
+        String docType = LocaleUtil.getLocaleSuffix(locale) + "feed";
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering feed [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","feed"));
+        model.put("content", Collections.singletonMap("type",docType));
 
         try {
             Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("feed"), out);
+            renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
             sb.append("done!");
             LOGGER.info(sb.toString());
@@ -192,16 +204,21 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderArchive(String archiveFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + archiveFile);
+        renderArchive(archiveFile, null);
+    }
+    
+    public void renderArchive(String archiveFile, String locale) throws Exception {
+        File outputFile = new File(destination.getPath() + LocaleUtil.getPathLocalePart(locale) + File.separator + archiveFile);
+        String docType = LocaleUtil.getLocaleSuffix(locale) + "archive";
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering archive [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","archive"));
+        model.put("content", Collections.singletonMap("type",docType));
 
         try {
             Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("archive"), out);
+            renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
             sb.append("done!");
             LOGGER.info(sb.toString());

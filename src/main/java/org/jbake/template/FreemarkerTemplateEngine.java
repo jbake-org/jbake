@@ -124,6 +124,10 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                 if ((docType+"s").equals(key)) {
                     return new SimpleSequence(DocumentList.wrap(DBUtil.query(db, "select * from "+docType+" order by date desc").iterator()));
                 }
+                if (("published_"+docType+"s").equals(key)) {
+                    List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
+                    return new SimpleSequence(DocumentList.wrap(query.iterator()));
+                }
             }
             if ("tag_posts".equals(key)) {
                 String tag = eagerModel.get("tag").toString();

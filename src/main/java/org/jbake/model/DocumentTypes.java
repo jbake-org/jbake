@@ -20,6 +20,10 @@ public class DocumentTypes {
         DEFAULT_DOC_TYPES.add(docType);
     }
 
+    public static boolean hasDocumentType(String docType) {
+        return DEFAULT_DOC_TYPES.contains(docType);
+    }
+    
     public static String[] getDocumentTypes() {
         return DEFAULT_DOC_TYPES.toArray(new String[DEFAULT_DOC_TYPES.size()]);
     }
