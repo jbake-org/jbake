@@ -1,19 +1,20 @@
 package org.jbake.app;
 
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.LocaleTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +28,10 @@ public class Oven {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
-    private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9]+)(?:\\.file)");
+    private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)(([a-zA-Z0-9]+)(?:_([a-zA-Z0-9]+))?)(?:\\.file)");
 
+    
+    
     private CompositeConfiguration config;
 	private File source;
 	private File destination;
@@ -38,7 +41,6 @@ public class Oven {
 	private boolean isClearCache;
 	private List<String> errors = new LinkedList<String>();
 	private int renderedCount = 0;
-
 	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
 	 *
@@ -119,12 +121,17 @@ public class Oven {
 	public void bake() throws Exception {
         ODatabaseDocumentTx db = DBUtil.createDB(config.getString("db.store"), config.getString("db.path"));
         updateDocTypesFromConfiguration();
+        
+        if (LocaleTypes.getLocales().length > 0) {
+            LOGGER.info("Locales : {}", (Object) LocaleTypes.getLocales());
+        }
+        
         DBUtil.updateSchema(db);
         try {
             long start = new Date().getTime();
             LOGGER.info("Baking has started...");
             clearCacheIfNeeded(db);
-
+            
             // process source content
             Crawler crawler = new Crawler(db, source, config);
             crawler.crawl(contentsPath);
@@ -138,7 +145,7 @@ public class Oven {
 				while (pagesIt.hasNext()) {
 					Map<String, Object> page = pagesIt.next();
 					try {
-						renderer.render(page);
+                                                renderer.render(page);
 						renderedCount++;
 					} catch (Exception e) {
 						errors.add(e.getMessage());
@@ -149,7 +156,10 @@ public class Oven {
 			// write index file
 			if (config.getBoolean("render.index")) {
 				try {
-					renderer.renderIndex(config.getString("index.file"));
+                                    renderer.renderIndex(config.getString("index.file"));
+                                    for (String locale : LocaleTypes.getLocalesForType("index")) {
+                                        renderer.renderIndex(config.getString("index.file"), locale);
+                                    }
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
@@ -158,7 +168,10 @@ public class Oven {
 			// write feed file
 			if (config.getBoolean("render.feed")) {
 				try {
-					renderer.renderFeed(config.getString("feed.file"));
+                                    renderer.renderFeed(config.getString("feed.file"));
+                                    for (String locale : LocaleTypes.getLocalesForType("feed")) {
+                                        renderer.renderFeed(config.getString("feed.file"), locale);
+                                    }
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
@@ -176,7 +189,10 @@ public class Oven {
 			// write master archive file
 			if (config.getBoolean("render.archive")) {
 				try {
-					renderer.renderArchive(config.getString("archive.file"));
+                                    renderer.renderArchive(config.getString("archive.file"));
+                                    for (String locale : LocaleTypes.getLocalesForType("archive")) {
+                                        renderer.renderArchive(config.getString("archive.file"), locale);
+                                    }
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
@@ -185,7 +201,7 @@ public class Oven {
 			// write tag files
 			if (config.getBoolean("render.tags")) {
 				try {
-					renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
+                                    renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
@@ -223,6 +239,11 @@ public class Oven {
             Matcher matcher = TEMPLATE_DOC_PATTERN.matcher(key);
             if (matcher.find()) {
                 DocumentTypes.addDocumentType(matcher.group(1));
+                final String localizedDocType = matcher.group(3);
+                if (localizedDocType != null) {
+                    String locale = matcher.group(2);
+                    LocaleTypes.addLocale(locale, new HashSet<String>(){{add(localizedDocType);}});
+                }
             }
         }
     }

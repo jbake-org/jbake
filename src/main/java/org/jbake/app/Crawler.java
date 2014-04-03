@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.io.File.separator;
+import org.jbake.model.LocaleTypes;
 
 /**
  * Crawls a file system looking for content.
@@ -58,6 +59,14 @@ public class Crawler {
                     sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
                     String sha1 = buildHash(sourceFile);
                     String uri = buildURI(sourceFile);
+                    String locale = LocaleUtil.getLocaleFromUri(uri);
+                    if (LocaleTypes.hasLocale(locale)) {
+                        uri = LocaleUtil.getPathLocalePart(locale) + LocaleUtil.stripLocaleSuffix(uri, locale);
+                        LOGGER.info("Localized uri: {}", uri);
+                    }
+                    else {
+                        locale = null; //not configured
+                    }
                     boolean process = true;
                     DocumentStatus status = DocumentStatus.NEW;
                     for (String docType : DocumentTypes.getDocumentTypes()) {
@@ -79,7 +88,7 @@ public class Crawler {
                         sb.append(" : new ");
                     }
                     if (process) { // new or updated
-                        crawlSourceFile(sourceFile, sha1, uri);
+                        crawlSourceFile(sourceFile, sha1, uri, locale);
                     }
                     LOGGER.info(sb.toString());
                 }
@@ -108,6 +117,10 @@ public class Crawler {
     }
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
+        crawlSourceFile(sourceFile, sha1, uri, null);
+    }
+    
+    private void crawlSourceFile(final File sourceFile, final String sha1, final String uri, final String locale) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
             fileContents.put("sha1", sha1);
@@ -121,6 +134,12 @@ public class Crawler {
             fileContents.put("uri", uri);
 
             String documentType = (String) fileContents.get("type");
+            documentType = LocaleUtil.getLocaleSuffix(locale) + LocaleUtil.stripLocaleSuffix(documentType, locale); //in case if it was supplied twice
+
+            if (DocumentTypes.hasDocumentType(documentType)) {
+                fileContents.put("type", documentType); //otherwise keeping whatever was supplied in the file
+            }
+            
             if (fileContents.get("status").equals("published-date")) {
                 if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
                     if (new Date().after((Date) fileContents.get("date"))) {
