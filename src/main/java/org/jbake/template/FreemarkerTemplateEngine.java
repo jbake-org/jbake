@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,7 +62,19 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     @Override
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
-            Template template = templateCfg.getTemplate(templateName);
+            Template template = null;
+            if (templateName.contains("_")) {
+                String locale = templateName.substring(templateName.lastIndexOf("_"));
+                Locale resolvedLocale = Locale.forLanguageTag(locale);
+                if (resolvedLocale != null) {
+                    template = templateCfg.getTemplate(templateName, resolvedLocale);
+                }
+            }
+            
+            if (template == null) {
+                template = templateCfg.getTemplate(templateName); //using default
+            }
+            
             template.process(new LazyLoadingModel(model, db), writer);
         } catch (IOException e) {
             throw new RenderingException(e);
