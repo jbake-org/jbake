@@ -17,9 +17,11 @@ package me.champeau.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 
 class JBakePlugin implements Plugin<Project> {
     void apply(Project project) {
-        project.task('jbake', type:JBakeTask)
+        Task jbake = project.task('jbake', type:JBakeTask)
+        project.task('jbakePreview', type:JBakePreviewTask).dependsOn(jbake)
     }
 }

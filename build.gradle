@@ -20,6 +20,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'org.jbake:jbake-core:2.3.0-SNAPSHOT'
+    compile 'org.eclipse.jetty:jetty-server:8.1.12.v20130726'
 }
 
 project.version = '0.1-SNAPSHOT'
