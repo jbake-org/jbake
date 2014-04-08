@@ -18,14 +18,13 @@ package me.champeau.gradle
 import org.apache.commons.configuration.CompositeConfiguration
 import org.apache.commons.configuration.MapConfiguration
 import org.gradle.api.internal.AbstractTask
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 import org.jbake.launcher.JettyServer
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class JBakePreviewTask extends AbstractTask {
 
@@ -36,9 +35,7 @@ class JBakePreviewTask extends AbstractTask {
 
     @TaskAction
     void jbakePreview() {
-        // TODO set logging level for the JettyServer instead
-        println "You can preview your site at: http://localhost:$port"
-        Logger log = LogFactory.getLogger
+        logging.level = LogLevel.INFO
         JettyServer.run( input.absolutePath, port )
     }
 }
