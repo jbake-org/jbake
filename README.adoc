@@ -32,19 +32,20 @@ This will add a `jbake` task to your build, which will search for a standard htt
 
 === Previewing
 You can preview your content by running the following command:
----
+
+----
 gradle jbake jbakePreview
----
+----
 
 This will start up a jetty container and serve your baked site on http://localhost:8820 by default.  You can change the
 port by adding this to your build.gradle file.
 
 [source,groovy]
----
+----
 jbakePreview {
    port = '8080'
 }
----
+----
 
 == Configuration
 === Plugin configuration
