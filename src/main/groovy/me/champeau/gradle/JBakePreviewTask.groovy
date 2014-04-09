@@ -15,13 +15,9 @@
  */
 package me.champeau.gradle
 
-import org.apache.commons.configuration.CompositeConfiguration
-import org.apache.commons.configuration.MapConfiguration
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 import org.jbake.launcher.JettyServer
@@ -30,8 +26,7 @@ class JBakePreviewTask extends AbstractTask {
 
     @InputDirectory File input = new File("$project.buildDir/jbake")
 
-    // TODO should be loaded from jbake.properties
-    @Input String port = "8820"
+    String port = "8820"
 
     @TaskAction
     void jbakePreview() {

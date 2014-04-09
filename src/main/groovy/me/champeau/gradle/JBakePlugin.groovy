@@ -21,7 +21,7 @@ import org.gradle.api.Task
 
 class JBakePlugin implements Plugin<Project> {
     void apply(Project project) {
-        Task jbake = project.task('jbake', type:JBakeTask)
-        project.task('jbakePreview', type:JBakePreviewTask).dependsOn(jbake)
+        project.task('jbake', type:JBakeTask)
+        project.task('jbakePreview', type:JBakePreviewTask)
     }
 }

@@ -27,8 +27,24 @@ buildscript {
 apply plugin: 'jbake'
 ----
 
-This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
+This will add a `jbake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
 `src/jbake` and generate content into `$buildDir/jbake` (typically `build/jbake`).
+
+=== Previewing
+You can preview your content by running the following command:
+---
+gradle jbake jbakePreview
+---
+
+This will start up a jetty container and serve your baked site on http://localhost:8820 by default.  You can change the
+port by adding this to your build.gradle file.
+
+[source,groovy]
+---
+jbakePreview {
+   port = '8080'
+}
+---
 
 == Configuration
 === Plugin configuration
@@ -53,4 +69,6 @@ jbake {
    configuration['template.post.file'] = 'mypost.ftl'
 }
 ----
+
+
 
