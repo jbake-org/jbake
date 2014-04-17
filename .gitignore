@@ -13,3 +13,4 @@ user.gradle
 *.classpath
 *.project
 
+.gradletasknamecache
