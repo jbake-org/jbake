@@ -4,7 +4,6 @@ jdk:
   - openjdk6
   - openjdk7
   - oraclejdk7
-  - oraclejdk8
 
 after_success:
   - mvn jacoco:report coveralls:jacoco
