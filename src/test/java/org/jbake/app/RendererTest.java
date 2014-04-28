@@ -1,7 +1,9 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,7 +12,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+
 import static org.assertj.core.api.Assertions.*;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -57,6 +61,7 @@ public class RendererTest {
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString("output.extension"));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
+        DocumentTypes.addDocumentType("paper");
     }
 
     @After
@@ -198,5 +203,24 @@ public class RendererTest {
         assertThat(output) 
         	.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")
         	.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>");
+    }
+    
+    @Test
+    public void renderSitemap() throws Exception {
+    	
+    	Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        renderer.renderSitemap("sitemap.xml");
+        File outputFile = new File(destinationFolder, "sitemap.xml");
+        Assert.assertTrue(outputFile.exists());
+
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("/blog/2013/second-post.html")
+        	.contains("/blog/2012/first-post.html")
+        	.contains("/papers/published-paper.html")
+        	.doesNotContain("draft-paper.html");
     }
 }

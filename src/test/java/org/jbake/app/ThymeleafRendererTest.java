@@ -1,7 +1,12 @@
 package org.jbake.app;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FileUtils;
+import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,6 +60,7 @@ public class ThymeleafRendererTest {
         }
         Assert.assertEquals(".html", config.getString("output.extension"));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
+        
     }
 
     @After
@@ -224,4 +230,25 @@ public class ThymeleafRendererTest {
         Assert.assertTrue(foundSecondPost);
     }
 
+    @Test
+    public void renderSitemap() throws Exception {
+    	// cannot be put in @Before as ThmyeLeaf can't lazy load from DB, and expects content there under this type
+    	DocumentTypes.addDocumentType("paper");
+    	DBUtil.updateSchema(db);
+    	
+    	Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        renderer.renderSitemap("sitemap.xml");
+        File outputFile = new File(destinationFolder, "sitemap.xml");
+        Assert.assertTrue(outputFile.exists());
+
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("/blog/2013/second-post.html")
+        	.contains("/blog/2012/first-post.html")
+        	.contains("/papers/published-paper.html")
+        	.doesNotContain("draft-paper.html");
+    }
 }
