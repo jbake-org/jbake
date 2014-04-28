@@ -60,7 +60,6 @@ public class GroovyRendererTest {
         }
         Assert.assertEquals(".html", config.getString("output.extension"));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
-        DocumentTypes.addDocumentType("paper");
     }
 
     @After
@@ -232,6 +231,9 @@ public class GroovyRendererTest {
 
     @Test
     public void renderSitemap() throws Exception {
+    	DocumentTypes.addDocumentType("paper");
+    	DBUtil.updateSchema(db);
+    	
     	Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
