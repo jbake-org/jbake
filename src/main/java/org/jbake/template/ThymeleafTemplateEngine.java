@@ -54,6 +54,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private void initializeTemplateEngine() {
         templateResolver = new FileTemplateResolver();
         templateResolver.setPrefix(templatesPath.getAbsolutePath() + File.separatorChar);
+        templateResolver.setCharacterEncoding(config.getString("template.encoding"));
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
     }
