@@ -144,12 +144,14 @@ public class Renderer {
         sb.append("Rendering sitemap [").append(outputFile).append("]... ");
 
         Map<String, Object> model = new HashMap<String, Object>();
+        model.put("renderer", renderingEngine);
         model.put("content", Collections.singletonMap("type","sitemap"));
 
         try {
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName("sitemap"), out);
             sb.append("done!");
+            out.close();
             LOGGER.info(sb.toString());
         } catch (Exception e) {
             sb.append("failed!");
