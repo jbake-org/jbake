@@ -110,6 +110,7 @@ public class Crawler {
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
+        	fileContents.put("rootpath", getPathToRoot(sourceFile));
             fileContents.put("sha1", sha1);
             fileContents.put("rendered", false);
             if (fileContents.get("tags") != null) {
@@ -138,6 +139,21 @@ public class Crawler {
         }
     }
 
+    public String getPathToRoot(File sourceFile) {
+    	File rootPath = new File(contentPath);
+    	File parentPath = sourceFile.getParentFile();
+    	int parentCount = 0;
+    	while (!parentPath.equals(rootPath)) {
+    		parentPath = parentPath.getParentFile();
+    		parentCount++;
+    	}
+    	StringBuffer sb = new StringBuffer();
+    	for (int i = 0; i < parentCount; i++) {
+    		sb.append("../");
+    	}
+    	return sb.toString();
+    }
+    
     public int getDocumentCount(String docType) {
         return (int) db.countClass(docType);
     }
