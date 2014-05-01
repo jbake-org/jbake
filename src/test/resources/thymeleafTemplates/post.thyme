@@ -15,6 +15,11 @@
 
 	<hr/>
 	
+	<h5>Published Posts</h5>
+	<div th:each="post : ${published_posts}" th:with='last_month=null' th:remove='tag'>
+		<a th:href='${config.site_host+post.uri}' th:text='${post.title}' href="post.html"></a>
+	</div>
+	
     <div th:replace="footer.thyme::footer"></div>
     </body>
 </html>

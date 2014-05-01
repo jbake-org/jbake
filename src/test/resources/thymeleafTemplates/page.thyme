@@ -15,6 +15,11 @@
       </div>
 
       <hr/>
+      
+      <h5>Published Pages</h5>
+		<div th:each="page : ${published_pages}" th:with='last_month=null' th:remove='tag'>
+			<a th:href='${config.site_host+page.uri}' th:text='${page.title}' href="page.html"></a>
+		</div>
 
     <div th:replace="footer.thyme::footer"></div>
     </body>

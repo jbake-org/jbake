@@ -10,4 +10,9 @@
 
 	<hr>
 	
+	<h5>Published Posts</h5>
+    <%published_posts.each {post -> %>
+    	<a href="${config.site_host}${post.uri}">${post.title}</a>
+    <%}%>
+	
 <%include "footer.gsp"%>

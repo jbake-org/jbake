@@ -69,39 +69,55 @@ public class GroovyRendererTest {
     }
 
     @Test
-    public void render() throws Exception {
+    public void renderPost() throws Exception {
+    	// setup
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Parser parser = new Parser(config, sourceFolder.getPath());
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        String filename = "second-post.html";
 
-        File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "blog" + File.separator + "2013" + File.separator + "second-post.html");
+        File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "blog" + File.separator + "2013" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/second-post.html");
+        content.put("uri", "/" + filename);
         renderer.render(content);
-        File outputFile = new File(destinationFolder, "second-post.html");
+        File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
-        Scanner scanner = new Scanner(outputFile);
-        boolean foundTitle = false;
-        boolean foundDate = false;
-        boolean foundBody = false;
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.contains("<h2>Second Post</h2>")) {
-                foundTitle = true;
-            }
-            if (line.trim().startsWith("<p class=\"post-date\">28") && line.endsWith("2013</p>")) {
-                foundDate = true;
-            }
-            if (line.contains("Lorem ipsum dolor sit amet")) {
-                foundBody = true;
-            }
-            if (foundTitle && foundDate && foundBody) {
-                break;
-            }
-        }
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("<h2>Second Post</h2>")
+        	.contains("<p class=\"post-date\">28")
+        	.contains("2013</p>")
+        	.contains("Lorem ipsum dolor sit amet")
+        	.contains("<h5>Published Posts</h5>")
+        	.contains("/blog/2012/first-post.html");
+    }
+    
+    @Test
+    public void renderPage() throws Exception {
+    	// setup
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Parser parser = new Parser(config, sourceFolder.getPath());
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        String filename = "about.html";
 
-        Assert.assertTrue(foundTitle);
-        Assert.assertTrue(foundDate);
-        Assert.assertTrue(foundBody);
+        File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + filename);
+        Map<String, Object> content = parser.processFile(sampleFile);
+        content.put("uri", "/" + filename);
+        renderer.render(content);
+        File outputFile = new File(destinationFolder, filename);
+        Assert.assertTrue(outputFile.exists());
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+	        .contains("<h4>About</h4>")
+	    	.contains("All about stuff!")
+	    	.contains("<h5>Published Pages</h5>")
+	    	.contains("/projects.html");
     }
 
     @Test
@@ -116,25 +132,12 @@ public class GroovyRendererTest {
         //validate
         File outputFile = new File(destinationFolder, "index.html");
         Assert.assertTrue(outputFile.exists());
-        Scanner scanner = new Scanner(outputFile);
-
-        boolean foundFirstTitle = false;
-        boolean foundSecondTitle = false;
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.contains("<h4><a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
-                foundFirstTitle = true;
-            }
-            if (line.contains("<h4><a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
-                foundSecondTitle = true;
-            }
-            if (foundFirstTitle && foundSecondTitle) {
-                break;
-            }
-        }
-
-        Assert.assertTrue(foundFirstTitle);
-        Assert.assertTrue(foundSecondTitle);
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("<h4><a href=\"/blog/2012/first-post.html\">First Post</a></h4>")
+        	.contains("<h4><a href=\"/blog/2013/second-post.html\">Second Post</a></h4>");
     }
 
     @Test
@@ -145,30 +148,13 @@ public class GroovyRendererTest {
         renderer.renderFeed("feed.xml");
         File outputFile = new File(destinationFolder, "feed.xml");
         Assert.assertTrue(outputFile.exists());
-        Scanner scanner = new Scanner(outputFile);
-
-        boolean foundDescription = false;
-        boolean foundFirstTitle = false;
-        boolean foundSecondTitle = false;
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.contains("<description>My corner of the Internet</description>")) {
-                foundDescription = true;
-            }
-            if (line.contains("<title>Second Post</title>")) {
-                foundFirstTitle = true;
-            }
-            if (line.contains("<title>First Post</title>")) {
-                foundSecondTitle = true;
-            }
-            if (foundDescription && foundFirstTitle && foundSecondTitle) {
-                break;
-            }
-        }
-
-        Assert.assertTrue(foundDescription);
-        Assert.assertTrue(foundFirstTitle);
-        Assert.assertTrue(foundSecondTitle);
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("<description>My corner of the Internet</description>")
+        	.contains("<title>Second Post</title>")
+        	.contains("<title>First Post</title>");
     }
 
     @Test
@@ -179,25 +165,12 @@ public class GroovyRendererTest {
         renderer.renderArchive("archive.html");
         File outputFile = new File(destinationFolder, "archive.html");
         Assert.assertTrue(outputFile.exists());
-        Scanner scanner = new Scanner(outputFile);
-
-        boolean foundFirstPost = false;
-        boolean foundSecondPost = false;
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
-                foundFirstPost = true;
-            }
-            if (line.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
-                foundSecondPost = true;
-            }
-            if (foundFirstPost && foundSecondPost) {
-                break;
-            }
-        }
-
-        Assert.assertTrue(foundFirstPost);
-        Assert.assertTrue(foundSecondPost);
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")
+        	.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>");
     }
 
     @Test
@@ -206,27 +179,14 @@ public class GroovyRendererTest {
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         renderer.renderTags(crawler.getTags(), "tags");
+        
+        // verify
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
         Assert.assertTrue(outputFile.exists());
-        Scanner scanner = new Scanner(outputFile);
-
-        boolean foundFirstPost = false;
-        boolean foundSecondPost = false;
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")) {
-                foundFirstPost = true;
-            }
-            if (line.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>")) {
-                foundSecondPost = true;
-            }
-            if (foundFirstPost && foundSecondPost) {
-                break;
-            }
-        }
-
-        Assert.assertTrue(foundFirstPost);
-        Assert.assertTrue(foundSecondPost);
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        	.contains("<a href=\"/blog/2013/second-post.html\">Second Post</a></h4>")
+        	.contains("<a href=\"/blog/2012/first-post.html\">First Post</a></h4>");
     }
 
     @Test

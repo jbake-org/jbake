@@ -9,5 +9,10 @@
       </div>
 
       <hr>
+      
+      <h5>Published Pages</h5>
+      <#list published_pages as page>
+      	<a href="${config.site_host}${page.uri}">${page.title}</a>
+      </#list>
 
 <#include "footer.ftl">
