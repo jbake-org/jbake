@@ -29,7 +29,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final Map<String, Object> model, String templateName, final Writer writer) throws RenderingException {
         model.put("version", config.getString("version"));
         Map<String, Object> configModel = new HashMap<String, Object>();
         Iterator<String> configKeys = config.getKeys();
@@ -39,6 +39,21 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
             configModel.put(key.replace(".", "_"), config.getProperty(key));
         }
         model.put("config", configModel);
+        // if default template exists we will use it
+        File templateFile = new File(templatesPath, templateName);
+        if (!templateFile.exists()) {
+        	LOGGER.info("Default template: {} was not found, searching for others...", templateName);
+        	// if default template does not exist then check if any alternative engine templates exist
+	        String templateNameWithoutExt = templateName.substring(0, templateName.length()-4);
+	        for (String extension : renderers.getRecognizedExtensions()) {
+	        	templateFile = new File(templatesPath, templateNameWithoutExt+"."+extension);
+	        	if (templateFile.exists()) {
+	        		LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName());
+	        		templateName = templateFile.getName();
+	        		break;
+	        	}
+	        }
+        }
         String ext = FileUtil.fileExt(templateName);
         AbstractTemplateEngine engine = renderers.getEngine(ext);
         if (engine!=null) {
