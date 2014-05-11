@@ -7,11 +7,12 @@
 	</formats>
 	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}/base/</directory>
+			<directory>${project.build.directory}/example-project-groovy/</directory>
 			<outputDirectory>/</outputDirectory>
 			<excludes>
 				<exclude>.git</exclude>
 				<exclude>README.md</exclude>
+				<exclude>LICENSE</exclude>
 			</excludes>
 		</fileSet>
 	</fileSets>

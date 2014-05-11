@@ -32,6 +32,13 @@
             </includes>
         </fileSet>
         <fileSet>
+        	<directory>${project.basedir}/src/main/logging</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>logback.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
         	<!-- adds jar package to the root directory of zip package -->
             <directory>${project.build.directory}</directory>
             <outputDirectory></outputDirectory>
@@ -46,19 +53,12 @@
                 <include>LICENSE</include>
             </includes>
         </fileSet>
-        <!-- <fileSet>
-        	<directory>${basedir}/src/main/templates/</directory>
-        	<outputDirectory></outputDirectory>
-            <includes>
-                <include>base*</include>
-            </includes>
-        </fileSet> -->
         <fileSet>
-        	<!-- adds base template file to the root directory of zip package -->
+        	<!-- adds example projects files to the root directory of zip package -->
         	<directory>${project.build.directory}</directory>
         	<outputDirectory></outputDirectory>
             <includes>
-                <include>base.zip</include>
+                <include>example*.zip</include>
             </includes>
         </fileSet>
     </fileSets>

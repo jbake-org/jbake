@@ -73,7 +73,7 @@
 		<pegdown.version>1.4.2</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
         <orientdb.version>1.6.2</orientdb.version>
-        <groovy.version>2.2.1</groovy.version>
+        <groovy.version>2.3.0</groovy.version>
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.9</logback.version>
         <assertj.version>1.6.0</assertj.version>
@@ -106,13 +106,36 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
+						<id>checkout-example-project-freemarker</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>checkout</goal>
 						</goals>
 						<configuration>
-							<checkoutDirectory>${project.build.directory}/base</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-template-bootstrap.git</connectionUrl>
+							<checkoutDirectory>${project.build.directory}/example-project-freemarker</checkoutDirectory>
+							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-freemarker.git</connectionUrl>
+						</configuration>
+					</execution>
+					<execution>
+						<id>checkout-example-project-groovy</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<configuration>
+							<checkoutDirectory>${project.build.directory}/example-project-groovy</checkoutDirectory>
+							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-groovy.git</connectionUrl>
+						</configuration>
+					</execution>
+					<execution>
+						<id>checkout-example-project-thymeleaf</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<configuration>
+							<checkoutDirectory>${project.build.directory}/example-project-thymeleaf</checkoutDirectory>
+							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-thymeleaf.git</connectionUrl>
 						</configuration>
 					</execution>
 				</executions>
@@ -129,6 +152,9 @@
 							<mainClass>org.jbake.launcher.Main</mainClass>
 							<packageName>org.jbake.launcher</packageName>
 						</manifest>
+						<manifestEntries>
+                        	<Class-Path>lib/</Class-Path>
+                    	</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -169,16 +195,46 @@
 				<version>2.4</version>
 				<executions>
 					<execution>
-						<id>make-base-template</id>
+						<id>zip-example-project-freemarker</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>base</finalName>
+							<finalName>example_project_freemarker</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
-								<descriptor>src/main/assembly/assembly-base-template.xml</descriptor>
+								<descriptor>src/main/assembly/assembly-example-project-freemarker.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+						</configuration>
+					</execution>
+					<execution>
+						<id>zip-example-project-groovy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>example_project_groovy</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-example-project-groovy.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+						</configuration>
+					</execution>
+					<execution>
+						<id>zip-example-project-thymeleaf</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>example_project_thymeleaf</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-example-project-thymeleaf.xml</descriptor>
 							</descriptors>
 							<attach>false</attach>
 						</configuration>
