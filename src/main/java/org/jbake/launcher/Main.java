@@ -21,7 +21,8 @@ import org.kohsuke.args4j.CmdLineParser;
  */
 public class Main {
 
-	private final String USAGE_PREFIX = "Usage: jbake";
+	private final String USAGE_PREFIX 		= "Usage: jbake";
+	private final String ALT_USAGE_PREFIX	= "   or  jbake";
 	
 	/**
 	 * Runs the app with the given arguments.
@@ -77,7 +78,13 @@ public class Main {
 		}
 
 		if (res.isInit()) {
-			initStructure(config);
+			if (res.getSourceValue() != null) {
+				// if type has been supplied then use it
+				initStructure(config, res.getSourceValue());
+			} else {
+				// default to freemarker if no value has been supplied
+				initStructure(config, "freemarker");
+			}
 		}
 		
 		if (res.isRunServer()) {
@@ -106,8 +113,10 @@ public class Main {
 	private void printUsage(Object options) {
 		CmdLineParser parser = new CmdLineParser(options);
 		StringWriter sw = new StringWriter();
-		sw.append(USAGE_PREFIX);
-		parser.printSingleLineUsage(sw, null);
+		sw.append(USAGE_PREFIX + "\n");
+		sw.append(ALT_USAGE_PREFIX + " <source> <destination>\n");
+		sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
+		sw.append("Options:");
 		System.out.println(sw.toString());
 		parser.setUsageWidth(100);
 		parser.printUsage(System.out);
@@ -119,11 +128,11 @@ public class Main {
 		System.exit(0);
 	}
 	
-	private void initStructure(CompositeConfiguration config) {
+	private void initStructure(CompositeConfiguration config, String type) {
 		Init init = new Init(config);
 		try {
 			File codeFolder = FileUtil.getRunningLocation();
-			init.run(new File("."), codeFolder);
+			init.run(new File("."), codeFolder, type);
 			System.out.println("Base folder structure successfully created.");
 			System.exit(0);
 		} catch (Exception e) {

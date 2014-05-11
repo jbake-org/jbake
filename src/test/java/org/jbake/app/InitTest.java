@@ -30,27 +30,41 @@ public class InitTest {
         }
 		config = ConfigUtil.load(rootPath);
 		// override base template config option
-		config.setProperty("base.template", "test.zip");
+		config.setProperty("example.project.freemarker", "test.zip");
 	}
 	
 	@Test
-	public void testInitOK() throws Exception {
+	public void initOK() throws Exception {
 		Init init = new Init(config);
 		File initPath = folder.newFolder("init");
-		init.run(initPath, rootPath);
+		init.run(initPath, rootPath, "freemarker");
 		File testFile = new File(initPath, "testfile.txt");
 		assertThat(testFile).exists();
 	}
 	
 	@Test
-	public void testInitFail(){
+	public void initFailDestinationContainsContent(){
 		Init init = new Init(config);
 		File initPath = folder.newFolder("init");
 		File contentFolder = new File(initPath.getPath() + File.separatorChar + config.getString("content.folder"));
 		contentFolder.mkdir();
 		try {
-			init.run(initPath, rootPath);
+			init.run(initPath, rootPath, "freemarker");
 			fail("Shouldn't be able to initialise folder with content folder within it!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		File testFile = new File(initPath, "testfile.txt");
+		assertThat(testFile).doesNotExist();
+	}
+	
+	@Test
+	public void initFailInvalidTemplateType(){
+		Init init = new Init(config);
+		File initPath = folder.newFolder("init");
+		try {
+			init.run(initPath, rootPath, "invalid");
+			fail("Shouldn't be able to initialise folder with invalid template type");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

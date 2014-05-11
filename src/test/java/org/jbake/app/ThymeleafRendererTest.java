@@ -93,7 +93,7 @@ public class ThymeleafRendererTest {
         	.contains("2013</p>")
         	.contains("Lorem ipsum dolor sit amet")
         	.contains("<h5>Published Posts</h5>")
-        	.contains("/blog/2012/first-post.html");
+        	.contains("blog/2012/first-post.html");
     }
     
     @Test
@@ -137,8 +137,8 @@ public class ThymeleafRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<h4><a href=\"/blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>")
-        	.contains("<h4><a href=\"/blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>");
+        	.contains("<h4><a href=\"blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>")
+        	.contains("<h4><a href=\"blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>");
     }
 
     @Test
@@ -170,8 +170,8 @@ public class ThymeleafRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<a href=\"/blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>")
-        	.contains("<a href=\"/blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>");
+        	.contains("<a href=\"blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>")
+        	.contains("<a href=\"blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>");
     }
 
     @Test
@@ -186,8 +186,8 @@ public class ThymeleafRendererTest {
         Assert.assertTrue(outputFile.exists());
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<a href=\"/blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>")
-        	.contains("<a href=\"/blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>");
+        	.contains("<a href=\"blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>")
+        	.contains("<a href=\"blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>");
     }
 
     @Test
@@ -206,9 +206,9 @@ public class ThymeleafRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("/blog/2013/second-post.html")
-        	.contains("/blog/2012/first-post.html")
-        	.contains("/papers/published-paper.html")
+        	.contains("blog/2013/second-post.html")
+        	.contains("blog/2012/first-post.html")
+        	.contains("papers/published-paper.html")
         	.doesNotContain("draft-paper.html");
     }
 }

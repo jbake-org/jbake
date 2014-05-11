@@ -103,6 +103,11 @@ public class Crawler {
 
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
+    	//uri = config.getString("site.context") + uri.substring(1, uri.length());
+    	// strip off leading / to enable generating non-root based sites
+    	if (uri.startsWith("/")) {
+    		uri = uri.substring(1, uri.length());
+    	}
         uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString("output.extension");
         return uri;
     }

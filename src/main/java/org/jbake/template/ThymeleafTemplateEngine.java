@@ -66,6 +66,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         Context context = new Context(locale, wrap(model));
         lock.lock();
         try {
+        	initializeTemplateEngine();
             @SuppressWarnings("unchecked")
             Map<String, Object> config = (Map<String, Object>) model.get("config");
             @SuppressWarnings("unchecked")

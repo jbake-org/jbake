@@ -57,7 +57,7 @@ public class Renderer {
      */
     public void render(Map<String, Object> content) throws Exception {
 //		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
-        String outputFilename = destination.getPath() + (String) content.get("uri");
+        String outputFilename = destination.getPath() + File.separatorChar + (String) content.get("uri");
         outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 
         // delete existing versions if they exist in case status has changed either way

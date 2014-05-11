@@ -47,16 +47,20 @@ public class Asset {
 			Arrays.sort(assets);
 			for (int i = 0; i < assets.length; i++) {
 				if (assets[i].isFile()) {
-					LOGGER.info("Copying [{}]...", assets[i].getPath());
+					StringBuilder sb = new StringBuilder();
+					sb.append("Copying [" + assets[i].getPath() + "]...");
 					File sourceFile = assets[i];
 					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
 					try {
 						FileUtils.copyFile(sourceFile, destFile);
+						sb.append("done!");
+						LOGGER.info(sb.toString());
 					} catch (IOException e) {
+						sb.append("failed!");
+						LOGGER.error(sb.toString(), e);
 						e.printStackTrace();
 						errors.add(e.getMessage());
 					}
-					LOGGER.info("done!");
 				} 
 				
 				if (assets[i].isDirectory()) {
