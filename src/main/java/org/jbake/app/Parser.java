@@ -1,10 +1,12 @@
 package org.jbake.app;
 
+import static org.apache.commons.configuration.ConfigurationConverter.getMap;
+import static org.apache.commons.configuration.ConfigurationConverter.getProperties;
 import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
-import static org.apache.commons.lang.math.NumberUtils.*;
+import static org.apache.commons.lang.math.NumberUtils.isNumber;
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 import static org.asciidoctor.AttributesBuilder.attributes;
 import static org.asciidoctor.OptionsBuilder.options;
-import static org.asciidoctor.SafeMode.UNSAFE;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,25 +17,28 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Asciidoctor.Factory;
 import org.asciidoctor.Attributes;
+import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.DocumentHeader;
 import org.asciidoctor.Options;
-import org.asciidoctor.OptionsBuilder;
 
 import com.petebevin.markdown.MarkdownProcessor;
 
@@ -313,7 +318,12 @@ public class Parser {
 	}
 
    private Options getAsciiDocOptionsAndAttributes() {
-      Attributes attributes = attributes(config.getStringArray("asciidoctor.attributes")).get();
+      Set<Entry<Object, Object>> properties = ConfigurationConverter.getMap(config.subset("asciidoctor.attribute")).entrySet();
+      StringBuilder entries = new StringBuilder(properties.size()*16);
+      for (Entry<Object, Object> e : properties) {
+         entries.append(e.getKey()).append("=").append(e.getValue()).append(" ");
+      }
+      Attributes attributes = attributes(entries.toString().trim()).get();
       Configuration optionsSubset = config.subset("asciidoctor.option");
       Options options = options().attributes(attributes).get();
       for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
