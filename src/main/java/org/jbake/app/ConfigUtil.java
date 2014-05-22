@@ -2,7 +2,9 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.EnvironmentConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SystemConfiguration;
 
 import java.io.File;
 
@@ -18,6 +20,10 @@ public class ConfigUtil {
     public static CompositeConfiguration load(File source) throws ConfigurationException {
         CompositeConfiguration config = new CompositeConfiguration();
         config.setListDelimiter(',');
+        
+        config.addConfiguration(new EnvironmentConfiguration());
+        config.addConfiguration(new SystemConfiguration());
+        
         File customConfigFile = new File(source, "custom.properties");
         if (customConfigFile.exists()) {
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
