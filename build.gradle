@@ -8,18 +8,18 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.2'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.4'
     }
 }
 
 repositories {
-    mavenLocal()
+    jcenter()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.jbake:jbake-core:2.3.0-SNAPSHOT'
+    compile 'org.jbake:jbake-core:2.3.0'
 }
 
 project.version = '0.1-SNAPSHOT'
