@@ -22,7 +22,7 @@ dependencies {
     compile 'org.jbake:jbake-core:2.3.0'
 }
 
-project.version = '0.1-SNAPSHOT'
+project.version = '0.2-SNAPSHOT'
 
 task sourceJar(type: Jar) {
     classifier = 'sources'
