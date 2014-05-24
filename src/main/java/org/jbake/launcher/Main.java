@@ -4,12 +4,18 @@ import java.io.File;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.FileUtil;
+import org.jbake.app.GitUtil;
 import org.jbake.app.Oven;
+import org.jbake.publisher.GithubPublisher;
+import org.jbake.spi.Publisher;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -23,6 +29,8 @@ public class Main {
 
 	private final String USAGE_PREFIX 		= "Usage: jbake";
 	private final String ALT_USAGE_PREFIX	= "   or  jbake";
+	
+	private static ServiceLoader<Publisher> publisherSetLoader = ServiceLoader.load(Publisher.class);
 	
 	/**
 	 * Runs the app with the given arguments.
@@ -54,7 +62,7 @@ public class Main {
 			System.exit(1);
 		}
 	}
-
+	
 	private void run(String[] args) {
 		LaunchOptions res = parseArguments(args);
 
@@ -77,6 +85,10 @@ public class Main {
 			bake(res);
 		}
 
+		if(res.isPublisher()) {
+		    resolvePublishers(config, res);
+		}
+		
 		if (res.isInit()) {
 			if (res.getSourceValue() != null) {
 				// if type has been supplied then use it
@@ -85,6 +97,20 @@ public class Main {
 				// default to freemarker if no value has been supplied
 				initStructure(config, "freemarker");
 			}
+			
+			if(res.isGit()) {
+			    try {
+                    Git git = GitUtil.initGit(new File("."));
+                    GitUtil.closeRepo(git);
+                    System.out.println("Git repository initialized.");
+                } catch (GitAPIException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+			}
+			
+			System.exit(0);
+			
 		}
 		
 		if (res.isRunServer()) {
@@ -97,7 +123,26 @@ public class Main {
 		}
 		
 	}
-	private LaunchOptions parseArguments(String[] args) {
+
+    private void resolvePublishers(CompositeConfiguration config, LaunchOptions res) {
+       
+        String[] publishers = res.getPublishers();
+        
+        for (String publisherName : publishers) {
+           
+            for (Publisher publisher : publisherSetLoader) {
+                
+                if(publisherName.equals(publisher.publisherName())) {
+                    publisher.publish(config, res);
+                }
+            }
+        }
+        
+        System.exit(0);
+        
+    }
+    
+    private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();
 		CmdLineParser parser = new CmdLineParser(res);
 
@@ -134,7 +179,6 @@ public class Main {
 			File codeFolder = FileUtil.getRunningLocation();
 			init.run(new File("."), codeFolder, type);
 			System.out.println("Base folder structure successfully created.");
-			System.exit(0);
 		} catch (Exception e) {
 			System.err.println("Failed to initalise structure!");
 			e.printStackTrace();

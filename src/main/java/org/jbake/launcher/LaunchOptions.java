@@ -1,11 +1,12 @@
 package org.jbake.launcher;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.spi.MapOptionHandler;
+import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 public class LaunchOptions {
 	@Argument(index = 0, usage = "source folder of site content (with templates and assets), if not supplied will default to current directory", metaVar = "<source>")
@@ -20,6 +21,9 @@ public class LaunchOptions {
 	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
 	private boolean init;
 	
+	@Option(name = "-g", aliases = {"--git"}, usage="initialises the folder as a git repository, it must be used alongside -i (--init) option")
+	private boolean git;
+	
 	@Option(name = "-s", aliases = {"--server"}, usage="runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
 	private boolean runServer;
 	
@@ -28,6 +32,12 @@ public class LaunchOptions {
 
     @Option(name = "--reset", usage="clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
+    
+    @Option(name = "--publisher-params", usage="creates a map of parameters that can be used inside publisher module. For example --publisher-params password=mysecretpassword. See publishers documentation for valid options", handler=MapOptionHandler.class)
+    private Map<String, String> publisherParams;
+    
+    @Option(name = "--publishers", usage="publishes baked content to specified publishers. Currently jbake provides out-of-the-box github publisher")
+    private String[] publishers; 
     
 	public File getSource() {
 		if (source != null) {
@@ -54,6 +64,22 @@ public class LaunchOptions {
 		return destination;
 	}
 
+	public Map<String, String> getPublisherParams() {
+        return publisherParams;
+    }
+	
+	public String[] getPublishers() {
+        return publishers;
+    }
+	
+	public boolean isPublisher() {
+	    return publishers != null && publishers.length > 0;
+	}
+	
+	public boolean isGit() {
+	    return git;
+	}
+	
 	public boolean isHelpNeeded() {
 		return helpNeeded;
 	}
@@ -70,7 +96,11 @@ public class LaunchOptions {
         return clearCache;
     }
 
+    public boolean isPublisherParameters() {
+        return this.publisherParams != null && this.publisherParams.size() > 0;
+    }
+    
     public boolean isBake() {
-		return bake || !(isHelpNeeded() || isRunServer() || isInit());
+		return bake || !(isHelpNeeded() || isRunServer() || isInit() || isPublisher() || isGit());
 	}
 }
