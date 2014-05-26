@@ -8,22 +8,21 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.2'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.4'
     }
 }
 
 repositories {
-    mavenLocal()
+    jcenter()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.jbake:jbake-core:2.3.0-SNAPSHOT'
-    compile 'org.eclipse.jetty:jetty-server:8.1.12.v20130726'
+    compile 'org.jbake:jbake-core:2.3.0'
 }
 
-project.version = '0.1-SNAPSHOT'
+project.version = '0.2-SNAPSHOT'
 
 task sourceJar(type: Jar) {
     classifier = 'sources'
