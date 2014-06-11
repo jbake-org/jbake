@@ -14,7 +14,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'me.champeau.gradle:jbake-gradle-plugin:0.1'
+    classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2'
 
     // optional, if you use asciidoctor markup
     classpath 'org.asciidoctor:asciidoctor-java-integration:0.1.4'
@@ -24,7 +24,7 @@ buildscript {
   }
 }
 
-apply plugin: 'jbake'
+apply plugin: 'me.champeau.jbake'
 ----
 
 This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
