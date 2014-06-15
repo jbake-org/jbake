@@ -1,0 +1,16 @@
+// Handles publication of distributions to Bintray
+
+apply plugin: 'bintray'
+
+bintray {
+    user = bintrayUsername
+    key = bintrayKey
+    publications = ['mavenJava']
+    pkg {
+        repo = 'gradle-plugins'
+        name = 'jbake-gradle-plugin'
+        desc = 'Adds the ability to run JBake directly from a Gradle build'
+        licenses = ['Apache-2.0']
+        labels = []
+    }
+}

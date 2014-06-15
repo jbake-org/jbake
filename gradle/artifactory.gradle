@@ -41,22 +41,29 @@ publishing {
 }
 
 artifactory {
-    contextUrl = 'https://oss.jfrog.org'
+    contextUrl = 'http://oss.jfrog.org/artifactory'
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = bintrayUsername
+            password = bintrayKey
+        }
+        defaults {
+            publications ('mavenJava')
+        }
+    }
     resolve {
         repository {
             repoKey = 'libs-release'
         }
     }
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local' //The Artifactory repository key to publish to
-            //when using oss.jfrog.org the credentials are from Bintray. For local build we expect them to be found in
-            //~/.gradle/gradle.properties, otherwise to be set in the build server
-            username = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')?:''
-            password = project.hasProperty('bintrayKey') ? project.bintrayKey : System.getenv('BINTRAY_KEY')?:''
-        }
-        defaults {
-            publications 'mavenJava'
-        }
+
+}
+
+artifactoryPublish {
+    onlyIf {
+        def pullRequest = System.getenv('TRAVIS_PULL_REQUEST')
+
+        !pullRequest || pullRequest=='false'
     }
 }
