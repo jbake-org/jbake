@@ -16,6 +16,8 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
+import net_alchim31_livereload.LRServer;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -25,6 +27,10 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.platform.Verticle;
 
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Runs jbake on a folder while watching and serving a folder with it
@@ -49,7 +55,14 @@ public class InlineMojo extends WatchMojo {
 	@Parameter(property = "jbake.port", defaultValue = "8080")
 	private Integer port;
 
+    /**
+     * Use livereload.
+     */
+    @Parameter(property = "jbake.livereload", defaultValue = "true")
+    private Boolean livereload;
+
     Server server = new Server();
+    LRServer lrServer;
 
     class Server extends Verticle {
         {
@@ -66,7 +79,9 @@ public class InlineMojo extends WatchMojo {
                     if (new File(outputDirectory + file).isDirectory()) {
                         req.response().setStatusCode(301).putHeader("Location", file + "/").close();
                     } else {
+                        refreshLock.readLock().lock();
                         req.response().sendFile(outputDirectory.getAbsolutePath() + file);
+                        refreshLock.readLock().unlock();
                     }
                 }
             }).listen(port, listenAddress);
@@ -74,10 +89,25 @@ public class InlineMojo extends WatchMojo {
     }
 
 	protected void stopServer() {
+        if (lrServer != null) {
+            try {
+                lrServer.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         server.stop();
 	}
 
 	protected void initServer() throws MojoExecutionException {
         server.start();
+        if (BooleanUtils.isTrue(livereload)) {
+            lrServer = new LRServer(35729, outputDirectory.toPath());
+            try {
+                lrServer.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 	}
 }

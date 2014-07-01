@@ -24,12 +24,17 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Runs jbake on a folder while watching for changes
  */
 @Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 public class WatchMojo extends GenerateMojo {
+
+    ReadWriteLock refreshLock = new ReentrantReadWriteLock();
+
 	public void execute() throws MojoExecutionException {
 		super.execute();
 
@@ -65,9 +70,11 @@ public class WatchMojo extends GenerateMojo {
 				if (Boolean.FALSE.equals(result)) {
 					Thread.sleep(1000);
 				} else if (Boolean.TRUE.equals(result)) {
+                    refreshLock.writeLock().lock();
 					getLog().info("Refreshing");
 
 					super.execute();
+                    refreshLock.writeLock().unlock();
 				} else if (null == result) {
 					break;
 				}
