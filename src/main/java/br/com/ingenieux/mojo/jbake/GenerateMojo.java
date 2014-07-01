@@ -40,10 +40,16 @@ public class GenerateMojo extends AbstractMojo {
 	 */
 	@Parameter(property = "jbake.inputDirectory", defaultValue = "${project.basedir}/src/main/jbake", required = true)
 	protected File inputDirectory;
+
+    /**
+     * Set if cache is present or clear
+     */
+    @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
+    protected boolean isClearCache;
 	
 	public void execute() throws MojoExecutionException {
 		try {
-			Oven oven = new Oven(inputDirectory, outputDirectory);
+			Oven oven = new Oven(inputDirectory, outputDirectory, isClearCache);
 			
 			oven.setupPaths();
 			oven.bake();
