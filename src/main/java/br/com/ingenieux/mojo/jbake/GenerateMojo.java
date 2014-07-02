@@ -16,6 +16,7 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
+import com.orientechnologies.orient.core.Orient;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -53,10 +54,15 @@ public class GenerateMojo extends AbstractMojo {
 			
 			oven.setupPaths();
 			oven.bake();
+            shutdownDatabase();
 		} catch (Exception e) {
 			getLog().info("Oops", e);
 			
 			throw new MojoExecutionException("Failure when running: ", e);
 		}
 	}
+
+    protected void shutdownDatabase() {
+        Orient.instance().shutdown();
+    }
 }
