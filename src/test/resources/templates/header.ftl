@@ -47,6 +47,9 @@
       }
     </style>
     <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <#if content?? && content.og??>
+        <meta property="og:description" content="${content.og.description}"/>
+    </#if>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -74,4 +77,3 @@
       </div>
 
       <hr>
-   

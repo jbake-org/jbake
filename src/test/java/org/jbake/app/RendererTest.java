@@ -91,7 +91,8 @@ public class RendererTest {
         	.contains("2013</p>")
         	.contains("Lorem ipsum dolor sit amet")
         	.contains("<h5>Published Posts</h5>")
-        	.contains("blog/2012/first-post.html");
+        	.contains("blog/2012/first-post.html")
+        	.contains("<meta property=\"og:description\" content=\"Something\"/>");
     }
     
     @Test
