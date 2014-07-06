@@ -245,6 +245,31 @@ public class Renderer {
                 LOGGER.error(sb.toString(), e);
                 errors.add(e.getMessage());
             }
+
+            if (config.getBoolean("render.tagfeeds", false)) {
+                File outputFile1 = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + "-feed.xml");
+                StringBuilder sb1 = new StringBuilder();
+                sb1.append("Rendering feed [").append(outputFile1).append("]... ");
+                Map<String, Object> model1 = new HashMap<String, Object>();
+                model1.put("renderer", renderingEngine);
+                Map<String, Object> content = new HashMap<String, Object>();
+                content.put("type", "feed");
+                content.put("tags", Collections.singletonList(tag));
+                model1.put("content", content);
+
+                try {
+                    Writer out = createWriter(outputFile1);
+                    renderingEngine.renderDocument(model1, findTemplateName("tagfeed"), out);
+                    out.close();
+                    sb1.append("done!");
+                    LOGGER.info(sb1.toString());
+                } catch (Exception e) {
+                    sb1.append("failed!");
+                    LOGGER.error(sb1.toString(), e);
+                    throw new Exception("Failed to render feed. Cause: " + e.getMessage());
+                }
+
+            }
         }
         if (!errors.isEmpty()) {
         	StringBuilder sb = new StringBuilder();
