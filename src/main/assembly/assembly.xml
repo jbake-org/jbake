@@ -26,7 +26,7 @@
 	-->
         <fileSet>
             <directory>${project.build.scriptSourceDirectory}</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>bin</outputDirectory>
             <includes>
                 <include>jbake*</include>
             </includes>
