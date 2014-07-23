@@ -183,7 +183,10 @@ public class Parser {
                             e.printStackTrace();
                         }
                     } else if (parts[0].equalsIgnoreCase("tags")) {
-                        content.put(parts[0], parts[1].split(","));
+                        String[] tags = parts[1].split(",");
+                        for( int i=0; i<tags.length; i++ )
+                            tags[i]=tags[i].trim();
+                        content.put(parts[0], tags);
                     } else {
                         content.put(parts[0], parts[1]);
                     }
