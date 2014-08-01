@@ -1,11 +1,5 @@
 package br.com.ingenieux.mojo.jbake.util;
 
-import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -20,6 +14,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
@@ -41,16 +41,6 @@ public class DirWatcher {
 	private void register(Path dir) throws IOException {
 		WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE,
 				ENTRY_MODIFY);
-		// if (trace) {
-		// Path prev = keys.get(key);
-		// if (prev == null) {
-		// System.out.format("register: %s\n", dir);
-		// } else {
-		// if (!dir.equals(prev)) {
-		// System.out.format("update: %s -> %s\n", prev, dir);
-		// }
-		// }
-		// }
 		keys.put(key, dir);
 	}
 
@@ -83,17 +73,17 @@ public class DirWatcher {
 	/**
 	 * Process all events for keys queued to the watcher
 	 */
-	public Boolean processEvents() {
+	public Long processEvents() {
 		// wait for key to be signalled
 		WatchKey key;
 		try {
 			key = watcher.poll(1L, TimeUnit.SECONDS);
 		} catch (InterruptedException x) {
-			return Boolean.FALSE;
+			return null;
 		}
 		
 		if (null == key)
-			return Boolean.FALSE;
+			return null;
 
 		Path dir = keys.get(key);
 		if (dir == null)
@@ -136,7 +126,7 @@ public class DirWatcher {
 			}
 		}
 		
-		return Boolean.TRUE;
+		return Long.valueOf(System.currentTimeMillis());
 	}
 
 	static void usage() {

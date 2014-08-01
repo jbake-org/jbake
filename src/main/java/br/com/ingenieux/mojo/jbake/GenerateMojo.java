@@ -16,7 +16,6 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
-import com.orientechnologies.orient.core.Orient;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -30,39 +29,38 @@ import java.io.File;
  */
 @Mojo(name = "generate", requiresProject = false)
 public class GenerateMojo extends AbstractMojo {
-	/**
-	 * Location of the Output Directory.
-	 */
-	@Parameter(property = "jbake.outputDirectory", defaultValue = "${project.build.directory}/${project.build.finalName}", required = true)
-	protected File outputDirectory;
-	
-	/**
-	 * Location of the Output Directory.
-	 */
-	@Parameter(property = "jbake.inputDirectory", defaultValue = "${project.basedir}/src/main/jbake", required = true)
-	protected File inputDirectory;
 
-    /**
-     * Set if cache is present or clear
-     */
-    @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
-    protected boolean isClearCache;
-	
-	public void execute() throws MojoExecutionException {
-		try {
-			Oven oven = new Oven(inputDirectory, outputDirectory, isClearCache);
-			
-			oven.setupPaths();
-			oven.bake();
-            shutdownDatabase();
-		} catch (Exception e) {
-			getLog().info("Oops", e);
-			
-			throw new MojoExecutionException("Failure when running: ", e);
-		}
-	}
+  /**
+   * Location of the Output Directory.
+   */
+  @Parameter(property = "jbake.outputDirectory",
+             defaultValue = "${project.build.directory}/${project.build.finalName}",
+             required = true)
+  protected File outputDirectory;
 
-    protected void shutdownDatabase() {
-        Orient.instance().shutdown();
+  /**
+   * Location of the Output Directory.
+   */
+  @Parameter(property = "jbake.inputDirectory", defaultValue = "${project.basedir}/src/main/jbake",
+             required = true)
+  protected File inputDirectory;
+
+  /**
+   * Set if cache is present or clear
+   */
+  @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
+  protected boolean isClearCache;
+
+  public void execute() throws MojoExecutionException {
+    try {
+      Oven oven = new Oven(inputDirectory, outputDirectory);
+
+      oven.setupPaths();
+      oven.bake();
+    } catch (Exception e) {
+      getLog().info("Oops", e);
+
+      throw new MojoExecutionException("Failure when running: ", e);
     }
+  }
 }
