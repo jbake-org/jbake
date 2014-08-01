@@ -49,7 +49,7 @@
 
     <issueManagement>
         <system>github</system>
-        <url>https://bitbucket.org/ingenieux/jbake-maven-plugin/</url>
+        <url>https://github.com/ingenieux/jbake-maven-plugin/</url>
     </issueManagement>
 
     <properties>
@@ -59,9 +59,9 @@
     </properties>
 
     <scm>
-        <connection>scm:hg:http://bitbucket.org/ingenieux/jbake-maven-plugin</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org/ingenieux/jbake-maven-plugin</developerConnection>
-        <url>http://bitbucket.org/ingenieux/jbake-maven-plugin</url>
+        <connection>scm:git:http://github.com/ingenieux/jbake-maven-plugin</connection>
+        <developerConnection>scm:git:ssh://git@github.com/ingenieux/jbake-maven-plugin.git</developerConnection>
+        <url>http://github.com/ingenieux/jbake-maven-plugin</url>
     </scm>
 
     <dependencies>
