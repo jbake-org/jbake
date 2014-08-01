@@ -16,6 +16,8 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
+import com.orientechnologies.orient.core.Orient;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -51,11 +53,33 @@ public class GenerateMojo extends AbstractMojo {
   @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
   protected boolean isClearCache;
 
-  public void execute() throws MojoExecutionException {
+  public final void execute() throws MojoExecutionException {
     try {
-      Oven oven = new Oven(inputDirectory, outputDirectory);
+      executeInternal();
+    } finally {
+      closeQuietly();
+    }
+  }
+
+  protected final void closeQuietly() {
+    try {
+      Orient.instance().shutdown();
+    } catch (Exception e) {
+      getLog().warn("Oops", e);
+    }
+  }
+
+  protected void executeInternal() throws MojoExecutionException {
+    reRender();
+  }
+
+  protected void reRender() throws MojoExecutionException {
+    try {
+      // TODO: At some point, reuse Oven
+      Oven oven = new Oven(inputDirectory, outputDirectory, isClearCache);
 
       oven.setupPaths();
+
       oven.bake();
     } catch (Exception e) {
       getLog().info("Oops", e);

@@ -21,10 +21,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import br.com.ingenieux.mojo.jbake.util.DirWatcher;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Runs jbake on a folder while watching for changes
@@ -32,15 +33,20 @@ import br.com.ingenieux.mojo.jbake.util.DirWatcher;
 @Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 public class WatchMojo extends GenerateMojo {
 
-  public void execute() throws MojoExecutionException {
-    super.execute();
+  public void executeInternal() throws MojoExecutionException {
+    reRender();
+
+    Long lastProcessed = Long.valueOf(System.currentTimeMillis());
 
     getLog().info(
         "Now listening for changes on path " + inputDirectory.getPath());
 
     initServer();
 
+    DirWatcher dirWatcher = null;
+
     try {
+      dirWatcher = new DirWatcher(inputDirectory);
       final AtomicBoolean done = new AtomicBoolean(false);
       final BufferedReader reader = new BufferedReader(
           new InputStreamReader(System.in));
@@ -49,25 +55,33 @@ public class WatchMojo extends GenerateMojo {
         @Override
         public void run() {
           try {
-            getLog().info("Running. Hit <ENTER> to finish");
-            reader.readLine();
+            getLog()
+                .info("Running. Enter a blank line to finish. Anything else forces re-rendering.");
+
+            while (true) {
+              String line = reader.readLine();
+
+              if (isBlank(line)) {
+                break;
+              }
+
+              reRender();
+            }
           } catch (Exception exc) {
+            getLog().info("Ooops", exc);
           } finally {
             done.set(true);
           }
         }
       }).start();
 
-      DirWatcher dirWatcher = new DirWatcher(Paths.get(inputDirectory
-                                                           .getPath()));
-
-      Long lastProcessed = Long.valueOf(System.currentTimeMillis());
+      dirWatcher.start();
 
       do {
         Long result = dirWatcher.processEvents();
 
         if (null == result) {
-          Thread.sleep(1000);
+          // do nothing on purpose
         } else if (result >= lastProcessed) {
           getLog().info("Refreshing");
 
@@ -83,11 +97,14 @@ public class WatchMojo extends GenerateMojo {
     } finally {
       getLog().info("Finishing");
 
+      if (null != dirWatcher)
+        dirWatcher.stop();
+
       stopServer();
     }
   }
 
-  protected void stopServer() {
+  protected void stopServer() throws MojoExecutionException {
   }
 
   protected void initServer() throws MojoExecutionException {
