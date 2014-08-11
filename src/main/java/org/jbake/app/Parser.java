@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -54,12 +53,12 @@ public class Parser {
         try {
             is = new FileInputStream(file);
             fileContents = IOUtils.readLines(is, config.getString("render.encoding"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error while opening file {}: {}", file, e);
+
             return null;
+        } finally {
+          IOUtils.closeQuietly(is);
         }
 
         boolean hasHeader = hasHeader(fileContents);
