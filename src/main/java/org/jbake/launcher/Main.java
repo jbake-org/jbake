@@ -1,7 +1,6 @@
 package org.jbake.launcher;
 
 import java.io.File;
-import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -10,8 +9,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.FileUtil;
 import org.jbake.app.Oven;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
+
+import de.tototec.cmdoption.CmdlineParser;
+import de.tototec.cmdoption.CmdlineParserException;
+import de.tototec.cmdoption.DefaultUsageFormatter;
 
 /**
  * Launcher for JBake.
@@ -21,124 +22,132 @@ import org.kohsuke.args4j.CmdLineParser;
  */
 public class Main {
 
-	private final String USAGE_PREFIX 		= "Usage: jbake";
-	private final String ALT_USAGE_PREFIX	= "   or  jbake";
-	
+	private final LaunchOptions launchOptions;
+
+	public Main(final LaunchOptions launchOptions) {
+		this.launchOptions = launchOptions;
+	}
+
 	/**
 	 * Runs the app with the given arguments.
 	 * 
+	 * FIXME: Only this method should call System.exit(). All others should be
+	 * // free of System.exit() calls to be easier to embedd. Instead a //
+	 * JBakeException should be used.
+	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		new Main().run(args);
-	}
-	
-	private void bake(LaunchOptions options) {
+	public static void main(final String[] args) {
+		final LaunchOptions res = new LaunchOptions();
+		final CmdlineParser parser = new CmdlineParser(res);
+		parser.setProgramName("jbake");
+
 		try {
-			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
+			parser.parse(args);
+			if (res.isHelpNeeded()) {
+				parser.setUsageFormatter(new DefaultUsageFormatter(true, 100));
+				parser.usage();
+				System.exit(0);
+			}
+		} catch (CmdlineParserException e) {
+			parser.usage();
+			System.exit(1);
+		}
+
+		try {
+			new Main(res).run();
+		} catch (JBakeException e) {
+			// TODO: localize
+			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
+		}
+	}
+
+	public static LaunchOptions parseOption(String[] args) {
+		final LaunchOptions options = new LaunchOptions();
+		final CmdlineParser parser = new CmdlineParser(options);
+		parser.setProgramName("jbake");
+		parser.parse(args);
+		return options;
+	}
+
+	private void bake() {
+		try {
+			Oven oven = new Oven(launchOptions.getSource(), launchOptions.getDestination(), launchOptions.isClearCache());
 			oven.setupPaths();
 			oven.bake();
 			final List<String> errors = oven.getErrors();
 			if (!errors.isEmpty()) {
 				// TODO: decide, if we want the all error here
-				System.err.println(MessageFormat.format("JBake failed with {0} errors:", errors.size()));
+				String msg = MessageFormat.format("JBake failed with {0} errors:", errors.size());
 				int errNr = 1;
-				for (String msg : errors) {
-					System.err.println(MessageFormat.format("{0}. {1}", errNr, msg));
+				for (String error : errors) {
+					msg += MessageFormat.format("{0}. {1}", errNr, error);
 					++errNr;
 				}
-				System.exit(1);
+				throw new JBakeException(msg);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
+			throw new JBakeException("An error occured while baking. " + e.getMessage(), e);
 		}
 	}
 
-	private void run(String[] args) {
-		LaunchOptions res = parseArguments(args);
-
+	/**
+	 * @throws JBakeException
+	 *             When errors occur.
+	 */
+	public void run() {
 		CompositeConfiguration config = null;
 		try {
-			config = ConfigUtil.load(res.getSource());
+			config = ConfigUtil.load(launchOptions.getSource());
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
-		System.out.println();
-		
-		if (res.isHelpNeeded()) {
-			printUsage(res);
-		}
-		
-		if(res.isBake()) {
-			bake(res);
+			throw new JBakeException("Configuration error: " + e.getMessage(),
+					e);
 		}
 
-		if (res.isInit()) {
-			if (res.getSourceValue() != null) {
+		System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
+		System.out.println();
+
+		if (launchOptions.isInit()) {
+			if (launchOptions.getSourceValue() != null) {
 				// if type has been supplied then use it
-				initStructure(config, res.getSourceValue());
+				initStructure(config, launchOptions.getSourceValue());
 			} else {
 				// default to freemarker if no value has been supplied
 				initStructure(config, "freemarker");
 			}
 		}
-		
-		if (res.isRunServer()) {
-			if (res.getSource().getPath().equals(".")) {
+
+		if (launchOptions.isBake()) {
+			bake();
+		}
+
+		if (launchOptions.isRunServer()) {
+			if (launchOptions.getSource().getPath().equals(".")) {
 				// use the default destination folder
 				runServer(config.getString("destination.folder"), config.getString("server.port"));
 			} else {
-				runServer(res.getSource().getPath(), config.getString("server.port"));
+				runServer(launchOptions.getSource().getPath(), config.getString("server.port"));
 			}
 		}
-		
-	}
-	private LaunchOptions parseArguments(String[] args) {
-		LaunchOptions res = new LaunchOptions();
-		CmdLineParser parser = new CmdLineParser(res);
 
-		try {
-			parser.parseArgument(args);
-		} catch (CmdLineException e) {
-			printUsage(res);
-		}
-
-		return res;
-	}
-
-	private void printUsage(Object options) {
-		CmdLineParser parser = new CmdLineParser(options);
-		StringWriter sw = new StringWriter();
-		sw.append(USAGE_PREFIX + "\n");
-		sw.append(ALT_USAGE_PREFIX + " <source> <destination>\n");
-		sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
-		sw.append("Options:");
-		System.out.println(sw.toString());
-		parser.setUsageWidth(100);
-		parser.printUsage(System.out);
-		System.exit(0);
 	}
 
 	private void runServer(String path, String port) {
 		JettyServer.run(path, port);
-		System.exit(0);
 	}
-	
+
 	private void initStructure(CompositeConfiguration config, String type) {
 		Init init = new Init(config);
 		try {
 			File codeFolder = FileUtil.getRunningLocation();
 			init.run(new File("."), codeFolder, type);
-			System.out.println("Base folder structure successfully created.");
-			System.exit(0);
+			if (launchOptions.isVerbose()) {
+				System.out.println("Base folder structure successfully created.");
+			}
 		} catch (Exception e) {
-			System.err.println("Failed to initalise structure!");
-			e.printStackTrace();
-			System.exit(1);
+			throw new JBakeException("Failed to initalise structure!", e);
 		}
 	}
 }
