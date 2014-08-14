@@ -54,7 +54,10 @@ public class MarkdownEngine extends MarkupEngine {
             }
 
         }
-        PegDownProcessor pegdownProcessor = new PegDownProcessor(extensions);
+        
+        long maxParsingTime = context.getConfig().getLong("markdown.maxParsingTimeInMillis", PegDownProcessor.DEFAULT_MAX_PARSING_TIME);
+        
+        PegDownProcessor pegdownProcessor = new PegDownProcessor(extensions, maxParsingTime);
         context.setBody(pegdownProcessor.markdownToHtml(context.getBody()));
     }
 }
