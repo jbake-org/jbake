@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -43,7 +44,7 @@ public class InitTest {
 	}
 	
 	@Test
-	public void initFailDestinationContainsContent(){
+	public void initFailDestinationContainsContent() throws IOException{
 		Init init = new Init(config);
 		File initPath = folder.newFolder("init");
 		File contentFolder = new File(initPath.getPath() + File.separatorChar + config.getString("content.folder"));
@@ -59,7 +60,7 @@ public class InitTest {
 	}
 	
 	@Test
-	public void initFailInvalidTemplateType(){
+	public void initFailInvalidTemplateType() throws IOException{
 		Init init = new Init(config);
 		File initPath = folder.newFolder("init");
 		try {
