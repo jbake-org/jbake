@@ -64,7 +64,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssa</maven.build.timestamp.format>
 		
-		<asciidoctor.java.version>0.1.4</asciidoctor.java.version>
+		<asciidoctorj.version>1.5.0</asciidoctorj.version>
 		<commons.io.version>2.4</commons.io.version>
 		<commons.configuration.version>1.9</commons.configuration.version>
 		<args4j.version>2.0.23</args4j.version>
@@ -344,8 +344,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.asciidoctor</groupId>
-			<artifactId>asciidoctor-java-integration</artifactId>
-			<version>${asciidoctor.java.version}</version>
+			<artifactId>asciidoctorj</artifactId>
+			<version>${asciidoctorj.version}</version>
             <optional>true</optional>
 		</dependency>
 		<dependency>

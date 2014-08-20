@@ -5,7 +5,7 @@ import org.apache.commons.configuration.Configuration;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.Attributes;
 import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.DocumentHeader;
+import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.Options;
 import org.jbake.app.ConfigUtil;
 import org.slf4j.Logger;
