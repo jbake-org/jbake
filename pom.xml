@@ -73,7 +73,7 @@
 		<pegdown.version>1.4.2</pegdown.version>
 		<jetty.version>8.1.12.v20130726</jetty.version>
         <orientdb.version>1.6.2</orientdb.version>
-        <groovy.version>2.3.4</groovy.version>
+        <groovy.version>2.3.6</groovy.version>
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.9</logback.version>
         <assertj.version>1.6.0</assertj.version>
@@ -363,12 +363,6 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-templates</artifactId>
-            <version>${groovy.version}</version>
-            <optional>true</optional>
-		</dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-servlet</artifactId>
             <version>${groovy.version}</version>
             <optional>true</optional>
 		</dependency>
