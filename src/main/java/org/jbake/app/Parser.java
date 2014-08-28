@@ -27,7 +27,13 @@ import java.util.Map;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Parser {
-    private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
+	/**
+	 * Config key for the jbake generation timestamp property (to use in templates).
+	 * When not defined, the jbae generation timestamp is simply not output.
+	 */
+    public static final String BAKED_TIMESTAMP = "baked.timestamp.as";
+
+	private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
     private CompositeConfiguration config;
     private String contentPath;
@@ -89,6 +95,18 @@ public class Parser {
         	if (content.get("status") == null) {
         		// file hasn't got status so use default
         		content.put("status", config.getString("default.status"));
+        	}
+        }
+        if(config.getString(BAKED_TIMESTAMP)!=null) {
+        	String timestamp = config.getString(BAKED_TIMESTAMP);
+        	if(content.containsKey(timestamp)) {
+        		LOGGER.warn(
+        				String.format("you tried to use as timestamp variable name \"%s\", "
+        								+ "which is already used in file %s. Timestamp will be ignored in that file.",
+        								timestamp,
+        								file));
+        	} else {
+        		content.put(timestamp, new Date());
         	}
         }
 
