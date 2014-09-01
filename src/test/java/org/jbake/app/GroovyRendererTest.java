@@ -6,6 +6,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Assert;
@@ -58,7 +59,7 @@ public class GroovyRendererTest {
                 config.setProperty(key, old.substring(0, old.length()-4)+".gsp");
             }
         }
-        Assert.assertEquals(".html", config.getString("output.extension"));
+        Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
     }
 

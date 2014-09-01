@@ -3,7 +3,9 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
@@ -39,7 +41,7 @@ public class Crawler {
     public Crawler(ODatabaseDocumentTx db, File source, CompositeConfiguration config) {
         this.db = db;
         this.config = config;
-        this.contentPath = source.getPath() + separator + config.getString("content.folder");
+        this.contentPath = source.getPath() + separator + config.getString(ConfigUtil.Keys.CONTENT_FOLDER);
         this.parser = new Parser(config, contentPath);
     }
 
@@ -108,7 +110,7 @@ public class Crawler {
     	if (uri.startsWith("/")) {
     		uri = uri.substring(1, uri.length());
     	}
-        uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString("output.extension");
+        uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
         return uri;
     }
 

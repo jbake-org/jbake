@@ -3,6 +3,7 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Assert;
@@ -59,7 +60,7 @@ public class RendererTest {
         }
 
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
-        Assert.assertEquals(".html", config.getString("output.extension"));
+        Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
     }
 

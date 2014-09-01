@@ -3,20 +3,24 @@ package org.jbake.template;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import groovy.text.XmlTemplateEngine;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -66,7 +70,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
         File sourceTemplate = new File(templatesPath, templateName);
         Template template = cachedTemplates.get(templateName);
         if (template == null) {
-            template = ste.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getString("template.encoding")));
+            template = ste.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getString(Keys.TEMPLATE_ENCODING)));
             cachedTemplates.put(templateName, template);
         }
         return template;

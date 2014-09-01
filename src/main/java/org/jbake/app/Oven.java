@@ -13,7 +13,9 @@ import java.util.regex.Pattern;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +76,7 @@ public class Oven {
 
     private void ensureDestination() throws Exception {
         if (null == destination) {
-            destination = new File(config.getString("destination.folder"));
+            destination = new File(config.getString(Keys.DESTINATION_FOLDER));
         }
         if (!destination.exists()) {
             destination.mkdirs();
@@ -91,9 +93,9 @@ public class Oven {
 	 */
 	public void setupPaths() throws Exception {
 		ensureSource();
-        templatesPath = setupRequiredFolderFromConfig("template.folder");
-        contentsPath = setupRequiredFolderFromConfig("content.folder");
-        assetsPath = setupPathFromConfig("asset.folder");
+        templatesPath = setupRequiredFolderFromConfig(Keys.TEMPLATE_FOLDER);
+        contentsPath = setupRequiredFolderFromConfig(Keys.CONTENT_FOLDER);
+        assetsPath = setupPathFromConfig(Keys.ASSET_FOLDER);
 		if (!assetsPath.exists()) {
 			LOGGER.warn("No asset folder was found!");
 		}
@@ -118,7 +120,7 @@ public class Oven {
 	 * @throws Exception
 	 */
 	public void bake() throws Exception {
-        ODatabaseDocumentTx db = DBUtil.createDB(config.getString("db.store"), config.getString("db.path"));
+        ODatabaseDocumentTx db = DBUtil.createDB(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
         updateDocTypesFromConfiguration();
         DBUtil.updateSchema(db);
         try {
@@ -148,45 +150,45 @@ public class Oven {
 			}
 
 			// write index file
-			if (config.getBoolean("render.index")) {
+			if (config.getBoolean(Keys.RENDER_INDEX)) {
 				try {
-					renderer.renderIndex(config.getString("index.file"));
+					renderer.renderIndex(config.getString(Keys.INDEX_FILE));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
 			}
 
 			// write feed file
-			if (config.getBoolean("render.feed")) {
+			if (config.getBoolean(Keys.RENDER_FEED)) {
 				try {
-					renderer.renderFeed(config.getString("feed.file"));
+					renderer.renderFeed(config.getString(Keys.FEED_FILE));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
 			}
 
 			// write sitemap file
-			if (config.getBoolean("render.sitemap")) {
+			if (config.getBoolean(Keys.RENDER_SITEMAP)) {
 				try {
-					renderer.renderSitemap(config.getString("sitemap.file"));
+					renderer.renderSitemap(config.getString(Keys.SITEMAP_FILE));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
 			}
 
 			// write master archive file
-			if (config.getBoolean("render.archive")) {
+			if (config.getBoolean(Keys.RENDER_ARCHIVE)) {
 				try {
-					renderer.renderArchive(config.getString("archive.file"));
+					renderer.renderArchive(config.getString(Keys.ARCHIVE_FILE));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
 			}
 
 			// write tag files
-			if (config.getBoolean("render.tags")) {
+			if (config.getBoolean(Keys.RENDER_TAGS)) {
 				try {
-					renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
+					renderer.renderTags(crawler.getTags(), config.getString(Keys.TAG_PATH));
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}

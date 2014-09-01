@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ZipUtil;
 
 /**
@@ -37,13 +38,13 @@ public class Init {
 		if (contents != null) {
 			for (File content : contents) {
 				if (content.isDirectory()) {
-					if (content.getName().equalsIgnoreCase(config.getString("template.folder"))) {
+					if (content.getName().equalsIgnoreCase(config.getString(Keys.TEMPLATE_FOLDER))) {
 						safe = false;
 					}
-					if (content.getName().equalsIgnoreCase(config.getString("content.folder"))) {
+					if (content.getName().equalsIgnoreCase(config.getString(Keys.CONTENT_FOLDER))) {
 						safe = false;
 					}
-					if (content.getName().equalsIgnoreCase(config.getString("asset.folder"))) {
+					if (content.getName().equalsIgnoreCase(config.getString(Keys.ASSET_FOLDER))) {
 						safe = false;
 					}
 				}

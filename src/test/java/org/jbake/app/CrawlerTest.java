@@ -15,6 +15,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.jbake.app.ConfigUtil.Keys;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +38,7 @@ public class CrawlerTest {
         }
 
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
-        Assert.assertEquals(".html", config.getString("output.extension"));
+        Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
     }
 
@@ -49,7 +50,7 @@ public class CrawlerTest {
 	@Test
 	public void crawl() throws ConfigurationException {
         Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString("content.folder")));
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
         Assert.assertEquals(2, crawler.getPostCount());
         Assert.assertEquals(3, crawler.getPageCount());

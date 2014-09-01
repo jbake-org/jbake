@@ -1,7 +1,9 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,19 +63,19 @@ public class Renderer {
         outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 
         // delete existing versions if they exist in case status has changed either way
-        File draftFile = new File(outputFilename + config.getString("draft.suffix") + config.getString("output.extension"));
+        File draftFile = new File(outputFilename + config.getString(Keys.DRAFT_SUFFIX) + config.getString(Keys.OUTPUT_EXTENSION));
         if (draftFile.exists()) {
             draftFile.delete();
         }
-        File publishedFile = new File(outputFilename + config.getString("output.extension"));
+        File publishedFile = new File(outputFilename + config.getString(Keys.OUTPUT_EXTENSION));
         if (publishedFile.exists()) {
             publishedFile.delete();
         }
 
         if (content.get("status").equals("draft")) {
-            outputFilename = outputFilename + config.getString("draft.suffix");
+            outputFilename = outputFilename + config.getString(Keys.DRAFT_SUFFIX);
         }
-        File outputFile = new File(outputFilename + config.getString("output.extension"));
+        File outputFile = new File(outputFilename + config.getString(Keys.OUTPUT_EXTENSION));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering [").append(outputFile).append("]... ");
@@ -101,7 +103,7 @@ public class Renderer {
             file.createNewFile();
         }
 
-        return new OutputStreamWriter(new FileOutputStream(file), config.getString("render.encoding"));
+        return new OutputStreamWriter(new FileOutputStream(file), config.getString(ConfigUtil.Keys.RENDER_ENCODING));
     }
 
     /**
@@ -230,7 +232,7 @@ public class Renderer {
             model.put("content", Collections.singletonMap("type","tag"));
 
             tag = tag.trim().replace(" ", "-");
-            File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));
+            File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
             StringBuilder sb = new StringBuilder();
             sb.append("Rendering tags [").append(outputFile).append("]... ");
 
