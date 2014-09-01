@@ -27,6 +27,8 @@ import java.util.Map;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Parser {
+	private static final String BUILD_TIMESTAMP = "build.timestamp";
+
 	/**
 	 * Config key for the jbake generation timestamp property (to use in templates).
 	 * When not defined, the jbae generation timestamp is simply not output.
@@ -106,7 +108,7 @@ public class Parser {
         								timestamp,
         								file));
         	} else {
-        		content.put(timestamp, new Date());
+        		content.put(timestamp, config.getString(BUILD_TIMESTAMP));
         	}
         }
 
