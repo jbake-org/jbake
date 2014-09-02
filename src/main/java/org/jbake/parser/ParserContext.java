@@ -1,15 +1,16 @@
 package org.jbake.parser;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+
 public class ParserContext {
     private final File file;
     private final List<String> fileLines;
-    private final CompositeConfiguration config;
+    private final Configuration config;
     private final String contentPath;
     private final boolean hasHeader;
     private final Map<String,Object> contents;
@@ -17,7 +18,7 @@ public class ParserContext {
     public ParserContext(
             File file,
             List<String> fileLines,
-            CompositeConfiguration config,
+            Configuration config,
             String contentPath,
             boolean hasHeader,
             Map<String, Object> contents) {
@@ -37,7 +38,7 @@ public class ParserContext {
         return fileLines;
     }
 
-    public CompositeConfiguration getConfig() {
+    public Configuration getConfig() {
         return config;
     }
 

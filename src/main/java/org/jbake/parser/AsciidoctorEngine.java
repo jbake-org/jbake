@@ -1,24 +1,21 @@
 package org.jbake.parser;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Attributes;
-import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.Options;
-import org.jbake.app.ConfigUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.apache.commons.configuration.Configuration;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.AttributesBuilder;
+import org.asciidoctor.Options;
+import org.asciidoctor.ast.DocumentHeader;
+import org.jbake.app.ConfigUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
 import static org.apache.commons.lang.math.NumberUtils.isNumber;
@@ -126,7 +123,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
-        CompositeConfiguration config = context.getConfig();
+        Configuration config = context.getConfig();
         final AttributesBuilder attributes = attributes(config.getStringArray("asciidoctor.attributes"));
         if (config.getBoolean("asciidoctor.attributes.export", false)) {
             final String prefix = config.getString(  "asciidoctor.attributes.export.prefix", "");
