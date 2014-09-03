@@ -10,6 +10,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import org.jbake.model.DocumentTypes;
 
 import java.util.ArrayList;
@@ -51,14 +52,14 @@ public class DBUtil {
 
     private static void createDocType(final OSchema schema, final String doctype) {
         OClass page = schema.createClass(doctype);
-        page.createProperty("sha1", OType.STRING).setNotNull(true);
-        page.createProperty("uri", OType.STRING).setNotNull(true);
+        page.createProperty(Crawler.Attributes.SHA1, OType.STRING).setNotNull(true);
+        page.createProperty(Crawler.Attributes.URI, OType.STRING).setNotNull(true);
         page.createProperty("rendered", OType.BOOLEAN).setNotNull(true);
         page.createProperty("cached", OType.BOOLEAN).setNotNull(true);
 
         // commented out because for some reason index seems to be written
         // after the database is closed to this triggers an exception
-        //page.createIndex("uriIdx", OClass.INDEX_TYPE.UNIQUE, "uri");
+        //page.createIndex("uriIdx", OClass.INDEX_TYPE.UNIQUE, Crawler.Attributes.URI);
         //page.createIndex("renderedIdx", OClass.INDEX_TYPE.NOTUNIQUE, "rendered");
     }
 

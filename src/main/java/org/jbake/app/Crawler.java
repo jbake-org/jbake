@@ -38,7 +38,7 @@ public class Crawler {
 
 			static final String PUBLISHED_DATE = "published-date";
 			static final String PUBLISHED = "published";
-			
+			static final String DRAFT = "draft";
 		}
 		static final String CACHED = "cached";
 		static final String DATE = "date";

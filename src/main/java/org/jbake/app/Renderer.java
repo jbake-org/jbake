@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.slf4j.Logger;
@@ -46,7 +47,17 @@ public class Renderer {
     }
 
     private String findTemplateName(String docType) {
-        return config.getString("template."+docType+".file");
+        String templateKey = "template."+docType+".file";
+		String returned = config.getString(templateKey);
+        if(returned==null) {
+        	throw new UnsupportedOperationException("config do not define a template for document type \""+docType+"\".\n"
+        					+ "How to fix that ? Add to JBake config file (jbake.properties) the following line :\n"
+        					+ "#####################################################\n"
+        					+ "\t"+templateKey+"=\"YOU MUST CREATE A TEMPLATE FILE\"\n"
+        					+ "#####################################################\n"
+        					);
+        }
+        return returned;
     }
 
     /**
@@ -57,7 +68,7 @@ public class Renderer {
      */
     public void render(Map<String, Object> content) throws Exception {
 //		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
-        String outputFilename = destination.getPath() + File.separatorChar + (String) content.get("uri");
+        String outputFilename = destination.getPath() + File.separatorChar + (String) content.get(Crawler.Attributes.URI);
         outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 
         // delete existing versions if they exist in case status has changed either way
@@ -70,7 +81,7 @@ public class Renderer {
             publishedFile.delete();
         }
 
-        if (content.get("status").equals("draft")) {
+        if (content.get(Crawler.Attributes.STATUS).equals(Crawler.Attributes.Status.DRAFT)) {
             outputFilename = outputFilename + config.getString("draft.suffix");
         }
         File outputFile = new File(outputFilename + config.getString("output.extension"));
@@ -82,7 +93,7 @@ public class Renderer {
         model.put("renderer", renderingEngine);
 
         try {
-            String docType = (String) content.get("type");
+            String docType = (String) content.get(Crawler.Attributes.TYPE);
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
