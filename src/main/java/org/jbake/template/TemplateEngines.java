@@ -1,10 +1,5 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -16,6 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * <p>A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New
@@ -43,7 +45,7 @@ public class TemplateEngines {
         return Collections.unmodifiableSet(templateEngines.keySet());
     }
 
-    public TemplateEngines(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public TemplateEngines(final Configuration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
         templateEngines = new HashMap<String, AbstractTemplateEngine>();
         loadEngines(config, db, destination, templatesPath);
     }
@@ -70,7 +72,7 @@ public class TemplateEngines {
      * @param templatesPath path to template directory
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
-    private static AbstractTemplateEngine tryLoadEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath, String engineClassName) {
+    private static AbstractTemplateEngine tryLoadEngine(final Configuration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath, String engineClassName) {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
@@ -96,7 +98,7 @@ public class TemplateEngines {
      * This method is used internally to load markup engines. Markup engines are found using descriptor files on
      * classpath, so adding an engine is as easy as adding a jar on classpath with the descriptor file included.
      */
-    private void loadEngines(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    private void loadEngines(final Configuration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
         try {
             ClassLoader cl = TemplateEngines.class.getClassLoader();
             Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.TemplateEngines.properties");
@@ -115,7 +117,7 @@ public class TemplateEngines {
         }
     }
 
-    private void registerEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath, String className, String... extensions) {
+    private void registerEngine(final Configuration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath, String className, String... extensions) {
         AbstractTemplateEngine engine = tryLoadEngine(config, db, destination, templatesPath, className);
         if (engine != null) {
             for (String extension : extensions) {

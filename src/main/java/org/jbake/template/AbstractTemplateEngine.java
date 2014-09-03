@@ -1,11 +1,12 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import org.apache.commons.configuration.CompositeConfiguration;
-
 import java.io.File;
 import java.io.Writer;
 import java.util.Map;
+
+import org.apache.commons.configuration.Configuration;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * A template is responsible for converting a model into a rendered document. The model
@@ -25,12 +26,12 @@ import java.util.Map;
  */
 public abstract class AbstractTemplateEngine {
 
-    protected final CompositeConfiguration config;
+    protected final Configuration config;
     protected final ODatabaseDocumentTx db;
     protected final File destination;
     protected final File templatesPath;
 
-    protected AbstractTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    protected AbstractTemplateEngine(final Configuration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
         this.config = config;
         this.db = db;
         this.destination = destination;
