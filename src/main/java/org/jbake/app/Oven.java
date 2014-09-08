@@ -6,17 +6,20 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.model.DocumentTypes;
+import org.jbake.render.RenderingException;
+import org.jbake.render.RenderingTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.model.DocumentTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * All the baking happens in the Oven!
@@ -127,70 +130,17 @@ public class Oven {
             clearCacheIfNeeded(db);
 
             // process source content
-            Crawler crawler = new Crawler(db, source, config);
-            crawler.crawl(contentsPath);
-            LOGGER.info("Pages : {}", crawler.getPageCount());
-            LOGGER.info("Posts : {}", crawler.getPostCount());
-
+            Crawler crawler = crawl(db);
+            
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
-
-			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from " + docType + " where rendered=false");
-				while (pagesIt.hasNext()) {
-					Map<String, Object> page = pagesIt.next();
-					try {
-						renderer.render(page);
-						renderedCount++;
-					} catch (Exception e) {
-						errors.add(e.getMessage());
-					}
-				}
-			}
-
-			// write index file
-			if (config.getBoolean("render.index")) {
-				try {
-					renderer.renderIndex(config.getString("index.file"));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
-
-			// write feed file
-			if (config.getBoolean("render.feed")) {
-				try {
-					renderer.renderFeed(config.getString("feed.file"));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
-
-			// write sitemap file
-			if (config.getBoolean("render.sitemap")) {
-				try {
-					renderer.renderSitemap(config.getString("sitemap.file"));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
-
-			// write master archive file
-			if (config.getBoolean("render.archive")) {
-				try {
-					renderer.renderArchive(config.getString("archive.file"));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
-
-			// write tag files
-			if (config.getBoolean("render.tags")) {
-				try {
-					renderer.renderTags(crawler.getTags(), config.getString("tag.path"));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+            
+            for(RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
+            	try {
+            	renderedCount += tool.render(renderer, db, destination, templatesPath, config);
+            	} catch(RenderingException e) {
+            		errors.add(e.getMessage());
+            	}
+            }
 
 			// mark docs as rendered
 			for (String docType : DocumentTypes.getDocumentTypes()) {
@@ -212,6 +162,19 @@ public class Oven {
 			db.close();
 			Orient.instance().shutdown();
 		}
+	}
+
+	/**
+	 * Extraction of crawling code from the {@link #bake()} mega-method to make it easier to grasp.
+	 * @param db
+	 * @return
+	 */
+	protected Crawler crawl(ODatabaseDocumentTx db) {
+		Crawler crawler = new Crawler(db, source, config);
+		crawler.crawl(contentsPath);
+		LOGGER.info("Pages : {}", crawler.getPageCount());
+		LOGGER.info("Posts : {}", crawler.getPostCount());
+		return crawler;
 	}
 
     /**

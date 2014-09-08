@@ -221,7 +221,8 @@ public class Renderer {
      * @param tagPath The output path
      * @throws Exception 
      */
-    public void renderTags(Set<String> tags, String tagPath) throws Exception {
+    public int renderTags(Set<String> tags, String tagPath) throws Exception {
+    	int renderedCount = 0;
     	final List<String> errors = new LinkedList<String>();
         for (String tag : tags) {
             Map<String, Object> model = new HashMap<String, Object>();
@@ -240,6 +241,7 @@ public class Renderer {
                 out.close();
                 sb.append("done!");
                 LOGGER.info(sb.toString());
+                renderedCount++;
             } catch (Exception e) {
                 sb.append("failed!");
                 LOGGER.error(sb.toString(), e);
@@ -253,6 +255,8 @@ public class Renderer {
         		sb.append("\n" + error);
         	}
         	throw new Exception(sb.toString());
+        } else {
+        	return renderedCount;
         }
     }
 }
