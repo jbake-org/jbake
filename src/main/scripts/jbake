@@ -1,3 +1,4 @@
 #!/bin/bash
-JBAKE_HOME="`dirname "$0"`"
-java -jar ${JBAKE_HOME}/jbake-core.jar $@
+EXEC_LOC="`dirname "$0"`"
+EXEC_PARENT="`dirname $EXEC_LOC`"
+java -jar ${EXEC_PARENT}/jbake-core.jar $@

@@ -1,0 +1,31 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      <head th:replace="header.thyme::head"/>
+      <body>
+      <div th:replace="header.thyme::top"/>
+
+      <!--<div class="jumbotron">
+        <h1>Bake your own site!</h1>
+        <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+        <a class="btn btn-large btn-success" href="#">Sign up today</a>
+      </div>
+
+	<hr/>-->
+
+	<div class="row-fluid marketing">
+		<div class="span12">
+			<div th:each="post : ${posts}">
+			<h4><a th:href='${post.uri}' th:text='${post.title}' href="post_uri.html">Post title</a></h4>
+			<p th:text='${#dates.format(post.date,"dd MMMM yyyy") + " - " + #strings.substring(post.body,0, 150)}'>...</p>
+			</div>
+			<a href="/archive.html">Archive</a>
+		</div>
+	</div>
+
+	<hr/>
+
+    <div th:replace="footer.thyme::footer"></div>
+    </body>
+</html>

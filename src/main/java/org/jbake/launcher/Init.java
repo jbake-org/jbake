@@ -2,10 +2,6 @@ package org.jbake.launcher;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ZipUtil;
@@ -31,7 +27,7 @@ public class Init {
 	 * @param templateLocationFolder
 	 * @throws Exception
 	 */
-	public void run(File outputFolder, File templateLocationFolder) throws Exception {
+	public void run(File outputFolder, File templateLocationFolder, String templateType) throws Exception {
 		if (!outputFolder.canWrite()) {
             throw new Exception("Output folder is not writeable!");
         }
@@ -57,11 +53,14 @@ public class Init {
 		if (!safe) {
 			throw new Exception("Output folder already contains structure!");
 		}
-		
-		File templateFile = new File(templateLocationFolder, config.getString("base.template"));
-		if (!templateFile.exists()) {
-			throw new Exception("Cannot locate template file: " + templateFile.getPath());
+		if (config.getString("example.project."+templateType) != null) {
+			File templateFile = new File(templateLocationFolder, config.getString("example.project."+templateType));
+			if (!templateFile.exists()) {
+				throw new Exception("Cannot find example project file: " + templateFile.getPath());
+			}
+			ZipUtil.extract(new FileInputStream(templateFile), outputFolder);
+		} else {
+			throw new Exception("Cannot locate example project type: " + templateType);
 		}
-		ZipUtil.extract(new FileInputStream(templateFile), outputFolder);
 	}
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+	<url th:each="content: ${published_content}">
+		<loc th:text='${config.site_host+content.uri}'>Full URL of post</loc>
+		<lastmod th:text='${#dates.format(content.date, "yyyy-MM-dd")}'>2014-01-30</lastmod>
+	</url>
+</urlset>

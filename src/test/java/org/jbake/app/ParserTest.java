@@ -1,8 +1,11 @@
 package org.jbake.app;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -23,22 +26,19 @@ public class ParserTest {
 	
 	private File validHTMLFile;
 	private File invalidHTMLFile;
-	private File validMarkdownFile;
-	private File invalidMarkdownFile;
 	private File validAsciiDocFile;
 	private File invalidAsciiDocFile;
 	private File validAsciiDocFileWithoutHeader;
 	private File invalidAsciiDocFileWithoutHeader;
 	private File validAsciiDocFileWithHeaderInContent;
 	
-	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\n~~~~~~";
+	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 
   
 	
 	@Before
 	public void createSampleFile() throws Exception {
-		ConfigUtil.reset();
 		rootPath = new File(this.getClass().getResource(".").getFile());
 		config = ConfigUtil.load(rootPath);
 		parser = new Parser(config,rootPath.getPath());
@@ -52,18 +52,6 @@ public class ParserTest {
 		invalidHTMLFile = folder.newFile("invalid.html");
 		out = new PrintWriter(invalidHTMLFile);
 		out.println(invalidHeader);
-		out.close();
-		
-		validMarkdownFile = folder.newFile("valid.md");
-		out = new PrintWriter(validMarkdownFile);
-		out.println(validHeader);
-		out.println("# This is a test");
-		out.close();
-		
-		invalidMarkdownFile = folder.newFile("invalid.md");
-		out = new PrintWriter(invalidMarkdownFile);
-		out.println(invalidHeader);
-		out.println("# This is a test");
 		out.close();
 		
 		validAsciiDocFile = folder.newFile("valid.ad");
@@ -132,6 +120,13 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
 		Assert.assertEquals("post", map.get("type"));
+		Assert.assertNotNull(map.get("date"));
+		Calendar cal = Calendar.getInstance();
+		cal.setTime((Date) map.get("date"));
+		Assert.assertEquals(8, cal.get(Calendar.MONTH));
+		Assert.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH));
+		Assert.assertEquals(2013, cal.get(Calendar.YEAR));
+
 	}
 	
 	@Test
@@ -141,28 +136,15 @@ public class ParserTest {
 	}
 	
 	@Test
-	public void parseValidMarkdownFile() throws Exception {
-		Map<String, Object> map = parser.processFile(validMarkdownFile);
-		Assert.assertNotNull(map);
-		Assert.assertEquals("draft", map.get("status"));
-		Assert.assertEquals("post", map.get("type"));
-		Assert.assertEquals("<h1>This is a test</h1>\n", map.get("body"));
-	}
-	
-	@Test
-	public void parseInvalidMarkdownFile() {
-		Parser parser = new Parser(config,rootPath.getPath());
-		Map<String, Object> map = parser.processFile(invalidMarkdownFile);
-		Assert.assertNull(map);
-	}
-	
-	@Test
 	public void parseValidAsciiDocFile() {
 		Map<String, Object> map = parser.processFile(validAsciiDocFile);
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
 		Assert.assertEquals("post", map.get("type"));
-		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
+		assertThat(map.get("body").toString())
+			.contains("class=\"paragraph\"")
+			.contains("<p>JBake now supports AsciiDoc.</p>");
+//		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
 	}
 	
 	@Test
@@ -178,7 +160,10 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("published", map.get("status"));
 		Assert.assertEquals("page", map.get("type"));
-		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
+		assertThat(map.get("body").toString())
+			.contains("class=\"paragraph\"")
+			.contains("<p>JBake now supports AsciiDoc.</p>");
+//		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
 	}
 	
 	@Test
@@ -194,6 +179,15 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("published", map.get("status"));
 		Assert.assertEquals("page", map.get("type"));
-		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
+		assertThat(map.get("body").toString())
+			.contains("class=\"paragraph\"")
+			.contains("<p>JBake now supports AsciiDoc.</p>")
+			.contains("class=\"listingblock\"")
+			.contains("class=\"content\"")
+			.contains("<pre>")
+			.contains("title=Example Header")
+			.contains("date=2013-02-01")
+			.contains("tags=tag1, tag2");
+//		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
 	}
 }

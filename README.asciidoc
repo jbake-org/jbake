@@ -3,9 +3,12 @@ Jonathan Bullock
 2013-10-20
 :idprefix:
 
+== JBake
+
 http://jbake.org[JBake] is a Java based open source static site/blog generator for developers.
 
-image::https://travis-ci.org/jonbullock/JBake.png?branch=master[Build Status, link="https://travis-ci.org/jonbullock/JBake"]
+image:http://img.shields.io/travis/jbake-org/jbake/master.svg["Build Status", link="https://travis-ci.org/jbake-org/jbake"]
+image:http://img.shields.io/coveralls/jbake-org/jbake/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/jbake"]
 
 == Documentation
 
@@ -55,12 +58,14 @@ Talk to other users of JBake on the forum:
 * http://commons.apache.org/[Apache Commons IO, Configuration, Lang & Logging]
 * http://maven.apache.org/[Apache Maven]
 * http://args4j.kohsuke.org/[Args4j]
-* http://asciidoctor.org/[Asciidoctor]
+* http://asciidoctor.org/[AsciidoctorJ]
 * http://www.eclipse.org/[Eclipse IDE]
 * http://freemarker.org/[Freemarker]
 * http://junit.org/[JUnit]
-* http://markdownj.org/[MarkdownJ]
+* http://pegdown.org/[Pegdown]
 * http://www.eclipse.org/jetty/[Jetty Server]
+* http://www.orientdb.org/[OrientDB]
+* http://groovy.codehaus.org/[Groovy]
 
 == Copyright & License
 

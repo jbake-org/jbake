@@ -26,13 +26,20 @@
 	-->
         <fileSet>
             <directory>${project.build.scriptSourceDirectory}</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>bin</outputDirectory>
             <includes>
                 <include>jbake*</include>
             </includes>
         </fileSet>
-        <!-- adds jar package to the root directory of zip package -->
         <fileSet>
+        	<directory>${project.basedir}/src/main/logging</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>logback.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+        	<!-- adds jar package to the root directory of zip package -->
             <directory>${project.build.directory}</directory>
             <outputDirectory></outputDirectory>
             <includes>
@@ -47,10 +54,11 @@
             </includes>
         </fileSet>
         <fileSet>
-        	<directory>${basedir}/src/main/templates/</directory>
+        	<!-- adds example projects files to the root directory of zip package -->
+        	<directory>${project.build.directory}</directory>
         	<outputDirectory></outputDirectory>
             <includes>
-                <include>base*</include>
+                <include>example*.zip</include>
             </includes>
         </fileSet>
     </fileSets>

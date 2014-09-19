@@ -1,0 +1,25 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      <head th:replace="header.thyme::head"/>
+      <body>
+      <div th:replace="header.thyme::top"/>
+      <div class="row-fluid marketing">
+		<div class="span12">
+				<h2 th:text="${content.title}">Post title</h2>
+				<p class="post-date" th:text='${#dates.format(content.date,"dd MMMM yyyy")}'>Date</p>
+				<p th:text="${content.body}"></p>
+		</div>
+	</div>
+
+	<hr/>
+	
+	<h5>Published Posts</h5>
+	<div th:each="post : ${published_posts}" th:with='last_month=null' th:remove='tag'>
+		<a th:href='${config.site_host+post.uri}' th:text='${post.title}' href="post.html"></a>
+	</div>
+	
+    <div th:replace="footer.thyme::footer"></div>
+    </body>
+</html>
