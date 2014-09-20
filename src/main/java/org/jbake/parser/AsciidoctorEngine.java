@@ -11,6 +11,7 @@ import org.jbake.app.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -143,7 +144,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             final String name = iterator.next();
             options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
         }
-        options.setBaseDir(context.getFile().getParent());
+        options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());
         options.setSafe(UNSAFE);
         return options;
     }
