@@ -74,7 +74,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         Map<String, Object> contents = context.getContents();
         if (header.getDocumentTitle() != null) {
-            contents.put("title", header.getDocumentTitle());
+            contents.put("title", header.getDocumentTitle().getMain());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (String key : attributes.keySet()) {
