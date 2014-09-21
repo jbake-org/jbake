@@ -158,6 +158,7 @@ public class ParserTest {
 	public void parseValidAsciiDocFileWithoutHeader() {
 		Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutHeader);
 		Assert.assertNotNull(map);
+		Assert.assertEquals("Hello, AsciiDoc!", map.get("title"));
 		Assert.assertEquals("published", map.get("status"));
 		Assert.assertEquals("page", map.get("type"));
 		assertThat(map.get("body").toString())
