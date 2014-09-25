@@ -113,7 +113,7 @@
 						</goals>
 						<configuration>
 							<checkoutDirectory>${project.build.directory}/example-project-freemarker</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-freemarker.git</connectionUrl>
+							<connectionUrl>scm:git:https://github.com/jbake-org/jbake-example-project-freemarker.git</connectionUrl>
 						</configuration>
 					</execution>
 					<execution>
@@ -124,7 +124,7 @@
 						</goals>
 						<configuration>
 							<checkoutDirectory>${project.build.directory}/example-project-groovy</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-groovy.git</connectionUrl>
+							<connectionUrl>scm:git:https://github.com/jbake-org/jbake-example-project-groovy.git</connectionUrl>
 						</configuration>
 					</execution>
 					<execution>
@@ -135,7 +135,7 @@
 						</goals>
 						<configuration>
 							<checkoutDirectory>${project.build.directory}/example-project-thymeleaf</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-thymeleaf.git</connectionUrl>
+							<connectionUrl>scm:git:https://github.com/jbake-org/jbake-example-project-thymeleaf.git</connectionUrl>
 						</configuration>
 					</execution>
 				</executions>
@@ -347,6 +347,12 @@
 			<artifactId>asciidoctorj</artifactId>
 			<version>${asciidoctorj.version}</version>
             <optional>true</optional>
+		</dependency>
+		<dependency>
+		    <groupId>org.fusesource.scalate</groupId>
+    		<artifactId>scalate-core_2.10</artifactId>
+    		<version>1.6.1</version>
+    		<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
