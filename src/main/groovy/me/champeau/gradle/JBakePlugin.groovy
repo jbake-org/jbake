@@ -17,9 +17,13 @@ package me.champeau.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.internal.project.ProjectInternal
 
 class JBakePlugin implements Plugin<Project> {
+
     void apply(Project project) {
-        project.task('jbake', type:JBakeTask)
+        project.apply(plugin: 'base')
+        project.task('jbake', type: JBakeTask, group: 'Documentation', description: 'Bake jbake project')
     }
 }

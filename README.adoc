@@ -19,6 +19,9 @@ buildscript {
     // optional, if you use asciidoctor markup
     classpath 'org.asciidoctor:asciidoctor-java-integration:0.1.4'
 
+    // optional, if you use markdown markup
+    classpath 'org.pegdown:pegdown:1.4.2'
+
     // optional, if you use freemarker template engine
     classpath 'org.freemarker:freemarker:2.3.19'
   }

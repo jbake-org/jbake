@@ -23,6 +23,9 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'org.jbake:jbake-core:2.3.0'
+    testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+        exclude group:'org.codehaus.groovy'
+    }
 }
 
 project.version = '0.2.1-SNAPSHOT'
