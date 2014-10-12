@@ -15,27 +15,47 @@
  */
 package me.champeau.gradle
 
-import org.apache.commons.configuration.CompositeConfiguration
-import org.apache.commons.configuration.MapConfiguration
-import org.gradle.api.internal.AbstractTask
+import org.gradle.api.DefaultTask
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.jbake.app.Oven
 
-class JBakeTask extends AbstractTask {
+class JBakeTask extends DefaultTask {
     @InputDirectory File input = new File("$project.projectDir/src/jbake")
     @OutputDirectory File output = new File("$project.buildDir/jbake")
     @Input Map<String, Object> configuration = [:]
     boolean clearCache = false
 
+    Configuration classpath
+    private static ClassLoader cl
+
+    JBakeProxy jbake
+
     @TaskAction
     void bake() {
-        new Oven(input, output, clearCache).with {
-            config = new CompositeConfiguration([new MapConfiguration(configuration), config])
-            setupPaths()
-            bake()
+        //TODO make it possible to change jbake configuration via extension?!
+        jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(),input: input,output: output,clearCache: clearCache)
+        jbake.jbake()
+    }
+
+    private def loadOvenDynamic() {
+        setupClassLoader()
+        loadClass("org.jbake.app.Oven")
+    }
+
+    private static Class loadClass(String className) {
+        cl.loadClass(className)
+    }
+
+    private def setupClassLoader() {
+        if (classpath?.files) {
+            def urls = classpath.files.collect { it.toURI().toURL() }
+            cl = new URLClassLoader(urls as URL[], Thread.currentThread().contextClassLoader)
+            Thread.currentThread().contextClassLoader = cl
+        } else {
+            cl = Thread.currentThread().contextClassLoader
         }
     }
 

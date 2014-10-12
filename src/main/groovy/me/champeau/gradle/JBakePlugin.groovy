@@ -22,8 +22,34 @@ import org.gradle.api.internal.project.ProjectInternal
 
 class JBakePlugin implements Plugin<Project> {
 
+
+    public static final String JBAKE = "jbake"
+
     void apply(Project project) {
         project.apply(plugin: 'base')
-        project.task('jbake', type: JBakeTask, group: 'Documentation', description: 'Bake jbake project')
+
+        JBakeExtension extension = project.extensions.create(JBAKE, JBakeExtension)
+
+        project.repositories {
+            jcenter()
+        }
+
+        Configuration configuration = project.configurations.maybeCreate(JBAKE)
+
+        project.afterEvaluate{
+            project.dependencies {
+                jbake("org.jbake:jbake-core:${extension.version}")
+                //TODO remove hard coded Engine-Versions to JBakeExtension
+                //TODO jbake >= 2.3.1 switched to org.asciidoctor:asciidoctorj:1.5.+
+                jbake("org.asciidoctor:asciidoctor-java-integration:0.1.4")
+                jbake("org.freemarker:freemarker:2.3.19")
+                jbake("org.pegdown:pegdown:1.4.2")
+            }
+        }
+
+        project.task('jbake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project'){
+            classpath = configuration
+        }
+
     }
 }
