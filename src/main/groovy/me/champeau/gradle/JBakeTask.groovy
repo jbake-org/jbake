@@ -22,6 +22,8 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
+import java.lang.reflect.Constructor
+
 class JBakeTask extends DefaultTask {
     @InputDirectory File input
     @OutputDirectory File output
@@ -35,8 +37,9 @@ class JBakeTask extends DefaultTask {
 
     @TaskAction
     void bake() {
-        //TODO make it possible to change jbake configuration via extension?!
         createJbake()
+        jbake.prepare()
+        mergeConfiguration()
         jbake.jbake()
     }
 
@@ -44,6 +47,22 @@ class JBakeTask extends DefaultTask {
         if ( !jbake ) {
             jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: getInput(), output: getOutput(), clearCache: getClearCache())
         }
+    }
+
+    private def mergeConfiguration(){
+
+        //config = new CompositeConfiguration([createMapConfiguration(), jbake.getConfig()])
+        def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
+        Constructor constructor = delegate.getConstructor(Collection)
+        def config = constructor.newInstance([createMapConfiguration(), jbake.getConfig()])
+        jbake.setConfig( config )
+
+    }
+
+    private def createMapConfiguration(){
+        def delegate = loadClass('org.apache.commons.configuration.MapConfiguration')
+        Constructor constructor = delegate.getConstructor(Map)
+        constructor.newInstance(getConfiguration())
     }
 
     private def loadOvenDynamic() {

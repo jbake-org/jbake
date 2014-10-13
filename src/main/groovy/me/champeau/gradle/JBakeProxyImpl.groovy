@@ -1,5 +1,9 @@
 package me.champeau.gradle
 
+import groovy.transform.Field
+import org.apache.commons.configuration.CompositeConfiguration
+import org.apache.commons.configuration.MapConfiguration
+
 import java.lang.reflect.Constructor
 
 
@@ -13,14 +17,26 @@ class JBakeProxyImpl implements JBakeProxy{
     def output
     def clearCache
 
-    def jbake() {
+    def jbake
 
+    def jbake() {
+        if(jbake) {
+            jbake.bake()
+        }
+    }
+
+    def prepare() {
         Constructor constructor = delegate.getConstructor(File.class,File.class,boolean)
 
-        def instance = constructor.newInstance(input, output, clearCache)
-        instance.with {
-            setupPaths()
-            bake()
-        }
+        jbake = constructor.newInstance(input, output, clearCache)
+        jbake.setupPaths()
+    }
+
+    def getConfig(){
+        jbake.config
+    }
+
+    def setConfig(Object config) {
+        jbake.config = config
     }
 }

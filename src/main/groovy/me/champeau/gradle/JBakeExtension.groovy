@@ -13,5 +13,6 @@ class JBakeExtension {
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
     boolean clearCache = false
+    Map<String, Object> configuration = [:]
 
 }

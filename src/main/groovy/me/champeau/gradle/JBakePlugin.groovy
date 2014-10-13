@@ -45,6 +45,7 @@ class JBakePlugin implements Plugin<Project> {
             conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
             conventionMapping.output = { project.file("$project.buildDir/$project.jbake.destDirName") }
             conventionMapping.clearCache = { project.jbake.clearCache }
+            conventionMapping.configuration = { project.jbake.configuration }
         }
 
     }

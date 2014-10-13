@@ -123,4 +123,16 @@ class JBakePluginSpec extends Specification {
         project.tasks.jbake.clearCache == clearCache
     }
 
+    def "should be configurable by extension"(){
+        given:
+        def configuration = [:]
+        configuration['render.tags'] = false
+
+        when:
+        project.jbake.configuration = configuration
+
+        then:
+        project.tasks.jbake.configuration['render.tags'] == false
+    }
+
 }
