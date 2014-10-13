@@ -18,38 +18,48 @@ package me.champeau.gradle
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.internal.project.ProjectInternal
 
 class JBakePlugin implements Plugin<Project> {
 
 
     public static final String JBAKE = "jbake"
+    Project project
+    JBakeExtension extension
 
     void apply(Project project) {
+        this.project = project
         project.apply(plugin: 'base')
-
-        JBakeExtension extension = project.extensions.create(JBAKE, JBakeExtension)
 
         project.repositories {
             jcenter()
         }
 
         Configuration configuration = project.configurations.maybeCreate(JBAKE)
+        extension = project.extensions.create(JBAKE, JBakeExtension)
 
-        project.afterEvaluate{
-            project.dependencies {
-                jbake("org.jbake:jbake-core:${extension.version}")
-                //TODO remove hard coded Engine-Versions to JBakeExtension
-                //TODO jbake >= 2.3.1 switched to org.asciidoctor:asciidoctorj:1.5.+
-                jbake("org.asciidoctor:asciidoctor-java-integration:0.1.4")
-                jbake("org.freemarker:freemarker:2.3.19")
-                jbake("org.pegdown:pegdown:1.4.2")
-            }
-        }
+        addDependenciesAfterEvaluate()
 
         project.task('jbake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project'){
             classpath = configuration
         }
 
     }
+
+    def addDependenciesAfterEvaluate() {
+        project.afterEvaluate {
+            addDependencies()
+        }
+    }
+
+    def addDependencies() {
+        project.dependencies {
+            jbake("org.jbake:jbake-core:${extension.version}")
+            //TODO remove hard coded Engine-Versions to JBakeExtension
+            //TODO jbake >= 2.3.1 switched to org.asciidoctor:asciidoctorj:1.5.+
+            jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorVersion}")
+            jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
+            jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
+        }
+    }
+
 }

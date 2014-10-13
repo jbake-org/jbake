@@ -36,8 +36,14 @@ class JBakeTask extends DefaultTask {
     @TaskAction
     void bake() {
         //TODO make it possible to change jbake configuration via extension?!
-        jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(),input: input,output: output,clearCache: clearCache)
+        createJbake()
         jbake.jbake()
+    }
+
+    private def createJbake() {
+        if ( !jbake ) {
+            jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: input, output: output, clearCache: clearCache)
+        }
     }
 
     private def loadOvenDynamic() {
