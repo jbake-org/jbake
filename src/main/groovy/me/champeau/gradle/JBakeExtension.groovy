@@ -12,5 +12,6 @@ class JBakeExtension {
     String asciidoctorjVersion = '1.5.1'
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
+    boolean clearCache = false
 
 }

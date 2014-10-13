@@ -2,7 +2,6 @@ package me.champeau.gradle
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -112,4 +111,16 @@ class JBakePluginSpec extends Specification {
         then:
         project.tasks.jbake.output == expectedFile
     }
+
+    def "clearcache should be configured by extension"(){
+        given:
+        def clearCache = true
+
+        when:
+        project.jbake.clearCache = clearCache
+
+        then:
+        project.tasks.jbake.clearCache == clearCache
+    }
+
 }

@@ -26,7 +26,7 @@ class JBakeTask extends DefaultTask {
     @InputDirectory File input
     @OutputDirectory File output
     @Input Map<String, Object> configuration = [:]
-    boolean clearCache = false
+    boolean clearCache
 
     Configuration classpath
     private static ClassLoader cl
@@ -42,7 +42,7 @@ class JBakeTask extends DefaultTask {
 
     private def createJbake() {
         if ( !jbake ) {
-            jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: getInput(), output: getOutput(), clearCache: clearCache)
+            jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: getInput(), output: getOutput(), clearCache: getClearCache())
         }
     }
 
