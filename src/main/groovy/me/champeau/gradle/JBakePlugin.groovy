@@ -54,9 +54,14 @@ class JBakePlugin implements Plugin<Project> {
     def addDependencies() {
         project.dependencies {
             jbake("org.jbake:jbake-core:${extension.version}")
-            //TODO remove hard coded Engine-Versions to JBakeExtension
-            //TODO jbake >= 2.3.1 switched to org.asciidoctor:asciidoctorj:1.5.+
-            jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorVersion}")
+
+            if ( new Version(extension.version) > new Version("2.3.0") ){
+                jbake("org.asciidoctor:asciidoctorj:${extension.asciidoctorjVersion}")
+            }
+            else {
+                jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorJavaIntegrationVersion}")
+            }
+
             jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
             jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
         }

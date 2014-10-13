@@ -39,10 +39,12 @@ class JBakePluginSpec extends Specification {
     }
 
     @Unroll
-    @Ignore
     def "should add dependency #name #version"(){
 
-        expect:
+        when:
+        project.evaluate()
+
+        then:
         project.configurations.jbake.dependencies.find {
             it.name == name && it.version == version
         }
@@ -56,16 +58,35 @@ class JBakePluginSpec extends Specification {
 
     }
 
-    @Ignore
     def "set dependency version by extension"(){
-        when:
+
+        given:
         project.jbake.version = '2.3.2'
+
+        when:
+        project.evaluate()
 
         then:
         project.configurations.jbake.dependencies.find {
             it.name == 'jbake-core' && it.version == '2.3.2'
         }
 
+    }
+
+    def "switch to asciidoctorj if version > 2.3.0"(){
+
+        given:
+        project.jbake.version = '2.3.1'
+
+        when:
+        project.evaluate()
+
+        then:
+        project.configurations.jbake.dependencies.find {
+            it.group == 'org.asciidoctor' &&
+            it.name == 'asciidoctorj' &&
+            it.version == '1.5.1'
+        }
     }
 
 }
