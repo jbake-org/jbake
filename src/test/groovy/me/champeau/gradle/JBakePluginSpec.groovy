@@ -89,4 +89,27 @@ class JBakePluginSpec extends Specification {
         }
     }
 
+    def "input dir should be configured by extension"(){
+        given:
+        def srcDirName = "src/jbake-project"
+        def expectedFile = project.file("$project.rootDir/$srcDirName")
+
+        when:
+        project.jbake.srcDirName = srcDirName
+
+        then:
+        project.tasks.jbake.input == expectedFile
+    }
+
+    def "output dir should be configured by extension"(){
+        given:
+        def destDirName = "jbake-out"
+        def expectedFile = project.file("$project.buildDir/$destDirName")
+
+        when:
+        project.jbake.destDirName = destDirName
+
+        then:
+        project.tasks.jbake.output == expectedFile
+    }
 }

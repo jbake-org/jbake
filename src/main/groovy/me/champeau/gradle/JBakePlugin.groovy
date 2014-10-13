@@ -40,7 +40,10 @@ class JBakePlugin implements Plugin<Project> {
         addDependenciesAfterEvaluate()
 
         project.task('jbake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project'){
+
             classpath = configuration
+            conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
+            conventionMapping.output = { project.file("$project.buildDir/$project.jbake.destDirName") }
         }
 
     }
