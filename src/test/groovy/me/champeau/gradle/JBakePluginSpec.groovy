@@ -50,24 +50,24 @@ class JBakePluginSpec extends Specification {
 
         where:
         group             | name                           | version
-        'org.jbake'       | 'jbake-core'                   | '2.3.0'
+        'org.jbake'       | 'jbake-core'                   | '2.3.2'
         'org.freemarker'  | 'freemarker'                   | '2.3.19'
         'org.pegdown'     | 'pegdown'                      | '1.4.2'
-        'org.asciidoctor' | 'asciidoctor-java-integration' | '0.1.4'
+        'org.asciidoctor' | 'asciidoctorj'                 | '1.5.1'
 
     }
 
     def "set dependency version by extension"(){
 
         given:
-        project.jbake.version = '2.3.2'
+        project.jbake.version = '2.3.0'
 
         when:
         project.evaluate()
 
         then:
         project.configurations.jbake.dependencies.find {
-            it.name == 'jbake-core' && it.version == '2.3.2'
+            it.name == 'jbake-core' && it.version == '2.3.0'
         }
 
     }
@@ -86,6 +86,23 @@ class JBakePluginSpec extends Specification {
             it.name == 'asciidoctorj' &&
             it.version == '1.5.1'
         }
+    }
+
+    def "use asciidoctor-java-integration if version < 2.3.1"(){
+
+        given:
+        project.jbake.version = '2.3.0'
+
+        when:
+        project.evaluate()
+
+        then:
+        project.configurations.jbake.dependencies.find {
+            it.group == 'org.asciidoctor' &&
+            it.name == 'asciidoctor-java-integration' &&
+            it.version == '0.1.4'
+        }
+
     }
 
     def "input dir should be configured by extension"(){
