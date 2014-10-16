@@ -85,7 +85,7 @@ public class WatchMojo extends GenerateMojo {
         } else if (result >= lastProcessed) {
           getLog().info("Refreshing");
 
-          super.execute();
+          super.reRender();
 
           lastProcessed = Long.valueOf(System.currentTimeMillis());
         }
