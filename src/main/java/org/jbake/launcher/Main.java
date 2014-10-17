@@ -80,10 +80,10 @@ public class Main {
 		if (res.isInit()) {
 			if (res.getSourceValue() != null) {
 				// if type has been supplied then use it
-				initStructure(config, res.getSourceValue());
+				initStructure(config, res.getTemplate(), res.getSourceValue());
 			} else {
 				// default to freemarker if no value has been supplied
-				initStructure(config, "freemarker");
+				initStructure(config, "freemarker", res.getSourceValue());
 			}
 		}
 		
@@ -127,16 +127,22 @@ public class Main {
 		JettyServer.run(path, port);
 		System.exit(0);
 	}
-	
-	private void initStructure(CompositeConfiguration config, String type) {
-		Init init = new Init(config);
+
+	private void initStructure(CompositeConfiguration config, String type, String source) {
+        Init init = new Init(config);
 		try {
-			File codeFolder = FileUtil.getRunningLocation();
-			init.run(new File("."), codeFolder, type);
+            File templateFolder = FileUtil.getRunningLocation();
+            File outputFolder;
+            if(source != null){
+                outputFolder = new File(source);
+            } else{
+                outputFolder = new File(".");
+            }
+            init.run(outputFolder, templateFolder, type);
 			System.out.println("Base folder structure successfully created.");
 			System.exit(0);
 		} catch (Exception e) {
-			System.err.println("Failed to initalise structure!");
+			System.err.println("Failed to initialise structure!");
 			e.printStackTrace();
 			System.exit(1);
 		}

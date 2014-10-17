@@ -51,7 +51,8 @@ public class Init {
 		}
 		
 		if (!safe) {
-			throw new Exception("Output folder already contains structure!");
+			throw new Exception(String.format("Output folder '%s' already contains structure!",
+                    outputFolder.getAbsolutePath()));
 		}
 		if (config.getString("example.project."+templateType) != null) {
 			File templateFile = new File(templateLocationFolder, config.getString("example.project."+templateType));

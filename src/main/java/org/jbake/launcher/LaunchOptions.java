@@ -19,7 +19,10 @@ public class LaunchOptions {
 	
 	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
 	private boolean init;
-	
+
+    @Option(name = "-t", aliases = {"--template"}, usage="Use specified template (use freemarker if not specified) ", depends = ("-i"))
+    private String template;
+
 	@Option(name = "-s", aliases = {"--server"}, usage="runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
 	private boolean runServer;
 	
@@ -28,7 +31,14 @@ public class LaunchOptions {
 
     @Option(name = "--reset", usage="clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
-    
+
+    public String getTemplate() {
+		if (template != null) {
+			return template;
+		} else {
+			return "freemarker";
+		}
+	}
 	public File getSource() {
 		if (source != null) {
 			return new File(source);
@@ -47,7 +57,6 @@ public class LaunchOptions {
 		} else {
 			return null;
 		}
-		
 	}
 	
 	public String getDestinationValue() {
