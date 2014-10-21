@@ -81,18 +81,18 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     if ("include".equals(key)) {
                         return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
                     }
-                    if ("db".equals(key)) {
+                    if (ModelExtractor.DB.equals(key)) {
                         return db;
                     }
-                    if ("published_posts".equals(key)) {
+                    if (ModelExtractor.PUBLISHED_POSTS.equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("published_pages".equals(key)) {
+                    if (ModelExtractor.PUBLISHED_PAGES.equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("published_content".equals(key)) {
+                    if (ModelExtractor.PUBLISHED_PAGES.equals(key)) {
                     	List<ODocument> publishedContent = new ArrayList<ODocument>();
                     	String[] documentTypes = DocumentTypes.getDocumentTypes();
                     	for (String docType : documentTypes) {
@@ -101,7 +101,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     	}
                     	return DocumentList.wrap(publishedContent.iterator());
                     }
-                    if ("all_content".equals(key)) {
+                    if (ModelExtractor.ALL_CONTENT.equals(key)) {
                     	List<ODocument> allContent = new ArrayList<ODocument>();
                     	String[] documentTypes = DocumentTypes.getDocumentTypes();
                     	for (String docType : documentTypes) {
@@ -110,7 +110,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     	}
                     	return DocumentList.wrap(allContent.iterator());
                     }
-                    if ("alltags".equals(key)) {
+                    if (ModelExtractor.ALLTAGS.equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
                         Set<String> result = new HashSet<String>();
                         for (ODocument document : query) {
@@ -125,13 +125,13 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                             return DocumentList.wrap(DBUtil.query(db, "select * from "+docType+" order by date desc").iterator());
                         }
                     }
-                    if ("tag_posts".equals(key)) {
+                    if (ModelExtractor.TAG_POSTS.equals(key)) {
                         String tag = model.get("tag").toString();
                         // fetch the tag posts from db
                         List<ODocument> query = DBUtil.query(db, "select * from post where status='published' where ? in tags order by date desc", tag);
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("published_date".equals(key)) {
+                    if (ModelExtractor.PUBLISHED_DATE.equals(key)) {
                         return new Date();
                     }
                 }

@@ -3,6 +3,7 @@ package org.jbake.template;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.DBUtil;
@@ -98,17 +99,17 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         }
 
         private void completeModel() {
-            put("db", db);
-            put("alltags", getAllTags());
-            put("tag_posts", getTagPosts());
-            put("published_date", new Date());
+            put(ModelExtractor.DB, db);
+            put(ModelExtractor.ALLTAGS, getAllTags());
+            put(ModelExtractor.TAG_POSTS, getTagPosts());
+            put(ModelExtractor.PUBLISHED_DATE, new Date());
             String[] documentTypes = DocumentTypes.getDocumentTypes();
             for (String docType : documentTypes) {
                 put(docType + "s", DocumentList.wrap(DBUtil.query(db, "select * from " + docType + " order by date desc").iterator()));
                 put("published_" + docType + "s", DocumentList.wrap(DBUtil.query(db, "select * from " + docType + " where status='published' order by date desc").iterator()));
             }
-            put("published_content", getPublishedContent());
-            put("all_content", getAllContent());
+            put(ModelExtractor.PUBLISHED_CONTENT, getPublishedContent());
+            put(ModelExtractor.ALL_CONTENT, getAllContent());
         }
 
         private Object getTagPosts() {

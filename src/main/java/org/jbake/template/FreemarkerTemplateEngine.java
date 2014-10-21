@@ -3,6 +3,7 @@ package org.jbake.template;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.SimpleCollection;
@@ -15,6 +16,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
@@ -84,15 +86,15 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
-            if ("published_posts".equals(key)) {
+            if (ModelExtractor.PUBLISHED_POSTS.equals(key)) {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("published_pages".equals(key)) {
+            if (ModelExtractor.PUBLISHED_PAGES.equals(key)) {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("published_content".equals(key)) {
+            if (ModelExtractor.PUBLISHED_CONTENT.equals(key)) {
             	List<ODocument> publishedContent = new ArrayList<ODocument>();
             	String[] documentTypes = DocumentTypes.getDocumentTypes();
             	for (String docType : documentTypes) {
@@ -101,7 +103,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             	}
             	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
             }
-            if ("all_content".equals(key)) {
+            if (ModelExtractor.ALL_CONTENT.equals(key)) {
             	List<ODocument> allContent = new ArrayList<ODocument>();
             	String[] documentTypes = DocumentTypes.getDocumentTypes();
             	for (String docType : documentTypes) {
@@ -110,7 +112,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             	}
             	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
             }
-            if ("alltags".equals(key)) {
+            if (ModelExtractor.ALLTAGS.equals(key)) {
                 List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
                 Set<String> result = new HashSet<String>();
                 for (ODocument document : query) {
@@ -125,13 +127,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                     return new SimpleSequence(DocumentList.wrap(DBUtil.query(db, "select * from "+docType+" order by date desc").iterator()));
                 }
             }
-            if ("tag_posts".equals(key)) {
+            if (ModelExtractor.TAG_POSTS.equals(key)) {
                 String tag = eagerModel.get("tag").toString();
                 // fetch the tag posts from db
                 List<ODocument> query = DBUtil.query(db, "select * from post where status='published' where ? in tags order by date desc", tag);
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("published_date".equals(key)) {
+            if (ModelExtractor.PUBLISHED_DATE.equals(key)) {
                 return new SimpleDate(new Date(), TemplateDateModel.UNKNOWN);
             }
             return eagerModel.get(key);
