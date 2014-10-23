@@ -9,6 +9,7 @@ import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
+import org.jbake.template.ModelExtractor.Names;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.VariablesMap;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -42,6 +44,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Cédric Champeau
  */
 public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
+    private static ModelExtractors extractors = new ModelExtractors();
     private final ReentrantLock lock = new ReentrantLock();
 
     private TemplateEngine templateEngine;
@@ -91,67 +94,22 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         return new JBakeVariablesMap(model);
     }
 
+    /**
+     * Due to OGNL interpreter(as far as i understandà, Thymeleaf do not support any form of data lazy loading.
+     * As a consequence, all the model extractors are called at variables map construction.
+     * This is sad, as it may impact rendering on heavy sites, but has otherwise no effect on code.
+     */
     private class JBakeVariablesMap extends VariablesMap<String, Object> {
 
-        public JBakeVariablesMap(final Map<String, Object> model) {
+		public JBakeVariablesMap(final Map<String, Object> model) {
             super(model);
-            completeModel();
-        }
-
-        private void completeModel() {
-            put(ModelExtractor.DB, db);
-            put(ModelExtractor.ALLTAGS, getAllTags());
-            put(ModelExtractor.TAG_POSTS, getTagPosts());
-            put(ModelExtractor.PUBLISHED_DATE, new Date());
-            String[] documentTypes = DocumentTypes.getDocumentTypes();
-            for (String docType : documentTypes) {
-                put(docType + "s", DocumentList.wrap(DBUtil.query(db, "select * from " + docType + " order by date desc").iterator()));
-                put("published_" + docType + "s", DocumentList.wrap(DBUtil.query(db, "select * from " + docType + " where status='published' order by date desc").iterator()));
+            for(String key : extractors.keySet()) {
+            	try {
+					put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
+				} catch (NoModelExtractorException e) {
+					// should never happen, as we iterate over xisting extractors
+				}
             }
-            put(ModelExtractor.PUBLISHED_CONTENT, getPublishedContent());
-            put(ModelExtractor.ALL_CONTENT, getAllContent());
-        }
-
-        private Object getTagPosts() {
-            Object tagName = get("tag");
-            if (tagName != null) {
-                String tag = tagName.toString();
-                // fetch the tag posts from db
-                List<ODocument> query = DBUtil.query(db, "select * from post where status='published' where ? in tags order by date desc", tag);
-                return DocumentList.wrap(query.iterator());
-            } else {
-                return Collections.emptyList();
-            }
-        }
-
-        private Object getAllTags() {
-            List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
-            Set<String> result = new HashSet<String>();
-            for (ODocument document : query) {
-                String[] tags = DBUtil.toStringArray(document.field("tags"));
-                Collections.addAll(result, tags);
-            }
-            return result;
-        }
-        
-        private Object getPublishedContent() {
-        	List<ODocument> publishedContent = new ArrayList<ODocument>();
-        	String[] documentTypes = DocumentTypes.getDocumentTypes();
-        	for (String docType : documentTypes) {
-        		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
-        		publishedContent.addAll(query);
-        	}
-        	return DocumentList.wrap(publishedContent.iterator());
-        }
-        
-        private Object getAllContent() {
-        	List<ODocument> allContent = new ArrayList<ODocument>();
-        	String[] documentTypes = DocumentTypes.getDocumentTypes();
-        	for (String docType : documentTypes) {
-        		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" order by date desc"));
-        		allContent.addAll(query);
-        	}
-        	return DocumentList.wrap(allContent.iterator());
         }
     }
 }
