@@ -3,8 +3,11 @@ package org.jbake.app;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.jbake.parser.Engines;
+import org.jbake.parser.MarkdownEngine;
 import org.jbake.parser.MarkupEngine;
 import org.jbake.parser.ParserContext;
+import org.jbake.plugins.ContentPlugin;
+import org.jbake.plugins.InterlinksContentPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +103,14 @@ public class Parser {
 
         // generate default body
         processBody(fileContents, content);
+        
+		{
+			ContentPlugin interlinks = new InterlinksContentPlugin();
+
+			if (engine instanceof MarkdownEngine) {
+				interlinks.parseMarkdown(content, config);
+			}
+		}
 
         // eventually process body using specific engine
         if (engine.validate(context)) {
