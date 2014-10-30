@@ -1,0 +1,19 @@
+extends ./layout.jade
+
+block content
+  div(class="row-fluid marketing")
+    div.span12
+      h4 #{content.title}
+      p #{content.body}
+
+      hr
+
+      h5 Published Pages
+
+      each page in published_pages
+        a(href="#{config.site_host}#{page.uri}") #{page.title}
+
+
+
+
+

@@ -1,0 +1,16 @@
+extends ./layout.jade
+
+block content
+  div(class="row-fluid marketing")
+    div.span12
+      each post in posts
+        h4 <a href="#{post.uri}">#{post.title}</a>
+        p.post-date #{dates.format(post.date,"dd MMMM yyyy")} - #{post.body.substring(0, 150)}...
+        a(href="/archive.html") Archive
+  hr
+
+
+
+
+
+
