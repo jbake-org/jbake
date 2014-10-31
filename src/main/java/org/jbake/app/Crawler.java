@@ -3,6 +3,7 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
@@ -65,7 +66,7 @@ public class Crawler {
                         switch (status) {
                             case UPDATED:
                                 sb.append(" : modified ");
-                                DBUtil.update(db, "delete from " + docType + " where uri=?", uri);
+                                DBUtil.update(db, "delete from " + docType + " where sourceuri=?", uri);
                                 break;
                             case IDENTICAL:
                                 sb.append(" : same ");
@@ -100,15 +101,13 @@ public class Crawler {
         }
         return sha1;
     }
-
+    
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-    	//uri = config.getString("site.context") + uri.substring(1, uri.length());
     	// strip off leading / to enable generating non-root based sites
     	if (uri.startsWith("/")) {
     		uri = uri.substring(1, uri.length());
     	}
-        uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString("output.extension");
         return uri;
     }
 
@@ -124,7 +123,7 @@ public class Crawler {
                 fileContents.put("tags", tags);
             }
             fileContents.put("file", sourceFile.getPath());
-            fileContents.put("uri", uri);
+            fileContents.put("uri", uri.substring(0, uri.lastIndexOf(".")) + FileUtil.findExtension(config, fileContents.get("type").toString()));
 
             String documentType = (String) fileContents.get("type");
             if (fileContents.get("status").equals("published-date")) {
@@ -182,7 +181,7 @@ public class Crawler {
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
-        List<ODocument> match = DBUtil.query(db, "select sha1,rendered from " + docType + " where uri=?", uri);
+        List<ODocument> match = DBUtil.query(db, "select sha1,rendered from " + docType + " where sourceuri=?", uri);
         if (!match.isEmpty()) {
             ODocument entries = match.get(0);
             String oldHash = entries.field("sha1");

@@ -56,16 +56,17 @@ public class Renderer {
      * @throws Exception
      */
     public void render(Map<String, Object> content) throws Exception {
+    	String docType = (String) content.get("type");
 //		String outputFilename = (new File((String)content.get("file")).getPath().replace(source.getPath()+File.separator+"content", destination.getPath()));
         String outputFilename = destination.getPath() + File.separatorChar + (String) content.get("uri");
         outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
 
         // delete existing versions if they exist in case status has changed either way
-        File draftFile = new File(outputFilename + config.getString("draft.suffix") + config.getString("output.extension"));
+        File draftFile = new File(outputFilename + config.getString("draft.suffix") + FileUtil.findExtension(config, docType));
         if (draftFile.exists()) {
             draftFile.delete();
         }
-        File publishedFile = new File(outputFilename + config.getString("output.extension"));
+        File publishedFile = new File(outputFilename + FileUtil.findExtension(config, docType));
         if (publishedFile.exists()) {
             publishedFile.delete();
         }
@@ -73,7 +74,7 @@ public class Renderer {
         if (content.get("status").equals("draft")) {
             outputFilename = outputFilename + config.getString("draft.suffix");
         }
-        File outputFile = new File(outputFilename + config.getString("output.extension"));
+        File outputFile = new File(outputFilename + FileUtil.findExtension(config,docType));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering [").append(outputFile).append("]... ");
@@ -82,7 +83,6 @@ public class Renderer {
         model.put("renderer", renderingEngine);
 
         try {
-            String docType = (String) content.get("type");
             Writer out = createWriter(outputFile);
             renderingEngine.renderDocument(model, findTemplateName(docType), out);
             out.close();
