@@ -78,13 +78,7 @@ public class Main {
 		}
 
 		if (res.isInit()) {
-			if (res.getSourceValue() != null) {
-				// if type has been supplied then use it
-				initStructure(config, res.getTemplate(), res.getSourceValue());
-			} else {
-				// default to freemarker if no value has been supplied
-				initStructure(config, "freemarker", res.getSourceValue());
-			}
+			initStructure(config, res.getTemplate(), res.getSourceValue());
 		}
 		
 		if (res.isRunServer()) {
