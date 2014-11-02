@@ -171,14 +171,23 @@ public class Crawler {
     }
 
     public Set<String> getTags() {
-        List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+        return getTags(db);
+    }
+
+    /**
+     * Utility method allowing loading of all documents having the given tag set
+     * @param db
+     * @return
+     */
+	public static Set<String> getTags(ODatabaseDocumentTx db) {
+		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
         Set<String> result = new HashSet<String>();
         for (ODocument document : query) {
             String[] tags = DBUtil.toStringArray(document.field("tags"));
             Collections.addAll(result, tags);
         }
         return result;
-    }
+	}
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
         List<ODocument> match = DBUtil.query(db, "select sha1,rendered from " + docType + " where sourceuri=?", uri);

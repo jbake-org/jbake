@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.slf4j.Logger;
@@ -24,6 +25,93 @@ import java.util.Set;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Renderer {
+	private static interface RenderingConfig {
+
+		File getPath();
+
+		String getName();
+
+		String getTemplate();
+
+		Map<String, Object> getModel();
+	}
+	
+	private static abstract class AbstractRenderingConfig implements RenderingConfig{
+
+		protected final File path;
+		protected final String name;
+		protected final String template;
+
+		public AbstractRenderingConfig(File path, String name, String template) {
+			super();
+			this.path = path;
+			this.name = name;
+			this.template = template;
+		}
+		
+		@Override
+		public File getPath() {
+			return path;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String getTemplate() {
+			return template;
+		}
+		
+	}
+	public static class ModelRenderingConfig extends AbstractRenderingConfig {
+		private final Map<String, Object> model;
+
+		public ModelRenderingConfig(File path, String name, Map<String, Object> model, String template) {
+			super(path, name, template);
+			this.model = model;
+		}
+		
+		@Override
+		public Map<String, Object> getModel() {
+			return model;
+		}
+	}
+	
+	class DefaultRenderingConfig extends AbstractRenderingConfig {
+
+		private final Object content;
+		
+		private DefaultRenderingConfig(File path, String allInOneName) {
+			super(path, allInOneName, findTemplateName(allInOneName));
+			this.content = Collections.singletonMap("type",allInOneName);
+		}
+		
+		public DefaultRenderingConfig(String filename, String allInOneName) {
+			super(new File(destination.getPath() + File.separator + filename), allInOneName, findTemplateName(allInOneName));
+			this.content = Collections.singletonMap("type",allInOneName);
+		}
+		
+		/**
+		 * Constructor added due to known use of a allInOneName which is used for name, template and content
+		 * @param path
+		 * @param allInOneName
+		 */
+		public DefaultRenderingConfig(String allInOneName) {
+			this(new File(destination.getPath() + File.separator + allInOneName + config.getString("output.extension")), 
+							allInOneName);
+		}
+
+		@Override
+		public Map<String, Object> getModel() {
+	        Map<String, Object> model = new HashMap<String, Object>();
+	        model.put("renderer", renderingEngine);
+	        model.put("content", content);
+	        return model;
+		}
+		
+	}
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Renderer.class);
 
@@ -103,6 +191,25 @@ public class Renderer {
 
         return new OutputStreamWriter(new FileOutputStream(file), config.getString("render.encoding"));
     }
+    
+    private void render(RenderingConfig renderConfig) throws Exception {
+        File outputFile = renderConfig.getPath();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering ").append(renderConfig.getName()).append(" [").append(outputFile).append("]...");
+
+        try {
+            Writer out = createWriter(outputFile);
+            renderingEngine.renderDocument(renderConfig.getModel(),
+            				renderConfig.getTemplate(), out);
+            out.close();
+            sb.append("done!");
+            LOGGER.info(sb.toString());
+        } catch (Exception e) {
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
+            throw new Exception("Failed to render "+renderConfig.getName(), e);
+        }
+    }
 
     /**
      * Render an index file using the supplied content.
@@ -111,24 +218,7 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderIndex(String indexFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + indexFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering index [").append(outputFile).append("]...");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","index"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("index"), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render index. Cause: " + e.getMessage());
-        }
+    	render(new DefaultRenderingConfig(indexFile, "index"));
     }
 
     /**
@@ -139,25 +229,7 @@ public class Renderer {
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
     public void renderSitemap(String sitemapFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + sitemapFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering sitemap [").append(outputFile).append("]... ");
-
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","sitemap"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("sitemap"), out);
-            sb.append("done!");
-            out.close();
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render sitemap. Cause: " + e.getMessage());
-        }
+    	render(new DefaultRenderingConfig(sitemapFile, "sitemap"));
     }
 
     /**
@@ -167,24 +239,7 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderFeed(String feedFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + feedFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering feed [").append(outputFile).append("]... ");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","feed"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("feed"), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render feed. Cause: " + e.getMessage());
-        }
+    	render(new DefaultRenderingConfig(feedFile, "feed"));
     }
 
     /**
@@ -194,24 +249,7 @@ public class Renderer {
      * @throws Exception 
      */
     public void renderArchive(String archiveFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + archiveFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering archive [").append(outputFile).append("]... ");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","archive"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("archive"), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render archive. Cause: " + e.getMessage());
-        }
+    	render(new DefaultRenderingConfig(archiveFile, "archive"));
     }
 
     /**
@@ -221,29 +259,25 @@ public class Renderer {
      * @param tagPath The output path
      * @throws Exception 
      */
-    public void renderTags(Set<String> tags, String tagPath) throws Exception {
+    public int renderTags(Set<String> tags, String tagPath) throws Exception {
+    	int renderedCount = 0;
     	final List<String> errors = new LinkedList<String>();
         for (String tag : tags) {
-            Map<String, Object> model = new HashMap<String, Object>();
-            model.put("renderer", renderingEngine);
-            model.put("tag", tag);
-            model.put("content", Collections.singletonMap("type","tag"));
-
-            tag = tag.trim().replace(" ", "-");
-            File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));
-            StringBuilder sb = new StringBuilder();
-            sb.append("Rendering tags [").append(outputFile).append("]... ");
-
             try {
-                Writer out = createWriter(outputFile);
-                renderingEngine.renderDocument(model, findTemplateName("tag"), out);
-                out.close();
-                sb.append("done!");
-                LOGGER.info(sb.toString());
+            	Map<String, Object> model = new HashMap<String, Object>();
+            	model.put("renderer", renderingEngine);
+            	model.put("tag", tag);
+            	model.put("content", Collections.singletonMap("type","tag"));
+
+            	tag = tag.trim().replace(" ", "-");
+            	File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString("output.extension"));
+            	render(new ModelRenderingConfig(path,
+            					"tag",
+            					model,
+            					findTemplateName("tag")));
+                renderedCount++;
             } catch (Exception e) {
-                sb.append("failed!");
-                LOGGER.error(sb.toString(), e);
-                errors.add(e.getMessage());
+                errors.add(e.getCause().getMessage());
             }
         }
         if (!errors.isEmpty()) {
@@ -253,6 +287,8 @@ public class Renderer {
         		sb.append("\n" + error);
         	}
         	throw new Exception(sb.toString());
+        } else {
+        	return renderedCount;
         }
     }
 }
