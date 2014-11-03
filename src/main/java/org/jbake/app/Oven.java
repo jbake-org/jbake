@@ -74,7 +74,7 @@ public class Oven {
 
     private void ensureDestination() throws Exception {
         if (null == destination) {
-            destination = new File(config.getString("destination.folder"));
+            destination = new File(source, config.getString("destination.folder"));
         }
         if (!destination.exists()) {
             destination.mkdirs();
