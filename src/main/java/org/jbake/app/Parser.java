@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.jbake.parser.Engines;
 import org.jbake.parser.MarkupEngine;
 import org.jbake.parser.ParserContext;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,6 +187,9 @@ public class Parser {
                         for( int i=0; i<tags.length; i++ )
                             tags[i]=tags[i].trim();
                         content.put(parts[0], tags);
+                    } else if (parts[1].startsWith("{") && parts[1].endsWith("}")) {
+                        // Json type
+                        content.put(parts[0], JSONValue.parse(parts[1]));
                     } else {
                         content.put(parts[0], parts[1]);
                     }
