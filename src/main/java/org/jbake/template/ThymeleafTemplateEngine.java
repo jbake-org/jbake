@@ -3,8 +3,10 @@ package org.jbake.template;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
@@ -54,14 +56,14 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private void initializeTemplateEngine() {
         templateResolver = new FileTemplateResolver();
         templateResolver.setPrefix(templatesPath.getAbsolutePath() + File.separatorChar);
-        templateResolver.setCharacterEncoding(config.getString("template.encoding"));
+        templateResolver.setCharacterEncoding(config.getString(Keys.TEMPLATE_ENCODING));
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
     }
 
     @Override
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
-        String localeString = config.getString("thymeleaf.locale");
+        String localeString = config.getString(Keys.THYMELEAF_LOCALE);
         Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
         Context context = new Context(locale, wrap(model));
         lock.lock();

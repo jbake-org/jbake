@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.parser.Engines;
 
 import java.io.File;
@@ -119,7 +120,7 @@ public class FileUtil {
     	if (extension != null) {
     		return extension;
     	} else {
-    		return config.getString("output.extension");
+    		return config.getString(Keys.OUTPUT_EXTENSION);
     	}
     }
     

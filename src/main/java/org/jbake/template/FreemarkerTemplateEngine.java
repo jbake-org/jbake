@@ -3,6 +3,7 @@ package org.jbake.template;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.SimpleCollection;
@@ -15,7 +16,9 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
@@ -49,7 +52,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
     private void createTemplateConfiguration(final CompositeConfiguration config, final File templatesPath) {
         templateCfg = new Configuration();
-        templateCfg.setDefaultEncoding(config.getString("render.encoding"));
+        templateCfg.setDefaultEncoding(config.getString(Keys.RENDER_ENCODING));
         try {
             templateCfg.setDirectoryForTemplateLoading(templatesPath);
         } catch (IOException e) {

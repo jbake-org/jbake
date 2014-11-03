@@ -6,6 +6,7 @@ import java.net.URL;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.launcher.Init;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,7 +48,7 @@ public class InitTest {
 	public void initFailDestinationContainsContent() throws IOException{
 		Init init = new Init(config);
 		File initPath = folder.newFolder("init");
-		File contentFolder = new File(initPath.getPath() + File.separatorChar + config.getString("content.folder"));
+		File contentFolder = new File(initPath.getPath() + File.separatorChar + config.getString(Keys.CONTENT_FOLDER));
 		contentFolder.mkdir();
 		try {
 			init.run(initPath, rootPath, "freemarker");

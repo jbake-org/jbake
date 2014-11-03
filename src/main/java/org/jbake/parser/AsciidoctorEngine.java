@@ -7,7 +7,7 @@ import org.asciidoctor.Attributes;
 import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.Options;
-import org.jbake.app.ConfigUtil;
+import org.jbake.app.ConfigUtil.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +88,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             if (key.equals("revdate")) {
                 if (attributes.get(key) != null && attributes.get(key) instanceof String) {
 
-                    DateFormat df = new SimpleDateFormat(context.getConfig().getString(ConfigUtil.DATE_FORMAT));
+                    DateFormat df = new SimpleDateFormat(context.getConfig().getString(Keys.DATE_FORMAT));
                     Date date = null;
                     try {
                         date = df.parse((String)attributes.get(key));
@@ -128,9 +128,9 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         CompositeConfiguration config = context.getConfig();
-        final AttributesBuilder attributes = attributes(config.getStringArray("asciidoctor.attributes"));
-        if (config.getBoolean("asciidoctor.attributes.export", false)) {
-            final String prefix = config.getString(  "asciidoctor.attributes.export.prefix", "");
+        final AttributesBuilder attributes = attributes(config.getStringArray(Keys.ASCIIDOCTOR_ATTRIBUTES));
+        if (config.getBoolean(Keys.ASCIIDOCTOR_ATTRIBUTES_EXPORT, false)) {
+            final String prefix = config.getString(  Keys.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX, "");
             for (final Iterator<String> it = config.getKeys(); it.hasNext();) {
                 final String key = it.next();
                 if (!key.startsWith("asciidoctor")) {
@@ -138,7 +138,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                 }
             }
         }
-        final Configuration optionsSubset = config.subset("asciidoctor.option");
+        final Configuration optionsSubset = config.subset(Keys.ASCIIDOCTOR_OPTION);
         final Options options = options().attributes(attributes.get()).get();
         for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
             final String name = iterator.next();

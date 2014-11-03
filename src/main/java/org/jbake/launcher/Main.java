@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
 import org.jbake.app.Oven;
 import org.kohsuke.args4j.CmdLineException;
@@ -66,7 +67,7 @@ public class Main {
 			System.exit(1);
 		}
 		
-		System.out.println("JBake " + config.getString("version") + " (" + config.getString("build.timestamp") + ") [http://jbake.org]");
+		System.out.println("JBake " + config.getString(Keys.VERSION) + " (" + config.getString(Keys.BUILD_TIMESTAMP) + ") [http://jbake.org]");
 		System.out.println();
 		
 		if (res.isHelpNeeded()) {
@@ -90,9 +91,9 @@ public class Main {
 		if (res.isRunServer()) {
 			if (res.getSource().getPath().equals(".")) {
 				// use the default destination folder
-				runServer(config.getString("destination.folder"), config.getString("server.port"));
+				runServer(config.getString(Keys.DESTINATION_FOLDER), config.getString(Keys.SERVER_PORT));
 			} else {
-				runServer(res.getSource().getPath(), config.getString("server.port"));
+				runServer(res.getSource().getPath(), config.getString(Keys.SERVER_PORT));
 			}
 		}
 		
