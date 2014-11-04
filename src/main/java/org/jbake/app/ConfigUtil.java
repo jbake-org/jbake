@@ -12,6 +12,7 @@ import java.io.File;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class ConfigUtil {
+	
 	/**
 	 * Set of config keys used by JBake
 	 * @author ndx
@@ -20,105 +21,154 @@ public class ConfigUtil {
 	public static interface Keys {
 
 		/**
-		 * Path of archived file. Should only be used when {@link #RENDER_ARCHIVE} is true.
+		 * Output filename for archive file, is only used when {@link #RENDER_ARCHIVE} is true
 		 */
 		static final String ARCHIVE_FILE = "archive.file";
-		static final String ASCIIDOCTOR_ATTRIBUTES = "asciidoctor.attributes";
-		static final String ASCIIDOCTOR_ATTRIBUTES_EXPORT = "asciidoctor.attributes.export";
-		static final String ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX = "asciidoctor.attributes.export.prefix";
-		static final String ASCIIDOCTOR_OPTION = "asciidoctor.option";
+		
 		/**
-		 * Folder where assets are stored. Assets are copied directly in output folder and not processed by JBake.
+		 * Asciidoctor attributes to be set when processing input
+		 */
+		static final String ASCIIDOCTOR_ATTRIBUTES = "asciidoctor.attributes";
+		
+		/**
+		 * Flag indicating if JBake properties should be made available to Asciidoctor
+		 */
+		static final String ASCIIDOCTOR_ATTRIBUTES_EXPORT = "asciidoctor.attributes.export";
+		
+		/**
+		 * Prefix to be used when exporting JBake properties to Asciidoctor
+		 */
+		static final String ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX = "asciidoctor.attributes.export.prefix";
+		
+		/**
+		 * Asciidoctor options to be set when processing input
+		 */
+		static final String ASCIIDOCTOR_OPTION = "asciidoctor.option";
+		
+		/**
+		 * Folder where assets are stored, they are copied directly in output folder and not processed
 		 */
 		static final String ASSET_FOLDER = "asset.folder";
+		
 		/**
-		 * Timestamp that will be output when generation start.
+		 * Timestamp that records when JBake build was made
 		 */
 		static final String BUILD_TIMESTAMP = "build.timestamp";
+		
 		/**
 		 * Folder where content (that's to say files to be transformed) resides in
 		 */
 		static final String CONTENT_FOLDER = "content.folder";
+		
 		/**
 		 * How date is formated
 		 */
-		final static String DATE_FORMAT = "date.format";
-		static final String DB_PATH = "db.path";
-		static final String DB_STORE = "db.store";
+		static final String DATE_FORMAT = "date.format";
+		
 		/**
-		 * Default status to use (in roder to avoid putting it in all files
+		 * Folder to store database files in
+		 */
+		static final String DB_PATH = "db.path";
+		
+		/**
+		 * Flag to identify if database is kept in memory (memory) or persisted to disk (local)
+		 */
+		static final String DB_STORE = "db.store";
+		
+		/**
+		 * Default status to use (in order to avoid putting it in all files)
 		 */
 		static final String DEFAULT_STATUS = "default.status";
+		
 		/**
-		 * Path where html files are generated in.
+		 * Folder where rendered files are output
 		 */
 		static final String DESTINATION_FOLDER = "destination.folder";
+		
 		/**
 		 * Suffix used to identify draft files
 		 */
 		static final String DRAFT_SUFFIX = "draft.suffix";
+		
 		/**
-		 * Feed template file. IS required only when {@link #RENDER_FEED} is set to true
+		 * Output filename for feed file, is only used when {@link #RENDER_FEED} is true
 		 */
 		static final String FEED_FILE = "feed.file";
+		
 		/**
-		 * Index template file. Required only when {@link #RENDER_INDEX} is set to true
+		 * Output filename for index, is only used when {@link #RENDER_INDEX} is true
 		 */
 		static final String INDEX_FILE = "index.file";
+		
 		/**
-		 * Common extension for all output files
+		 * File extension to be used for all output files
 		 */
 		static final String OUTPUT_EXTENSION = "output.extension";
+		
 		/**
-		 * Flag indicating if archive file should be generated.
+		 * Flag indicating if archive file should be generated
 		 */
 		static final String RENDER_ARCHIVE = "render.archive";
+		
 		/**
-		 * Encoding used to render files.
+		 * Encoding used when rendering files
 		 */
 		static final String RENDER_ENCODING = "render.encoding";
+		
 		/**
-		 * Flag indicating if feed file should be generated.
+		 * Flag indicating if feed file should be generated
 		 */
 		static final String RENDER_FEED = "render.feed";
+		
 		/**
-		 * Flag indicating if index file should be generated.
+		 * Flag indicating if index file should be generated
 		 */
 		static final String RENDER_INDEX = "render.index";
+		
 		/**
-		 * Flag indicating if sitemap file should be generated.
+		 * Flag indicating if sitemap file should be generated
 		 */
 		static final String RENDER_SITEMAP = "render.sitemap";
+		
 		/**
-		 * Flag indicating if tags file should be generated.
+		 * Flag indicating if tag files should be generated
 		 */
 		static final String RENDER_TAGS = "render.tags";
+		
 		/**
 		 * Port used when running Jetty server
 		 */
 		static final String SERVER_PORT = "server.port";
+		
 		/**
 		 * Sitemap template file name. Used only when {@link #RENDER_SITEMAP} is set to true
 		 */
 		static final String SITEMAP_FILE = "sitemap.file";
+		
 		/**
-		 * tags template file name. Used only when {@link #RENDER_TAGS} is set to true
+		 * Tags output path, used only when {@link #RENDER_TAGS} is true
 		 */
 		static final String TAG_PATH = "tag.path";
+		
 		/**
-		 * Ecoding for template files
+		 * Encoding to be used for template files
 		 */
 		static final String TEMPLATE_ENCODING = "template.encoding";
+		
 		/**
 		 * Folder where template files are looked for
 		 */
 		static final String TEMPLATE_FOLDER = "template.folder";
-		/**
-		 * Locale used for thymeleaf template rendering
-		 */
-		public static final String THYMELEAF_LOCALE = "thymeleaf.locale";
-		static final String VERSION = "version";
 		
+		/**
+		 * Locale used for Thymeleaf template rendering
+		 */
+		static final String THYMELEAF_LOCALE = "thymeleaf.locale";
+		
+		/**
+		 * Version of JBake
+		 */
+		static final String VERSION = "version";
 	}
 
     public static CompositeConfiguration load(File source) throws ConfigurationException {
