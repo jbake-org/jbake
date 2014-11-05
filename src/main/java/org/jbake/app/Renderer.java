@@ -118,7 +118,7 @@ public class Renderer {
         sb.append("Rendering index [").append(outputFile).append("]...");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","index"));
+        model.put("content", buildSimpleModel("index"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -147,7 +147,7 @@ public class Renderer {
 
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","sitemap"));
+        model.put("content", buildSimpleModel("sitemap"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -174,7 +174,7 @@ public class Renderer {
         sb.append("Rendering feed [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","feed"));
+        model.put("content", buildSimpleModel("feed"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -201,7 +201,7 @@ public class Renderer {
         sb.append("Rendering archive [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", Collections.singletonMap("type","archive"));
+        model.put("content", buildSimpleModel("archive"));
 
         try {
             Writer out = createWriter(outputFile);
@@ -229,7 +229,7 @@ public class Renderer {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
             model.put("tag", tag);
-            model.put("content", Collections.singletonMap("type","tag"));
+            model.put("content", buildSimpleModel("tag"));
 
             tag = tag.trim().replace(" ", "-");
             File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
@@ -256,5 +256,19 @@ public class Renderer {
         	}
         	throw new Exception(sb.toString());
         }
+    }
+    
+    /**
+     * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
+     * 
+     * @param type
+     * @return
+     */
+    private Map<String, Object> buildSimpleModel(String type) {
+    	Map<String, Object> content = new HashMap<String, Object>();
+    	content.put("type", type);
+    	content.put("rootpath", "");
+    	// add any more keys here that need to have a default value to prevent need to perform null check in templates
+    	return content;
     }
 }
