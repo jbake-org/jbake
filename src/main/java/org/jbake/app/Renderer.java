@@ -229,7 +229,9 @@ public class Renderer {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
             model.put("tag", tag);
-            model.put("content", buildSimpleModel("tag"));
+            Map<String, Object> map = buildSimpleModel("tag");
+            map.put("rootpath", "../");
+            model.put("content", map);
 
             tag = tag.trim().replace(" ", "-");
             File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
