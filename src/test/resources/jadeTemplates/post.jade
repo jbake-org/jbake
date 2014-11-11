@@ -1,0 +1,20 @@
+extends ./layout.jade
+
+block content
+  div(class="row-fluid marketing")
+    div.span12
+      h2 #{content.title}
+      p.post-date #{dates.format(content.date,"dd MMMM yyyy")}
+      p #{content.body}
+
+      hr
+
+      h5 Published Posts
+
+      each post in published_posts
+        a(href="#{config.site_host}#{post.uri}") #{post.title}
+
+
+
+
+

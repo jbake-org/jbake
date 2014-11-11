@@ -139,6 +139,18 @@
 							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-thymeleaf.git</connectionUrl>
 						</configuration>
 					</execution>
+					<execution>
+						<id>checkout-example-project-jade</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>checkout</goal>
+						</goals>
+						<configuration>
+							<checkoutDirectory>${project.build.directory}/example-project-jade</checkoutDirectory>
+							<!-- TODO: Move this project to jbake repo -->
+							<connectionUrl>scm:git:git://github.com/mariuszs/jbake-example-project-jade.git</connectionUrl>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -236,6 +248,21 @@
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-example-project-thymeleaf.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+						</configuration>
+					</execution>
+					<execution>
+						<id>zip-example-project-jade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>example_project_jade</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-example-project-jade.xml</descriptor>
 							</descriptors>
 							<attach>false</attach>
 						</configuration>
@@ -378,6 +405,12 @@
             <version>${thymeleaf.version}</version>
             <optional>true</optional>
         </dependency>
+		<dependency>
+			<groupId>de.neuland-bfi</groupId>
+			<artifactId>jade4j</artifactId>
+			<version>0.4.0</version>
+		</dependency>
+
 		<!-- sl4j Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

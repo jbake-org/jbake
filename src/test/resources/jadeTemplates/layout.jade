@@ -1,0 +1,42 @@
+html
+  head
+    meta(charset='utf-8')
+    title Jonathan Bullock
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    meta(name='keywords', content='')
+    meta(name='generator', content='JBake')
+
+    block scripts
+    // Le styles
+    link(rel='stylesheet', href='/css/bootstrap.min.css')
+    link(rel='stylesheet', href='css/asciidoctor.css')
+    link(rel='stylesheet', href='css/base.min.css')
+    link(rel='stylesheet', href='css/prettify.min.css')
+
+    // HTML5 shim, for IE6-8 support of HTML5 elements
+    // if lt IE 9
+      script(src='js/html5shiv.min.js')
+
+    // Fav and touch icons
+    // <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png"/>
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png"/>
+    link(rel='shortcut icon', href='favicon.ico')
+
+  body
+    div#container-narrow
+      ul#nav nav-pills pull-right
+        li: a(href="/index.html") Home
+        li: a(href="/about.html") About
+        li: a(href="/projects.html") Projects
+        li: a(href="/feed.html") Subscribe
+      h3#muted Jonathan Bullock
+      block content
+      block foot
+        div#footer
+          p &copy; Jonathan Bullock 2013 | Mixed with <a href="http://twitter.github.com/bootstrap/">Bootstrap v2.3.1</a> | Baked with <a href="http://jbake.org">JBake #{version}</a>
+    script(src='/js/jquery-1.11.1.min.js')
+    script(src='/js/bootstrap.min.js')
