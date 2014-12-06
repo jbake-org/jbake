@@ -1,0 +1,25 @@
+{% extends 'base.pebble' %}
+
+{% block primary %}
+
+	<div class="row-fluid marketing">
+		<div class="span12">
+			<h2>Tags</h2>
+			{% for posts as post %}
+				{% if (last_month) %}
+					{% if post.date | date("MMMM yyyy") != last_month %}
+						<h3>{{ post.date | date("MMMM yyyy") }}</h3>
+					{% endif %}
+				{% else %}
+					<h3>{{ post.date | date("MMMM yyyy") }}</h3>
+				{% endif %}
+				
+				<h4>{{ post.date | date("dd MMMM") }} - <a href="{{ post.uri} }">{{ post.title }}</a></h4>
+				{% set last_month = post.date | date("MMMM yyyy") %}
+			{% endfor %}
+		</div>
+	</div>
+
+	<hr>
+
+{% endblock %}

@@ -1,0 +1,6 @@
+ 
+{% include 'header.pebble' %}
+
+{% block 'primary' %}{% endblock %}
+
+{% include 'footer.pebble' %}

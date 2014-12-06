@@ -1,0 +1,17 @@
+{% extends 'base.pebble' %}
+
+{% block primary %}
+
+	<div class="row-fluid marketing">
+		<div class="span12">
+			{% for post in posts %}
+				<h4><a href="{{ post.uri }}">{{ post.title }}</a></h4>
+				<p>{{ post.date | date("dd MMMM yyyy") }} - {{ post.body | abbreviate(150) }}...</p>
+			{% endfor %}
+			<a href="/archive.html">Archive</a>
+		</div>
+	</div>
+
+	<hr>
+
+{% endblock %}
