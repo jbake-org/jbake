@@ -1,7 +1,5 @@
 package org.jbake.template;
 
-import groovy.lang.GString;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -21,6 +19,7 @@ import org.jbake.model.DocumentTypes;
 
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
+import com.mitchellbosecke.pebble.extension.escaper.EscaperExtension;
 import com.mitchellbosecke.pebble.loader.FileLoader;
 import com.mitchellbosecke.pebble.loader.Loader;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
@@ -48,6 +47,14 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
         Loader loader = new FileLoader();
         loader.setPrefix(templatesPath.getAbsolutePath());
         engine = new PebbleEngine(loader);
+        engine.setStrictVariables(true);
+
+        /*
+         * Turn off the autoescaper because I believe that we can assume all
+         * data is safe considering it is all statically generated.
+         */
+        EscaperExtension escaper = engine.getExtension(EscaperExtension.class);
+        escaper.setAutoEscaping(false);
     }
 
     @Override
@@ -67,18 +74,15 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
     }
 
     private Map<String, Object> wrap(final Map<String, Object> model) {
-        return new HashMap<String, Object>(model) {
+        Map<String, Object> result = new HashMap<String, Object>(model) {
 
             private static final long serialVersionUID = -5489285491728950547L;
 
             @Override
             public Object get(final Object property) {
-                if (property instanceof String || property instanceof GString) {
+                if (property instanceof String) {
                     String key = property.toString();
 
-                    if ("db".equals(key)) {
-                        return db;
-                    }
                     if ("published_posts".equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>(
                                 "select * from post where status='published' order by date desc"));
@@ -119,6 +123,7 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
                         }
                         return result;
                     }
+
                     String[] documentTypes = DocumentTypes.getDocumentTypes();
                     for (String docType : documentTypes) {
                         if ((docType + "s").equals(key)) {
@@ -126,6 +131,7 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
                                     "select * from " + docType + " order by date desc").iterator());
                         }
                     }
+
                     if ("tag_posts".equals(key)) {
                         String tag = model.get("tag").toString();
                         // fetch the tag posts from db
@@ -140,7 +146,36 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
 
                 return super.get(property);
             }
+
+            @Override
+            public boolean containsKey(Object property) {
+                if (property instanceof String) {
+                    String key = property.toString();
+                    List<String> lazyKeys = new ArrayList<String>();
+                    lazyKeys.add("published_posts");
+                    lazyKeys.add("published_pages");
+                    lazyKeys.add("published_content");
+                    lazyKeys.add("all_content");
+                    lazyKeys.add("alltags");
+                    lazyKeys.add("tag_posts");
+                    lazyKeys.add("published_date");
+
+                    String[] documentTypes = DocumentTypes.getDocumentTypes();
+                    for (String docType : documentTypes) {
+                        lazyKeys.add(docType + "s");
+                    }
+
+                    if (lazyKeys.contains(key)) {
+                        return true;
+                    }
+                }
+
+                return super.containsKey(property);
+            }
         };
+
+        return result;
+        // return model;
     }
 
 }
