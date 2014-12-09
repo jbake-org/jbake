@@ -1,26 +1,29 @@
 {% extends 'base.pebble' %}
 
+{% block header %}Archive{% endblock %}
+
 {% block primary %}
 
 	<div class="row-fluid marketing">
 		<div class="span12">
-			<h2>Archive</h2>
+            {% set last_month = null %}
 			{% for post in posts %}
-				{% if (last_month) %}
+				{% if (last_month is not null) %}
 					{% if post.date | date("MMMM yyyy") != last_month %}
-						<h3>{{ post.date | date("MMMM yyyy") }}</h3>
+                        </ul>
+						<h4>{{ post.date | date("MMMM yyyy") }}</h4>
+                        <ul>
 					{% endif %}
 				{% else %}
-					<h3>{{ post.date | date("MMMM yyyy") }}</h3>
+					<h4>{{ post.date | date("MMMM yyyy") }}</h4>
+                    <ul>
 				{% endif %}
 				
-				<h4>{{ post.date | date("dd MMMM") }} - <a href="{{ post.uri }}">{{ post.title }}</a></h4>
+				<li>{{ post.date | date("dd") }} - <a href="{{ post.uri }}">{{ post.title }}</a></li>
 				
 				{% set last_month = post.date | date("MMMM yyyy") %}
 			{% endfor %}
 		</div>
 	</div>
-
-	<hr>
 
 {% endblock %}

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-{% for list all_content as content %}
-    <content>
-        <uri>{{ config.site_host }}{{ content.uri }}</uri>
-        <date>{{ content.date | date("yyyy-MM-dd") }}</date>
-    </content>
-{% endfor %}

@@ -1,18 +1,13 @@
 {% extends 'base.pebble' %}
       
+{% block title %}{{ content.title }}{% endblock %}
+{% block header %}{{ content.title }}{% endblock %}
+
 {% block primary %}
-	<div class="row-fluid marketing">
-		<div class="span12">
-				<h2>{{ content.title }}</h2>
-				<p class="post-date">{{ content.date | date("dd MMMM yyyy") }}</p>
-				<p>{{ content.body }}</p>	
-		</div>
-	</div>
-	
-	<hr>
-	
-	<h5>Published Posts</h5>
-	{% for post in published_posts %}
-		<a href="{{ config.site_host }}{{ post.uri }}">{{ post.title }}</a>
-	{% endfor %}
+    
+    <p><em>{{ content.date | date("dd MMMM yyyy") }}</em></p>
+
+    <p>{{ content.body }}</p>
+
+    <hr />
 {% endblock %}
