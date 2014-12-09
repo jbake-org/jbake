@@ -5,9 +5,14 @@
 
 {% block primary %}
     
-    <p><em>{{ content.date | date("dd MMMM yyyy") }}</em></p>
+    <p class="post-date">{{ content.date | date("dd MMMM yyyy") }}</p>
 
     <p>{{ content.body }}</p>
 
     <hr />
+    
+    <h5>Published Posts</h5>
+    {% for post in published_posts %}
+    	<a href="{{ config.site_host }}{{ post.uri }}">{{ post.title }}</a>
+    {% endfor %}
 {% endblock %}

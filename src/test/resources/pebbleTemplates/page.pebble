@@ -10,4 +10,9 @@
     <p>{{ content.body }}</p>
 
     <hr />
+    
+    <h5>Published Pages</h5>
+    {% for page in published_pages %}
+    	<a href="{{ config.site_host }}/{{ page.uri }}">{{ page.title }}</a>
+    {% endfor %}
 {% endblock %}

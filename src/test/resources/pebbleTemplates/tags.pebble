@@ -4,8 +4,9 @@
 
 {% block primary %}
     
-    {% for posts as post %}
-        {% if (last_month) %}
+    {% set last_month = null %}
+    {% for post in posts %}
+        {% if last_month is not null %}
             {% if post.date | date("MMMM yyyy") != last_month %}
                 </ul>
                 <h4>{{ post.date | date("MMMM yyyy") }}</h4>
@@ -16,7 +17,7 @@
             <ul>
         {% endif %}
         
-        <li>{{ post.date | date("dd MMMM") }} - <a href="{{ post.uri} }">{{ post.title }}</a></li>
+        <li>{{ post.date | date("dd MMMM") }} - <a href="{{ post.uri }}">{{ post.title }}</a></li>
         {% set last_month = post.date | date("MMMM yyyy") %}
 
     {% endfor %}

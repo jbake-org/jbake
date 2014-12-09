@@ -47,7 +47,6 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
         Loader loader = new FileLoader();
         loader.setPrefix(templatesPath.getAbsolutePath());
         engine = new PebbleEngine(loader);
-        engine.setStrictVariables(true);
 
         /*
          * Turn off the autoescaper because I believe that we can assume all
@@ -82,7 +81,10 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
             public Object get(final Object property) {
                 if (property instanceof String) {
                     String key = property.toString();
-
+                    
+                    if ("db".equals(key)) {
+                        return db;
+                    }
                     if ("published_posts".equals(key)) {
                         List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>(
                                 "select * from post where status='published' order by date desc"));
@@ -152,6 +154,7 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
                 if (property instanceof String) {
                     String key = property.toString();
                     List<String> lazyKeys = new ArrayList<String>();
+                    lazyKeys.add("db");
                     lazyKeys.add("published_posts");
                     lazyKeys.add("published_pages");
                     lazyKeys.add("published_content");
@@ -175,7 +178,6 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
         };
 
         return result;
-        // return model;
     }
 
 }
