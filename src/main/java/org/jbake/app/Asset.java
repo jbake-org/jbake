@@ -35,6 +35,15 @@ public class Asset {
 		this.source = source;
 		this.destination = destination;
 	}
+
+	/**
+	 * Copy all files from the source directory of assets passed when created this object.
+	 *
+	 */
+	public void copySourceFile(){
+		//Run the copy ont the first directory of assets
+		copy(source);
+	}
 	
 	/**
 	 * Copy all files from supplied path. 
@@ -50,7 +59,7 @@ public class Asset {
 					StringBuilder sb = new StringBuilder();
 					sb.append("Copying [" + assets[i].getPath() + "]...");
 					File sourceFile = assets[i];
-					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
+					File destFile = new File(sourceFile.getPath().replace(source.getPath(), destination.getPath()));
 					try {
 						FileUtils.copyFile(sourceFile, destFile);
 						sb.append("done!");
