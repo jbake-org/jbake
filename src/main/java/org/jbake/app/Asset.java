@@ -37,11 +37,11 @@ public class Asset {
 	}
 
 	/**
-	 * Copy all files from the source directory of assets passed when created this object.
+	 * Copy all files from the source directory passed when created this object.
 	 *
 	 */
 	public void copySourceFile(){
-		//Run the copy ont the first directory of assets
+		//Run the copy on the first directory of assets
 		copy(source);
 	}
 	
