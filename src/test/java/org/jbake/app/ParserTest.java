@@ -74,7 +74,7 @@ public class ParserTest {
 		
 		validAsciiDocFileWithoutHeader = folder.newFile("validwoheader.ad");
 		out = new PrintWriter(validAsciiDocFileWithoutHeader);
-		out.println("= Hello, AsciiDoc!");
+		out.println("= Hello: AsciiDoc!");
 		out.println("Test User <user@test.org>");
 		out.println("2013-09-02");
 		out.println(":jbake-status: published");
@@ -158,7 +158,7 @@ public class ParserTest {
 	public void parseValidAsciiDocFileWithoutHeader() {
 		Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutHeader);
 		Assert.assertNotNull(map);
-		Assert.assertEquals("Hello, AsciiDoc!", map.get("title"));
+		Assert.assertEquals("Hello: AsciiDoc!", map.get("title"));
 		Assert.assertEquals("published", map.get("status"));
 		Assert.assertEquals("page", map.get("type"));
 		assertThat(map.get("body").toString())
