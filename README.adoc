@@ -15,12 +15,6 @@ buildscript {
 
   dependencies {
     classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2'
-
-    // optional, if you use asciidoctor markup
-    classpath 'org.asciidoctor:asciidoctor-java-integration:0.1.4'
-
-    // optional, if you use freemarker template engine
-    classpath 'org.freemarker:freemarker:2.3.19'
   }
 }
 
@@ -38,10 +32,42 @@ The default input and output directories can be changed using the `jbake` config
 [source,groovy]
 ----
 jbake {
-    input = file('jbake-sources')
-    output = file("$buildDir/output")
+    srcDirName  = 'jbake-sources'
+    destDirName = 'output'
 }
 ----
+The generated output can then be found at `$buildDir/output`.
+
+The Version could be changed too:
+
+[source,groovy]
+----
+jbake {
+    version  = '2.3.0'
+}
+----
+
+The default is 2.3.2.
+
+=== Render Engine configuration
+
+Jbake uses three engines. The library versions could be changed too:
+
+[source,groovy]
+----
+jbake {
+
+    pegdownVersion = '1.4.2'
+    freemarkerVersion = '2.3.19'
+    asciidoctorJavaIntegrationVersion = '0.1.4'
+    asciidoctorjVersion = '1.5.1'
+}
+----
+
+Notice the `asciidoctorJavaIntegrationVersion` and `asciidoctorjVersion`. Since Version 2.3.1 jbake has changed
+to the asciidoctorj library.
+
+This plugin handles this change internally. If you use a Version > 2.3.0 of jbake, the dependency switch to the new one.
 
 === JBake configuration
 There are several options to configure http://www.jbake.org[JBake]. One is to have the regular `jbake.properties` file
