@@ -199,8 +199,8 @@ public class Oven {
 				DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
 			}
 			// copy assets
-			Asset asset = new Asset(source, destination);
-			asset.copy(assetsPath);
+			Asset asset = new Asset(assetsPath, destination);
+			asset.copySourceFile();
 			errors.addAll(asset.getErrors());
 
 			LOGGER.info("Baking finished!");
