@@ -199,7 +199,7 @@ public class Oven {
 				DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
 			}
 			// copy assets
-			Asset asset = new Asset(source, destination);
+			Asset asset = new Asset(source, destination, config);
 			asset.copy(assetsPath);
 			errors.addAll(asset.getErrors());
 

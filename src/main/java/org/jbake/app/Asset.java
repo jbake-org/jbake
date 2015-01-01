@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ public class Asset {
 
     private File source;
 	private File destination;
+	private CompositeConfiguration config;
 	private final List<String> errors = new LinkedList<String>();
 
 	/**
@@ -31,8 +33,9 @@ public class Asset {
 	 * @param source
 	 * @param destination
 	 */
-	public Asset(File source, File destination) {
+	public Asset(File source, File destination, CompositeConfiguration config) {
 		this.source = source;
+		this.config = config;
 		this.destination = destination;
 	}
 	
@@ -50,7 +53,7 @@ public class Asset {
 					StringBuilder sb = new StringBuilder();
 					sb.append("Copying [" + assets[i].getPath() + "]...");
 					File sourceFile = assets[i];
-					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+"assets", destination.getPath()));
+					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+config.getString(ConfigUtil.Keys.ASSET_FOLDER), destination.getPath()));
 					try {
 						FileUtils.copyFile(sourceFile, destFile);
 						sb.append("done!");
