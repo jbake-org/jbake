@@ -1,4 +1,4 @@
-package org.jbake.launcher;
+package org.jbake.app;
 
 /**
  * This runtime exception is thrown by JBake API to indicate an processing

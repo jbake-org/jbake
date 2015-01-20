@@ -10,6 +10,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
+import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
