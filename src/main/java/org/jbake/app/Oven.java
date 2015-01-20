@@ -48,7 +48,6 @@ public class Oven {
 	 *
 	 * @param source		The source folder
 	 * @param destination	The destination folder
-	 * @throws Exception
 	 */
 	public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) {
 		this.source = source;
@@ -61,6 +60,7 @@ public class Oven {
         return config;
     }
 
+    // TODO: do we want to use this. Else, config could be final
     public void setConfig(final CompositeConfiguration config) {
         this.config = config;
     }
@@ -90,7 +90,7 @@ public class Oven {
 	/**
 	 * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
 	 *
-	 * @throws Exception If template or contents folder don't exist
+	 * @throws JBakeException If template or contents folder don't exist
 	 */
 	public void setupPaths() {
 		ensureSource();
