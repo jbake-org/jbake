@@ -1,0 +1,20 @@
+html
+    include header
+    body
+        .container-narrow
+            .masthead
+                ul.nav.nav-pills.pull-right
+                    li
+                        a(href='/') Home
+                    li
+                        a(href='/about.html') About
+                    li
+                        a(href='/projects.html') Projects
+                    li
+                        a(href='/feed.xml') Subscribe
+                h3.muted Jonathan Bullock
+            hr
+
+            block content
+
+        include footer
