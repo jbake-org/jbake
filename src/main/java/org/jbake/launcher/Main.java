@@ -10,6 +10,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
+import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -30,41 +31,46 @@ public class Main {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		new Main().run(args);
-	}
-	
-	private void bake(LaunchOptions options) {
+	public static void main(final String[] args) {
 		try {
-			Oven oven = new Oven(options.getSource(), options.getDestination(), options.isClearCache());
-			oven.setupPaths();
-			oven.bake();
-			final List<String> errors = oven.getErrors();
-			if (!errors.isEmpty()) {
-				// TODO: decide, if we want the all error here
-				System.err.println(MessageFormat.format("JBake failed with {0} errors:", errors.size()));
-				int errNr = 1;
-				for (String msg : errors) {
-					System.err.println(MessageFormat.format("{0}. {1}", errNr, msg));
-					++errNr;
-				}
-				System.exit(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			new Main().run(args);
+		} catch (final JBakeException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace(System.err);
 			System.exit(1);
+		} catch (final Throwable e) {
+			System.err.println("An unexpected error occurred: " + e.getMessage());
+			System.exit(2);
+		}
+	}
+
+	private void bake(final LaunchOptions options, final CompositeConfiguration config) {
+		final Oven oven = new Oven(options.getSource(), options.getDestination(), config, options.isClearCache());
+		oven.setupPaths();
+		oven.bake();
+
+		final List<String> errors = oven.getErrors();
+		if (!errors.isEmpty()) {
+			final StringBuilder msg = new StringBuilder();
+			// TODO: decide, if we want the all errors here
+			msg.append(MessageFormat.format("JBake failed with {0} errors:\n", errors.size()));
+			int errNr = 1;
+			for (final String error : errors) {
+				msg.append(MessageFormat.format("{0}. {1}\n", errNr, error));
+				++errNr;
+			}
+			throw new JBakeException(msg.toString());
 		}
 	}
 
 	private void run(String[] args) {
 		LaunchOptions res = parseArguments(args);
 
-		CompositeConfiguration config = null;
+		final CompositeConfiguration config;
 		try {
 			config = ConfigUtil.load(res.getSource());
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-			System.exit(1);
+		} catch (final ConfigurationException e) {
+			throw new JBakeException("Configuration error: " + e.getMessage(), e);
 		}
 		
 		System.out.println("JBake " + config.getString(Keys.VERSION) + " (" + config.getString(Keys.BUILD_TIMESTAMP) + ") [http://jbake.org]");
@@ -72,10 +78,12 @@ public class Main {
 		
 		if (res.isHelpNeeded()) {
 			printUsage(res);
+			// Help was requested, so we are done here
+			return;
 		}
-		
-		if(res.isBake()) {
-			bake(res);
+
+		if (res.isBake()) {
+			bake(res, config);
 		}
 
 		if (res.isInit()) {
@@ -98,8 +106,9 @@ public class Main {
 
 		try {
 			parser.parseArgument(args);
-		} catch (CmdLineException e) {
+		} catch (final CmdLineException e) {
 			printUsage(res);
+			throw new JBakeException("Invalid commandline arguments: " + e.getMessage(), e);
 		}
 
 		return res;
@@ -115,12 +124,10 @@ public class Main {
 		System.out.println(sw.toString());
 		parser.setUsageWidth(100);
 		parser.printUsage(System.out);
-		System.exit(0);
 	}
 
 	private void runServer(String path, String port) {
 		JettyServer.run(path, port);
-		System.exit(0);
 	}
 
 	private void initStructure(CompositeConfiguration config, String type, String source) {
@@ -135,11 +142,9 @@ public class Main {
             }
             init.run(outputFolder, templateFolder, type);
 			System.out.println("Base folder structure successfully created.");
-			System.exit(0);
-		} catch (Exception e) {
-			System.err.println("Failed to initialise structure!");
-			e.printStackTrace();
-			System.exit(1);
+		} catch (final Exception e) {
+			final String msg = "Failed to initialise structure: " + e.getMessage();
+			throw new JBakeException(msg, e);
 		}
 	}
 }
