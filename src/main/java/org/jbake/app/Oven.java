@@ -16,6 +16,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.launcher.JBakeException;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +50,11 @@ public class Oven {
 	 * @param destination	The destination folder
 	 * @throws Exception
 	 */
-	public Oven(File source, File destination, boolean isClearCache) throws Exception {
+	public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) {
 		this.source = source;
 		this.destination = destination;
-        this.config = ConfigUtil.load(source);
-        this.isClearCache = isClearCache;
+		this.config = config;
+		this.isClearCache = isClearCache;
 	}
 
     public CompositeConfiguration getConfig() {
@@ -64,34 +65,34 @@ public class Oven {
         this.config = config;
     }
 
-    private void ensureSource() throws Exception {
-        if (!FileUtil.isExistingFolder(source)) {
-            throw new Exception("Error: Source folder must exist!");
-        }
-        if (!source.canRead()) {
-            throw new Exception("Error: Source folder is not readable!");
-        }
-    }
 
+	private void ensureSource() {
+		if (!FileUtil.isExistingFolder(source)) {
+			throw new JBakeException("Error: Source folder must exist: " + source.getAbsolutePath());
+		}
+		if (!source.canRead()) {
+			throw new JBakeException("Error: Source folder is not readable: " + source.getAbsolutePath());
+		}
+	}
 
-    private void ensureDestination() throws Exception {
-        if (null == destination) {
-            destination = new File(source, config.getString(Keys.DESTINATION_FOLDER));
-        }
-        if (!destination.exists()) {
-            destination.mkdirs();
-        }
-        if (!destination.canWrite()) {
-            throw new Exception("Error: Destination folder is not writable!");
-        }
-    }
+	private void ensureDestination() {
+		if (null == destination) {
+			destination = new File(source, config.getString(Keys.DESTINATION_FOLDER));
+		}
+		if (!destination.exists()) {
+			destination.mkdirs();
+		}
+		if (!destination.canWrite()) {
+			throw new JBakeException("Error: Destination folder is not writable: " + destination.getAbsolutePath());
+		}
+	}
 
 	/**
 	 * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
 	 *
 	 * @throws Exception If template or contents folder don't exist
 	 */
-	public void setupPaths() throws Exception {
+	public void setupPaths() {
 		ensureSource();
         templatesPath = setupRequiredFolderFromConfig(Keys.TEMPLATE_FOLDER);
         contentsPath = setupRequiredFolderFromConfig(Keys.CONTENT_FOLDER);
@@ -106,27 +107,27 @@ public class Oven {
         return new File(source, config.getString(key));
     }
 
-    private File setupRequiredFolderFromConfig(String key) throws Exception {
-        File path = setupPathFromConfig(key);
-        if (!FileUtil.isExistingFolder(path)) {
-            throw new Exception("Error: Required folder cannot be found! Expected to find [" + key + "] at: " + path.getCanonicalPath());
-        }
-        return path;
-    }
+	private File setupRequiredFolderFromConfig(final String key) {
+		final File path = setupPathFromConfig(key);
+		if (!FileUtil.isExistingFolder(path)) {
+			throw new JBakeException("Error: Required folder cannot be found! Expected to find [" + key + "] at: " + path.getAbsolutePath());
+		}
+		return path;
+	}
 
 	/**
 	 * All the good stuff happens in here...
 	 *
-	 * @throws Exception
+	 * @throws JBakeException
 	 */
-	public void bake() throws Exception {
-        ODatabaseDocumentTx db = DBUtil.createDB(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
-        updateDocTypesFromConfiguration();
-        DBUtil.updateSchema(db);
-        try {
-            long start = new Date().getTime();
-            LOGGER.info("Baking has started...");
-            clearCacheIfNeeded(db);
+	public void bake() {
+		final ODatabaseDocumentTx db = DBUtil.createDB(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+		updateDocTypesFromConfiguration();
+		DBUtil.updateSchema(db);
+		try {
+			final long start = new Date().getTime();
+			LOGGER.info("Baking has started...");
+			clearCacheIfNeeded(db);
 
             // process source content
             Crawler crawler = new Crawler(db, source, config);
