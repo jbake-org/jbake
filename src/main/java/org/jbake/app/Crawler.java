@@ -67,7 +67,7 @@ public class Crawler {
                         switch (status) {
                             case UPDATED:
                                 sb.append(" : modified ");
-                                DBUtil.update(db, "delete from " + docType + " where sourceuri=?", uri);
+                                db.deleteContent(docType, uri);
                                 break;
                             case IDENTICAL:
                                 sb.append(" : same ");

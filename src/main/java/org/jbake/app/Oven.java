@@ -137,11 +137,9 @@ public class Oven {
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
             for (String docType : DocumentTypes.getDocumentTypes()) {
-                    DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from " + docType + " where rendered=false");
-                    while (pagesIt.hasNext()) {
-                            Map<String, Object> page = pagesIt.next();
+                    for (ODocument document: db.getUnrenderedContent(docType)) {
                             try {
-                                    renderer.render(page);
+                                    renderer.render((Map<String, Object>)document);
                                     renderedCount++;
                             } catch (Exception e) {
                                     errors.add(e.getMessage());
@@ -196,7 +194,7 @@ public class Oven {
 
             // mark docs as rendered
             for (String docType : DocumentTypes.getDocumentTypes()) {
-                    DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
+                    db.markConentAsRendered(docType);
             }
             // copy assets
             Asset asset = new Asset(source, destination, config);
@@ -245,18 +243,18 @@ public class Oven {
                 String sha1 = docs.get(0).field("sha1");
                 needed = !sha1.equals(currentTemplatesSignature);
                 if (needed) {
-                    DBUtil.update(db, "update Signatures set sha1=? where key='templates'", currentTemplatesSignature);
+                    db.updateSignatures(currentTemplatesSignature);
                 }
             } else {
                 // first computation of templates signature
-                DBUtil.update(db, "insert into Signatures(key,sha1) values('templates',?)", currentTemplatesSignature);
+                db.insertSignature(currentTemplatesSignature);
                 needed = true;
             }
         }
         if (needed) {
             for (String docType : DocumentTypes.getDocumentTypes()) {
                 try {
-                    DBUtil.update(db,"delete from "+docType);
+                    db.deleteAllByDocType(docType);
                 } catch (Exception e) {
                     // maybe a non existing document type
                 }

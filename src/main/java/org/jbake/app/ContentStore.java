@@ -83,22 +83,10 @@ public class ContentStore {
         db.drop();
     }
 
-    public <RET extends List<?>> RET query1(OQuery<? extends Object> iCommand, Object... iArgs) {
-        return db.query(iCommand, iArgs);
-    }
-
     public long countClass(String iClassName) {
         return db.countClass(iClassName);
     }
 
-    public <RET extends OCommandRequest> RET command(OCommandRequest iCommand) {
-        return db.command(iCommand);
-    }
-
-    public <RET extends OCommandRequest> RET  command(OCommandSQL oCommandSQL) {
-        return db.command(oCommandSQL);
-    }
-    
     private static void createDocType(final OSchema schema, final String doctype) {
         OClass page = schema.createClass(doctype);
         page.createProperty("sha1", OType.STRING).setNotNull(true);
@@ -121,28 +109,59 @@ public class ContentStore {
     }
 
     public List<ODocument> getPublishedContent(String docType) {
-        return db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
+        return query("select * from "+docType+" where status='published' order by date desc");
     }
 
     public List<ODocument> getAllContent(String docType) {
-        return db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" order by date desc"));
+        return query("select * from "+docType+" order by date desc");
     }
 
     public List<ODocument> getAllTags() {
-        return db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+        return query("select tags from post where status='published'");
     }
 
     public List<ODocument> getPublishedPostsByTag(String tag) {
-        return db.command(new OSQLSynchQuery<ODocument>("select * from post where status='published' where ? in tags order by date desc")).execute(tag);
+        return executeCommand("select * from post where status='published' where ? in tags order by date desc", tag);
     }
 
     public List<ODocument> getSignatures() {
-        return db.query(new OSQLSynchQuery<ODocument>("select sha1 from Signatures where key='templates'"));
-
+        return query("select sha1 from Signatures where key='templates'");
     }
 
     public List<ODocument> getDocumentStatus(String docType, String uri) {
-        return db.command(new OSQLSynchQuery<ODocument>("select sha1,rendered from " + docType + " where sourceuri=?")).execute(uri);
+        return executeCommand("select sha1,rendered from " + docType + " where sourceuri=?", uri);
 
+    }
+
+    public void deleteContent(String docType, String uri) {
+        executeCommand("delete from " + docType + " where sourceuri=?", uri);
+    }
+
+    public List<ODocument> getUnrenderedContent(String docType) {
+        return query("select * from " + docType + " where rendered=false");
+    }
+
+    public void markConentAsRendered(String docType) {
+        executeCommand("update " + docType + " set rendered=true where rendered=false and cached=true");
+    }
+
+    public void updateSignatures(String currentTemplatesSignature) {
+        executeCommand("update Signatures set sha1=? where key='templates'", currentTemplatesSignature);
+    }
+    
+    public void deleteAllByDocType(String docType) {
+        executeCommand("delete from "+docType);
+    }
+
+    public void insertSignature(String currentTemplatesSignature) {
+        executeCommand("insert into Signatures(key,sha1) values('templates',?)", currentTemplatesSignature);
+    }
+
+    private List<ODocument> query (String sql) {
+        return db.query(new OSQLSynchQuery<ODocument>(sql));
+    }
+
+    private List<ODocument> executeCommand(String query, Object... args) {
+        return db.command(new OSQLSynchQuery<ODocument>(query)).execute(args);
     }
 }
