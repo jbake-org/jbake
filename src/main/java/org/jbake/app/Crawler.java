@@ -32,13 +32,13 @@ public class Crawler {
 
     private CompositeConfiguration config;
     private Parser parser;
-    private final ODatabaseDocumentTx db;
+    private final ContentStore db;
     private String contentPath;
 
     /**
      * Creates new instance of Crawler.
      */
-    public Crawler(ODatabaseDocumentTx db, File source, CompositeConfiguration config) {
+    public Crawler(ContentStore db, File source, CompositeConfiguration config) {
         this.db = db;
         this.config = config;
         this.contentPath = source.getPath() + separator + config.getString(ConfigUtil.Keys.CONTENT_FOLDER);

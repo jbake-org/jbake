@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import org.jbake.app.ContentStore;
 
 /**
  * <p>A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New
@@ -43,7 +44,7 @@ public class TemplateEngines {
         return Collections.unmodifiableSet(templateEngines.keySet());
     }
 
-    public TemplateEngines(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public TemplateEngines(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         templateEngines = new HashMap<String, AbstractTemplateEngine>();
         loadEngines(config, db, destination, templatesPath);
     }
@@ -70,11 +71,11 @@ public class TemplateEngines {
      * @param templatesPath path to template directory
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
-    private static AbstractTemplateEngine tryLoadEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath, String engineClassName) {
+    private static AbstractTemplateEngine tryLoadEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath, String engineClassName) {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
-            Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(CompositeConfiguration.class, ODatabaseDocumentTx.class, File.class, File.class);
+            Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(CompositeConfiguration.class, ContentStore.class, File.class, File.class);
             return ctor.newInstance(config, db, destination, templatesPath);
         } catch (ClassNotFoundException e) {
             return null;
@@ -96,7 +97,7 @@ public class TemplateEngines {
      * This method is used internally to load markup engines. Markup engines are found using descriptor files on
      * classpath, so adding an engine is as easy as adding a jar on classpath with the descriptor file included.
      */
-    private void loadEngines(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    private void loadEngines(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         try {
             ClassLoader cl = TemplateEngines.class.getClassLoader();
             Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.TemplateEngines.properties");
@@ -115,7 +116,7 @@ public class TemplateEngines {
         }
     }
 
-    private void registerEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath, String className, String... extensions) {
+    private void registerEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath, String className, String... extensions) {
         AbstractTemplateEngine engine = tryLoadEngine(config, db, destination, templatesPath, className);
         if (engine != null) {
             for (String extension : extensions) {

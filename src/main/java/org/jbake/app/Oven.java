@@ -120,7 +120,7 @@ public class Oven {
 	 * @throws Exception
 	 */
 	public void bake() throws Exception {
-        ODatabaseDocumentTx db = DBUtil.createDB(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+        ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
         updateDocTypesFromConfiguration();
         DBUtil.updateSchema(db);
         try {
@@ -136,85 +136,85 @@ public class Oven {
 
             Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
-			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from " + docType + " where rendered=false");
-				while (pagesIt.hasNext()) {
-					Map<String, Object> page = pagesIt.next();
-					try {
-						renderer.render(page);
-						renderedCount++;
-					} catch (Exception e) {
-						errors.add(e.getMessage());
-					}
-				}
-			}
+            for (String docType : DocumentTypes.getDocumentTypes()) {
+                    DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from " + docType + " where rendered=false");
+                    while (pagesIt.hasNext()) {
+                            Map<String, Object> page = pagesIt.next();
+                            try {
+                                    renderer.render(page);
+                                    renderedCount++;
+                            } catch (Exception e) {
+                                    errors.add(e.getMessage());
+                            }
+                    }
+            }
 
-			// write index file
-			if (config.getBoolean(Keys.RENDER_INDEX)) {
-				try {
-					renderer.renderIndex(config.getString(Keys.INDEX_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+            // write index file
+            if (config.getBoolean(Keys.RENDER_INDEX)) {
+                    try {
+                            renderer.renderIndex(config.getString(Keys.INDEX_FILE));
+                    } catch (Exception e) {
+                            errors.add(e.getMessage());
+                    }
+            }
 
-			// write feed file
-			if (config.getBoolean(Keys.RENDER_FEED)) {
-				try {
-					renderer.renderFeed(config.getString(Keys.FEED_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+            // write feed file
+            if (config.getBoolean(Keys.RENDER_FEED)) {
+                    try {
+                            renderer.renderFeed(config.getString(Keys.FEED_FILE));
+                    } catch (Exception e) {
+                            errors.add(e.getMessage());
+                    }
+            }
 
-			// write sitemap file
-			if (config.getBoolean(Keys.RENDER_SITEMAP)) {
-				try {
-					renderer.renderSitemap(config.getString(Keys.SITEMAP_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+            // write sitemap file
+            if (config.getBoolean(Keys.RENDER_SITEMAP)) {
+                    try {
+                            renderer.renderSitemap(config.getString(Keys.SITEMAP_FILE));
+                    } catch (Exception e) {
+                            errors.add(e.getMessage());
+                    }
+            }
 
-			// write master archive file
-			if (config.getBoolean(Keys.RENDER_ARCHIVE)) {
-				try {
-					renderer.renderArchive(config.getString(Keys.ARCHIVE_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+            // write master archive file
+            if (config.getBoolean(Keys.RENDER_ARCHIVE)) {
+                    try {
+                            renderer.renderArchive(config.getString(Keys.ARCHIVE_FILE));
+                    } catch (Exception e) {
+                            errors.add(e.getMessage());
+                    }
+            }
 
-			// write tag files
-			if (config.getBoolean(Keys.RENDER_TAGS)) {
-				try {
-					renderer.renderTags(crawler.getTags(), config.getString(Keys.TAG_PATH));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+            // write tag files
+            if (config.getBoolean(Keys.RENDER_TAGS)) {
+                    try {
+                            renderer.renderTags(crawler.getTags(), config.getString(Keys.TAG_PATH));
+                    } catch (Exception e) {
+                            errors.add(e.getMessage());
+                    }
+            }
 
-			// mark docs as rendered
-			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
-			}
-			// copy assets
-			Asset asset = new Asset(source, destination, config);
-			asset.copy(assetsPath);
-			errors.addAll(asset.getErrors());
+            // mark docs as rendered
+            for (String docType : DocumentTypes.getDocumentTypes()) {
+                    DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
+            }
+            // copy assets
+            Asset asset = new Asset(source, destination, config);
+            asset.copy(assetsPath);
+            errors.addAll(asset.getErrors());
 
-			LOGGER.info("Baking finished!");
-			long end = new Date().getTime();
-			LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
-			if (errors.size() > 0) {
-				LOGGER.error("Failed to bake {} item(s)!", errors.size());
-			}
-			
-		} finally {
-			db.close();
-			Orient.instance().shutdown();
-		}
-	}
+            LOGGER.info("Baking finished!");
+            long end = new Date().getTime();
+            LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
+            if (errors.size() > 0) {
+                    LOGGER.error("Failed to bake {} item(s)!", errors.size());
+            }
+
+        } finally {
+                db.close();
+                Orient.instance().shutdown();
+        }
+    }
 
     /**
      * Iterates over the configuration, searching for keys like "template.index.file=..."
@@ -231,7 +231,7 @@ public class Oven {
         }
     }
 
-    private void clearCacheIfNeeded(final ODatabaseDocumentTx db) {
+    private void clearCacheIfNeeded(final ContentStore db) {
         boolean needed = isClearCache;
         if (!needed) {
             List<ODocument> docs = DBUtil.query(db, "select sha1 from Signatures where key='templates'");

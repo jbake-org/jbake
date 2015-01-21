@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import org.jbake.app.ContentStore;
 
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
@@ -48,7 +49,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private TemplateEngine templateEngine;
     private FileTemplateResolver templateResolver;
 
-    public ThymeleafTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public ThymeleafTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
         initializeTemplateEngine();
     }

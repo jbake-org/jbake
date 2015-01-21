@@ -1,6 +1,5 @@
 package org.jbake.app;
 
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
@@ -24,8 +22,8 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class CrawlerTest {
-	private CompositeConfiguration config;
-    private ODatabaseDocumentTx db;
+    private CompositeConfiguration config;
+    private ContentStore db;
     private File sourceFolder;
 	
 	@Before

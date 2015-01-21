@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.jbake.app.ContentStore;
 
 /**
  * A template which is responsible for delegating to a supported template engine,
@@ -26,7 +27,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
 
     private final TemplateEngines renderers;
 
-    public DelegatingTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public DelegatingTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
         this.renderers = new TemplateEngines(config, db, destination, templatesPath);
     }

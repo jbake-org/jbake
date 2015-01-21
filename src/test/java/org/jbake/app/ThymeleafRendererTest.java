@@ -32,7 +32,7 @@ public class ThymeleafRendererTest {
     private File destinationFolder;
     private File templateFolder;
     private CompositeConfiguration config;
-    private ODatabaseDocumentTx db;
+    private ContentStore db;
 
     @Before
     public void setup() throws Exception, IOException, URISyntaxException {

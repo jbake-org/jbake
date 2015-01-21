@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jbake.app.ContentStore;
 
 /**
  * Renders documents using a Groovy template engine. Depending on the file extension of the template, the template
@@ -50,7 +51,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
 
     private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
 
-    public GroovyTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public GroovyTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
     }
 

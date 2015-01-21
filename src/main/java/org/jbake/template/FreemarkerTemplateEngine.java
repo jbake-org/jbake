@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jbake.app.ContentStore;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -45,7 +46,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
     private Configuration templateCfg;
 
-    public FreemarkerTemplateEngine(final CompositeConfiguration config, final ODatabaseDocumentTx db, final File destination, final File templatesPath) {
+    public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
         createTemplateConfiguration(config, templatesPath);
     }
@@ -74,13 +75,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     }
 
     /**
-     * A custom Freemarker model that avoids loading the whole documents into memory if not neccessary.
+     * A custom Freemarker model that avoids loading the whole documents into memory if not necessary.
      */
     public static class LazyLoadingModel implements TemplateHashModel {
         private final SimpleHash eagerModel;
-        private final ODatabaseDocumentTx db;
+        private final ContentStore db;
 
-        public LazyLoadingModel(final Map<String, Object> eagerModel, final ODatabaseDocumentTx db) {
+        public LazyLoadingModel(final Map<String, Object> eagerModel, final ContentStore db) {
             this.eagerModel = new SimpleHash(eagerModel);
             this.db = db;
         }
