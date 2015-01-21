@@ -32,7 +32,7 @@ public class DBUtil {
         return result;
     }
 
-    public static List<ODocument> query(ContentStore db, String query, Object... args) {
+    private static List<ODocument> query(ContentStore db, String query, Object... args) {
         return db.command(new OSQLSynchQuery<ODocument>(query)).execute(args);
     }
 

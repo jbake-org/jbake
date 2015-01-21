@@ -1,6 +1,5 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
@@ -24,9 +23,7 @@ import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,19 +86,19 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
             if ("published_posts".equals(key)) {
-                List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
+                List<ODocument> query = db.getPublishedPosts();
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
             if ("published_pages".equals(key)) {
-                List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
+                List<ODocument> query = db.getPublishedPages();
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
             if ("published_content".equals(key)) {
             	List<ODocument> publishedContent = new ArrayList<ODocument>();
             	String[] documentTypes = DocumentTypes.getDocumentTypes();
             	for (String docType : documentTypes) {
-            		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
-            		publishedContent.addAll(query);
+            		List<ODocument> query = db.getPublishedContent(docType);
+           		publishedContent.addAll(query);
             	}
             	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
             }
@@ -109,13 +106,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             	List<ODocument> allContent = new ArrayList<ODocument>();
             	String[] documentTypes = DocumentTypes.getDocumentTypes();
             	for (String docType : documentTypes) {
-            		List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" order by date desc"));
+            		List<ODocument> query = db.getAllContent(docType);
             		allContent.addAll(query);
             	}
             	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
             }
             if ("alltags".equals(key)) {
-                List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+                List<ODocument> query = db.getAllTags();
                 Set<String> result = new HashSet<String>();
                 for (ODocument document : query) {
                     String[] tags = DBUtil.toStringArray(document.field("tags"));
@@ -126,13 +123,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             String[] documentTypes = DocumentTypes.getDocumentTypes();
             for (String docType : documentTypes) {
                 if ((docType+"s").equals(key)) {
-                    return new SimpleSequence(DocumentList.wrap(DBUtil.query(db, "select * from "+docType+" order by date desc").iterator()));
+                    return new SimpleSequence(DocumentList.wrap(db.getAllContent(docType).iterator()));
                 }
             }
             if ("tag_posts".equals(key)) {
                 String tag = eagerModel.get("tag").toString();
                 // fetch the tag posts from db
-                List<ODocument> query = DBUtil.query(db, "select * from post where status='published' where ? in tags order by date desc", tag);
+                List<ODocument> query = db.getPublishedPostsByTag(tag);
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
             if ("published_date".equals(key)) {

@@ -53,7 +53,8 @@ public class CrawlerTest {
         Assert.assertEquals(2, crawler.getPostCount());
         Assert.assertEquals(3, crawler.getPageCount());
         
-        List<ODocument> results = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
+        List<ODocument> results = db.getPublishedPosts();
+//                query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
         DocumentList list = DocumentList.wrap(results.iterator());
         for (Map<String,Object> content : list) {
         	assertThat(content)

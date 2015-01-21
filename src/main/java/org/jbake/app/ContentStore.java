@@ -31,7 +31,9 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.query.OQuery;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import java.util.List;
 import static org.jbake.app.DBUtil.updateSchema;
 import org.jbake.model.DocumentTypes;
@@ -81,7 +83,7 @@ public class ContentStore {
         db.drop();
     }
 
-    public <RET extends List<?>> RET query(OQuery<? extends Object> iCommand, Object... iArgs) {
+    public <RET extends List<?>> RET query1(OQuery<? extends Object> iCommand, Object... iArgs) {
         return db.query(iCommand, iArgs);
     }
 
@@ -109,4 +111,38 @@ public class ContentStore {
         //page.createIndex("uriIdx", OClass.INDEX_TYPE.UNIQUE, "uri");
         //page.createIndex("renderedIdx", OClass.INDEX_TYPE.NOTUNIQUE, "rendered");
     }    
+
+    public List<ODocument> getPublishedPosts() {
+        return getPublishedContent("post");
+    }
+
+    public List<ODocument> getPublishedPages() {
+        return getPublishedContent("page");
+    }
+
+    public List<ODocument> getPublishedContent(String docType) {
+        return db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" where status='published' order by date desc"));
+    }
+
+    public List<ODocument> getAllContent(String docType) {
+        return db.query(new OSQLSynchQuery<ODocument>("select * from "+docType+" order by date desc"));
+    }
+
+    public List<ODocument> getAllTags() {
+        return db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+    }
+
+    public List<ODocument> getPublishedPostsByTag(String tag) {
+        return db.command(new OSQLSynchQuery<ODocument>("select * from post where status='published' where ? in tags order by date desc")).execute(tag);
+    }
+
+    public List<ODocument> getSignatures() {
+        return db.query(new OSQLSynchQuery<ODocument>("select sha1 from Signatures where key='templates'"));
+
+    }
+
+    public List<ODocument> getDocumentStatus(String docType, String uri) {
+        return db.command(new OSQLSynchQuery<ODocument>("select sha1,rendered from " + docType + " where sourceuri=?")).execute(uri);
+
+    }
 }

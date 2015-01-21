@@ -172,7 +172,7 @@ public class Crawler {
     }
 
     public Set<String> getTags() {
-        List<ODocument> query = db.query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+        List<ODocument> query = db.getAllTags(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
         Set<String> result = new HashSet<String>();
         for (ODocument document : query) {
             String[] tags = DBUtil.toStringArray(document.field("tags"));
@@ -182,7 +182,7 @@ public class Crawler {
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
-        List<ODocument> match = DBUtil.query(db, "select sha1,rendered from " + docType + " where sourceuri=?", uri);
+        List<ODocument> match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
             ODocument entries = match.get(0);
             String oldHash = entries.field("sha1");
