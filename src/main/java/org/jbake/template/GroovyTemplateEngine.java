@@ -116,7 +116,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     	return DocumentList.wrap(allContent.iterator());
                     }
                     if ("alltags".equals(key)) {
-                        List<ODocument> query = db.getAllTags();
+                        List<ODocument> query = db.getAllTagsFromPublishedPosts();
                         Set<String> result = new HashSet<String>();
                         for (ODocument document : query) {
                             String[] tags = DBUtil.toStringArray(document.field("tags"));

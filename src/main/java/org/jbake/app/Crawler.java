@@ -172,7 +172,7 @@ public class Crawler {
     }
 
     public Set<String> getTags() {
-        List<ODocument> query = db.getAllTags(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
+        List<ODocument> query = db.getAllTagsFromPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
         Set<String> result = new HashSet<String>();
         for (ODocument document : query) {
             String[] tags = DBUtil.toStringArray(document.field("tags"));

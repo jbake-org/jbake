@@ -116,7 +116,7 @@ public class ContentStore {
         return query("select * from "+docType+" order by date desc");
     }
 
-    public List<ODocument> getAllTags() {
+    public List<ODocument> getAllTagsFromPublishedPosts() {
         return query("select tags from post where status='published'");
     }
 
