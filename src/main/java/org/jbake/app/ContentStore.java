@@ -40,6 +40,8 @@ import org.jbake.model.DocumentTypes;
  */
 public class ContentStore {
     private ODatabaseDocumentTx db;
+    private int start = -1;
+    private int limit = -1;
 
     public ContentStore(final String type, String name) {
         db = new ODatabaseDocumentTx(type + ":" + name);
@@ -52,6 +54,22 @@ public class ContentStore {
         if (!exists) {
             updateSchema();
         }
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     public final void updateSchema() {
@@ -99,7 +117,11 @@ public class ContentStore {
     }
 
     public List<ODocument> getPublishedContent(String docType) {
-        return query("select * from " + docType + " where status='published' order by date desc");
+        String query = "select * from " + docType + " where status='published'";
+        if ((start > -1) && (limit > -1)) {
+            query += " SKIP " + start + " LIMIT " + limit;
+        }
+        return query(query + " order by date desc");
     }
 
     public List<ODocument> getAllContent(String docType) {
