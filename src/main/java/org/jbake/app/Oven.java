@@ -231,7 +231,7 @@ public class Oven {
     private void clearCacheIfNeeded(final ContentStore db) {
         boolean needed = isClearCache;
         if (!needed) {
-            List<ODocument> docs = db.getSignatures();
+            List<ODocument> docs = db.getSignaturesForTemplates();
             String currentTemplatesSignature;
             try {
                 currentTemplatesSignature = FileUtil.sha1(templatesPath);
