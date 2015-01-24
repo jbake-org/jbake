@@ -102,9 +102,9 @@ public class Oven {
 		ensureDestination();
 	}
 
-    private File setupPathFromConfig(String key) {
-        return new File(source, config.getString(key));
-    }
+        private File setupPathFromConfig(String key) {
+            return new File(source, config.getString(key));
+        }
 
 	private File setupRequiredFolderFromConfig(final String key) {
 		final File path = setupPathFromConfig(key);
@@ -120,101 +120,98 @@ public class Oven {
 	 * @throws JBakeException
 	 */
 	public void bake() {
-		final ODatabaseDocumentTx db = DBUtil.createDB(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
-		updateDocTypesFromConfiguration();
-		DBUtil.updateSchema(db);
-		try {
-			final long start = new Date().getTime();
-			LOGGER.info("Baking has started...");
-			clearCacheIfNeeded(db);
+            final ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+            updateDocTypesFromConfiguration();
+            DBUtil.updateSchema(db);
+            try {
+                final long start = new Date().getTime();
+                LOGGER.info("Baking has started...");
+                clearCacheIfNeeded(db);
 
-            // process source content
-            Crawler crawler = new Crawler(db, source, config);
-            crawler.crawl(contentsPath);
-            LOGGER.info("Pages : {}", crawler.getPageCount());
-            LOGGER.info("Posts : {}", crawler.getPostCount());
+                // process source content
+                Crawler crawler = new Crawler(db, source, config);
+                crawler.crawl(contentsPath);
+                LOGGER.info("Pages : {}", crawler.getPageCount());
+                LOGGER.info("Posts : {}", crawler.getPostCount());
 
-            Renderer renderer = new Renderer(db, destination, templatesPath, config);
+                Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
-			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DocumentIterator pagesIt = DBUtil.fetchDocuments(db, "select * from " + docType + " where rendered=false");
-				while (pagesIt.hasNext()) {
-					Map<String, Object> page = pagesIt.next();
-					try {
-						renderer.render(page);
-						renderedCount++;
-					} catch (Exception e) {
-						errors.add(e.getMessage());
-					}
-				}
-			}
+                for (String docType : DocumentTypes.getDocumentTypes()) {
+                        for (ODocument document: db.getUnrenderedContent(docType)) {
+                                try {
+                                        renderer.render((Map<String, Object>)document);
+                                        renderedCount++;
+                                } catch (Exception e) {
+                                        errors.add(e.getMessage());
+                                }
+                        }
+                }
 
-			// write index file
-			if (config.getBoolean(Keys.RENDER_INDEX)) {
-				try {
-					renderer.renderIndex(config.getString(Keys.INDEX_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+                // write index file
+                if (config.getBoolean(Keys.RENDER_INDEX)) {
+                        try {
+                                renderer.renderIndex(config.getString(Keys.INDEX_FILE));
+                        } catch (Exception e) {
+                                errors.add(e.getMessage());
+                        }
+                }
 
-			// write feed file
-			if (config.getBoolean(Keys.RENDER_FEED)) {
-				try {
-					renderer.renderFeed(config.getString(Keys.FEED_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+                // write feed file
+                if (config.getBoolean(Keys.RENDER_FEED)) {
+                        try {
+                                renderer.renderFeed(config.getString(Keys.FEED_FILE));
+                        } catch (Exception e) {
+                                errors.add(e.getMessage());
+                        }
+                }
 
-			// write sitemap file
-			if (config.getBoolean(Keys.RENDER_SITEMAP)) {
-				try {
-					renderer.renderSitemap(config.getString(Keys.SITEMAP_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+                // write sitemap file
+                if (config.getBoolean(Keys.RENDER_SITEMAP)) {
+                        try {
+                                renderer.renderSitemap(config.getString(Keys.SITEMAP_FILE));
+                        } catch (Exception e) {
+                                errors.add(e.getMessage());
+                        }
+                }
 
-			// write master archive file
-			if (config.getBoolean(Keys.RENDER_ARCHIVE)) {
-				try {
-					renderer.renderArchive(config.getString(Keys.ARCHIVE_FILE));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+                // write master archive file
+                if (config.getBoolean(Keys.RENDER_ARCHIVE)) {
+                        try {
+                                renderer.renderArchive(config.getString(Keys.ARCHIVE_FILE));
+                        } catch (Exception e) {
+                                errors.add(e.getMessage());
+                        }
+                }
 
-			// write tag files
-			if (config.getBoolean(Keys.RENDER_TAGS)) {
-				try {
-					renderer.renderTags(crawler.getTags(), config.getString(Keys.TAG_PATH));
-				} catch (Exception e) {
-					errors.add(e.getMessage());
-				}
-			}
+                // write tag files
+                if (config.getBoolean(Keys.RENDER_TAGS)) {
+                        try {
+                                renderer.renderTags(crawler.getTags(), config.getString(Keys.TAG_PATH));
+                        } catch (Exception e) {
+                                errors.add(e.getMessage());
+                        }
+                }
 
-			// mark docs as rendered
-			for (String docType : DocumentTypes.getDocumentTypes()) {
-				DBUtil.update(db, "update " + docType + " set rendered=true where rendered=false and cached=true");
-			}
-			// copy assets
-			Asset asset = new Asset(source, destination, config);
-			asset.copy(assetsPath);
-			errors.addAll(asset.getErrors());
+                // mark docs as rendered
+                for (String docType : DocumentTypes.getDocumentTypes()) {
+                        db.markConentAsRendered(docType);
+                }
+                // copy assets
+                Asset asset = new Asset(source, destination, config);
+                asset.copy(assetsPath);
+                errors.addAll(asset.getErrors());
 
-			LOGGER.info("Baking finished!");
-			long end = new Date().getTime();
-			LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
-			if (errors.size() > 0) {
-				LOGGER.error("Failed to bake {} item(s)!", errors.size());
-			}
-			
-		} finally {
-			db.close();
-			Orient.instance().shutdown();
-		}
-	}
+                LOGGER.info("Baking finished!");
+                long end = new Date().getTime();
+                LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
+                if (errors.size() > 0) {
+                        LOGGER.error("Failed to bake {} item(s)!", errors.size());
+                }
+        } finally {
+                db.close();
+                Orient.instance().shutdown();
+        }
+    }
 
     /**
      * Iterates over the configuration, searching for keys like "template.index.file=..."
@@ -231,10 +228,10 @@ public class Oven {
         }
     }
 
-    private void clearCacheIfNeeded(final ODatabaseDocumentTx db) {
+    private void clearCacheIfNeeded(final ContentStore db) {
         boolean needed = isClearCache;
         if (!needed) {
-            List<ODocument> docs = DBUtil.query(db, "select sha1 from Signatures where key='templates'");
+            List<ODocument> docs = db.getSignaturesForTemplates();
             String currentTemplatesSignature;
             try {
                 currentTemplatesSignature = FileUtil.sha1(templatesPath);
@@ -245,18 +242,18 @@ public class Oven {
                 String sha1 = docs.get(0).field("sha1");
                 needed = !sha1.equals(currentTemplatesSignature);
                 if (needed) {
-                    DBUtil.update(db, "update Signatures set sha1=? where key='templates'", currentTemplatesSignature);
+                    db.updateSignatures(currentTemplatesSignature);
                 }
             } else {
                 // first computation of templates signature
-                DBUtil.update(db, "insert into Signatures(key,sha1) values('templates',?)", currentTemplatesSignature);
+                db.insertSignature(currentTemplatesSignature);
                 needed = true;
             }
         }
         if (needed) {
             for (String docType : DocumentTypes.getDocumentTypes()) {
                 try {
-                    DBUtil.update(db,"delete from "+docType);
+                    db.deleteAllByDocType(docType);
                 } catch (Exception e) {
                     // maybe a non existing document type
                 }

@@ -41,7 +41,7 @@ public class Renderer {
      * @param destination   The destination folder
      * @param templatesPath The templates folder
      */
-    public Renderer(ODatabaseDocumentTx db, File destination, File templatesPath, CompositeConfiguration config) {
+    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
         this.destination = destination;
         this.config = config;
         this.renderingEngine = new DelegatingTemplateEngine(config, db, destination, templatesPath);

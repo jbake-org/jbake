@@ -1,6 +1,5 @@
 package org.jbake.app;
 
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
@@ -24,8 +22,8 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class CrawlerTest {
-	private CompositeConfiguration config;
-    private ODatabaseDocumentTx db;
+    private CompositeConfiguration config;
+    private ContentStore db;
     private File sourceFolder;
 	
 	@Before
@@ -55,7 +53,8 @@ public class CrawlerTest {
         Assert.assertEquals(2, crawler.getPostCount());
         Assert.assertEquals(3, crawler.getPageCount());
         
-        List<ODocument> results = db.query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
+        List<ODocument> results = db.getPublishedPosts();
+//                query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
         DocumentList list = DocumentList.wrap(results.iterator());
         for (Map<String,Object> content : list) {
         	assertThat(content)
