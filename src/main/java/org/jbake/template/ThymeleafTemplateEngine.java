@@ -1,7 +1,6 @@
 package org.jbake.template;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
@@ -30,7 +29,7 @@ import org.jbake.app.ContentStore;
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
  *
- * <p>This template engine is not recommanded for large sites because the whole model
+ * <p>This template engine is not recommended for large sites because the whole model
  * is loaded into memory due to Thymeleaf internal limitations.</p>
  *
  * <p>The default rendering mode is "HTML5", but it is possible to use another mode
@@ -101,16 +100,16 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
         private void completeModel() {
             put("db", db);
-            put("alltags", getAllTags());
-            put("tag_posts", getTagPosts());
-            put("published_date", new Date());
+            put(ContentStore.ALLTAGS, getAllTags());
+            put(ContentStore.TAG_POSTS, getTagPosts());
+            put(ContentStore.PUBLISHED_DATE, new Date());
             String[] documentTypes = DocumentTypes.getDocumentTypes();
             for (String docType : documentTypes) {
                 put(docType + "s", DocumentList.wrap(db.getAllContent(docType).iterator()));
                 put("published_" + docType + "s", DocumentList.wrap(db.getPublishedContent(docType).iterator()));
             }
-            put("published_content", getPublishedContent());
-            put("all_content", getAllContent());
+            put(ContentStore.PUBLISHED_CONTENT, getPublishedContent());
+            put(ContentStore.ALL_CONTENT, getAllContent());
         }
 
         private Object getTagPosts() {

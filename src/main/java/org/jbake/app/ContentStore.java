@@ -42,6 +42,14 @@ import org.jbake.model.DocumentTypes;
  * @author jdlee
  */
 public class ContentStore {
+    public static final String PUBLISHED_DATE = "published_date";
+    public static final String TAG_POSTS = "tag_posts";
+    public static final String ALLTAGS = "alltags";
+    public static final String ALL_CONTENT = "all_content";
+    public static final String PUBLISHED_CONTENT = "published_content";
+    public static final String PUBLISHED_PAGES = "published_pages";
+    public static final String PUBLISHED_POSTS = "published_posts";
+
     private ODatabaseDocumentTx db;
     private int start = -1;
     private int limit = -1;
