@@ -1,7 +1,5 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.template.DelegatingTemplateEngine;
@@ -13,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,15 +28,17 @@ public class Renderer {
 
     // TODO: should all content be made available to all templates via this class??
 
-    private File destination;
-    private CompositeConfiguration config;
+    private final File destination;
+    private final CompositeConfiguration config;
     private final DelegatingTemplateEngine renderingEngine;
 
     /**
      * Creates a new instance of Renderer with supplied references to folders.
      *
+     * @param db            The database holding the content
      * @param destination   The destination folder
      * @param templatesPath The templates folder
+     * @param config        
      */
     public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
         this.destination = destination;
