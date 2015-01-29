@@ -17,10 +17,10 @@ public class LaunchOptions {
 	@Option(name = "-b", aliases = {"--bake"}, usage="start baking (this is the default action if no option is supplied)")
 	private boolean bake;
 	
-	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates")
+	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)")
 	private boolean init;
 
-    @Option(name = "-t", aliases = {"--template"}, usage="Use specified template (use freemarker if not specified) ", depends = ("-i"))
+    @Option(name = "-t", aliases = {"--template"}, usage="use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", depends = ("-i"))
     private String template;
 
 	@Option(name = "-s", aliases = {"--server"}, usage="runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
