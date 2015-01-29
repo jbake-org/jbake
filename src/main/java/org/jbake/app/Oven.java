@@ -139,7 +139,7 @@ public class Oven {
                 for (String docType : DocumentTypes.getDocumentTypes()) {
                         for (ODocument document: db.getUnrenderedContent(docType)) {
                                 try {
-                                        renderer.render((Map<String, Object>)document);
+                                        renderer.render(DBUtil.documentToModel(document));
                                         renderedCount++;
                                 } catch (Exception e) {
                                         errors.add(e.getMessage());

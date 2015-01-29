@@ -30,8 +30,11 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+
 import java.util.List;
+
 import org.jbake.model.DocumentTypes;
 
 /**
@@ -82,7 +85,7 @@ public class ContentStore {
     }
 
     public List<ODocument> getDocumentStatus(String docType, String uri) {
-        return executeCommand("select sha1,rendered from " + docType + " where sourceuri=?", uri);
+        return query("select sha1,rendered from " + docType + " where sourceuri=?", uri);
 
     }
 
@@ -91,7 +94,7 @@ public class ContentStore {
     }
 
     public List<ODocument> getPublishedPostsByTag(String tag) {
-        return executeCommand("select * from post where status='published' where ? in tags order by date desc", tag);
+        return query("select * from post where status='published' where ? in tags order by date desc", tag);
     }
 
     public List<ODocument> getPublishedPages() {
@@ -141,9 +144,13 @@ public class ContentStore {
     private List<ODocument> query(String sql) {
         return db.query(new OSQLSynchQuery<ODocument>(sql));
     }
+    
+    private List<ODocument> query(String sql, Object... args) {
+        return db.command(new OSQLSynchQuery<ODocument>(sql)).execute(args);
+    }
 
-    private List<ODocument> executeCommand(String query, Object... args) {
-        return db.command(new OSQLSynchQuery<ODocument>(query)).execute(args);
+    private void executeCommand(String query, Object... args) {
+        db.command(new OCommandSQL(query)).execute(args);
     }
 
     private static void createDocType(final OSchema schema, final String doctype) {
