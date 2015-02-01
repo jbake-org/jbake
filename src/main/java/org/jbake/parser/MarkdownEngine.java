@@ -69,6 +69,10 @@ public class MarkdownEngine extends MarkupEngine {
             extension = Extensions.TABLES;
         } else if (name.equals("WIKILINKS")) {
             extension = Extensions.WIKILINKS;
+	//} else if (name.equals("ANCHORLINKS")) { // not available in pegdown-1.4.2
+        //    extension = Extensions.ANCHORLINKS;
+        } else if (name.equals("STRIKETHROUGH")) {
+            extension = Extensions.STRIKETHROUGH;
         } else if (name.equals("ALL")) {
             extension = Extensions.ALL;
         }
