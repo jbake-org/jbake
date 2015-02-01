@@ -22,37 +22,17 @@ public class MarkdownEngine extends MarkupEngine {
         int extensions = Extensions.NONE;
         if (mdExts.length > 0) {
             for (int index = 0; index < mdExts.length; index++) {
-                if (mdExts[index].equals("HARDWRAPS")) {
-                    extensions |= Extensions.HARDWRAPS;
-                } else if (mdExts[index].equals("AUTOLINKS")) {
-                    extensions |= Extensions.AUTOLINKS;
-                } else if (mdExts[index].equals("FENCED_CODE_BLOCKS")) {
-                    extensions |= Extensions.FENCED_CODE_BLOCKS;
-                } else if (mdExts[index].equals("DEFINITIONS")) {
-                    extensions |= Extensions.DEFINITIONS;
-                } else if (mdExts[index].equals("ABBREVIATIONS")) {
-                    extensions |= Extensions.ABBREVIATIONS;
-                } else if (mdExts[index].equals("QUOTES")) {
-                    extensions |= Extensions.QUOTES;
-                } else if (mdExts[index].equals("SMARTS")) {
-                    extensions |= Extensions.SMARTS;
-                } else if (mdExts[index].equals("SMARTYPANTS")) {
-                    extensions |= Extensions.SMARTYPANTS;
-                } else if (mdExts[index].equals("SUPPRESS_ALL_HTML")) {
-                    extensions |= Extensions.SUPPRESS_ALL_HTML;
-                } else if (mdExts[index].equals("SUPPRESS_HTML_BLOCKS")) {
-                    extensions |= Extensions.SUPPRESS_HTML_BLOCKS;
-                } else if (mdExts[index].equals("SUPPRESS_INLINE_HTML")) {
-                    extensions |= Extensions.SUPPRESS_INLINE_HTML;
-                } else if (mdExts[index].equals("TABLES")) {
-                    extensions |= Extensions.TABLES;
-                } else if (mdExts[index].equals("WIKILINKS")) {
-                    extensions |= Extensions.WIKILINKS;
-                } else if (mdExts[index].equals("ALL")) {
-                    extensions = Extensions.ALL;
+                String ext = mdExts[index];
+                if (ext.startsWith("-")) {
+		    ext = ext.substring(1);
+                    extensions=removeExtension(extensions, extensionFor(ext));
+                } else {
+                    if (ext.startsWith("+")) {
+		      ext = ext.substring(1);
+                    }
+                    extensions=addExtension(extensions, extensionFor(ext));
                 }
             }
-
         }
         
         long maxParsingTime = context.getConfig().getLong("markdown.maxParsingTimeInMillis", PegDownProcessor.DEFAULT_MAX_PARSING_TIME);
@@ -60,4 +40,45 @@ public class MarkdownEngine extends MarkupEngine {
         PegDownProcessor pegdownProcessor = new PegDownProcessor(extensions, maxParsingTime);
         context.setBody(pegdownProcessor.markdownToHtml(context.getBody()));
     }
+
+    private int extensionFor(String name) {
+        int extension = Extensions.NONE;
+	if (name.equals("HARDWRAPS")) {
+	    extension = Extensions.HARDWRAPS;
+        } else if (name.equals("AUTOLINKS")) {
+            extension = Extensions.AUTOLINKS;
+        } else if (name.equals("FENCED_CODE_BLOCKS")) {
+            extension = Extensions.FENCED_CODE_BLOCKS;
+        } else if (name.equals("DEFINITIONS")) {
+            extension = Extensions.DEFINITIONS;
+        } else if (name.equals("ABBREVIATIONS")) {
+            extension = Extensions.ABBREVIATIONS;
+        } else if (name.equals("QUOTES")) {
+            extension = Extensions.QUOTES;
+        } else if (name.equals("SMARTS")) {
+            extension = Extensions.SMARTS;
+        } else if (name.equals("SMARTYPANTS")) {
+            extension = Extensions.SMARTYPANTS;
+        } else if (name.equals("SUPPRESS_ALL_HTML")) {
+            extension = Extensions.SUPPRESS_ALL_HTML;
+        } else if (name.equals("SUPPRESS_HTML_BLOCKS")) {
+            extension = Extensions.SUPPRESS_HTML_BLOCKS;
+        } else if (name.equals("SUPPRESS_INLINE_HTML")) {
+            extension = Extensions.SUPPRESS_INLINE_HTML;
+        } else if (name.equals("TABLES")) {
+            extension = Extensions.TABLES;
+        } else if (name.equals("WIKILINKS")) {
+            extension = Extensions.WIKILINKS;
+        } else if (name.equals("ALL")) {
+            extension = Extensions.ALL;
+        }
+        return extension;
+    }
+    private int addExtension(int previousExtensions, int additionalExtension) {
+	return previousExtensions | additionalExtension;
+    }
+    private int removeExtension(int previousExtensions, int unwantedExtension) {
+	return previousExtensions & (~unwantedExtension);
+    }
+
 }
