@@ -12,4 +12,4 @@ user.gradle
 .settings
 *.classpath
 *.project
-
+gradle.properties

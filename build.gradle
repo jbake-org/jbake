@@ -23,6 +23,7 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    compile 'com.github.zafarkhaja:java-semver:0.8.0'
     provided 'org.jbake:jbake-core:2.3.2'
     testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
         exclude group:'org.codehaus.groovy'

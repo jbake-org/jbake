@@ -15,6 +15,7 @@
  */
 package me.champeau.gradle
 
+import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -60,7 +61,9 @@ class JBakePlugin implements Plugin<Project> {
         project.dependencies {
             jbake("org.jbake:jbake-core:${extension.version}")
 
-            if ( new Version(extension.version) > new Version("2.3.0") ){
+            Version currentVersion = Version.valueOf(extension.version)
+            Version jbake2_3_0 = Version.valueOf("2.3.0")
+            if ( currentVersion.greaterThan( jbake2_3_0 ) ){
                 jbake("org.asciidoctor:asciidoctorj:${extension.asciidoctorjVersion}")
             }
             else {
