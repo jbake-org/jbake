@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DBUtil {
-    public static ContentStore createDB(final String type, String name) {
-        return new ContentStore(type, name);
-    }
     public static ContentStore createDataStore(final String type, String name) {
         return new ContentStore(type, name);
     }

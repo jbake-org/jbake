@@ -60,7 +60,7 @@ public class GroovyRendererTest {
             }
         }
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
+        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
     }
 
     @After

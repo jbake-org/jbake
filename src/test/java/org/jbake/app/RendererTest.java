@@ -50,7 +50,7 @@ public class RendererTest {
 
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
+        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
     }
 
     @After
