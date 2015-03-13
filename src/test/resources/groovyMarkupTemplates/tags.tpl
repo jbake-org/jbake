@@ -8,9 +8,7 @@ layout 'layout/main.tpl',
                     div{
                         alltags.sort().each { tag ->
                             span{
-                                a(href:"tags/${tag.replace(' ', '-')}.html", class:"label"){
-                                    ${tag}
-                                }
+                                a(href:"tags/${tag.replace(' ', '-')}.html", class:"label", "${tag}")
                             }
                         }
                     }

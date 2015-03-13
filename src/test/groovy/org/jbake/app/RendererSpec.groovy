@@ -293,7 +293,7 @@ class RendererSpec extends Specification {
         output.contains("<a href=\"blog/2013/second-post.html\"")
         output.contains("<a href=\"blog/2012/first-post.html\"");
         output.contains("Taglist")
-        output.contains("<a href=\"tags/blog.html\" class=\"label\"")
+        output =~ /<a href="tags\/blog.html" class="label".*>blog<\/a>/
 
         where:
 
