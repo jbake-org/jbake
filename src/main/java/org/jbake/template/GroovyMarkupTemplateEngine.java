@@ -1,52 +1,38 @@
 package org.jbake.template;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-
 import groovy.lang.GString;
 import groovy.lang.Writable;
-import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import groovy.text.XmlTemplateEngine;
-
+import groovy.text.markup.MarkupTemplateEngine;
+import groovy.text.markup.TemplateConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.jbake.app.ContentStore;
+import java.io.*;
+import java.util.*;
 
 /**
- * Renders documents using a Groovy template engine. Depending on the file extension of the template, the template
- * engine will either be a {@link groovy.text.SimpleTemplateEngine}, or an {@link groovy.text.XmlTemplateEngine}
- * (.gxml).
+ * Renders documents using the GroovyMarkupTemplateEngine.
  *
- * @author Cédric Champeau
+ * @see <a href="http://groovy-lang.org/templating.html#_the_markuptemplateengine">Groovy MarkupTemplateEngine Documentation</a>
+ *
+ * The file extension to activate this Engine is .tpl
  */
-public class GroovyTemplateEngine extends AbstractTemplateEngine {
+public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
 
     private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
 
-    public GroovyTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
+    public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
     }
 
@@ -54,7 +40,8 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = findTemplate(templateName);
-            Writable writable = template.make(wrap(model));
+            Map<String, Object> wrappedModel = wrap(model);
+            Writable writable = template.make(wrappedModel);
             writable.writeTo(writer);
         } catch (Exception e) {
             throw new RenderingException(e);
@@ -62,7 +49,14 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     }
 
     private Template findTemplate(final String templateName) throws SAXException, ParserConfigurationException, ClassNotFoundException, IOException {
-        TemplateEngine ste = templateName.endsWith(".gxml") ? new XmlTemplateEngine() : new SimpleTemplateEngine();
+
+        TemplateConfiguration templateConfiguration = new TemplateConfiguration();
+        templateConfiguration.setUseDoubleQuotes(true);
+        templateConfiguration.setAutoIndent(true);
+        templateConfiguration.setAutoNewLine(true);
+        templateConfiguration.setAutoEscape(true);
+        
+        TemplateEngine ste = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(),templatesPath,templateConfiguration);
         File sourceTemplate = new File(templatesPath, templateName);
         Template template = cachedTemplates.get(templateName);
         if (template == null) {
@@ -78,18 +72,12 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
             public Object get(final Object property) {
                 if (property instanceof String || property instanceof GString) {
                     String key = property.toString();
-                    if ("include".equals(key)) {
-                        return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
-                    }
-                    if ("db".equals(key)) {
-                        return db;
-                    }
                     if ("published_posts".equals(key)) {
-                        List<ODocument> query = db.getPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
+                        List<ODocument> query = db.getPublishedPosts();
                         return DocumentList.wrap(query.iterator());
                     }
                     if ("published_pages".equals(key)) {
-                        List<ODocument> query = db.getPublishedPages(); //query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
+                        List<ODocument> query = db.getPublishedPages();
                         return DocumentList.wrap(query.iterator());
                     }
                     if ("published_content".equals(key)) {
@@ -139,12 +127,5 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                 return super.get(property);
             }
         };
-    }
-
-    private void doInclude(Map<String, Object> model, String templateName) throws Exception {
-        AbstractTemplateEngine engine = (AbstractTemplateEngine) model.get("renderer");
-        Writer out = (Writer) model.get("out");
-        engine.renderDocument(model, templateName, out);
-        model.put("out", out);
     }
 }

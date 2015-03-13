@@ -20,6 +20,7 @@ class RendererSpec extends Specification {
     @Shared
     def templateMap = [
             'groovyTemplates': '.gsp',
+            'groovyMarkupTemplates': '.tpl',
             'thymeleafTemplates': '.thyme',
             'templates' : '.tfl'
     ]
