@@ -7,9 +7,19 @@
       <div th:replace="header.thyme::top"/>
 
 	<div class="row-fluid marketing">
+
+        <div class="span12">
+            <h1>Taglist</h1>
+            <div th:each="tag : ${alltags}">
+                <span>
+                    <a th:href="'tags/' + ${tag} + '.html'" href="tags/blog.html" class="label" th:text="${tag}">blog</a>
+                </span>
+            </div>
+        </div>
+
 		<div class="span12">
 			<h2>Tags</h2>
-			<div th:each="post : ${posts}" th:with='last_month=null' th:remove='tag'>
+			<div th:each="post : ${tag_posts}" th:with='last_month=null' th:remove='tag'>
                 <h3 th:if='${last_month!=#dates.format(post.date,"MMMM yyyy")}' th:text='${#dates.format(post.date,"MMMM yyyy")}'>June 2014</h3>
 
             	<h4><span th:text='${#dates.format(post.date,"dd MMMM")}' th:remove='tag'/> - <a th:href="${post.uri}" th:text='${post.title}' href="foo.html">Post title</a></h4>
