@@ -30,10 +30,25 @@ import java.util.*;
  */
 public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
 
-    private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
+    private TemplateConfiguration templateConfiguration;
+    private TemplateEngine templateEngine;
 
     public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
+        setupTemplateConfiguration();
+        initializeTemplateEngine();
+    }
+
+    private void setupTemplateConfiguration() {
+        templateConfiguration = new TemplateConfiguration();
+        templateConfiguration.setUseDoubleQuotes(true);
+        templateConfiguration.setAutoIndent(true);
+        templateConfiguration.setAutoNewLine(true);
+        templateConfiguration.setAutoEscape(true);
+    }
+
+    private void initializeTemplateEngine() {
+        templateEngine = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(),templatesPath,templateConfiguration);
     }
 
     @Override
@@ -49,20 +64,9 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     }
 
     private Template findTemplate(final String templateName) throws SAXException, ParserConfigurationException, ClassNotFoundException, IOException {
-
-        TemplateConfiguration templateConfiguration = new TemplateConfiguration();
-        templateConfiguration.setUseDoubleQuotes(true);
-        templateConfiguration.setAutoIndent(true);
-        templateConfiguration.setAutoNewLine(true);
-        templateConfiguration.setAutoEscape(true);
-        
-        TemplateEngine ste = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(),templatesPath,templateConfiguration);
         File sourceTemplate = new File(templatesPath, templateName);
-        Template template = cachedTemplates.get(templateName);
-        if (template == null) {
-            template = ste.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getString(Keys.TEMPLATE_ENCODING)));
-            cachedTemplates.put(templateName, template);
-        }
+
+        Template template = templateEngine.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getString(Keys.TEMPLATE_ENCODING)));
         return template;
     }
 
