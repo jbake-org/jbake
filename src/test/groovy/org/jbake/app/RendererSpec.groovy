@@ -264,7 +264,7 @@ class RendererSpec extends Specification {
 
         when:
         //exec
-        renderer.renderIndex(fileName);
+        renderer.renderArchive(fileName);
 
         then:
         def output = getOutput(fileName)
