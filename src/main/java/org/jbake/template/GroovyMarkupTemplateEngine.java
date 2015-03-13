@@ -31,7 +31,7 @@ import java.util.*;
 public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
 
     private TemplateConfiguration templateConfiguration;
-    private TemplateEngine templateEngine;
+    private MarkupTemplateEngine templateEngine;
 
     public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
@@ -54,20 +54,13 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     @Override
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
-            Template template = findTemplate(templateName);
+            Template template = templateEngine.createTemplateByPath(templateName);
             Map<String, Object> wrappedModel = wrap(model);
             Writable writable = template.make(wrappedModel);
             writable.writeTo(writer);
         } catch (Exception e) {
             throw new RenderingException(e);
         }
-    }
-
-    private Template findTemplate(final String templateName) throws SAXException, ParserConfigurationException, ClassNotFoundException, IOException {
-        File sourceTemplate = new File(templatesPath, templateName);
-
-        Template template = templateEngine.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getString(Keys.TEMPLATE_ENCODING)));
-        return template;
     }
 
     private Map<String, Object> wrap(final Map<String, Object> model) {
