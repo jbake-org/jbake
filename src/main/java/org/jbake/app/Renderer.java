@@ -124,15 +124,17 @@ public class Renderer {
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
         model.put("content", buildSimpleModel("index"));
-        db.setLimit(postsPerPage);
+        if (paginate) {
+            db.setLimit(postsPerPage);
+        }
 
         try {
             int page = 1;
             while (start < totalPosts) {
                 String fileName = indexFile;
-                db.setStart(start);
 
                 if (paginate) {
+                    db.setStart(start);
                     int index = fileName.lastIndexOf(".");
                     if (page != 1) {
                         String previous = fileName.substring(0, index) + (page-1) +
