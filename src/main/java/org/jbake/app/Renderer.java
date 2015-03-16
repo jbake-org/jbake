@@ -137,9 +137,7 @@ public class Renderer {
                     db.setStart(start);
                     int index = fileName.lastIndexOf(".");
                     if (page != 1) {
-                        int prevPage = page - 1;
-                        String previous = fileName.substring(0, index) + 
-                                (prevPage != 1 ? page-1 : "") +
+                        String previous = fileName.substring(0, index) +  (page > 2 ? page-1 : "") + 
                                 fileName.substring(index);
                         model.put("previousFileName", previous);
                     } else {
