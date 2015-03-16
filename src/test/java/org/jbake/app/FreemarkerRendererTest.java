@@ -82,7 +82,7 @@ public class FreemarkerRendererTest {
             }
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
+        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
     }
 
     @After
