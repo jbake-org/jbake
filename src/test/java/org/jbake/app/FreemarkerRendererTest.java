@@ -81,10 +81,8 @@ public class FreemarkerRendererTest {
                 config.setProperty(key, old.substring(0, old.length()-4)+".ftl");
             }
         }
-        config.setProperty(Keys.PAGINATE_INDEX, true);
-        config.setProperty(Keys.POSTS_PER_PAGE, 1);
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
+        db = DBUtil.createDB("memory", "documents"+System.currentTimeMillis());
     }
 
     @After
