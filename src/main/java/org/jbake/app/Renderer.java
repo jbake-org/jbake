@@ -137,9 +137,13 @@ public class Renderer {
                     db.setStart(start);
                     int index = fileName.lastIndexOf(".");
                     if (page != 1) {
-                        String previous = fileName.substring(0, index) + (page-1) +
-                            fileName.substring(index);
+                        int prevPage = page - 1;
+                        String previous = fileName.substring(0, index) + 
+                                (prevPage != 1 ? page-1 : "") +
+                                fileName.substring(index);
                         model.put("previousFileName", previous);
+                    } else {
+                        model.remove("previousFileName");
                     }
                     
                     // If this iteration won't consume the remaining posts, calculate
@@ -147,6 +151,8 @@ public class Renderer {
                     if ((start + postsPerPage) < totalPosts) {
                         model.put("nextFileName", fileName.substring(0, index) + (page+1) +
                             fileName.substring(index));
+                    } else {
+                        model.remove("nextFileName");
                     }
                     // Add page number to file name
                     fileName = fileName.substring(0, index) + (page > 1 ? page : "") +
