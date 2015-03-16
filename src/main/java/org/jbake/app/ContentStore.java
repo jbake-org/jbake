@@ -51,8 +51,8 @@ public class ContentStore {
     public static final String PUBLISHED_POSTS = "published_posts";
 
     private ODatabaseDocumentTx db;
-    private int start = -1;
-    private int limit = -1;
+    private long start = -1;
+    private long limit = -1;
 
     public ContentStore(final String type, String name) {
         db = new ODatabaseDocumentTx(type + ":" + name);
@@ -67,7 +67,7 @@ public class ContentStore {
         }
     }
 
-    public int getStart() {
+    public long getStart() {
         return start;
     }
 
@@ -75,7 +75,7 @@ public class ContentStore {
         this.start = start;
     }
 
-    public int getLimit() {
+    public long getLimit() {
         return limit;
     }
 
@@ -100,6 +100,7 @@ public class ContentStore {
 
     public void close() {
         db.close();
+        DBUtil.closeDataStore();
     }
 
     public void drop() {
@@ -129,14 +130,18 @@ public class ContentStore {
 
     public List<ODocument> getPublishedContent(String docType) {
         String query = "select * from " + docType + " where status='published'";
-        if ((start > -1) && (limit > -1)) {
+        if ((start >= 0) && (limit > -1)) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
         return query(query + " order by date desc");
     }
 
     public List<ODocument> getAllContent(String docType) {
-        return query("select * from " + docType + " order by date desc");
+        String query = "select * from " + docType;
+        if ((start >= 0) && (limit > -1)) {
+            query += " SKIP " + start + " LIMIT " + limit;
+        }
+        return query(query + " order by date desc");
     }
 
     public List<ODocument> getAllTagsFromPublishedPosts() {

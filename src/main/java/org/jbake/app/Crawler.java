@@ -115,7 +115,7 @@ public class Crawler {
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
-        	fileContents.put("rootpath", getPathToRoot(sourceFile));
+            fileContents.put("rootpath", getPathToRoot(sourceFile));
             fileContents.put("sha1", sha1);
             fileContents.put("rendered", false);
             if (fileContents.get("tags") != null) {

@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Assert;
@@ -80,6 +81,8 @@ public class FreemarkerRendererTest {
                 config.setProperty(key, old.substring(0, old.length()-4)+".ftl");
             }
         }
+        config.setProperty(Keys.PAGINATE_INDEX, true);
+        config.setProperty(Keys.POSTS_PER_PAGE, 1);
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
     }
