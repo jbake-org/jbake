@@ -25,6 +25,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.jbake.app.Oven;
 
 import java.io.File;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.jbake.app.ConfigUtil;
+import org.jbake.app.JBakeException;
 
 /**
  * Runs jbake on a folder
@@ -77,9 +81,16 @@ public class GenerateMojo extends AbstractMojo {
     try {
       // TODO: Smells bad. A lot
       Orient.instance().startup();
+      
+        final CompositeConfiguration config;
+        try {
+            config = ConfigUtil.load(inputDirectory);
+        } catch (final ConfigurationException e) {
+            throw new JBakeException("Configuration error: " + e.getMessage(), e);
+        }
 
       // TODO: At some point, reuse Oven
-      Oven oven = new Oven(inputDirectory, outputDirectory, isClearCache);
+      Oven oven = new Oven(inputDirectory, outputDirectory, config, isClearCache);
 
       oven.setupPaths();
 
