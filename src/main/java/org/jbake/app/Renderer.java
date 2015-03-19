@@ -169,6 +169,7 @@ public class Renderer {
                     break; // TODO: eww
                 }
             }
+            db.resetPagination();
             sb.append("done!");
         } catch (Exception e) {
             sb.append("failed!");
