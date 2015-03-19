@@ -82,6 +82,11 @@ public class ContentStore {
     public void setLimit(int limit) {
         this.limit = limit;
     }
+    
+    public void resetPagination() {
+        this.start = -1;
+        this.limit = -1;
+    }
 
     public final void updateSchema() {
         OSchema schema = db.getMetadata().getSchema();
