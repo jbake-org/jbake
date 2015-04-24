@@ -201,6 +201,13 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <extensions>
             <extension>
                 <groupId>org.kuali.maven.wagons</groupId>
