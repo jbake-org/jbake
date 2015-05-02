@@ -149,17 +149,28 @@
                         </configuration>
                     </execution>
                     <execution>
-						<id>checkout-example-project-jade</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>checkout</goal>
-						</goals>
-						<configuration>
-							<checkoutDirectory>${project.build.directory}/example-project-jade</checkoutDirectory>
-							<!-- TODO: Move this project to jbake repo -->
-							<connectionUrl>scm:git:git://github.com/mariuszs/jbake-example-project-jade.git</connectionUrl>
-						</configuration>
-					</execution>
+                        <id>checkout-example-project-jade</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>${project.build.directory}/example-project-jade</checkoutDirectory>
+                            <!-- TODO: Move this project to jbake repo -->
+                            <connectionUrl>scm:git:git://github.com/mariuszs/jbake-example-project-jade.git</connectionUrl>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>checkout-example-project-groovy-mte</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>${project.build.directory}/example-project-groovy-mte</checkoutDirectory>
+                            <connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-groovy-mte.git</connectionUrl>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -276,6 +287,21 @@
 							<attach>false</attach>
 						</configuration>
 					</execution>
+                    <execution>
+                        <id>zip-example-project-groovy-mte</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>example_project_groovy-mte</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly-example-project-groovy-mte.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
@@ -481,14 +507,14 @@
             <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
-        
+
         <!-- <dependency>
             <groupId>com.mitchellbosecke</groupId>
             <artifactId>pebble</artifactId>
             <version>${pebble.version}</version>
             <optional>true</optional>
         </dependency> -->
-        
+
 		<dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-vfs2</artifactId>
