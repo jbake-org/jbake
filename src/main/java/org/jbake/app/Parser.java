@@ -115,6 +115,9 @@ public class Parser {
         	String[] tags = (String[]) content.get("tags");
             for( int i=0; i<tags.length; i++ ) {
                 tags[i]=tags[i].trim();
+                if (config.getBoolean(Keys.TAG_SANITIZE)) {
+                	tags[i]=tags[i].replace(" ", "-");
+                }
             }
             content.put("tags", tags);
         }

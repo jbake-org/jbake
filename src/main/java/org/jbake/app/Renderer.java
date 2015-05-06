@@ -233,7 +233,6 @@ public class Renderer {
             map.put("rootpath", "../");
             model.put("content", map);
 
-            tag = tag.trim().replace(" ", "-");
             File outputFile = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
             StringBuilder sb = new StringBuilder();
             sb.append("Rendering tags [").append(outputFile).append("]... ");

@@ -153,6 +153,11 @@ public class ConfigUtil {
 		static final String TAG_PATH = "tag.path";
 		
 		/**
+		 * Should the tag value be sanitized?
+		 */
+		static final String TAG_SANITIZE = "tag.sanitize";
+		
+		/**
 		 * Encoding to be used for template files
 		 */
 		static final String TEMPLATE_ENCODING = "template.encoding";
