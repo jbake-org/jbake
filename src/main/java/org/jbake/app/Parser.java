@@ -111,6 +111,16 @@ public class Parser {
             return null;
         }
 
+        if (content.get("tags") != null) {
+        	String[] tags = (String[]) content.get("tags");
+            for( int i=0; i<tags.length; i++ ) {
+                tags[i]=tags[i].trim();
+            }
+            content.put("tags", tags);
+        }
+        
+        // TODO: post parsing plugins to hook in here?
+        
         return content;
     }
 
@@ -172,6 +182,7 @@ public class Parser {
             if (line.equals("~~~~~~")) {
                 break;
             } else {
+            	// following doesn't allow = to be used in title!
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
                     if (parts[0].equalsIgnoreCase("date")) {
@@ -185,8 +196,6 @@ public class Parser {
                         }
                     } else if (parts[0].equalsIgnoreCase("tags")) {
                         String[] tags = parts[1].split(",");
-                        for( int i=0; i<tags.length; i++ )
-                            tags[i]=tags[i].trim();
                         content.put(parts[0], tags);
                     } else if (parts[1].startsWith("{") && parts[1].endsWith("}")) {
                         // Json type
