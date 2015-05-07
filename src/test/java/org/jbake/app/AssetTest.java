@@ -16,31 +16,31 @@ import org.junit.rules.TemporaryFolder;
 public class AssetTest {
 
 	private CompositeConfiguration config;
-	
+
 	@Before
     public void setup() throws Exception, IOException, URISyntaxException {
 		config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
 	}
-	
+
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
-	
+
 	@Test
 	public void copy() throws Exception {
 		URL assetsUrl = this.getClass().getResource("/assets");
 		File assets = new File(assetsUrl.getFile());
 		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
 		asset.copy(assets);
-		
+
 		File cssFile = new File(folder.getRoot().getPath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
-		Assert.assertTrue(cssFile.exists());
+		Assert.assertTrue("File " + cssFile.getAbsolutePath() + " does not exist", cssFile.exists());
 		File imgFile = new File(folder.getRoot().getPath() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
-		Assert.assertTrue(imgFile.exists());
+		Assert.assertTrue("File " + imgFile.getAbsolutePath() + " does not exist", imgFile.exists());
 		File jsFile = new File(folder.getRoot().getPath() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
-		Assert.assertTrue(jsFile.exists());
+		Assert.assertTrue("File " + jsFile.getAbsolutePath() + " does not exist", jsFile.exists());
 	}
-	
+
 	@Test
 	public void copyCustomFolder() throws Exception {
 		config.setProperty(ConfigUtil.Keys.ASSET_FOLDER, "media");
@@ -48,8 +48,8 @@ public class AssetTest {
 		File assets = new File(assetsUrl.getFile());
 		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
 		asset.copy(assets);
-		
+
 		File favFile = new File(folder.getRoot().getPath() + File.separatorChar + "favicon.ico");
-		Assert.assertTrue(favFile.exists());
+		Assert.assertTrue("File " + favFile.getAbsolutePath() + " does not exist", favFile.exists());
 	}
 }
