@@ -32,7 +32,7 @@ public class ParserTest {
 	private File invalidAsciiDocFileWithoutHeader;
 	private File validAsciiDocFileWithHeaderInContent;
 	
-	private String validHeader = "title=This is a Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
+	private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 
   
@@ -120,6 +120,7 @@ public class ParserTest {
 		Assert.assertNotNull(map);
 		Assert.assertEquals("draft", map.get("status"));
 		Assert.assertEquals("post", map.get("type"));
+		Assert.assertEquals("This is a Title = This is a valid Title", map.get("title"));
 		Assert.assertNotNull(map.get("date"));
 		Calendar cal = Calendar.getInstance();
 		cal.setTime((Date) map.get("date"));

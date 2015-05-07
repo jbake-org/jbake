@@ -185,8 +185,7 @@ public class Parser {
             if (line.equals("~~~~~~")) {
                 break;
             } else {
-            	// following doesn't allow = to be used in title!
-                String[] parts = line.split("=");
+                String[] parts = line.split("=",2);
                 if (parts.length == 2) {
                     if (parts[0].equalsIgnoreCase("date")) {
                         DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));
