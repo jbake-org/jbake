@@ -75,7 +75,7 @@ public class Parser {
 
         MarkupEngine engine = Engines.get(FileUtil.fileExt(file));
         if (engine==null) {
-            LOGGER.error("Unable to find suitable markup engine for {}",file);
+            LOGGER.warn("Unable to find suitable markup engine for {}",file);
             return null;
         }
 
@@ -96,7 +96,7 @@ public class Parser {
 
         if (content.get("type")==null||content.get("status")==null) {
             // output error
-            LOGGER.error("Error parsing meta data from header!");
+            LOGGER.warn("Error parsing meta data from header (missing type or status value) for file {}!", file);
             return null;
         }
 
@@ -107,7 +107,7 @@ public class Parser {
         if (engine.validate(context)) {
             engine.processBody(context);
         } else {
-            LOGGER.error("Incomplete source file ({}) for markup engine:", file, engine.getClass().getSimpleName());
+            LOGGER.warn("Incomplete source file ({}) for markup engine:", file, engine.getClass().getSimpleName());
             return null;
         }
 
