@@ -51,7 +51,12 @@ public class ConfigUtil {
 		 * Folder where assets are stored, they are copied directly in output folder and not processed
 		 */
 		static final String ASSET_FOLDER = "asset.folder";
-		
+
+		/**
+		 * Flag indicating if hidden asset resources should be ignored
+		 */
+		static final String ASSET_IGNORE_HIDDEN = "asset.ignore";
+
 		/**
 		 * Timestamp that records when JBake build was made
 		 */

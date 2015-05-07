@@ -52,4 +52,19 @@ public class AssetTest {
 		File favFile = new File(folder.getRoot().getPath() + File.separatorChar + "favicon.ico");
 		Assert.assertTrue("File " + favFile.getAbsolutePath() + " does not exist", favFile.exists());
 	}
+
+	@Test
+	public void copyIgnore() throws Exception {
+		config.setProperty(Keys.ASSET_FOLDER, "ignorables");
+		config.setProperty(Keys.ASSET_IGNORE_HIDDEN, "true");
+		URL assetsUrl = this.getClass().getResource("/ignorables");
+		File assets = new File(assetsUrl.getFile());
+		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
+		asset.copy(assets);
+
+		File testFile = new File(folder.getRoot(), "test.txt");
+		Assert.assertTrue("File " + testFile.getAbsolutePath() + " does not exist", testFile.exists());
+		File testIgnoreFile = new File(folder.getRoot(), ".test.txt");
+		Assert.assertFalse("File " + testIgnoreFile.getAbsolutePath() + " does exist", testIgnoreFile.exists());
+	}
 }
