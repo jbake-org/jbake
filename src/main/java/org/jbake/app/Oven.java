@@ -42,6 +42,13 @@ public class Oven {
 	private List<String> errors = new LinkedList<String>();
 	private int renderedCount = 0;
 
+    /**
+     * Delegate c'tor to prevent API break for the moment.
+     */
+    public Oven(final File source, final File destination, final boolean isClearCache) throws Exception {
+        this(source, destination, ConfigUtil.load(source), isClearCache);
+    }
+
 	/**
 	 * Creates a new instance of the Oven with references to the source and destination folders.
 	 *
