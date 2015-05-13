@@ -12,6 +12,7 @@ import org.jbake.model.DocumentTypes;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.VariablesMap;
+import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
@@ -59,6 +60,12 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         templateResolver.setCharacterEncoding(config.getString(Keys.TEMPLATE_ENCODING));
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
+        try {
+            IDialect condCommentDialect = (IDialect) Class.forName("org.thymeleaf.extras.conditionalcomments.dialect.ConditionalCommentsDialect").newInstance();
+            templateEngine.addDialect(condCommentDialect);
+        } catch (Exception e) {
+            // Sad, but true and not a real problem
+        }
     }
 
     @Override
