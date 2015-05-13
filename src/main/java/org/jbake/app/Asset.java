@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,10 +27,11 @@ public class Asset {
 	private File destination;
 	private CompositeConfiguration config;
 	private final List<String> errors = new LinkedList<String>();
+	private final boolean ignoreHidden;
 
 	/**
 	 * Creates an instance of Asset.
-	 * 
+	 *
 	 * @param source
 	 * @param destination
 	 */
@@ -37,15 +39,21 @@ public class Asset {
 		this.source = source;
 		this.config = config;
 		this.destination = destination;
+		ignoreHidden = config.getBoolean(ConfigUtil.Keys.ASSET_IGNORE_HIDDEN, false);
 	}
-	
+
 	/**
-	 * Copy all files from supplied path. 
-	 * 
+	 * Copy all files from supplied path.
+	 *
 	 * @param path	The starting path
 	 */
 	public void copy(File path) {
-		File[] assets = path.listFiles();
+		File[] assets = path.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return !ignoreHidden || !file.isHidden();
+			}
+		});
 		if (assets != null) {
 			Arrays.sort(assets);
 			for (int i = 0; i < assets.length; i++) {
@@ -64,8 +72,8 @@ public class Asset {
 						e.printStackTrace();
 						errors.add(e.getMessage());
 					}
-				} 
-				
+				}
+
 				if (assets[i].isDirectory()) {
 					copy(assets[i]);
 				}
