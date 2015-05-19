@@ -163,14 +163,6 @@ public class Crawler {
         return (int) db.countClass(docType);
     }
 
-    public int getPostCount() {
-        return getDocumentCount("post");
-    }
-
-    public int getPageCount() {
-        return getDocumentCount("page");
-    }
-
     public Set<String> getTags() {
         List<ODocument> query = db.getAllTagsFromPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
         Set<String> result = new HashSet<String>();

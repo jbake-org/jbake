@@ -19,6 +19,7 @@ import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * All the baking happens in the Oven!
@@ -60,6 +61,8 @@ public class Oven {
 		this.destination = destination;
 		this.config = config;
 		this.isClearCache = isClearCache;
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
 	}
 
     public CompositeConfiguration getConfig() {
@@ -127,7 +130,7 @@ public class Oven {
 	 * @throws JBakeException
 	 */
 	public void bake() {
-            final ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+			final ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
             updateDocTypesFromConfiguration();
             DBUtil.updateSchema(db);
             try {
@@ -137,10 +140,15 @@ public class Oven {
 
                 // process source content
                 Crawler crawler = new Crawler(db, source, config);
-                crawler.crawl(contentsPath);
-                LOGGER.info("Pages : {}", crawler.getPageCount());
-                LOGGER.info("Posts : {}", crawler.getPostCount());
-
+                crawler.crawl(contentsPath);                
+                LOGGER.info("Content detected:");
+                for (String docType : DocumentTypes.getDocumentTypes()) {
+                	int count = crawler.getDocumentCount(docType);
+                	if (count > 0) {
+                		LOGGER.info("Parsed {} files of type: {}", count, docType);
+            		}
+                }
+                
                 Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
                 for (String docType : DocumentTypes.getDocumentTypes()) {

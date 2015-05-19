@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class DocumentTypes {
 
-    private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<String>(Arrays.asList("page", "post", "index", "archive", "feed"));
+    private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<String>(Arrays.asList("page", "post", "masterindex", "archive", "feed"));
 
     public static void addDocumentType(String docType) {
         DEFAULT_DOC_TYPES.add(docType);

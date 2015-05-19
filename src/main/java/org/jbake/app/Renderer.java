@@ -118,11 +118,11 @@ public class Renderer {
         sb.append("Rendering index [").append(outputFile).append("]...");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
-        model.put("content", buildSimpleModel("index"));
+        model.put("content", buildSimpleModel("masterindex"));
 
         try {
             Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("index"), out);
+            renderingEngine.renderDocument(model, findTemplateName("masterindex"), out);
             out.close();
             sb.append("done!");
             LOGGER.info(sb.toString());

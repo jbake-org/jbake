@@ -50,8 +50,8 @@ public class CrawlerTest {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(2, crawler.getPostCount());
-        Assert.assertEquals(3, crawler.getPageCount());
+        Assert.assertEquals(2, crawler.getDocumentCount("post"));
+        Assert.assertEquals(3, crawler.getDocumentCount("page"));
         
         List<ODocument> results = db.getPublishedPosts();
 //                query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
