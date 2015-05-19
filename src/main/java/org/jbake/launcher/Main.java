@@ -14,6 +14,7 @@ import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Launcher for JBake.
@@ -33,6 +34,8 @@ public class Main {
 	 */
 	public static void main(final String[] args) {
 		try {
+			installLegacyLoggingBridge();
+
 			new Main().run(args);
 		} catch (final JBakeException e) {
 			System.err.println(e.getMessage());
@@ -42,6 +45,11 @@ public class Main {
 			System.err.println("An unexpected error occurred: " + e.getMessage());
 			System.exit(2);
 		}
+	}
+
+	private static void installLegacyLoggingBridge() {
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
 	}
 
 	private void bake(final LaunchOptions options, final CompositeConfiguration config) {
