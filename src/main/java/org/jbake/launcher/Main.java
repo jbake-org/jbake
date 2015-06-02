@@ -7,6 +7,11 @@ import java.util.List;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.impl.DefaultFileMonitor;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
@@ -91,6 +96,7 @@ public class Main {
 		}
 		
 		if (res.isRunServer()) {
+			startWatch(res, config);
 			if (res.getSource().getPath().equals(".")) {
 				// use the default destination folder
 				runServer(config.getString(Keys.DESTINATION_FOLDER), config.getString(Keys.SERVER_PORT));
@@ -146,5 +152,21 @@ public class Main {
 			final String msg = "Failed to initialise structure: " + e.getMessage();
 			throw new JBakeException(msg, e);
 		}
+	}
+	
+	private void startWatch(final LaunchOptions res, CompositeConfiguration config) {
+		try {
+			FileSystemManager fsMan = VFS.getManager();
+			FileObject listenPath = fsMan.resolveFile(new File(res.getSource(), config.getString(Keys.CONTENT_FOLDER)).getPath());
+			
+			DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(res, config));
+			monitor.setRecursive(true);
+			monitor.addFile(listenPath);
+			monitor.start();
+		} catch (FileSystemException e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 }

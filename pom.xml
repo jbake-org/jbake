@@ -67,6 +67,7 @@
 		<asciidoctorj.version>1.5.2</asciidoctorj.version>
 		<commons.io.version>2.4</commons.io.version>
 		<commons.configuration.version>1.9</commons.configuration.version>
+		<commons.vfs2.version>2.0</commons.vfs2.version>
 		<args4j.version>2.0.26</args4j.version>
 		<freemarker.version>2.3.20</freemarker.version>
 		<junit.version>4.11</junit.version>
@@ -411,5 +412,12 @@
             <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
+        
+        <dependency>
+    		<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-vfs2</artifactId>
+    		<version>${commons.vfs2.version}</version>
+    		<optional>true</optional>
+		</dependency>
 	</dependencies>
 </project>

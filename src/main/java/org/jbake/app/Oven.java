@@ -224,7 +224,7 @@ public class Oven {
                 }
         } finally {
                 db.close();
-                Orient.instance().shutdown();
+//                Orient.instance().shutdown();
         }
     }
 
