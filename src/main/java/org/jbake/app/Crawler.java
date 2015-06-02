@@ -124,6 +124,7 @@ public class Crawler {
                 fileContents.put("tags", tags);
             }
             fileContents.put("file", sourceFile.getPath());
+            fileContents.put("sourceuri", uri);
             fileContents.put("uri", uri.substring(0, uri.lastIndexOf(".")) + FileUtil.findExtension(config, fileContents.get("type").toString()));
 
             String documentType = (String) fileContents.get("type");
