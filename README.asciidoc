@@ -65,7 +65,7 @@ Talk to other users of JBake on the forum:
 * http://pegdown.org/[Pegdown]
 * http://www.eclipse.org/jetty/[Jetty Server]
 * http://www.orientdb.org/[OrientDB]
-* http://groovy.codehaus.org/[Groovy]
+* http://groovy-lang.org/[Groovy]
 
 == Copyright & License
 
