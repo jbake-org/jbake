@@ -1,7 +1,5 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.template.DelegatingTemplateEngine;
@@ -13,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,15 +28,17 @@ public class Renderer {
 
     // TODO: should all content be made available to all templates via this class??
 
-    private File destination;
-    private CompositeConfiguration config;
+    private final File destination;
+    private final CompositeConfiguration config;
     private final DelegatingTemplateEngine renderingEngine;
 
     /**
      * Creates a new instance of Renderer with supplied references to folders.
      *
+     * @param db            The database holding the content
      * @param destination   The destination folder
      * @param templatesPath The templates folder
+     * @param config        
      */
     public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
         this.destination = destination;
@@ -112,20 +111,66 @@ public class Renderer {
      * @param indexFile The name of the output file
      * @throws Exception 
      */
-    public void renderIndex(String indexFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + indexFile);
+    public void renderIndex(final String indexFile) throws Exception {
         StringBuilder sb = new StringBuilder();
-        sb.append("Rendering index [").append(outputFile).append("]...");
+        sb.append("Rendering index ");
+
+        ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+        long totalPosts = db.countClass("post");
+        boolean paginate = config.getBoolean(Keys.PAGINATE_INDEX, false);
+        int postsPerPage = config.getInt(Keys.POSTS_PER_PAGE, -1);
+        int start = 0;
+
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("renderer", renderingEngine);
         model.put("content", buildSimpleModel("masterindex"));
+        if (paginate) {
+            db.setLimit(postsPerPage);
+        }
 
         try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("masterindex"), out);
-            out.close();
+            int page = 1;
+            while (start < totalPosts) {
+                String fileName = indexFile;
+
+                if (paginate) {
+                    db.setStart(start);
+                    int index = fileName.lastIndexOf(".");
+                    if (page != 1) {
+                        String previous = fileName.substring(0, index) +  (page > 2 ? page-1 : "") + 
+                                fileName.substring(index);
+                        model.put("previousFileName", previous);
+                    } else {
+                        model.remove("previousFileName");
+                    }
+                    
+                    // If this iteration won't consume the remaining posts, calculate
+                    // the next file name
+                    if ((start + postsPerPage) < totalPosts) {
+                        model.put("nextFileName", fileName.substring(0, index) + (page+1) +
+                            fileName.substring(index));
+                    } else {
+                        model.remove("nextFileName");
+                    }
+                    // Add page number to file name
+                    fileName = fileName.substring(0, index) + (page > 1 ? page : "") +
+                            fileName.substring(index);
+                }
+                sb.append("[").append(fileName).append("]...");
+                Writer out = createWriter(new File(destination.getPath() + File.separator + fileName));
+                renderingEngine.renderDocument(model, findTemplateName("masterindex"), out);
+                out.close();
+                
+                if (paginate) {
+                    start += postsPerPage;
+                    page++;
+                } else {
+                    break; // TODO: eww
+                }
+            }
             sb.append("done!");
             LOGGER.info(sb.toString());
+            db.resetPagination();
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);

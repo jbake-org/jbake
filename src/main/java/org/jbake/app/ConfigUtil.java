@@ -181,6 +181,9 @@ public class ConfigUtil {
 		 * Version of JBake
 		 */
 		static final String VERSION = "version";
+                
+                static final String PAGINATE_INDEX = "index.paginate";
+                static final String POSTS_PER_PAGE = "index.posts_per_page";
 		
 	}
 

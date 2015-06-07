@@ -1,27 +1,51 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2015 jdlee.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.jbake.app;
 
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.model.DocumentTypes;
-import org.junit.After;
-
 import java.io.File;
-
-import static org.assertj.core.api.Assertions.*;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.model.DocumentTypes;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class RendererTest {
+/**
+ *
+ * @author jdlee
+ */
+public class FreemarkerRendererTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -43,13 +67,23 @@ public class RendererTest {
 
         destinationFolder = folder.getRoot();
 
-        templateFolder = new File(sourceFolder, "templates");
+        templateFolder = new File(sourceFolder, "freemarkerTemplates");
         if (!templateFolder.exists()) {
             throw new Exception("Cannot find template folder!");
         }
 
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
-        Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
+        Iterator<String> keys = config.getKeys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            if (key.startsWith("template") && key.endsWith(".file")) {
+                String old = (String)config.getProperty(key);
+                config.setProperty(key, old.substring(0, old.length()-4)+".ftl");
+            }
+        }
+        config.setProperty(Keys.PAGINATE_INDEX, true);
+        config.setProperty(Keys.POSTS_PER_PAGE, 1);
+        Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
     }
 
@@ -61,35 +95,33 @@ public class RendererTest {
 
     @Test
     public void renderPost() throws Exception {
-    	Crawler crawler = new Crawler(db, sourceFolder, config);
-    	crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+    	// setup
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Parser parser = new Parser(config, sourceFolder.getPath());
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        String filename = "second-post.html";
 
-        File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "blog" + File.separator + "2013" + File.separator + "second-post.html");
+        File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "blog" + File.separator + "2013" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/second-post.html");
+        content.put("uri", "/" + filename);
         renderer.render(content);
-        File outputFile = new File(destinationFolder, "second-post.html");
+        File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
         
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<h2>Second Post</h2>")
-        	.contains("<p class=\"post-date\">28")
-        	.contains("2013</p>")
-        	.contains("Lorem ipsum dolor sit amet")
-        	.contains("<h5>Published Posts</h5>")
-        	.contains("blog/2012/first-post.html")
-        	.contains("<meta property=\"og:description\" content=\"Something\"/>");
+        	.contains("<h1>Second Post</h1>")
+        	.contains("<p><em>28 February 2013</em></p>")
+        	.contains("Lorem ipsum dolor sit amet");
     }
     
     @Test
     public void renderPage() throws Exception {
     	// setup
-    	Crawler crawler = new Crawler(db, sourceFolder, config);
-    	crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Parser parser = new Parser(config, sourceFolder.getPath());
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         String filename = "about.html";
@@ -104,10 +136,8 @@ public class RendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<h4>About</h4>")
-        	.contains("All about stuff!")
-        	.contains("<h5>Published Pages</h5>")
-        	.contains("/projects.html");
+	        .contains("<title>About</title>")
+	    	.contains("All about stuff!");
     }
 
     @Test
@@ -122,12 +152,19 @@ public class RendererTest {
         //validate
         File outputFile = new File(destinationFolder, "index.html");
         Assert.assertTrue(outputFile.exists());
+        File outputFile2 = new File(destinationFolder, "index2.html");
+        Assert.assertTrue(outputFile2.exists());
         
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>")
-        	.contains("<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>");
+//        	.contains("<a href=\"blog/2012/first-post.html\">")
+        	.contains("<a href=\"blog/2013/second-post.html\">");
+        
+        String output2 = FileUtils.readFileToString(outputFile2);
+        assertThat(output2) 
+        	.contains("<a href=\"blog/2012/first-post.html\">");
+//        	.contains("<a href=\"blog/2013/second-post.html\">");
     }
 
     @Test
@@ -155,12 +192,12 @@ public class RendererTest {
         renderer.renderArchive("archive.html");
         File outputFile = new File(destinationFolder, "archive.html");
         Assert.assertTrue(outputFile.exists());
-
+        
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a></h4>")
-        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a></h4>");
+        	.contains("<a href=\"blog/2013/second-post.html\">")
+        	.contains("<a href=\"blog/2012/first-post.html\">");
     }
 
     @Test
@@ -175,10 +212,10 @@ public class RendererTest {
         Assert.assertTrue(outputFile.exists());
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a></h4>")
-        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a></h4>");
+        	.contains("<a href=\"blog/2013/second-post.html\">")
+        	.contains("<a href=\"blog/2012/first-post.html\">");
     }
-    
+
     @Test
     public void renderSitemap() throws Exception {
     	DocumentTypes.addDocumentType("paper");
@@ -200,29 +237,4 @@ public class RendererTest {
         	.doesNotContain("draft-paper.html");
     }
     
-    @Test
-    public void renderAllContent() throws Exception {
-    	DocumentTypes.addDocumentType("paper");
-    	DBUtil.updateSchema(db);
-    	
-    	Crawler crawler = new Crawler(db, sourceFolder, config);
-    	crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Parser parser = new Parser(config, sourceFolder.getPath());
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
-
-        File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "allcontent.html");
-        Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/allcontent.html");
-        renderer.render(content);
-        File outputFile = new File(destinationFolder, "allcontent.html");
-        Assert.assertTrue(outputFile.exists());
-        
-        // verify
-        String output = FileUtils.readFileToString(outputFile);
-        assertThat(output) 
-        	.contains("blog/2013/second-post.html")
-        	.contains("blog/2012/first-post.html")
-        	.contains("papers/published-paper.html")
-        	.contains("draft-paper.html");
-    }
 }

@@ -1,8 +1,6 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import groovy.lang.GString;
 import groovy.lang.Writable;
@@ -22,13 +20,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,15 +84,15 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     if ("db".equals(key)) {
                         return db;
                     }
-                    if ("published_posts".equals(key)) {
+                    if (ContentStore.PUBLISHED_POSTS.equals(key)) {
                         List<ODocument> query = db.getPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("published_pages".equals(key)) {
+                    if (ContentStore.PUBLISHED_PAGES.equals(key)) {
                         List<ODocument> query = db.getPublishedPages(); //query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("published_content".equals(key)) {
+                    if (ContentStore.PUBLISHED_CONTENT.equals(key)) {
                     	List<ODocument> publishedContent = new ArrayList<ODocument>();
                     	String[] documentTypes = DocumentTypes.getDocumentTypes();
                     	for (String docType : documentTypes) {
@@ -106,7 +101,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     	}
                     	return DocumentList.wrap(publishedContent.iterator());
                     }
-                    if ("all_content".equals(key)) {
+                    if (ContentStore.ALL_CONTENT.equals(key)) {
                     	List<ODocument> allContent = new ArrayList<ODocument>();
                     	String[] documentTypes = DocumentTypes.getDocumentTypes();
                     	for (String docType : documentTypes) {
@@ -115,7 +110,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     	}
                     	return DocumentList.wrap(allContent.iterator());
                     }
-                    if ("alltags".equals(key)) {
+                    if (ContentStore.ALLTAGS.equals(key)) {
                         List<ODocument> query = db.getAllTagsFromPublishedPosts();
                         Set<String> result = new HashSet<String>();
                         for (ODocument document : query) {
@@ -130,13 +125,13 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                             return DocumentList.wrap(db.getAllContent(docType).iterator());
                         }
                     }
-                    if ("tag_posts".equals(key)) {
+                    if (ContentStore.TAG_POSTS.equals(key)) {
                         String tag = model.get("tag").toString();
                         // fetch the tag posts from db
                         List<ODocument> query = db.getPublishedPostsByTag(tag);
                         return DocumentList.wrap(query.iterator());
                     }
-                    if ("published_date".equals(key)) {
+                    if (ContentStore.PUBLISHED_DATE.equals(key)) {
                         return new Date();
                     }
                 }

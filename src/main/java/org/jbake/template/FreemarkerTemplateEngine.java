@@ -1,7 +1,6 @@
 package org.jbake.template;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -32,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jbake.app.ContentStore;
 
 /**
@@ -85,15 +86,15 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
-            if ("published_posts".equals(key)) {
+            if (ContentStore.PUBLISHED_POSTS.equals(key)) {
                 List<ODocument> query = db.getPublishedPosts();
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("published_pages".equals(key)) {
+            if (ContentStore.PUBLISHED_PAGES.equals(key)) {
                 List<ODocument> query = db.getPublishedPages();
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("published_content".equals(key)) {
+            if (ContentStore.PUBLISHED_CONTENT.equals(key)) {
             	List<ODocument> publishedContent = new ArrayList<ODocument>();
             	String[] documentTypes = DocumentTypes.getDocumentTypes();
             	for (String docType : documentTypes) {
@@ -102,7 +103,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             	}
             	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
             }
-            if ("all_content".equals(key)) {
+            if (ContentStore.ALL_CONTENT.equals(key)) {
             	List<ODocument> allContent = new ArrayList<ODocument>();
             	String[] documentTypes = DocumentTypes.getDocumentTypes();
             	for (String docType : documentTypes) {
@@ -111,7 +112,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             	}
             	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
             }
-            if ("alltags".equals(key)) {
+            if (ContentStore.ALLTAGS.equals(key)) {
                 List<ODocument> query = db.getAllTagsFromPublishedPosts();
                 Set<String> result = new HashSet<String>();
                 for (ODocument document : query) {
@@ -126,13 +127,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                     return new SimpleSequence(DocumentList.wrap(db.getAllContent(docType).iterator()));
                 }
             }
-            if ("tag_posts".equals(key)) {
+            if (ContentStore.TAG_POSTS.equals(key)) {
                 String tag = eagerModel.get("tag").toString();
                 // fetch the tag posts from db
                 List<ODocument> query = db.getPublishedPostsByTag(tag);
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
-            if ("published_date".equals(key)) {
+            if (ContentStore.PUBLISHED_DATE.equals(key)) {
                 return new SimpleDate(new Date(), TemplateDateModel.UNKNOWN);
             }
             return eagerModel.get(key);

@@ -42,7 +42,17 @@ import org.jbake.model.DocumentTypes;
  * @author jdlee
  */
 public class ContentStore {
+    public static final String PUBLISHED_DATE = "published_date";
+    public static final String TAG_POSTS = "tag_posts";
+    public static final String ALLTAGS = "alltags";
+    public static final String ALL_CONTENT = "all_content";
+    public static final String PUBLISHED_CONTENT = "published_content";
+    public static final String PUBLISHED_PAGES = "published_pages";
+    public static final String PUBLISHED_POSTS = "published_posts";
+
     private ODatabaseDocumentTx db;
+    private long start = -1;
+    private long limit = -1;
 
     public ContentStore(final String type, String name) {
         db = new ODatabaseDocumentTx(type + ":" + name);
@@ -55,6 +65,27 @@ public class ContentStore {
         if (!exists) {
             updateSchema();
         }
+    }
+
+    public long getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public long getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+    
+    public void resetPagination() {
+        this.start = -1;
+        this.limit = -1;
     }
 
     public final void updateSchema() {
@@ -74,6 +105,7 @@ public class ContentStore {
 
     public void close() {
         db.close();
+        DBUtil.closeDataStore();
     }
 
     public void drop() {
@@ -102,11 +134,19 @@ public class ContentStore {
     }
 
     public List<ODocument> getPublishedContent(String docType) {
-        return query("select * from " + docType + " where status='published' order by date desc");
+        String query = "select * from " + docType + " where status='published'";
+        if ((start >= 0) && (limit > -1)) {
+            query += " SKIP " + start + " LIMIT " + limit;
+        }
+        return query(query + " order by date desc");
     }
 
     public List<ODocument> getAllContent(String docType) {
-        return query("select * from " + docType + " order by date desc");
+        String query = "select * from " + docType;
+        if ((start >= 0) && (limit > -1)) {
+            query += " SKIP " + start + " LIMIT " + limit;
+        }
+        return query(query + " order by date desc");
     }
 
     public List<ODocument> getAllTagsFromPublishedPosts() {
