@@ -244,5 +244,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     private List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
+        
     }
 }

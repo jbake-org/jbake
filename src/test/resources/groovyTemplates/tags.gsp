@@ -9,10 +9,23 @@
 	<hr>-->
 
 	<div class="row-fluid marketing">
-		<div class="span12">
+
+        <div class="span12">
+            <h1>Taglist</h1>
+            <div>
+                <% alltags.sort().each { tag -> %>
+
+                    <span>
+                    <a href="tags/${tag.replace(' ', '-')}.html" class="label">${tag}</a>
+                    </span>
+                <%}%>
+            </div>
+        </div>
+
+        <div class="span12">
 			<h2>Tags</h2>
             <%def last_month=null;%>
-			<%posts.each {post ->%>
+			<%tag_posts.each {post ->%>
 				<%if (last_month) {%>
 					<%if (post.date.format("MMMM yyyy") != last_month) {%>
 						<h3>${post.date.format("MMMM yyyy")}</h3>

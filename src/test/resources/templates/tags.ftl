@@ -9,9 +9,22 @@
 	<hr>-->
 
 	<div class="row-fluid marketing">
-		<div class="span12">
+
+        <div class="span12">
+            <h1>Taglist</h1>
+            <#list alltags as tag>
+            <div>
+                <span>
+                    <a href="tags/${tag}.html" class="label">${tag}</a>
+                </span>
+            </div>
+            </#list>
+        </div>
+
+
+        <div class="span12">
 			<h2>Tags</h2>
-			<#list posts as post>
+			<#list tag_posts as post>
 				<#if (last_month)??>
 					<#if post.date?string("MMMM yyyy") != last_month>
 						<h3>${post.date?string("MMMM yyyy")}</h3>

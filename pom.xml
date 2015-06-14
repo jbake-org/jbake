@@ -1,79 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
 	<groupId>org.jbake</groupId>
 	<artifactId>jbake-core</artifactId>
 	<version>2.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>jbake</name>
-	<description>JBake is a Java based open source static site/blog generator for developers.</description>
-	<url>http://jbake.org</url>
-	<developers>
-		<developer>
-			<id>jonbullock</id>
-			<name>Jonathan Bullock</name>
-			<email>jonbullock@gmail.com</email>
-			<url>http://jonathanbullock.com</url>
-			<timezone>0</timezone>
-		</developer>
-	</developers>
+    <name>jbake</name>
+    <description>JBake is a Java based open source static site/blog generator for developers.</description>
+    <url>http://jbake.org</url>
+    <developers>
+        <developer>
+            <id>jonbullock</id>
+            <name>Jonathan Bullock</name>
+            <email>jonbullock@gmail.com</email>
+            <url>http://jonathanbullock.com</url>
+            <timezone>0</timezone>
+        </developer>
+    </developers>
 
-	<scm>
-		<url>https://github.com/jbake-org/jbake/</url>
-		<connection>scm:git:git@github.com:jbake-org/jbake.git</connection>
-		<developerConnection>scm:git:https://github.com/jbake-org/jbake.git</developerConnection>
-	</scm>
-	
-	<issueManagement>
-		<system>GitHub Issues</system>
-		<url>https://github.com/jbake-org/jbake/issues</url>
-	</issueManagement>
+    <scm>
+        <url>https://github.com/jbake-org/jbake/</url>
+        <connection>scm:git:git@github.com:jbake-org/jbake.git</connection>
+        <developerConnection>scm:git:https://github.com/jbake-org/jbake.git</developerConnection>
+    </scm>
 
-	<mailingLists>
-		<mailingList>
-			<name>jbake-dev</name>
-			<subscribe>jbake-dev@googlegroups.com</subscribe>
-			<unsubscribe>jbake-dev+unsubscribe@googlegroups.com</unsubscribe>
-			<archive>http://groups.google.com/group/jbake-dev</archive>
-		</mailingList>
-		<mailingList>
-			<name>jbake-user</name>
-			<subscribe>jbake-user@googlegroups.com</subscribe>
-			<unsubscribe>jbake-user+unsubscribe@googlegroups.com</unsubscribe>
-			<archive>http://groups.google.com/group/jbake-user</archive>
-		</mailingList>
-	</mailingLists>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/jbake-org/jbake/issues</url>
+    </issueManagement>
 
-	<licenses>
-		<license>
-			<name>The MIT License (MIT)</name>
-			<url>http://opensource.org/licenses/MIT</url>
-		</license>
-	</licenses>
+    <mailingLists>
+        <mailingList>
+            <name>jbake-dev</name>
+            <subscribe>jbake-dev@googlegroups.com</subscribe>
+            <unsubscribe>jbake-dev+unsubscribe@googlegroups.com</unsubscribe>
+            <archive>http://groups.google.com/group/jbake-dev</archive>
+        </mailingList>
+        <mailingList>
+            <name>jbake-user</name>
+            <subscribe>jbake-user@googlegroups.com</subscribe>
+            <unsubscribe>jbake-user+unsubscribe@googlegroups.com</unsubscribe>
+            <archive>http://groups.google.com/group/jbake-user</archive>
+        </mailingList>
+    </mailingLists>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<timestamp>${maven.build.timestamp}</timestamp>
-		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssa</maven.build.timestamp.format>
-		
-		<asciidoctorj.version>1.5.2</asciidoctorj.version>
-		<commons.io.version>2.4</commons.io.version>
-		<commons.configuration.version>1.9</commons.configuration.version>
-		<args4j.version>2.0.26</args4j.version>
-		<freemarker.version>2.3.20</freemarker.version>
-		<junit.version>4.11</junit.version>
-		<pegdown.version>1.4.2</pegdown.version>
-		<jetty.version>8.1.12.v20130726</jetty.version>
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssa</maven.build.timestamp.format>
+
+        <asciidoctorj.version>1.5.2</asciidoctorj.version>
+        <commons.io.version>2.4</commons.io.version>
+        <commons.configuration.version>1.9</commons.configuration.version>
+        <args4j.version>2.0.26</args4j.version>
+        <freemarker.version>2.3.20</freemarker.version>
+        <junit.version>4.11</junit.version>
+        <spock.version>1.0-groovy-2.4</spock.version>
+        <pegdown.version>1.4.2</pegdown.version>
+        <jetty.version>8.1.12.v20130726</jetty.version>
         <orientdb.version>1.6.4</orientdb.version>
-        <groovy.version>2.3.6</groovy.version>
+        <groovy.version>2.4.1</groovy.version>
         <slf4j.version>1.7.6</slf4j.version>
         <logback.version>1.1.1</logback.version>
         <assertj.version>1.7.0</assertj.version>
@@ -82,239 +84,271 @@
         <json-simple.version>1.1.1</json-simple.version>
     </properties>
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<id>checkout-example-project-freemarker</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>checkout</goal>
-						</goals>
-						<configuration>
-							<checkoutDirectory>${project.build.directory}/example-project-freemarker</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-freemarker.git</connectionUrl>
-						</configuration>
-					</execution>
-					<execution>
-						<id>checkout-example-project-groovy</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>checkout</goal>
-						</goals>
-						<configuration>
-							<checkoutDirectory>${project.build.directory}/example-project-groovy</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-groovy.git</connectionUrl>
-						</configuration>
-					</execution>
-					<execution>
-						<id>checkout-example-project-thymeleaf</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>checkout</goal>
-						</goals>
-						<configuration>
-							<checkoutDirectory>${project.build.directory}/example-project-thymeleaf</checkoutDirectory>
-							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-thymeleaf.git</connectionUrl>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>org.jbake.launcher.Main</mainClass>
-							<packageName>org.jbake.launcher</packageName>
-						</manifest>
-						<manifestEntries>
-                        	<Class-Path>lib/</Class-Path>
-                    	</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>dist</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<excludeScope>test</excludeScope>
-							<includeScope>compile</includeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>zip-example-project-freemarker</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<finalName>example_project_freemarker</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-example-project-freemarker.xml</descriptor>
-							</descriptors>
-							<attach>false</attach>
-						</configuration>
-					</execution>
-					<execution>
-						<id>zip-example-project-groovy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<finalName>example_project_groovy</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-example-project-groovy.xml</descriptor>
-							</descriptors>
-							<attach>false</attach>
-						</configuration>
-					</execution>
-					<execution>
-						<id>zip-example-project-thymeleaf</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<finalName>example_project_thymeleaf</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly-example-project-thymeleaf.xml</descriptor>
-							</descriptors>
-							<attach>false</attach>
-						</configuration>
-					</execution>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>dist</outputDirectory>
-							<finalName>jbake-${project.version}</finalName>
-							<descriptors>
-								<descriptor>src/main/assembly/assembly.xml</descriptor>
-							</descriptors>
-							<attach>false</attach>
-						</configuration>
-					</execution>
-				</executions>
-        	</plugin>
-        	<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.2.201409121644</version>
-				<executions>
-					<execution>
-						<id>prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eluder.coveralls</groupId>
-				<artifactId>coveralls-maven-plugin</artifactId>
-				<version>2.0.1</version>
-				<configuration>
-					<!-- <repoToken>yourcoverallsprojectrepositorytoken</repoToken> -->
-					<!-- <timestamp>yyyy-MM-dd HH:mm:ssa</timestamp> -->
-				</configuration>
-			</plugin>
-		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons.io.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>${commons.configuration.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>${json-simple.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>args4j</groupId>
-			<artifactId>args4j</artifactId>
-			<version>${args4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>${freemarker.version}</version>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>checkout-example-project-freemarker</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>${project.build.directory}/example-project-freemarker</checkoutDirectory>
+                            <connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-freemarker.git
+                            </connectionUrl>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>checkout-example-project-groovy</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>${project.build.directory}/example-project-groovy</checkoutDirectory>
+                            <connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-groovy.git
+                            </connectionUrl>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>checkout-example-project-thymeleaf</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>${project.build.directory}/example-project-thymeleaf</checkoutDirectory>
+                            <connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-thymeleaf.git
+                            </connectionUrl>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>org.jbake.launcher.Main</mainClass>
+                            <packageName>org.jbake.launcher</packageName>
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>lib/</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>dist</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <excludeScope>test</excludeScope>
+                            <includeScope>compile</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>zip-example-project-freemarker</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>example_project_freemarker</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly-example-project-freemarker.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>zip-example-project-groovy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>example_project_groovy</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly-example-project-groovy.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>zip-example-project-thymeleaf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>example_project_thymeleaf</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly-example-project-thymeleaf.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>dist</outputDirectory>
+                            <finalName>jbake-${project.version}</finalName>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.2.201409121644</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>2.0.1</version>
+                <configuration>
+                    <!-- <repoToken>yourcoverallsprojectrepositorytoken</repoToken> -->
+                    <!-- <timestamp>yyyy-MM-dd HH:mm:ssa</timestamp> -->
+                </configuration>
+            </plugin>
+
+            <!-- Mandatory plugins for using Spock -->
+            <plugin>
+                <!-- The gmavenplus plugin is used to compile Groovy code. To learn more about this plugin,
+                visit https://github.com/groovy/GMavenPlus/wiki -->
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.class</include>
+                        <include>**/*Spec.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>${commons.configuration.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${json-simple.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>${args4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
             <optional>true</optional>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orient-commons</artifactId>
@@ -326,41 +360,47 @@
             <version>${orientdb.version}</version>
         </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>${assertj.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- <dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.21</version>
-		</dependency> -->
-		<dependency>
-			<groupId>org.pegdown</groupId>
-			<artifactId>pegdown</artifactId>
-			<version>${pegdown.version}</version>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>${spock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.21</version>
+        </dependency> -->
+        <dependency>
+            <groupId>org.pegdown</groupId>
+            <artifactId>pegdown</artifactId>
+            <version>${pegdown.version}</version>
             <optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.asciidoctor</groupId>
-			<artifactId>asciidoctorj</artifactId>
-			<version>${asciidoctorj.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.asciidoctor</groupId>
+            <artifactId>asciidoctorj</artifactId>
+            <version>${asciidoctorj.version}</version>
             <optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
             <optional>true</optional>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
@@ -372,7 +412,7 @@
             <artifactId>groovy-templates</artifactId>
             <version>${groovy.version}</version>
             <optional>true</optional>
-		</dependency>
+        </dependency>
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
@@ -411,5 +451,5 @@
             <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>
