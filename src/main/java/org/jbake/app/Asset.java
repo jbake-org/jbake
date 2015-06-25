@@ -26,7 +26,7 @@ public class Asset {
     private File source;
 	private File destination;
 	private CompositeConfiguration config;
-	private final List<String> errors = new LinkedList<String>();
+	private final List<Throwable> errors = new LinkedList<Throwable>();
 	private final boolean ignoreHidden;
 
 	/**
@@ -70,7 +70,7 @@ public class Asset {
 						sb.append("failed!");
 						LOGGER.error(sb.toString(), e);
 						e.printStackTrace();
-						errors.add(e.getMessage());
+						errors.add(e);
 					}
 				}
 
@@ -81,8 +81,8 @@ public class Asset {
 		}
 	}
 
-	public List<String> getErrors() {
-		return new ArrayList<String>(errors);
+	public List<Throwable> getErrors() {
+		return new ArrayList<Throwable>(errors);
 	}
 
 }
