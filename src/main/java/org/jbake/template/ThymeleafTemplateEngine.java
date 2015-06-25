@@ -49,15 +49,21 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private TemplateEngine templateEngine;
     private FileTemplateResolver templateResolver;
 
+	private String templateMode;
+
     public ThymeleafTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
-        initializeTemplateEngine();
     }
 
-    private void initializeTemplateEngine() {
+    private void initializeTemplateEngine(String mode) {
+    	if (mode.equals(templateMode)) {
+    		return;
+    	}
+        templateMode = mode;
         templateResolver = new FileTemplateResolver();
         templateResolver.setPrefix(templatesPath.getAbsolutePath() + File.separatorChar);
         templateResolver.setCharacterEncoding(config.getString(Keys.TEMPLATE_ENCODING));
+        templateResolver.setTemplateMode(mode);
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         try {
@@ -75,7 +81,6 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         Context context = new Context(locale, wrap(model));
         lock.lock();
         try {
-        	initializeTemplateEngine();
             @SuppressWarnings("unchecked")
             Map<String, Object> config = (Map<String, Object>) model.get("config");
             @SuppressWarnings("unchecked")
@@ -88,7 +93,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
                     mode = configMode;
                 }
             }
-            templateResolver.setTemplateMode(mode);
+            initializeTemplateEngine(mode);
             templateEngine.process(templateName, context, writer);
         } finally {
             lock.unlock();
