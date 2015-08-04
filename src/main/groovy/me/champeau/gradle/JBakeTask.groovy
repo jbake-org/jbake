@@ -30,6 +30,11 @@ class JBakeTask extends AbstractTask {
     @Input Map<String, Object> configuration = [:]
     boolean clearCache = false
 
+    JBakeTask() {
+        group = 'jbake'
+        description = 'Bakes your website with JBake'
+    }
+
     @TaskAction
     void bake() {
         new Oven(input, output, clearCache).with {

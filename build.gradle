@@ -17,15 +17,17 @@ buildscript {
 
 repositories {
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.jbake:jbake-core:2.3.0'
+    compile 'org.jbake:jbake-core:2.3.3-SNAPSHOT'
+    compile 'org.eclipse.jetty:jetty-server:8.1.12.v20130726'
 }
 
-project.version = '0.2.1-SNAPSHOT'
+project.version = '0.2.2-SNAPSHOT'
 
 task sourceJar(type: Jar) {
     classifier = 'sources'

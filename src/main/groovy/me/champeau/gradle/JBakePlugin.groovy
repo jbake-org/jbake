@@ -23,5 +23,6 @@ class JBakePlugin implements Plugin<Project> {
     void apply(Project project) {
         project.task('jbake', type:JBakeTask)
         project.task('jbakePreview', type:JBakePreviewTask)
+        project.task('jbakeWatch', type:JBakeWatchTask)
     }
 }
