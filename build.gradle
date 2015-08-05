@@ -4,6 +4,7 @@ apply plugin: 'maven-publish'
 apply from: 'gradle/credentials.gradle'
 apply from: 'gradle/artifactory.gradle'
 apply from: 'gradle/bintray.gradle'
+apply from: "gradle/providedConfiguration.gradle"
 
 buildscript {
     repositories {
@@ -23,8 +24,12 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.jbake:jbake-core:2.3.3-SNAPSHOT'
+    //compile 'org.jbake:jbake-core:2.3.3-SNAPSHOT'
     compile 'org.eclipse.jetty:jetty-server:8.1.12.v20130726'
+    provided 'org.jbake:jbake-core:2.3.2'
+    testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+        exclude group:'org.codehaus.groovy'
+    }
 }
 
 project.version = '0.2.2-SNAPSHOT'

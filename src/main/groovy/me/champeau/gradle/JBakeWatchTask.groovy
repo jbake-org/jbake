@@ -4,7 +4,7 @@ import org.gradle.api.internal.AbstractTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.jbake.app.Watcher
+//import org.jbake.app.Watcher
 
 class JBakeWatchTask extends AbstractTask {
 
@@ -18,8 +18,8 @@ class JBakeWatchTask extends AbstractTask {
 
     @TaskAction
     void jbakeWatch() {
-        new Watcher(input, output).with {
-            watch();
-        }
+    //    new Watcher(input, output).with {
+    //        watch();
+    //    }
     }
 }
