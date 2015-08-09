@@ -29,8 +29,6 @@ class JBakePlugin implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
         project.apply(plugin: 'base')
-        //project.task('jbake', type:JBakeTask)
-        project.task('jbakePreview', type:JBakePreviewTask)
 
         project.repositories {
             jcenter()
@@ -50,6 +48,10 @@ class JBakePlugin implements Plugin<Project> {
             conventionMapping.configuration = { project.jbake.configuration }
         }
 
+        project.task('jbakePreview', type:JBakePreviewTask, description: 'Preview a jbake project') {
+            conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
+            conventionMapping.configuration = { project.jbake.configuration }
+        }
     }
 
     def addDependenciesAfterEvaluate() {
@@ -71,6 +73,7 @@ class JBakePlugin implements Plugin<Project> {
 
             jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
             jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
+            jbake("org.eclipse.jetty:jetty-server:${extension.jettyVersion}")
         }
     }
 

@@ -10,6 +10,7 @@ class JBakeExtension {
     String freemarkerVersion = '2.3.19'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
     String asciidoctorjVersion = '1.5.1'
+    String jettyVersion = '8.1.12.v20130726'
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
     boolean clearCache = false

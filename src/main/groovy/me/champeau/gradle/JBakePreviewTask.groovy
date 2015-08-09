@@ -15,22 +15,21 @@
  */
 package me.champeau.gradle
 
-import org.gradle.api.internal.AbstractTask
+import org.gradle.api.DefaultTask
 import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
-
 import org.jbake.launcher.JettyServer
 
-class JBakePreviewTask extends AbstractTask {
+class JBakePreviewTask extends DefaultTask {
 
-    @InputDirectory File input = new File("$project.buildDir/jbake")
-
+    @InputDirectory File input
+    @Input Map<String, Object> configuration = [:]
     @Input String port = "8820"
 
     JBakePreviewTask() {
-    	group = 'jbake'
+    	group = 'Documentation'
     	description = 'Starts up a Jetty container to preview your JBake site locally.'
     }
 
