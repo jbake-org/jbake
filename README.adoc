@@ -2,6 +2,14 @@
 
 This plugin allows rendering a site using http://www.jbake.org[JBake] directly from http://www.gradle.org[Gradle].
 
+== Examples
+
+A few of the sites that use the plugin and serve as a good example are:
+
+* https://github.com/melix/blog
+* https://github.com/danhyun/blog
+* https://github.com/msgilligan/msgilligan.github.io
+
 == Usage
 
 *This is work in progress*
