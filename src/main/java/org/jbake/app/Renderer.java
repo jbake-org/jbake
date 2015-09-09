@@ -93,7 +93,7 @@ public class Renderer {
         } catch (Exception e) {
             sb.append("failed!");
             LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render file. Cause: " + e.getMessage());
+            throw new Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.getMessage(), e);
         }
     }
 

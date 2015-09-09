@@ -23,21 +23,14 @@ public class Asset {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
 
-    private File source;
-	private File destination;
-	private CompositeConfiguration config;
+	private final File destination;
 	private final List<String> errors = new LinkedList<String>();
 	private final boolean ignoreHidden;
 
 	/**
 	 * Creates an instance of Asset.
-	 *
-	 * @param source
-	 * @param destination
 	 */
 	public Asset(File source, File destination, CompositeConfiguration config) {
-		this.source = source;
-		this.config = config;
 		this.destination = destination;
 		ignoreHidden = config.getBoolean(ConfigUtil.Keys.ASSET_IGNORE_HIDDEN, false);
 	}
@@ -48,41 +41,41 @@ public class Asset {
 	 * @param path	The starting path
 	 */
 	public void copy(File path) {
-		File[] assets = path.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				return !ignoreHidden || !file.isHidden();
-			}
-		});
-		if (assets != null) {
-			Arrays.sort(assets);
-			for (int i = 0; i < assets.length; i++) {
-				if (assets[i].isFile()) {
-					StringBuilder sb = new StringBuilder();
-					sb.append("Copying [" + assets[i].getPath() + "]...");
-					File sourceFile = assets[i];
-					File destFile = new File(sourceFile.getPath().replace(source.getPath()+File.separator+config.getString(ConfigUtil.Keys.ASSET_FOLDER), destination.getPath()));
-					try {
-						FileUtils.copyFile(sourceFile, destFile);
-						sb.append("done!");
-						LOGGER.info(sb.toString());
-					} catch (IOException e) {
-						sb.append("failed!");
-						LOGGER.error(sb.toString(), e);
-						e.printStackTrace();
-						errors.add(e.getMessage());
-					}
-				}
+        copy(path, destination);
+    }
 
-				if (assets[i].isDirectory()) {
-					copy(assets[i]);
-				}
-			}
-		}
-	}
+    private void copy(File sourceFolder, File targetFolder) {
+        final File[] assets = sourceFolder.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return !ignoreHidden || !file.isHidden();
+            }
+        });
+        if (assets != null) {
+            Arrays.sort(assets);
+            for (File asset : assets) {
+                final File target = new File(targetFolder, asset.getName());
+                if (asset.isFile()) {
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append("Copying [").append(asset.getPath()).append("]... ");
+                    try {
+                        FileUtils.copyFile(asset, target);
+                        sb.append("done!");
+                        LOGGER.info(sb.toString());
+                    } catch (IOException e) {
+                        sb.append("failed!");
+                        LOGGER.error(sb.toString(), e);
+                        errors.add(e.getMessage());
+                    }
+                } else if (asset.isDirectory()) {
+                    copy(asset, target);
+                }
+            }
+        }
+    }
 
-	public List<String> getErrors() {
-		return new ArrayList<String>(errors);
-	}
+    public List<String> getErrors() {
+        return new ArrayList<String>(errors);
+    }
 
 }

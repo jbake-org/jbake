@@ -15,6 +15,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
@@ -113,7 +114,7 @@ public class Oven {
 	}
 
         private File setupPathFromConfig(String key) {
-            return new File(source, config.getString(key));
+            return new File(FilenameUtils.concat(source.getAbsolutePath(), config.getString(key)));
         }
 
 	private File setupRequiredFolderFromConfig(final String key) {

@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
@@ -41,7 +42,7 @@ public class Crawler {
     public Crawler(ContentStore db, File source, CompositeConfiguration config) {
         this.db = db;
         this.config = config;
-        this.contentPath = source.getPath() + separator + config.getString(ConfigUtil.Keys.CONTENT_FOLDER);
+        this.contentPath = FilenameUtils.concat(source.getAbsolutePath(), config.getString(ConfigUtil.Keys.CONTENT_FOLDER));
         this.parser = new Parser(config, contentPath);
     }
 

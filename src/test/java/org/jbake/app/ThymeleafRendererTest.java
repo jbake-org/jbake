@@ -2,7 +2,12 @@ package org.jbake.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
@@ -11,17 +16,12 @@ import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
+import com.orientechnologies.orient.core.Orient;
 
 public class ThymeleafRendererTest {
 
@@ -33,6 +33,11 @@ public class ThymeleafRendererTest {
     private File templateFolder;
     private CompositeConfiguration config;
     private ContentStore db;
+
+    @BeforeClass
+    public static void startup() {
+        Orient.instance().startup();
+    }
 
     @Before
     public void setup() throws Exception, IOException, URISyntaxException {
