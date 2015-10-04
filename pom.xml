@@ -426,6 +426,12 @@
 			<version>${thymeleaf.extras.version}</version>
 			<optional>true</optional>
 		</dependency>
+        <dependency>
+            <groupId>de.neuland-bfi</groupId>
+            <artifactId>jade4j</artifactId>
+            <version>0.4.2</version>
+            <optional>true</optional>
+        </dependency>
 		<!-- sl4j Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
