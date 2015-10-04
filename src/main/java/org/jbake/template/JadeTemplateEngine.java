@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
+import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.CDATAFilter;
@@ -20,6 +21,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import java.util.*;
  * Renders pages using the <a href="http://jade.org/">Jade</a> template language.
  *
  * @author Aleksandar Vidakovic
+ * @author Mariusz Smykuła
  */
 public class JadeTemplateEngine extends AbstractTemplateEngine {
     private static final String FILTER_CDATA = "cdata";
@@ -43,8 +46,10 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
     public JadeTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
 
-        TemplateLoader loader = new FileTemplateLoader(templatesPath.getAbsolutePath() + "/", "UTF-8");
+        TemplateLoader loader = new FileTemplateLoader(templatesPath.getAbsolutePath() + File.separatorChar, config.getString(Keys.TEMPLATE_ENCODING));
         jadeConfiguration.setTemplateLoader(loader);
+        jadeConfiguration.setMode(Jade4J.Mode.XHTML);
+        jadeConfiguration.setPrettyPrint(true);
         jadeConfiguration.setFilter(FILTER_CDATA, new CDATAFilter());
         jadeConfiguration.setFilter(FILTER_SCRIPT, new JsFilter());
         jadeConfiguration.setFilter(FILTER_STYLE, new CssFilter());
