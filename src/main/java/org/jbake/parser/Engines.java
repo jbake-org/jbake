@@ -49,13 +49,13 @@ public class Engines {
         loadEngines();
     }
 
-    private final Map<String, MarkupEngine> parsers;
+    private final Map<String, ParserEngine> parsers;
 
-    public static MarkupEngine get(String fileExtension) {
+    public static ParserEngine get(String fileExtension) {
         return INSTANCE.getEngine(fileExtension);
     }
 
-    public static void register(String fileExtension, MarkupEngine engine) {
+    public static void register(String fileExtension, ParserEngine engine) {
         INSTANCE.registerEngine(fileExtension, engine);
     }
 
@@ -64,17 +64,17 @@ public class Engines {
     }
 
     private Engines() {
-        parsers = new HashMap<String, MarkupEngine>();
+        parsers = new HashMap<String, ParserEngine>();
     }
 
-    private void registerEngine(String fileExtension, MarkupEngine markupEngine) {
-        MarkupEngine old = parsers.put(fileExtension, markupEngine);
+    private void registerEngine(String fileExtension, ParserEngine markupEngine) {
+    	ParserEngine old = parsers.put(fileExtension, markupEngine);
         if (old != null) {
             LOGGER.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
         }
     }
 
-    private MarkupEngine getEngine(String fileExtension) {
+    private ParserEngine getEngine(String fileExtension) {
         return parsers.get(fileExtension);
     }
 
@@ -85,10 +85,10 @@ public class Engines {
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.
      * @return null if the engine is not available, an instance of the engine otherwise
      */
-    private static MarkupEngine tryLoadEngine(String engineClassName) {
+    private static ParserEngine tryLoadEngine(String engineClassName) {
         try {
             @SuppressWarnings("unchecked")
-            Class<? extends MarkupEngine> engineClass = (Class<? extends MarkupEngine>) Class.forName(engineClassName, false, Engines.class.getClassLoader());
+            Class<? extends ParserEngine> engineClass = (Class<? extends ParserEngine>) Class.forName(engineClassName, false, Engines.class.getClassLoader());
             return engineClass.newInstance();
         } catch (ClassNotFoundException e) {
             return new ErrorEngine(engineClassName);
@@ -126,7 +126,7 @@ public class Engines {
     }
 
     private static void registerEngine(String className, String... extensions) {
-        MarkupEngine engine = tryLoadEngine(className);
+    	ParserEngine engine = tryLoadEngine(className);
         if (engine != null) {
             for (String extension : extensions) {
                 register(extension, engine);

@@ -8,14 +8,21 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.jbake.model.DocumentTypes;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import static org.assertj.core.api.Assertions.*;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RendererTest {
 
@@ -64,7 +71,7 @@ public class RendererTest {
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "blog" + File.separator + "2013" + File.separator + "second-post.html");
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/second-post.html");
+        content.put(Crawler.Attributes.URI, "/second-post.html");
         renderer.render(content);
         File outputFile = new File(destinationFolder, "second-post.html");
         Assert.assertTrue(outputFile.exists());
@@ -92,7 +99,7 @@ public class RendererTest {
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/" + filename);
+        content.put(Crawler.Attributes.URI, "/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
@@ -208,7 +215,7 @@ public class RendererTest {
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "allcontent.html");
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/allcontent.html");
+        content.put(Crawler.Attributes.URI, "/allcontent.html");
         renderer.render(content);
         File outputFile = new File(destinationFolder, "allcontent.html");
         Assert.assertTrue(outputFile.exists());

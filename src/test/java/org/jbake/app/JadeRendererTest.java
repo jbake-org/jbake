@@ -132,8 +132,8 @@ public class JadeRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output)
-        	.contains("<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>")
-        	.contains("<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>");
+        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a>")
+        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a>");
     }
 
     @Test
@@ -165,8 +165,8 @@ public class JadeRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output)
-        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a></h4>")
-        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a></h4>");
+        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a>")
+        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a>");
     }
 
     @Test
@@ -181,8 +181,8 @@ public class JadeRendererTest {
         Assert.assertTrue(outputFile.exists());
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output)
-        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a></h4>")
-        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a></h4>");
+        	.contains("<a href=\"blog/2013/second-post.html\">Second Post</a>")
+        	.contains("<a href=\"blog/2012/first-post.html\">First Post</a>");
     }
 
     @Test

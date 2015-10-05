@@ -58,7 +58,7 @@ public class CrawlerTest {
         DocumentList list = DocumentList.wrap(results.iterator());
         for (Map<String,Object> content : list) {
         	assertThat(content)
-        		.containsKey("rootpath")
+        		.containsKey(Crawler.Attributes.ROOTPATH)
         		.containsValue("../../");
         }
         
