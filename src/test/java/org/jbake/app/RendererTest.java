@@ -120,7 +120,7 @@ public class RendererTest {
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         //exec
-        renderer.renderIndex("index.html");
+        renderer.renderIndex("index.html", db);
 
         //validate
         File outputFile = new File(destinationFolder, "index.html");

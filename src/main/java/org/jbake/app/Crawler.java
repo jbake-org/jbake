@@ -48,6 +48,7 @@ public class Crawler {
 		static final String URI = "uri";
 		static final String FILE = "file";
 		static final String TAGS = "tags";
+		static final String TAG = "tag";
 		static final String RENDERED = "rendered";
 		static final String SHA1 = "sha1";
 		static final String ROOTPATH = "rootpath";
@@ -187,7 +188,7 @@ public class Crawler {
     public int getDocumentCount(String docType) {
         return (int) db.countClass(docType);
     }
-
+    
     public Set<String> getTags() {
         List<ODocument> query = db.getAllTagsFromPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
         Set<String> result = new HashSet<String>();
