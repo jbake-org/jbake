@@ -60,7 +60,9 @@ public class Renderer {
     public void render(Map<String, Object> content) throws Exception {
     	String docType = (String) content.get("type");
         String outputFilename = destination.getPath() + File.separatorChar + (String) content.get("uri");
-        outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
+        if (outputFilename.contains(".")) {
+        	outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
+        }
 
         // delete existing versions if they exist in case status has changed either way
         File draftFile = new File(outputFilename + config.getString(Keys.DRAFT_SUFFIX) + FileUtil.findExtension(config, docType));
