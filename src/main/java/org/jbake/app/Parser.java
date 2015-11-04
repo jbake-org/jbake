@@ -86,6 +86,10 @@ public class Parser {
         // then read engine specific headers
         engine.processHeader(context);
         
+        if (content.get("date") == null) {
+        	content.put("date", new Date(file.lastModified()));
+        }
+        
         if (config.getString(Keys.DEFAULT_STATUS) != null) {
         	// default status has been set
         	if (content.get("status") == null) {
