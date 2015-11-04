@@ -60,7 +60,7 @@ public class Renderer {
     public void render(Map<String, Object> content) throws Exception {
     	String docType = (String) content.get("type");
         String outputFilename = destination.getPath() + File.separatorChar + (String) content.get("uri");
-        if (outputFilename.contains(".")) {
+        if (outputFilename.lastIndexOf(".") > 0) {
         	outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
         }
 
