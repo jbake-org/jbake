@@ -29,6 +29,10 @@ import java.util.Map;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Parser {
+	
+	public static final String END_OF_HEADER = "~~~~~~";
+	public static final String EOL = "\n";
+	
     private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
     private CompositeConfiguration config;
@@ -142,6 +146,9 @@ public class Parser {
         List<String> header = new ArrayList<String>();
 
         for (String line : contents) {
+        	if (line.trim().isEmpty()) {
+        		continue;
+        	}
             header.add(line);
             if (line.contains("=")) {
                 if (line.startsWith("type=")) {
@@ -151,7 +158,7 @@ public class Parser {
                     statusFound = true;
                 }
             }
-            if (line.equals("~~~~~~")) {
+            if (line.equals(END_OF_HEADER)) {
                 headerSeparatorFound = true;
                 header.remove(line);
                 break;
@@ -168,10 +175,11 @@ public class Parser {
             }
         }
 
-        if (!headerValid || !statusFound || !typeFound) {
-            return false;
-        }
-        return true;
+//        if (!headerValid || !statusFound || !typeFound) {
+//            return false;
+//        }
+//        return true;
+        return headerValid && statusFound && typeFound;
     }
 
     /**
@@ -182,7 +190,7 @@ public class Parser {
      */
     private void processHeader(List<String> contents, final Map<String, Object> content) {
         for (String line : contents) {
-            if (line.equals("~~~~~~")) {
+            if (line.equals(END_OF_HEADER)) {
                 break;
             } else {
                 String[] parts = line.split("=",2);
@@ -221,16 +229,16 @@ public class Parser {
         boolean inBody = false;
         for (String line : contents) {
             if (inBody) {
-                body.append(line).append("\n");
+                body.append(line).append(EOL);
             }
-            if (line.equals("~~~~~~")) {
+            if (line.equals(END_OF_HEADER)) {
                 inBody = true;
             }
         }
 
         if (body.length() == 0) {
             for (String line : contents) {
-                body.append(line).append("\n");
+                body.append(line).append(EOL);
             }
         }
         

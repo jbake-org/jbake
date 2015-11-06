@@ -1,6 +1,8 @@
 package org.jbake.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.jbake.app.Parser.END_OF_HEADER;
+import static org.jbake.app.Parser.EOL;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -16,7 +18,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class ParserTest {
-
+	
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 	
@@ -31,11 +33,26 @@ public class ParserTest {
 	private File validAsciiDocFileWithoutHeader;
 	private File invalidAsciiDocFileWithoutHeader;
 	private File validAsciiDocFileWithHeaderInContent;
+	private File validAsciiDocFileWithEmptyFirstLineInHeader;
+	private File validAsciiDocFileWithBlankFirstLineInHeader;
+	private File validAsciiDocFileWithEmptyRandomLineInHeader;
+	private File validAsciiDocFileWithBlankRandomLineInHeader;
 	
-	private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
-	private String invalidHeader = "title=This is a Title\n~~~~~~";
-
-  
+	private String validHeader = "title=This is a Title = This is a valid Title" + EOL 
+			+ "status=draft" + EOL 
+			+ "type=post"+ EOL 
+			+ "date=2013-09-02"+ EOL 
+			+ END_OF_HEADER;
+	private String invalidHeader = "title=This is a Title" + EOL + END_OF_HEADER;
+	
+	private int rp = 2;
+	private int pos = validHeader.indexOf(EOL, rp);
+	private String validHeaderWithEmptyFirstLine = EOL + validHeader;
+	private String validHeaderWithBlankFirstLine = "   " + EOL + validHeader;
+	private String validHeaderWithEmptyRandomLine = validHeader.substring(0, pos)
+			+ EOL + validHeader.substring(pos + 1);
+	private String validHeaderWithBlankRandomLine = validHeader.substring(0, pos)
+			+ "   " + EOL + validHeader.substring(pos + 1);
 	
 	@Before
 	public void createSampleFile() throws Exception {
@@ -109,8 +126,32 @@ public class ParserTest {
 		out.println("type=post");
 		out.println("tags=tag1, tag2");
 		out.println("status=published");
-		out.println("~~~~~~");
+		out.println(END_OF_HEADER);
 		out.println("----");
+		out.close();
+		
+		validAsciiDocFileWithEmptyFirstLineInHeader = folder.newFile("validwithemptyfirstlineinheader.ad");
+		out = new PrintWriter(validAsciiDocFileWithEmptyFirstLineInHeader);
+		out.println(validHeaderWithEmptyFirstLine);
+		out.println("<p>This is a test with empty first line in header.</p>");
+		out.close();
+		
+		validAsciiDocFileWithBlankFirstLineInHeader = folder.newFile("validwithblankfirstlineinheader.ad");
+		out = new PrintWriter(validAsciiDocFileWithBlankFirstLineInHeader);
+		out.println(validHeaderWithBlankFirstLine);
+		out.println("<p>This is a test with blank first line in header.</p>");
+		out.close();
+		
+		validAsciiDocFileWithEmptyRandomLineInHeader = folder.newFile("validwithemptyrandomlineinheader.ad");
+		out = new PrintWriter(validAsciiDocFileWithEmptyRandomLineInHeader);
+		out.println(validHeaderWithEmptyRandomLine);
+		out.println("<p>This is a test with empty random line in header.</p>");
+		out.close();
+		
+		validAsciiDocFileWithBlankRandomLineInHeader = folder.newFile("validwithblankrandomlineinheader.ad");System.out.println("---#b> "+validHeaderWithBlankRandomLine.replaceAll(EOL, "EOL"));		
+		out = new PrintWriter(validAsciiDocFileWithBlankRandomLineInHeader);
+		out.println(validHeaderWithBlankRandomLine);
+		out.println("<p>This is a test with blank random line in header.</p>");
 		out.close();
 	}
 	
@@ -192,4 +233,29 @@ public class ParserTest {
 			.contains("tags=tag1, tag2");
 //		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
 	}
+
+	@Test
+	public void parseValidAsciiDocFileWithEmptyFirstLineInHeader() {
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithEmptyFirstLineInHeader);
+		Assert.assertNotNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFileWithBlankFirstLineInHeader() {
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithBlankFirstLineInHeader);
+		Assert.assertNotNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFileWithEmptyRandomLineInHeader() {
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithEmptyRandomLineInHeader);
+		Assert.assertNotNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFileWithBlankRandomLineInHeader() {
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithBlankRandomLineInHeader);
+		Assert.assertNotNull(map);
+	}
+	
 }
