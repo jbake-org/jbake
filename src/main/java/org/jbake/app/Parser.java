@@ -151,10 +151,10 @@ public class Parser {
         	}
             header.add(line);
             if (line.contains("=")) {
-                if (line.startsWith("type=")) {
+                if (line.matches("^type\\s*=.*")) {
                     typeFound = true;
                 }
-                if (line.startsWith("status=")) {
+                if (line.matches("^status\\s*=.*")) {
                     statusFound = true;
                 }
             }
@@ -175,13 +175,9 @@ public class Parser {
             }
         }
 
-//        if (!headerValid || !statusFound || !typeFound) {
-//            return false;
-//        }
-//        return true;
         return headerValid && statusFound && typeFound;
     }
-
+    
     /**
      * Process the header of the file.
      *
@@ -193,7 +189,7 @@ public class Parser {
             if (line.equals(END_OF_HEADER)) {
                 break;
             } else {
-                String[] parts = line.split("=",2);
+                String[] parts = line.split("\\s*=\\s*",2);
                 if (parts.length == 2) {
                     if (parts[0].equalsIgnoreCase("date")) {
                         DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));

@@ -37,6 +37,7 @@ public class ParserTest {
 	private File validAsciiDocFileWithBlankFirstLineInHeader;
 	private File validAsciiDocFileWithEmptyRandomLineInHeader;
 	private File validAsciiDocFileWithBlankRandomLineInHeader;
+	private File  validAsciiDocFileWithSpacesAroundEqualInHeader;
 	
 	private String validHeader = "title=This is a Title = This is a valid Title" + EOL 
 			+ "status=draft" + EOL 
@@ -53,6 +54,13 @@ public class ParserTest {
 			+ EOL + validHeader.substring(pos + 1);
 	private String validHeaderWithBlankRandomLine = validHeader.substring(0, pos)
 			+ "   " + EOL + validHeader.substring(pos + 1);
+	
+	private String validHeaderWithSpacesAroundEqual = "title = This is a Title = This is a valid Title" + EOL 
+			+ "status    =draft" + EOL 
+			+ "type=    post"+ EOL 
+			+ "date    =  2013-09-02"+ EOL 
+			+ END_OF_HEADER;
+	
 	
 	@Before
 	public void createSampleFile() throws Exception {
@@ -148,11 +156,18 @@ public class ParserTest {
 		out.println("<p>This is a test with empty random line in header.</p>");
 		out.close();
 		
-		validAsciiDocFileWithBlankRandomLineInHeader = folder.newFile("validwithblankrandomlineinheader.ad");System.out.println("---#b> "+validHeaderWithBlankRandomLine.replaceAll(EOL, "EOL"));		
+		validAsciiDocFileWithBlankRandomLineInHeader = folder.newFile("validwithblankrandomlineinheader.ad");		
 		out = new PrintWriter(validAsciiDocFileWithBlankRandomLineInHeader);
 		out.println(validHeaderWithBlankRandomLine);
 		out.println("<p>This is a test with blank random line in header.</p>");
 		out.close();
+		
+		validAsciiDocFileWithSpacesAroundEqualInHeader = folder.newFile("validwithspacesaroundequalinheader.ad");		
+		out = new PrintWriter(validAsciiDocFileWithSpacesAroundEqualInHeader);
+		out.println(validHeaderWithSpacesAroundEqual);
+		out.println("<p>This is a test with spaces around equals in header.</p>");
+		out.close();
+		
 	}
 	
 	@Test
@@ -255,6 +270,12 @@ public class ParserTest {
 	@Test
 	public void parseValidAsciiDocFileWithBlankRandomLineInHeader() {
 		Map<String, Object> map = parser.processFile(validAsciiDocFileWithBlankRandomLineInHeader);
+		Assert.assertNotNull(map);
+	}
+	
+	@Test
+	public void parseValidAsciiDocFileWithSpacesAroundEqualInHeader() {
+		Map<String, Object> map = parser.processFile(validAsciiDocFileWithSpacesAroundEqualInHeader);
 		Assert.assertNotNull(map);
 	}
 	
