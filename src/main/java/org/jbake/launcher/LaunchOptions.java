@@ -64,7 +64,7 @@ public class LaunchOptions {
 	}
 
 	public boolean isHelpNeeded() {
-		return helpNeeded;
+		return helpNeeded || !(isBake() || isRunServer() || isInit() || source != null || destination != null);
 	}
 	
 	public boolean isRunServer() {
@@ -80,6 +80,6 @@ public class LaunchOptions {
     }
 
     public boolean isBake() {
-		return bake || !(isHelpNeeded() || isRunServer() || isInit());
+		return bake || (source != null && destination != null);
 	}
 }
