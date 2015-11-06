@@ -32,13 +32,11 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import org.jbake.model.DocumentTypes;
 
 import java.util.List;
 
-import org.jbake.model.DocumentTypes;
-
 /**
- *
  * @author jdlee
  */
 public class ContentStore {
@@ -144,7 +142,7 @@ public class ContentStore {
     private List<ODocument> query(String sql) {
         return db.query(new OSQLSynchQuery<ODocument>(sql));
     }
-    
+
     private List<ODocument> query(String sql, Object... args) {
         return db.command(new OSQLSynchQuery<ODocument>(sql)).execute(args);
     }

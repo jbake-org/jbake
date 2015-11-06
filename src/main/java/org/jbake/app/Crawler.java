@@ -1,24 +1,14 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.io.File.separator;
 
@@ -102,20 +92,20 @@ public class Crawler {
         }
         return sha1;
     }
-    
+
     private String buildURI(final File sourceFile) {
-    	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-    	// strip off leading / to enable generating non-root based sites
-    	if (uri.startsWith("/")) {
-    		uri = uri.substring(1, uri.length());
-    	}
+        String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath(contentPath), "");
+        // strip off leading / to enable generating non-root based sites
+        if (uri.startsWith("/")) {
+            uri = uri.substring(1, uri.length());
+        }
         return uri;
     }
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
-        	fileContents.put("rootpath", getPathToRoot(sourceFile));
+            fileContents.put("rootpath", getPathToRoot(sourceFile));
             fileContents.put("sha1", sha1);
             fileContents.put("rendered", false);
             if (fileContents.get("tags") != null) {
@@ -136,7 +126,7 @@ public class Crawler {
             }
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
-            boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String)fileContents.get("cached")):true;
+            boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String) fileContents.get("cached")) : true;
             doc.field("cached", cached);
             doc.save();
         } else {
@@ -145,20 +135,20 @@ public class Crawler {
     }
 
     public String getPathToRoot(File sourceFile) {
-    	File rootPath = new File(contentPath);
-    	File parentPath = sourceFile.getParentFile();
-    	int parentCount = 0;
-    	while (!parentPath.equals(rootPath)) {
-    		parentPath = parentPath.getParentFile();
-    		parentCount++;
-    	}
-    	StringBuffer sb = new StringBuffer();
-    	for (int i = 0; i < parentCount; i++) {
-    		sb.append("../");
-    	}
-    	return sb.toString();
+        File rootPath = new File(contentPath);
+        File parentPath = sourceFile.getParentFile();
+        int parentCount = 0;
+        while (!parentPath.equals(rootPath)) {
+            parentPath = parentPath.getParentFile();
+            parentCount++;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parentCount; i++) {
+            sb.append("../");
+        }
+        return sb.toString();
     }
-    
+
     public int getDocumentCount(String docType) {
         return (int) db.countClass(docType);
     }

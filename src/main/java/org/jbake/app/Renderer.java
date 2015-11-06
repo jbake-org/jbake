@@ -1,24 +1,13 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * Render output to a file.
@@ -48,7 +37,7 @@ public class Renderer {
     }
 
     private String findTemplateName(String docType) {
-        return config.getString("template."+docType+".file");
+        return config.getString("template." + docType + ".file");
     }
 
     /**
@@ -58,10 +47,10 @@ public class Renderer {
      * @throws Exception
      */
     public void render(Map<String, Object> content) throws Exception {
-    	String docType = (String) content.get("type");
-        String outputFilename = destination.getPath() + File.separatorChar + (String) content.get("uri");
+        String docType = (String) content.get("type");
+        String outputFilename = destination.getPath() + File.separatorChar + content.get("uri");
         if (outputFilename.lastIndexOf(".") > 0) {
-        	outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
+            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
         }
 
         // delete existing versions if they exist in case status has changed either way
@@ -79,7 +68,7 @@ public class Renderer {
             outputFilename = outputFilename + config.getString(Keys.DRAFT_SUFFIX);
         }
 
-        File outputFile = new File(outputFilename + FileUtil.findExtension(config,docType));
+        File outputFile = new File(outputFilename + FileUtil.findExtension(config, docType));
         StringBuilder sb = new StringBuilder();
         sb.append("Rendering [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
@@ -112,7 +101,7 @@ public class Renderer {
      * Render an index file using the supplied content.
      *
      * @param indexFile The name of the output file
-     * @throws Exception 
+     * @throws Exception
      */
     public void renderIndex(String indexFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + indexFile);
@@ -137,8 +126,8 @@ public class Renderer {
 
     /**
      * Render an XML sitemap file using the supplied content.
-     * @throws Exception 
      *
+     * @throws Exception
      * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
@@ -168,7 +157,7 @@ public class Renderer {
      * Render an XML feed file using the supplied content.
      *
      * @param feedFile The name of the output file
-     * @throws Exception 
+     * @throws Exception
      */
     public void renderFeed(String feedFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + feedFile);
@@ -195,7 +184,7 @@ public class Renderer {
      * Render an archive file using the supplied content.
      *
      * @param archiveFile The name of the output file
-     * @throws Exception 
+     * @throws Exception
      */
     public void renderArchive(String archiveFile) throws Exception {
         File outputFile = new File(destination.getPath() + File.separator + archiveFile);
@@ -223,10 +212,10 @@ public class Renderer {
      *
      * @param tags    The content to renderDocument
      * @param tagPath The output path
-     * @throws Exception 
+     * @throws Exception
      */
     public void renderTags(Set<String> tags, String tagPath) throws Exception {
-    	final List<String> errors = new LinkedList<String>();
+        final List<String> errors = new LinkedList<String>();
         for (String tag : tags) {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
@@ -252,26 +241,23 @@ public class Renderer {
             }
         }
         if (!errors.isEmpty()) {
-        	StringBuilder sb = new StringBuilder();
-        	sb.append("Failed to render tags. Cause(s):");
-        	for(String error: errors) {
-        		sb.append("\n" + error);
-        	}
-        	throw new Exception(sb.toString());
+            StringBuilder sb = new StringBuilder();
+            sb.append("Failed to render tags. Cause(s):");
+            for (String error : errors) {
+                sb.append("\n" + error);
+            }
+            throw new Exception(sb.toString());
         }
     }
-    
+
     /**
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
-     * 
-     * @param type
-     * @return
      */
     private Map<String, Object> buildSimpleModel(String type) {
-    	Map<String, Object> content = new HashMap<String, Object>();
-    	content.put("type", type);
-    	content.put("rootpath", "");
-    	// add any more keys here that need to have a default value to prevent need to perform null check in templates
-    	return content;
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("type", type);
+        content.put("rootpath", "");
+        // add any more keys here that need to have a default value to prevent need to perform null check in templates
+        return content;
     }
 }

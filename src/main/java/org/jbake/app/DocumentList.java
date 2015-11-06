@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author Cédric Champeau
  */
-public class DocumentList extends LinkedList<Map<String,Object>> {
+public class DocumentList extends LinkedList<Map<String, Object>> {
 
     public static DocumentList wrap(Iterator<ODocument> docs) {
         DocumentList list = new DocumentList();

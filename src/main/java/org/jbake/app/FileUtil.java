@@ -4,11 +4,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.parser.Engines;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 
@@ -107,7 +103,7 @@ public class FileUtil {
             fis.close();
         } else if (sourceFile.isDirectory()) {
             File[] files = sourceFile.listFiles();
-            if (files!=null) {
+            if (files != null) {
                 for (File file : files) {
                     updateDigest(digest, file, buffer);
                 }
@@ -116,38 +112,38 @@ public class FileUtil {
     }
 
     public static String findExtension(CompositeConfiguration config, String docType) {
-    	String extension = config.getString("template."+docType+".extension");
-    	if (extension != null) {
-    		return extension;
-    	} else {
-    		return config.getString(Keys.OUTPUT_EXTENSION);
-    	}
+        String extension = config.getString("template." + docType + ".extension");
+        if (extension != null) {
+            return extension;
+        } else {
+            return config.getString(Keys.OUTPUT_EXTENSION);
+        }
     }
-    
-	/**
-	 * platform independent file.getPath() 
-	 * 
-	 * @param file the file to transform, or {@code null}
-	 * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null} 
-	 *         Needed to transform Windows path separators into slashes.
-	 */
-	public static String asPath(File file) {
-		if(file == null) {
-			return null;
-		}
-	    return asPath(file.getPath());
-	}
-	
-	/**
-	 * platform independent file.getPath() 
-	 * 
-	 * @param path the path to transform, or {@code null}
-	 * @return The result will have alle platform path separators replaced by "/".
-	 */
-	public static String asPath(String path) {
-		if(path == null) {
-			return null;
-		}
-		return path.replace(File.separator, "/");
-	}
+
+    /**
+     * platform independent file.getPath()
+     *
+     * @param file the file to transform, or {@code null}
+     * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null}
+     * Needed to transform Windows path separators into slashes.
+     */
+    public static String asPath(File file) {
+        if (file == null) {
+            return null;
+        }
+        return asPath(file.getPath());
+    }
+
+    /**
+     * platform independent file.getPath()
+     *
+     * @param path the path to transform, or {@code null}
+     * @return The result will have alle platform path separators replaced by "/".
+     */
+    public static String asPath(String path) {
+        if (path == null) {
+            return null;
+        }
+        return path.replace(File.separator, "/");
+    }
 }
