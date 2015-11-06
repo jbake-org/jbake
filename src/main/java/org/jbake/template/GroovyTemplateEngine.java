@@ -1,44 +1,24 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-
 import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import groovy.text.XmlTemplateEngine;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.jbake.app.ContentStore;
+import java.io.*;
+import java.util.*;
 
 /**
  * Renders documents using a Groovy template engine. Depending on the file extension of the template, the template
@@ -98,22 +78,22 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                         return DocumentList.wrap(query.iterator());
                     }
                     if ("published_content".equals(key)) {
-                    	List<ODocument> publishedContent = new ArrayList<ODocument>();
-                    	String[] documentTypes = DocumentTypes.getDocumentTypes();
-                    	for (String docType : documentTypes) {
-                    		List<ODocument> query = db.getPublishedContent(docType);
-                    		publishedContent.addAll(query);
-                    	}
-                    	return DocumentList.wrap(publishedContent.iterator());
+                        List<ODocument> publishedContent = new ArrayList<ODocument>();
+                        String[] documentTypes = DocumentTypes.getDocumentTypes();
+                        for (String docType : documentTypes) {
+                            List<ODocument> query = db.getPublishedContent(docType);
+                            publishedContent.addAll(query);
+                        }
+                        return DocumentList.wrap(publishedContent.iterator());
                     }
                     if ("all_content".equals(key)) {
-                    	List<ODocument> allContent = new ArrayList<ODocument>();
-                    	String[] documentTypes = DocumentTypes.getDocumentTypes();
-                    	for (String docType : documentTypes) {
-                    		List<ODocument> query = db.getAllContent(docType);
-                    		allContent.addAll(query);
-                    	}
-                    	return DocumentList.wrap(allContent.iterator());
+                        List<ODocument> allContent = new ArrayList<ODocument>();
+                        String[] documentTypes = DocumentTypes.getDocumentTypes();
+                        for (String docType : documentTypes) {
+                            List<ODocument> query = db.getAllContent(docType);
+                            allContent.addAll(query);
+                        }
+                        return DocumentList.wrap(allContent.iterator());
                     }
                     if ("alltags".equals(key)) {
                         List<ODocument> query = db.getAllTagsFromPublishedPosts();
@@ -126,7 +106,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     }
                     String[] documentTypes = DocumentTypes.getDocumentTypes();
                     for (String docType : documentTypes) {
-                        if ((docType+"s").equals(key)) {
+                        if ((docType + "s").equals(key)) {
                             return DocumentList.wrap(db.getAllContent(docType).iterator());
                         }
                     }
@@ -146,10 +126,12 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
         };
     }
 
+    @SuppressWarnings("unused")
     private void doInclude(Map<String, Object> model, String templateName) throws Exception {
         AbstractTemplateEngine engine = (AbstractTemplateEngine) model.get("renderer");
         Writer out = (Writer) model.get("out");
         engine.renderDocument(model, templateName, out);
         model.put("out", out);
     }
+
 }

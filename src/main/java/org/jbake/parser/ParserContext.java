@@ -12,7 +12,7 @@ public class ParserContext {
     private final CompositeConfiguration config;
     private final String contentPath;
     private final boolean hasHeader;
-    private final Map<String,Object> contents;
+    private final Map<String, Object> contents;
 
     public ParserContext(
             File file,
