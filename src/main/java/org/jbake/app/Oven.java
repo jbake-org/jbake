@@ -62,12 +62,6 @@ public class Oven {
         return config;
     }
 
-    // TODO: do we want to use this. Else, config could be final
-    public void setConfig(final CompositeConfiguration config) {
-        this.config = config;
-    }
-
-
     private void ensureSource() {
         if (!FileUtil.isExistingFolder(source)) {
             throw new JBakeException("Error: Source folder must exist: " + source.getAbsolutePath());

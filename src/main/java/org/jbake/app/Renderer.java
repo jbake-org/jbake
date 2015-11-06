@@ -69,32 +69,7 @@ public class Renderer {
         }
 
         File outputFile = new File(outputFilename + FileUtil.findExtension(config, docType));
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering [").append(outputFile).append("]... ");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("content", content);
-        model.put("renderer", renderingEngine);
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName(docType), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render file. Cause: " + e.getMessage());
-        }
-    }
-
-    private Writer createWriter(File file) throws IOException {
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        return new OutputStreamWriter(new FileOutputStream(file), config.getString(ConfigUtil.Keys.RENDER_ENCODING));
+        render(outputFile, docType, content);
     }
 
     /**
@@ -104,24 +79,7 @@ public class Renderer {
      * @throws Exception
      */
     public void renderIndex(String indexFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + indexFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering index [").append(outputFile).append("]...");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", buildSimpleModel("masterindex"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("masterindex"), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render index. Cause: " + e.getMessage());
-        }
+        render(indexFile, "masterindex");
     }
 
     /**
@@ -132,25 +90,7 @@ public class Renderer {
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
     public void renderSitemap(String sitemapFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + sitemapFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering sitemap [").append(outputFile).append("]... ");
-
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", buildSimpleModel("sitemap"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("sitemap"), out);
-            sb.append("done!");
-            out.close();
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render sitemap. Cause: " + e.getMessage());
-        }
+        render(sitemapFile, "sitemap");
     }
 
     /**
@@ -160,24 +100,7 @@ public class Renderer {
      * @throws Exception
      */
     public void renderFeed(String feedFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + feedFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering feed [").append(outputFile).append("]... ");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", buildSimpleModel("feed"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("feed"), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render feed. Cause: " + e.getMessage());
-        }
+        render(feedFile, "feed");
     }
 
     /**
@@ -187,24 +110,7 @@ public class Renderer {
      * @throws Exception
      */
     public void renderArchive(String archiveFile) throws Exception {
-        File outputFile = new File(destination.getPath() + File.separator + archiveFile);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering archive [").append(outputFile).append("]... ");
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", buildSimpleModel("archive"));
-
-        try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName("archive"), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
-        } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
-            throw new Exception("Failed to render archive. Cause: " + e.getMessage());
-        }
+        render(archiveFile, "archive");
     }
 
     /**
@@ -229,9 +135,7 @@ public class Renderer {
             sb.append("Rendering tags [").append(outputFile).append("]... ");
 
             try {
-                Writer out = createWriter(outputFile);
-                renderingEngine.renderDocument(model, findTemplateName("tag"), out);
-                out.close();
+                write(outputFile, model, "tag");
                 sb.append("done!");
                 LOGGER.info(sb.toString());
             } catch (Exception e) {
@@ -259,5 +163,38 @@ public class Renderer {
         content.put("rootpath", "");
         // add any more keys here that need to have a default value to prevent need to perform null check in templates
         return content;
+    }
+
+    private void render(String fileName, String type) throws Exception {
+        render(new File(destination.getPath() + File.separator + fileName), type, buildSimpleModel(type));
+    }
+
+    private void render(File outputFile, String type, Map<String, Object> content) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Rendering ").append(type).append(" [").append(outputFile).append("]... ");
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("renderer", renderingEngine);
+        model.put("content", content);
+
+        try {
+            write(outputFile, model, type);
+            sb.append("done!");
+            LOGGER.info(sb.toString());
+        } catch (Exception e) {
+            sb.append("failed!");
+            LOGGER.error(sb.toString(), e);
+            throw new Exception("Failed to render " + type + ". Cause: " + e.getMessage());
+        }
+    }
+
+    private void write(File outputFile, Map<String, Object> model, String type) throws Exception {
+        if (!outputFile.exists()) {
+            outputFile.getParentFile().mkdirs();
+            outputFile.createNewFile();
+        }
+
+        Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), config.getString(Keys.RENDER_ENCODING));
+        renderingEngine.renderDocument(model, findTemplateName(type), out);
+        out.close();
     }
 }

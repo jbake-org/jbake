@@ -118,27 +118,27 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private void processAsciiDoc(ParserContext context) {
-        final Asciidoctor asciidoctor = getEngine();
+        Asciidoctor asciidoctor = getEngine();
         Options options = getAsciiDocOptionsAndAttributes(context);
         context.setBody(asciidoctor.render(context.getBody(), options));
     }
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         CompositeConfiguration config = context.getConfig();
-        final AttributesBuilder attributes = attributes(config.getStringArray(Keys.ASCIIDOCTOR_ATTRIBUTES));
+        AttributesBuilder attributes = attributes(config.getStringArray(Keys.ASCIIDOCTOR_ATTRIBUTES));
         if (config.getBoolean(Keys.ASCIIDOCTOR_ATTRIBUTES_EXPORT, false)) {
-            final String prefix = config.getString(Keys.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX, "");
-            for (final Iterator<String> it = config.getKeys(); it.hasNext(); ) {
-                final String key = it.next();
+            String prefix = config.getString(Keys.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX, "");
+            for (Iterator<String> it = config.getKeys(); it.hasNext(); ) {
+                String key = it.next();
                 if (!key.startsWith("asciidoctor")) {
                     attributes.attribute(prefix + key.replace(".", "_"), config.getProperty(key));
                 }
             }
         }
-        final Configuration optionsSubset = config.subset(Keys.ASCIIDOCTOR_OPTION);
-        final Options options = options().attributes(attributes.get()).get();
-        for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext(); ) {
-            final String name = iterator.next();
+        Configuration optionsSubset = config.subset(Keys.ASCIIDOCTOR_OPTION);
+        Options options = options().attributes(attributes.get()).get();
+        for (Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext(); ) {
+            String name = iterator.next();
             options.setOption(name, guessTypeByContent(optionsSubset.getString(name)));
         }
         options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());
