@@ -1,7 +1,7 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ContentStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,13 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import org.jbake.app.ContentStore;
+import java.util.*;
 
 /**
  * <p>A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New
@@ -64,11 +58,10 @@ public class TemplateEngines {
      * This method is used to search for a specific class, telling if loading the engine would succeed. This is
      * typically used to avoid loading optional modules.
      *
-     *
-     * @param config the configuration
-     * @param db database instance
-     * @param destination target directory
-     * @param templatesPath path to template directory
+     * @param config          the configuration
+     * @param db              database instance
+     * @param destination     target directory
+     * @param templatesPath   path to template directory
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
     private static AbstractTemplateEngine tryLoadEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath, String engineClassName) {

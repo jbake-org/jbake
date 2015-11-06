@@ -17,11 +17,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Parses a File for content.
@@ -45,11 +41,10 @@ public class Parser {
     /**
      * Process the file by parsing the contents.
      *
-     * @param    file
      * @return The contents of the file
      */
     public Map<String, Object> processFile(File file) {
-        Map<String,Object> content = new HashMap<String, Object>();
+        Map<String, Object> content = new HashMap<String, Object>();
         InputStream is = null;
         List<String> fileContents = null;
         try {
@@ -60,7 +55,7 @@ public class Parser {
 
             return null;
         } finally {
-          IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(is);
         }
 
         boolean hasHeader = hasHeader(fileContents);
@@ -74,8 +69,8 @@ public class Parser {
         );
 
         MarkupEngine engine = Engines.get(FileUtil.fileExt(file));
-        if (engine==null) {
-            LOGGER.warn("Unable to find suitable markup engine for {}",file);
+        if (engine == null) {
+            LOGGER.warn("Unable to find suitable markup engine for {}", file);
             return null;
         }
 
@@ -85,16 +80,16 @@ public class Parser {
         }
         // then read engine specific headers
         engine.processHeader(context);
-        
+
         if (config.getString(Keys.DEFAULT_STATUS) != null) {
-        	// default status has been set
-        	if (content.get("status") == null) {
-        		// file hasn't got status so use default
-        		content.put("status", config.getString(Keys.DEFAULT_STATUS));
-        	}
+            // default status has been set
+            if (content.get("status") == null) {
+                // file hasn't got status so use default
+                content.put("status", config.getString(Keys.DEFAULT_STATUS));
+            }
         }
 
-        if (content.get("type")==null||content.get("status")==null) {
+        if (content.get("type") == null || content.get("status") == null) {
             // output error
             LOGGER.warn("Error parsing meta data from header (missing type or status value) for file {}!", file);
             return null;
@@ -112,18 +107,18 @@ public class Parser {
         }
 
         if (content.get("tags") != null) {
-        	String[] tags = (String[]) content.get("tags");
-            for( int i=0; i<tags.length; i++ ) {
-                tags[i]=tags[i].trim();
+            String[] tags = (String[]) content.get("tags");
+            for (int i = 0; i < tags.length; i++) {
+                tags[i] = tags[i].trim();
                 if (config.getBoolean(Keys.TAG_SANITIZE)) {
-                	tags[i]=tags[i].replace(" ", "-");
+                    tags[i] = tags[i].replace(" ", "-");
                 }
             }
             content.put("tags", tags);
         }
-        
+
         // TODO: post parsing plugins to hook in here?
-        
+
         return content;
     }
 
@@ -168,30 +163,25 @@ public class Parser {
             }
         }
 
-        if (!headerValid || !statusFound || !typeFound) {
-            return false;
-        }
-        return true;
+        return !(!headerValid || !statusFound || !typeFound);
     }
 
     /**
      * Process the header of the file.
      *
      * @param contents Contents of file
-     * @param content
      */
     private void processHeader(List<String> contents, final Map<String, Object> content) {
         for (String line : contents) {
             if (line.equals("~~~~~~")) {
                 break;
             } else {
-                String[] parts = line.split("=",2);
+                String[] parts = line.split("=", 2);
                 if (parts.length == 2) {
                     if (parts[0].equalsIgnoreCase("date")) {
                         DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));
-                        Date date = null;
                         try {
-                            date = df.parse(parts[1]);
+                            Date date = df.parse(parts[1]);
                             content.put(parts[0], date);
                         } catch (ParseException e) {
                             e.printStackTrace();
@@ -214,7 +204,6 @@ public class Parser {
      * Process the body of the file.
      *
      * @param contents Contents of file
-     * @param content
      */
     private void processBody(List<String> contents, final Map<String, Object> content) {
         StringBuilder body = new StringBuilder();
@@ -233,7 +222,7 @@ public class Parser {
                 body.append(line).append("\n");
             }
         }
-        
+
         content.put("body", body.toString());
     }
 

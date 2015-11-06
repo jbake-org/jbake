@@ -1,23 +1,10 @@
 package org.jbake.template;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.SimpleCollection;
-import freemarker.template.SimpleDate;
-import freemarker.template.SimpleHash;
-import freemarker.template.SimpleSequence;
-import freemarker.template.Template;
-import freemarker.template.TemplateDateModel;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModel;
-import freemarker.template.TemplateModelException;
-
+import freemarker.template.*;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
@@ -25,14 +12,7 @@ import org.jbake.model.DocumentTypes;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.jbake.app.ContentStore;
+import java.util.*;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -94,22 +74,22 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                 return new SimpleSequence(DocumentList.wrap(query.iterator()));
             }
             if ("published_content".equals(key)) {
-            	List<ODocument> publishedContent = new ArrayList<ODocument>();
-            	String[] documentTypes = DocumentTypes.getDocumentTypes();
-            	for (String docType : documentTypes) {
-            		List<ODocument> query = db.getPublishedContent(docType);
-           		publishedContent.addAll(query);
-            	}
-            	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
+                List<ODocument> publishedContent = new ArrayList<ODocument>();
+                String[] documentTypes = DocumentTypes.getDocumentTypes();
+                for (String docType : documentTypes) {
+                    List<ODocument> query = db.getPublishedContent(docType);
+                    publishedContent.addAll(query);
+                }
+                return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
             }
             if ("all_content".equals(key)) {
-            	List<ODocument> allContent = new ArrayList<ODocument>();
-            	String[] documentTypes = DocumentTypes.getDocumentTypes();
-            	for (String docType : documentTypes) {
-            		List<ODocument> query = db.getAllContent(docType);
-            		allContent.addAll(query);
-            	}
-            	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
+                List<ODocument> allContent = new ArrayList<ODocument>();
+                String[] documentTypes = DocumentTypes.getDocumentTypes();
+                for (String docType : documentTypes) {
+                    List<ODocument> query = db.getAllContent(docType);
+                    allContent.addAll(query);
+                }
+                return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
             }
             if ("alltags".equals(key)) {
                 List<ODocument> query = db.getAllTagsFromPublishedPosts();
@@ -122,7 +102,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
             }
             String[] documentTypes = DocumentTypes.getDocumentTypes();
             for (String docType : documentTypes) {
-                if ((docType+"s").equals(key)) {
+                if ((docType + "s").equals(key)) {
                     return new SimpleSequence(DocumentList.wrap(db.getAllContent(docType).iterator()));
                 }
             }

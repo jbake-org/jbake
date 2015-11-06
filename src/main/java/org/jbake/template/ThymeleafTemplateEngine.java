@@ -1,11 +1,10 @@
 package org.jbake.template;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
 import org.jbake.app.DBUtil;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentTypes;
@@ -17,28 +16,20 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-import org.jbake.app.ContentStore;
 
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
- *
+ * <p/>
  * <p>This template engine is not recommanded for large sites because the whole model
  * is loaded into memory due to Thymeleaf internal limitations.</p>
- *
+ * <p/>
  * <p>The default rendering mode is "HTML5", but it is possible to use another mode
  * for each document type, by adding a key in the configuration, for example:</p>
  * <p/>
  * <code>
- *     template.feed.thymeleaf.mode=XML
+ * template.feed.thymeleaf.mode=XML
  * </code>
  *
  * @author Cédric Champeau
@@ -75,7 +66,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         Context context = new Context(locale, wrap(model));
         lock.lock();
         try {
-        	initializeTemplateEngine();
+            initializeTemplateEngine();
             @SuppressWarnings("unchecked")
             Map<String, Object> config = (Map<String, Object>) model.get("config");
             @SuppressWarnings("unchecked")
@@ -141,25 +132,25 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
             }
             return result;
         }
-        
+
         private Object getPublishedContent() {
-        	List<ODocument> publishedContent = new ArrayList<ODocument>();
-        	String[] documentTypes = DocumentTypes.getDocumentTypes();
-        	for (String docType : documentTypes) {
-        		List<ODocument> query = db.getPublishedContent(docType);
-        		publishedContent.addAll(query);
-        	}
-        	return DocumentList.wrap(publishedContent.iterator());
+            List<ODocument> publishedContent = new ArrayList<ODocument>();
+            String[] documentTypes = DocumentTypes.getDocumentTypes();
+            for (String docType : documentTypes) {
+                List<ODocument> query = db.getPublishedContent(docType);
+                publishedContent.addAll(query);
+            }
+            return DocumentList.wrap(publishedContent.iterator());
         }
-        
+
         private Object getAllContent() {
-        	List<ODocument> allContent = new ArrayList<ODocument>();
-        	String[] documentTypes = DocumentTypes.getDocumentTypes();
-        	for (String docType : documentTypes) {
-        		List<ODocument> query = db.getAllContent(docType);
-        		allContent.addAll(query);
-        	}
-        	return DocumentList.wrap(allContent.iterator());
+            List<ODocument> allContent = new ArrayList<ODocument>();
+            String[] documentTypes = DocumentTypes.getDocumentTypes();
+            for (String docType : documentTypes) {
+                List<ODocument> query = db.getAllContent(docType);
+                allContent.addAll(query);
+            }
+            return DocumentList.wrap(allContent.iterator());
         }
     }
 }
