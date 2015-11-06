@@ -125,4 +125,13 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
             }
         };
     }
+
+    @SuppressWarnings("unused")
+    private void doInclude(Map<String, Object> model, String templateName) throws Exception {
+        AbstractTemplateEngine engine = (AbstractTemplateEngine) model.get("renderer");
+        Writer out = (Writer) model.get("out");
+        engine.renderDocument(model, templateName, out);
+        model.put("out", out);
+    }
+
 }
