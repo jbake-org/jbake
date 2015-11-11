@@ -1,8 +1,5 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
@@ -11,6 +8,7 @@ import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Arrays;
@@ -21,7 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.io.File.separator;
+import org.apache.commons.io.FilenameUtils;
+import org.jbake.model.DocumentStatus;
+import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 /**
  * Crawls a file system looking for content.
@@ -131,7 +137,13 @@ public class Crawler {
     
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-    	// strip off leading / to enable generating non-root based sites
+    	String noExtensionUrlFolder = config.getString(Keys.URI_NO_EXTENSION);
+        if (!noExtensionUrlFolder.equals("false") && uri.startsWith(noExtensionUrlFolder)) {
+            uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getString(Keys.OUTPUT_EXTENSION);
+        } else {
+            uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
+        }
+        // strip off leading / to enable generating non-root based sites
     	if (uri.startsWith("/")) {
     		uri = uri.substring(1, uri.length());
     	}
@@ -149,6 +161,7 @@ public class Crawler {
                 String[] tags = (String[]) fileContents.get(Attributes.TAGS);
                 fileContents.put(Attributes.TAGS, tags);
             }
+
             fileContents.put(Attributes.FILE, sourceFile.getPath());
             fileContents.put(Attributes.URI, uri);
 
@@ -160,6 +173,11 @@ public class Crawler {
                     }
                 }
             }
+            
+            if (!config.getString(Keys.URI_NO_EXTENSION).equals("false")) {
+                fileContents.put("noExtensionUri", uri.replace("/index.html", "/"));
+            }
+            
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
             boolean cached = fileContents.get(Attributes.CACHED) != null ? Boolean.valueOf((String)fileContents.get(Attributes.CACHED)):true;

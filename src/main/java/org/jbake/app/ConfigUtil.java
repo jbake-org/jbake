@@ -1,12 +1,12 @@
 package org.jbake.app;
 
+import java.io.File;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 /**
  * Provides Configuration related functions.
@@ -21,7 +21,6 @@ public class ConfigUtil {
 	 *
 	 */
 	public static interface Keys {
-
 		/**
 		 * Output filename for archive file, is only used when {@link #RENDER_ARCHIVE} is true
 		 */
@@ -51,6 +50,11 @@ public class ConfigUtil {
 		 * Folder where assets are stored, they are copied directly in output folder and not processed
 		 */
 		static final String ASSET_FOLDER = "asset.folder";
+
+		/**
+		 * Flag indicating if content starting with this URI should have extensionless URI's
+		 */
+		static final String URI_NO_EXTENSION = "uri.noExtension";
 
 		/**
 		 * Flag indicating if hidden asset resources should be ignored
@@ -181,10 +185,16 @@ public class ConfigUtil {
 		 * Version of JBake
 		 */
 		static final String VERSION = "version";
-                
-                static final String PAGINATE_INDEX = "index.paginate";
-                static final String POSTS_PER_PAGE = "index.posts_per_page";
 		
+		/**
+		 * Flag indicating if there should be pagination when rendering index
+		 */
+		static final String PAGINATE_INDEX = "index.paginate";
+		
+		/**
+		 * How many posts per page on index
+		 */
+		static final String POSTS_PER_PAGE = "index.posts_per_page";
 	}
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
