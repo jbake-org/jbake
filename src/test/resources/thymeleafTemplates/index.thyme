@@ -18,7 +18,7 @@
 		<div class="span12">
 			<div th:each="post : ${posts}">
 			<h4><a th:href='${post.uri}' th:text='${post.title}' href="post_uri.html">Post title</a></h4>
-			<p th:text='${#dates.format(post.date,"dd MMMM yyyy") + " - " + #strings.substring(post.body,0, 150)}'>...</p>
+			<p th:text='${#dates.format(post.date,"dd/MM/yyyy") + " - " + post.summaryForHome}'></p>
 			</div>
 			<a href="/archive.html">Archive</a>
 		</div>

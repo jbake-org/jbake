@@ -1,6 +1,9 @@
 package org.jbake.parser;
 
+import static org.jbake.app.ContentTag.*;
+
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.Content;
 
 import java.io.File;
 import java.util.List;
@@ -12,8 +15,27 @@ public class ParserContext {
     private final CompositeConfiguration config;
     private final String contentPath;
     private final boolean hasHeader;
-    private final Map<String,Object> contents;
+    private final Content contents;
 
+    public ParserContext(
+            File file,
+            List<String> fileLines,
+            CompositeConfiguration config,
+            String contentPath,
+            boolean hasHeader,
+            Content contents) {
+        this.file = file;
+        this.fileLines = fileLines;
+        this.config = config;
+        this.contentPath = contentPath;
+        this.hasHeader = hasHeader;
+        this.contents = contents;
+    }
+
+    /**
+     * Kept to prevent API break.
+     */
+    @Deprecated
     public ParserContext(
             File file,
             List<String> fileLines,
@@ -26,7 +48,7 @@ public class ParserContext {
         this.config = config;
         this.contentPath = contentPath;
         this.hasHeader = hasHeader;
-        this.contents = contents;
+        this.contents = new Content(contents);
     }
 
     public File getFile() {
@@ -45,7 +67,12 @@ public class ParserContext {
         return contentPath;
     }
 
+    @Deprecated
     public Map<String, Object> getContents() {
+        return contents.getContentAsMap();
+    }
+
+    public Content getContent() {
         return contents;
     }
 
@@ -55,10 +82,10 @@ public class ParserContext {
 
     // short methods for common use
     public String getBody() {
-        return contents.get("body").toString();
+        return contents.getString(body, null);
     }
 
     public void setBody(String str) {
-        contents.put("body", str);
+        contents.put(body, str);
     }
 }

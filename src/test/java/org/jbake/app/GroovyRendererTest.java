@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
@@ -137,8 +139,40 @@ public class GroovyRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>")
-        	.contains("<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>");
+            .contains("<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>")
+            .contains("<p>28/02/2013 -")
+            .contains("<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>")
+            .contains("<p>27/02/2012 -")
+            .contains("Lorem ipsum dolor sit amet")
+            .contains("Aliquam erat volutpat.");
+    }
+
+    @Test 
+    public void renderIndexWithExcerpt() throws Exception {
+        //setup
+        config.setProperty(Keys.INDEX_SUMMERY, true);
+        config.setProperty(ContentTag.summaryLength.key(), 60);
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        //exec
+        renderer.renderIndex("index.html");
+
+        //validate
+        File outputFile = new File(destinationFolder, "index.html");
+        Assert.assertTrue(outputFile.exists());
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+            .contains("<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>")
+            .contains("<p>28/02/2013 -")
+            .contains("<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>")
+            .contains("<p>27/02/2012 -")
+            .contains("Lorem ipsum dolor sit amet")
+            .contains("ultricies a hendrerit quam iaculis")
+            .doesNotContain("Duis tempor elit sit amet")
+            .doesNotContain("Aliquam erat volutpat.");
     }
 
     @Test
@@ -153,9 +187,34 @@ public class GroovyRendererTest {
         // verify
         String output = FileUtils.readFileToString(outputFile);
         assertThat(output) 
-        	.contains("<description>My corner of the Internet</description>")
-        	.contains("<title>Second Post</title>")
-        	.contains("<title>First Post</title>");
+            .contains("<description>My corner of the Internet</description>")
+            .contains("<title>Second Post</title>")
+            .contains("<title>First Post</title>")
+            .contains("Lorem ipsum dolor sit amet")
+            .contains("Aliquam erat volutpat.");
+    }
+
+    @Test
+    public void renderFeedWithExcerpt() throws Exception {
+        config.setProperty(Keys.FEED_SUMMERY, true);
+        config.setProperty(ContentTag.summaryLength.key(), 60);
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        renderer.renderFeed("feed.xml");
+        File outputFile = new File(destinationFolder, "feed.xml");
+        Assert.assertTrue(outputFile.exists());
+        
+        // verify
+        String output = FileUtils.readFileToString(outputFile);
+        assertThat(output) 
+        .contains("<description>My corner of the Internet</description>")
+        .contains("<title>Second Post</title>")
+        .contains("<title>First Post</title>")
+        .contains("Lorem ipsum dolor sit amet")
+        .contains("ultricies a hendrerit quam iaculis")
+        .doesNotContain("Duis tempor elit sit amet")
+        .doesNotContain("Aliquam erat volutpat.");
     }
 
     @Test

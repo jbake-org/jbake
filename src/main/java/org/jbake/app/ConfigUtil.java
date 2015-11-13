@@ -97,16 +97,57 @@ public class ConfigUtil {
 		 */
 		static final String DRAFT_SUFFIX = "draft.suffix";
 		
-		/**
-		 * Output filename for feed file, is only used when {@link #RENDER_FEED} is true
-		 */
-		static final String FEED_FILE = "feed.file";
-		
-		/**
-		 * Output filename for index, is only used when {@link #RENDER_INDEX} is true
-		 */
-		static final String INDEX_FILE = "index.file";
-		
+        /**
+         * Output filename for feed file, is only used when {@link #RENDER_FEED} is true
+         */
+        static final String FEED_FILE = "feed.file";
+        
+        /**
+         * Flag indicating if index page shows excerpts or full bodies, 
+         * is only used when {@link #RENDER_INDEX} is true
+         */
+        static final String INDEX_SUMMERY = "index.summery";
+        
+        /**
+         * Flag indicating if feed page shows excerpts or full bodies, 
+         * is only used when {@link #RENDER_INDEX} is true
+         */
+        static final String FEED_SUMMERY = "feed.summery";
+        
+        /**
+         * The max length of an excerpt used as summary.
+         * 
+         * By default: -1, i.e. no limit.
+         */
+        static final String SUMMERY_MAX_LENGTH = "summary.max.length";
+        
+        /*
+         * The unit used to truncate the body, either character, Unicode code point or word.
+         * 
+         * By default: world
+         */
+        static final String SUMMERY_LENGTH_UNIT = "summary.length.unit";
+
+        /**
+         * The ellipsis used with an excerpt shorter than the page/post body content.
+         * 
+         * By default: ...
+         */
+        static final String SUMMERY_ELLIPSIS = "summary.ellipsis";
+        
+        /**
+         * The readmore label used with an excerpt shorter than the page/post body content.
+         * 
+         * If a pattern is provided then it will be interpolated with the post/page link. 
+         * By default: empty string
+         */
+        static final String SUMMERY_READMORE = "summary.readmore";
+        
+        /**
+         * Output filename for index, is only used when {@link #RENDER_INDEX} is true
+         */
+        static final String INDEX_FILE = "index.file";
+        
 		/**
 		 * File extension to be used for all output files
 		 */
