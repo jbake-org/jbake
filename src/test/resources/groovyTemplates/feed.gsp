@@ -16,7 +16,7 @@
       <pubDate>${post.date.format("EEE, d MMM yyyy HH:mm:ss Z")}</pubDate>
       <guid isPermaLink="false">${post.uri}</guid>
       	<description>
-	${post.body}
+	${post.summaryForFeed}
 	</description>
     </item>
     <%}%>

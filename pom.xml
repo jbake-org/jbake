@@ -80,6 +80,13 @@
         <thymeleaf.version>2.1.3.RELEASE</thymeleaf.version>
 		<thymeleaf.extras.version>2.1.1.RELEASE</thymeleaf.extras.version>
         <json-simple.version>1.1.1</json-simple.version>
+        <tika.version>1.9</tika.version><!-- Version 1.9 of Tika is the last one working with Java 6 -->
+        <tagsoup.version>1.2.1</tagsoup.version>
+        <sis.version>0.6</sis.version><!-- 0.5, 0.6 -->
+        <asm.version>5.0.4</asm.version><!-- 4.1, 5.0.4 -->
+        <guava.version>18.0</guava.version><!-- 11.0.2, 18.0 -->
+        <hamcrest.version>1.3</hamcrest.version>
+        <htmlcompressor.version>1.5.2</htmlcompressor.version>
     </properties>
 
 	<build>
@@ -288,6 +295,7 @@
 			</resource>
 		</resources>
 	</build>
+	
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -298,6 +306,12 @@
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>${commons.configuration.version}</version>
+			<exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
@@ -332,6 +346,12 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
@@ -348,6 +368,12 @@
 			<artifactId>pegdown</artifactId>
 			<version>${pegdown.version}</version>
             <optional>true</optional>
+            <exclusions>
+                <exclusion><!-- provided by tika -->
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.asciidoctor</groupId>
@@ -391,12 +417,16 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jul-to-slf4j</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
 
 		<dependency>
             <groupId>ch.qos.logback</groupId>
@@ -404,12 +434,49 @@
             <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
-
+        
+        <!-- excerpt -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-            <optional>true</optional>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <version>${tika.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+	    <dependency>
+		    <groupId>org.ccil.cowan.tagsoup</groupId>
+		    <artifactId>tagsoup</artifactId>
+		    <version>${tagsoup.version}</version>
+	    </dependency>
+        <dependency>
+            <groupId>org.apache.sis.core</groupId>
+            <artifactId>sis-utility</artifactId>
+            <version>${sis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-debug-all</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.htmlcompressor</groupId>
+            <artifactId>htmlcompressor</artifactId>
+            <version>${htmlcompressor.version}</version>
+        </dependency>            
+     
 	</dependencies>
 </project>

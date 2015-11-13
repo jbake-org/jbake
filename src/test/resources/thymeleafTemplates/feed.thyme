@@ -15,7 +15,7 @@
       <link th:text='${"http://jonathanbullock.com"+post.uri}'>http://jonathanbullock.com/blog/foo.html</link>
       <pubDate th:text='${#dates.format(post.date,"EEE, d MMM yyyy HH:mm:ss Z")}'>2014-01-30</pubDate>
       <guid isPermaLink="false" th:text="${post.uri}">http://jonathanbullock.com/blog/foo.html</guid>
-      	<description th:text='${#strings.escapeXml(post.body)}'>Body of the post</description>
+      	<description th:text='${post.summaryForFeed}'>Summary of the post</description>
     </item>
   </channel> 
 </rss>

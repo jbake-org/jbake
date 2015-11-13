@@ -1,11 +1,12 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import static org.jbake.app.ContentStatus.*;
+import static org.jbake.app.ContentTag.*;
+
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Parser.PostParsingProcessor;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
@@ -17,10 +18,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.io.File.separator;
+import static java.lang.Boolean.FALSE;
 
 /**
  * Crawls a file system looking for content.
@@ -61,10 +62,10 @@ public class Crawler {
                     String sha1 = buildHash(sourceFile);
                     String uri = buildURI(sourceFile);
                     boolean process = true;
-                    DocumentStatus status = DocumentStatus.NEW;
+                    DocumentStatus docStatus = DocumentStatus.NEW;
                     for (String docType : DocumentTypes.getDocumentTypes()) {
-                        status = findDocumentStatus(docType, uri, sha1);
-                        switch (status) {
+                        docStatus = findDocumentStatus(docType, uri, sha1);
+                        switch (docStatus) {
                             case UPDATED:
                                 sb.append(" : modified ");
                                 db.deleteContent(docType, uri);
@@ -77,7 +78,7 @@ public class Crawler {
                             break;
                         }
                     }
-                    if (DocumentStatus.NEW == status) {
+                    if (DocumentStatus.NEW == docStatus) {
                         sb.append(" : new ");
                     }
                     if (process) { // new or updated
@@ -113,35 +114,44 @@ public class Crawler {
     }
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
-        Map<String, Object> fileContents = parser.processFile(sourceFile);
-        if (fileContents != null) {
-        	fileContents.put("rootpath", getPathToRoot(sourceFile));
-            fileContents.put("sha1", sha1);
-            fileContents.put("rendered", false);
-            if (fileContents.get("tags") != null) {
-                // store them as a String[]
-                String[] tags = (String[]) fileContents.get("tags");
-                fileContents.put("tags", tags);
-            }
-            fileContents.put("file", sourceFile.getPath());
-            fileContents.put("uri", uri.substring(0, uri.lastIndexOf(".")) + FileUtil.findExtension(config, fileContents.get("type").toString()));
-
-            String documentType = (String) fileContents.get("type");
-            if (fileContents.get("status").equals("published-date")) {
-                if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
-                    if (new Date().after((Date) fileContents.get("date"))) {
-                        fileContents.put("status", "published");
-                    }
-                }
-            }
-            ODocument doc = new ODocument(documentType);
-            doc.fields(fileContents);
-            boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String)fileContents.get("cached")):true;
-            doc.field("cached", cached);
-            doc.save();
-        } else {
+        Content fileContents = parser.process(sourceFile, getPostParsingProcessor(sourceFile, sha1, uri));
+        if (fileContents == null) {
             LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
+            return;
         }
+        String documentType = fileContents.getString(type, null);
+        ODocument doc = new ODocument(documentType);
+        doc.fields(fileContents.getContentAsMap());
+        doc.field("cached", fileContents.getBoolean(cached, true));
+        doc.save();
+    }
+    
+    public PostParsingProcessor getPostParsingProcessor(final File file, final String sourceSha1, final String sourceUri) {
+    	return new PostParsingProcessor() {
+    		@Override
+    		public void doProcess(final Content contents) {
+    		    final File sourceFile = file;
+            	contents.put(rootpath, getPathToRoot(sourceFile));
+                contents.put(sha1, sourceSha1);
+                contents.put(rendered, false);
+                if (contents.get(tags) != null) {
+                    // store them as a String[]
+                    String[] contentTags = (String[]) contents.get(tags);
+                    contents.put(tags, contentTags);
+                }
+                contents.put(ContentTag.file, sourceFile.getPath());
+                contents.put(uri, sourceUri.substring(0, sourceUri.lastIndexOf(".")) 
+                		+ FileUtil.findExtension(config, contents.getString(type, null)));
+
+                if (contents.getStatus().equals(publishedDate)
+                    && contents.get(date) != null 
+                    && (contents.get(date) instanceof Date)
+                    && new Date().after((Date) contents.get(date))) {
+                	contents.setStatus(published);
+                }
+     			
+    		}
+    	};
     }
 
     public String getPathToRoot(File sourceFile) {
@@ -173,12 +183,12 @@ public class Crawler {
         return result;
     }
 
-    private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
+    private DocumentStatus findDocumentStatus(String docType, String uri, String souceSha1) {
         List<ODocument> match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
             ODocument entries = match.get(0);
-            String oldHash = entries.field("sha1");
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field("rendered"))) {
+            String oldHash = entries.field(sha1.name());
+            if (!(oldHash.equals(souceSha1)) || FALSE.equals(entries.field("rendered"))) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;
