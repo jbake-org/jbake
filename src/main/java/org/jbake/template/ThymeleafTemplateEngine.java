@@ -100,74 +100,13 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     }
 
     private class JBakeVariablesMap extends VariablesMap<String, Object> {
-
-//        public JBakeVariablesMap(final Map<String, Object> model) {
-//            super(model);
-//            completeModel();
-//        }
-//
-//        private void completeModel() {
-//            put("db", db);
-//            put(ContentStore.ALLTAGS, getAllTags());
-//            put(ContentStore.TAG_POSTS, getTagPosts());
-//            put(ContentStore.PUBLISHED_DATE, new Date());
-//            String[] documentTypes = DocumentTypes.getDocumentTypes();
-//            for (String docType : documentTypes) {
-//                put(docType + "s", DocumentList.wrap(db.getAllContent(docType).iterator()));
-//                put("published_" + docType + "s", DocumentList.wrap(db.getPublishedContent(docType).iterator()));
-//            }
-//            put(ContentStore.PUBLISHED_CONTENT, getPublishedContent());
-//            put(ContentStore.ALL_CONTENT, getAllContent());
-//        }
-//
-//        private Object getTagPosts() {
-//            Object tagName = get("tag");
-//            if (tagName != null) {
-//                String tag = tagName.toString();
-//                // fetch the tag posts from db
-//                List<ODocument> query = db.getPublishedPostsByTag(tag);
-//                return DocumentList.wrap(query.iterator());
-//            } else {
-//                return Collections.emptyList();
-//            }
-//        }
-//
-//        private Object getAllTags() {
-//            List<ODocument> query = db.getAllTagsFromPublishedPosts();
-//            Set<String> result = new HashSet<String>();
-//            for (ODocument document : query) {
-//                String[] tags = DBUtil.toStringArray(document.field("tags"));
-//                Collections.addAll(result, tags);
-//            }
-//            return result;
-//        }
-//        
-//        private Object getPublishedContent() {
-//        	List<ODocument> publishedContent = new ArrayList<ODocument>();
-//        	String[] documentTypes = DocumentTypes.getDocumentTypes();
-//        	for (String docType : documentTypes) {
-//        		List<ODocument> query = db.getPublishedContent(docType);
-//        		publishedContent.addAll(query);
-//        	}
-//        	return DocumentList.wrap(publishedContent.iterator());
-//        }
-//        
-//        private Object getAllContent() {
-//        	List<ODocument> allContent = new ArrayList<ODocument>();
-//        	String[] documentTypes = DocumentTypes.getDocumentTypes();
-//        	for (String docType : documentTypes) {
-//        		List<ODocument> query = db.getAllContent(docType);
-//        		allContent.addAll(query);
-//        	}
-//        	return DocumentList.wrap(allContent.iterator());
-//        }
     	public JBakeVariablesMap(final Map<String, Object> model) {
             super(model);
             for(String key : extractors.keySet()) {
             	try {
 					put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
 				} catch (NoModelExtractorException e) {
-					// should never happen, as we iterate over xisting extractors
+					// should never happen, as we iterate over existing extractors
 				}
             }
         }

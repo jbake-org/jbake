@@ -37,6 +37,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 public class PebbleTemplateEngine extends AbstractTemplateEngine {
 
     private PebbleEngine engine;
+    private static ModelExtractors extractors = new ModelExtractors();
 
     public PebbleTemplateEngine(final CompositeConfiguration config, final ContentStore db,
             final File destination, final File templatesPath) {
@@ -82,62 +83,11 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
             public Object get(final Object property) {
                 if (property instanceof String) {
                     String key = property.toString();
-                    
-                    if ("db".equals(key)) {
-                        return db;
-                    }
-                    if ("published_posts".equals(key)) {
-                        List<ODocument> query = db.getPublishedPosts();
-                        return DocumentList.wrap(query.iterator());
-                    }
-                    if ("published_pages".equals(key)) {
-                        List<ODocument> query = db.getPublishedPages();
-                        return DocumentList.wrap(query.iterator());
-                    }
-                    if ("published_content".equals(key)) {
-                        List<ODocument> publishedContent = new ArrayList<ODocument>();
-                        String[] documentTypes = DocumentTypes.getDocumentTypes();
-                        for (String docType : documentTypes) {
-                            List<ODocument> query = db.getPublishedContent(docType);
-                            publishedContent.addAll(query);
-                        }
-                        return DocumentList.wrap(publishedContent.iterator());
-                    }
-                    if ("all_content".equals(key)) {
-                        List<ODocument> allContent = new ArrayList<ODocument>();
-                        String[] documentTypes = DocumentTypes.getDocumentTypes();
-                        for (String docType : documentTypes) {
-                            List<ODocument> query = db.getAllContent(docType);
-                            allContent.addAll(query);
-                        }
-                        return DocumentList.wrap(allContent.iterator());
-                    }
-                    if ("alltags".equals(key)) {
-                        List<ODocument> query = db.getAllTagsFromPublishedPosts();
-                        Set<String> result = new HashSet<String>();
-                        for (ODocument document : query) {
-                            String[] tags = DBUtil.toStringArray(document.field("tags"));
-                            Collections.addAll(result, tags);
-                        }
-                        return result;
-                    }
-
-                    String[] documentTypes = DocumentTypes.getDocumentTypes();
-                    for (String docType : documentTypes) {
-                        if ((docType + "s").equals(key)) {
-                            return DocumentList.wrap(db.getAllContent(docType).iterator());
-                        }
-                    }
-
-                    if ("tag_posts".equals(key)) {
-                        String tag = model.get("tag").toString();
-                        // fetch the tag posts from db
-                        List<ODocument> query = db.getPublishedPostsByTag(tag);
-                        return DocumentList.wrap(query.iterator());
-                    }
-                    if ("published_date".equals(key)) {
-                        return new Date();
-                    }
+                    try {
+                		return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
+                	} catch(NoModelExtractorException e) {
+                		// fallback to parent model
+                	}
                 }
 
                 return super.get(property);
@@ -148,14 +98,14 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
                 if (property instanceof String) {
                     String key = property.toString();
                     List<String> lazyKeys = new ArrayList<String>();
-                    lazyKeys.add("db");
-                    lazyKeys.add("published_posts");
-                    lazyKeys.add("published_pages");
-                    lazyKeys.add("published_content");
-                    lazyKeys.add("all_content");
-                    lazyKeys.add("alltags");
-                    lazyKeys.add("tag_posts");
-                    lazyKeys.add("published_date");
+                    lazyKeys.add(ContentStore.DATABASE);
+                    lazyKeys.add(ContentStore.PUBLISHED_POSTS);
+                    lazyKeys.add(ContentStore.PUBLISHED_PAGES);
+                    lazyKeys.add(ContentStore.PUBLISHED_CONTENT);
+                    lazyKeys.add(ContentStore.ALL_CONTENT);
+                    lazyKeys.add(ContentStore.ALLTAGS);
+                    lazyKeys.add(ContentStore.TAG_POSTS);
+                    lazyKeys.add(ContentStore.PUBLISHED_DATE);
 
                     String[] documentTypes = DocumentTypes.getDocumentTypes();
                     for (String docType : documentTypes) {

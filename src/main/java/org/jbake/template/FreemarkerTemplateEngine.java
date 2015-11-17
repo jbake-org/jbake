@@ -89,57 +89,6 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
-//            if (ContentStore.PUBLISHED_POSTS.equals(key)) {
-//                List<ODocument> query = db.getPublishedPosts();
-//                return new SimpleSequence(DocumentList.wrap(query.iterator()));
-//            }
-//            if (ContentStore.PUBLISHED_PAGES.equals(key)) {
-//                List<ODocument> query = db.getPublishedPages();
-//                return new SimpleSequence(DocumentList.wrap(query.iterator()));
-//            }
-//            if (ContentStore.PUBLISHED_CONTENT.equals(key)) {
-//            	List<ODocument> publishedContent = new ArrayList<ODocument>();
-//            	String[] documentTypes = DocumentTypes.getDocumentTypes();
-//            	for (String docType : documentTypes) {
-//            		List<ODocument> query = db.getPublishedContent(docType);
-//           		publishedContent.addAll(query);
-//            	}
-//            	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
-//            }
-//            if (ContentStore.ALL_CONTENT.equals(key)) {
-//            	List<ODocument> allContent = new ArrayList<ODocument>();
-//            	String[] documentTypes = DocumentTypes.getDocumentTypes();
-//            	for (String docType : documentTypes) {
-//            		List<ODocument> query = db.getAllContent(docType);
-//            		allContent.addAll(query);
-//            	}
-//            	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
-//            }
-//            if (ContentStore.ALLTAGS.equals(key)) {
-//                List<ODocument> query = db.getAllTagsFromPublishedPosts();
-//                Set<String> result = new HashSet<String>();
-//                for (ODocument document : query) {
-//                    String[] tags = DBUtil.toStringArray(document.field("tags"));
-//                    Collections.addAll(result, tags);
-//                }
-//                return new SimpleCollection(result);
-//            }
-//            String[] documentTypes = DocumentTypes.getDocumentTypes();
-//            for (String docType : documentTypes) {
-//                if ((docType+"s").equals(key)) {
-//                    return new SimpleSequence(DocumentList.wrap(db.getAllContent(docType).iterator()));
-//                }
-//            }
-//            if (ContentStore.TAG_POSTS.equals(key)) {
-//                String tag = eagerModel.get("tag").toString();
-//                // fetch the tag posts from db
-//                List<ODocument> query = db.getPublishedPostsByTag(tag);
-//                return new SimpleSequence(DocumentList.wrap(query.iterator()));
-//            }
-//            if (ContentStore.PUBLISHED_DATE.equals(key)) {
-//                return new SimpleDate(new Date(), TemplateDateModel.UNKNOWN);
-//            }
-//            return eagerModel.get(key);
         	try {
         		return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
 

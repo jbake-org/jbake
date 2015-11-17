@@ -52,6 +52,7 @@ public class ContentStore {
     public static final String PUBLISHED_CONTENT = "published_content";
     public static final String PUBLISHED_PAGES = "published_pages";
     public static final String PUBLISHED_POSTS = "published_posts";
+    public static final String DATABASE = "db";
 
     private ODatabaseDocumentTx db;
     private long start = -1;
