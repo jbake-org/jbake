@@ -52,7 +52,7 @@ public class ConfigUtil {
 		static final String ASSET_FOLDER = "asset.folder";
 
 		/**
-		 * Flag indicating if content starting with this URI should have extensionless URI's
+		 * URI prefix for content that should be given extensionless output URI's
 		 */
 		static final String URI_NO_EXTENSION = "uri.noExtension";
 

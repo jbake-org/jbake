@@ -57,14 +57,14 @@ public abstract class AbstractTemplateEngineRenderingTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private File sourceFolder;
-    private File destinationFolder;
-    private File templateFolder;
-    private CompositeConfiguration config;
-    private ContentStore db;
+    protected File sourceFolder;
+    protected File destinationFolder;
+    protected File templateFolder;
+    protected CompositeConfiguration config;
+    protected ContentStore db;
 
-    private final String templateDir;
-    private final String templateExtension;
+    protected final String templateDir;
+    protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
@@ -119,7 +119,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content"
                 + File.separator + "blog" + File.separator + "2013" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/" + filename);
+        content.put(Crawler.Attributes.URI, "/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
@@ -142,7 +142,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
-        content.put("uri", "/" + filename);
+        content.put(Crawler.Attributes.URI, "/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
