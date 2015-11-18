@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.db.record.OTrackedList;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import org.jbake.model.DocumentTypes;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,11 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 public class DBUtil {
-    public static ContentStore createDB(final String type, String name) {
-        return new ContentStore(type, name);
-    }
+    private static ContentStore contentStore;
+    
     public static ContentStore createDataStore(final String type, String name) {
-        return new ContentStore(type, name);
+        if (contentStore == null) {
+            contentStore = new ContentStore(type, name);
+        }
+        return contentStore;
+    }
+    
+    public static void closeDataStore() {
+        contentStore = null;
     }
     
     public static void updateSchema(final ContentStore db) {

@@ -1,8 +1,6 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import groovy.lang.GString;
 import groovy.lang.Writable;
@@ -22,13 +20,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +45,7 @@ import org.jbake.app.ContentStore;
 public class GroovyTemplateEngine extends AbstractTemplateEngine {
 
     private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
+    private static ModelExtractors extractors = new ModelExtractors();
 
     public GroovyTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
@@ -78,7 +74,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     }
 
     private Map<String, Object> wrap(final Map<String, Object> model) {
-        return new HashMap<String, Object>(model) {
+    	return new HashMap<String, Object>(model) {
             @Override
             public Object get(final Object property) {
                 if (property instanceof String || property instanceof GString) {
@@ -86,59 +82,11 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     if ("include".equals(key)) {
                         return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
                     }
-                    if ("db".equals(key)) {
-                        return db;
-                    }
-                    if ("published_posts".equals(key)) {
-                        List<ODocument> query = db.getPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
-                        return DocumentList.wrap(query.iterator());
-                    }
-                    if ("published_pages".equals(key)) {
-                        List<ODocument> query = db.getPublishedPages(); //query(new OSQLSynchQuery<ODocument>("select * from page where status='published' order by date desc"));
-                        return DocumentList.wrap(query.iterator());
-                    }
-                    if ("published_content".equals(key)) {
-                    	List<ODocument> publishedContent = new ArrayList<ODocument>();
-                    	String[] documentTypes = DocumentTypes.getDocumentTypes();
-                    	for (String docType : documentTypes) {
-                    		List<ODocument> query = db.getPublishedContent(docType);
-                    		publishedContent.addAll(query);
-                    	}
-                    	return DocumentList.wrap(publishedContent.iterator());
-                    }
-                    if ("all_content".equals(key)) {
-                    	List<ODocument> allContent = new ArrayList<ODocument>();
-                    	String[] documentTypes = DocumentTypes.getDocumentTypes();
-                    	for (String docType : documentTypes) {
-                    		List<ODocument> query = db.getAllContent(docType);
-                    		allContent.addAll(query);
-                    	}
-                    	return DocumentList.wrap(allContent.iterator());
-                    }
-                    if ("alltags".equals(key)) {
-                        List<ODocument> query = db.getAllTagsFromPublishedPosts();
-                        Set<String> result = new HashSet<String>();
-                        for (ODocument document : query) {
-                            String[] tags = DBUtil.toStringArray(document.field("tags"));
-                            Collections.addAll(result, tags);
-                        }
-                        return result;
-                    }
-                    String[] documentTypes = DocumentTypes.getDocumentTypes();
-                    for (String docType : documentTypes) {
-                        if ((docType+"s").equals(key)) {
-                            return DocumentList.wrap(db.getAllContent(docType).iterator());
-                        }
-                    }
-                    if ("tag_posts".equals(key)) {
-                        String tag = model.get("tag").toString();
-                        // fetch the tag posts from db
-                        List<ODocument> query = db.getPublishedPostsByTag(tag);
-                        return DocumentList.wrap(query.iterator());
-                    }
-                    if ("published_date".equals(key)) {
-                        return new Date();
-                    }
+                	try {
+                		return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
+                	} catch(NoModelExtractorException e) {
+                		// fallback to parent model
+                	}
                 }
 
                 return super.get(property);

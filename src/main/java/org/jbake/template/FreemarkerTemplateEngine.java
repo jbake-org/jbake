@@ -1,7 +1,6 @@
 package org.jbake.template;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -26,12 +25,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.jbake.app.ContentStore;
 
 /**
@@ -41,6 +44,7 @@ import org.jbake.app.ContentStore;
  */
 public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
+	private static ModelExtractors extractors = new ModelExtractors();
     private Configuration templateCfg;
 
     public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
@@ -85,57 +89,25 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
-            if ("published_posts".equals(key)) {
-                List<ODocument> query = db.getPublishedPosts();
-                return new SimpleSequence(DocumentList.wrap(query.iterator()));
-            }
-            if ("published_pages".equals(key)) {
-                List<ODocument> query = db.getPublishedPages();
-                return new SimpleSequence(DocumentList.wrap(query.iterator()));
-            }
-            if ("published_content".equals(key)) {
-            	List<ODocument> publishedContent = new ArrayList<ODocument>();
-            	String[] documentTypes = DocumentTypes.getDocumentTypes();
-            	for (String docType : documentTypes) {
-            		List<ODocument> query = db.getPublishedContent(docType);
-           		publishedContent.addAll(query);
-            	}
-            	return new SimpleSequence(DocumentList.wrap(publishedContent.iterator()));
-            }
-            if ("all_content".equals(key)) {
-            	List<ODocument> allContent = new ArrayList<ODocument>();
-            	String[] documentTypes = DocumentTypes.getDocumentTypes();
-            	for (String docType : documentTypes) {
-            		List<ODocument> query = db.getAllContent(docType);
-            		allContent.addAll(query);
-            	}
-            	return new SimpleSequence(DocumentList.wrap(allContent.iterator()));
-            }
-            if ("alltags".equals(key)) {
-                List<ODocument> query = db.getAllTagsFromPublishedPosts();
-                Set<String> result = new HashSet<String>();
-                for (ODocument document : query) {
-                    String[] tags = DBUtil.toStringArray(document.field("tags"));
-                    Collections.addAll(result, tags);
-                }
-                return new SimpleCollection(result);
-            }
-            String[] documentTypes = DocumentTypes.getDocumentTypes();
-            for (String docType : documentTypes) {
-                if ((docType+"s").equals(key)) {
-                    return new SimpleSequence(DocumentList.wrap(db.getAllContent(docType).iterator()));
-                }
-            }
-            if ("tag_posts".equals(key)) {
-                String tag = eagerModel.get("tag").toString();
-                // fetch the tag posts from db
-                List<ODocument> query = db.getPublishedPostsByTag(tag);
-                return new SimpleSequence(DocumentList.wrap(query.iterator()));
-            }
-            if ("published_date".equals(key)) {
-                return new SimpleDate(new Date(), TemplateDateModel.UNKNOWN);
-            }
-            return eagerModel.get(key);
+        	try {
+        		return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
+
+					@Override
+					public TemplateModel adapt(String key, Object extractedValue) {
+						if(key.equals(ContentStore.ALLTAGS)) {
+							return new SimpleCollection((Collection) extractedValue);
+						} else if(key.equals(ContentStore.PUBLISHED_DATE)) {
+							return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
+						} else {
+							// All other cases, as far as I know, are document collections
+							return new SimpleSequence((Collection) extractedValue);
+						}
+										
+					}
+				});
+        	} catch(NoModelExtractorException e) {
+        		return eagerModel.get(key);
+        	}
         }
 
         @Override

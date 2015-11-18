@@ -1,15 +1,14 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Arrays;
@@ -20,7 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.io.File.separator;
+import org.apache.commons.io.FilenameUtils;
+import org.jbake.model.DocumentStatus;
+import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 /**
  * Crawls a file system looking for content.
@@ -28,6 +35,31 @@ import static java.io.File.separator;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Crawler {
+	public static interface Attributes {
+		/**
+		 * Possible values of the {@link Attributes#STATUS} property
+		 * @author ndx
+		 *
+		 */
+		public static interface Status {
+
+			static final String PUBLISHED_DATE = "published-date";
+			static final String PUBLISHED = "published";
+			static final String DRAFT = "draft";
+		}
+		static final String CACHED = "cached";
+		static final String DATE = "date";
+		static final String STATUS = "status";
+		static final String TYPE = "type";
+		static final String URI = "uri";
+		static final String FILE = "file";
+		static final String TAGS = "tags";
+		static final String TAG = "tag";
+		static final String RENDERED = "rendered";
+		static final String SHA1 = "sha1";
+		static final String ROOTPATH = "rootpath";
+		
+	}
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
 
     private CompositeConfiguration config;
@@ -105,7 +137,13 @@ public class Crawler {
     
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-    	// strip off leading / to enable generating non-root based sites
+    	String noExtensionUrlFolder = config.getString(Keys.URI_NO_EXTENSION);
+        if (!noExtensionUrlFolder.equals("false") && uri.startsWith(noExtensionUrlFolder)) {
+            uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getString(Keys.OUTPUT_EXTENSION);
+        } else {
+            uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
+        }
+        // strip off leading / to enable generating non-root based sites
     	if (uri.startsWith("/")) {
     		uri = uri.substring(1, uri.length());
     	}
@@ -115,29 +153,35 @@ public class Crawler {
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
-        	fileContents.put("rootpath", getPathToRoot(sourceFile));
-            fileContents.put("sha1", sha1);
-            fileContents.put("rendered", false);
-            if (fileContents.get("tags") != null) {
+        	fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
+            fileContents.put(Attributes.SHA1, sha1);
+            fileContents.put(Attributes.RENDERED, false);
+            if (fileContents.get(Attributes.TAGS) != null) {
                 // store them as a String[]
-                String[] tags = (String[]) fileContents.get("tags");
-                fileContents.put("tags", tags);
+                String[] tags = (String[]) fileContents.get(Attributes.TAGS);
+                fileContents.put(Attributes.TAGS, tags);
             }
-            fileContents.put("file", sourceFile.getPath());
-            fileContents.put("uri", uri.substring(0, uri.lastIndexOf(".")) + FileUtil.findExtension(config, fileContents.get("type").toString()));
 
-            String documentType = (String) fileContents.get("type");
-            if (fileContents.get("status").equals("published-date")) {
-                if (fileContents.get("date") != null && (fileContents.get("date") instanceof Date)) {
-                    if (new Date().after((Date) fileContents.get("date"))) {
-                        fileContents.put("status", "published");
+            fileContents.put(Attributes.FILE, sourceFile.getPath());
+            fileContents.put(Attributes.URI, uri);
+
+            String documentType = (String) fileContents.get(Attributes.TYPE);
+            if (fileContents.get(Attributes.STATUS).equals(Status.PUBLISHED_DATE)) {
+                if (fileContents.get(Attributes.DATE) != null && (fileContents.get(Attributes.DATE) instanceof Date)) {
+                    if (new Date().after((Date) fileContents.get(Attributes.DATE))) {
+                        fileContents.put(Attributes.STATUS, Status.PUBLISHED);
                     }
                 }
             }
+            
+            if (!config.getString(Keys.URI_NO_EXTENSION).equals("false")) {
+                fileContents.put("noExtensionUri", uri.replace("/index.html", "/"));
+            }
+            
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
-            boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String)fileContents.get("cached")):true;
-            doc.field("cached", cached);
+            boolean cached = fileContents.get(Attributes.CACHED) != null ? Boolean.valueOf((String)fileContents.get(Attributes.CACHED)):true;
+            doc.field(Attributes.CACHED, cached);
             doc.save();
         } else {
             LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
@@ -162,12 +206,12 @@ public class Crawler {
     public int getDocumentCount(String docType) {
         return (int) db.countClass(docType);
     }
-
+    
     public Set<String> getTags() {
         List<ODocument> query = db.getAllTagsFromPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
         Set<String> result = new HashSet<String>();
         for (ODocument document : query) {
-            String[] tags = DBUtil.toStringArray(document.field("tags"));
+            String[] tags = DBUtil.toStringArray(document.field(Attributes.TAGS));
             Collections.addAll(result, tags);
         }
         return result;
@@ -177,8 +221,8 @@ public class Crawler {
         List<ODocument> match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
             ODocument entries = match.get(0);
-            String oldHash = entries.field("sha1");
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field("rendered"))) {
+            String oldHash = entries.field(Attributes.SHA1);
+            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field(Attributes.RENDERED))) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;

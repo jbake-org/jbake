@@ -1,0 +1,15 @@
+extends layout.jade
+
+block content
+    .row-fluid.marketing
+        .span12
+            h2 Tags
+            each post, index in posts
+                if last_month != formatter.format(post.date, 'MMMM yyyy')
+                    h3 #{formatter.format(post.date, 'MMMM yyyy')}
+                h4
+                    | #{formatter.format(post.date, 'dd MMMM')}
+                    | &nbsp;-&nbsp;
+                    a(href='#{post.uri}') #{post.title}
+                - var last_month = formatter.format(post.date, 'MMMM yyyy')
+    hr

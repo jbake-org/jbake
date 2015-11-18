@@ -1,0 +1,17 @@
+{% extends 'base.pebble' %}
+
+{% block header %}Blog{% endblock %}
+
+{% block primary %}
+
+    {% for post in published_posts %}
+        <a href="{{ post.uri }}"><h1>{{ post.title }}</h1></a>
+        <p>{{ post.date | date("dd MMMM yyyy") }}</p>
+        <p>{{ post.body }}</p>
+    {% endfor %}
+
+    <hr>
+
+    <p>Older posts are available in the <a href="{{ content.rootpath }}archive.html">archive</a>.</p>
+
+{% endblock %}
