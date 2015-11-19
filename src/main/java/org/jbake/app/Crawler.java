@@ -52,6 +52,7 @@ public class Crawler {
 		static final String STATUS = "status";
 		static final String TYPE = "type";
 		static final String URI = "uri";
+		static final String SOURCE_URI = "sourceuri";
 		static final String FILE = "file";
 		static final String TAGS = "tags";
 		static final String TAG = "tag";
@@ -161,8 +162,8 @@ public class Crawler {
                 String[] tags = (String[]) fileContents.get(Attributes.TAGS);
                 fileContents.put(Attributes.TAGS, tags);
             }
-
             fileContents.put(Attributes.FILE, sourceFile.getPath());
+            fileContents.put(Attributes.SOURCE_URI, uri);
             fileContents.put(Attributes.URI, uri);
 
             String documentType = (String) fileContents.get(Attributes.TYPE);
