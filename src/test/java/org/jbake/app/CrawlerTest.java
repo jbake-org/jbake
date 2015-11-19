@@ -1,7 +1,5 @@
 package org.jbake.app;
 
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -94,8 +92,8 @@ public class CrawlerTest {
 	        Map<String, Object> model = documents.next();
 	        String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName((String) model.get("file")) + "/";
 
-	        assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
-            assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
+	        Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
+	        Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
 	    }
 	}
 
