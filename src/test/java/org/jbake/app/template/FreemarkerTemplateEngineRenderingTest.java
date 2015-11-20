@@ -43,29 +43,10 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
     public FreemarkerTemplateEngineRenderingTest() {
         super("freemarkerTemplates", "ftl");
-
-        outputStrings.put("post", Arrays.asList("<h1>Second Post</h1>",
-                "<p><em>28 February 2013</em></p>",
-                "Lorem ipsum dolor sit amet", "<meta property=\"og:description\" content=\"Something\"/>"));
-        outputStrings.put("page", Arrays.asList("<title>About</title>",
-	    	"All about stuff!"));
-        outputStrings.put("index", Arrays.asList("<a href=\"blog/2012/first-post.html\">",
-                "<a href=\"blog/2013/second-post.html\">"));
-        outputStrings.put("feed", Arrays.asList("<description>My corner of the Internet</description>",
-                "<title>Second Post</title>",
-                "<title>First Post</title>"));
-        outputStrings.put("archive", Arrays.asList("<a href=\"blog/2013/second-post.html\">",
-        	"<a href=\"blog/2012/first-post.html\">"));
-        outputStrings.put("tags", Arrays.asList("<a href=\"blog/2013/second-post.html\">",
-        	"<a href=\"blog/2012/first-post.html\">"));
-        outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
-        	"blog/2012/first-post.html",
-        	"papers/published-paper.html"));
     }
 
     @Test
-	@Override
-	public void renderIndex() throws Exception {
+	public void renderPaginatedIndex() throws Exception {
 		config.setProperty(Keys.PAGINATE_INDEX, true);
         config.setProperty(Keys.POSTS_PER_PAGE, 1);
         outputStrings.put("index", Arrays.asList("<a href=\"blog/2013/second-post.html\">"));
