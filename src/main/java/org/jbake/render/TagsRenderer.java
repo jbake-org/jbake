@@ -17,7 +17,6 @@ public class TagsRenderer implements RenderingTool {
 	public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
 		if (config.getBoolean(Keys.RENDER_TAGS)) {
 			try {
-//				return renderer.renderTags(Crawler.getTags(db), config.getString("tag.path"));
 				return renderer.renderTags(db.getTags(), config.getString(Keys.TAG_PATH));
 			} catch (Exception e) {
 				throw new RenderingException(e);

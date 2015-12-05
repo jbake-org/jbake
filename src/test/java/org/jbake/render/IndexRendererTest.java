@@ -12,11 +12,11 @@ import java.io.File;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class ArchiveRendererTest {
+public class IndexRendererTest {
 
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderArchives() throws RenderingException {
-        ArchiveRenderer renderer = new ArchiveRenderer();
+    public void returnsZeroWhenConfigDoesNotRenderIndices() throws RenderingException {
+        IndexRenderer renderer = new IndexRenderer();
 
         CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
@@ -29,8 +29,8 @@ public class ArchiveRendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderArchives() throws Exception {
-        ArchiveRenderer renderer = new ArchiveRenderer();
+    public void doesNotRenderWhenConfigDoesNotRenderIndices() throws Exception {
+        IndexRenderer renderer = new IndexRenderer();
 
         CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
@@ -39,12 +39,12 @@ public class ArchiveRendererTest {
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, never()).renderArchive(anyString());
+        verify(mockRenderer, never()).renderIndex(anyString(), any(ContentStore.class));
     }
 
     @Test
-    public void returnsOneWhenConfigRendersArchives() throws RenderingException {
-        ArchiveRenderer renderer = new ArchiveRenderer();
+    public void returnsOneWhenConfigRendersIndices() throws RenderingException {
+        IndexRenderer renderer = new IndexRenderer();
 
         CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
@@ -58,8 +58,8 @@ public class ArchiveRendererTest {
     }
 
     @Test
-    public void doesRenderWhenConfigDoesNotRenderArchives() throws Exception {
-        ArchiveRenderer renderer = new ArchiveRenderer();
+    public void doesRenderWhenConfigDoesNotRenderIndices() throws Exception {
+        IndexRenderer renderer = new IndexRenderer();
 
         CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
@@ -68,23 +68,23 @@ public class ArchiveRendererTest {
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, times(1)).renderArchive("random string");
+        verify(mockRenderer, times(1)).renderIndex("random string", contentStore);
     }
 
     @Test(expected = RenderingException.class)
     public void propogatesRenderingException() throws Exception {
-        ArchiveRenderer renderer = new ArchiveRenderer();
+        IndexRenderer renderer = new IndexRenderer();
 
         CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderArchive(anyString());
+        doThrow(new Exception()).when(mockRenderer).renderIndex(anyString(), any(ContentStore.class));
 
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, never()).renderArchive("random string");
+        verify(mockRenderer, never()).renderIndex("random string", contentStore);
     }
 
 }
