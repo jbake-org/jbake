@@ -174,10 +174,7 @@ public abstract class MarkupEngine implements ParserEngine {
             }
         }
 
-        if (!headerValid || !statusFound || !typeFound) {
-            return false;
-        }
-        return true;
+        return headerValid && statusFound && typeFound;
     }
 
     /**
