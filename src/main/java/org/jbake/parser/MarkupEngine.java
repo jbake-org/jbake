@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
-import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler;
 import org.json.simple.JSONValue;
@@ -32,6 +31,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class MarkupEngine implements ParserEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarkupEngine.class);
+    private static final String HEADER_SEPARATOR = "~~~~~~";
+
     /**
      * Tests if this markup engine can process the document.
      * @param context the parser context
@@ -156,7 +157,7 @@ public abstract class MarkupEngine implements ParserEngine {
                     statusFound = true;
                 }
             }
-            if (line.equals("~~~~~~")) {
+            if (line.equals(HEADER_SEPARATOR)) {
                 headerSeparatorFound = true;
                 header.remove(line);
                 break;
@@ -188,7 +189,7 @@ public abstract class MarkupEngine implements ParserEngine {
      */
     private void processHeader(Configuration config, List<String> contents, final Map<String, Object> content) {
         for (String line : contents) {
-            if (line.equals("~~~~~~")) {
+            if (line.equals(HEADER_SEPARATOR)) {
                 break;
             } else {
                 String[] parts = line.split("=",2);
@@ -231,7 +232,7 @@ public abstract class MarkupEngine implements ParserEngine {
             if (inBody) {
                 body.append(line).append("\n");
             }
-            if (line.equals("~~~~~~")) {
+            if (line.equals(HEADER_SEPARATOR)) {
                 inBody = true;
             }
         }
