@@ -188,30 +188,32 @@ public abstract class MarkupEngine implements ParserEngine {
         for (String line : contents) {
             if (line.equals(HEADER_SEPARATOR)) {
                 break;
-            } else {
-                String[] parts = line.split("=",2);
-                if (parts.length == 2) {
-                    if (parts[0].equalsIgnoreCase("date")) {
-                        DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));
-                        Date date = null;
-                        try {
-                            date = df.parse(parts[1]);
-                            content.put(parts[0], date);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    } else if (parts[0].equalsIgnoreCase("tags")) {
-                        String[] tags = parts[1].split(",");
-                        for( int i=0; i<tags.length; i++ )
-                            tags[i]=tags[i].trim();
-                        content.put(parts[0], tags);
-                    } else if (parts[1].startsWith("{") && parts[1].endsWith("}")) {
-                        // Json type
-                        content.put(parts[0], JSONValue.parse(parts[1]));
-                    } else {
-                        content.put(parts[0], parts[1]);
-                    }
+            }
+
+            String[] parts = line.split("=",2);
+            if (parts.length != 2) {
+                continue;
+            }
+            
+            if (parts[0].equalsIgnoreCase("date")) {
+                DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));
+                Date date = null;
+                try {
+                    date = df.parse(parts[1]);
+                    content.put(parts[0], date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
+            } else if (parts[0].equalsIgnoreCase("tags")) {
+                String[] tags = parts[1].split(",");
+                for( int i=0; i<tags.length; i++ )
+                    tags[i]=tags[i].trim();
+                content.put(parts[0], tags);
+            } else if (parts[1].startsWith("{") && parts[1].endsWith("}")) {
+                // Json type
+                content.put(parts[0], JSONValue.parse(parts[1]));
+            } else {
+                content.put(parts[0], parts[1]);
             }
         }
     }
