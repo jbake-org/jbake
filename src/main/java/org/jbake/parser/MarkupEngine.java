@@ -194,28 +194,38 @@ public abstract class MarkupEngine implements ParserEngine {
             if (parts.length != 2) {
                 continue;
             }
-            
-            if (parts[0].equalsIgnoreCase("date")) {
+
+            String key = parts[0];
+            String value = parts[1];
+
+            if (key.equalsIgnoreCase("date")) {
                 DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));
                 Date date = null;
                 try {
-                    date = df.parse(parts[1]);
-                    content.put(parts[0], date);
+                    date = df.parse(value);
+                    content.put(key, date);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            } else if (parts[0].equalsIgnoreCase("tags")) {
-                String[] tags = parts[1].split(",");
-                for( int i=0; i<tags.length; i++ )
-                    tags[i]=tags[i].trim();
-                content.put(parts[0], tags);
-            } else if (parts[1].startsWith("{") && parts[1].endsWith("}")) {
-                // Json type
-                content.put(parts[0], JSONValue.parse(parts[1]));
+            } else if (key.equalsIgnoreCase("tags")) {
+                content.put(key, getTags(value));
+            } else if (isJson(value)) {
+                content.put(key, JSONValue.parse(value));
             } else {
-                content.put(parts[0], parts[1]);
+                content.put(key, value);
             }
         }
+    }
+
+    private String[] getTags(String tagsPart) {
+        String[] tags = tagsPart.split(",");
+        for( int i=0; i<tags.length; i++ )
+            tags[i]=tags[i].trim();
+        return tags;
+    }
+
+    private boolean isJson(String part) {
+        return part.startsWith("{") && part.endsWith("}");
     }
 
     /**
