@@ -5,15 +5,9 @@ import org.apache.commons.configuration.CompositeConfiguration;
 public class MockCompositeConfiguration extends CompositeConfiguration {
 
     private boolean _bool = false;
-    private String _string = "random string";
 
     public MockCompositeConfiguration withInnerBoolean(boolean bool) {
         _bool = bool;
-        return this;
-    }
-
-    public MockCompositeConfiguration withInnerString(String string) {
-        _string = string;
         return this;
     }
 
@@ -24,6 +18,6 @@ public class MockCompositeConfiguration extends CompositeConfiguration {
 
     @Override
     public String getString(String string) {
-        return _string;
+        return "random string";
     }
 }
