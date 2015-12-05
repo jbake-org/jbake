@@ -481,26 +481,13 @@
             <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
-        
-        <!-- <dependency>
-            <groupId>com.mitchellbosecke</groupId>
-            <artifactId>pebble</artifactId>
-            <version>${pebble.version}</version>
-            <optional>true</optional>
-        </dependency> -->
-        
-		<dependency>
+
+        <dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-vfs2</artifactId>
     		<version>${commons.vfs2.version}</version>
     		<optional>true</optional>
 		</dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.0.31-beta</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
