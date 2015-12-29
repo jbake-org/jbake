@@ -157,7 +157,7 @@ public class Main {
 	private void startWatch(final LaunchOptions res, CompositeConfiguration config) {
 		try {
 			FileSystemManager fsMan = VFS.getManager();
-			FileObject listenPath = fsMan.resolveFile(new File(res.getSource(), config.getString(Keys.CONTENT_FOLDER)).getPath());
+			FileObject listenPath = fsMan.resolveFile(res.getSource(), config.getString(Keys.CONTENT_FOLDER));
 			
 			DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(res, config));
 			monitor.setRecursive(true);
