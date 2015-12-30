@@ -4,8 +4,12 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileListener;
 import org.jbake.app.Oven;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CustomFSChangeListener implements FileListener {
+	
+	private final static Logger LOGGER = LoggerFactory.getLogger(CustomFSChangeListener.class);
 	
 	private LaunchOptions options;
 	private CompositeConfiguration config;
@@ -17,22 +21,19 @@ public class CustomFSChangeListener implements FileListener {
 
 	@Override
 	public void fileCreated(FileChangeEvent event) throws Exception {
-		// TODO Auto-generated method stub
-		System.out.println("File created: " + event.getFile().getURL());
+		LOGGER.info("File created event detected: " + event.getFile().getURL());
 		exec();
 	}
 
 	@Override
 	public void fileDeleted(FileChangeEvent event) throws Exception {
-		// TODO Auto-generated method stub
-		System.out.println("File deleted: " + event.getFile().getURL());
+		LOGGER.info("File deleted event detected: " + event.getFile().getURL());
 		exec();
 	}
 
 	@Override
 	public void fileChanged(FileChangeEvent event) throws Exception {
-		// TODO Auto-generated method stub
-		System.out.println("File changed: " + event.getFile().getURL());
+		LOGGER.info("File changed event detected: " + event.getFile().getURL());
 		exec();
 	}
 

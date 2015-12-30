@@ -19,6 +19,7 @@ import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Launcher for JBake.
@@ -69,8 +70,10 @@ public class Main {
 	}
 
 	private void run(String[] args) {
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
 		LaunchOptions res = parseArguments(args);
-
+		
 		final CompositeConfiguration config;
 		try {
 			config = ConfigUtil.load(res.getSource());

@@ -2,6 +2,7 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler.Attributes;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,12 +85,12 @@ public class Renderer {
 		
 		private DefaultRenderingConfig(File path, String allInOneName) {
 			super(path, allInOneName, findTemplateName(allInOneName));
-			this.content = Collections.singletonMap("type",allInOneName);
+			this.content = buildSimpleModel(allInOneName);
 		}
 		
 		public DefaultRenderingConfig(String filename, String allInOneName) {
 			super(new File(destination.getPath() + File.separator + filename), allInOneName, findTemplateName(allInOneName));
-			this.content = Collections.singletonMap("type",allInOneName);
+			this.content = buildSimpleModel(allInOneName);
 		}
 		
 		/**
@@ -323,12 +323,14 @@ public class Renderer {
             try {
             	Map<String, Object> model = new HashMap<String, Object>();
             	model.put("renderer", renderingEngine);
-            	model.put("tag", tag);
-            	model.put("content", Collections.singletonMap("type","tag"));
+            	model.put(Attributes.TAG, tag);
+            	Map<String, Object> map = buildSimpleModel(Attributes.TAG);
+                map.put(Attributes.ROOTPATH, "../");
+                model.put("content", map);
 
             	tag = tag.trim().replace(" ", "-");
             	File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
-            	render(new ModelRenderingConfig(path, "tag", model, findTemplateName("tag")));
+            	render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
                 renderedCount++;
             } catch (Exception e) {
                 errors.add(e.getCause().getMessage());
@@ -354,8 +356,8 @@ public class Renderer {
      */
     private Map<String, Object> buildSimpleModel(String type) {
     	Map<String, Object> content = new HashMap<String, Object>();
-    	content.put("type", type);
-    	content.put("rootpath", "");
+    	content.put(Attributes.TYPE, type);
+    	content.put(Attributes.ROOTPATH, "");
     	// add any more keys here that need to have a default value to prevent need to perform null check in templates
     	return content;
     }

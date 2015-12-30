@@ -1,13 +1,9 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.DBUtil;
-import org.jbake.app.DocumentList;
-import org.jbake.model.DocumentTypes;
+import org.jbake.app.Crawler.Attributes;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.VariablesMap;
@@ -16,15 +12,10 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.jbake.app.ContentStore;
 
 /**
@@ -82,7 +73,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
             Map<String, Object> content = (Map<String, Object>) model.get("content");
             String mode = "HTML5";
             if (config != null && content != null) {
-                String key = "template_" + content.get("type") + "_thymeleaf_mode";
+                String key = "template_" + content.get(Attributes.TYPE) + "_thymeleaf_mode";
                 String configMode = (String) config.get(key);
                 if (configMode != null) {
                     mode = configMode;

@@ -64,8 +64,6 @@ public class Oven {
 		this.destination = destination;
 		this.config = config;
 		this.isClearCache = isClearCache;
-		SLF4JBridgeHandler.removeHandlersForRootLogger();
-		SLF4JBridgeHandler.install();
 	}
 
     public CompositeConfiguration getConfig() {

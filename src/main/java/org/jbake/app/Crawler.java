@@ -20,14 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jbake.model.DocumentStatus;
-import org.jbake.model.DocumentTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 /**
  * Crawls a file system looking for content.
@@ -51,6 +45,7 @@ public class Crawler {
 		static final String DATE = "date";
 		static final String STATUS = "status";
 		static final String TYPE = "type";
+		static final String TITLE = "title";
 		static final String URI = "uri";
 		static final String SOURCE_URI = "sourceuri";
 		static final String FILE = "file";
@@ -59,6 +54,7 @@ public class Crawler {
 		static final String RENDERED = "rendered";
 		static final String SHA1 = "sha1";
 		static final String ROOTPATH = "rootpath";
+		static final String ID = "id";
 		
 	}
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
