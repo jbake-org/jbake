@@ -6,8 +6,8 @@
     <atom:link href="http://jonathanbullock.com/feed.xml" rel="self" type="application/rss+xml" />
     <description>My corner of the Internet</description>
     <language>en-gb</language>
-    <pubDate>${published_date.format("EEE, d MMM yyyy HH:mm:ss Z")}</pubDate>
-    <lastBuildDate>${published_date.format("EEE, d MMM yyyy HH:mm:ss Z")}</lastBuildDate>
+    <pubDate>${new java.text.SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH).format(published_date)}</pubDate>
+    <lastBuildDate>${new java.text.SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH).format(published_date)}</lastBuildDate>
 
     <%posts.each {post -> %>
     <item>

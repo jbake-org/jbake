@@ -3,7 +3,7 @@
       <div class="row-fluid marketing">
 		<div class="span12">
 				<h2>${content.title}</h2>
-				<p class="post-date">${content.date.format("dd MMMM yyyy")}</p>
+				<p class="post-date">${new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(content.date)}</p>
 				<p>${content.body}</p>	
 		</div>
 	</div>

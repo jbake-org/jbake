@@ -12,7 +12,7 @@
 		<div class="span12">
 			<%posts[0..<2].each { post ->%>
 			<h4><a href="${post.uri}">${post.title}</a></h4>
-			<p>${post.date.format("dd MMMM yyyy")} - ${post.body.substring(0, 150)}...</p>
+			<p>${new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(post.date)} - ${post.body.substring(0, 150)}...</p>
 			<%}%>
 			<a href="/archive.html">Archive</a>
 		</div>
