@@ -1,25 +1,14 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.Template;
-import groovy.text.TemplateEngine;
-import groovy.text.XmlTemplateEngine;
 import groovy.text.markup.MarkupTemplateEngine;
 import groovy.text.markup.TemplateConfiguration;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.codehaus.groovy.runtime.MethodClosure;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
-import org.jbake.app.DBUtil;
-import org.jbake.app.DocumentList;
-import org.jbake.model.DocumentTypes;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.*;
 import java.util.*;

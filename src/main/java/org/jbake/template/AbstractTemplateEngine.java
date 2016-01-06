@@ -7,7 +7,6 @@ import org.jbake.app.ContentStore;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * A template is responsible for converting a model into a rendered document. The model

@@ -1,6 +1,5 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -17,23 +16,13 @@ import freemarker.template.TemplateModelException;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.DBUtil;
-import org.jbake.app.DocumentList;
-import org.jbake.model.DocumentTypes;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jbake.app.ContentStore;
 
