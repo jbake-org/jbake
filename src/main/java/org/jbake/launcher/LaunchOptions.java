@@ -1,8 +1,6 @@
 package org.jbake.launcher;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
