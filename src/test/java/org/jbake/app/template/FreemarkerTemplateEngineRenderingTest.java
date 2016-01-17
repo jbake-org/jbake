@@ -26,11 +26,11 @@ package org.jbake.app.template;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.Crawler;
-import org.jbake.app.Renderer;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,9 +43,19 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
     public FreemarkerTemplateEngineRenderingTest() {
         super("freemarkerTemplates", "ftl");
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
+        cal.set(Calendar.DAY_OF_MONTH, 28);
+        // Do not hardcode date string, instead dynamically generate it.
+        // If we hardcode it, this means that we are stick to one single locale,
+        // and thus test will fail if we run it on machine with different Locale.
+        // see https://github.com/jbake-org/jbake/issues/259
+        String formattedDate = new SimpleDateFormat(DATE_FORMAT).format(cal.getTime());
+
 
         outputStrings.put("post", Arrays.asList("<h1>Second Post</h1>",
-                "<p><em>28 February 2013</em></p>",
+                "<p><em>"+formattedDate+"</em></p>",
                 "Lorem ipsum dolor sit amet", "<meta property=\"og:description\" content=\"Something\"/>"));
         outputStrings.put("page", Arrays.asList("<title>About</title>",
 	    	"All about stuff!"));
