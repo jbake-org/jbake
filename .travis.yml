@@ -1,5 +1,8 @@
 language: java
 
+addons:
+  hostname: short-hostname
+
 jdk:
   - openjdk6
   - openjdk7
