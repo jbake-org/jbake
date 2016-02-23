@@ -19,14 +19,13 @@ package br.com.ingenieux.mojo.jbake;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.platform.Verticle;
 
 import java.io.File;
 
+import static spark.Spark.*;
+
 import net_alchim31_livereload.LRServer;
+import spark.Spark;
 
 /**
  * Runs jbake on a folder while watching and serving a folder with it
@@ -58,32 +57,7 @@ public class InlineMojo extends WatchMojo {
   @Parameter(property = "jbake.livereload", defaultValue = "true")
   private Boolean livereload;
 
-  Server server = new Server();
-
   LRServer lrServer;
-
-  class Server extends Verticle {
-
-    {
-      vertx = VertxFactory.newVertx();
-    }
-
-    @Override
-    public void start() {
-      vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
-        @Override
-        public void handle(HttpServerRequest req) {
-          String file = req.path().endsWith("/") ? req.path() + indexFile : req.path();
-
-          if (new File(outputDirectory + file).isDirectory()) {
-            req.response().setStatusCode(301).putHeader("Location", file + "/").close();
-          } else {
-            req.response().sendFile(outputDirectory.getAbsolutePath() + file);
-          }
-        }
-      }).listen(port, listenAddress);
-    }
-  }
 
   protected void stopServer() throws MojoExecutionException {
     if (lrServer != null) {
@@ -93,11 +67,17 @@ public class InlineMojo extends WatchMojo {
         throw new MojoExecutionException("LiveReload Failure", e);
       }
     }
-    server.stop();
+
+    stop();
   }
 
   protected void initServer() throws MojoExecutionException {
-    server.start();
+    externalStaticFileLocation(outputDirectory.getPath());
+
+    ipAddress(listenAddress);
+    port(this.port);
+
+
 
     if (Boolean.TRUE.equals(livereload)) {
       lrServer = new LRServer(35729, outputDirectory.toPath());
@@ -107,5 +87,7 @@ public class InlineMojo extends WatchMojo {
         throw new MojoExecutionException("LiveReload Failure", e);
       }
     }
+
+    awaitInitialization();
   }
 }
