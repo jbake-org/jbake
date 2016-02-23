@@ -81,13 +81,6 @@ public class GenerateMojo extends AbstractMojo {
     try {
       // TODO: Smells bad. A lot
       Orient.instance().startup();
-      
-        final CompositeConfiguration config;
-        try {
-            config = ConfigUtil.load(inputDirectory);
-        } catch (final ConfigurationException e) {
-            throw new JBakeException("Configuration error: " + e.getMessage(), e);
-        }
 
       // TODO: At some point, reuse Oven
       Oven oven = new Oven(inputDirectory, outputDirectory, createConfiguration(), isClearCache);
@@ -105,9 +98,9 @@ public class GenerateMojo extends AbstractMojo {
   protected CompositeConfiguration createConfiguration() throws ConfigurationException {
     final CompositeConfiguration config = new CompositeConfiguration();
 
-    config.addConfiguration(new MapConfiguration(this.getPluginContext()));
-
     config.addConfiguration(ConfigUtil.load(inputDirectory));
+
+    config.addConfiguration(new MapConfiguration(this.getPluginContext()));
 
     return config;
   }
