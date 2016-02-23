@@ -18,13 +18,19 @@ package br.com.ingenieux.mojo.jbake;
 
 import com.orientechnologies.orient.core.Orient;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.MapConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jbake.app.ConfigUtil;
 import org.jbake.app.Oven;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Runs jbake on a folder
@@ -53,6 +59,15 @@ public class GenerateMojo extends AbstractMojo {
   @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
   protected boolean isClearCache;
 
+  /**
+   * Custom configuration properties.
+   * These properties override the properties in <code>jbake.properties</code>.
+   * In the templates the properties can be accessed using the prefix <code>config.</code>
+   * e.g. <code>config.foo</code> for the property <code>&lt;foo>bar&lt/foo></code>.
+   */
+  @Parameter(required = false)
+  protected Map<String, Object> properties = new HashMap<>();
+
   public final void execute() throws MojoExecutionException {
     try {
       executeInternal();
@@ -79,7 +94,7 @@ public class GenerateMojo extends AbstractMojo {
       Orient.instance().startup();
 
       // TODO: At some point, reuse Oven
-      Oven oven = new Oven(inputDirectory, outputDirectory, isClearCache);
+      Oven oven = new Oven(inputDirectory, outputDirectory, createConfiguration(), isClearCache);
 
       oven.setupPaths();
 
@@ -90,4 +105,12 @@ public class GenerateMojo extends AbstractMojo {
       throw new MojoExecutionException("Failure when running: ", e);
     }
   }
+
+  private CompositeConfiguration createConfiguration() throws ConfigurationException {
+    final CompositeConfiguration config = new CompositeConfiguration();
+    config.addConfiguration(new MapConfiguration(properties));
+    config.addConfiguration(ConfigUtil.load(inputDirectory));
+    return config;
+  }
+
 }
