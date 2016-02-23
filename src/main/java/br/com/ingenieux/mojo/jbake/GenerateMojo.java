@@ -26,18 +26,16 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.jbake.app.ConfigUtil;
+import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Runs jbake on a folder
  */
 @Mojo(name = "generate", requiresProject = false)
 public class GenerateMojo extends AbstractMojo {
-
   /**
    * Location of the Output Directory.
    */
@@ -58,15 +56,6 @@ public class GenerateMojo extends AbstractMojo {
    */
   @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
   protected boolean isClearCache;
-
-  /**
-   * Custom configuration properties.
-   * These properties override the properties in <code>jbake.properties</code>.
-   * In the templates the properties can be accessed using the prefix <code>config.</code>
-   * e.g. <code>config.foo</code> for the property <code>&lt;foo>bar&lt/foo></code>.
-   */
-  @Parameter(required = false)
-  protected Map<String, Object> properties = new HashMap<>();
 
   public final void execute() throws MojoExecutionException {
     try {
@@ -92,6 +81,13 @@ public class GenerateMojo extends AbstractMojo {
     try {
       // TODO: Smells bad. A lot
       Orient.instance().startup();
+      
+        final CompositeConfiguration config;
+        try {
+            config = ConfigUtil.load(inputDirectory);
+        } catch (final ConfigurationException e) {
+            throw new JBakeException("Configuration error: " + e.getMessage(), e);
+        }
 
       // TODO: At some point, reuse Oven
       Oven oven = new Oven(inputDirectory, outputDirectory, createConfiguration(), isClearCache);
@@ -106,10 +102,13 @@ public class GenerateMojo extends AbstractMojo {
     }
   }
 
-  private CompositeConfiguration createConfiguration() throws ConfigurationException {
+  protected CompositeConfiguration createConfiguration() throws ConfigurationException {
     final CompositeConfiguration config = new CompositeConfiguration();
-    config.addConfiguration(new MapConfiguration(properties));
+
+    config.addConfiguration(new MapConfiguration(this.getPluginContext()));
+
     config.addConfiguration(ConfigUtil.load(inputDirectory));
+
     return config;
   }
 
