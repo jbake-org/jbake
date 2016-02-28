@@ -22,7 +22,7 @@ class JBakePluginSpec extends Specification {
     def "should add a JBakeTask"(){
 
         expect:
-        project.tasks.jbake instanceof JBakeTask
+        project.tasks.bake instanceof JBakeTask
     }
 
     def "should add jbake configuration"(){
@@ -114,7 +114,7 @@ class JBakePluginSpec extends Specification {
         project.jbake.srcDirName = srcDirName
 
         then:
-        project.tasks.jbake.input == expectedFile
+        project.tasks.bake.input == expectedFile
     }
 
     def "output dir should be configured by extension"(){
@@ -126,7 +126,7 @@ class JBakePluginSpec extends Specification {
         project.jbake.destDirName = destDirName
 
         then:
-        project.tasks.jbake.output == expectedFile
+        project.tasks.bake.output == expectedFile
     }
 
     def "clearcache should be configured by extension"(){
@@ -137,7 +137,7 @@ class JBakePluginSpec extends Specification {
         project.jbake.clearCache = clearCache
 
         then:
-        project.tasks.jbake.clearCache == clearCache
+        project.tasks.bake.clearCache == clearCache
     }
 
     def "should be configurable by extension"(){
@@ -149,7 +149,7 @@ class JBakePluginSpec extends Specification {
         project.jbake.configuration = configuration
 
         then:
-        project.tasks.jbake.configuration['render.tags'] == false
+        project.tasks.bake.configuration['render.tags'] == false
     }
 
 }

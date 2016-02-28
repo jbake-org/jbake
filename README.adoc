@@ -22,14 +22,14 @@ buildscript {
   }
 
   dependencies {
-    classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2'
+    classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2.1'
   }
 }
 
 apply plugin: 'me.champeau.jbake'
 ----
 
-This will add a `jbake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
+This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
 `src/jbake` and generate content into `$buildDir/jbake` (typically `build/jbake`).
 
 == Configuration
