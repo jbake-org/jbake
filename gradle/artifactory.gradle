@@ -1,4 +1,4 @@
-apply plugin: 'artifactory-publish'
+// apply plugin: 'artifactory-publish'
 
 publishing {
     publications {
@@ -40,6 +40,7 @@ publishing {
     }
 }
 
+/*
 artifactory {
     contextUrl = 'http://oss.jfrog.org/artifactory'
     publish {
@@ -67,3 +68,4 @@ artifactoryPublish {
         !pullRequest || pullRequest=='false'
     }
 }
+*/

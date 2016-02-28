@@ -1,6 +1,6 @@
 // Handles publication of distributions to Bintray
 
-apply plugin: 'bintray'
+apply plugin: 'com.jfrog.bintray'
 
 bintray {
     user = bintrayUsername
