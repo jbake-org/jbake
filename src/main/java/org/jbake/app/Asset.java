@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class Asset {
 		File[] assets = path.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				return !ignoreHidden || !file.isHidden();
+				return !ignoreHidden || !isHiddenFile(file);
 			}
 		});
 		if (assets != null) {
@@ -83,6 +84,13 @@ public class Asset {
 
 	public List<String> getErrors() {
 		return new ArrayList<String>(errors);
+	}
+	
+	private boolean isHiddenFile(File file){
+		String name = file.getName();
+		if(!StringUtils.isBlank(name))
+			return name.startsWith(".");
+		return false;
 	}
 
 }
