@@ -90,7 +90,9 @@ public class AssetTest {
 		Asset asset = new Asset(assets.getParentFile(), readOnlyFolder.getRoot(), config);
 		asset.copy(assets);
 
-		Assert.assertFalse("At least one error during copy expected", asset.getErrors().isEmpty());
+		//Bug affects Windows: http://bugs.java.com/view_bug.do?bug_id=6728842
+		if(!System.getProperty( "os.name" ).startsWith( "Windows" ))
+			Assert.assertFalse("At least one error during copy expected", asset.getErrors().isEmpty());
 	}
 
 	/**
