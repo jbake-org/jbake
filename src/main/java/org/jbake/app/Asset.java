@@ -86,7 +86,7 @@ public class Asset {
 		return new ArrayList<String>(errors);
 	}
 	
-	private boolean isHiddenFile(File file){
+	protected static boolean isHiddenFile(File file){
 		String name = file.getName();
 		if(!StringUtils.isBlank(name))
 			return name.startsWith(".");

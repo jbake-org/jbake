@@ -108,4 +108,12 @@ public class AssetTest {
 		Asset asset = new Asset(assets.getParentFile(), readOnlyFolder.getRoot(), config);
 		asset.copy(assets);
 	}
+	
+	@Test
+	public void testFileIsHidden(){
+		File hiddenFile = new File(".text.xml");
+		Assert.assertTrue(Asset.isHiddenFile(hiddenFile));
+		File notHiddenFile = new File("text.xml");
+		Assert.assertFalse(Asset.isHiddenFile(notHiddenFile));
+	}
 }
