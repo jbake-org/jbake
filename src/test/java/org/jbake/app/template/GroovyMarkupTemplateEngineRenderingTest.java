@@ -41,8 +41,8 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
                 "<a href=\"blog/2012/first-post.html\">First Post</a></h4>"));
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
                 "blog/2012/first-post.html",
-                "papers/published-paper.html"));
-        outputStrings.put("paper", Arrays.asList("<h2>Published Paper</h2>",
+                "papers/published-fixture.groovyMarkupTemplates.paper.html"));
+        outputStrings.put("fixture.groovyMarkupTemplates.paper", Arrays.asList("<h2>Published Paper</h2>",
                 "<p class=\"post-date\">24",
                 "2014</p>",
                 "Lorem ipsum dolor sit amet",
@@ -54,15 +54,15 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     @Test
     public void renderCustomTypePaper() throws Exception {
         // setup
-        config.setProperty("template.paper.file", "paper." + templateExtension);
-        DocumentTypes.addDocumentType("paper");
+        config.setProperty("template.fixture.groovyMarkupTemplates.paper.file", "fixture.groovyMarkupTemplates.paper." + templateExtension);
+        DocumentTypes.addDocumentType("fixture.groovyMarkupTemplates.paper");
         DBUtil.updateSchema(db);
 
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Parser parser = new Parser(config, sourceFolder.getPath());
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
-        String filename = "published-paper.html";
+        String filename = "published-fixture.groovyMarkupTemplates.paper.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "papers" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
@@ -73,7 +73,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
 
         // verify
         String output = FileUtils.readFileToString(outputFile);
-        for (String string : getOutputStrings("paper")) {
+        for (String string : getOutputStrings("fixture.groovyMarkupTemplates.paper")) {
             assertThat(output).contains(string);
         }
 

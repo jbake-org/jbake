@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates.layout
+
 yieldUnescaped '<!DOCTYPE html>'
 html(lang:'en'){
 

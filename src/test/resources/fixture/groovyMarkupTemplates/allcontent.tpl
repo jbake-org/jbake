@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates
+
 xmlDeclaration()
 list{
     all_content.each { cntnt ->

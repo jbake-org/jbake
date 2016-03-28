@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates
+
 layout 'layout/main.tpl', true,
         papers: published_papers,
         bodyContents: contents {

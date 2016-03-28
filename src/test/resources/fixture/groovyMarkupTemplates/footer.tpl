@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates
+
 div(class:"footer"){
     p{
         yieldUnescaped '&copy; Jonathan Bullock 2013 | Mixed with '

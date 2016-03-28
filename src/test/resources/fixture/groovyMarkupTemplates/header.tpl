@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates
+
 meta(charset:'utf-8')
 title('Jonathan Bullock')
 meta(name:"viewport", content:"width=device-width, initial-scale=1.0")

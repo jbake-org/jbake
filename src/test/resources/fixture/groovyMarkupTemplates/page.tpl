@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates
+
 layout 'layout/main.tpl',
         bodyContents: contents {
 

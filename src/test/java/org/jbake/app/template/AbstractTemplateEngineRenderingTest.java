@@ -25,6 +25,7 @@ package org.jbake.app.template;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+<<<<<<< HEAD
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
@@ -39,6 +40,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+=======
+import org.jbake.app.*;
+import org.jbake.model.DocumentTypes;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+>>>>>>> 48e3cb8... added gradle application distribution
 
 import java.io.File;
 import java.net.URL;
@@ -53,7 +68,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- *
  * @author jdlee
  */
 public abstract class AbstractTemplateEngineRenderingTest {
@@ -70,9 +84,12 @@ public abstract class AbstractTemplateEngineRenderingTest {
     protected final String templateDir;
     protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
+<<<<<<< HEAD
     private Crawler crawler;
     private Parser parser;
     protected Renderer renderer;
+=======
+>>>>>>> 48e3cb8... added gradle application distribution
     protected Locale currentLocale;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
@@ -81,6 +98,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     }
 
     @Before
+<<<<<<< HEAD
     public void setup() throws Exception {
         currentLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
@@ -89,6 +107,14 @@ public abstract class AbstractTemplateEngineRenderingTest {
         DocumentTypes.addListener(listener);
 
         URL sourceUrl = this.getClass().getResource("/");
+=======
+    public void setup() throws Exception, IOException, URISyntaxException {
+
+        currentLocale = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
+
+        URL sourceUrl = this.getClass().getResource("/fixture");
+>>>>>>> 48e3cb8... added gradle application distribution
 
         sourceFolder = new File(sourceUrl.getFile());
         if (!sourceFolder.exists()) {
@@ -102,7 +128,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
             throw new Exception("Cannot find template folder!");
         }
 
-        config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+        config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -112,6 +138,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
             }
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
+<<<<<<< HEAD
         db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
 
         crawler = new Crawler(db, sourceFolder, config);
@@ -157,15 +184,21 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
                 "blog/2012/first-post.html",
-                "papers/published-paper.html"));
+                "papers/published-fixture.groovyMarkupTemplates.paper.html"));
 
+=======
+        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
+>>>>>>> 48e3cb8... added gradle application distribution
     }
 
     @After
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
+<<<<<<< HEAD
         db.shutdown();
+=======
+>>>>>>> 48e3cb8... added gradle application distribution
         Locale.setDefault(currentLocale);
     }
 
@@ -265,7 +298,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderSitemap() throws Exception {
-        DocumentTypes.addDocumentType("paper");
+        DocumentTypes.addDocumentType("fixture.groovyMarkupTemplates.paper");
         DBUtil.updateSchema(db);
 
         renderer.renderSitemap("sitemap.xml");
@@ -277,11 +310,11 @@ public abstract class AbstractTemplateEngineRenderingTest {
         for (String string : getOutputStrings("sitemap")) {
             assertThat(output).contains(string);
         }
-        assertThat(output).doesNotContain("draft-paper.html");
+        assertThat(output).doesNotContain("draft-fixture.groovyMarkupTemplates.paper.html");
     }
 
     protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
-        
+
     }
 }

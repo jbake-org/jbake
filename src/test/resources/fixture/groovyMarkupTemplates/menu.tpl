@@ -1,3 +1,5 @@
+package fixture.groovyMarkupTemplates
+
 div(class:"masthead"){
     ul(class:"nav nav-pills pull-right"){
         li { a(href:"/",'Home') }

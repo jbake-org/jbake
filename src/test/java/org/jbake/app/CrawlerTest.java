@@ -24,16 +24,16 @@ public class CrawlerTest {
     private ContentStore db;
     private File sourceFolder;
 
-	@Before
+    @Before
     public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/");
+        URL sourceUrl = this.getClass().getResource("/fixture");
 
         sourceFolder = new File(sourceUrl.getFile());
         if (!sourceFolder.exists()) {
             throw new Exception("Cannot find sample data structure!");
         }
 
-        config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+        config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
     }
@@ -81,22 +81,23 @@ public class CrawlerTest {
     @Test
     public void renderWithPrettyUrls() throws Exception {
         Map<String, Object> testProperties = new HashMap<String, Object>();
-        testProperties.put(Keys.URI_NO_EXTENSION, true);
-        testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
+        testProperties.put(Keys.URI_NO_EXTENSION, "/blog");
 
         CompositeConfiguration config = new CompositeConfiguration();
         config.addConfiguration(new MapConfiguration(testProperties));
-        config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/").getFile())));
+        config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile())));
 
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
+        URL contentUrl = this.getClass().getResource("/fixture");
+        File content = new File(contentUrl.getFile());
+        Crawler crawler = new Crawler(db, content, config);
+        crawler.crawl(new File(content.getPath() + File.separator + "content"));
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
+        Assert.assertEquals(2, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
-
         DocumentList documents = db.getPublishedPosts();
 
         for (Map<String, Object> model : documents) {
+
             String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName((String) model.get("file")) + "/";
 
             Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
