@@ -52,7 +52,7 @@ public class FileUtil {
         if (!codeFile.exists()) {
             throw new Exception("Cannot locate running location of JBake!");
         }
-        File codeFolder = codeFile.getParentFile();
+        File codeFolder = codeFile.getParentFile().getParentFile();
         if (!codeFolder.exists()) {
             throw new Exception("Cannot locate running location of JBake!");
         }
