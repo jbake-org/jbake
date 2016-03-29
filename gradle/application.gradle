@@ -1,5 +1,7 @@
 import org.ajoberstar.grgit.Grgit
 
+import java.text.SimpleDateFormat
+
 buildscript {
     repositories {
         jcenter()
@@ -13,6 +15,14 @@ apply plugin: 'application'
 
 mainClassName = "org.jbake.launcher.Main"
 applicationName = "jbake"
+
+processResources {
+    from("src/main/resources"){
+        include 'default.properties'
+        expand  version: project.version,
+                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format( new Date() )
+    }
+}
 
 ext {
     examplesBase = "$project.buildDir/examples"
@@ -53,10 +63,6 @@ exampleRepositories.each { name, repository ->
         exclude '.git'
     }
 
-}
-
-startScripts {
-    classpath += files("logging")
 }
 
 distributions {
