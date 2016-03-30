@@ -8,6 +8,7 @@ version = '2.5.0-SNAPSHOT'
 description = """jbake"""
 
 apply from: 'gradle/application.gradle'
+apply from: 'gradle/maven-publishing.gradle'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -16,27 +17,48 @@ repositories {
     jcenter()
 }
 
+ext {
+    commonsIoVersion = '2.4'
+    commonsConfigurationVersion = '1.9'
+    jsonSimpleVersion = '1.1.1'
+    args4jVersion = '2.0.26'
+    freemarkerVersion = '2.3.20'
+    orientDbVersion = '1.6.4'
+    pegdownVersion = '1.4.2'
+    asciidoctorjVersion = '1.5.2'
+    jettyServerVersion = '8.1.12.v20130726'
+    groovyVersion = '2.4.1'
+    thymeleafVersion = '2.1.3.RELEASE'
+    thymeleafExtrasVersion = '2.1.1.RELEASE'
+    slf4jVersion = '1.7.6'
+    logbackVersion = '1.1.1'
+    jade4jVersion = '0.4.2'
+    commonsVfs2Version = '2.0'
+    junitVersion = '4.11'
+    assertjCoreVersion = '1.7.0'
+}
+
 dependencies {
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-    compile group: 'commons-configuration', name: 'commons-configuration', version: '1.9'
-    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-    compile group: 'args4j', name: 'args4j', version: '2.0.26'
-    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.20'
-    compile group: 'com.orientechnologies', name: 'orient-commons', version: '1.6.4'
-    compile group: 'com.orientechnologies', name: 'orientdb-core', version: '1.6.4'
-    compile group: 'org.pegdown', name: 'pegdown', version: '1.4.2'
-    compile group: 'org.asciidoctor', name: 'asciidoctorj', version: '1.5.2'
-    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '8.1.12.v20130726'
-    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.3.6'
-    compile group: 'org.codehaus.groovy', name: 'groovy-templates', version: '2.3.6'
-    compile group: 'org.thymeleaf', name: 'thymeleaf', version: '2.1.3.RELEASE'
-    compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-conditionalcomments', version: '2.1.1.RELEASE'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.6'
-    compile group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.6'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.1'
-    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.1'
-    compile group: 'de.neuland-bfi', name: 'jade4j', version: '0.4.2'
-    compile group: 'org.apache.commons', name: 'commons-vfs2', version: '2.0'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '1.7.0'
+    compile group: 'commons-io', name: 'commons-io', version:  commonsIoVersion
+    compile group: 'commons-configuration', name: 'commons-configuration', version: commonsConfigurationVersion
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
+    compile group: 'args4j', name: 'args4j', version: args4jVersion
+    compile group: 'org.freemarker', name: 'freemarker', version: freemarkerVersion
+    compile group: 'com.orientechnologies', name: 'orient-commons', version: orientDbVersion
+    compile group: 'com.orientechnologies', name: 'orientdb-core', version: orientDbVersion
+    compile group: 'org.pegdown', name: 'pegdown', version: pegdownVersion
+    compile group: 'org.asciidoctor', name: 'asciidoctorj', version: asciidoctorjVersion
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyServerVersion
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
+    compile group: 'org.codehaus.groovy', name: 'groovy-templates', version: groovyVersion
+    compile group: 'org.thymeleaf', name: 'thymeleaf', version: thymeleafVersion
+    compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-conditionalcomments', version: thymeleafExtrasVersion
+    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    compile group: 'org.slf4j', name: 'jul-to-slf4j', version: slf4jVersion
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+    compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
+    compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
+    compile group: 'org.apache.commons', name: 'commons-vfs2', version: commonsVfs2Version
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
 }
