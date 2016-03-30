@@ -8,6 +8,9 @@ jdk:
   - openjdk7
   - oraclejdk7
 
+script:
+  - ./gradlew test
+
 after_success:
   - ./gradlew jacocoTestReport coveralls
 
