@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'jacoco'
 
 group = 'org.jbake'
 version = '2.5.0-SNAPSHOT'
@@ -62,3 +63,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
 }
+
+jacoco {
+    toolVersion = '0.7.2.201409121644'
+}
+
+jacocoTestReport.dependsOn test
