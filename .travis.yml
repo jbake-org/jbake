@@ -11,10 +11,13 @@ jdk:
 install: true
 
 script:
-  - ./gradlew test
+  - ./gradlew check
 
 after_success:
   - ./gradlew jacocoTestReport coveralls || ./gradlew clean
+
+after_failure:
+  - ./gradlew clean check --debug
 
 notifications:
   irc: "irc.freenode.org#anchos"

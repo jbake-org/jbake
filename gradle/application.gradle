@@ -29,7 +29,7 @@ ext {
 processResources {
     from("src/main/resources"){
         include 'default.properties'
-        expand  version: project.version,
+        expand  jbakeVersion: project.version,
                 timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format( new Date() )
     }
 }
