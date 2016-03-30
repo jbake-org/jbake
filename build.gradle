@@ -12,17 +12,17 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'jacoco'
 
-if( JavaVersion.current().java7Compatible ) {
-    apply plugin: 'com.github.kt3k.coveralls'
-}
 
 group = 'org.jbake'
 version = '2.5.0-SNAPSHOT'
 
 description = """jbake"""
 
-apply from: 'gradle/application.gradle'
-apply from: 'gradle/maven-publishing.gradle'
+if( JavaVersion.current().java7Compatible ) {
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply from: 'gradle/application.gradle'
+    apply from: 'gradle/maven-publishing.gradle'
+}
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
