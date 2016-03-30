@@ -12,7 +12,7 @@ script:
   - ./gradlew test
 
 after_success:
-  - ./gradlew jacocoTestReport coveralls
+  - ./gradlew jacocoTestReport coveralls || ./gradlew clean
 
 notifications:
   irc: "irc.freenode.org#anchos"
