@@ -1,7 +1,11 @@
+plugins {
+    id "jacoco"
+    id "com.github.kt3k.coveralls" version "2.5.0"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'jacoco'
 
 group = 'org.jbake'
 version = '2.5.0-SNAPSHOT'
@@ -66,6 +70,13 @@ dependencies {
 
 jacoco {
     toolVersion = '0.7.2.201409121644'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
 
 jacocoTestReport.dependsOn test

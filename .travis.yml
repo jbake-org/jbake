@@ -9,7 +9,7 @@ jdk:
   - oraclejdk7
 
 after_success:
-  - mvn jacoco:report coveralls:jacoco
+  - ./gradlew jacocoTestReport coveralls
 
 notifications:
-  irc: "irc.freenode.org#jbake"
+  irc: "irc.freenode.org#anchos"
