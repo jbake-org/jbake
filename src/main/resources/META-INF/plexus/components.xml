@@ -9,26 +9,14 @@
                     <lifecycle>
                         <id>default</id>
                         <phases>
-                            <generate-resources></generate-resources>
-                            <process-resources></process-resources>
-                            <compile>
-                                ${project.groupId}:${project.artifactId}:${project.version}:generate
-                            </compile>
-                            <process-test-resources></process-test-resources>
-                            <test-compile></test-compile>
-                            <test></test>
-                            <package></package>
-                            <install></install>
-                            <deploy></deploy>
+                            <process-classes>${project.groupId}:${project.artifactId}:${project.version}:generate</process-resources>
                         </phases>
                     </lifecycle>
                     <lifecycle>
                         <id>site</id>
                         <phases>
                             <pre-site></pre-site>
-                            <site>
-                                ${project.groupId}:${project.artifactId}:${project.version}:generate
-                            </site>
+                            <site>${project.groupId}:${project.artifactId}:${project.version}:generate</site>
                             <post-site></post-site>
                             <site-deploy></site-deploy>
                         </phases>
