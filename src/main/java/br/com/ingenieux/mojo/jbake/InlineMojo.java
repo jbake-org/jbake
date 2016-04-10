@@ -20,12 +20,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.File;
-
-import static spark.Spark.*;
-
-import net_alchim31_livereload.LRServer;
-import spark.Spark;
+import static spark.Spark.awaitInitialization;
+import static spark.Spark.externalStaticFileLocation;
+import static spark.Spark.ipAddress;
+import static spark.Spark.port;
+import static spark.Spark.stop;
 
 /**
  * Runs jbake on a folder while watching and serving a folder with it
@@ -51,23 +50,7 @@ public class InlineMojo extends WatchMojo {
   @Parameter(property = "jbake.port", defaultValue = "8080")
   private Integer port;
 
-  /**
-   * Use livereload.
-   */
-  @Parameter(property = "jbake.livereload", defaultValue = "true")
-  private Boolean livereload;
-
-  LRServer lrServer;
-
   protected void stopServer() throws MojoExecutionException {
-    if (lrServer != null) {
-      try {
-        lrServer.stop();
-      } catch (Exception e) {
-        throw new MojoExecutionException("LiveReload Failure", e);
-      }
-    }
-
     stop();
   }
 
@@ -76,17 +59,6 @@ public class InlineMojo extends WatchMojo {
 
     ipAddress(listenAddress);
     port(this.port);
-
-
-
-    if (Boolean.TRUE.equals(livereload)) {
-      lrServer = new LRServer(35729, outputDirectory.toPath());
-      try {
-        lrServer.start();
-      } catch (Exception e) {
-        throw new MojoExecutionException("LiveReload Failure", e);
-      }
-    }
 
     awaitInitialization();
   }

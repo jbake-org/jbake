@@ -25,6 +25,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
@@ -34,8 +36,11 @@ import java.io.File;
 /**
  * Runs jbake on a folder
  */
-@Mojo(name = "generate", requiresProject = false)
+@Mojo(name = "generate", requiresProject = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class GenerateMojo extends AbstractMojo {
+  @Parameter(defaultValue="${project}")
+  protected MavenProject project;
+
   /**
    * Location of the Output Directory.
    */
@@ -100,7 +105,7 @@ public class GenerateMojo extends AbstractMojo {
 
     config.addConfiguration(ConfigUtil.load(inputDirectory));
 
-    config.addConfiguration(new MapConfiguration(this.getPluginContext()));
+    config.addConfiguration(new MapConfiguration(this.project.getProperties()));
 
     return config;
   }
