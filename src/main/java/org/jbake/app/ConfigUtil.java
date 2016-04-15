@@ -90,7 +90,12 @@ public class ConfigUtil {
 		 * Default status to use (in order to avoid putting it in all files)
 		 */
 		static final String DEFAULT_STATUS = "default.status";
-		
+
+        /**
+         * Default type to use (in order to avoid putting it in all files)
+         */
+        static final String DEFAULT_TYPE = "default.type";
+
 		/**
 		 * Folder where rendered files are output
 		 */
@@ -195,7 +200,7 @@ public class ConfigUtil {
 		 * How many posts per page on index
 		 */
 		static final String POSTS_PER_PAGE = "index.posts_per_page";
-	}
+    }
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
 	private final static String LEGACY_CONFIG_FILE = "custom.properties";
