@@ -23,6 +23,25 @@ dependencies {
 
 version = "0.2.2"
 
+
+jar {
+    manifest {
+        attributes(
+            'Built-By': System.properties['user.name'],
+            'Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString(),
+            'Build-Date': buildDate,
+            'Build-Time': buildTime,
+            'Build-Revision': versioning.info.commit,
+            'Specification-Title': project.name,
+            'Specification-Version': project.version,
+            'Specification-Vendor': project.name,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': project.name
+        )
+    }
+}
+
 pluginBundle {
     website = 'http://jbake.org/'
     vcsUrl = 'https://github.com/jbake-org/jbake-gradle-plugin'
@@ -34,5 +53,11 @@ pluginBundle {
             id = 'me.champeau.jbake'
             displayName = 'JBake Gradle Plugin'
         }
+    }
+
+    mavenCoordinates {
+        groupId = "org.samples.override"
+        artifactId = "greeting-plugins"
+        version = "1.4"
     }
 }
