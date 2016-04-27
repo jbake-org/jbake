@@ -69,26 +69,6 @@ publishing {
     }
 }
 
-pluginBundle {
-    website = project.project_website
-    vcsUrl = project.project_scm
-    description = project.project_description
-    tags = ['jbake', 'site-generator']
-
-    plugins {
-        jbakePlugin {
-            id = 'me.champeau.jbake'
-            displayName = 'JBake Gradle Plugin'
-        }
-    }
-
-    mavenCoordinates {
-        groupId = "org.samples.override"
-        artifactId = "greeting-plugins"
-        version = "1.4"
-    }
-}
-
 if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
 if (!project.hasProperty('bintrayKey')) ext.bintrayKey = ''
 
@@ -110,5 +90,26 @@ bintray {
         version {
             attributes = ['gradle-plugin': 'me.champeau.gradle.jbake:me.champeau.gradle:jbake-gradle-plugin ']
         }
+    }
+}
+
+
+pluginBundle {
+    website = project.project_website
+    vcsUrl = project.project_scm
+    description = project.project_description
+    tags = ['jbake', 'site-generator']
+
+    plugins {
+        jbakePlugin {
+            id = 'me.champeau.jbake'
+            displayName = 'JBake Gradle Plugin'
+        }
+    }
+
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
+        version = project.version
     }
 }
