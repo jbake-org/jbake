@@ -24,26 +24,6 @@ jar {
     }
 }
 
-pluginBundle {
-    website = project.project_website
-    vcsUrl = project.project_scm
-    description = project.project_description
-    tags = ['jbake', 'site-generator']
-
-    plugins {
-        jbakePlugin {
-            id = 'me.champeau.jbake'
-            displayName = 'JBake Gradle Plugin'
-        }
-    }
-
-    mavenCoordinates {
-        groupId = "org.samples.override"
-        artifactId = "greeting-plugins"
-        version = "1.4"
-    }
-}
-
 def pomConfig = {
     name project.name
     description project.project_description
@@ -86,6 +66,26 @@ publishing {
                 asNode().appendNode('description', project.project_description)
             }
         }
+    }
+}
+
+pluginBundle {
+    website = project.project_website
+    vcsUrl = project.project_scm
+    description = project.project_description
+    tags = ['jbake', 'site-generator']
+
+    plugins {
+        jbakePlugin {
+            id = 'me.champeau.jbake'
+            displayName = 'JBake Gradle Plugin'
+        }
+    }
+
+    mavenCoordinates {
+        groupId = "org.samples.override"
+        artifactId = "greeting-plugins"
+        version = "1.4"
     }
 }
 
