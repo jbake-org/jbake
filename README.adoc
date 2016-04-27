@@ -38,6 +38,8 @@ plugins {
 This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
 `src/jbake` and generate content into `$buildDir/jbake` (typically `build/jbake`).
 
+WARNING: versions prior to `0.3.0` had a task named `jbake`. This task has been renamed to `bake` since `0.3.0`.
+
 == Configuration
 === Plugin configuration
 
