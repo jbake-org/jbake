@@ -1,4 +1,17 @@
-= JBake plugin for Gradle image:https://secure.travis-ci.org/jbake-org/jbake-gradle-plugin.png?branch=master["Build Status", link="https://travis-ci.org/jbake-org/jbake-gradle-plugin"]
+= JBake plugin for Gradle
+:jbake-version: 2.4.0
+:plugin-version: 0.3.0-SNAPSHOT
+:linkattrs:
+:project-name: jbake-gradle-plugin
+
+image:http://img.shields.io/travis/jbake-org/{project-name}/master.svg["Build Status", link="https://travis-ci.org/jbake-org/{project-name}"]
+image:http://img.shields.io/coveralls/jbake-org/{project-name}/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/{project-name}"]
+image:http://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="http://www.apache.org/licenses/LICENSE-2.0.txt"]
+image:https://api.bintray.com/packages/jbake/maven/{project-name}/images/download.svg[link="https://bintray.com/jbake/maven/{project-name}/_latestVersion"]
+
+---
+
+image:https://secure.travis-ci.org/jbake-org/jbake-gradle-plugin.png?branch=master["Build Status", link="https://travis-ci.org/jbake-org/jbake-gradle-plugin"]
 
 This plugin allows rendering a site using http://www.jbake.org[JBake] directly from http://www.gradle.org[Gradle].
 
@@ -15,9 +28,10 @@ A few of the sites that use the plugin and serve as a good example are:
 *This is work in progress*
 
 [source,groovy]
+[subs="attributes"]
 ----
 plugins {
-    id 'me.champeau.jbake' version '0.2.1'
+    id 'me.champeau.jbake' version '{plugin-version}'
 }
 ----
 
@@ -47,7 +61,7 @@ jbake {
 }
 ----
 
-The default is 2.3.2.
+The default is {jbake-version}.
 
 === Render Engine configuration
 
@@ -56,11 +70,10 @@ Jbake uses three engines. The library versions could be changed too:
 [source,groovy]
 ----
 jbake {
-
     pegdownVersion = '1.4.2'
     freemarkerVersion = '2.3.19'
     asciidoctorJavaIntegrationVersion = '0.1.4'
-    asciidoctorjVersion = '1.5.1'
+    asciidoctorjVersion = '1.5.4'
 }
 ----
 
