@@ -25,9 +25,9 @@ jar {
 }
 
 pluginBundle {
-    website = project_website
-    vcsUrl = project_scm
-    description = project_description
+    website = project.project_website
+    vcsUrl = project.project_scm
+    description = project.project_description
     tags = ['jbake', 'site-generator']
 
     plugins {
@@ -100,12 +100,12 @@ bintray {
         userOrg = 'melix'
         repo = 'gradle-plugins'
         name = 'jbake-gradle-plugin'
-        desc = project_description
+        desc = project.project_description
         licenses = ['Apache-2.0']
         labels = ['jbake', 'site-generator']
-        websiteUrl = project_website
-        issueTrackerUrl = project_issues
-        vcsUrl = project_scm
+        websiteUrl = project.project_website
+        issueTrackerUrl = project.project_issues
+        vcsUrl = project.project_scm
         publicDownloadNumbers = true
         version {
             attributes = ['gradle-plugin': 'me.champeau.gradle.jbake:me.champeau.gradle:jbake-gradle-plugin ']
