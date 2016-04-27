@@ -37,7 +37,7 @@ def pomConfig = {
         }
     }
     scm {
-        url project.project_scm
+        url project.project_vcs
     }
     developers {
         [
@@ -85,10 +85,10 @@ bintray {
         labels = ['jbake', 'site-generator']
         websiteUrl = project.project_website
         issueTrackerUrl = project.project_issues
-        vcsUrl = project.project_scm
+        vcsUrl = project.project_vcs
         publicDownloadNumbers = true
         version {
-            attributes = ['gradle-plugin': 'me.champeau.gradle.jbake:me.champeau.gradle:jbake-gradle-plugin ']
+            attributes = ['gradle-plugin': 'me.champeau.jbake:me.champeau.gradle:jbake-gradle-plugin ']
         }
     }
 }
@@ -96,7 +96,7 @@ bintray {
 
 pluginBundle {
     website = project.project_website
-    vcsUrl = project.project_scm
+    vcsUrl = project.project_vcs
     description = project.project_description
     tags = ['jbake', 'site-generator']
 
