@@ -58,3 +58,5 @@ artifacts {
     sourcesJar
     javadocJar
 }
+
+task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
