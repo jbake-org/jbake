@@ -21,9 +21,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 
 class JBakePlugin implements Plugin<Project> {
+    static final String JBAKE = "jbake"
 
-
-    public static final String JBAKE = "jbake"
     Project project
     JBakeExtension extension
 
@@ -41,14 +40,12 @@ class JBakePlugin implements Plugin<Project> {
         addDependenciesAfterEvaluate()
 
         project.task('bake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project'){
-
             classpath = configuration
             conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
             conventionMapping.output = { project.file("$project.buildDir/$project.jbake.destDirName") }
             conventionMapping.clearCache = { project.jbake.clearCache }
             conventionMapping.configuration = { project.jbake.configuration }
         }
-
     }
 
     def addDependenciesAfterEvaluate() {
@@ -74,5 +71,4 @@ class JBakePlugin implements Plugin<Project> {
             jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
         }
     }
-
 }
