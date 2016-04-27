@@ -7,9 +7,6 @@ out
 *.ipr
 *.iws
 .idea
-*.class
-user.gradle
 .settings
 *.classpath
 *.project
-gradle.properties

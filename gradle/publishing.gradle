@@ -93,7 +93,6 @@ bintray {
     }
 }
 
-
 pluginBundle {
     website = project.project_website
     vcsUrl = project.project_vcs
