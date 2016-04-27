@@ -14,5 +14,18 @@
  * limitations under the License.
  */
 
-ext.bintrayUsername = project.hasProperty('bintrayUsername')?project.getProperty('bintrayUsername'):System.getenv('BINTRAY_USER')?:''
-ext.bintrayKey = project.hasProperty('bintrayKey')?project.getProperty('bintrayKey'):System.getenv('BINTRAY_KEY')?:''
+license {
+    header = rootProject.file('gradle/HEADER')
+    strictCheck = true
+    ignoreFailures = true
+    mapping {
+        java   = 'SLASHSTAR_STYLE'
+        groovy = 'SLASHSTAR_STYLE'
+    }
+    ext.year = '2014-2016'
+    exclude '**/*.properties'
+}
+
+licenseTest {
+    source -= sourceSets.test.resources
+}
