@@ -1,22 +1,11 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1'
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
-        classpath 'net.nemerosa:versioning:1.6.2'
-    }
+plugins {
+    id "com.gradle.plugin-publish" version "0.9.4"
+    id "com.github.ben-manes.versions" version "0.12.0"
+    id "net.nemerosa.versioning" version "1.7.1"
 }
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: 'com.github.ben-manes.versions'
-apply from: 'gradle/credentials.gradle'
-apply from: 'gradle/artifactory.gradle'
-apply from: 'gradle/bintray.gradle'
 apply from: 'gradle/providedConfiguration.gradle'
 
 repositories {
@@ -32,12 +21,43 @@ dependencies {
     }
 }
 
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
+version = "0.2.2"
+
+
+jar {
+    manifest {
+        attributes(
+            'Built-By': System.properties['user.name'],
+            'Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString(),
+            'Build-Date': buildDate,
+            'Build-Time': buildTime,
+            'Build-Revision': versioning.info.commit,
+            'Specification-Title': project.name,
+            'Specification-Version': project.version,
+            'Specification-Vendor': project.name,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': project.name
+        )
+    }
 }
 
-task groovydocJar(type: Jar, dependsOn: groovydoc) {
-    classifier = 'groovydoc'
-    from groovydoc.destinationDir
+pluginBundle {
+    website = 'http://jbake.org/'
+    vcsUrl = 'https://github.com/jbake-org/jbake-gradle-plugin'
+    description = 'Adds the ability to run JBake directly from a Gradle build'
+    tags = ['jbake', 'site-generator']
+
+    plugins {
+        jbakePlugin {
+            id = 'me.champeau.jbake'
+            displayName = 'JBake Gradle Plugin'
+        }
+    }
+
+    mavenCoordinates {
+        groupId = "org.samples.override"
+        artifactId = "greeting-plugins"
+        version = "1.4"
+    }
 }

@@ -16,17 +16,9 @@ A few of the sites that use the plugin and serve as a good example are:
 
 [source,groovy]
 ----
-buildscript {
-  repositories {
-      jcenter()
-  }
-
-  dependencies {
-    classpath 'me.champeau.gradle:jbake-gradle-plugin:0.2.1'
-  }
+plugins {
+    id 'me.champeau.jbake' version '0.2.1'
 }
-
-apply plugin: 'me.champeau.jbake'
 ----
 
 This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
