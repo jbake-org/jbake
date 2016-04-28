@@ -22,6 +22,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import static spark.Spark.awaitInitialization;
 import static spark.Spark.externalStaticFileLocation;
+import static spark.Spark.init;
 import static spark.Spark.ipAddress;
 import static spark.Spark.port;
 import static spark.Spark.stop;
@@ -59,6 +60,8 @@ public class InlineMojo extends WatchMojo {
 
     ipAddress(listenAddress);
     port(this.port);
+
+    init();
 
     awaitInitialization();
   }
