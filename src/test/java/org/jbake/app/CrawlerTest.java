@@ -61,9 +61,9 @@ public class CrawlerTest {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(3, crawler.getDocumentCount("post"));
-        Assert.assertEquals(3, crawler.getDocumentCount("page"));
-        
+        Assert.assertEquals(2, db.getDocumentCount("post"));
+        Assert.assertEquals(3, db.getDocumentCount("page"));
+
         List<ODocument> results = db.getPublishedPosts();
 //                query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
         DocumentList list = DocumentList.wrap(results.iterator());
@@ -100,8 +100,9 @@ public class CrawlerTest {
 	    Crawler crawler = new Crawler(db, content, config);
 	    crawler.crawl(new File(content.getPath() + File.separator + "content"));
 
-	    Assert.assertEquals(3, crawler.getDocumentCount("post"));
-	    Assert.assertEquals(3, crawler.getDocumentCount("page"));
+	    Assert.assertEquals(2, db.getDocumentCount("post"));
+	    Assert.assertEquals(3, db.getDocumentCount("page"));
+
 	    DocumentIterator documents = new DocumentIterator(db.getPublishedPosts().iterator());
 	    while (documents.hasNext()) {
 	        Map<String, Object> model = documents.next();

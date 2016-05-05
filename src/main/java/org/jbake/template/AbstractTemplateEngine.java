@@ -26,6 +26,7 @@ import org.apache.commons.configuration.Configuration;
  */
 public abstract class AbstractTemplateEngine {
 
+    protected static ModelExtractors extractors = new ModelExtractors();
     protected final Configuration config;
     protected final ContentStore db;
     protected final File destination;

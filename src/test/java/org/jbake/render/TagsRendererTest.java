@@ -42,7 +42,7 @@ public class TagsRendererTest {
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, never()).renderTags(anySetOf(String.class), anyString());
+        verify(mockRenderer, never()).renderTags(anyString());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class TagsRendererTest {
         Set<String> tags = new HashSet(Arrays.asList("tag1", "tags2"));
         when(contentStore.getTags()).thenReturn(tags);
 
-        when(mockRenderer.renderTags(tags, "random string")).thenReturn(1);
+        when(mockRenderer.renderTags("random string")).thenReturn(1);
 
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
@@ -78,7 +78,7 @@ public class TagsRendererTest {
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, times(1)).renderTags(tags, "random string");
+        verify(mockRenderer, times(1)).renderTags("random string");
     }
 
     @Test(expected = RenderingException.class)
@@ -89,12 +89,12 @@ public class TagsRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderTags(anySetOf(String.class), anyString());
+        doThrow(new Exception()).when(mockRenderer).renderTags(anyString());
 
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, never()).renderTags(anySetOf(String.class), anyString());
+        verify(mockRenderer, never()).renderTags(anyString());
     }
 
 }

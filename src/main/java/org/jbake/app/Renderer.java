@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Render output to a file.
@@ -95,7 +94,6 @@ public class Renderer {
 		
 		/**
 		 * Constructor added due to known use of a allInOneName which is used for name, template and content
-		 * @param path
 		 * @param allInOneName
 		 */
 		public DefaultRenderingConfig(String allInOneName) {
@@ -120,7 +118,7 @@ public class Renderer {
     private final File destination;
     private final CompositeConfiguration config;
     private final DelegatingTemplateEngine renderingEngine;
-
+    private final ContentStore db;
     /**
      * Creates a new instance of Renderer with supplied references to folders.
      *
@@ -133,6 +131,7 @@ public class Renderer {
         this.destination = destination;
         this.config = config;
         this.renderingEngine = new DelegatingTemplateEngine(config, db, destination, templatesPath);
+        this.db = db;
     }
 
     private String findTemplateName(String docType) {
@@ -220,10 +219,10 @@ public class Renderer {
      * Render an index file using the supplied content.
      *
      * @param indexFile The name of the output file
-     * @throws Exception 
+     * @throws Exception
      */
-    public void renderIndex(String indexFile, ContentStore db) throws Exception {
-      long totalPosts = db.countClass("post");
+    public void renderIndex(String indexFile) throws Exception {
+      long totalPosts = db.getDocumentCount("post");
       boolean paginate = config.getBoolean(Keys.PAGINATE_INDEX, false);
       int postsPerPage = config.getInt(Keys.POSTS_PER_PAGE, -1);
       int start = 0;
@@ -312,14 +311,13 @@ public class Renderer {
     /**
      * Render tag files using the supplied content.
      *
-     * @param tags    The content to renderDocument
      * @param tagPath The output path
      * @throws Exception 
      */
-    public int renderTags(Set<String> tags, String tagPath) throws Exception {
+    public int renderTags(String tagPath) throws Exception {
     	int renderedCount = 0;
     	final List<Throwable> errors = new LinkedList<Throwable>();
-        for (String tag : tags) {
+        for (String tag : db.getTags()) {
             try {
             	Map<String, Object> model = new HashMap<String, Object>();
             	model.put("renderer", renderingEngine);

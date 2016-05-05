@@ -32,4 +32,8 @@ public class DocumentTypes {
         Engines.getRecognizedExtensions();
         return DEFAULT_DOC_TYPES.toArray(new String[DEFAULT_DOC_TYPES.size()]);
     }
+
+    public static boolean contains(String documentType) {
+        return DEFAULT_DOC_TYPES.contains(documentType);
+    }
 }

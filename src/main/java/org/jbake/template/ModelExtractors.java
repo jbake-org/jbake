@@ -46,7 +46,7 @@ public class ModelExtractors {
         loadEngines();
     }
 
-    private void registerEngine(String key, ModelExtractor extractor) {
+    public void registerEngine(String key, ModelExtractor extractor) {
     	ModelExtractor old = extractors.put(key, extractor);
         if (old != null) {
             LOGGER.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old);
@@ -62,10 +62,6 @@ public class ModelExtractors {
      * typically used to avoid loading optional modules.
      *
      *
-     * @param config the configuration
-     * @param db database instance
-     * @param destination target directory
-     * @param templatesPath path to template directory
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
     private static ModelExtractor tryLoadEngine(String engineClassName) {

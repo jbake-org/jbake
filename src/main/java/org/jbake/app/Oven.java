@@ -141,7 +141,7 @@ public class Oven {
                 crawler.crawl(contentsPath);
                 LOGGER.info("Content detected:");
                 for (String docType : DocumentTypes.getDocumentTypes()) {
-                	int count = crawler.getDocumentCount(docType);
+                	long count = db.getDocumentCount(docType);
                 	if (count > 0) {
                 		LOGGER.info("Parsed {} files of type: {}", count, docType);
             		}

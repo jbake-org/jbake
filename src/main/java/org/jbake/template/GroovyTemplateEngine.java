@@ -35,7 +35,6 @@ import org.jbake.app.ContentStore;
 public class GroovyTemplateEngine extends AbstractTemplateEngine {
 
     private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
-    private static ModelExtractors extractors = new ModelExtractors();
 
     public GroovyTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);

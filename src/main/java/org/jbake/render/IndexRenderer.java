@@ -14,7 +14,7 @@ public class IndexRenderer implements RenderingTool {
 	public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
 		if (config.getBoolean(Keys.RENDER_INDEX)) {
 			try {
-				renderer.renderIndex(config.getString(Keys.INDEX_FILE), db);
+				renderer.renderIndex(config.getString(Keys.INDEX_FILE));
 				return 1;
 			} catch (Exception e) {
 				throw new RenderingException(e);

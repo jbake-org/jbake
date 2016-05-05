@@ -32,7 +32,6 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
  * @author Cédric Champeau
  */
 public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
-	private static ModelExtractors extractors = new ModelExtractors();
     private final ReentrantLock lock = new ReentrantLock();
 
     private TemplateEngine templateEngine;
