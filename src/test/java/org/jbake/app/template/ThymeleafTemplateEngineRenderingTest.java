@@ -43,15 +43,15 @@ public class ThymeleafTemplateEngineRenderingTest extends AbstractTemplateEngine
 	    	"All about stuff!",
 	    	"<h5>Published Pages</h5>",
 	    	"/projects.html"));
-        outputStrings.put("index", Arrays.asList("<h4><a href=\"blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>",
-        	"<h4><a href=\"blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>"));
+        outputStrings.put("index", Arrays.asList("<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>",
+        	"<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>"));
         outputStrings.put("feed", Arrays.asList("<description>My corner of the Internet</description>",
         	"<title>Second Post</title>",
         	"<title>First Post</title>"));
-        outputStrings.put("archive", Arrays.asList("<a href=\"blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>",
-        	"<a href=\"blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>"));
-        outputStrings.put("tags", Arrays.asList("<a href=\"blog/2013/second-post.html\" shape=\"rect\">Second Post</a></h4>",
-        	"<a href=\"blog/2012/first-post.html\" shape=\"rect\">First Post</a></h4>"));
+        outputStrings.put("archive", Arrays.asList("<a href=\"blog/2013/second-post.html\">Second Post</a></h4>",
+        	"<a href=\"blog/2012/first-post.html\">First Post</a></h4>"));
+        outputStrings.put("tags", Arrays.asList("<a href=\"blog/2013/second-post.html\">Second Post</a></h4>",
+        	"<a href=\"blog/2012/first-post.html\">First Post</a></h4>"));
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
         	"blog/2012/first-post.html",
         	"papers/published-paper.html"));
