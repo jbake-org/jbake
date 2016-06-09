@@ -156,8 +156,7 @@
 						</goals>
 						<configuration>
 							<checkoutDirectory>${project.build.directory}/example-project-jade</checkoutDirectory>
-							<!-- TODO: Move this project to jbake repo -->
-							<connectionUrl>scm:git:git://github.com/mariuszs/jbake-example-project-jade.git</connectionUrl>
+							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-jade.git</connectionUrl>
 						</configuration>
 					</execution>
                 </executions>
