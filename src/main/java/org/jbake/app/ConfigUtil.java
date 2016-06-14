@@ -52,9 +52,14 @@ public class ConfigUtil {
 		static final String ASSET_FOLDER = "asset.folder";
 
 		/**
-		 * URI prefix for content that should be given extensionless output URI's
+		 * Flag indicating if content matching prefix below should be given extension-less URI's
 		 */
 		static final String URI_NO_EXTENSION = "uri.noExtension";
+		
+		/**
+		 * URI prefix for content that should be given extension-less output URI's
+		 */
+		static final String URI_NO_EXTENSION_PREFIX = "uri.noExtension.prefix";
 
 		/**
 		 * Flag indicating if hidden asset resources should be ignored

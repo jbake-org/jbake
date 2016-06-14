@@ -55,6 +55,7 @@ public class Crawler {
 		static final String SHA1 = "sha1";
 		static final String ROOTPATH = "rootpath";
 		static final String ID = "id";
+		static final String NO_EXTENSION_URI = "noExtensionUri";
 		
 	}
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
@@ -134,12 +135,18 @@ public class Crawler {
     
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-    	String noExtensionUrlFolder = config.getString(Keys.URI_NO_EXTENSION);
-        if (!noExtensionUrlFolder.equals("false") && uri.startsWith(noExtensionUrlFolder)) {
-            uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getString(Keys.OUTPUT_EXTENSION);
+    	
+    	boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
+    	String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
+    	if (noExtensionUri && noExtensionUriPrefix != null && noExtensionUriPrefix.length() > 0) {
+        	// convert URI from xxx.html to xxx/index.html
+    		if (uri.startsWith(noExtensionUriPrefix)) {
+    			uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getString(Keys.OUTPUT_EXTENSION);
+    		}
         } else {
             uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
         }
+    	
         // strip off leading / to enable generating non-root based sites
     	if (uri.startsWith("/")) {
     		uri = uri.substring(1, uri.length());
@@ -171,8 +178,8 @@ public class Crawler {
                 }
             }
             
-            if (!config.getString(Keys.URI_NO_EXTENSION).equals("false")) {
-                fileContents.put("noExtensionUri", uri.replace("/index.html", "/"));
+            if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
+            	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
             
             ODocument doc = new ODocument(documentType);
