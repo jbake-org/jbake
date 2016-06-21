@@ -1,22 +1,23 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.Crawler.Attributes;
-import org.jbake.template.DelegatingTemplateEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler.Attributes;
+import org.jbake.template.DelegatingTemplateEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Render output to a file.
@@ -359,7 +360,7 @@ public class Renderer {
     public int renderCategories(Set<String> categories, String categoriesPath) throws Exception {
     	int renderedCount = 0;
     	final List<String> errors = new LinkedList<String>();
-    	Map<String,String> generatedCategories = new HashMap<String, String>();
+    	Map<String,String> generatedCategories = new LinkedHashMap<String, String>();
         for (String category : categories) {
             try {
             	Map<String, Object> model = new HashMap<String, Object>();

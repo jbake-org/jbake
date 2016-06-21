@@ -62,6 +62,7 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         	"blog/2012/first-post.html",
         	"papers/published-paper.html"));
         outputStrings.put("categories", Arrays.asList("blog/2012/first-post.html"));
+        outputStrings.put("categories_index", Arrays.asList("<a href=\"Technology.html\"/>"));
     }
 
     @Test
@@ -93,6 +94,14 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         String output = FileUtils.readFileToString(outputFile);
         for (String string : outputStrings.get("categories")) {
             assertThat(output).contains(string);
+        }
+        
+        // verify index.html file
+        File indexFile = new File(destinationFolder + File.separator + "categories" + File.separator + "index.html");
+        Assert.assertTrue(indexFile.exists());
+        String indexData = FileUtils.readFileToString(indexFile);
+        for (String string : outputStrings.get("categories_index")) {
+            assertThat(indexData).contains(string);
         }
     }
 }
