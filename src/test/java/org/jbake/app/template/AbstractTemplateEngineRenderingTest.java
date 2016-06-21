@@ -246,4 +246,9 @@ public abstract class AbstractTemplateEngineRenderingTest {
         return outputStrings.get(type);
         
     }
+    
+    @Test
+    public void renderCategories() throws Exception {
+      
+    }
 }

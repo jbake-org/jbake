@@ -56,6 +56,8 @@ public class Crawler {
 		static final String ROOTPATH = "rootpath";
 		static final String ID = "id";
 		static final String NO_EXTENSION_URI = "noExtensionUri";
+		static final String CATEGORIES = "categories";
+		static final String CATEGORY = "category";
 		
 	}
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
