@@ -53,12 +53,13 @@ public class CrawlerTest {
         db.drop();
         db.close();
     }
+    
 	@Test
 	public void crawl() throws ConfigurationException {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(2, crawler.getDocumentCount("post"));
+        Assert.assertEquals(3, crawler.getDocumentCount("post"));
         Assert.assertEquals(3, crawler.getDocumentCount("page"));
         
         List<ODocument> results = db.getPublishedPosts();
@@ -70,6 +71,9 @@ public class CrawlerTest {
         		.containsValue("../../");
         }
         
+        // covers bug #213
+        List<ODocument> publishedPostsByTag = db.getPublishedPostsByTag("blog");
+        Assert.assertEquals(2, publishedPostsByTag.size());
     }
 	@Test
 	public void renderWithPrettyUrls() throws Exception {
@@ -86,7 +90,7 @@ public class CrawlerTest {
 	    Crawler crawler = new Crawler(db, content, config);
 	    crawler.crawl(new File(content.getPath() + File.separator + "content"));
 
-	    Assert.assertEquals(2, crawler.getDocumentCount("post"));
+	    Assert.assertEquals(3, crawler.getDocumentCount("post"));
 	    Assert.assertEquals(3, crawler.getDocumentCount("page"));
 	    DocumentIterator documents = new DocumentIterator(db.getPublishedPosts().iterator());
 	    while (documents.hasNext()) {

@@ -10,7 +10,7 @@
 
 	<div class="row-fluid marketing">
 		<div class="span12">
-			<%posts[0..<2].each { post ->%>
+			<%published_posts[0..<2].each { post ->%>
 			<h4><a href="${post.uri}">${post.title}</a></h4>
 			<p>${post.date.format("dd MMMM yyyy")} - ${post.body.substring(0, 150)}...</p>
 			<%}%>
