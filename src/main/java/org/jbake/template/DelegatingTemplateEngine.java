@@ -35,7 +35,6 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     @Override
     public void renderDocument(final Map<String, Object> model, String templateName, final Writer writer) throws RenderingException {
         model.put("version", config.getString(Keys.VERSION));
-        model.put("baked_timestamp", new Date());
         Map<String, Object> configModel = new HashMap<String, Object>();
         Iterator<String> configKeys = config.getKeys();
         while (configKeys.hasNext()) {

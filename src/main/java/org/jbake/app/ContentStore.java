@@ -130,7 +130,7 @@ public class ContentStore {
     }
 
     public List<ODocument> getPublishedPostsByTag(String tag) {
-        return query("select * from post where status='published' where ? in tags order by date desc", tag);
+        return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
 
     public List<ODocument> getPublishedPostsByCategories(String category) {
