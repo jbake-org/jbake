@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil.Keys;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +71,14 @@ public class CrawlerTest {
         	assertThat(content)
         		.containsKey(Crawler.Attributes.ROOTPATH)
         		.containsValue("../../");
+        }
+        
+        List<ODocument> draftPosts = db.getAllContent("post");
+        DocumentList draftList = DocumentList.wrap(draftPosts.iterator());
+        for (Map<String,Object> content : list) {
+        	if (content.get(Crawler.Attributes.TITLE).equals("Draft Post")) {
+        		assertThat(content).containsKey(Crawler.Attributes.DATE);
+        	}
         }
         
         // covers bug #213
