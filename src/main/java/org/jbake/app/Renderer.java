@@ -364,6 +364,58 @@ public class Renderer {
             return renderedCount;
         }
     }
+    
+    /**
+     * Render tag files using the supplied content.
+     *
+     * @param categories    The content to renderDocument
+     * @param categoriesPath The output path
+     * @throws Exception 
+     */
+    public int renderCategories(String categoriesPath) throws Exception {
+    	int renderedCount = 0;
+    	final List<String> errors = new LinkedList<String>();
+        for (String category : db.getCategories()) {
+            try {
+            	Map<String, Object> model = new HashMap<String, Object>();
+            	model.put("renderer", renderingEngine);
+            	model.put(Attributes.CATEGORY, category);
+            	Map<String, Object> map = buildSimpleModel(Attributes.CATEGORY);
+                map.put(Attributes.ROOTPATH, "../");
+                model.put("content", map);
+
+            	String pathCategory = category.trim().replace(" ", "-") + config.getString(Keys.OUTPUT_EXTENSION);
+            	File path = new File(destination.getPath() + File.separator + categoriesPath + File.separator + pathCategory);
+            	render(new ModelRenderingConfig(path, Attributes.CATEGORY, model, findTemplateName(Attributes.CATEGORY)));
+                renderedCount++;
+            } catch (Exception e) {
+                errors.add(e.getCause().getMessage());
+            }
+        }
+        
+        // Add an index file at root folder of categories.
+        // This will prevent directory listing and also provide an option to display all categories page.
+    	Map<String, Object> model = new HashMap<String, Object>();
+    	model.put("renderer", renderingEngine);
+    	Map<String, Object> map = buildSimpleModel(Attributes.CATEGORIES);
+        map.put(Attributes.ROOTPATH, "../");
+        model.put("content", map);
+
+    	File path = new File(destination.getPath() + File.separator + categoriesPath + File.separator + "index" + config.getString(Keys.OUTPUT_EXTENSION));
+    	render(new ModelRenderingConfig(path, Attributes.CATEGORIES, model, findTemplateName(Attributes.CATEGORIES)));
+        renderedCount++;
+        
+        if (!errors.isEmpty()) {
+        	StringBuilder sb = new StringBuilder();
+        	sb.append("Failed to render Categories. Cause(s):");
+        	for(String error: errors) {
+        		sb.append("\n" + error);
+        	}
+        	throw new Exception(sb.toString());
+        } else {
+        	return renderedCount;
+        }
+    }
 
     /**
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.

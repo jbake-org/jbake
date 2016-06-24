@@ -158,6 +158,11 @@ public class ConfigUtil {
 		String RENDER_TAGS = "render.tags";
 		
 		/**
+		 * Flag indicating if category files should be generated
+		 */
+		String RENDER_CATEGORIES = "render.categories";
+		
+		/**
 		 * Port used when running Jetty server
 		 */
 		String SERVER_PORT = "server.port";
@@ -211,6 +216,26 @@ public class ConfigUtil {
 		 * The configured base URI for the hosted content
 		 */
 		String SITE_HOST = "site.host";
+		
+		/**
+		 * Should Category generation and usage be enabled? Default is true. Posts without categories will be marked as 'Uncategorized'. Default category can be changed with {#link #CATEGORY_DEFAULT}.
+		 */
+		String CATEGORIES_ENABLE = "categories.enable";
+		
+		/**
+		 * Default Category for posts when {@link CATEGORIES_ENABLE} is {@code true} and no category is specified for post.
+		 */
+		String CATEGORY_DEFAULT = "category.default";
+		
+		/**
+		 * Tags output path, used only when {@link #RENDER_CATEGORIES} is true
+		 */
+		String CATEGORY_PATH = "categories.path";
+		
+		/**
+		 * Should Categories be sanitized for space?
+		 */
+		String CATEGORY_SANITIZE = "categories.sanitize";
 	}
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);

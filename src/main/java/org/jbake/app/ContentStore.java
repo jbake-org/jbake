@@ -145,6 +145,10 @@ public class ContentStore {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
 
+    public DocumentList getPublishedPostsByCategories(String category) {
+        return query("select * from post where status='published' and ? in categories order by date desc", category);
+    }
+    
     public DocumentList getPublishedDocumentsByTag(String tag) {
         final DocumentList documents = new DocumentList();
         for (final String docType : DocumentTypes.getDocumentTypes()) {
@@ -174,6 +178,10 @@ public class ContentStore {
         return query(query);
     }
 
+    public DocumentList getAllCategoriesFromPublishedPosts() {
+        return query("select categories from post where status='published'");
+    }
+    
     public DocumentList getAllTagsFromPublishedPosts() {
         return query("select tags from post where status='published'");
     }
@@ -240,6 +248,16 @@ public class ContentStore {
             }
         }
         return result;
+    }
+
+    public Set<String> getCategories() {
+    	DocumentList docs = this.getAllCategoriesFromPublishedPosts();
+	    Set<String> result = new HashSet<String>();
+	    for (Map<String, Object> document : docs) {
+	        String[] categories = DBUtil.toStringArray(document.get("categories"));
+	        Collections.addAll(result, categories);
+	    }
+	    return result;
     }
 
     private void createDocType(final OSchema schema, final String doctype) {

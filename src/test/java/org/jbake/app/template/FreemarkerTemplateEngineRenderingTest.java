@@ -25,7 +25,11 @@ package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler;
+import org.jbake.app.Renderer;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -82,4 +86,33 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
     }
 
+    @Test
+    @Override
+    public void renderCategories() throws Exception {
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        renderer.renderCategories("categories");
+
+        // verify
+        File outputFile = new File(destinationFolder + File.separator + "categories" + File.separator + "Technology.html");
+        Assert.assertTrue(outputFile.exists());
+        String output = FileUtils.readFileToString(outputFile, "UTF8");
+        for (String string : outputStrings.get("categories")) {
+            assertThat(output).contains(string);
+        }
+        
+        // verify index.html file
+        File indexFile = new File(destinationFolder + File.separator + "categories" + File.separator + "index.html");
+        Assert.assertTrue(indexFile.exists());
+        String indexData = FileUtils.readFileToString(indexFile);
+        
+        //       outputStrings.put("categories", Arrays.asList("blog/2012/first-post.html"));
+        //outputStrings.put("categories_index", Arrays.asList("<a href=\"Technology.html\"/>"));
+        
+        
+        for (String string : outputStrings.get("categories_index")) {
+            assertThat(indexData).contains(string);
+        }
+    }
 }
