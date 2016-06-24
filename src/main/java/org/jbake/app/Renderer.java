@@ -1,22 +1,23 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.Crawler.Attributes;
-import org.jbake.template.DelegatingTemplateEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler.Attributes;
+import org.jbake.template.DelegatingTemplateEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Render output to a file.
@@ -339,6 +340,64 @@ public class Renderer {
         if (!errors.isEmpty()) {
         	StringBuilder sb = new StringBuilder();
         	sb.append("Failed to render tags. Cause(s):");
+        	for(String error: errors) {
+        		sb.append("\n" + error);
+        	}
+        	throw new Exception(sb.toString());
+        } else {
+        	return renderedCount;
+        }
+    }
+    
+    
+    /**
+     * Render tag files using the supplied content.
+     *
+     * @param categories    The content to renderDocument
+     * @param categoriesPath The output path
+     * @throws Exception 
+     */
+    public int renderCategories(Set<String> categories, String categoriesPath) throws Exception {
+    	int renderedCount = 0;
+    	final List<String> errors = new LinkedList<String>();
+    	Map<String,String> generatedCategories = new LinkedHashMap<String, String>();
+        for (String category : categories) {
+            try {
+            	Map<String, Object> model = new HashMap<String, Object>();
+            	model.put("renderer", renderingEngine);
+            	model.put(Attributes.CATEGORY, category);
+            	Map<String, Object> map = buildSimpleModel(Attributes.CATEGORY);
+                map.put(Attributes.ROOTPATH, "../");
+                model.put("content", map);
+
+            	String pathCategory = category.trim().replace(" ", "-") + config.getString(Keys.OUTPUT_EXTENSION);
+            	File path = new File(destination.getPath() + File.separator + categoriesPath + File.separator + pathCategory);
+            	render(new ModelRenderingConfig(path, Attributes.CATEGORY, model, findTemplateName(Attributes.CATEGORY)));
+            	generatedCategories.put(category, pathCategory);
+                renderedCount++;
+            } catch (Exception e) {
+                errors.add(e.getCause().getMessage());
+            }
+        }
+        
+        // Add an index file at root folder of categories.
+        // This will prevent directory listing and also provide an option to display all categories page.
+        if(!categories.isEmpty()){
+        	Map<String, Object> model = new HashMap<String, Object>();
+        	model.put("renderer", renderingEngine);
+        	Map<String, Object> map = buildSimpleModel(Attributes.CATEGORIES);
+            map.put(Attributes.ROOTPATH, "../");
+            map.put(Attributes.CATEGORIES, generatedCategories);
+            model.put("content", map);
+
+        	File path = new File(destination.getPath() + File.separator + categoriesPath + File.separator + "index" + config.getString(Keys.OUTPUT_EXTENSION));
+        	render(new ModelRenderingConfig(path, Attributes.CATEGORIES, model, findTemplateName(Attributes.CATEGORIES)));
+            renderedCount++;
+        }
+        
+        if (!errors.isEmpty()) {
+        	StringBuilder sb = new StringBuilder();
+        	sb.append("Failed to render Categories. Cause(s):");
         	for(String error: errors) {
         		sb.append("\n" + error);
         	}

@@ -133,6 +133,10 @@ public class ContentStore {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
 
+    public List<ODocument> getPublishedPostsByCategories(String category) {
+        return query("select * from post where status='published' where ? in categories order by date desc", category);
+    }
+    
     public List<ODocument> getPublishedPages() {
         return getPublishedContent("page");
     }
@@ -153,6 +157,10 @@ public class ContentStore {
         return query(query + " order by date desc");
     }
 
+    public List<ODocument> getAllCategoriesFromPublishedPosts() {
+        return query("select categories from post where status='published'");
+    }
+    
     public List<ODocument> getAllTagsFromPublishedPosts() {
         return query("select tags from post where status='published'");
     }
@@ -203,6 +211,16 @@ public class ContentStore {
 	    for (ODocument document : docs) {
 	        String[] tags = DBUtil.toStringArray(document.field("tags"));
 	        Collections.addAll(result, tags);
+	    }
+	    return result;
+    }
+    
+    public Set<String> getCategories() {
+    	List<ODocument> docs = this.getAllCategoriesFromPublishedPosts();
+	    Set<String> result = new HashSet<String>();
+	    for (ODocument document : docs) {
+	        String[] categories = DBUtil.toStringArray(document.field("categories"));
+	        Collections.addAll(result, categories);
 	    }
 	    return result;
     }

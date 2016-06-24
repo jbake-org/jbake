@@ -2,13 +2,21 @@ package org.jbake.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,7 +40,7 @@ public class ParserTest {
 	private File invalidAsciiDocFileWithoutHeader;
 	private File validAsciiDocFileWithHeaderInContent;
 	
-	private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
+	private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~\n";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 
   
@@ -114,6 +122,33 @@ public class ParserTest {
 		out.close();
 	}
 	
+	public Map<String, String> getCommonTestPostData(){
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("title", "This is a test post");
+		data.put("type", "post");
+		data.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+		data.put("tags", "tagA,tagB");
+		data.put("status", "published");
+		data.put("body", "This content is for body of the post.");
+		return data;
+	}
+	public String convertMapToStringHeader(Map<String,String> data){
+		if (data == null) return null;
+		StringBuffer header = new StringBuffer();
+		Map<String, String> lockedMap =  Collections.unmodifiableMap(data);
+		for (String key : lockedMap.keySet()) {
+			if(key != "body")
+				header.append(key).append("=").append(lockedMap.get(key)).append("\n");
+		}
+		if(!lockedMap.isEmpty()){
+			header.append("~~~~~~\n");
+		}
+		if(lockedMap.containsKey("body")){
+			header.append(lockedMap.get("body"));
+		}
+		return header.toString();
+	}
+	
 	@Test
 	public void parseValidHTMLFile() {
 		Map<String, Object> map = parser.processFile(validHTMLFile);
@@ -191,5 +226,82 @@ public class ParserTest {
 			.contains("date=2013-02-01")
 			.contains("tags=tag1, tag2");
 //		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
+	}
+	
+	@Test
+	public void parseCategoriesCheckDefaultCategory() throws IOException{
+		File tempHtml = folder.newFile("test.html");
+		PrintWriter out = new PrintWriter(tempHtml);
+		out.print(convertMapToStringHeader(getCommonTestPostData()));
+		out.close();
+		Map<String, Object> map = parser.processFile(tempHtml);
+		assertThat(map.get("categories"))
+					.isNotNull()
+					.isInstanceOf(String[].class)
+					.isEqualTo(Arrays.array("Uncategorized"));
+		
+	}
+	
+	@Test
+	public void parseCategoriesCheckNoDefaultCategory() throws IOException{
+		File tempHtml = folder.newFile("test.html");
+		PrintWriter out = new PrintWriter(tempHtml);
+		out.print(convertMapToStringHeader(getCommonTestPostData()));
+		out.close();
+		config.setProperty("categories.enable", false);
+		parser = new Parser(config,rootPath.getPath());
+		Map<String, Object> map = parser.processFile(tempHtml);
+		assertThat(map.get("categories"))
+					.isNull();
+	}
+	
+	@Test
+	public void parseCategoriesCheckSpecificDefaultCategoryWithSanitize() throws IOException{
+		File tempHtml = folder.newFile("test.html");
+		BufferedWriter out = new BufferedWriter(new FileWriter(tempHtml));
+		out.write(convertMapToStringHeader(getCommonTestPostData()));
+		out.flush();
+		out.close();
+		config.setProperty("category.default", "Java Collections");
+		config.setProperty("categories.sanitize", true);
+		parser = new Parser(config,rootPath.getPath());
+		Map<String, Object> map = parser.processFile(tempHtml);
+		assertThat(map.get("categories"))
+					.isNotNull()
+					.isInstanceOf(String[].class)
+					.isEqualTo(Arrays.array("Java-Collections"));
+		
+	}
+	
+	@Test
+	public void parseCategoriesCheckMultipleCategories() throws IOException{
+		File tempHtml = folder.newFile("test.html");
+		PrintWriter out = new PrintWriter(tempHtml);
+		Map<String,String> data = getCommonTestPostData();
+		data.put("categories", "Java, J2EE, Spring Framework");
+		out.print(convertMapToStringHeader(data));
+		out.close();
+		parser = new Parser(config,rootPath.getPath());
+		Map<String, Object> map = parser.processFile(tempHtml);
+		assertThat(map.get("categories"))
+					.isNotNull()
+					.isInstanceOf(String[].class)
+					.isEqualTo(Arrays.array("Java","J2EE","Spring Framework"));
+	}
+	@Test
+	public void parseCategoriesCheckMultipleCategoriesWithSanitize() throws IOException{
+		File tempHtml = folder.newFile("test.html");
+		PrintWriter out = new PrintWriter(tempHtml);
+		Map<String,String> data = getCommonTestPostData();
+		data.put("categories", "Java, J2EE, Spring Framework");
+		out.print(convertMapToStringHeader(data));
+		out.close();
+		config.setProperty("categories.sanitize", true);
+		parser = new Parser(config,rootPath.getPath());
+		Map<String, Object> map = parser.processFile(tempHtml);
+		assertThat(map.get("categories"))
+					.isNotNull()
+					.isInstanceOf(String[].class)
+					.isEqualTo(Arrays.array("Java","J2EE","Spring-Framework"));
 	}
 }
