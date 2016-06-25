@@ -364,7 +364,7 @@ public class Renderer {
             return renderedCount;
         }
     }
-    
+      
     /**
      * Render tag files using the supplied content.
      *
@@ -384,9 +384,13 @@ public class Renderer {
                 map.put(Attributes.ROOTPATH, "../");
                 model.put("content", map);
 
-            	String pathCategory = category.trim().replace(" ", "-") + config.getString(Keys.OUTPUT_EXTENSION);
-            	File path = new File(destination.getPath() + File.separator + categoriesPath + File.separator + pathCategory);
+            	String pathCategory = category.trim().replace(" ", "-");
+            	String uri = File.separator + categoriesPath + File.separator + pathCategory;
+            	uri = getValidExtensionUri(uri,config);
+            	File path = new File(destination.getPath() + uri);
+            	
             	render(new ModelRenderingConfig(path, Attributes.CATEGORY, model, findTemplateName(Attributes.CATEGORY)));
+            	
                 renderedCount++;
             } catch (Exception e) {
                 errors.add(e.getCause().getMessage());
@@ -416,7 +420,25 @@ public class Renderer {
         	return renderedCount;
         }
     }
+    
+    /**
+     * If uri.noExtension is set to true then generate extension less uri. This method is to be used where uri.noExtension.prefix doesn't matter like categories, tags etc. 
+     * @param uri
+     * @param config
+     * @return
+     */
+    public static String getValidExtensionUri(String uri, CompositeConfiguration config){
+    	boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
+    	
+    	if (noExtensionUri) {
+    		uri = uri + "/index" + config.getString(Keys.OUTPUT_EXTENSION);
+        } else {
+            uri = uri + config.getString(Keys.OUTPUT_EXTENSION);
+        }
+    	return uri;
+    }
 
+   
     /**
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
      *

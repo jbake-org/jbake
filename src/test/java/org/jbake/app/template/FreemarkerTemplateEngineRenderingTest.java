@@ -86,9 +86,36 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
     }
 
+
+    @Test
+    public void renderCategoriesNoExtension() throws Exception {
+    	config.setProperty(Keys.URI_NO_EXTENSION, true);
+    	config.setProperty(Keys.URI_NO_EXTENSION_PREFIX, "blog");
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        renderer.renderCategories("categories");
+
+        // verify
+        File outputFile = new File(destinationFolder + File.separator + "categories" + File.separator + "Technology" + File.separator + "index.html");
+        Assert.assertTrue(outputFile.exists());
+        String output = FileUtils.readFileToString(outputFile);
+        for (String string : outputStrings.get("categories_noextension")) {
+            assertThat(output).contains(string);
+        }
+        
+        // verify index.html file
+        File indexFile = new File(destinationFolder + File.separator + "categories" + File.separator + "index.html");
+        Assert.assertTrue(indexFile.exists());
+        String indexData = FileUtils.readFileToString(indexFile);
+        for (String string : outputStrings.get("categories_index_noextension")) {
+            assertThat(indexData).contains(string);
+        }
+    }
     @Test
     @Override
     public void renderCategories() throws Exception {
+    	config.setProperty(Keys.URI_NO_EXTENSION, false);
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
@@ -97,7 +124,7 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         // verify
         File outputFile = new File(destinationFolder + File.separator + "categories" + File.separator + "Technology.html");
         Assert.assertTrue(outputFile.exists());
-        String output = FileUtils.readFileToString(outputFile, "UTF8");
+        String output = FileUtils.readFileToString(outputFile);
         for (String string : outputStrings.get("categories")) {
             assertThat(output).contains(string);
         }
@@ -106,11 +133,6 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         File indexFile = new File(destinationFolder + File.separator + "categories" + File.separator + "index.html");
         Assert.assertTrue(indexFile.exists());
         String indexData = FileUtils.readFileToString(indexFile);
-        
-        //       outputStrings.put("categories", Arrays.asList("blog/2012/first-post.html"));
-        //outputStrings.put("categories_index", Arrays.asList("<a href=\"Technology.html\"/>"));
-        
-        
         for (String string : outputStrings.get("categories_index")) {
             assertThat(indexData).contains(string);
         }
