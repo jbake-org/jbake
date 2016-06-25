@@ -11,15 +11,18 @@ import org.slf4j.LoggerFactory;
 import static java.io.File.separator;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -178,6 +181,9 @@ public class Crawler {
                 }
             }
             
+            buildPermalink(fileContents);
+            
+            
             if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
             	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
@@ -191,6 +197,83 @@ public class Crawler {
             LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
         }
     }
+    
+    /**
+     * This function generates permalinks if they are enabled in configuration.
+     * 
+     * Sample configuration entry: permalink.pattern = 
+     * 
+     * @param fileContents
+     * @author Manik Magar
+     * @return
+     */
+    private String buildPermalink(Map<String, Object> fileContents){
+    	String permalink = (String) fileContents.get(Attributes.URI);
+    	
+    	boolean permalinkEnabled = config.getBoolean("permalink");
+    	if (permalinkEnabled) {
+    		
+    		String pattern = config.getString("permalink.pattern");
+    		
+    		String[] parts = pattern.split("/:");
+    		List<String> pLink = new ArrayList<String>();
+    		for (String part : parts){
+    			part = part.trim().replace("/", "");
+    			if (part.endsWith(":")){
+    				pLink.add(part.replace(":", ""));
+    			} else if(fileContents.containsKey(part)){
+    				Object value = fileContents.get(part);
+    				if (value instanceof String){
+    					pLink.add(value.toString());
+    				} else if (value.getClass().equals(String[].class)){
+    					pLink.addAll(Arrays.asList((String[])value));
+    				}
+    			} else if (Arrays.asList("YEAR","MONTH","DAY").contains(part)) {
+    				Date publishedDate = (Date) fileContents.get("date");
+    				if(Objects.nonNull(publishedDate)){
+    					String dateValue = null;
+    					if(part.equalsIgnoreCase("YEAR")){
+    						dateValue = DateFormatUtils.format(publishedDate, "yyyy");
+    					}
+    					if(part.equalsIgnoreCase("MONTH")){
+    						dateValue = DateFormatUtils.format(publishedDate, "MM");
+    					}
+    					if(part.equalsIgnoreCase("DAY")){
+    						dateValue = DateFormatUtils.format(publishedDate, "dd");
+    					}
+    					pLink.add(dateValue);
+    				}
+    			} 
+    		}
+    		
+			permalink = String.join("/", pLink);
+			permalink = sanitize(permalink).concat("/");
+			
+			boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
+	    	String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
+	    		if (noExtensionUri && (noExtensionUriPrefix != null && noExtensionUriPrefix.trim().isEmpty())) {
+	    		String uri = permalink;
+	    		uri = uri + "/index.html";
+	    		fileContents.put(Attributes.URI, uri);
+	    	} else {
+	    		permalink = permalink.substring(0, permalink.length() -1 );
+	    		permalink = permalink + config.getString(Keys.OUTPUT_EXTENSION);
+	    	}
+	    		
+        }
+    		
+    	
+    	return permalink;
+    }
+    
+    /**
+     * Replace the spaces with hyphens
+     * @return
+     */
+    private String sanitize(String input){
+    	return input.replace(" ", "-");
+    }
+    
 
     public String getPathToRoot(File sourceFile) {
     	File rootPath = new File(contentPath);
