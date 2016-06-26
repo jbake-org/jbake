@@ -59,6 +59,7 @@ public class Crawler {
 		static final String ROOTPATH = "rootpath";
 		static final String ID = "id";
 		static final String NO_EXTENSION_URI = "noExtensionUri";
+		static final String PERMALINK = "permalink";
 		
 	}
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
@@ -181,12 +182,12 @@ public class Crawler {
                 }
             }
             
-            buildPermalink(fileContents);
-            
-            
-            if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
+           if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
             	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
+           
+           String permalink = buildPermalink(fileContents);
+           fileContents.put(Attributes.PERMALINK, permalink);
             
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
@@ -201,26 +202,52 @@ public class Crawler {
     /**
      * This function generates permalinks if they are enabled in configuration.
      * 
-     * Sample configuration entry: permalink.pattern = 
+     * Default pattern is /:filepath
+     * 
+     * Conditions -
+     * 	1. String ending with ':' is treated as static strings. For example, permalink = /:blogdata:/:filepath, will generate all urls as /blogdata/{actual file path}
+     *  2. :filepath is reserved to add actual source file path (relative to content root)
+     *  3. :filename is reserved to add name of source file.
+     *  4. If the keyword values is array then all values of array are used for generation. For example, if /:tags is used and post has two tags tagA, tagB then url would be /tagA/tagB
+     *  5. :YEAR, :MONTH, :DAY are reserved to pull related part of content published date.
+     *  
+     * If uri.noExtension is enabled then permalink generation will use it to generate extension less urls.
+     * 
+     * on front end, permalinks can be accessed as {content.permalink}
      * 
      * @param fileContents
      * @author Manik Magar
      * @return
      */
     private String buildPermalink(Map<String, Object> fileContents){
-    	String permalink = (String) fileContents.get(Attributes.URI);
-    	
-    	boolean permalinkEnabled = config.getBoolean("permalink");
-    	if (permalinkEnabled) {
+    	String permalink = "";
+    	String separator = File.separator;
+    	String permalinkPattern = config.getString(Attributes.PERMALINK,"/:filepath");
+    	if(config.containsKey(Attributes.PERMALINK +"."+ fileContents.get(Attributes.TYPE))){
+    		permalinkPattern = config.getString(Attributes.PERMALINK +"."+ fileContents.get(Attributes.TYPE));
+    	}
+    	if (Objects.nonNull(permalinkPattern) && !permalinkPattern.trim().isEmpty()) {
     		
-    		String pattern = config.getString("permalink.pattern");
-    		
+    		String pattern = permalinkPattern;
+    		if(pattern.startsWith(":")) pattern = separator+pattern;
     		String[] parts = pattern.split("/:");
     		List<String> pLink = new ArrayList<String>();
     		for (String part : parts){
     			part = part.trim().replace("/", "");
     			if (part.endsWith(":")){
     				pLink.add(part.replace(":", ""));
+    			} else if(part.equalsIgnoreCase("filepath")) {
+    				String path = FileUtil.asPath(fileContents.get(Attributes.FILE).toString()).replace(FileUtil.asPath( contentPath), "");
+    				path = FilenameUtils.removeExtension(path);
+    				// strip off leading / to enable generating non-root based sites
+    		    	if (path.startsWith("/")) {
+    		    		path = path.substring(1, path.length());
+    		    	}
+    				pLink.add(path);
+    			} else if(part.equalsIgnoreCase("filename")) {
+    				String sourcePath = (String) fileContents.get(Attributes.SOURCE_URI);
+    				String fileName = FilenameUtils.getBaseName(sourcePath);
+    				pLink.add(fileName);
     			} else if(fileContents.containsKey(part)){
     				Object value = fileContents.get(part);
     				if (value instanceof String){
@@ -228,7 +255,7 @@ public class Crawler {
     				} else if (value.getClass().equals(String[].class)){
     					pLink.addAll(Arrays.asList((String[])value));
     				}
-    			} else if (Arrays.asList("YEAR","MONTH","DAY").contains(part)) {
+    			} else if (Arrays.asList("YEAR","MONTH","DAY").contains(part.toUpperCase())) {
     				Date publishedDate = (Date) fileContents.get("date");
     				if(Objects.nonNull(publishedDate)){
     					String dateValue = null;
@@ -246,20 +273,26 @@ public class Crawler {
     			} 
     		}
     		
-			permalink = String.join("/", pLink);
-			permalink = sanitize(permalink).concat("/");
-			
+			permalink = String.join(separator, pLink);
+			permalink = sanitize(permalink).concat(separator);
+			String uri = permalink;
 			boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
-	    	String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
-	    		if (noExtensionUri && (noExtensionUriPrefix != null && noExtensionUriPrefix.trim().isEmpty())) {
-	    		String uri = permalink;
-	    		uri = uri + "/index.html";
-	    		fileContents.put(Attributes.URI, uri);
+	    	if (noExtensionUri) {
+	    		uri = uri + "index.html";
 	    	} else {
 	    		permalink = permalink.substring(0, permalink.length() -1 );
 	    		permalink = permalink + config.getString(Keys.OUTPUT_EXTENSION);
+	    		uri = permalink;
 	    	}
-	    		
+	    	if(uri.startsWith("/")){
+	    		uri = uri.substring(1);
+	    	}
+	    	fileContents.put(Attributes.URI, uri);
+	    	
+	    	//Calculate the root path based on the permalink
+	    	File permaFile = new File(contentPath,uri);
+	    	String rootPath = getPathToRoot(permaFile);
+	    	fileContents.put(Attributes.ROOTPATH,rootPath);
         }
     		
     	
