@@ -18,10 +18,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -226,7 +227,7 @@ public class Crawler {
     	if(config.containsKey(Attributes.PERMALINK +"."+ fileContents.get(Attributes.TYPE))){
     		permalinkPattern = config.getString(Attributes.PERMALINK +"."+ fileContents.get(Attributes.TYPE));
     	}
-    	if (Objects.nonNull(permalinkPattern) && !permalinkPattern.trim().isEmpty()) {
+    	if (permalinkPattern != null && !permalinkPattern.trim().isEmpty()) {
     		
     		String pattern = permalinkPattern;
     		if(pattern.startsWith(":")) pattern = separator+pattern;
@@ -257,7 +258,7 @@ public class Crawler {
     				}
     			} else if (Arrays.asList("YEAR","MONTH","DAY").contains(part.toUpperCase())) {
     				Date publishedDate = (Date) fileContents.get("date");
-    				if(Objects.nonNull(publishedDate)){
+    				if(publishedDate != null){
     					String dateValue = null;
     					if(part.equalsIgnoreCase("YEAR")){
     						dateValue = DateFormatUtils.format(publishedDate, "yyyy");
@@ -273,7 +274,7 @@ public class Crawler {
     			} 
     		}
     		
-			permalink = String.join(separator, pLink);
+			permalink = StringUtils.join(pLink, separator);
 			permalink = sanitize(permalink).concat(separator);
 			String uri = permalink;
 			boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);

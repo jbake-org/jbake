@@ -1,7 +1,5 @@
 package org.jbake.app;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,25 +8,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.orientechnologies.orient.core.record.impl.ODocument;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
+
+import org.jbake.app.ConfigUtil.Keys;
+
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.jbake.app.ConfigUtil.Keys;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import static org.assertj.core.api.Assertions.*;
 
 public class CrawlerTest {
     private CompositeConfiguration config;
     private ContentStore db;
     private File sourceFolder;
-	  
+	
 	@Before
     public void setup() throws Exception, IOException, URISyntaxException {
         URL sourceUrl = this.getClass().getResource("/");
@@ -37,7 +39,7 @@ public class CrawlerTest {
         if (!sourceFolder.exists()) {
             throw new Exception("Cannot find sample data structure!");
         }
-        
+
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
@@ -64,6 +66,14 @@ public class CrawlerTest {
         	assertThat(content)
         		.containsKey(Crawler.Attributes.ROOTPATH)
         		.containsValue("../../");
+        }
+        
+        List<ODocument> draftPosts = db.getAllContent("post");
+        DocumentList draftList = DocumentList.wrap(draftPosts.iterator());
+        for (Map<String,Object> content : list) {
+        	if (content.get(Crawler.Attributes.TITLE).equals("Draft Post")) {
+        		assertThat(content).containsKey(Crawler.Attributes.DATE);
+        	}
         }
         
         // covers bug #213

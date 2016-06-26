@@ -91,6 +91,10 @@ public abstract class MarkupEngine implements ParserEngine {
         // then read engine specific headers
         processHeader(context);
         
+        if (content.get(Crawler.Attributes.DATE) == null) {
+        	content.put(Crawler.Attributes.DATE, new Date(file.lastModified()));
+        }
+        
         if (config.getString(Keys.DEFAULT_STATUS) != null) {
         	// default status has been set
         	if (content.get(Crawler.Attributes.STATUS) == null) {
