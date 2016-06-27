@@ -90,7 +90,9 @@ public class AssetTest {
 		Asset asset = new Asset(assets.getParentFile(), readOnlyFolder.getRoot(), config);
 		asset.copy(assets);
 
-		Assert.assertFalse("At least one error during copy expected", asset.getErrors().isEmpty());
+		//Bug affects Windows: http://bugs.java.com/view_bug.do?bug_id=6728842
+		if(!System.getProperty( "os.name" ).startsWith( "Windows" ))
+			Assert.assertFalse("At least one error during copy expected", asset.getErrors().isEmpty());
 	}
 
 	/**
@@ -105,5 +107,13 @@ public class AssetTest {
 		File assets = new File(assetsUrl.getFile() + File.separatorChar + "non-existent");
 		Asset asset = new Asset(assets.getParentFile(), readOnlyFolder.getRoot(), config);
 		asset.copy(assets);
+	}
+	
+	@Test
+	public void testFileIsHidden(){
+		File hiddenFile = new File(".text.xml");
+		Assert.assertTrue(Asset.isHiddenFile(hiddenFile));
+		File notHiddenFile = new File("text.xml");
+		Assert.assertFalse(Asset.isHiddenFile(notHiddenFile));
 	}
 }
