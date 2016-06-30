@@ -1,0 +1,100 @@
+= Contributing
+// settings:
+:idprefix:
+:idseparator: -
+:source-language: java
+:language: {source-language}
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+// URIs:
+:uri-repo: https://github.com/jbake-org/jbake
+:uri-help-base: https://help.github.com/articles
+:uri-issues: {uri-repo}/issues
+:uri-fork-help: {uri-help-base}/fork-a-repo
+:uri-branch-help: {uri-fork-help}#create-branches
+:uri-pr-help: {uri-help-base}/using-pull-requests
+:uri-gist: https://gist.github.com
+:uri-hamcrest: http://hamcrest.org/JavaHamcrest/
+:uri-assertj: http://joel-costigliola.github.io/assertj/
+
+First off thanks for your interest in improving JBake! We appreciate you taking the time to contribute to JBake and to
+ensure that your contribution is easy to review and process we kindly ask that you follow the guidance outlined below.
+
+== License Agreement
+
+By contributing changes to this repository, you agree to license your contributions under the <<LICENSE#,MIT license>>.
+This ensures your contributions have the same license as the project and that the community is free to use your contributions.
+You also assert that you are the original author of the work that you are contributing unless otherwise stated.
+
+== Raising an Issue
+
+We use the {uri-issues}[issue tracker on GitHub] associated with this project to track bugs and features. Before
+submitting a bug report or feature request, check to make sure it hasn't already been submitted. When submitting
+a bug report, please include a {uri-gist}[Gist] that includes any details that may help reproduce the bug,
+including your local environment details (i.e. installation method, JVM version, and Operating System).
+
+Most importantly, since JBake is a static site generator, reproducing most bugs requires that we have some snippet of
+content on which triggers the bad behaviour in JBake.
+
+== Raising a Pull Request
+
+Prior to starting work on a Pull Request please post a message on the developers mailing list outlining the new feature
+or bug you are planning to work on. You can then be advised if anyone else is already working on the same topic or
+if there is any pertinent information that you should be made aware of such as upcoming structural or API changes.
+
+Once you're ready to start work on your pull request follow the steps outlined below.
+
+. {uri-fork-help}[Fork the repository].
+. {uri-branch-help}[Create a topic branch].
+. Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
+. Implement your feature or bug fix.
+. Run `mvn test` to run the tests. If your tests fail, return to step 4.
+. Add, commit, and push your changes.
+. {uri-pr-help}[Submit a pull request].
+
+For ideas about how to use pull requests, see the post
+http://blog.quickpeople.co.uk/2013/07/10/useful-github-patterns[Useful GitHub Patterns].
+
+////
+uncomment when code style & prefs have been defined
+=== Code Style and Formatting
+
+Please use the JBake code Eclipse formatting preferences[link] prior to starting work on any contribution. IntelliJ users
+can import this into their IDE.
+////
+
+=== Writing and Executing Tests
+
+Tests and their resources reside within `/src/test` and should be written using the JUnit framework, you also have the
+following testing libraries available to you when writing your tests:
+
+* Hamcrest{uri-hamcrest}[link]
+* AssertJ{uri-assertj}[link]
+
+Any resources, such as templates, that your tests require should be placed within `/src/test/resources`.
+
+To execute the tests from the command line you will require Maven to be installed, once you have Maven installed you
+can execute the following command from the root folder in the repository:
+
+ $ mvn test
+
+You will be able to run the unit tests in most IDE's such as Eclipse as well.
+
+If you would like to utilise another testing library in your test classes, then please mention this and your reasons
+for use when posting on the developers mailing list about your planned contribution.
+
+If you would like to use a different testing framework instead of JUnit you may volunteer to convert the existing test
+suite over to the new framework, we'd prefer not to have multiple test suites in different frameworks.
+
+////
+this next section is messy, documentation should be included with the project, a copy should exist in the web site
+repo but not only there
+=== Documentation
+
+Some pull requests may alter the existing behaviour of or add a new feature to JBake, in this scenario please
+review the JBake documentation and make...
+////
+
+=== Supported Java Versions
+
+At present JBake supports Java 6 and above and any contributions shouldn't use Java 7 or Java 8 syntax, please see
+the {uri-issues}[roadmap] for when support for Java 7 & 8 is planned.

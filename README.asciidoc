@@ -14,17 +14,13 @@ image:http://img.shields.io/coveralls/jbake-org/jbake/master.svg["Coverage Statu
 
 Full documentation is available on http://jbake.org/docs/[jbake.org].
 
-== Maven
-
-You can run directly from the source code using the Maven exec plugin:
-
-----
-mvn exec:java -Dexec.mainClass=org.jbake.launcher.Main -Dexec.args="/fromFolder /tmp/toFolder/"
-----
-
 == Contributing
 
-Coming soon...
+We welcome all contributions to the project both big and small. From new features, bug reports to even spelling mistake corrections in 
+the documentation. Please don't hesitate to submit an issue.
+
+The CONTRIBUTING.asciidoc[Contributing] guide provides information on how to submit an issue or create a pull request to fix a bug or 
+add a new feature to JBake.
 
 == Versioning
 
@@ -53,6 +49,22 @@ Talk to other users of JBake on the forum:
 
 * http://groups.google.com/group/jbake-user[Forum]
 
+== Build System
+
+The project uses Apache Maven as the build system. To build the JBake distribution ZIP file execute the following command from the root of the repo:
+
+----
+$ mvn package
+----
+
+This will build a ZIP file in the `/dist` folder.
+
+Alternatively you can run directly from the source code using the Maven exec plugin:
+
+----
+mvn exec:java -Dexec.mainClass=org.jbake.launcher.Main -Dexec.args="/fromFolder /tmp/toFolder/"
+----
+
 == Tools & Libraries Used
 
 * http://commons.apache.org/[Apache Commons IO, Configuration, Lang & Logging]
@@ -69,4 +81,4 @@ Talk to other users of JBake on the forum:
 
 == Copyright & License
 
-Licensed under the MIT License, see the LICENSE file.
+Licensed under the MIT License, see the LICENSE[LICENSE] file for details.
