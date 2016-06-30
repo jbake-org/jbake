@@ -67,8 +67,8 @@ can import this into their IDE.
 Tests and their resources reside within `/src/test` and should be written using the JUnit framework, you also have the
 following testing libraries available to you when writing your tests:
 
-* Hamcrest {uri-hamcrest}[link]
-* AssertJ {uri-assertj}[link]
+* {uri-hamcrest}[Hamcrest]
+* {uri-assertj}[AssertJ]
 
 Any resources, such as templates, that your tests require should be placed within `/src/test/resources`.
 
