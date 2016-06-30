@@ -19,7 +19,7 @@ Full documentation is available on http://jbake.org/docs/[jbake.org].
 We welcome all contributions to the project both big and small. From new features, bug reports to even spelling mistake corrections in 
 the documentation. Please don't hesitate to submit an issue.
 
-The CONTRIBUTING.asciidoc[Contributing] guide provides information on how to submit an issue or create a pull request to fix a bug or 
+The link:CONTRIBUTING.asciidoc[Contributing] guide provides information on how to submit an issue or create a pull request to fix a bug or 
 add a new feature to JBake.
 
 == Versioning
