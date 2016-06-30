@@ -67,6 +67,8 @@ public abstract class AbstractTemplateEngineRenderingTest {
     protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
 
+    protected final String DATE_FORMAT = "dd MMMM yyyy";
+
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
         this.templateExtension = templateExtension;
