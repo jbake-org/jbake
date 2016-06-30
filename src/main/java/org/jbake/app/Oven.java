@@ -43,7 +43,7 @@ public class Oven {
 	private File contentsPath;
 	private File assetsPath;
 	private boolean isClearCache;
-	private List<String> errors = new LinkedList<String>();
+	private List<Throwable> errors = new LinkedList<Throwable>();
 	private int renderedCount = 0;
 
     /**
@@ -156,7 +156,7 @@ public class Oven {
                 	try {
                 		renderedCount += tool.render(renderer, db, destination, templatesPath, config);
                 	} catch(RenderingException e) {
-                		errors.add(e.getMessage());
+                		errors.add(e);
                 	}
                 }
 
@@ -230,8 +230,8 @@ public class Oven {
         }
     }
 
-	public List<String> getErrors() {
-		return new ArrayList<String>(errors);
+	public List<Throwable> getErrors() {
+		return new ArrayList<Throwable>(errors);
 	}
     
 }
