@@ -15,13 +15,14 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :uri-gist: https://gist.github.com
 :uri-hamcrest: http://hamcrest.org/JavaHamcrest/
 :uri-assertj: http://joel-costigliola.github.io/assertj/
+:uri-license: LICENSE
 
 First off thanks for your interest in improving JBake! We appreciate you taking the time to contribute to JBake and to
 ensure that your contribution is easy to review and process we kindly ask that you follow the guidance outlined below.
 
 == License Agreement
 
-By contributing changes to this repository, you agree to license your contributions under the <<LICENSE#,MIT license>>.
+By contributing changes to this repository, you agree to license your contributions under the link:{uri-license}[MIT license].
 This ensures your contributions have the same license as the project and that the community is free to use your contributions.
 You also assert that you are the original author of the work that you are contributing unless otherwise stated.
 
