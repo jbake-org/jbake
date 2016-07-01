@@ -27,10 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,6 +64,9 @@ public abstract class AbstractTemplateEngineRenderingTest {
     protected final String templateDir;
     protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
+    private Crawler crawler;
+    private Parser parser;
+    private Renderer renderer;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
@@ -99,6 +100,52 @@ public abstract class AbstractTemplateEngineRenderingTest {
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
+
+        crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
+        parser = new Parser(config, sourceFolder.getPath());
+        renderer = new Renderer(db, destinationFolder, templateFolder, config);
+
+        setupExpectedOutputStrings();
+    }
+
+    private void setupExpectedOutputStrings() {
+
+        outputStrings.put("post", Arrays.asList("<h2>Second Post</h2>",
+                "<p class=\"post-date\">28",
+                "2013</p>",
+                "Lorem ipsum dolor sit amet",
+                "<h5>Published Posts</h5>",
+                "blog/2012/first-post.html"));
+
+        outputStrings.put("page", Arrays.asList("<h4>About</h4>",
+                "All about stuff!",
+                "<h5>Published Pages</h5>",
+                "/projects.html"));
+
+        outputStrings.put("index", Arrays.asList("<a href=\"blog/2012/first-post.html\"",
+                ">First Post</a>",
+                "<a href=\"blog/2013/second-post.html\"",
+                ">Second Post</a>"));
+
+        outputStrings.put("feed", Arrays.asList("<description>My corner of the Internet</description>",
+                "<title>Second Post</title>",
+                "<title>First Post</title>"));
+
+        outputStrings.put("archive", Arrays.asList("<a href=\"blog/2013/second-post.html\"",
+                ">Second Post</a>",
+                "<a href=\"blog/2012/first-post.html\"",
+                ">First Post</a>"));
+
+        outputStrings.put("tags", Arrays.asList("<a href=\"blog/2013/second-post.html\"",
+                ">Second Post</a>",
+                "<a href=\"blog/2012/first-post.html\"",
+                ">First Post</a>"));
+
+        outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
+                "blog/2012/first-post.html",
+                "papers/published-paper.html"));
+
     }
 
     @After
@@ -110,10 +157,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
     @Test
     public void renderPost() throws Exception {
         // setup
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Parser parser = new Parser(config, sourceFolder.getPath());
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         String filename = "second-post.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content"
@@ -134,10 +177,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
     @Test
     public void renderPage() throws Exception {
         // setup
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Parser parser = new Parser(config, sourceFolder.getPath());
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         String filename = "about.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + filename);
@@ -156,10 +195,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderIndex() throws Exception {
-        //setup
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         //exec
         renderer.renderIndex("index.html", db);
 
@@ -176,9 +211,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderFeed() throws Exception {
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         renderer.renderFeed("feed.xml");
         File outputFile = new File(destinationFolder, "feed.xml");
         Assert.assertTrue(outputFile.exists());
@@ -192,9 +224,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderArchive() throws Exception {
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         renderer.renderArchive("archive.html");
         File outputFile = new File(destinationFolder, "archive.html");
         Assert.assertTrue(outputFile.exists());
@@ -208,9 +237,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderTags() throws Exception {
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         renderer.renderTags(crawler.getTags(), "tags");
 
         // verify
@@ -227,9 +253,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
         DocumentTypes.addDocumentType("paper");
         DBUtil.updateSchema(db);
 
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
         renderer.renderSitemap("sitemap.xml");
         File outputFile = new File(destinationFolder, "sitemap.xml");
         Assert.assertTrue(outputFile.exists());
