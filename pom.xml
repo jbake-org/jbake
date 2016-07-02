@@ -74,7 +74,7 @@
         <junit.version>4.11</junit.version>
         <pegdown.version>1.4.2</pegdown.version>
         <jetty.version>8.1.12.v20130726</jetty.version>
-        <orientdb.version>1.6.4</orientdb.version>
+        <orientdb.version>2.0-M1</orientdb.version>
         <groovy.version>2.4.1</groovy.version>
         <slf4j.version>1.7.6</slf4j.version>
         <logback.version>1.1.1</logback.version>
@@ -480,19 +480,18 @@
             <version>${logback.version}</version>
             <optional>true</optional>
         </dependency>
-        
-        <!-- <dependency>
-            <groupId>com.mitchellbosecke</groupId>
-            <artifactId>pebble</artifactId>
-            <version>${pebble.version}</version>
-            <optional>true</optional>
-        </dependency> -->
-        
-		<dependency>
+
+        <dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-vfs2</artifactId>
     		<version>${commons.vfs2.version}</version>
     		<optional>true</optional>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.0.31-beta</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
