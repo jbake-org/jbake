@@ -157,8 +157,16 @@ public class MdParserTest {
         mdFileSuppressInlineHTML = folder.newFile("suppressInlineHTML.md");
         out = new PrintWriter(mdFileSuppressInlineHTML);
         out.println(validHeader);
-        out.println("<div>!</div>");
-        out.println("<em>!</em>");
+        // TODO: (JSB) this looks like an upstream bug in 1.6.0, none of this inline HTML is not suppressed at all in output:
+        // out.println("<div>!</div>");
+        // out.println("<em>!</em>");
+        // but this is suppressed in output:
+        // out.println("<div>!</div><em>!</em>");
+        out.println("This is the first paragraph.");
+        out.println();
+        out.println("<div>!</div><em>!</em>");
+        out.println();
+        out.println("This is the second paragraph.");
         out.close();
 
         mdFileTables = folder.newFile("tables.md");
@@ -267,7 +275,7 @@ public class MdParserTest {
         Map<String, Object> map = parser.processFile(mdFileDefinitions);
         Assert.assertNotNull(map);
         Assert.assertEquals(
-                "<dl><dt>Apple</dt><dd>Pomaceous fruit</dd>\n</dl>", map
+                "<dl>\n  <dt>Apple</dt>\n  <dd>Pomaceous fruit</dd>\n</dl>", map
                         .get("body"));
 
         // Test without DEFNITIONS
@@ -388,14 +396,14 @@ public class MdParserTest {
         Parser parser = new Parser(config, configFile.getPath());
         Map<String, Object> map = parser.processFile(mdFileSuppressHTMLBlocks);
         Assert.assertNotNull(map);
-        Assert.assertEquals("<p><em>!</em></p>", map.get("body"));
+        Assert.assertEquals("", map.get("body"));
 
         // Test without SUPPRESS_HTML_BLOCKS
         config.clearProperty(extensions);
         parser = new Parser(config, configFile.getPath());
         map = parser.processFile(mdFileSuppressHTMLBlocks);
         Assert.assertNotNull(map);
-        Assert.assertEquals("<div>!</div><p><em>!</em></p>", map.get("body"));
+        Assert.assertEquals("<div>!</div>\n<em>!</em>", map.get("body"));
     }
 
     @Test
@@ -407,14 +415,14 @@ public class MdParserTest {
         Parser parser = new Parser(config, configFile.getPath());
         Map<String, Object> map = parser.processFile(mdFileSuppressInlineHTML);
         Assert.assertNotNull(map);
-        Assert.assertEquals("<div>!</div><p>!</p>", map.get("body"));
+        Assert.assertEquals("<p>This is the first paragraph.</p>\n<p>!!</p>\n<p>This is the second paragraph.</p>", map.get("body"));
 
         // Test without SUPPRESS_INLINE_HTML
         config.clearProperty(extensions);
         parser = new Parser(config, configFile.getPath());
         map = parser.processFile(mdFileSuppressInlineHTML);
         Assert.assertNotNull(map);
-        Assert.assertEquals("<div>!</div><p><em>!</em></p>", map.get("body"));
+        Assert.assertEquals("<p>This is the first paragraph.</p>\n<p><div>!</div><em>!</em></p>\n<p>This is the second paragraph.</p>", map.get("body"));
     }
 
     @Test
