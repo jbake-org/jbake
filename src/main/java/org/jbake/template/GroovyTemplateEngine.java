@@ -1,6 +1,5 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import groovy.lang.GString;
 import groovy.lang.Writable;
@@ -12,9 +11,6 @@ import groovy.text.XmlTemplateEngine;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.DBUtil;
-import org.jbake.app.DocumentList;
-import org.jbake.model.DocumentTypes;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,14 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.jbake.app.ContentStore;
 
 /**

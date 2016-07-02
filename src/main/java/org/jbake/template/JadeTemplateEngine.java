@@ -1,15 +1,11 @@
 package org.jbake.template;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.CssFilter;
-import de.neuland.jade4j.filter.Filter;
 import de.neuland.jade4j.filter.JsFilter;
 import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.FileTemplateLoader;
@@ -19,10 +15,7 @@ import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jbake.app.ContentStore;
-import org.jbake.app.DBUtil;
-import org.jbake.app.DocumentList;
 import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.model.DocumentTypes;
 
 import java.io.File;
 import java.io.IOException;

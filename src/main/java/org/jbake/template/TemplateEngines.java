@@ -18,7 +18,6 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 /**
  * <p>A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New

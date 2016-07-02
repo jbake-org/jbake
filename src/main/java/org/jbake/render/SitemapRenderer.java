@@ -8,7 +8,6 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
 import org.jbake.template.RenderingException;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 public class SitemapRenderer implements RenderingTool {
 
