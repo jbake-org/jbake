@@ -3,8 +3,8 @@ package org.jbake.parser;
 import org.apache.commons.configuration.Configuration;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.Options;
+import org.asciidoctor.ast.DocumentHeader;
 import org.jbake.app.ConfigUtil.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +35,17 @@ public class AsciidoctorEngine extends MarkupEngine {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private Asciidoctor engine;
+    /* comma separated file paths to additional gems */
+    private static final String OPT_GEM_PATH = "gemPath";
+    /* comma separated gem names */
+    private static final String OPT_REQUIRES = "requires";
 
     public AsciidoctorEngine() {
         Class engineClass = Asciidoctor.class;
         assert engineClass!=null;
     }
 
-    private Asciidoctor getEngine() {
+    private Asciidoctor getEngine(Options options) {
         try {
             lock.readLock().lock();
             if (engine==null) {
@@ -50,7 +54,22 @@ public class AsciidoctorEngine extends MarkupEngine {
                     lock.writeLock().lock();
                     if (engine==null) {
                         LOGGER.info("Initializing Asciidoctor engine...");
-                        engine = Asciidoctor.Factory.create();
+                        if (options.map().containsKey(OPT_GEM_PATH)) {
+                            engine = Asciidoctor.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
+                        } else {
+                            engine = Asciidoctor.Factory.create();
+                        }
+
+                        if (options.map().containsKey(OPT_REQUIRES)) {
+                            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
+                            if (requires.length != 0) {
+                                ;
+                                for (String require : requires) {
+                                    engine.requireLibrary(require);
+                                }
+                            }
+                        }
+
                         LOGGER.info("Asciidoctor engine initialized.");
                     }
                 } finally {
@@ -66,7 +85,8 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     @Override
     public void processHeader(final ParserContext context) {
-        final Asciidoctor asciidoctor = getEngine();
+        Options options = getAsciiDocOptionsAndAttributes(context);
+        final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         Map<String, Object> contents = context.getContents();
         if (header.getDocumentTitle() != null) {
@@ -117,8 +137,8 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private void processAsciiDoc(ParserContext context) {
-        final Asciidoctor asciidoctor = getEngine();
         Options options = getAsciiDocOptionsAndAttributes(context);
+        final Asciidoctor asciidoctor = getEngine(options);
         context.setBody(asciidoctor.render(context.getBody(), options));
     }
 
