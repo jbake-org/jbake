@@ -1,22 +1,20 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.lang.LocaleUtils;
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.Crawler.Attributes;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.context.VariablesMap;
-import org.thymeleaf.dialect.IDialect;
-import org.thymeleaf.templateresolver.FileTemplateResolver;
-
 import java.io.File;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.lang.LocaleUtils;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler.Attributes;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
@@ -24,7 +22,7 @@ import org.jbake.app.ContentStore;
  * <p>This template engine is not recommended for large sites because the whole model
  * is loaded into memory due to Thymeleaf internal limitations.</p>
  *
- * <p>The default rendering mode is "HTML5", but it is possible to use another mode
+ * <p>The default rendering mode is "HTML", but it is possible to use another mode
  * for each document type, by adding a key in the configuration, for example:</p>
  * <p/>
  * <code>
@@ -57,12 +55,6 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         templateResolver.setTemplateMode(mode);
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
-        try {
-            IDialect condCommentDialect = (IDialect) Class.forName("org.thymeleaf.extras.conditionalcomments.dialect.ConditionalCommentsDialect").newInstance();
-            templateEngine.addDialect(condCommentDialect);
-        } catch (Exception e) {
-            // Sad, but true and not a real problem
-        }
     }
 
     @Override
@@ -76,7 +68,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
             Map<String, Object> config = (Map<String, Object>) model.get("config");
             @SuppressWarnings("unchecked")
             Map<String, Object> content = (Map<String, Object>) model.get("content");
-            String mode = "HTML5";
+            String mode = "HTML";
             if (config != null && content != null) {
                 String key = "template_" + content.get(Attributes.TYPE) + "_thymeleaf_mode";
                 String configMode = (String) config.get(key);
@@ -91,12 +83,12 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    private VariablesMap<String, Object> wrap(final Map<String, Object> model) {
-        return new JBakeVariablesMap(model);
+    private Map<String, Object> wrap(final Map<String, Object> model) {
+        return new JBakeMap(model);
     }
 
-    private class JBakeVariablesMap extends VariablesMap<String, Object> {
-    	public JBakeVariablesMap(final Map<String, Object> model) {
+    private class JBakeMap extends HashMap<String, Object> {
+    	public JBakeMap(final Map<String, Object> model) {
             super(model);
             for(String key : extractors.keySet()) {
             	try {
