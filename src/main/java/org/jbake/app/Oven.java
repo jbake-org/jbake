@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
@@ -137,7 +138,7 @@ public class Oven {
 
                 // process source content
                 Crawler crawler = new Crawler(db, source, config);
-                crawler.crawl(contentsPath);                
+                crawler.crawl(contentsPath);
                 LOGGER.info("Content detected:");
                 for (String docType : DocumentTypes.getDocumentTypes()) {
                 	int count = crawler.getDocumentCount(docType);
@@ -145,9 +146,9 @@ public class Oven {
                 		LOGGER.info("Parsed {} files of type: {}", count, docType);
             		}
                 }
-                
+
                 Renderer renderer = new Renderer(db, destination, templatesPath, config);
-                
+
                 for(RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
                 	try {
                 		renderedCount += tool.render(renderer, db, destination, templatesPath, config);
@@ -229,5 +230,5 @@ public class Oven {
 	public List<Throwable> getErrors() {
 		return new ArrayList<Throwable>(errors);
 	}
-    
+
 }

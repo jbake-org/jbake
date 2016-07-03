@@ -75,7 +75,6 @@
         <pegdown.version>1.6.0</pegdown.version>
         <jetty.version>8.1.19.v20160209</jetty.version>
         <orientdb.version>1.7.10</orientdb.version>
-        <orientdb.commons.version>1.7.10</orientdb.commons.version>
         <groovy.version>2.4.7</groovy.version>
         <slf4j.version>1.7.21</slf4j.version>
         <logback.version>1.1.7</logback.version>
@@ -160,6 +159,17 @@
 							<connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-jade.git</connectionUrl>
 						</configuration>
 					</execution>
+					<execution>
+                        <id>checkout-example-project-groovy-mte</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                        <configuration>
+                            <checkoutDirectory>${project.build.directory}/example-project-groovy-mte</checkoutDirectory>
+                            <connectionUrl>scm:git:git://github.com/jbake-org/jbake-example-project-groovy-mte.git</connectionUrl>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -276,6 +286,21 @@
 							<attach>false</attach>
 						</configuration>
 					</execution>
+                    <execution>
+                        <id>zip-example-project-groovy-mte</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>example_project_groovy-mte</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly-example-project-groovy-mte.xml</descriptor>
+                            </descriptors>
+                            <attach>false</attach>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
