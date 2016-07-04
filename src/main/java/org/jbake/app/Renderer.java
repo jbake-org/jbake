@@ -381,7 +381,7 @@ public class Renderer {
             	model.put("renderer", renderingEngine);
             	model.put(Attributes.CATEGORY, category);
             	Map<String, Object> map = buildSimpleModel(Attributes.CATEGORY);
-                map.put(Attributes.ROOTPATH, "../");
+                map.put(Attributes.ROOTPATH, "../../");
                 model.put("content", map);
 
             	String pathCategory = category.trim().replace(" ", "-");
