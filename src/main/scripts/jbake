@@ -1,4 +1,9 @@
 #!/bin/bash
 EXEC_LOC="`dirname "$0"`"
 EXEC_PARENT="`dirname $EXEC_LOC`"
-java -jar ${EXEC_PARENT}/jbake-core.jar $@
+if [ `uname -o` = "Cygwin" ]
+then
+    java -jar $(cygpath -w "${EXEC_PARENT}/jbake-core.jar") $@
+else
+    java -jar "${EXEC_PARENT}/jbake-core.jar" $@
+fi
