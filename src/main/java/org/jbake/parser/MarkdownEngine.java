@@ -43,8 +43,8 @@ public class MarkdownEngine extends MarkupEngine {
 
     private int extensionFor(String name) {
         int extension = Extensions.NONE;
-	if (name.equals("HARDWRAPS")) {
-	    extension = Extensions.HARDWRAPS;
+		if (name.equals("HARDWRAPS")) {
+			extension = Extensions.HARDWRAPS;
         } else if (name.equals("AUTOLINKS")) {
             extension = Extensions.AUTOLINKS;
         } else if (name.equals("FENCED_CODE_BLOCKS")) {
@@ -69,8 +69,8 @@ public class MarkdownEngine extends MarkupEngine {
             extension = Extensions.TABLES;
         } else if (name.equals("WIKILINKS")) {
             extension = Extensions.WIKILINKS;
-	//} else if (name.equals("ANCHORLINKS")) { // not available in pegdown-1.4.2
-        //    extension = Extensions.ANCHORLINKS;
+        } else if (name.equals("ANCHORLINKS")) {
+            extension = Extensions.ANCHORLINKS;
         } else if (name.equals("STRIKETHROUGH")) {
             extension = Extensions.STRIKETHROUGH;
         } else if (name.equals("ALL")) {
@@ -79,10 +79,10 @@ public class MarkdownEngine extends MarkupEngine {
         return extension;
     }
     private int addExtension(int previousExtensions, int additionalExtension) {
-	return previousExtensions | additionalExtension;
+    	return previousExtensions | additionalExtension;
     }
     private int removeExtension(int previousExtensions, int unwantedExtension) {
-	return previousExtensions & (~unwantedExtension);
+    	return previousExtensions & (~unwantedExtension);
     }
 
 }
