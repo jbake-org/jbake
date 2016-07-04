@@ -102,10 +102,10 @@ public class LaunchOptionsTest {
         CmdLineParser parser = new CmdLineParser(res);
         parser.parseArgument(args);
 
-        assertThat(res.isHelpNeeded()).isFalse();
+        assertThat(res.isHelpNeeded()).isTrue();
         assertThat(res.isRunServer()).isFalse();
         assertThat(res.isInit()).isFalse();
-        assertThat(res.isBake()).isTrue();
+        assertThat(res.isBake()).isFalse();
         assertThat(res.getSource().getPath()).isEqualTo(".");
         assertThat(res.getDestination()).isNull();
     }
