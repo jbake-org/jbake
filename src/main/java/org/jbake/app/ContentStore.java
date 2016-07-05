@@ -207,6 +207,18 @@ public class ContentStore {
 	    return result;
     }
     
+    public Set<String> getAllTags() {
+    	Set<String> result = new HashSet<String>();
+    	for (String docType : DocumentTypes.getDocumentTypes()) {
+    		List<ODocument> docs = query("select tags from " + docType + " where status='published'");
+    		for (ODocument document : docs) {
+    	        String[] tags = DBUtil.toStringArray(document.field("tags"));
+    	        Collections.addAll(result, tags);
+    	    }
+    	}
+    	return result;
+    }
+    
     private static void createDocType(final OSchema schema, final String doctype) {
         OClass page = schema.createClass(doctype);
         page.createProperty("sha1", OType.STRING).setNotNull(true);

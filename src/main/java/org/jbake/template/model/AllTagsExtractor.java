@@ -17,13 +17,7 @@ public class AllTagsExtractor implements ModelExtractor<Set<String>> {
 
 	@Override
 	public Set<String> get(ContentStore db, Map model, String key) {
-        List<ODocument> query = db.getAllTagsFromPublishedPosts();
-        Set<String> result = new HashSet<String>();
-        for (ODocument document : query) {
-            String[] tags = DBUtil.toStringArray(document.field(Crawler.Attributes.TAGS));
-            Collections.addAll(result, tags);
-        }
-        return result;
+        return db.getAllTags();
 	}
 
 }
