@@ -158,7 +158,11 @@ public class AsciidoctorEngine extends MarkupEngine {
         final Options options = options().attributes(attributes.get()).get();
         for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
             final String name = iterator.next();
-            options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
+            if (name.equals(Options.TEMPLATE_DIRS)) {
+            	options.setTemplateDirs(optionsSubset.getString(name));
+            } else {
+            	options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
+            }
         }
         options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());
         options.setSafe(UNSAFE);
