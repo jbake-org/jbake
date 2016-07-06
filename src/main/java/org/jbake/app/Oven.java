@@ -1,25 +1,18 @@
 package org.jbake.app;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.orientechnologies.orient.core.record.impl.ODocument;
-
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
 import org.jbake.template.RenderingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * All the baking happens in the Oven!
@@ -174,7 +167,7 @@ public class Oven {
                 }
         } finally {
                 db.close();
-//                Orient.instance().shutdown();
+                db.shutdown();
         }
     }
 

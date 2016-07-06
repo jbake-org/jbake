@@ -23,6 +23,7 @@
  */
 package org.jbake.app;
 
+import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -110,6 +111,11 @@ public class ContentStore {
     public void close() {
         db.close();
         DBUtil.closeDataStore();
+    }
+
+    public void shutdown() {
+
+        Orient.instance().shutdown();
     }
 
     public void drop() {
