@@ -222,6 +222,7 @@ public class Crawler {
      */
     private String buildPermalink(Map<String, Object> fileContents){
     	String permalink = "";
+    	
     	String separator = File.separator;
     	String permalinkPattern = config.getString(Attributes.PERMALINK,"/:filepath");
     	if(config.containsKey(Attributes.PERMALINK +"."+ fileContents.get(Attributes.TYPE))){
@@ -233,46 +234,53 @@ public class Crawler {
     		if(pattern.startsWith(":")) pattern = separator+pattern;
     		String[] parts = pattern.split("/:");
     		List<String> pLink = new ArrayList<String>();
-    		for (String part : parts){
-    			part = part.trim().replace("/", "");
-    			if (part.endsWith(":")){
-    				pLink.add(part.replace(":", ""));
-    			} else if(part.equalsIgnoreCase("filepath")) {
-    				String path = FileUtil.asPath(fileContents.get(Attributes.FILE).toString()).replace(FileUtil.asPath( contentPath), "");
-    				path = FilenameUtils.removeExtension(path);
-    				// strip off leading / to enable generating non-root based sites
-    		    	if (path.startsWith("/")) {
-    		    		path = path.substring(1, path.length());
-    		    	}
-    				pLink.add(path);
-    			} else if(part.equalsIgnoreCase("filename")) {
-    				String sourcePath = (String) fileContents.get(Attributes.SOURCE_URI);
-    				String fileName = FilenameUtils.getBaseName(sourcePath);
-    				pLink.add(fileName);
-    			} else if(fileContents.containsKey(part)){
-    				Object value = fileContents.get(part);
-    				if (value instanceof String){
-    					pLink.add(value.toString());
-    				} else if (value.getClass().equals(String[].class)){
-    					pLink.addAll(Arrays.asList((String[])value));
-    				}
-    			} else if (Arrays.asList("YEAR","MONTH","DAY").contains(part.toUpperCase())) {
-    				Date publishedDate = (Date) fileContents.get("date");
-    				if(publishedDate != null){
-    					String dateValue = null;
-    					if(part.equalsIgnoreCase("YEAR")){
-    						dateValue = DateFormatUtils.format(publishedDate, "yyyy");
-    					}
-    					if(part.equalsIgnoreCase("MONTH")){
-    						dateValue = DateFormatUtils.format(publishedDate, "MM");
-    					}
-    					if(part.equalsIgnoreCase("DAY")){
-    						dateValue = DateFormatUtils.format(publishedDate, "dd");
-    					}
-    					pLink.add(dateValue);
-    				}
-    			} 
-    		}
+    		
+    		
+    		//Check if permalink is specified in the content, Use it as final link
+        	if(fileContents.containsKey(Attributes.PERMALINK) && !StringUtils.isBlank(fileContents.get(Attributes.PERMALINK).toString())){
+        		pLink.add(fileContents.get(Attributes.PERMALINK).toString());
+        	} else {
+    			for (String part : parts){
+	    			part = part.trim().replace("/", "");
+	    			if (part.endsWith(":")){
+	    				pLink.add(part.replace(":", ""));
+	    			} else if(part.equalsIgnoreCase("filepath")) {
+	    				String path = FileUtil.asPath(fileContents.get(Attributes.FILE).toString()).replace(FileUtil.asPath( contentPath), "");
+	    				path = FilenameUtils.removeExtension(path);
+	    				// strip off leading / to enable generating non-root based sites
+	    		    	if (path.startsWith("/")) {
+	    		    		path = path.substring(1, path.length());
+	    		    	}
+	    				pLink.add(path);
+	    			} else if(part.equalsIgnoreCase("filename")) {
+	    				String sourcePath = (String) fileContents.get(Attributes.SOURCE_URI);
+	    				String fileName = FilenameUtils.getBaseName(sourcePath);
+	    				pLink.add(fileName);
+	    			} else if(fileContents.containsKey(part)){
+	    				Object value = fileContents.get(part);
+	    				if (value instanceof String){
+	    					pLink.add(value.toString());
+	    				} else if (value.getClass().equals(String[].class)){
+	    					pLink.addAll(Arrays.asList((String[])value));
+	    				}
+	    			} else if (Arrays.asList("YEAR","MONTH","DAY").contains(part.toUpperCase())) {
+	    				Date publishedDate = (Date) fileContents.get("date");
+	    				if(publishedDate != null){
+	    					String dateValue = null;
+	    					if(part.equalsIgnoreCase("YEAR")){
+	    						dateValue = DateFormatUtils.format(publishedDate, "yyyy");
+	    					}
+	    					if(part.equalsIgnoreCase("MONTH")){
+	    						dateValue = DateFormatUtils.format(publishedDate, "MM");
+	    					}
+	    					if(part.equalsIgnoreCase("DAY")){
+	    						dateValue = DateFormatUtils.format(publishedDate, "dd");
+	    					}
+	    					pLink.add(dateValue);
+	    				}
+	    			} 
+	    		}
+        	}
     		
 			permalink = StringUtils.join(pLink, separator);
 			permalink = sanitize(permalink).concat(separator);
