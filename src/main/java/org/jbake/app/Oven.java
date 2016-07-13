@@ -11,12 +11,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
+import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.jbake.template.RenderingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
  * All the baking happens in the Oven!
  *
  * @author Jonathan Bullock <jonbullock@gmail.com>
- *
  */
 public class Oven {
 
@@ -50,18 +48,18 @@ public class Oven {
         this(source, destination, ConfigUtil.load(source), isClearCache);
     }
 
-	/**
-	 * Creates a new instance of the Oven with references to the source and destination folders.
-	 *
-	 * @param source		The source folder
-	 * @param destination	The destination folder
-	 */
-	public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) {
-		this.source = source;
-		this.destination = destination;
-		this.config = config;
-		this.isClearCache = isClearCache;
-	}
+    /**
+     * Creates a new instance of the Oven with references to the source and destination folders.
+     *
+     * @param source      The source folder
+     * @param destination The destination folder
+     */
+    public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) {
+        this.source = source;
+        this.destination = destination;
+        this.config = config;
+        this.isClearCache = isClearCache;
+    }
 
     public CompositeConfiguration getConfig() {
         return config;
@@ -72,47 +70,46 @@ public class Oven {
         this.config = config;
     }
 
+    private void ensureSource() {
+        if (!FileUtil.isExistingFolder(source)) {
+            throw new JBakeException("Error: Source folder must exist: " + source.getAbsolutePath());
+        }
+        if (!source.canRead()) {
+            throw new JBakeException("Error: Source folder is not readable: " + source.getAbsolutePath());
+        }
+    }
 
-	private void ensureSource() {
-		if (!FileUtil.isExistingFolder(source)) {
-			throw new JBakeException("Error: Source folder must exist: " + source.getAbsolutePath());
-		}
-		if (!source.canRead()) {
-			throw new JBakeException("Error: Source folder is not readable: " + source.getAbsolutePath());
-		}
-	}
+    private void ensureDestination() {
+        if (null == destination) {
+            destination = new File(source, config.getString(Keys.DESTINATION_FOLDER));
+        }
+        if (!destination.exists()) {
+            destination.mkdirs();
+        }
+        if (!destination.canWrite()) {
+            throw new JBakeException("Error: Destination folder is not writable: " + destination.getAbsolutePath());
+        }
+    }
 
-	private void ensureDestination() {
-		if (null == destination) {
-			destination = new File(source, config.getString(Keys.DESTINATION_FOLDER));
-		}
-		if (!destination.exists()) {
-			destination.mkdirs();
-		}
-		if (!destination.canWrite()) {
-			throw new JBakeException("Error: Destination folder is not writable: " + destination.getAbsolutePath());
-		}
-	}
+    private File setupPathFromConfig(String key) {
+        return new File(source, config.getString(key));
+    }
 
-	/**
-	 * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
-	 *
-	 * @throws JBakeException If template or contents folder don't exist
-	 */
-	public void setupPaths() {
-		ensureSource();
+    /**
+     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
+     *
+     * @throws JBakeException If template or contents folder don't exist
+     */
+    public void setupPaths() {
+        ensureSource();
         templatesPath = setupRequiredFolderFromConfig(Keys.TEMPLATE_FOLDER);
         contentsPath = setupRequiredFolderFromConfig(Keys.CONTENT_FOLDER);
         assetsPath = setupPathFromConfig(Keys.ASSET_FOLDER);
-		if (!assetsPath.exists()) {
-			LOGGER.warn("No asset folder was found!");
-		}
-		ensureDestination();
-	}
-
-        private File setupPathFromConfig(String key) {
-            return new File(source, config.getString(key));
+        if (!assetsPath.exists()) {
+            LOGGER.warn("No asset folder was found!");
         }
+        ensureDestination();
+    }
 
 	private File setupRequiredFolderFromConfig(final String key) {
 		final File path = setupPathFromConfig(key);
@@ -183,6 +180,9 @@ public class Oven {
      * in order to register new document types.
      */
     private void updateDocTypesFromConfiguration() {
+        ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
+        DocumentTypes.addListener(listener);
+
         Iterator<String> keyIterator = config.getKeys();
         while (keyIterator.hasNext()) {
             String key = keyIterator.next();

@@ -61,7 +61,7 @@ public class CrawlerTest {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(2, db.getDocumentCount("post"));
+        Assert.assertEquals(3, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
         List<ODocument> results = db.getPublishedPosts();
@@ -95,12 +95,10 @@ public class CrawlerTest {
 	    config.addConfiguration(new MapConfiguration(testProperties));
 	    config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/").getFile())));
 
-	    URL contentUrl = this.getClass().getResource("/");
-	    File content = new File(contentUrl.getFile());
-	    Crawler crawler = new Crawler(db, content, config);
-	    crawler.crawl(new File(content.getPath() + File.separator + "content"));
+		Crawler crawler = new Crawler(db, sourceFolder, config);
+		crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-	    Assert.assertEquals(2, db.getDocumentCount("post"));
+	    Assert.assertEquals(3, db.getDocumentCount("post"));
 	    Assert.assertEquals(3, db.getDocumentCount("page"));
 
 	    DocumentIterator documents = new DocumentIterator(db.getPublishedPosts().iterator());

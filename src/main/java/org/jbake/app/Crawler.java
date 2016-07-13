@@ -50,7 +50,7 @@ public class Crawler {
 		static final String ID = "id";
 		static final String NO_EXTENSION_URI = "noExtensionUri";
 		static final String ALLTAGS = "alltags";
-		static final String PUBLISHED_DATE = "published-date";
+		static final String PUBLISHED_DATE = "published_date";
 	}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);

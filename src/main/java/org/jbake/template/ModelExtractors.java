@@ -2,7 +2,6 @@ package org.jbake.template;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
@@ -10,6 +9,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.jbake.app.ContentStore;
+import org.jbake.model.DocumentTypeUtils;
+import org.jbake.template.model.PublishedCustomExtractor;
+import org.jbake.template.model.TypedDocumentsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,34 +35,33 @@ import org.slf4j.LoggerFactory;
 public class ModelExtractors {
     private static final String PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties";
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(ModelExtractors.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ModelExtractors.class);
 
     private final Map<String, ModelExtractor> extractors;
 
-    public Set<String> getRecognizedExtensions() {
-        return Collections.unmodifiableSet(extractors.keySet());
+    private static class Loader {
+        private static final ModelExtractors INSTANCE = new ModelExtractors();
     }
 
-    public ModelExtractors() {
+    public static ModelExtractors getInstance() {
+        return Loader.INSTANCE;
+    }
+
+    private ModelExtractors() {
         extractors = new TreeMap<String, ModelExtractor>();
         loadEngines();
     }
 
     public void registerEngine(String key, ModelExtractor extractor) {
-    	ModelExtractor old = extractors.put(key, extractor);
+        ModelExtractor old = extractors.put(key, extractor);
         if (old != null) {
             LOGGER.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old);
         }
     }
 
-    public ModelExtractor getEngine(String fileExtension) {
-        return extractors.get(fileExtension);
-    }
-
     /**
      * This method is used to search for a specific class, telling if loading the engine would succeed. This is
      * typically used to avoid loading optional modules.
-     *
      *
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
@@ -104,8 +105,8 @@ public class ModelExtractors {
         }
     }
 
-    private void loadAndRegisterEngine(String className, String...extensions) {
-    	ModelExtractor engine = tryLoadEngine(className);
+    private void loadAndRegisterEngine(String className, String... extensions) {
+        ModelExtractor engine = tryLoadEngine(className);
         if (engine != null) {
             for (String extension : extensions) {
                 registerEngine(extension, engine);
@@ -113,31 +114,41 @@ public class ModelExtractors {
         }
     }
 
-	public <Type> Type extractAndTransform(ContentStore db, String key, Map map, TemplateEngineAdapter<Type> adapter) throws NoModelExtractorException{
-		if(extractors.containsKey(key)) {
-			Object extractedValue = extractors.get(key).get(db, map, key);
-			return adapter.adapt(key, extractedValue);
-		} else {
-			throw new NoModelExtractorException("no model extractor for key \""+key+"\"");
-		}
-	}
+    public <Type> Type extractAndTransform(ContentStore db, String key, Map map, TemplateEngineAdapter<Type> adapter) throws NoModelExtractorException {
+        if (extractors.containsKey(key)) {
+            Object extractedValue = extractors.get(key).get(db, map, key);
+            return adapter.adapt(key, extractedValue);
+        } else {
+            throw new NoModelExtractorException("no model extractor for key \"" + key + "\"");
+        }
+    }
 
-	/**
-	 * @param key
-	 * @return
-	 * @see java.util.Map#containsKey(java.lang.Object)
-	 * @category delegate
-	 */
-	public boolean containsKey(Object key) {
-		return extractors.containsKey(key);
-	}
+    /**
+     * @param key
+     * @return
+     * @category delegate
+     * @see java.util.Map#containsKey(java.lang.Object)
+     */
+    public boolean containsKey(Object key) {
+        return extractors.containsKey(key);
+    }
 
-	/**
-	 * @return
-	 * @see java.util.Map#keySet()
-	 * @category delegate
-	 */
-	public Set<String> keySet() {
-		return extractors.keySet();
-	}
+    /**
+     * @return
+     * @category delegate
+     * @see java.util.Map#keySet()
+     */
+    public Set<String> keySet() {
+        return extractors.keySet();
+    }
+
+    public void registerExtractorsForCustomTypes(String docType) {
+        String pluralizedDoctype = DocumentTypeUtils.pluralize(docType);
+        if (!containsKey(pluralizedDoctype)) {
+            LOGGER.info("register new extractors for documentTyp: " + docType);
+            registerEngine(pluralizedDoctype, new TypedDocumentsExtractor());
+            registerEngine("published_" + pluralizedDoctype, new PublishedCustomExtractor(docType));
+        }
+    }
+
 }

@@ -39,6 +39,8 @@ import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
+import org.jbake.template.ModelExtractors;
+import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,6 +80,10 @@ public abstract class AbstractTemplateEngineRenderingTest {
     public void setup() throws Exception, IOException, URISyntaxException {
         currentLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
+
+        ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
+        DocumentTypes.addListener(listener);
+
         URL sourceUrl = this.getClass().getResource("/");
 
         sourceFolder = new File(sourceUrl.getFile());

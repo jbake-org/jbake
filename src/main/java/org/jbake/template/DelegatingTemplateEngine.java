@@ -31,20 +31,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     public DelegatingTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
         this.renderers = new TemplateEngines(config, db, destination, templatesPath);
-        this.registerExtractorsForCustomTypes();
     }
-
-    private void registerExtractorsForCustomTypes() {
-        for (String docType : DocumentTypes.getDocumentTypes()) {
-            String pluralizedDoctype = DocumentTypeUtils.pluralize(docType);
-            if (!extractors.containsKey(pluralizedDoctype)) {
-                LOGGER.debug("unknown extractor for documentTyp: " + docType);
-                extractors.registerEngine(pluralizedDoctype, new TypedDocumentsExtractor());
-                extractors.registerEngine("published_" + pluralizedDoctype, new PublishedCustomExtractor(docType));
-            }
-        }
-    }
-
 
     @Override
     public void renderDocument(final Map<String, Object> model, String templateName, final Writer writer) throws RenderingException {
