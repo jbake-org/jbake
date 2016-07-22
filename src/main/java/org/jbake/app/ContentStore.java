@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
 
 /**
@@ -45,14 +46,6 @@ import org.jbake.model.DocumentTypes;
  * @author jdlee
  */
 public class ContentStore {
-    public static final String PUBLISHED_DATE = "published_date";
-    public static final String TAG_POSTS = "tag_posts";
-    public static final String ALLTAGS = "alltags";
-    public static final String ALL_CONTENT = "all_content";
-    public static final String PUBLISHED_CONTENT = "published_content";
-    public static final String PUBLISHED_PAGES = "published_pages";
-    public static final String PUBLISHED_POSTS = "published_posts";
-    public static final String DATABASE = "db";
 
     private ODatabaseDocumentTx db;
     private long start = -1;
@@ -116,8 +109,8 @@ public class ContentStore {
         db.drop();
     }
 
-    public long countClass(String iClassName) {
-        return db.countClass(iClassName);
+    public long getDocumentCount(String docType) {
+        return db.countClass(docType);
     }
 
     public List<ODocument> getDocumentStatus(String docType, String uri) {
@@ -201,7 +194,7 @@ public class ContentStore {
     	List<ODocument> docs = this.getAllTagsFromPublishedPosts();
 	    Set<String> result = new HashSet<String>();
 	    for (ODocument document : docs) {
-	        String[] tags = DBUtil.toStringArray(document.field("tags"));
+	        String[] tags = DBUtil.toStringArray(document.field(Crawler.Attributes.TAGS));
 	        Collections.addAll(result, tags);
 	    }
 	    return result;
@@ -221,10 +214,10 @@ public class ContentStore {
     
     private static void createDocType(final OSchema schema, final String doctype) {
         OClass page = schema.createClass(doctype);
-        page.createProperty("sha1", OType.STRING).setNotNull(true);
-        page.createProperty("sourceuri", OType.STRING).setNotNull(true);
-        page.createProperty("rendered", OType.BOOLEAN).setNotNull(true);
-        page.createProperty("cached", OType.BOOLEAN).setNotNull(true);
+        page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
+        page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
+        page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
+        page.createProperty(String.valueOf(DocumentAttributes.RENDERED), OType.BOOLEAN).setNotNull(true);
 
         // commented out because for some reason index seems to be written
         // after the database is closed to this triggers an exception

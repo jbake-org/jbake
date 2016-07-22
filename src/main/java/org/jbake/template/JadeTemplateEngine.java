@@ -34,7 +34,6 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
     private static final String FILTER_STYLE = "css";
     private static final String FILTER_SCRIPT = "js";
 
-    private static ModelExtractors extractors = new ModelExtractors();
     private JadeConfiguration jadeConfiguration = new JadeConfiguration();
 
     public JadeTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {

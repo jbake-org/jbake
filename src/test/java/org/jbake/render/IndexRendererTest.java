@@ -39,7 +39,7 @@ public class IndexRendererTest {
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, never()).renderIndex(anyString(), any(ContentStore.class));
+        verify(mockRenderer, never()).renderIndex(anyString());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class IndexRendererTest {
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, times(1)).renderIndex("random string", contentStore);
+        verify(mockRenderer, times(1)).renderIndex("random string");
     }
 
     @Test(expected = RenderingException.class)
@@ -79,12 +79,12 @@ public class IndexRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderIndex(anyString(), any(ContentStore.class));
+        doThrow(new Exception()).when(mockRenderer).renderIndex(anyString());
 
         int renderResponse = renderer.render(mockRenderer, contentStore,
                 new File("fake"), new File("fake"), compositeConfiguration);
 
-        verify(mockRenderer, never()).renderIndex("random string", contentStore);
+        verify(mockRenderer, never()).renderIndex("random string");
     }
 
 }

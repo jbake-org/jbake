@@ -1,6 +1,5 @@
 package org.jbake.template;
 
-
 import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.Template;
@@ -21,7 +20,6 @@ import java.util.*;
  * The file extension to activate this Engine is .tpl
  */
 public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
-	private static ModelExtractors extractors = new ModelExtractors();
     private TemplateConfiguration templateConfiguration;
     private MarkupTemplateEngine templateEngine;
 

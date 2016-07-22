@@ -39,6 +39,8 @@ import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
+import org.jbake.template.ModelExtractors;
+import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -67,6 +69,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     private Crawler crawler;
     private Parser parser;
     private Renderer renderer;
+    protected Locale currentLocale;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
@@ -75,6 +78,12 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Before
     public void setup() throws Exception, IOException, URISyntaxException {
+        currentLocale = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
+
+        ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
+        DocumentTypes.addListener(listener);
+
         URL sourceUrl = this.getClass().getResource("/");
 
         sourceFolder = new File(sourceUrl.getFile());
@@ -152,6 +161,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
+        Locale.setDefault(currentLocale);
     }
 
     @Test
@@ -196,7 +206,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     @Test
     public void renderIndex() throws Exception {
         //exec
-        renderer.renderIndex("index.html", db);
+        renderer.renderIndex("index.html");
 
         //validate
         File outputFile = new File(destinationFolder, "index.html");
@@ -237,7 +247,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderTags() throws Exception {
-        renderer.renderTags(crawler.getTags(), "tags");
+        renderer.renderTags( "tags");
 
         // verify
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
@@ -265,7 +275,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         assertThat(output).doesNotContain("draft-paper.html");
     }
 
-    private List<String> getOutputStrings(String type) {
+    protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
         
     }

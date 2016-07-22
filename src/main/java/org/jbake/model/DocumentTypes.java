@@ -1,6 +1,7 @@
 package org.jbake.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,8 +19,21 @@ public class DocumentTypes {
 
     private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<String>(Arrays.asList("page", "post", "masterindex", "archive", "feed"));
 
+    private static final Set<DocumentTypeListener> LISTENERS = new HashSet<DocumentTypeListener>();
+
     public static void addDocumentType(String docType) {
         DEFAULT_DOC_TYPES.add(docType);
+        notifyListener(docType);
+    }
+
+    private static void notifyListener(String docType) {
+        for ( DocumentTypeListener listener : LISTENERS) {
+            listener.added(docType);
+        }
+    }
+
+    public static void addListener( DocumentTypeListener listener ) {
+        LISTENERS.add(listener);
     }
 
     /**
@@ -31,5 +45,9 @@ public class DocumentTypes {
         // make sure engines are loaded before to get document types
         Engines.getRecognizedExtensions();
         return DEFAULT_DOC_TYPES.toArray(new String[DEFAULT_DOC_TYPES.size()]);
+    }
+
+    public static boolean contains(String documentType) {
+        return DEFAULT_DOC_TYPES.contains(documentType);
     }
 }

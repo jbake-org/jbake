@@ -4,6 +4,7 @@ package org.jbake.app;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes.Status;
+import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
@@ -12,12 +13,9 @@ import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -36,28 +34,25 @@ public class Crawler {
 		 *
 		 */
 		public static interface Status {
-
 			static final String PUBLISHED_DATE = "published-date";
 			static final String PUBLISHED = "published";
 			static final String DRAFT = "draft";
 		}
-		static final String CACHED = "cached";
 		static final String DATE = "date";
 		static final String STATUS = "status";
 		static final String TYPE = "type";
 		static final String TITLE = "title";
 		static final String URI = "uri";
-		static final String SOURCE_URI = "sourceuri";
 		static final String FILE = "file";
 		static final String TAGS = "tags";
 		static final String TAG = "tag";
-		static final String RENDERED = "rendered";
-		static final String SHA1 = "sha1";
 		static final String ROOTPATH = "rootpath";
 		static final String ID = "id";
 		static final String NO_EXTENSION_URI = "noExtensionUri";
-		
+		static final String ALLTAGS = "alltags";
+		static final String PUBLISHED_DATE = "published_date";
 	}
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
 
     private CompositeConfiguration config;
@@ -158,15 +153,15 @@ public class Crawler {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
         	fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
-            fileContents.put(Attributes.SHA1, sha1);
-            fileContents.put(Attributes.RENDERED, false);
+            fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
+            fileContents.put(String.valueOf(DocumentAttributes.RENDERED), false);
             if (fileContents.get(Attributes.TAGS) != null) {
                 // store them as a String[]
                 String[] tags = (String[]) fileContents.get(Attributes.TAGS);
                 fileContents.put(Attributes.TAGS, tags);
             }
             fileContents.put(Attributes.FILE, sourceFile.getPath());
-            fileContents.put(Attributes.SOURCE_URI, uri);
+            fileContents.put(String.valueOf(DocumentAttributes.SOURCE_URI), uri);
             fileContents.put(Attributes.URI, uri);
 
             String documentType = (String) fileContents.get(Attributes.TYPE);
@@ -184,8 +179,8 @@ public class Crawler {
             
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
-            boolean cached = fileContents.get(Attributes.CACHED) != null ? Boolean.valueOf((String)fileContents.get(Attributes.CACHED)):true;
-            doc.field(Attributes.CACHED, cached);
+            boolean cached = fileContents.get(DocumentAttributes.CACHED) != null ? Boolean.valueOf((String)fileContents.get(DocumentAttributes.CACHED)):true;
+            doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
             doc.save();
         } else {
             LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
@@ -206,27 +201,13 @@ public class Crawler {
     	}
     	return sb.toString();
     }
-    
-    public int getDocumentCount(String docType) {
-        return (int) db.countClass(docType);
-    }
-    
-    public Set<String> getTags() {
-        List<ODocument> query = db.getAllTagsFromPublishedPosts(); //query(new OSQLSynchQuery<ODocument>("select tags from post where status='published'"));
-        Set<String> result = new HashSet<String>();
-        for (ODocument document : query) {
-            String[] tags = DBUtil.toStringArray(document.field(Attributes.TAGS));
-            Collections.addAll(result, tags);
-        }
-        return result;
-    }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
         List<ODocument> match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
             ODocument entries = match.get(0);
-            String oldHash = entries.field(Attributes.SHA1);
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field(Attributes.RENDERED))) {
+            String oldHash = entries.field(String.valueOf(DocumentAttributes.SHA1));
+            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field(String.valueOf(DocumentAttributes.RENDERED)))) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;

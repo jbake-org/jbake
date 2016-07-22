@@ -16,6 +16,7 @@ import freemarker.template.TemplateModelException;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,6 @@ import org.jbake.app.ContentStore;
  */
 public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
-	private static ModelExtractors extractors = new ModelExtractors();
     private Configuration templateCfg;
 
     public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
@@ -83,9 +83,9 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
 					@Override
 					public TemplateModel adapt(String key, Object extractedValue) {
-						if(key.equals(ContentStore.ALLTAGS)) {
+						if(key.equals(Crawler.Attributes.ALLTAGS)) {
 							return new SimpleCollection((Collection) extractedValue);
-						} else if(key.equals(ContentStore.PUBLISHED_DATE)) {
+						} else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
 							return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
 						} else {
 							// All other cases, as far as I know, are document collections
