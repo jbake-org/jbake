@@ -1,42 +1,32 @@
 package org.jbake.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.jbake.app.ConfigUtil.Keys;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jbake.app.ConfigUtil.Keys;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest {
     private CompositeConfiguration config;
     private ContentStore db;
     private File sourceFolder;
-	
-	@Before
+
+    @Before
     public void setup() throws Exception, IOException, URISyntaxException {
         URL sourceUrl = this.getClass().getResource("/");
 
@@ -47,7 +37,7 @@ public class CrawlerTest {
 
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
+        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
     }
 
     @After
@@ -55,82 +45,86 @@ public class CrawlerTest {
         db.drop();
         db.close();
     }
-    
-	@Test
-	public void crawl() throws ConfigurationException {
+
+    @Test
+    public void crawl() throws ConfigurationException {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
         Assert.assertEquals(3, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
-        List<ODocument> results = db.getPublishedPosts();
-//                query(new OSQLSynchQuery<ODocument>("select * from post where status='published' order by date desc"));
-        DocumentList list = DocumentList.wrap(results.iterator());
-        for (Map<String,Object> content : list) {
-        	assertThat(content)
-        		.containsKey(Crawler.Attributes.ROOTPATH)
-        		.containsValue("../../");
+        DocumentList results = db.getPublishedPosts();
+
+        assertThat(results.size()).isEqualTo(2);
+
+        for (Map<String, Object> content : results) {
+            assertThat(content)
+                    .containsKey(Crawler.Attributes.ROOTPATH)
+                    .containsValue("../../");
         }
-        
-        List<ODocument> draftPosts = db.getAllContent("post");
-        DocumentList draftList = DocumentList.wrap(draftPosts.iterator());
-        for (Map<String,Object> content : list) {
-        	if (content.get(Crawler.Attributes.TITLE).equals("Draft Post")) {
-        		assertThat(content).containsKey(Crawler.Attributes.DATE);
-        	}
+
+        DocumentList allPosts = db.getAllContent("post");
+
+        assertThat(allPosts.size()).isEqualTo(3);
+
+        for (Map<String, Object> content : allPosts) {
+            if (content.get(Crawler.Attributes.TITLE).equals("Draft Post")) {
+                assertThat(content).containsKey(Crawler.Attributes.DATE);
+            }
         }
-        
+
         // covers bug #213
-        List<ODocument> publishedPostsByTag = db.getPublishedPostsByTag("blog");
+        DocumentList publishedPostsByTag = db.getPublishedPostsByTag("blog");
         Assert.assertEquals(2, publishedPostsByTag.size());
     }
-	@Test
-	public void renderWithPrettyUrls() throws Exception {
-	    Map<String, Object> testProperties = new HashMap<String, Object>();
-	    testProperties.put(Keys.URI_NO_EXTENSION, true);
-	    testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
 
-	    CompositeConfiguration config = new CompositeConfiguration();
-	    config.addConfiguration(new MapConfiguration(testProperties));
-	    config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/").getFile())));
+    @Test
+    public void renderWithPrettyUrls() throws Exception {
+        Map<String, Object> testProperties = new HashMap<String, Object>();
+        testProperties.put(Keys.URI_NO_EXTENSION, true);
+        testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
 
-		Crawler crawler = new Crawler(db, sourceFolder, config);
-		crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
+        CompositeConfiguration config = new CompositeConfiguration();
+        config.addConfiguration(new MapConfiguration(testProperties));
+        config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/").getFile())));
 
-	    Assert.assertEquals(3, db.getDocumentCount("post"));
-	    Assert.assertEquals(3, db.getDocumentCount("page"));
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-	    DocumentIterator documents = new DocumentIterator(db.getPublishedPosts().iterator());
-	    while (documents.hasNext()) {
-	        Map<String, Object> model = documents.next();
-	        String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName((String) model.get("file")) + "/";
+        Assert.assertEquals(3, db.getDocumentCount("post"));
+        Assert.assertEquals(3, db.getDocumentCount("page"));
 
-	        Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
-	        Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-	    }
-	}
+        DocumentList documents = db.getPublishedPosts();
 
-	private static class RegexMatcher extends BaseMatcher<Object> {
-	    private final String regex;
+        for (Map<String, Object> model : documents) {
+            String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName((String) model.get("file")) + "/";
 
-	    public RegexMatcher(String regex){
-	        this.regex = regex;
-	    }
+            Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
+            Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
+        }
+    }
 
-	    @Override
-        public boolean matches(Object o){
-	        return ((String)o).matches(regex);
+    private static class RegexMatcher extends BaseMatcher<Object> {
+        private final String regex;
 
-	    }
+        public RegexMatcher(String regex) {
+            this.regex = regex;
+        }
 
-	    @Override
-        public void describeTo(Description description){
-	        description.appendText("matches regex: " + regex);
-	    }
+        @Override
+        public boolean matches(Object o) {
+            return ((String) o).matches(regex);
 
-	    public static RegexMatcher matches(String regex){
-	        return new RegexMatcher(regex);
-	    }
-	}
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("matches regex: " + regex);
+        }
+
+        public static RegexMatcher matches(String regex) {
+            return new RegexMatcher(regex);
+        }
+    }
 }

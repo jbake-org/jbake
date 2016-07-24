@@ -5,12 +5,13 @@ import groovy.lang.Writable;
 import groovy.text.Template;
 import groovy.text.markup.MarkupTemplateEngine;
 import groovy.text.markup.TemplateConfiguration;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.

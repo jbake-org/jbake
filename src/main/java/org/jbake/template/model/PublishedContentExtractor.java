@@ -15,13 +15,13 @@ public class PublishedContentExtractor implements ModelExtractor<DocumentList> {
 
 	@Override
 	public DocumentList get(ContentStore db, Map model, String key) {
-    	List<ODocument> publishedContent = new ArrayList<ODocument>();
+    	DocumentList publishedContent = new DocumentList();
     	String[] documentTypes = DocumentTypes.getDocumentTypes();
     	for (String docType : documentTypes) {
-    		List<ODocument> query = db.getPublishedContent(docType);
+    		DocumentList query = db.getPublishedContent(docType);
     		publishedContent.addAll(query);
     	}
-    	return DocumentList.wrap(publishedContent.iterator());
+    	return publishedContent;
 	}
 
 }
