@@ -145,7 +145,7 @@ public class ModelExtractors {
     public void registerExtractorsForCustomTypes(String docType) {
         String pluralizedDoctype = DocumentTypeUtils.pluralize(docType);
         if (!containsKey(pluralizedDoctype)) {
-            LOGGER.info("register new extractors for documentTyp: " + docType);
+            LOGGER.info("register new extractors for document type: " + docType);
             registerEngine(pluralizedDoctype, new TypedDocumentsExtractor());
             registerEngine("published_" + pluralizedDoctype, new PublishedCustomExtractor(docType));
         }
