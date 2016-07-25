@@ -206,7 +206,7 @@ public class ContentStore {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList docs = query("select tags from " + docType + " where status='published'");
             for (Map<String, Object> document : docs) {
-                String[] tags = DBUtil.toStringArray(document.get("tags"));
+                String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
                 Collections.addAll(result, tags);
             }
         }

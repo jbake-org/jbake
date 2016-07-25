@@ -2,6 +2,7 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
@@ -203,7 +204,7 @@ public class Oven {
                 currentTemplatesSignature = "";
             }
             if (!docs.isEmpty()) {
-                String sha1 = (String) docs.get(0).get("sha1");
+                String sha1 = (String) docs.get(0).get(String.valueOf(DocumentAttributes.SHA1));
                 needed = !sha1.equals(currentTemplatesSignature);
                 if (needed) {
                     db.updateSignatures(currentTemplatesSignature);

@@ -8,10 +8,10 @@ import java.util.Map;
 
 public class PublishedPostsExtractor implements ModelExtractor<DocumentList> {
 
-	@Override
-	public DocumentList get(ContentStore db, Map model, String key) {
+    @Override
+    public DocumentList get(ContentStore db, Map model, String key) {
 
         return db.getPublishedPosts();
-	}
+    }
 
 }

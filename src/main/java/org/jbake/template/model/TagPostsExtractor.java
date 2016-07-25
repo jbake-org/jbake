@@ -9,14 +9,14 @@ import java.util.Map;
 
 public class TagPostsExtractor implements ModelExtractor<DocumentList> {
 
-	@Override
-	public DocumentList get(ContentStore db, Map model, String key) {
+    @Override
+    public DocumentList get(ContentStore db, Map model, String key) {
         String tag = null;
-		if (model.get(Crawler.Attributes.TAG) != null) {
-			tag = model.get(Crawler.Attributes.TAG).toString();
-		}
+        if (model.get(Crawler.Attributes.TAG) != null) {
+            tag = model.get(Crawler.Attributes.TAG).toString();
+        }
         // fetch the tag posts from db
         return db.getPublishedPostsByTag(tag);
-	}
+    }
 
 }
