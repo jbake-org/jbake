@@ -1,17 +1,16 @@
 
 package org.jbake.app;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.Map;
 
 /**
  * Tests basic Markdown syntax and the extensions supported by the Markdown
@@ -58,6 +57,16 @@ public class MdParserTest {
     private File mdFileTables;
 
     private File mdFileWikilinks;
+
+    private File mdFileAtxheaderspace;
+
+    private File mdFileForcelistitempara;
+
+    private File mdFileRelaxedhrules;
+
+    private File mdTasklistitems;
+
+    private File mdExtanchorlinks;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -182,6 +191,56 @@ public class MdParserTest {
         out = new PrintWriter(mdFileWikilinks);
         out.println(validHeader);
         out.println("[[Wiki-style links]]");
+        out.close();
+
+        mdFileAtxheaderspace = folder.newFile("atxheaderspace.md");
+        out = new PrintWriter(mdFileAtxheaderspace);
+        out.println(validHeader);
+        out.println("#Test");
+        out.close();
+
+        mdFileForcelistitempara = folder.newFile("forcelistitempara.md");
+        out = new PrintWriter(mdFileForcelistitempara);
+        out.println(validHeader);
+        out.println("1. Item 1");
+        out.println("Item 1 lazy continuation");
+        out.println("");
+        out.println("    Item 1 paragraph 1");
+        out.println("Item 1 paragraph 1 lazy continuation");
+            out.println("    Item 1 paragraph 1 continuation");
+        out.close();
+
+        mdFileRelaxedhrules = folder.newFile("releaxedhrules.md");
+        out = new PrintWriter(mdFileRelaxedhrules);
+        out.println(validHeader);
+        out.println("Hello World");
+        out.println("---");
+        out.println("***");
+        out.println("___");
+        out.println("");
+        out.println("Hello World");
+        out.println("***");
+        out.println("---");
+        out.println("___");
+        out.println("");
+        out.println("Hello World");
+        out.println("___");
+        out.println("---");
+        out.println("***");
+        out.close();
+
+        mdTasklistitems = folder.newFile("tasklistsitem.md");
+        out = new PrintWriter(mdTasklistitems);
+        out.println(validHeader);
+        out.println("* loose bullet item 3");
+        out.println("* [ ] open task item");
+        out.println("* [x] closed task item");
+        out.close();
+
+        mdExtanchorlinks = folder.newFile("mdExtanchorlinks.md");
+        out = new PrintWriter(mdExtanchorlinks);
+        out.println(validHeader);
+        out.println("# header & some *formatting* ~~chars~~");
         out.close();
     }
 
@@ -468,5 +527,133 @@ public class MdParserTest {
         Assert.assertNotNull(map);
         Assert.assertEquals("<p>[[Wiki-style links]]</p>", map.get("body"));
     }
+
+    @Test
+    public void parseValidMdFileAtxheaderspace() throws Exception {
+        config.clearProperty(extensions);
+        config.setProperty(extensions, "ATXHEADERSPACE");
+
+        // Test with ATXHEADERSPACE
+        Parser parser = new Parser(config, configFile.getPath());
+        Map<String, Object> map = parser.processFile(mdFileAtxheaderspace);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<p>#Test</p>", map.get("body"));
+
+        // Test without ATXHEADERSPACE
+        config.clearProperty(extensions);
+        parser = new Parser(config, configFile.getPath());
+        map = parser.processFile(mdFileAtxheaderspace);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<h1>Test</h1>", map.get("body"));
+    }
+
+    @Test
+    public void parseValidMdFileForcelistitempara() throws Exception {
+        config.clearProperty(extensions);
+        config.setProperty(extensions, "FORCELISTITEMPARA");
+
+        // Test with FORCELISTITEMPARA
+        Parser parser = new Parser(config, configFile.getPath());
+        Map<String, Object> map = parser.processFile(mdFileForcelistitempara);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<ol>\n" +
+                "  <li>\n" +
+                "    <p>Item 1 Item 1 lazy continuation</p>\n" +
+                "    <p>Item 1 paragraph 1 Item 1 paragraph 1 lazy continuation Item 1 paragraph 1 continuation</p>\n" +
+                "  </li>\n" +
+                "</ol>", map.get("body"));
+
+        // Test without FORCELISTITEMPARA
+        config.clearProperty(extensions);
+        parser = new Parser(config, configFile.getPath());
+        map = parser.processFile(mdFileForcelistitempara);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<ol>\n" +
+                "  <li>Item 1 Item 1 lazy continuation\n" +
+                "    <p>Item 1 paragraph 1 Item 1 paragraph 1 lazy continuation Item 1 paragraph 1 continuation</p>\n" +
+                "  </li>\n" +
+                "</ol>", map.get("body"));
+    }
+
+    @Test
+    public void parseValidMdFileRelaxedhrules() throws Exception {
+        config.clearProperty(extensions);
+        config.setProperty(extensions, "RELAXEDHRULES");
+
+        // Test with RELAXEDHRULES
+        Parser parser = new Parser(config, configFile.getPath());
+        Map<String, Object> map = parser.processFile(mdFileRelaxedhrules);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<h2>Hello World</h2>\n" +
+                "<hr/>\n" +
+                "<hr/>\n" +
+                "<p>Hello World</p>\n" +
+                "<hr/>\n" +
+                "<hr/>\n" +
+                "<hr/>\n" +
+                "<p>Hello World</p>\n" +
+                "<hr/>\n" +
+                "<hr/>\n" +
+                "<hr/>", map.get("body"));
+
+        // Test without RELAXEDHRULES
+        config.clearProperty(extensions);
+        parser = new Parser(config, configFile.getPath());
+        map = parser.processFile(mdFileRelaxedhrules);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<h2>Hello World</h2>\n" +
+                "<p>*** ___</p>\n" +
+                "<p>Hello World</p>\n" +
+                "<p>*** --- ___</p>\n" +
+                "<p>Hello World</p>\n" +
+                "<p>___ --- ***</p>", map.get("body"));
+    }
+
+    @Test
+    public void parseValidMdFileTasklistitems() throws Exception {
+        config.clearProperty(extensions);
+        config.setProperty(extensions, "TASKLISTITEMS");
+
+        // Test with TASKLISTITEMS
+        Parser parser = new Parser(config, configFile.getPath());
+        Map<String, Object> map = parser.processFile(mdTasklistitems);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<ul>\n" +
+                "  <li>loose bullet item 3</li>\n" +
+                "  <li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" disabled=\"disabled\"></input>open task item</li>\n" +
+                "  <li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"checked\" disabled=\"disabled\"></input>closed task item</li>\n" +
+                "</ul>", map.get("body"));
+
+        // Test without TASKLISTITEMS
+        config.clearProperty(extensions);
+        parser = new Parser(config, configFile.getPath());
+        map = parser.processFile(mdTasklistitems);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<ul>\n" +
+                "  <li>loose bullet item 3</li>\n" +
+                "  <li>[ ] open task item</li>\n" +
+                "  <li>[x] closed task item</li>\n" +
+                "</ul>", map.get("body"));
+    }
+
+    @Test
+    public void parseValidMdFileExtanchorlinks() throws Exception {
+        config.clearProperty(extensions);
+        config.setProperty(extensions, "EXTANCHORLINKS");
+
+        // Test with EXTANCHORLINKS
+        Parser parser = new Parser(config, configFile.getPath());
+        Map<String, Object> map = parser.processFile(mdExtanchorlinks);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<h1><a href=\"#header-some-formatting-chars-\" name=\"header-some-formatting-chars-\"></a>header &amp; some <em>formatting</em> ~~chars~~</h1>", map.get("body"));
+
+        // Test without EXTANCHORLINKS
+        config.clearProperty(extensions);
+        parser = new Parser(config, configFile.getPath());
+        map = parser.processFile(mdExtanchorlinks);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>", map.get("body"));
+    }
+
 
 }
