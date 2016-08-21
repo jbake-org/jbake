@@ -66,7 +66,7 @@ public abstract class MarkupEngine implements ParserEngine {
         List<String> fileContents = null;
         try {
             is = new FileInputStream(file);
-            fileContents = IOUtils.readLines(is, config.getString("render.encoding"));
+            fileContents = IOUtils.readLines(is, config.getString(Keys.RENDER_ENCODING));
         } catch (IOException e) {
             LOGGER.error("Error while opening file {}: {}", file, e);
 
@@ -121,15 +121,15 @@ public abstract class MarkupEngine implements ParserEngine {
             return null;
         }
 
-		if (content.get("tags") != null) {
-        	String[] tags = (String[]) content.get("tags");
+		if (content.get(Crawler.Attributes.TAGS) != null) {
+        	String[] tags = (String[]) content.get(Crawler.Attributes.TAGS);
             for( int i=0; i<tags.length; i++ ) {
                 tags[i]=tags[i].trim();
                 if (config.getBoolean(Keys.TAG_SANITIZE)) {
                 	tags[i]=tags[i].replace(" ", "-");
                 }
             }
-            content.put("tags", tags);
+            content.put(Crawler.Attributes.TAGS, tags);
         }
         
         // TODO: post parsing plugins to hook in here?
@@ -152,7 +152,9 @@ public abstract class MarkupEngine implements ParserEngine {
         List<String> header = new ArrayList<String>();
 
         for (String line : contents) {
-            header.add(line);
+        	if (!line.isEmpty()){
+        		header.add(line);
+        	}
             if (line.contains("=")) {
                 if (line.startsWith("type=")) {
                     typeFound = true;
@@ -194,15 +196,19 @@ public abstract class MarkupEngine implements ParserEngine {
                 break;
             }
 
+            if (line.isEmpty()) {
+            	continue;
+            }
+            
             String[] parts = line.split("=",2);
             if (parts.length != 2) {
                 continue;
             }
 
-            String key = parts[0];
-            String value = parts[1];
+            String key = parts[0].trim();
+            String value = parts[1].trim();
 
-            if (key.equalsIgnoreCase("date")) {
+            if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
                 DateFormat df = new SimpleDateFormat(config.getString(Keys.DATE_FORMAT));
                 Date date = null;
                 try {
@@ -211,7 +217,7 @@ public abstract class MarkupEngine implements ParserEngine {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            } else if (key.equalsIgnoreCase("tags")) {
+            } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
                 content.put(key, getTags(value));
             } else if (isJson(value)) {
                 content.put(key, JSONValue.parse(value));
@@ -256,6 +262,6 @@ public abstract class MarkupEngine implements ParserEngine {
             }
         }
         
-        content.put("body", body.toString());
+        content.put(Crawler.Attributes.BODY, body.toString());
     }
 }

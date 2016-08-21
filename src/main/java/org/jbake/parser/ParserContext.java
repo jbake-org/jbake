@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
+import org.jbake.app.Crawler;
 
 public class ParserContext {
     private final File file;
@@ -55,10 +56,10 @@ public class ParserContext {
 
     // short methods for common use
     public String getBody() {
-        return contents.get("body").toString();
+        return contents.get(Crawler.Attributes.BODY).toString();
     }
 
     public void setBody(String str) {
-        contents.put("body", str);
+        contents.put(Crawler.Attributes.BODY, str);
     }
 }
