@@ -73,8 +73,22 @@ public class MarkdownEngine extends MarkupEngine {
             extension = Extensions.ANCHORLINKS;
         } else if (name.equals("STRIKETHROUGH")) {
             extension = Extensions.STRIKETHROUGH;
+        }else if (name.equals("ATXHEADERSPACE")) {
+            extension = Extensions.ATXHEADERSPACE;
+        }else if (name.equals("FORCELISTITEMPARA")) {
+            extension = Extensions.FORCELISTITEMPARA;
+        }else if (name.equals("RELAXEDHRULES")) {
+            extension = Extensions.RELAXEDHRULES;
+        }else if (name.equals("TASKLISTITEMS")) {
+            extension = Extensions.TASKLISTITEMS;
+        }else if (name.equals("EXTANCHORLINKS")) {
+            extension = Extensions.EXTANCHORLINKS;
         } else if (name.equals("ALL")) {
             extension = Extensions.ALL;
+        } else if (name.equals("ALL_OPTIONALS")) {
+            extension = Extensions.ALL_OPTIONALS;
+        } else if (name.equals("ALL_WITH_OPTIONALS")) {
+            extension = Extensions.ALL_WITH_OPTIONALS;
         }
         return extension;
     }
