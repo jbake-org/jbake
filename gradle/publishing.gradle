@@ -115,7 +115,7 @@ pluginBundle {
 
     plugins {
         jbakePlugin {
-            id = 'me.champeau.jbake'
+            id = project_pluginId
             displayName = 'JBake Gradle Plugin'
         }
     }
