@@ -48,8 +48,6 @@ class PluginIntegrationSpec extends Specification {
         File destinationFile = new File(destination)
         File resourceFile = new File(resource.toURI())
 
-        println "try to copy '$resourceFile' to '$destinationFile'"
-
         if (resourceFile.file) {
             FileUtils.copyFile(resourceFile, destinationFile)
         } else {
