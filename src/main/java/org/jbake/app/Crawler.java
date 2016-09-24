@@ -1,7 +1,9 @@
 package org.jbake.app;
 
 
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.model.DocumentAttributes;
@@ -9,7 +11,6 @@ import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Arrays;
@@ -17,9 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
-
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import static java.io.File.separator;
 
 /**
  * Crawls a file system looking for content.
@@ -27,31 +26,31 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  */
 public class Crawler {
-	public static interface Attributes {
+	public interface Attributes {
 		/**
 		 * Possible values of the {@link Attributes#STATUS} property
 		 * @author ndx
 		 *
 		 */
-		public static interface Status {
-			static final String PUBLISHED_DATE = "published-date";
-			static final String PUBLISHED = "published";
-			static final String DRAFT = "draft";
+        interface Status {
+			String PUBLISHED_DATE = "published-date";
+			String PUBLISHED = "published";
+			String DRAFT = "draft";
 		}
-		static final String DATE = "date";
-		static final String STATUS = "status";
-		static final String TYPE = "type";
-		static final String TITLE = "title";
-		static final String URI = "uri";
-		static final String FILE = "file";
-		static final String TAGS = "tags";
-		static final String TAG = "tag";
-		static final String ROOTPATH = "rootpath";
-		static final String ID = "id";
-		static final String NO_EXTENSION_URI = "noExtensionUri";
-		static final String ALLTAGS = "alltags";
-		static final String PUBLISHED_DATE = "published_date";
-		static final String BODY = "body";
+		String DATE = "date";
+		String STATUS = "status";
+		String TYPE = "type";
+		String TITLE = "title";
+		String URI = "uri";
+		String FILE = "file";
+		String TAGS = "tags";
+		String TAG = "tag";
+		String ROOTPATH = "rootpath";
+		String ID = "id";
+		String NO_EXTENSION_URI = "noExtensionUri";
+		String ALLTAGS = "alltags";
+		String PUBLISHED_DATE = "published_date";
+		String BODY = "body";
 	}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);

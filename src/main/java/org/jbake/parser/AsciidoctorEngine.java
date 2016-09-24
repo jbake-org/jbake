@@ -63,7 +63,6 @@ public class AsciidoctorEngine extends MarkupEngine {
                         if (options.map().containsKey(OPT_REQUIRES)) {
                             String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
                             if (requires.length != 0) {
-                                ;
                                 for (String require : requires) {
                                     engine.requireLibrary(require);
                                 }

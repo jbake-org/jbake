@@ -24,18 +24,17 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -47,7 +46,7 @@ public class PaginationTest {
     private ContentStore db;
 
     @Before
-    public void setup() throws Exception, IOException, URISyntaxException {
+    public void setup() throws Exception {
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {

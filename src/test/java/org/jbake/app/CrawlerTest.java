@@ -1,35 +1,25 @@
 package org.jbake.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.jbake.app.ConfigUtil.Keys;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jbake.app.ConfigUtil.Keys;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest {
     private CompositeConfiguration config;
@@ -37,7 +27,7 @@ public class CrawlerTest {
     private File sourceFolder;
 	
 	@Before
-    public void setup() throws Exception, IOException, URISyntaxException {
+    public void setup() throws Exception {
         URL sourceUrl = this.getClass().getResource("/");
 
         sourceFolder = new File(sourceUrl.getFile());

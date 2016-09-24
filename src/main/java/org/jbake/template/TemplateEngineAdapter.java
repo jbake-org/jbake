@@ -7,7 +7,7 @@ package org.jbake.template;
  *
  */
 public interface TemplateEngineAdapter<Type> {
-	public static class NoopAdapter implements TemplateEngineAdapter<Object> {
+	class NoopAdapter implements TemplateEngineAdapter<Object> {
 
 		@Override
 		public Object adapt(String key, Object extractedValue) {
