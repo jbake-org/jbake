@@ -32,17 +32,16 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentTypes;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.jbake.model.DocumentAttributes;
-import org.jbake.model.DocumentTypes;
-
 /**
- *
  * @author jdlee
  */
 public class ContentStore {
@@ -79,7 +78,7 @@ public class ContentStore {
     public void setLimit(int limit) {
         this.limit = limit;
     }
-    
+
     public void resetPagination() {
         this.start = -1;
         this.limit = -1;
@@ -113,24 +112,24 @@ public class ContentStore {
         return db.countClass(docType);
     }
 
-    public List<ODocument> getDocumentStatus(String docType, String uri) {
+    public DocumentList getDocumentStatus(String docType, String uri) {
         return query("select sha1,rendered from " + docType + " where sourceuri=?", uri);
 
     }
 
-    public List<ODocument> getPublishedPosts() {
+    public DocumentList getPublishedPosts() {
         return getPublishedContent("post");
     }
 
-    public List<ODocument> getPublishedPostsByTag(String tag) {
+    public DocumentList getPublishedPostsByTag(String tag) {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
 
-    public List<ODocument> getPublishedPages() {
+    public DocumentList getPublishedPages() {
         return getPublishedContent("page");
     }
 
-    public List<ODocument> getPublishedContent(String docType) {
+    public DocumentList getPublishedContent(String docType) {
         String query = "select * from " + docType + " where status='published'";
         if ((start >= 0) && (limit > -1)) {
             query += " SKIP " + start + " LIMIT " + limit;
@@ -138,7 +137,7 @@ public class ContentStore {
         return query(query + " order by date desc");
     }
 
-    public List<ODocument> getAllContent(String docType) {
+    public DocumentList getAllContent(String docType) {
         String query = "select * from " + docType;
         if ((start >= 0) && (limit > -1)) {
             query += " SKIP " + start + " LIMIT " + limit;
@@ -146,15 +145,15 @@ public class ContentStore {
         return query(query + " order by date desc");
     }
 
-    public List<ODocument> getAllTagsFromPublishedPosts() {
+    public DocumentList getAllTagsFromPublishedPosts() {
         return query("select tags from post where status='published'");
     }
 
-    public List<ODocument> getSignaturesForTemplates() {
+    public DocumentList getSignaturesForTemplates() {
         return query("select sha1 from Signatures where key='templates'");
     }
 
-    public List<ODocument> getUnrenderedContent(String docType) {
+    public DocumentList getUnrenderedContent(String docType) {
         return query("select * from " + docType + " where rendered=false");
     }
 
@@ -178,12 +177,14 @@ public class ContentStore {
         executeCommand("insert into Signatures(key,sha1) values('templates',?)", currentTemplatesSignature);
     }
 
-    private List<ODocument> query(String sql) {
-        return db.query(new OSQLSynchQuery<ODocument>(sql));
+    private DocumentList query(String sql) {
+        List<ODocument> results = db.query(new OSQLSynchQuery<ODocument>(sql));
+        return DocumentList.wrap(results.iterator());
     }
-    
-    private List<ODocument> query(String sql, Object... args) {
-        return db.command(new OSQLSynchQuery<ODocument>(sql)).execute(args);
+
+    private DocumentList query(String sql, Object... args) {
+        List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(args);
+        return DocumentList.wrap(results.iterator());
     }
 
     private void executeCommand(String query, Object... args) {
@@ -191,27 +192,27 @@ public class ContentStore {
     }
 
     public Set<String> getTags() {
-    	List<ODocument> docs = this.getAllTagsFromPublishedPosts();
-	    Set<String> result = new HashSet<String>();
-	    for (ODocument document : docs) {
-	        String[] tags = DBUtil.toStringArray(document.field(Crawler.Attributes.TAGS));
-	        Collections.addAll(result, tags);
-	    }
-	    return result;
+        DocumentList docs = this.getAllTagsFromPublishedPosts();
+        Set<String> result = new HashSet<String>();
+        for (Map<String, Object> document : docs) {
+            String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
+            Collections.addAll(result, tags);
+        }
+        return result;
     }
-    
+
     public Set<String> getAllTags() {
-    	Set<String> result = new HashSet<String>();
-    	for (String docType : DocumentTypes.getDocumentTypes()) {
-    		List<ODocument> docs = query("select tags from " + docType + " where status='published'");
-    		for (ODocument document : docs) {
-    	        String[] tags = DBUtil.toStringArray(document.field("tags"));
-    	        Collections.addAll(result, tags);
-    	    }
-    	}
-    	return result;
+        Set<String> result = new HashSet<String>();
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            DocumentList docs = query("select tags from " + docType + " where status='published'");
+            for (Map<String, Object> document : docs) {
+                String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
+                Collections.addAll(result, tags);
+            }
+        }
+        return result;
     }
-    
+
     private static void createDocType(final OSchema schema, final String doctype) {
         OClass page = schema.createClass(doctype);
         page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);

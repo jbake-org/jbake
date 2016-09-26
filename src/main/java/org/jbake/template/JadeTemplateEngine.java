@@ -11,17 +11,18 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.jbake.app.ContentStore;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Renders pages using the <a href="http://jade.org/">Jade</a> template language.

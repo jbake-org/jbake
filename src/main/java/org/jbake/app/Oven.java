@@ -1,5 +1,15 @@
 package org.jbake.app;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentTypes;
+import org.jbake.render.RenderingTool;
+import org.jbake.template.ModelExtractorsDocumentTypeListener;
+import org.jbake.template.RenderingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,16 +19,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.model.DocumentTypes;
-import org.jbake.render.RenderingTool;
-import org.jbake.template.ModelExtractorsDocumentTypeListener;
-import org.jbake.template.RenderingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * All the baking happens in the Oven!
@@ -196,7 +196,7 @@ public class Oven {
     private void clearCacheIfNeeded(final ContentStore db) {
         boolean needed = isClearCache;
         if (!needed) {
-            List<ODocument> docs = db.getSignaturesForTemplates();
+            DocumentList docs = db.getSignaturesForTemplates();
             String currentTemplatesSignature;
             try {
                 currentTemplatesSignature = FileUtil.sha1(templatesPath);
@@ -204,7 +204,7 @@ public class Oven {
                 currentTemplatesSignature = "";
             }
             if (!docs.isEmpty()) {
-                String sha1 = docs.get(0).field("sha1");
+                String sha1 = (String) docs.get(0).get(String.valueOf(DocumentAttributes.SHA1));
                 needed = !sha1.equals(currentTemplatesSignature);
                 if (needed) {
                     db.updateSignatures(currentTemplatesSignature);

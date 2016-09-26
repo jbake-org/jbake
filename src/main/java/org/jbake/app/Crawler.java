@@ -1,7 +1,9 @@
 package org.jbake.app;
 
 
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.model.DocumentAttributes;
@@ -9,17 +11,13 @@ import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static java.io.File.separator;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
-
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import static java.io.File.separator;
 
 /**
  * Crawls a file system looking for content.
@@ -128,10 +126,10 @@ public class Crawler {
         }
         return sha1;
     }
-    
+
     private String buildURI(final File sourceFile) {
     	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
-    	
+
     	boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
     	String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
     	if (noExtensionUri && noExtensionUriPrefix != null && noExtensionUriPrefix.length() > 0) {
@@ -142,7 +140,7 @@ public class Crawler {
         } else {
             uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
         }
-    	
+
         // strip off leading / to enable generating non-root based sites
     	if (uri.startsWith("/")) {
     		uri = uri.substring(1, uri.length());
@@ -173,11 +171,11 @@ public class Crawler {
                     }
                 }
             }
-            
+
             if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
             	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
-            
+
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
             boolean cached = fileContents.get(DocumentAttributes.CACHED) != null ? Boolean.valueOf((String)fileContents.get(DocumentAttributes.CACHED)):true;
@@ -204,11 +202,11 @@ public class Crawler {
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
-        List<ODocument> match = db.getDocumentStatus(docType, uri);
+        DocumentList match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
-            ODocument entries = match.get(0);
-            String oldHash = entries.field(String.valueOf(DocumentAttributes.SHA1));
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.field(String.valueOf(DocumentAttributes.RENDERED)))) {
+            Map entries = match.get(0);
+            String oldHash = (String) entries.get(String.valueOf(DocumentAttributes.SHA1));
+            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.get(String.valueOf(DocumentAttributes.RENDERED)))) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;

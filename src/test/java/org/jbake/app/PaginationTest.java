@@ -24,21 +24,18 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
- *
  * @author jdlee
  */
 public class PaginationTest {
@@ -47,7 +44,7 @@ public class PaginationTest {
     private ContentStore db;
 
     @Before
-    public void setup() throws Exception, IOException, URISyntaxException {
+    public void setup() throws Exception {
         config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {
@@ -83,19 +80,19 @@ public class PaginationTest {
             doc.field("cached", cached);
             doc.save();
         }
-        
+
         int iterationCount = 0;
         int start = 0;
         db.setLimit(PER_PAGE);
-        
+
         while (start < TOTAL_POSTS) {
             db.setStart(start);
-            List<ODocument> posts = db.getAllContent("post");
-            Assert.assertEquals("dummyfile" + (1 + (PER_PAGE * iterationCount)), posts.get(0).field("name"));
+            DocumentList posts = db.getAllContent("post");
+            Assert.assertEquals("dummyfile" + (1 + (PER_PAGE * iterationCount)), posts.get(0).get("name"));
 //            Assert.assertEquals("dummyfile" + (PER_PAGE + (PER_PAGE * iterationCount)), posts.get(posts.size()-1).field("name"));
             iterationCount++;
             start += PER_PAGE;
         }
-        Assert.assertEquals(Math.round(TOTAL_POSTS / (1.0*PER_PAGE) + 0.4), iterationCount);
+        Assert.assertEquals(Math.round(TOTAL_POSTS / (1.0 * PER_PAGE) + 0.4), iterationCount);
     }
 }
