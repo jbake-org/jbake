@@ -13,10 +13,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,9 +24,9 @@ public class CrawlerTest {
     private CompositeConfiguration config;
     private ContentStore db;
     private File sourceFolder;
-
-    @Before
-    public void setup() throws Exception, IOException, URISyntaxException {
+	
+	@Before
+    public void setup() throws Exception {
         URL sourceUrl = this.getClass().getResource("/");
 
         sourceFolder = new File(sourceUrl.getFile());

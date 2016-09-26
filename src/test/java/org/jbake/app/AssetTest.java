@@ -1,10 +1,5 @@
 package org.jbake.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Assert;
@@ -13,12 +8,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.net.URL;
+
 public class AssetTest {
 
 	private CompositeConfiguration config;
 
 	@Before
-    public void setup() throws Exception, IOException, URISyntaxException {
+    public void setup() throws Exception {
 		config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
 		readOnlyFolder.getRoot().setReadOnly();
