@@ -23,6 +23,7 @@
  */
 package org.jbake.app;
 
+import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -51,6 +52,7 @@ public class ContentStore {
     private long limit = -1;
 
     public ContentStore(final String type, String name) {
+        startupIfEnginesAreMissing();
         db = new ODatabaseDocumentTx(type + ":" + name);
         boolean exists = db.exists();
         if (!exists) {
@@ -102,6 +104,18 @@ public class ContentStore {
     public void close() {
         db.close();
         DBUtil.closeDataStore();
+    }
+
+    public void shutdown() {
+        Orient.instance().shutdown();
+    }
+
+    private void startupIfEnginesAreMissing() {
+        // If an instance of Orient was previously shutdown all engines are removed.
+        // We need to startup Orient again.
+        if ( Orient.instance().getEngines().size() == 0 ) {
+            Orient.instance().startup();
+        }
     }
 
     public void drop() {
