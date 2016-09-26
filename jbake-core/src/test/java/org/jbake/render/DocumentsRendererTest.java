@@ -1,5 +1,9 @@
 package org.jbake.render;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
@@ -8,18 +12,12 @@ import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
 import org.jbake.template.RenderingException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
@@ -29,9 +27,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DocumentsRendererTest {
+class DocumentsRendererTest {
 
-    public DocumentsRenderer documentsRenderer;
+    private DocumentsRenderer documentsRenderer;
     private ContentStore db;
     private Renderer renderer;
     private JBakeConfiguration configuration;
@@ -40,8 +38,8 @@ public class DocumentsRendererTest {
     @Captor
     private ArgumentCaptor<DocumentModel> argument;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
 
         MockitoAnnotations.initMocks(this);
 
@@ -54,7 +52,7 @@ public class DocumentsRendererTest {
     }
 
     @Test
-    public void shouldReturnZeroIfNothingHasRendered() throws Exception {
+    void shouldReturnZeroIfNothingHasRendered() throws Exception {
 
         when(db.getUnrenderedContent()).thenReturn(emptyTemplateModelList);
 
@@ -64,7 +62,7 @@ public class DocumentsRendererTest {
     }
 
     @Test
-    public void shouldReturnCountOfProcessedDocuments() throws Exception {
+    void shouldReturnCountOfProcessedDocuments() throws Exception {
 
         // given:
         DocumentTypes.addDocumentType("customType");
@@ -85,7 +83,7 @@ public class DocumentsRendererTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionWithCollectedErrorMessages() {
+    void shouldThrowAnExceptionWithCollectedErrorMessages() {
         String fakeExceptionMessage = "fake exception";
 
         // expect
@@ -116,7 +114,7 @@ public class DocumentsRendererTest {
     }
 
     @Test
-    public void shouldContainPostNavigation() throws Exception {
+    void shouldContainPostNavigation() throws Exception {
         // given
         DocumentTypes.addDocumentType("customType");
 

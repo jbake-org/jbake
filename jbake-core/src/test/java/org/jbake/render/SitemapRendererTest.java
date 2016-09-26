@@ -5,9 +5,10 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -16,10 +17,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class SitemapRendererTest {
+class SitemapRendererTest {
 
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderSitemaps() throws RenderingException {
+    void returnsZeroWhenConfigDoesNotRenderSitemaps() throws RenderingException {
         SitemapRenderer renderer = new SitemapRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -34,7 +35,7 @@ public class SitemapRendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderSitemaps() throws Exception {
+    void doesNotRenderWhenConfigDoesNotRenderSitemaps() throws Exception {
         SitemapRenderer renderer = new SitemapRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -49,7 +50,7 @@ public class SitemapRendererTest {
     }
 
     @Test
-    public void returnsOneWhenConfigRendersSitemaps() throws RenderingException {
+    void returnsOneWhenConfigRendersSitemaps() throws RenderingException {
         SitemapRenderer renderer = new SitemapRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -65,7 +66,7 @@ public class SitemapRendererTest {
     }
 
     @Test
-    public void doesRenderWhenConfigDoesRenderSitemaps() throws Exception {
+    void doesRenderWhenConfigDoesRenderSitemaps() throws Exception {
         SitemapRenderer renderer = new SitemapRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -80,8 +81,8 @@ public class SitemapRendererTest {
         verify(mockRenderer, times(1)).renderSitemap(anyString());
     }
 
-    @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    @Test
+    void propagatesRenderingException() throws Exception {
         SitemapRenderer renderer = new SitemapRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -93,11 +94,9 @@ public class SitemapRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderSitemap(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
-
-        verify(mockRenderer, never()).renderSitemap(anyString());
+        assertThatThrownBy(() -> renderer.render(mockRenderer, contentStore, configuration))
+            .isInstanceOf(RenderingException.class);
     }
-
 }
 
 

@@ -5,16 +5,22 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class Error404RendererTest {
+class Error404RendererTest {
+
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderError404() throws RenderingException {
+    void returnsZeroWhenConfigDoesNotRenderError404() throws RenderingException {
         Error404Renderer renderer = new Error404Renderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -29,7 +35,7 @@ public class Error404RendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderError404() throws Exception {
+    void doesNotRenderWhenConfigDoesNotRenderError404() throws Exception {
         Error404Renderer renderer = new Error404Renderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -44,7 +50,7 @@ public class Error404RendererTest {
     }
 
     @Test
-    public void returnsOneWhenConfigRendersError404() throws RenderingException {
+    void returnsOneWhenConfigRendersError404() throws RenderingException {
         Error404Renderer renderer = new Error404Renderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -59,7 +65,7 @@ public class Error404RendererTest {
     }
 
     @Test
-    public void doesRenderWhenConfigDoesNotRenderError404() throws Exception {
+    void doesRenderWhenConfigDoesNotRenderError404() throws Exception {
         Error404Renderer renderer = new Error404Renderer();
         String error404file = "mock404file.html";
 
@@ -75,8 +81,8 @@ public class Error404RendererTest {
         verify(mockRenderer, times(1)).renderError404(error404file);
     }
 
-    @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    @Test
+    void propagatesRenderingException() throws Exception {
         Error404Renderer renderer = new Error404Renderer();
         String error404file = "mock404file.html";
 
@@ -89,8 +95,7 @@ public class Error404RendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderError404(anyString());
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
-
-        verify(mockRenderer, never()).renderError404(error404file);
+        assertThatThrownBy(() -> renderer.render(mockRenderer, contentStore, configuration))
+            .isInstanceOf(RenderingException.class);
     }
 }

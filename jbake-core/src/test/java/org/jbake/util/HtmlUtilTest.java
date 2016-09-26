@@ -4,23 +4,23 @@ import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentModel;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class HtmlUtilTest {
+class HtmlUtilTest {
 
     private DefaultJBakeConfiguration config;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
     }
 
     @Test
-    public void shouldNotAddBodyHTMLElement() {
+    void shouldNotAddBodyHTMLElement() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -36,7 +36,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldNotAddSiteHost() {
+    void shouldNotAddSiteHost() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -52,7 +52,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldAddSiteHostWithRelativeImageToDocument() {
+    void shouldAddSiteHostWithRelativeImageToDocument() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -67,7 +67,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldAddContentPath() {
+    void shouldAddContentPath() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -83,7 +83,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldAddContentPathForCurrentDirectory() {
+    void shouldAddContentPathForCurrentDirectory() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -99,7 +99,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldNotAddRootPath() {
+    void shouldNotAddRootPath() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -114,7 +114,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldNotAddRootPathForNoExtension() {
+    void shouldNotAddRootPathForNoExtension() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -130,7 +130,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldAddContentPathForNoExtension() {
+    void shouldAddContentPathForNoExtension() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -145,7 +145,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldNotChangeForHTTP() {
+    void shouldNotChangeForHTTP() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");
@@ -161,7 +161,7 @@ public class HtmlUtilTest {
     }
 
     @Test
-    public void shouldNotChangeForHTTPS() {
+    void shouldNotChangeForHTTPS() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
         fileContent.setUri("blog/2017/05/first_post.html");

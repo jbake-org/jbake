@@ -1,62 +1,51 @@
 package org.jbake;
 
-import org.apache.commons.vfs2.util.Os;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
-public class BuiltInProjectsTest {
+class BuiltInProjectsTest {
 
-    @Parameter
-    public String projectName;
-    @Parameter(1)
-    public String extension;
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    private Path folder;
     private File projectFolder;
     private File templateFolder;
     private File outputFolder;
     private String jbakeExecutable;
     private BinaryRunner runner;
 
-    @Parameters(name = " {0} ")
-    public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-            {"thymeleaf", "thyme"},
-            {"freemarker", "ftl"},
-            {"jade", "jade"},
-            {"groovy", "gsp"},
-            {"groovy-mte", "tpl"}
-        });
-    }
-
-    @Before
-    public void setup() throws IOException {
-        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
+    @BeforeEach
+    void setup() throws IOException {
+        if (OS.current() == OS.WINDOWS) {
             jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
         } else {
             jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
         }
-        projectFolder = folder.newFolder("project");
+        projectFolder = folder.resolve("project").toFile();
+        Files.createDirectory(projectFolder.toPath());
         templateFolder = new File(projectFolder, "templates");
         outputFolder = new File(projectFolder, "output");
         runner = new BinaryRunner(projectFolder);
     }
 
-    @Test
-    public void shouldBakeWithProject() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+        "thymeleaf,thyme",
+        "freemarker,ftl",
+        "jade,jade",
+        "groovy,gsp",
+        "groovy-mte,tpl"
+    })
+    void shouldBakeWithProject(String projectName, String extension) throws Exception {
         shouldInitProject(projectName, extension);
         shouldBakeProject();
     }

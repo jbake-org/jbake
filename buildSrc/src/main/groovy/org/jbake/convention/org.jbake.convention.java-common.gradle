@@ -18,12 +18,9 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "ch.qos.logback:logback-core:$logbackVersion"
 
-    testImplementation "org.junit-pioneer:junit-pioneer:$junitPioneer"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
-    // compatibility for Junit 4 test
-    testCompileOnly "junit:junit:$junit4Version"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
+    testImplementation(platform("org.junit:junit-bom:$junit5Version"))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
 
     testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"

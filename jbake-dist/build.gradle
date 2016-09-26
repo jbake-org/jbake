@@ -47,6 +47,7 @@ task smokeTest(type: Test, dependsOn: installDist) {
 }
 
 smokeTest {
+    useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat = "full"
