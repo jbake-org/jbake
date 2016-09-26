@@ -1,1 +1,1 @@
-See https://github.com/jonbullock/JBake/issues instead
+See https://github.com/jbake-org/jbake/issues instead
