@@ -35,18 +35,6 @@ public class DBUtil {
         return result;
     }
 
-//    private static List<ODocument> query(ContentStore db, String query, Object... args) {
-//        return db.command(new OSQLSynchQuery<ODocument>(query)).execute(args);
-//    }
-//
-//    public static void update(ContentStore db, String query, Object... args) {
-//        db.command(new OCommandSQL(query)).execute(args);
-//    }
-//
-//    public static DocumentIterator fetchDocuments(ContentStore db, String query, Object... args) {
-//        return new DocumentIterator(query(db, query, args).iterator());
-//    }
-
     /**
      * Converts a DB list into a String array
      */
