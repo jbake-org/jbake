@@ -11,7 +11,7 @@ image:https://img.shields.io/travis/jbake-org/jbake/master.svg["Build Status", l
 image:https://img.shields.io/coveralls/jbake-org/jbake/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/jbake"]
 image:https://img.shields.io/maven-central/v/org.jbake/jbake-core.svg["Maven Download", link="http://jbake.org/download.html#maven"]
 image:https://api.bintray.com/packages/jbake/maven/jbake-core/images/download.svg["Bintray Download", link="https://bintray.com/jbake/maven/jbake-core/_latestVersion"]
-imgae:https://img.shields.io/homebrew/v/jbake.svg["Homebrew Download", link="http://jbake.org/download.html#homebrew"]
+image:https://img.shields.io/homebrew/v/jbake.svg["Homebrew Download", link="http://jbake.org/download.html#homebrew"]
 
 == Documentation
 
