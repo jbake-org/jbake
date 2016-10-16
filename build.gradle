@@ -1,10 +1,19 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
+    }
+}
+
 plugins {
     id "java"
     id "eclipse"
     id "idea"
     id "jacoco"
-    id "com.jfrog.bintray" version "1.7.2" apply false
-    id "com.github.kt3k.coveralls" version "2.6.3" apply false
 }
 
 group = 'org.jbake'
