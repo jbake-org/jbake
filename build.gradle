@@ -1,11 +1,15 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
+        classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.0"
     }
 }
 
@@ -28,6 +32,7 @@ if( JavaVersion.current().java7Compatible ) {
     apply from: 'gradle/signing.gradle'
     apply from: 'gradle/maven-publishing.gradle'
     apply from: 'gradle/publishing.gradle'
+    apply from: 'gradle/sdkman.gradle'
 }
 
 sourceCompatibility = 1.6

@@ -79,3 +79,7 @@ distributions {
         }
     }
 }
+
+distZip {
+    classifier = "bin"
+}
