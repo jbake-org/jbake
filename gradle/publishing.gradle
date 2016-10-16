@@ -23,6 +23,9 @@ jar {
     }
 }
 
+ext.bintrayUsername = project.hasProperty('bintrayUsername')?bintrayUsername:''
+ext.bintrayKey = project.hasProperty('bintrayKey')?bintrayKey:''
+
 bintray {
     user = bintrayUsername
     key = bintrayKey
