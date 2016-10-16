@@ -37,6 +37,7 @@ bintray {
             from signPom
             into signPom.bintrayDestination
         }
+        signPom.dependsOn install
         bintrayUpload.dependsOn signPom
     }
 
