@@ -1,12 +1,11 @@
 apply plugin: 'maven'
-apply plugin: 'signing'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 def jbakePom = pom {
     project {
-        description 'JBake is a Java based open source static site/blog generator for developers.'
-        url 'http://jbake.org'
+        description project.project_description
+        url project.website
         developers {
             developer {
                 id 'jonbullock'
@@ -17,13 +16,13 @@ def jbakePom = pom {
             }
         }
         scm {
-            url 'https://github.com/jbake-org/jbake/'
+            url project.vcs
             connection 'scm:git:git@github.com:jbake-org/jbake.git'
             developerConnection 'scm:git:https://github.com/jbake-org/jbake.git'
         }
         issueManagement {
             system 'GitHub Issues'
-            url 'https://github.com/jbake-org/jbake/issues'
+            url project.issues
         }
         mailingLists {
 
@@ -62,12 +61,6 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives javadocJar, sourcesJar
-}
-
-
-signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
 }
 
 install {

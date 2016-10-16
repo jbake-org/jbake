@@ -1,27 +1,24 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
-    }
+plugins {
+    id "java"
+    id "eclipse"
+    id "idea"
+    id "jacoco"
+    id "com.jfrog.bintray" version "1.7.2" apply false
+    id "com.github.kt3k.coveralls" version "2.6.3" apply false
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'jacoco'
-
-
 group = 'org.jbake'
-version = '2.5.0-SNAPSHOT'
+version = '2.6.0-SNAPSHOT'
 
 description = """jbake"""
 
 if( JavaVersion.current().java7Compatible ) {
     apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'com.jfrog.bintray'
     apply from: 'gradle/application.gradle'
+    apply from: 'gradle/signing.gradle'
     apply from: 'gradle/maven-publishing.gradle'
+    apply from: 'gradle/publishing.gradle'
 }
 
 sourceCompatibility = 1.6
@@ -78,7 +75,7 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = '0.7.2.201409121644'
+    toolVersion = '0.7.7.201606060606'
 }
 
 jacocoTestReport {
