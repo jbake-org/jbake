@@ -1,5 +1,8 @@
 apply plugin: "io.sdkman.vendors"
 
+ext.sdkman_consumer_key = project.hasProperty('sdkman_consumer_key')?sdkman_consumer_key:''
+ext.sdkman_consumer_token = project.hasProperty('sdkman_consumer_token')?sdkman_consumer_token:''
+
 sdkman {
     consumerKey = project.sdkman_consumer_key
     consumerToken = project.sdkman_consumer_token

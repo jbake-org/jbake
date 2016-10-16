@@ -18,6 +18,7 @@ plugins {
     id "eclipse"
     id "idea"
     id "jacoco"
+    id 'com.github.ben-manes.versions' version '0.13.0'
 }
 
 group = 'org.jbake'
