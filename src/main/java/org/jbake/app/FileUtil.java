@@ -43,7 +43,7 @@ public class FileUtil {
      * Works out the folder where JBake is running from.
      *
      * @return File referencing folder JBake is running from
-     * @throws Exception		when application is not able to work out where is JBake running from
+     * @throws Exception	when application is not able to work out where is JBake running from
      */
     public static File getRunningLocation() throws Exception {
         String codePath = FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();

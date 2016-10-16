@@ -135,7 +135,7 @@ public class ModelExtractors {
     }
 
     /**
-     * @return              Set of keys contained in this object
+     * @return  A @{@link Set} of all known keys a @{@link ModelExtractor} is registered with
      * @see java.util.Map#keySet()
      */
     public Set<String> keySet() {

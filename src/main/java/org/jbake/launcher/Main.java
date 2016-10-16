@@ -28,7 +28,7 @@ public class Main {
 
 	/**
 	 * Runs the app with the given arguments.
-	 * 
+	 *
 	 * @param args	Application arguments
 	 */
 	public static void main(final String[] args) {
