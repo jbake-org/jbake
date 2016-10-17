@@ -65,10 +65,13 @@ class JBakePlugin implements Plugin<Project> {
             }
             else {
                 jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorJavaIntegrationVersion}")
-            }
+             }
 
             jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
             jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
+            jbake("org.codehaus.groovy:groovy-templates:${extension.groovyTemplatesVersion}")
+            jbake("de.neuland-bfi:jade4j:${extension.jade4jVersion}")
+            jbake("org.thymeleaf:thymeleaf:${extension.thymeleafVersion}")
         }
     }
 }
