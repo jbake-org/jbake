@@ -64,7 +64,7 @@ class JBakePluginSpec extends Specification {
 
         where:
         group             | name                           | version
-        'org.jbake'       | 'jbake-core'                   | '2.4.0'
+        'org.jbake'       | 'jbake-core'                   | '2.5.0'
         'org.freemarker'  | 'freemarker'                   | '2.3.19'
         'org.pegdown'     | 'pegdown'                      | '1.4.2'
         'org.asciidoctor' | 'asciidoctorj'                 | '1.5.4'
