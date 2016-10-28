@@ -1,5 +1,7 @@
 package org.jbake.util;
 
+import java.io.File;
+
 public class PagingHelper {
     long totalDocuments;
     int postsPerPage;
@@ -15,9 +17,7 @@ public class PagingHelper {
 
     public String getNextFileName(int currentPageNumber, String fileName) {
         if (currentPageNumber < getNumberOfPages()) {
-            int index = fileName.lastIndexOf(".");
-            return fileName.substring(0, index) + (currentPageNumber + 1) +
-                    fileName.substring(index);
+            return (currentPageNumber + 1) + File.separator + fileName;
         } else {
             return null;
         }
@@ -28,9 +28,12 @@ public class PagingHelper {
         if (isFirstPage(currentPageNumber)) {
             return null;
         } else {
-            int index = fileName.lastIndexOf(".");
-            return fileName.substring(0, index) + (currentPageNumber > 2 ? currentPageNumber - 1 : "") +
-                    fileName.substring(index);
+            if ( currentPageNumber == 2 ) {
+                return fileName;
+            }
+            else {
+                return (currentPageNumber - 1) + File.separator + fileName;
+            }
         }
     }
 
@@ -39,9 +42,12 @@ public class PagingHelper {
     }
 
     public String getCurrentFileName(int page, String fileName) {
-        int index = fileName.lastIndexOf(".");
-        return fileName.substring(0, index) + (page > 1 ? page : "") +
-                fileName.substring(index);
+        if ( isFirstPage(page) ) {
+            return fileName;
+        }
+        else {
+            return page + File.separator + fileName;
+        }
     }
 
 }

@@ -246,9 +246,8 @@ public class Renderer {
         model.put("content", buildSimpleModel("masterindex"));
         model.put("numberOfPages", pagingHelper.getNumberOfPages());
 
-        db.setLimit(postsPerPage);
-
         try {
+            db.setLimit(postsPerPage);
 
             for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
                 String fileName = indexFile;
