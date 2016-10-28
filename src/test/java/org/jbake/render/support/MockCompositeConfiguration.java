@@ -7,7 +7,7 @@ public class MockCompositeConfiguration extends CompositeConfiguration {
     private boolean _bool = false;
     private String _string = "random string";
 
-    public MockCompositeConfiguration withInnerBoolean(boolean bool) {
+    public MockCompositeConfiguration withDefaultBoolean(boolean bool) {
         _bool = bool;
         return this;
     }
@@ -19,6 +19,10 @@ public class MockCompositeConfiguration extends CompositeConfiguration {
 
     @Override
     public boolean getBoolean(String key) {
+
+        if ( super.containsKey(key) ) {
+            return super.getBoolean(key);
+        }
         return _bool;
     }
 

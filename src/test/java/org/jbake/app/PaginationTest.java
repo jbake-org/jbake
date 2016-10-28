@@ -81,18 +81,20 @@ public class PaginationTest {
             doc.save();
         }
 
-        int iterationCount = 0;
+        int pageCount = 1;
         int start = 0;
         db.setLimit(PER_PAGE);
 
         while (start < TOTAL_POSTS) {
             db.setStart(start);
             DocumentList posts = db.getAllContent("post");
-            Assert.assertEquals("dummyfile" + (1 + (PER_PAGE * iterationCount)), posts.get(0).get("name"));
-//            Assert.assertEquals("dummyfile" + (PER_PAGE + (PER_PAGE * iterationCount)), posts.get(posts.size()-1).field("name"));
-            iterationCount++;
+
+            int expectedNumber = (pageCount==1)?pageCount:((pageCount%2==0)?pageCount+1:pageCount+PER_PAGE);
+
+            Assert.assertEquals("pagcount " +pageCount,"dummyfile" + expectedNumber, posts.get(0).get("name"));
+            pageCount++;
             start += PER_PAGE;
         }
-        Assert.assertEquals(Math.round(TOTAL_POSTS / (1.0 * PER_PAGE) + 0.4), iterationCount);
+        Assert.assertEquals(4, pageCount);
     }
 }

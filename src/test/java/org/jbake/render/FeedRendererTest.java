@@ -18,7 +18,7 @@ public class FeedRendererTest {
     public void returnsZeroWhenConfigDoesNotRenderFeeds() throws RenderingException {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -32,7 +32,7 @@ public class FeedRendererTest {
     public void doesNotRenderWhenConfigDoesNotRenderFeeds() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -46,7 +46,7 @@ public class FeedRendererTest {
     public void returnsOneWhenConfigRendersFeeds() throws RenderingException {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -61,7 +61,7 @@ public class FeedRendererTest {
     public void doesRenderWhenConfigDoesNotRenderFeeds() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -75,7 +75,7 @@ public class FeedRendererTest {
     public void propogatesRenderingException() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
