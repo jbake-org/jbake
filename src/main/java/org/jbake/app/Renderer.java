@@ -237,7 +237,7 @@ public class Renderer {
     }
 
     public void renderIndexPaging(String indexFile) throws Exception {
-        long totalPosts = db.getDocumentCount("post");
+        long totalPosts = db.getPublishedCount("post");
         int postsPerPage = config.getInt(Keys.POSTS_PER_PAGE,5);
         PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
 

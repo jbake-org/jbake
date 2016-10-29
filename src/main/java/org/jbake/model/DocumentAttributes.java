@@ -4,7 +4,9 @@ public enum DocumentAttributes {
     SHA1("sha1"),
     SOURCE_URI("sourceuri"),
     RENDERED("rendered"),
-    CACHED("cached");
+    CACHED("cached"),
+    STATUS("status"),
+    KEY("key");
 
     private String label;
 

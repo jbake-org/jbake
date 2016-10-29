@@ -63,6 +63,7 @@ public class PaginationTest {
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
+        db.shutdown();
     }
 
     @Test

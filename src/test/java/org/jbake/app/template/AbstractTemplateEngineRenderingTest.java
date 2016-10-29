@@ -136,8 +136,8 @@ public abstract class AbstractTemplateEngineRenderingTest {
                 "<h5>Published Pages</h5>",
                 "/projects.html"));
 
-        outputStrings.put("index", Arrays.asList("<a href=\"blog/2012/first-post.html\"",
-                ">First Post</a>",
+        outputStrings.put("index", Arrays.asList("<a href=\"blog/2016/another-post.html\"",
+                ">Another Post</a>",
                 "<a href=\"blog/2013/second-post.html\"",
                 ">Second Post</a>"));
 
@@ -165,6 +165,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
+        db.shutdown();
         Locale.setDefault(currentLocale);
     }
 
