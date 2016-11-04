@@ -102,7 +102,10 @@ public class Main {
 			startWatch(res, config);
 			if (res.getSource().getPath().equals(".")) {
 				// use the default destination folder
-				runServer(config.getString(Keys.DESTINATION_FOLDER), config.getString(Keys.SERVER_PORT));
+				runServer( config.getString( Keys.DESTINATION_FOLDER ), config.getString( Keys.SERVER_PORT ) );
+			} else if (res.getDestination() != null) {
+				// use the destination provided via the commandline
+				runServer( res.getDestination().getPath(), config.getString( Keys.SERVER_PORT ));
 			} else {
 				runServer(res.getSource().getPath(), config.getString(Keys.SERVER_PORT));
 			}
