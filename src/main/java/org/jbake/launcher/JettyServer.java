@@ -25,7 +25,7 @@ public class JettyServer {
 	 * @param path
 	 * @param port
 	 */
-	public static void run(String path, String port) {
+	public void run(String path, String port) {
 		Server server = new Server();
 		SelectChannelConnector connector = new SelectChannelConnector();
         connector.setPort(Integer.parseInt(port));
