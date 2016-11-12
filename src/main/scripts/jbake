@@ -1,5 +1,11 @@
 #!/bin/bash
-EXEC_LOC="`dirname "$0"`"
+
+P=$(realpath $0)
+if [ 0 -ne $? ]; then
+  P=$0
+fi
+
+EXEC_LOC="`dirname "$P"`"
 EXEC_PARENT="`dirname $EXEC_LOC`"
 
 CYGWIN=false;
