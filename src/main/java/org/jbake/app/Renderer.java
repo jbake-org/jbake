@@ -326,7 +326,6 @@ public class Renderer {
                 map.put(Attributes.ROOTPATH, "../");
                 model.put("content", map);
 
-            	tag = tag.trim().replace(" ", "-");
             	File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
             	render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
                 renderedCount++;
