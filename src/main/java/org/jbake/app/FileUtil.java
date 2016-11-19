@@ -15,7 +15,7 @@ import java.security.MessageDigest;
 /**
  * Provides File related functions
  *
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class FileUtil {
 
@@ -43,10 +43,9 @@ public class FileUtil {
      * Works out the folder where JBake is running from.
      *
      * @return File referencing folder JBake is running from
-     * @throws Exception
+     * @throws Exception		when application is not able to work out where is JBake running from
      */
     public static File getRunningLocation() throws Exception {
-        // work out where JBake is running from
         String codePath = FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String decodedPath = URLDecoder.decode(codePath, "UTF-8");
         File codeFile = new File(decodedPath);
@@ -80,7 +79,7 @@ public class FileUtil {
      *
      * @param sourceFile the original file or directory
      * @return an hex string representing the SHA1 hash of the file or directory.
-     * @throws Exception
+     * @throws Exception if any IOException of SecurityException occured
      */
     public static String sha1(File sourceFile) throws Exception {
         byte[] buffer = new byte[1024];

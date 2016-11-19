@@ -22,7 +22,7 @@ import static java.io.File.separator;
 /**
  * Crawls a file system looking for content.
  *
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class Crawler {
 	public interface Attributes {
@@ -61,6 +61,9 @@ public class Crawler {
 
     /**
      * Creates new instance of Crawler.
+		 * @param db			Database instance for content
+		 * @param source	Base directory where content directory is located
+		 * @param config	Project configuration
      */
     public Crawler(ContentStore db, File source, CompositeConfiguration config) {
         this.db = db;

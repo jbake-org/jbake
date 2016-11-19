@@ -37,6 +37,8 @@ public class DBUtil {
 
     /**
      * Converts a DB list into a String array
+     * @param entry     Entry input to be converted
+     * @return          input entry as String[]
      */
     @SuppressWarnings("unchecked")
     public static String[] toStringArray(Object entry) {

@@ -1,10 +1,5 @@
 package org.jbake.launcher;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.util.List;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
@@ -21,10 +16,15 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import java.io.File;
+import java.io.StringWriter;
+import java.text.MessageFormat;
+import java.util.List;
+
 /**
  * Launcher for JBake.
  * 
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
 public class Main {
@@ -35,7 +35,7 @@ public class Main {
 	/**
 	 * Runs the app with the given arguments.
 	 * 
-	 * @param args
+	 * @param args	Application arguments
 	 */
 	public static void main(final String[] args) {
 		try {

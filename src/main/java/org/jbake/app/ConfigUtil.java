@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * Provides Configuration related functions.
  *
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class ConfigUtil {
 	

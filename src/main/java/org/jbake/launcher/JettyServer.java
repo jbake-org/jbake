@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides Jetty server related functions
  * 
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
 public class JettyServer {
@@ -22,8 +22,8 @@ public class JettyServer {
 	/**
 	 * Run Jetty web server serving out supplied path on supplied port
 	 * 
-	 * @param path
-	 * @param port
+	 * @param path	Base directory for resourced to be served
+	 * @param port	Required server port
 	 */
 	public static void run(String path, String port) {
 		Server server = new Server();
