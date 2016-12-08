@@ -15,19 +15,29 @@
  */
 
 plugins {
+    id 'groovy'
+    id 'idea'
     id 'maven-publish'
     id 'com.jfrog.bintray' version '1.7.1'
     id 'net.nemerosa.versioning' version '2.4.0'
     id 'com.github.ben-manes.versions' version '0.13.0'
     id 'com.gradle.plugin-publish' version '0.9.5'
     id 'com.github.hierynomus.license' version '0.11.0'
+    id 'java-gradle-plugin'
 }
 
-apply plugin: 'groovy'
-apply plugin: 'idea'
 apply from: 'gradle/credentials.gradle'
 apply from: 'gradle/publishing.gradle'
 apply from: 'gradle/code-quality.gradle'
+
+gradlePlugin {
+    plugins {
+        jbakePlugin {
+            id = project_pluginId
+            implementationClass = "me.champeau.gradle.JBakePlugin"
+        }
+    }
+}
 
 repositories {
     jcenter()
@@ -40,6 +50,7 @@ dependencies {
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group:'org.codehaus.groovy'
     }
+    testCompile "commons-io:commons-io:2.5"
 }
 
 compileGroovy {
