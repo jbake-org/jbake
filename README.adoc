@@ -11,8 +11,6 @@ image:https://api.bintray.com/packages/jbake/maven/{project-name}/images/downloa
 
 ---
 
-image:https://secure.travis-ci.org/jbake-org/jbake-gradle-plugin.png?branch=master["Build Status", link="https://travis-ci.org/jbake-org/jbake-gradle-plugin"]
-
 This plugin allows rendering a site using http://www.jbake.org[JBake] directly from http://www.gradle.org[Gradle].
 
 == Examples

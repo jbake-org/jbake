@@ -15,8 +15,11 @@ before_script:
     - ./gradlew --version
 
 script:
-    - TERM=dumb ./gradlew build
+    - TERM=dumb ./gradlew build jacocoTestReport
 
 jdk:
     - oraclejdk8
     - oraclejdk7
+
+after_success:
+    - ./gradlew coveralls
