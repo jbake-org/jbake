@@ -32,5 +32,5 @@ class JBakeExtension {
     String destDirName = 'jbake'
     boolean clearCache = false
     Map<String, Object> configuration = [:]
-
+    boolean includeDefaultRepositories = true
 }

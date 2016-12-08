@@ -75,7 +75,15 @@ class PluginIntegrationSpec extends Specification {
         runner
     }
 
-    protected BuildResult runTasksWithSuccess(String... arguments) {
+    protected BuildResult runTasksWithSucess(String... arguments) {
         getGradleRunner(arguments).build()
+    }
+
+    protected BuildResult runTasksWithFailure(String... arguments) {
+        getGradleRunner(arguments).buildAndFail()
+    }
+
+    protected BuildResult runTasks(boolean success, String... arguments) {
+        success ? runTasksWithSucess(arguments) : runTasksWithFailure(arguments)
     }
 }

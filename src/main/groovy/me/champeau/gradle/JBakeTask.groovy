@@ -19,6 +19,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
@@ -28,12 +29,14 @@ class JBakeTask extends DefaultTask {
     @InputDirectory File input
     @OutputDirectory File output
     @Input Map<String, Object> configuration = [:]
+    @Input @Optional
     boolean clearCache
 
+    @Input @Optional
     Configuration classpath
     private static ClassLoader cl
 
-    JBakeProxy jbake
+    private JBakeProxy jbake
 
     @TaskAction
     void bake() {
@@ -50,7 +53,6 @@ class JBakeTask extends DefaultTask {
     }
 
     private def mergeConfiguration(){
-
         //config = new CompositeConfiguration([createMapConfiguration(), jbake.getConfig()])
         def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
         Constructor constructor = delegate.getConstructor(Collection)
@@ -67,7 +69,7 @@ class JBakeTask extends DefaultTask {
 
     private def loadOvenDynamic() {
         setupClassLoader()
-        loadClass("org.jbake.app.Oven")
+        loadClass('org.jbake.app.Oven')
     }
 
     private static Class loadClass(String className) {
@@ -83,5 +85,4 @@ class JBakeTask extends DefaultTask {
             cl = Thread.currentThread().contextClassLoader
         }
     }
-
 }

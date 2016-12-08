@@ -98,3 +98,18 @@ jbake {
 }
 ----
 
+=== Repositories configuration
+The plugin will automatically include `jcenter()` as a repository in order to resolve JBake and template engine dependencies.
+You may deactivate this feature by setting `includeDefaultRepositories` to false, like so
+
+[source,groovy]
+----
+jbake {
+   includeDefaultRepositories = false
+}
+----
+
+WARNING: You must still define at least one repository from where all JBake and template engine dependencies should
+be resolved. Failure to do so will result in a build error.
+
+

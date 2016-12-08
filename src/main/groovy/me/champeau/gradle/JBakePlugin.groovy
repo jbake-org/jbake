@@ -21,7 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 
 class JBakePlugin implements Plugin<Project> {
-    static final String JBAKE = "jbake"
+    static final String JBAKE = 'jbake'
 
     Project project
     JBakeExtension extension
@@ -30,16 +30,13 @@ class JBakePlugin implements Plugin<Project> {
         this.project = project
         project.apply(plugin: 'base')
 
-        project.repositories {
-            jcenter()
-        }
 
         Configuration configuration = project.configurations.maybeCreate(JBAKE)
         extension = project.extensions.create(JBAKE, JBakeExtension)
 
         addDependenciesAfterEvaluate()
 
-        project.task('bake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project'){
+        project.task('bake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project') {
             classpath = configuration
             conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
             conventionMapping.output = { project.file("$project.buildDir/$project.jbake.destDirName") }
@@ -48,24 +45,30 @@ class JBakePlugin implements Plugin<Project> {
         }
     }
 
-    def addDependenciesAfterEvaluate() {
+    private void addDependenciesAfterEvaluate() {
         project.afterEvaluate {
+            JBakeExtension extension = project.extensions.findByName(JBAKE)
+            if (extension.includeDefaultRepositories) {
+                project.repositories {
+                    jcenter()
+                }
+            }
+
             addDependencies()
         }
     }
 
-    def addDependencies() {
+    private void addDependencies() {
         project.dependencies {
             jbake("org.jbake:jbake-core:${extension.version}")
 
             Version currentVersion = Version.valueOf(extension.version)
-            Version jbake2_3_0 = Version.valueOf("2.3.0")
-            if ( currentVersion.greaterThan( jbake2_3_0 ) ){
+            Version jbake2_3_0 = Version.valueOf('2.3.0')
+            if (currentVersion.greaterThan(jbake2_3_0)) {
                 jbake("org.asciidoctor:asciidoctorj:${extension.asciidoctorjVersion}")
-            }
-            else {
+            } else {
                 jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorJavaIntegrationVersion}")
-             }
+            }
 
             jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
             jbake("org.pegdown:pegdown:${extension.pegdownVersion}")

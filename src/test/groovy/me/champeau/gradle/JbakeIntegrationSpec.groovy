@@ -18,6 +18,7 @@ package me.champeau.gradle
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Unroll
 
+import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
@@ -44,7 +45,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         '''
 
         when:
-        BuildResult result = runTasksWithSuccess('bake', '--info')
+        BuildResult result = runTasksWithSucess('bake', '--info')
 
         then:
         result.task(':bake').outcome == SUCCESS
@@ -60,5 +61,69 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
             '3.0',    // first release in 3.x line, compatibility changes
             '3.2'     // latest release, deprecations & warnings
         ]
+    }
+
+    @Unroll
+    def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
+        given:
+        gradleVersion = '3.2'
+        File jbakeSourceDir = newFolder('src', 'jbake')
+
+        copyResources('example-project', jbakeSourceDir.path)
+
+        buildFile << """
+            plugins {
+                id 'me.champeau.jbake'
+            }
+
+            jbake {
+                asciidoctorjVersion = '1.5.4.1'
+                version = '2.4.0'
+                includeDefaultRepositories = $includeDefaultRepositories
+                configuration['render.tags'] = true
+            }
+        """
+
+        when:
+        BuildResult result = runTasks(status == SUCCESS, 'bake', '--info')
+
+        then:
+        result.task(':bake').outcome == status
+
+        where:
+        includeDefaultRepositories | status
+        true                       | SUCCESS
+        false                      | FAILED
+    }
+
+    def 'Bake with default repositories set to false and repositories block defined results in SUCCESS'() {
+        given:
+        gradleVersion = '3.2'
+        File jbakeSourceDir = newFolder('src', 'jbake')
+
+        copyResources('example-project', jbakeSourceDir.path)
+
+        buildFile << """
+            plugins {
+                id 'me.champeau.jbake'
+            }
+
+            repositories {
+                jcenter()
+            }
+
+            jbake {
+                asciidoctorjVersion = '1.5.4.1'
+                version = '2.4.0'
+                includeDefaultRepositories = false
+                configuration['render.tags'] = true
+            }
+        """
+
+        when:
+        BuildResult result = runTasksWithSucess('bake', '--info')
+
+        then:
+        result.task(':bake').outcome == SUCCESS
     }
 }
