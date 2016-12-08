@@ -22,7 +22,6 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 class PluginIntegrationSpec extends Specification {
-
     private final TemporaryFolder folder = new TemporaryFolder()
 
     File buildFile
@@ -31,7 +30,7 @@ class PluginIntegrationSpec extends Specification {
 
     void setup() {
         folder.create()
-        buildFile = folder.newFile("build.gradle")
+        buildFile = folder.newFile('build.gradle')
     }
 
     void cleanup() {
@@ -39,8 +38,8 @@ class PluginIntegrationSpec extends Specification {
     }
 
     protected void copyResources(String srcDir, String destination) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(srcDir);
+        ClassLoader classLoader = getClass().getClassLoader()
+        URL resource = classLoader.getResource(srcDir)
         if (resource == null) {
             throw new RuntimeException("Could not find classpath resource: $srcDir")
         }

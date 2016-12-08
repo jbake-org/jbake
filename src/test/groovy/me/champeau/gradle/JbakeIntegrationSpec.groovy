@@ -18,44 +18,47 @@ package me.champeau.gradle
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Unroll
 
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
-
     @Unroll
-    def "setup and bake with gradle #version"() {
+    def 'Setup and bake with gradle #version'() {
         given:
         gradleVersion = version
-        File jbakeSourceDir = newFolder("src", "jbake")
-        File jbakeDestinationDir = new File(projectDir,"build/jbake")
-        File blogTagFile = new File(jbakeDestinationDir,"tags/blog.html")
+        File jbakeSourceDir = newFolder('src', 'jbake')
+        File jbakeDestinationDir = new File(projectDir, 'build/jbake')
+        File blogTagFile = new File(jbakeDestinationDir, 'tags/blog.html')
 
-        copyResources("example-project", jbakeSourceDir.path)
+        copyResources('example-project', jbakeSourceDir.path)
 
         buildFile << '''
             plugins {
                 id 'me.champeau.jbake'
             }
 
-            jbake{
-                asciidoctorjVersion = "1.5.4.1"
+            jbake {
+                asciidoctorjVersion = '1.5.4.1'
                 version = '2.4.0'
                 configuration['render.tags'] = true
             }
         '''
 
         when:
-        BuildResult result = runTasksWithSuccess("bake", "--info")
+        BuildResult result = runTasksWithSuccess('bake', '--info')
 
         then:
-        result.task(":bake").outcome == SUCCESS
-        result.output.contains("Baked 5 items")
+        result.task(':bake').outcome == SUCCESS
+        result.output.contains('Baked 5 items')
 
         blogTagFile.size() > 0
 
         where:
-        version << ['2.8','2.14.1','3.0']
+        version << [
+            '2.8',    // lower limit of Tooling API compatibility for TestKit
+            '2.12',   // introduces changes such as compileOnly
+            '2.14.1', // latest release in 2.x line
+            '3.0',    // first release in 3.x line, compatibility changes
+            '3.2'     // latest release, deprecations & warnings
+        ]
     }
-
-
 }
