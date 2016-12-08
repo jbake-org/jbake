@@ -67,15 +67,18 @@ The default is {jbake-version}.
 
 === Render Engine configuration
 
-Jbake uses three engines. The library versions could be changed too:
+Jbake uses several engines. The library versions could be changed too:
 
 [source,groovy]
 ----
 jbake {
-    pegdownVersion = '1.4.2'
-    freemarkerVersion = '2.3.19'
+    pegdownVersion = '1.6.0'
+    freemarkerVersion = '2.3.25-incubating'
+    groovyTemplatesVersion = '2.4.7'
+    jade4jVersion = '1.2.3'
+    thymeleafVersion = '3.0.2.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'
-    asciidoctorjVersion = '1.5.4'
+    asciidoctorjVersion = '1.5.4.1'
 }
 ----
 

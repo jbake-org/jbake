@@ -63,11 +63,14 @@ class JBakePluginSpec extends Specification {
         }
 
         where:
-        group             | name                           | version
-        'org.jbake'       | 'jbake-core'                   | '2.5.0'
-        'org.freemarker'  | 'freemarker'                   | '2.3.19'
-        'org.pegdown'     | 'pegdown'                      | '1.4.2'
-        'org.asciidoctor' | 'asciidoctorj'                 | '1.5.4'
+        group                   | name                  | version
+        'org.jbake'             | 'jbake-core'          | '2.5.0'
+        'org.freemarker'        | 'freemarker'          | '2.3.25-incubating'
+        'org.pegdown'           | 'pegdown'             | '1.6.0'
+        'org.asciidoctor'       | 'asciidoctorj'        | '1.5.4.1'
+        'org.codehaus.groovy'   | 'groovy-templates'    | '2.4.7'
+        'org.thymeleaf'         | 'thymeleaf'           | '3.0.2.RELEASE'
+        'de.neuland-bfi'        | 'jade4j'              | '1.2.3'
 
     }
 
@@ -96,9 +99,7 @@ class JBakePluginSpec extends Specification {
 
         then:
         project.configurations.jbake.dependencies.find {
-            it.group == 'org.asciidoctor' &&
-            it.name == 'asciidoctorj' &&
-            it.version == '1.5.4'
+            it.group == 'org.asciidoctor' && it.name == 'asciidoctorj'
         }
     }
 
