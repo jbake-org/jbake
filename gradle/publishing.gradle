@@ -85,17 +85,15 @@ publishing {
     }
 }
 
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
-if (!project.hasProperty('bintrayKey')) ext.bintrayKey = ''
-
 bintray {
     user = bintrayUsername
     key = bintrayKey
     publications = ['mavenJava']
+    dryRun = bintrayDryRun.toBoolean()
     pkg {
-        userOrg = 'melix'
-        repo = 'gradle-plugins'
-        name = 'jbake-gradle-plugin'
+        userOrg = bintrayOrg
+        repo = bintrayRepo
+        name = project.name
         desc = project.project_description
         licenses = ['Apache-2.0']
         labels = ['jbake', 'site-generator']
