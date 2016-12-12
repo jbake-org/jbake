@@ -139,6 +139,15 @@ public class ContentStore {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
 
+    public DocumentList getPublishedDocumentsByTag(String tag) {
+        final DocumentList documents = new DocumentList();
+        for (final String docType : DocumentTypes.getDocumentTypes()) {
+            DocumentList documentsByTag = query("select * from " + docType + " where status='published' and ? in tags order by date desc", tag);
+            documents.addAll(documentsByTag);
+        }
+        return documents;
+    }
+
     public DocumentList getPublishedPages() {
         return getPublishedContent("page");
     }

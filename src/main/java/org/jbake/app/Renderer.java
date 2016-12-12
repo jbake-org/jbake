@@ -317,7 +317,7 @@ public class Renderer {
     public int renderTags(String tagPath) throws Exception {
     	int renderedCount = 0;
     	final List<Throwable> errors = new LinkedList<Throwable>();
-        for (String tag : db.getTags()) {
+        for (String tag : db.getAllTags()) {
             try {
             	Map<String, Object> model = new HashMap<String, Object>();
             	model.put("renderer", renderingEngine);
