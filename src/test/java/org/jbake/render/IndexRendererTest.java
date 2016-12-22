@@ -11,7 +11,6 @@ import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jbake.app.ConfigUtil.Keys.PAGINATE_INDEX;
-import static org.jbake.app.ConfigUtil.Keys.RENDER_INDEX;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -80,7 +79,7 @@ public class IndexRendererTest {
     }
 
     @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    public void propagatesRenderingException() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
         CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);

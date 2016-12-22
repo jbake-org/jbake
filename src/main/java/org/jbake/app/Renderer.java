@@ -5,15 +5,10 @@ import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.jbake.util.PagingHelper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,6 +110,14 @@ public class Renderer {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
             model.put("content", content);
+
+            if ( config.containsKey(Keys.PAGINATE_INDEX) && config.getBoolean(Keys.PAGINATE_INDEX) ) {
+                model.put("numberOfPages", 0);
+                model.put("currentPageNumber", 0);
+                model.put("previousFileName", "");
+                model.put("nextFileName", "");
+            }
+
             return model;
         }
 
@@ -238,36 +241,43 @@ public class Renderer {
 
     public void renderIndexPaging(String indexFile) throws Exception {
         long totalPosts = db.getPublishedCount("post");
-        int postsPerPage = config.getInt(Keys.POSTS_PER_PAGE,5);
-        PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
+        int postsPerPage = config.getInt(Keys.POSTS_PER_PAGE, 5);
 
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("renderer", renderingEngine);
-        model.put("content", buildSimpleModel("masterindex"));
-        model.put("numberOfPages", pagingHelper.getNumberOfPages());
+        if (totalPosts == 0) {
+            //paging makes no sense. render single index file instead
+            renderIndex(indexFile);
+        } else {
 
-        db.setLimit(postsPerPage);
+            PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
 
-        try {
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("renderer", renderingEngine);
+            model.put("content", buildSimpleModel("masterindex"));
+            model.put("numberOfPages", pagingHelper.getNumberOfPages());
 
-            for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
-                String fileName = indexFile;
+            db.setLimit(postsPerPage);
 
-                db.setStart(pageStart);
-                model.put("currentPageNumber", page);
-                String previous = pagingHelper.getPreviousFileName(page, fileName);
-                model.put("previousFileName", previous);
-                String nextFileName = pagingHelper.getNextFileName(page, fileName);
-                model.put("nextFileName", nextFileName);
+            try {
 
-                // Add page number to file name
-                fileName = pagingHelper.getCurrentFileName(page, fileName);
-                ModelRenderingConfig renderConfig = new ModelRenderingConfig(fileName, model, "masterindex");
-                render(renderConfig);
+                for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
+                    String fileName = indexFile;
+
+                    db.setStart(pageStart);
+                    model.put("currentPageNumber", page);
+                    String previous = pagingHelper.getPreviousFileName(page, fileName);
+                    model.put("previousFileName", previous);
+                    String nextFileName = pagingHelper.getNextFileName(page, fileName);
+                    model.put("nextFileName", nextFileName);
+
+                    // Add page number to file name
+                    fileName = pagingHelper.getCurrentFileName(page, fileName);
+                    ModelRenderingConfig renderConfig = new ModelRenderingConfig(fileName, model, "masterindex");
+                    render(renderConfig);
+                }
+                db.resetPagination();
+            } catch (Exception e) {
+                throw new Exception("Failed to render index. Cause: " + e.getMessage(), e);
             }
-            db.resetPagination();
-        } catch (Exception e) {
-            throw new Exception("Failed to render index. Cause: " + e.getMessage(), e);
         }
     }
 

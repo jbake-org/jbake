@@ -32,6 +32,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author jdlee
@@ -61,6 +63,23 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         for (String string : getOutputStrings("index")) {
             assertThat(output).contains(string);
         }
+    }
+
+    @Test
+    public void shouldFallbackToRenderSingleIndexIfNoPostArePresent() throws Exception {
+        config.setProperty(Keys.PAGINATE_INDEX, true);
+        config.setProperty(Keys.POSTS_PER_PAGE, 1);
+
+        db.deleteAllByDocType("post");
+
+        renderer.renderIndexPaging("index.html");
+
+        File paginatedFile = new File(destinationFolder, "index2.html");
+        assertFalse("paginated file is not rendered",paginatedFile.exists());
+
+        File indexFile = new File(destinationFolder, "index.html");
+        assertTrue("index file exists",indexFile.exists());
+
     }
 
 }
