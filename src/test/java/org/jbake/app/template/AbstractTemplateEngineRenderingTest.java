@@ -42,6 +42,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,7 +72,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
     private Crawler crawler;
     private Parser parser;
-    private Renderer renderer;
+    protected Renderer renderer;
     protected Locale currentLocale;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
@@ -135,8 +136,8 @@ public abstract class AbstractTemplateEngineRenderingTest {
                 "<h5>Published Pages</h5>",
                 "/projects.html"));
 
-        outputStrings.put("index", Arrays.asList("<a href=\"blog/2012/first-post.html\"",
-                ">First Post</a>",
+        outputStrings.put("index", Arrays.asList("<a href=\"blog/2016/another-post.html\"",
+                ">Another Post</a>",
                 "<a href=\"blog/2013/second-post.html\"",
                 ">Second Post</a>"));
 
@@ -164,6 +165,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
+        db.shutdown();
         Locale.setDefault(currentLocale);
     }
 
@@ -181,7 +183,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("post")) {
             assertThat(output).contains(string);
         }
@@ -200,7 +202,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("page")) {
             assertThat(output).contains(string);
         }
@@ -216,7 +218,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("index")) {
             assertThat(output).contains(string);
         }
@@ -229,7 +231,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("feed")) {
             assertThat(output).contains(string);
         }
@@ -242,7 +244,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("archive")) {
             assertThat(output).contains(string);
         }
@@ -255,7 +257,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         // verify
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
         Assert.assertTrue(outputFile.exists());
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("tags")) {
             assertThat(output).contains(string);
         }
@@ -271,7 +273,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("sitemap")) {
             assertThat(output).contains(string);
         }

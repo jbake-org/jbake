@@ -18,7 +18,7 @@ public class SitemapRendererTest {
     public void returnsZeroWhenConfigDoesNotRenderSitemaps() throws RenderingException {
         SitemapRenderer renderer = new SitemapRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -32,7 +32,7 @@ public class SitemapRendererTest {
     public void doesNotRenderWhenConfigDoesNotRenderSitemaps() throws Exception {
         SitemapRenderer renderer = new SitemapRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -46,7 +46,7 @@ public class SitemapRendererTest {
     public void returnsOneWhenConfigRendersSitemaps() throws RenderingException {
         SitemapRenderer renderer = new SitemapRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -61,7 +61,7 @@ public class SitemapRendererTest {
     public void doesRenderWhenConfigDoesNotRenderSitemaps() throws Exception {
         SitemapRenderer renderer = new SitemapRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -75,7 +75,7 @@ public class SitemapRendererTest {
     public void propogatesRenderingException() throws Exception {
         SitemapRenderer renderer = new SitemapRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 

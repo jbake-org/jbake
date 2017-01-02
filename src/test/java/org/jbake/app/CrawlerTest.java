@@ -43,6 +43,7 @@ public class CrawlerTest {
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
+        db.shutdown();
     }
 
     @Test
@@ -50,12 +51,12 @@ public class CrawlerTest {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(3, db.getDocumentCount("post"));
+        Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
         DocumentList results = db.getPublishedPosts();
 
-        assertThat(results.size()).isEqualTo(2);
+        assertThat(results.size()).isEqualTo(3);
 
         for (Map<String, Object> content : results) {
             assertThat(content)
@@ -65,7 +66,7 @@ public class CrawlerTest {
 
         DocumentList allPosts = db.getAllContent("post");
 
-        assertThat(allPosts.size()).isEqualTo(3);
+        assertThat(allPosts.size()).isEqualTo(4);
 
         for (Map<String, Object> content : allPosts) {
             if (content.get(Crawler.Attributes.TITLE).equals("Draft Post")) {
@@ -75,7 +76,7 @@ public class CrawlerTest {
 
         // covers bug #213
         DocumentList publishedPostsByTag = db.getPublishedPostsByTag("blog");
-        Assert.assertEquals(2, publishedPostsByTag.size());
+        Assert.assertEquals(3, publishedPostsByTag.size());
     }
 
     @Test
@@ -91,7 +92,7 @@ public class CrawlerTest {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(3, db.getDocumentCount("post"));
+        Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
         DocumentList documents = db.getPublishedPosts();

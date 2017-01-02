@@ -35,6 +35,8 @@ import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,6 +49,7 @@ import java.util.Set;
  */
 public class ContentStore {
 
+    private final Logger logger = LoggerFactory.getLogger(ContentStore.class);
     private ODatabaseDocumentTx db;
     private long start = -1;
     private long limit = -1;
@@ -94,10 +97,7 @@ public class ContentStore {
             }
         }
         if (schema.getClass("Signatures") == null) {
-            // create the sha1 signatures class
-            OClass signatures = schema.createClass("Signatures");
-            signatures.createProperty("key", OType.STRING).setNotNull(true);
-            signatures.createProperty("sha1", OType.STRING).setNotNull(true);
+            createSignatureType(schema);
         }
     }
 
@@ -124,6 +124,10 @@ public class ContentStore {
 
     public long getDocumentCount(String docType) {
         return db.countClass(docType);
+    }
+
+    public long getPublishedCount(String docType) {
+        return (Long) query("select count(*) as count from " + docType + " where status='published'").get(0).get("count");
     }
 
     public DocumentList getDocumentStatus(String docType, String uri) {
@@ -236,16 +240,27 @@ public class ContentStore {
         return result;
     }
 
-    private static void createDocType(final OSchema schema, final String doctype) {
+    private void createDocType(final OSchema schema, final String doctype) {
+        logger.debug("Create document class '{}'", doctype );
+
         OClass page = schema.createClass(doctype);
         page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
+        page.createIndex(doctype + "sha1Index", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
         page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
+        page.createIndex(doctype + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
         page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
+        page.createIndex(doctype + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.CACHED.toString());
         page.createProperty(String.valueOf(DocumentAttributes.RENDERED), OType.BOOLEAN).setNotNull(true);
+        page.createIndex(doctype + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.RENDERED.toString());
+        page.createProperty(String.valueOf(DocumentAttributes.STATUS), OType.STRING).setNotNull(true);
+        page.createIndex(doctype + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.STATUS.toString());
+    }
 
-        // commented out because for some reason index seems to be written
-        // after the database is closed to this triggers an exception
-        //page.createIndex("uriIdx", OClass.INDEX_TYPE.UNIQUE, "uri");
-        //page.createIndex("renderedIdx", OClass.INDEX_TYPE.NOTUNIQUE, "rendered");
+    private void createSignatureType(OSchema schema) {
+        OClass signatures = schema.createClass("Signatures");
+        signatures.createProperty(String.valueOf(DocumentAttributes.KEY), OType.STRING).setNotNull(true);
+        signatures.createIndex("keyIdx", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.KEY.toString());
+        signatures.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
+        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
     }
 }

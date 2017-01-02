@@ -10,7 +10,13 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.jbake.app.ConfigUtil.Keys.PAGINATE_INDEX;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class IndexRendererTest {
 
@@ -18,7 +24,7 @@ public class IndexRendererTest {
     public void returnsZeroWhenConfigDoesNotRenderIndices() throws RenderingException {
         IndexRenderer renderer = new IndexRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -32,7 +38,7 @@ public class IndexRendererTest {
     public void doesNotRenderWhenConfigDoesNotRenderIndices() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -46,7 +52,7 @@ public class IndexRendererTest {
     public void returnsOneWhenConfigRendersIndices() throws RenderingException {
         IndexRenderer renderer = new IndexRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -61,7 +67,8 @@ public class IndexRendererTest {
     public void doesRenderWhenConfigDoesNotRenderIndices() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        MockCompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
+        compositeConfiguration.setProperty(PAGINATE_INDEX, false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -72,10 +79,11 @@ public class IndexRendererTest {
     }
 
     @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    public void propagatesRenderingException() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
+        compositeConfiguration.setProperty(PAGINATE_INDEX, false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 

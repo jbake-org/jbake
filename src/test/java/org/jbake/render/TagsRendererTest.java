@@ -21,7 +21,7 @@ public class TagsRendererTest {
     public void returnsZeroWhenConfigDoesNotRenderTags() throws RenderingException {
         TagsRenderer renderer = new TagsRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -35,7 +35,7 @@ public class TagsRendererTest {
     public void doesNotRenderWhenConfigDoesNotRenderTags() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -49,7 +49,7 @@ public class TagsRendererTest {
     public void returnsOneWhenConfigRendersIndices() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -68,7 +68,7 @@ public class TagsRendererTest {
     public void doesRenderWhenConfigDoesNotRenderIndices() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -85,7 +85,7 @@ public class TagsRendererTest {
     public void propogatesRenderingException() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 

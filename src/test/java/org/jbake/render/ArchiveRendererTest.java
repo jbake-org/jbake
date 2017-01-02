@@ -18,7 +18,7 @@ public class ArchiveRendererTest {
     public void returnsZeroWhenConfigDoesNotRenderArchives() throws RenderingException {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -32,7 +32,7 @@ public class ArchiveRendererTest {
     public void doesNotRenderWhenConfigDoesNotRenderArchives() throws Exception {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(false);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -46,7 +46,7 @@ public class ArchiveRendererTest {
     public void returnsOneWhenConfigRendersArchives() throws RenderingException {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
@@ -61,7 +61,7 @@ public class ArchiveRendererTest {
     public void doesRenderWhenConfigDoesNotRenderArchives() throws Exception {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
@@ -75,7 +75,7 @@ public class ArchiveRendererTest {
     public void propogatesRenderingException() throws Exception {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withInnerBoolean(true);
+        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
