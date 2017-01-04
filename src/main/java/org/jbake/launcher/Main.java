@@ -101,14 +101,27 @@ public class Main {
 		
 		if (res.isRunServer()) {
 			watcher.start(res, config);
-			if (res.getSource().getPath().equals(".")) {
-				// use the default destination folder
-				runServer( config.getString( Keys.DESTINATION_FOLDER ), config.getString( Keys.SERVER_PORT ) );
-			} else if (res.getDestination() != null) {
-				// use the destination provided via the commandline
-				runServer( res.getDestination().getPath(), config.getString( Keys.SERVER_PORT ));
+			// TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
+			if (res.isBake()) {
+				// bake and server commands have been run together
+				if (res.getDestination() != null) {
+					// use the destination provided via the commandline
+					runServer( res.getDestination().getPath(), config.getString( Keys.SERVER_PORT ));
+				} else if (!res.getSource().getPath().equals(".")) {
+					// use the source folder provided via the commandline
+					runServer( res.getSource().getPath(), config.getString( Keys.SERVER_PORT ));
+				} else {
+					// use the default DESTINATION_FOLDER value
+					runServer(config.getString( Keys.DESTINATION_FOLDER ), config.getString(Keys.SERVER_PORT));
+				}
 			} else {
-				runServer(config.getString( Keys.DESTINATION_FOLDER ), config.getString(Keys.SERVER_PORT));
+				// server command run on it's own
+				if (!res.getSource().getPath().equals(".")) {
+					runServer( res.getSource().getPath(), config.getString( Keys.SERVER_PORT ));
+				} else {
+					// use the default destination folder
+					runServer( config.getString( Keys.DESTINATION_FOLDER ), config.getString( Keys.SERVER_PORT ) );
+				}
 			}
 		}
 		

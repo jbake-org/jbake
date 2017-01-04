@@ -36,13 +36,37 @@ public class MainTest {
 
         verify(mockJetty).run("output","8820");
     }
+    
+    @Test
+    public void launchBakeAndJetty() {
+        String[] args = {"-b", "-s"};
+        main.run(args);
+
+        verify(mockJetty).run("output","8820");
+    }
+    
+    @Test
+    public void launchBakeAndJettyWithCustomDirForJetty() {
+        String[] args = {"-b", "-s", "src/jbake"};
+        main.run(args);
+
+        verify(mockJetty).run("src/jbake","8820");
+    }
 
     @Test
     public void launchJettyWithCustomSourceDir() {
         String[] args = {"src/jbake", "-s"};
         main.run(args);
 
-        verify(mockJetty).run("output","8820");
+        verify(mockJetty).run("src/jbake","8820");
+    }
+    
+    @Test
+    public void launchJettyWithCustomServerSourceDir() {
+        String[] args = {"-s", "build/jbake"};
+        main.run(args);
+
+        verify(mockJetty).run("build/jbake","8820");
     }
 
     // Documentation states these two commands will define the custom output, but the LaunchOptions file isn't setup for that.
@@ -52,7 +76,7 @@ public class MainTest {
         String[] args = {"-s", "build/jbake"};
         main.run(args);
 
-        verify(mockJetty).run("output","8820");
+        verify(mockJetty).run("build/jbake","8820");
     }
 
     @Test
