@@ -2,21 +2,13 @@ package org.jbake.launcher;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.util.List;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.impl.DefaultFileMonitor;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
-import org.jbake.app.Oven;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -31,10 +23,10 @@ public class Main {
 
 	private final String USAGE_PREFIX 		= "Usage: jbake";
 	private final String ALT_USAGE_PREFIX	= "   or  jbake";
-	
+
 	/**
 	 * Runs the app with the given arguments.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(final String[] args) {
@@ -50,37 +42,46 @@ public class Main {
 		}
 	}
 
-	private void bake(final LaunchOptions options, final CompositeConfiguration config) {
-		final Oven oven = new Oven(options.getSource(), options.getDestination(), config, options.isClearCache());
-		oven.setupPaths();
-		oven.bake();
+	private Baker baker;
+	private JettyServer jettyServer;
+	private BakeWatcher watcher;
 
-		final List<Throwable> errors = oven.getErrors();
-		if (!errors.isEmpty()) {
-			final StringBuilder msg = new StringBuilder();
-			// TODO: decide, if we want the all errors here
-			msg.append(MessageFormat.format("JBake failed with {0} errors:\n", errors.size()));
-			int errNr = 1;
-			for (final Throwable error : errors) {
-				msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.getMessage()));
-				++errNr;
-			}
-			throw new JBakeException(msg.toString(), errors.get(0));
-		}
+	/**
+	 * Default constructor.
+	 */
+	public Main() {
+		this(new Baker(), new JettyServer(), new BakeWatcher());
 	}
 
-	private void run(String[] args) {
+	/**
+	 * Optional constructor to externalize dependencies.
+	 *
+	 * @param baker
+	 * @param jetty
+	 * @param watcher
+	 */
+	protected Main(Baker baker, JettyServer jetty, BakeWatcher watcher) {
+		this.baker = baker;
+		this.jettyServer = jetty;
+		this.watcher = watcher;
+	}
+
+	protected void run(String[] args) {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
-		LaunchOptions res = parseArguments(args);
-		
+		LaunchOptions res = parseArguments( args );
+
 		final CompositeConfiguration config;
 		try {
-			config = ConfigUtil.load(res.getSource());
-		} catch (final ConfigurationException e) {
-			throw new JBakeException("Configuration error: " + e.getMessage(), e);
+			config = ConfigUtil.load( res.getSource() );
+		} catch( final ConfigurationException e ) {
+			throw new JBakeException( "Configuration error: " + e.getMessage(), e );
 		}
-		
+
+		run(res, config);
+	}
+
+	protected void run(LaunchOptions res, CompositeConfiguration config) {
 		System.out.println("JBake " + config.getString(Keys.VERSION) + " (" + config.getString(Keys.BUILD_TIMESTAMP) + ") [http://jbake.org]");
 		System.out.println();
 		
@@ -91,7 +92,7 @@ public class Main {
 		}
 
 		if (res.isBake()) {
-			bake(res, config);
+			baker.bake(res, config);
 		}
 
 		if (res.isInit()) {
@@ -99,12 +100,15 @@ public class Main {
 		}
 		
 		if (res.isRunServer()) {
-			startWatch(res, config);
+			watcher.start(res, config);
 			if (res.getSource().getPath().equals(".")) {
 				// use the default destination folder
-				runServer(config.getString(Keys.DESTINATION_FOLDER), config.getString(Keys.SERVER_PORT));
+				runServer( config.getString( Keys.DESTINATION_FOLDER ), config.getString( Keys.SERVER_PORT ) );
+			} else if (res.getDestination() != null) {
+				// use the destination provided via the commandline
+				runServer( res.getDestination().getPath(), config.getString( Keys.SERVER_PORT ));
 			} else {
-				runServer(res.getSource().getPath(), config.getString(Keys.SERVER_PORT));
+				runServer(config.getString( Keys.DESTINATION_FOLDER ), config.getString(Keys.SERVER_PORT));
 			}
 		}
 		
@@ -136,7 +140,7 @@ public class Main {
 	}
 
 	private void runServer(String path, String port) {
-		JettyServer.run(path, port);
+		jettyServer.run(path, port);
 	}
 
 	private void initStructure(CompositeConfiguration config, String type, String source) {
@@ -156,20 +160,5 @@ public class Main {
 			throw new JBakeException(msg, e);
 		}
 	}
-	
-	private void startWatch(final LaunchOptions res, CompositeConfiguration config) {
-		try {
-			FileSystemManager fsMan = VFS.getManager();
-			FileObject listenPath = fsMan.resolveFile(res.getSource(), config.getString(Keys.CONTENT_FOLDER));
-			
-			DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(res, config));
-			monitor.setRecursive(true);
-			monitor.addFile(listenPath);
-			monitor.start();
-		} catch (FileSystemException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
+
 }
