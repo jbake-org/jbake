@@ -341,7 +341,7 @@ public class Renderer {
             StringBuilder sb = new StringBuilder();
             sb.append("Failed to render tags. Cause(s):");
             for (Throwable error : errors) {
-                sb.append("\n" + error.getMessage());
+                sb.append("\n").append(error.getMessage());
             }
             throw new Exception(sb.toString(), errors.get(0));
         } else {
