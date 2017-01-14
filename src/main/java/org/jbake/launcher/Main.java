@@ -73,11 +73,10 @@ public class Main {
 
 		final CompositeConfiguration config;
 		try {
-			config = ConfigUtil.load( res.getSource() );
+			config = ConfigUtil.load( res.getSource(), res.isRunServer() );
 		} catch( final ConfigurationException e ) {
 			throw new JBakeException( "Configuration error: " + e.getMessage(), e );
 		}
-
 		run(res, config);
 	}
 

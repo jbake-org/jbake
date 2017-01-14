@@ -2,11 +2,11 @@ package org.jbake.app;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ConfigUtilTest {
 
@@ -15,9 +15,18 @@ public class ConfigUtilTest {
 		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
 		
 		// check default.properties values exist
-		Assert.assertEquals("output", config.getString(Keys.DESTINATION_FOLDER));	
+		assertEquals("output", config.getString(Keys.DESTINATION_FOLDER));
 		
 		// check custom.properties values exist
-		Assert.assertEquals("testing123", config.getString("test.property"));
+		assertEquals("testing123", config.getString("test.property"));
+
+		assertEquals("http://www.jbake.org", config.getString(Keys.SITE_HOST));
+	}
+
+	@Test
+	public void shouldHaveSiteConfiguredWhenServerRunning() throws Exception {
+		CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()), true);
+
+		assertEquals("http://localhost:8820", config.getString(Keys.SITE_HOST));
 	}
 }

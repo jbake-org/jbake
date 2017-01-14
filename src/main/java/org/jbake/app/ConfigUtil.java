@@ -3,6 +3,7 @@ package org.jbake.app;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SystemConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,6 +201,11 @@ public class ConfigUtil {
 		 * How many posts per page on index
 		 */
 		String POSTS_PER_PAGE = "index.posts_per_page";
+
+		/**
+		 * The configured base URI for the hosted content
+		 */
+		String SITE_HOST = "site.host";
 	}
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
@@ -207,8 +213,12 @@ public class ConfigUtil {
 	private final static String CONFIG_FILE = "jbake.properties";
 	private final static String DEFAULT_CONFIG_FILE = "default.properties";
 	private static boolean LEGACY_CONFIG_FILE_WARNING_SHOWN = false;
-	
-    public static CompositeConfiguration load(File source) throws ConfigurationException {
+
+	public static CompositeConfiguration load(File source) throws ConfigurationException {
+		return load(source, false);
+	}
+
+    public static CompositeConfiguration load(File source, boolean isRunServer) throws ConfigurationException {
         CompositeConfiguration config = new CompositeConfiguration();
         config.setListDelimiter(',');
         File customConfigFile = new File(source, LEGACY_CONFIG_FILE);
@@ -225,6 +235,12 @@ public class ConfigUtil {
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
         }
         config.addConfiguration(new PropertiesConfiguration(DEFAULT_CONFIG_FILE));
+        config.addConfiguration(new SystemConfiguration());
+        if (isRunServer) {
+			String port = config.getString(Keys.SERVER_PORT);
+			config.setProperty(Keys.SITE_HOST, "http://localhost:"+port);
+		}
         return config;
     }
+
 }
