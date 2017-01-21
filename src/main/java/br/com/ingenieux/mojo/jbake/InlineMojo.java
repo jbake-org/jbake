@@ -19,65 +19,50 @@ package br.com.ingenieux.mojo.jbake;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.platform.Verticle;
 
-import java.io.File;
+import static spark.Spark.awaitInitialization;
+import static spark.Spark.externalStaticFileLocation;
+import static spark.Spark.init;
+import static spark.Spark.ipAddress;
+import static spark.Spark.port;
+import static spark.Spark.stop;
 
 /**
  * Runs jbake on a folder while watching and serving a folder with it
  */
 @Mojo(name = "inline", requiresDirectInvocation = true, requiresProject = false)
 public class InlineMojo extends WatchMojo {
-	/**
-	 * Listen Port
-	 */
-	@Parameter(property = "jbake.listenAddress", defaultValue = "127.0.0.1")
-	private String listenAddress;
 
-    /**
-     * Index File
-     */
-    @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
-    private String indexFile;
+  /**
+   * Listen Port
+   */
+  @Parameter(property = "jbake.listenAddress", defaultValue = "127.0.0.1")
+  private String listenAddress;
 
-    /**
-	 * Listen Port
-	 */
-	@Parameter(property = "jbake.port", defaultValue = "8080")
-	private Integer port;
+  /**
+   * Index File
+   */
+  @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
+  private String indexFile;
 
-    Server server = new Server();
+  /**
+   * Listen Port
+   */
+  @Parameter(property = "jbake.port", defaultValue = "8080")
+  private Integer port;
 
-    class Server extends Verticle {
-        {
-            vertx = VertxFactory.newVertx();
-        }
+  protected void stopServer() throws MojoExecutionException {
+    stop();
+  }
 
-        @Override
-        public void start() {
-            vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
-                @Override
-                public void handle(HttpServerRequest req) {
-                    String file = req.path().endsWith("/") ? req.path() + indexFile : req.path();
+  protected void initServer() throws MojoExecutionException {
+    externalStaticFileLocation(outputDirectory.getPath());
 
-                    if (new File(outputDirectory + file).isDirectory()) {
-                        req.response().setStatusCode(301).putHeader("Location", file + "/").close();
-                    } else {
-                        req.response().sendFile(outputDirectory.getAbsolutePath() + file);
-                    }
-                }
-            }).listen(port, listenAddress);
-        }
-    }
+    ipAddress(listenAddress);
+    port(this.port);
 
-	protected void stopServer() {
-        server.stop();
-	}
+    init();
 
-	protected void initServer() throws MojoExecutionException {
-        server.start();
-	}
+    awaitInitialization();
+  }
 }

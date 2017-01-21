@@ -1,18 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <groupId>br.com.ingenieux</groupId>
     <artifactId>jbake-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
 
     <prerequisites>
-      <maven>3.1.1</maven>
+        <maven>3.1.1</maven>
     </prerequisites>
 
     <description>jbake-maven-plugin is a plugin to integrate JBake into your projects</description>
@@ -49,7 +51,7 @@
 
     <issueManagement>
         <system>github</system>
-        <url>https://bitbucket.org/ingenieux/jbake-maven-plugin/</url>
+        <url>https://github.com/ingenieux/jbake-maven-plugin/</url>
     </issueManagement>
 
     <properties>
@@ -59,9 +61,10 @@
     </properties>
 
     <scm>
-        <connection>scm:hg:http://bitbucket.org/ingenieux/jbake-maven-plugin</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org/ingenieux/jbake-maven-plugin</developerConnection>
-        <url>http://bitbucket.org/ingenieux/jbake-maven-plugin</url>
+        <connection>scm:git:http://github.com/ingenieux/jbake-maven-plugin</connection>
+        <developerConnection>scm:git:ssh://git@github.com/ingenieux/jbake-maven-plugin.git
+        </developerConnection>
+        <url>http://github.com/ingenieux/jbake-maven-plugin</url>
     </scm>
 
     <dependencies>
@@ -74,6 +77,18 @@
                     <artifactId>jetty-server</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -105,17 +120,18 @@
             <artifactId>plexus-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-platform</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.22</version>
+        </dependency>
+        <dependency>
+            <groupId>org.asciidoctor</groupId>
+            <artifactId>asciidoctorj</artifactId>
+            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
@@ -124,12 +140,12 @@
             <dependency>
                 <groupId>org.jbake</groupId>
                 <artifactId>jbake-core</artifactId>
-                <version>2.2.1</version>
+                <version>2.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-api</artifactId>
-                <version>3.0.4</version>
+                <version>3.3.9</version>
             </dependency>
             <dependency>
                 <groupId>commons-lang</groupId>
@@ -137,30 +153,35 @@
                 <version>2.6</version>
             </dependency>
             <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.maven.plugin-testing</groupId>
                 <artifactId>maven-plugin-testing-harness</artifactId>
-                <version>2.0-alpha-1</version>
+                <version>3.3.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
-                <version>1.2.12</version>
+                <version>1.2.17</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-settings</artifactId>
-                <version>3.0.4</version>
+                <version>3.3.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-core</artifactId>
-                <version>3.0.4</version>
+                <version>3.3.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.plugin-tools</groupId>
                 <artifactId>maven-plugin-annotations</artifactId>
-                <version>3.2</version>
+                <version>3.4</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -171,17 +192,22 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.22</version>
             </dependency>
             <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-core</artifactId>
-                <version>2.0.2-final</version>
+                <groupId>com.sparkjava</groupId>
+                <artifactId>spark-core</artifactId>
+                <version>2.3</version>
             </dependency>
             <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-platform</artifactId>
-                <version>2.0.2-final</version>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>9.3.2.v20150730</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>9.3.2.v20150730</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -195,52 +221,58 @@
             </extension>
         </extensions>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.2</version>
-                    <inherited>true</inherited>
-                    <configuration>
-                        <requirements>
-                            <jdk>1.7</jdk>
-                        </requirements>
-                        <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>mojo-descriptor</id>
-                            <goals>
-                                <goal>descriptor</goal>
-                            </goals>
-                        </execution>
-                        <!-- if you want to generate help goal -->
-                        <execution>
-                            <id>help-goal</id>
-                            <goals>
-                                <goal>helpmojo</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
-                    <configuration>
-                        <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-                        <source>1.7</source>
-                        <target>1.7</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.3</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.4</version>
+                <configuration>
+                    <goalPrefix>jbake</goalPrefix>
+                    <requirements>
+                        <jdk>1.8</jdk>
+                    </requirements>
+                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-descriptor</id>
+                        <phase>process-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>help-goal</id>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <reporting>
@@ -248,22 +280,22 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.8.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.4</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.10.3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.5</version>
             </plugin>
         </plugins>
     </reporting>

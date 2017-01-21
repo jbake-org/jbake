@@ -16,76 +16,97 @@ package br.com.ingenieux.mojo.jbake;
  * limitations under the License.
  */
 
-import br.com.ingenieux.mojo.jbake.util.DirWatcher;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import br.com.ingenieux.mojo.jbake.util.DirWatcher;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Runs jbake on a folder while watching for changes
  */
 @Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 public class WatchMojo extends GenerateMojo {
-	public void execute() throws MojoExecutionException {
-		super.execute();
 
-		getLog().info(
-				"Now listening for changes on path " + inputDirectory.getPath());
+  public void executeInternal() throws MojoExecutionException {
+    reRender();
 
-		initServer();
+    Long lastProcessed = Long.valueOf(System.currentTimeMillis());
 
-		try {
-			final AtomicBoolean done = new AtomicBoolean(false);
-			final BufferedReader reader = new BufferedReader(
-					new InputStreamReader(System.in));
+    getLog().info(
+        "Now listening for changes on path " + inputDirectory.getPath());
 
-			(new Thread() {
-				@Override
-				public void run() {
-					try {
-						getLog().info("Running. Hit <ENTER> to finish");
-						reader.readLine();
-					} catch (Exception exc) {
-					} finally {
-						done.set(true);
-					}
-				}
-			}).start();
+    initServer();
 
-			DirWatcher dirWatcher = new DirWatcher(Paths.get(inputDirectory
-					.getPath()));
+    DirWatcher dirWatcher = null;
 
-			do {
-				Boolean result = dirWatcher.processEvents();
+    try {
+      dirWatcher = new DirWatcher(inputDirectory);
+      final AtomicBoolean done = new AtomicBoolean(false);
+      final BufferedReader reader = new BufferedReader(
+          new InputStreamReader(System.in));
 
-				if (Boolean.FALSE.equals(result)) {
-					Thread.sleep(1000);
-				} else if (Boolean.TRUE.equals(result)) {
-					getLog().info("Refreshing");
+      (new Thread() {
+        @Override
+        public void run() {
+          try {
+            getLog()
+                .info("Running. Enter a blank line to finish. Anything else forces re-rendering.");
 
-					super.execute();
-				} else if (null == result) {
-					break;
-				}
-			} while (!done.get());
-		} catch (Exception exc) {
-			getLog().info("Oops", exc);
+            while (true) {
+              String line = reader.readLine();
 
-			throw new MojoExecutionException("Oops", exc);
-		} finally {
-			getLog().info("Finishing");
+              if (isBlank(line)) {
+                break;
+              }
 
-			stopServer();
-		}
-	}
+              reRender();
+            }
+          } catch (Exception exc) {
+            getLog().info("Ooops", exc);
+          } finally {
+            done.set(true);
+          }
+        }
+      }).start();
 
-	protected void stopServer() {
-	}
+      dirWatcher.start();
 
-	protected void initServer() throws MojoExecutionException {
-	}
+      do {
+        Long result = dirWatcher.processEvents();
+
+        if (null == result) {
+          // do nothing on purpose
+        } else if (result >= lastProcessed) {
+          getLog().info("Refreshing");
+
+          super.reRender();
+
+          lastProcessed = Long.valueOf(System.currentTimeMillis());
+        }
+      } while (!done.get());
+    } catch (Exception exc) {
+      getLog().info("Oops", exc);
+
+      throw new MojoExecutionException("Oops", exc);
+    } finally {
+      getLog().info("Finishing");
+
+      if (null != dirWatcher)
+        dirWatcher.stop();
+
+      stopServer();
+    }
+  }
+
+  protected void stopServer() throws MojoExecutionException {
+  }
+
+  protected void initServer() throws MojoExecutionException {
+  }
 }

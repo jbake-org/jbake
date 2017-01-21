@@ -1,0 +1,28 @@
+<component-set>
+    <components>
+        <component>
+            <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+            <role-hint>jbake</role-hint>
+            <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+            <configuration>
+                <lifecycles>
+                    <lifecycle>
+                        <id>default</id>
+                        <phases>
+                            <process-classes>${project.groupId}:${project.artifactId}:${project.version}:generate</process-resources>
+                        </phases>
+                    </lifecycle>
+                    <lifecycle>
+                        <id>site</id>
+                        <phases>
+                            <pre-site></pre-site>
+                            <site>${project.groupId}:${project.artifactId}:${project.version}:generate</site>
+                            <post-site></post-site>
+                            <site-deploy></site-deploy>
+                        </phases>
+                    </lifecycle>
+                </lifecycles>
+            </configuration>
+        </component>
+    </components>
+</component-set>
