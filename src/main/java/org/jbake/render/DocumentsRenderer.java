@@ -33,7 +33,7 @@ public class DocumentsRenderer implements RenderingTool {
             StringBuilder sb = new StringBuilder();
             sb.append("Failed to render documents. Cause(s):");
             for (String error : errors) {
-                sb.append("\n" + error);
+                sb.append("\n").append(error);
             }
             throw new RenderingException(sb.toString());
         } else {
