@@ -1,6 +1,6 @@
 #!/bin/bash
 
-P=$(realpath $0)
+P=$(realpath $0 2>/dev/null)
 if [ 0 -ne $? ]; then
   P=$0
 fi
