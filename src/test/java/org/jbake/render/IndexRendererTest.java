@@ -95,6 +95,24 @@ public class IndexRendererTest {
         verify(mockRenderer, never()).renderIndex("random string");
     }
 
+
+    /**
+     * @see <a href="https://github.com/jbake-org/jbake/issues/332">Issue 332</a>
+     */
+    @Test
+    public void shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() throws Exception {
+        IndexRenderer renderer = new IndexRenderer();
+
+        MockCompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
+        ContentStore contentStore = mock(ContentStore.class);
+        Renderer mockRenderer = mock(Renderer.class);
+
+        int renderResponse = renderer.render(mockRenderer, contentStore,
+                new File("fake"), new File("fake"), compositeConfiguration);
+
+        verify(mockRenderer, times(1)).renderIndex("random string");
+    }
+
 }
 
 
