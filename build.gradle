@@ -7,9 +7,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
-        classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.0"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.7.1'
+        classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.1"
     }
 }
 
