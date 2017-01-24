@@ -7,6 +7,7 @@ fi
 
 EXEC_LOC="`dirname "$P"`"
 EXEC_PARENT="`dirname $EXEC_LOC`"
+OPTS="-XX:MaxDirectMemorySize=1024m"
 
 CYGWIN=false;
 case "`uname`" in
@@ -15,7 +16,7 @@ esac
 
 if $CYGWIN ;
 then
-    java -jar $(cygpath -w "${EXEC_PARENT}/jbake-core.jar") $@
+    java $OPTS -jar $(cygpath -w "${EXEC_PARENT}/jbake-core.jar") $@
 else
-    java -jar "${EXEC_PARENT}/jbake-core.jar" $@
+    java $OPTS -jar "${EXEC_PARENT}/jbake-core.jar" $@
 fi

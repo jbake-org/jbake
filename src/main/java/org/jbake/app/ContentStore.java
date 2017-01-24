@@ -25,6 +25,8 @@ package org.jbake.app;
 
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
+import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
@@ -61,7 +63,7 @@ public class ContentStore {
         if (!exists) {
             db.create();
         }
-        db = ODatabaseDocumentPool.global().acquire(type + ":" + name, "admin", "admin");
+        db = new OPartitionedDatabasePoolFactory().get(type+":"+name, "admin", "admin").acquire();
         ODatabaseRecordThreadLocal.INSTANCE.set(db);
         if (!exists) {
             updateSchema();
@@ -157,19 +159,19 @@ public class ContentStore {
     }
 
     public DocumentList getPublishedContent(String docType) {
-        String query = "select * from " + docType + " where status='published'";
+        String query = "select * from " + docType + " where status='published' order by date desc";
         if ((start >= 0) && (limit > -1)) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
-        return query(query + " order by date desc");
+        return query(query);
     }
 
     public DocumentList getAllContent(String docType) {
-        String query = "select * from " + docType;
+        String query = "select * from " + docType + " order by date desc";
         if ((start >= 0) && (limit > -1)) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
-        return query(query + " order by date desc");
+        return query(query);
     }
 
     public DocumentList getAllTagsFromPublishedPosts() {
@@ -258,8 +260,6 @@ public class ContentStore {
 
     private void createSignatureType(OSchema schema) {
         OClass signatures = schema.createClass("Signatures");
-        signatures.createProperty(String.valueOf(DocumentAttributes.KEY), OType.STRING).setNotNull(true);
-        signatures.createIndex("keyIdx", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.KEY.toString());
         signatures.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
     }
