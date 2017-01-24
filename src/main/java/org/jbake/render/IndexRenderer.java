@@ -1,6 +1,7 @@
 package org.jbake.render;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
@@ -14,7 +15,7 @@ public class IndexRenderer implements RenderingTool {
     public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
         if (config.getBoolean(Keys.RENDER_INDEX)) {
             try {
-                if (config.getBoolean(Keys.PAGINATE_INDEX)) {
+                if (shouldPaginateIndex(config)) {
                     renderer.renderIndexPaging(config.getString(Keys.INDEX_FILE));
                 } else {
                     renderer.renderIndex(config.getString(Keys.INDEX_FILE));
@@ -26,6 +27,10 @@ public class IndexRenderer implements RenderingTool {
         } else {
             return 0;
         }
+    }
+
+    private boolean shouldPaginateIndex(CompositeConfiguration config) {
+        return config.containsKey(Keys.PAGINATE_INDEX) && config.getBoolean(Keys.PAGINATE_INDEX);
     }
 
 }
