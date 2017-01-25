@@ -12,7 +12,7 @@ public class LaunchOptions {
 	@Argument(index = 1, usage = "destination folder for output, if not supplied will default to a folder called \"output\" in the current directory", metaVar = "<destination>")
 	private String destination;
 	
-	@Option(name = "-b", aliases = {"--bake"}, usage="start baking (this is the default action if no option is supplied)")
+	@Option(name = "-b", aliases = {"--bake"}, usage="performs a bake")
 	private boolean bake;
 	
 	@Option(name = "-i", aliases = {"--init"}, usage="initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)")
