@@ -29,7 +29,7 @@ public class Oven {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
-    private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9]+)(?:\\.file)");
+    private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
 
     private CompositeConfiguration config;
 	private File source;
