@@ -245,7 +245,7 @@ public class ContentStore {
 
         OClass page = schema.createClass(doctype);
         page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
-        page.createIndex(doctype + "sha1Index", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
+        page.createIndex(doctype + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.SHA1.toString());
         page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
         page.createIndex(doctype + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
         page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
