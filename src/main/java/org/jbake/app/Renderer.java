@@ -146,6 +146,22 @@ public class Renderer {
         this.renderingEngine = new DelegatingTemplateEngine(config, db, destination, templatesPath);
         this.db = db;
     }
+    
+    /**
+     * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
+     *
+     * @param db            The database holding the content
+     * @param destination   The destination folder
+     * @param templatesPath The templates folder
+     * @param config
+     * @param renderingEngine The instance of DelegatingTemplateEngine to use
+     */
+    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config, DelegatingTemplateEngine renderingEngine) {
+        this.destination = destination;
+        this.config = config;
+        this.renderingEngine = renderingEngine;
+        this.db = db;
+    }
 
     private String findTemplateName(String docType) {
         String templateKey = "template." + docType + ".file";
@@ -162,7 +178,7 @@ public class Renderer {
     public void render(Map<String, Object> content) throws Exception {
         String docType = (String) content.get(Crawler.Attributes.TYPE);
         String outputFilename = destination.getPath() + File.separatorChar + content.get(Attributes.URI);
-        if (outputFilename.lastIndexOf(".") > 0) {
+        if (outputFilename.lastIndexOf(".") > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
         }
 
