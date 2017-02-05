@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil;
 import org.jbake.app.Crawler.Attributes;
-import org.jbake.util.HtmlUtil;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,11 +17,11 @@ import org.junit.Test;
 
 public class HtmlUtilTest {
 	
-	private CompositeConfiguration config;
+	private DefaultJBakeConfiguration config;
 	
 	@Before
 	public void setUp() throws Exception{
-		config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
+		config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
 	}
 	
 	@Test

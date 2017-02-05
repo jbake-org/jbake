@@ -1,12 +1,5 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.jbake.app.ContentStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import org.jbake.app.ContentStore;
+
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,9 +46,9 @@ public class TemplateEngines {
         return Collections.unmodifiableSet(templateEngines.keySet());
     }
 
-    public TemplateEngines(final Configuration config, final ContentStore db, final File destination, final File templatesPath) {
+    public TemplateEngines(final JBakeConfiguration config, final ContentStore db) {
         templateEngines = new HashMap<String, AbstractTemplateEngine>();
-        loadEngines(config, db, destination, templatesPath);
+        loadEngines(config, db);
     }
 
     private void registerEngine(String fileExtension, AbstractTemplateEngine templateEngine) {
@@ -71,16 +69,14 @@ public class TemplateEngines {
      *
      * @param config the configuration
      * @param db database instance
-     * @param destination target directory
-     * @param templatesPath path to template directory
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
-    private static AbstractTemplateEngine tryLoadEngine(final Configuration config, final ContentStore db, final File destination, final File templatesPath, String engineClassName) {
+    private static AbstractTemplateEngine tryLoadEngine(final JBakeConfiguration config, final ContentStore db, String engineClassName) {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
-            Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(CompositeConfiguration.class, ContentStore.class, File.class, File.class);
-            return ctor.newInstance(config, db, destination, templatesPath);
+            Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(JBakeConfiguration.class, ContentStore.class);
+            return ctor.newInstance(config, db);
         } catch (ClassNotFoundException e) {
             return null;
         } catch (InstantiationException e) {
@@ -101,7 +97,7 @@ public class TemplateEngines {
      * This method is used internally to load markup engines. Markup engines are found using descriptor files on
      * classpath, so adding an engine is as easy as adding a jar on classpath with the descriptor file included.
      */
-    private void loadEngines(final Configuration config, final ContentStore db, final File destination, final File templatesPath) {
+    private void loadEngines(final JBakeConfiguration config, final ContentStore db) {
         try {
             ClassLoader cl = TemplateEngines.class.getClassLoader();
             Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.TemplateEngines.properties");
@@ -112,7 +108,7 @@ public class TemplateEngines {
                 for (Map.Entry<Object, Object> entry : props.entrySet()) {
                     String className = (String) entry.getKey();
                     String[] extensions = ((String) entry.getValue()).split(",");
-                    registerEngine(config, db, destination, templatesPath, className, extensions);
+                    registerEngine(config, db, className, extensions);
                 }
             }
         } catch (IOException e) {
@@ -120,8 +116,8 @@ public class TemplateEngines {
         }
     }
 
-    private void registerEngine(final Configuration config, final ContentStore db, final File destination, final File templatesPath, String className, String... extensions) {
-        AbstractTemplateEngine engine = tryLoadEngine(config, db, destination, templatesPath, className);
+    private void registerEngine(final JBakeConfiguration config, final ContentStore db, String className, String... extensions) {
+        AbstractTemplateEngine engine = tryLoadEngine(config, db, className);
         if (engine != null) {
             for (String extension : extensions) {
                 registerEngine(extension, engine);

@@ -1,8 +1,8 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
+import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -14,9 +14,8 @@ import java.util.List;
  */
 public class Baker {
 
-    public void bake(final LaunchOptions options, final CompositeConfiguration config) {
-        final Oven oven = new Oven(options.getSource(), options.getDestination(), config, options.isClearCache());
-        oven.setupPaths();
+    public void bake(final JBakeConfiguration config) {
+        final Oven oven = new Oven(config);
         oven.bake();
 
         final List<Throwable> errors = oven.getErrors();

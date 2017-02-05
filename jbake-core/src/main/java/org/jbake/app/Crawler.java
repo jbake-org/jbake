@@ -5,18 +5,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes.Status;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
  * Crawls a file system looking for content.
@@ -55,31 +54,40 @@ public class Crawler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
 
-    private CompositeConfiguration config;
+    private JBakeConfiguration config;
     private Parser parser;
     private final ContentStore db;
-    private String contentPath;
 
     /**
      * Creates new instance of Crawler.
      *
      * @param db     Database instance for content
-     * @param source Base directory where content directory is located
      * @param config Project configuration
      */
-    public Crawler(ContentStore db, File source, CompositeConfiguration config) {
+    public Crawler(ContentStore db, JBakeConfiguration config) {
         this.db = db;
         this.config = config;
-        this.contentPath = FilenameUtils.concat(source.getAbsolutePath(), config.getString(ConfigUtil.Keys.CONTENT_FOLDER));
-        this.parser = new Parser(config, contentPath);
+        this.parser = new Parser(config);
     }
 
+    public void crawl() {
+        crawl(config.getContentFolder());
+
+        LOGGER.info("Content detected:");
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            long count = db.getDocumentCount(docType);
+            if (count > 0) {
+                LOGGER.info("Parsed {} files of type: {}", count, docType);
+            }
+        }
+
+    }
     /**
      * Crawl all files and folders looking for content.
      *
      * @param path Folder to start from
      */
-    public void crawl(File path) {
+    private void crawl(File path) {
         File[] contents = path.listFiles(FileUtil.getFileFilter());
         if (contents != null) {
             Arrays.sort(contents);
@@ -133,16 +141,17 @@ public class Crawler {
     }
 
     private String buildURI(final File sourceFile) {
-        String uri = FileUtil.asPath(sourceFile.getPath())
-                .replace(FileUtil.asPath(contentPath), "")
-                // On windows we have to replace the backslash
-                .replace(File.separator, "/");
+    	String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getContentFolder()), "");
 
-        if (useNoExtensionUri(uri)) {
-            // convert URI from xxx.html to xxx/index.html
-            uri = createNoExtensionUri(uri);
+    	boolean noExtensionUri = config.getUriWithoutExtension();
+    	String noExtensionUriPrefix = config.getPrefixForUriWithoutExtension();
+    	if (noExtensionUri && noExtensionUriPrefix != null && noExtensionUriPrefix.length() > 0) {
+        	// convert URI from xxx.html to xxx/index.html
+    		if (uri.startsWith(noExtensionUriPrefix)) {
+    			uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getOutputExtension();
+    		}
         } else {
-            uri = createUri(uri);
+            uri = uri.substring(0, uri.lastIndexOf(".")) + config.getOutputExtension();
         }
 
         // strip off leading / to enable generating non-root based sites
@@ -153,7 +162,7 @@ public class Crawler {
     }
 
     private String createUri(String uri) {
-        return uri.substring(0, uri.lastIndexOf('.')) + config.getString(Keys.OUTPUT_EXTENSION);
+        return uri.substring(0, uri.lastIndexOf(".")) + config.getOutputExtension();
     }
 
     private String createNoExtensionUri(String uri) {
@@ -161,12 +170,12 @@ public class Crawler {
                 + FilenameUtils.getPath(uri)
                 + FilenameUtils.getBaseName(uri)
                 + "/index"
-                + config.getString(Keys.OUTPUT_EXTENSION);
+                + config.getOutputExtension();
     }
 
     private boolean useNoExtensionUri(String uri) {
-        boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
-        String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
+        boolean noExtensionUri = config.getUriWithoutExtension();
+        String noExtensionUriPrefix = config.getPrefixForUriWithoutExtension();
 
         return noExtensionUri
                 && (noExtensionUriPrefix != null)
@@ -198,13 +207,13 @@ public class Crawler {
                 }
             }
 
-            if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
-                fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
+            if (config.getUriWithoutExtension()) {
+            	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
-            
-            
+
+
             // Prevent image source url's from breaking
-            HtmlUtil.fixImageSourceUrls(fileContents,config);
+            HtmlUtil.fixImageSourceUrls(fileContents, config);
 
             ODocument doc = new ODocument(documentType);
             doc.fromMap(fileContents);
@@ -217,7 +226,7 @@ public class Crawler {
     }
 
     public String getPathToRoot(File sourceFile) {
-    	File rootPath = new File(contentPath);
+    	File rootPath = config.getContentFolder();
     	File parentPath = sourceFile.getParentFile();
     	int parentCount = 0;
     	while (!parentPath.equals(rootPath)) {
@@ -228,7 +237,7 @@ public class Crawler {
     	for (int i = 0; i < parentCount; i++) {
     		sb.append("../");
     	}
-    	if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
+    	if (config.getUriWithoutExtension()) {
         	sb.append("../");
         }
     	return sb.toString();

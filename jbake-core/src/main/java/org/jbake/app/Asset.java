@@ -1,7 +1,7 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,24 +23,24 @@ public class Asset {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
 
-    private final File source;
-	private final File destination;
-	private CompositeConfiguration config;
+	private JBakeConfiguration config;
 	private final List<Throwable> errors = new LinkedList<Throwable>();
-	private final boolean ignoreHidden;
 
 	/**
 	 * Creates an instance of Asset.
 	 *
-	 * @param source			Source file for the asset
-	 * @param destination 		Destination (target) directory for asset file
-	 * @param config			Project configuration
+	 * @param config The project configuration. @see{{@link JBakeConfiguration}}
 	 */
-	public Asset(File source, File destination, CompositeConfiguration config) {
-		this.source = source;
-		this.destination = destination;
+	public Asset(JBakeConfiguration config) {
 		this.config = config;
-		this.ignoreHidden = config.getBoolean(ConfigUtil.Keys.ASSET_IGNORE_HIDDEN, false);
+	}
+
+	/**
+	 * Copy all files from assets folder to destination folder
+	 * read from configuration
+	 */
+	public void copy() {
+		copy( config.getAssetFolder() );
 	}
 
 	/**
@@ -52,10 +52,10 @@ public class Asset {
 		FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return (!ignoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file));
+                return (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file));
             }
         };
-        copy(path, destination, filter);
+        copy(path, config.getDestinationFolder(), filter);
     }
 
     private void copy(File sourceFolder, File targetFolder, final FileFilter filter) {
@@ -81,7 +81,7 @@ public class Asset {
     }
     
     public void copyAssetsFromContent(File path){
-    		copy(path, destination, FileUtil.getNotContentFileFilter());
+    		copy(path, config.getDestinationFolder(), FileUtil.getNotContentFileFilter());
     }
     
 

@@ -1,19 +1,17 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * Launcher for JBake.
@@ -47,6 +45,7 @@ public class Main {
 	private Baker baker;
 	private JettyServer jettyServer;
 	private BakeWatcher watcher;
+	private ConfigUtil configUtil;
 
 	/**
 	 * Default constructor.
@@ -66,6 +65,7 @@ public class Main {
 		this.baker = baker;
 		this.jettyServer = jetty;
 		this.watcher = watcher;
+		this.configUtil = new ConfigUtil();
 	}
 
 	protected void run(String[] args) {
@@ -73,19 +73,23 @@ public class Main {
 		SLF4JBridgeHandler.install();
 		LaunchOptions res = parseArguments( args );
 
-		final CompositeConfiguration config;
+		final DefaultJBakeConfiguration config;
 		try {
-			config = ConfigUtil.load( res.getSource(), res.isRunServer() );
+			config = (DefaultJBakeConfiguration) getConfigUtil().loadConfig( res.getSource() );
+			if ( res.getDestination() != null ) {
+				config.setDestinationFolder(res.getDestination());
+			}
+			config.setClearCache(res.isClearCache());
 		} catch( final ConfigurationException e ) {
 			throw new JBakeException( "Configuration error: " + e.getMessage(), e );
 		}
 		run(res, config);
 	}
 
-	protected void run(LaunchOptions res, CompositeConfiguration config) {
-		System.out.println("JBake " + config.getString(Keys.VERSION) + " (" + config.getString(Keys.BUILD_TIMESTAMP) + ") [http://jbake.org]");
+	protected void run(LaunchOptions res, JBakeConfiguration config) {
+		System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]");
 		System.out.println();
-		
+
 		if (res.isHelpNeeded()) {
 			printUsage(res);
 			// Help was requested, so we are done here
@@ -93,41 +97,39 @@ public class Main {
 		}
 
 		if (res.isBake()) {
-			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
-			baker.bake(res, config);
+			baker.bake(config);
 		}
 
 		if (res.isInit()) {
-			initStructure(config, res.getTemplate(), res.getSourceValue());
+			initStructure(res.getTemplate(), config);
 		}
-		
+
 		if (res.isRunServer()) {
-			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
-			watcher.start(res, config);
+			watcher.start(config);
 			// TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
 			if (res.isBake()) {
 				// bake and server commands have been run together
 				if (res.getDestination() != null) {
 					// use the destination provided via the commandline
-					runServer( res.getDestination().getPath(), config.getString( Keys.SERVER_PORT ));
+					runServer( res.getDestination(), config.getServerPort());
 				} else if (!res.getSource().getPath().equals(".")) {
 					// use the source folder provided via the commandline
-					runServer( res.getSource().getPath(), config.getString( Keys.SERVER_PORT ));
+					runServer( res.getSource(), config.getServerPort());
 				} else {
 					// use the default DESTINATION_FOLDER value
-					runServer(config.getString( Keys.DESTINATION_FOLDER ), config.getString(Keys.SERVER_PORT));
+					runServer(config.getDestinationFolder(), config.getServerPort());
 				}
 			} else {
 				// server command run on it's own
 				if (!res.getSource().getPath().equals(".")) {
-					runServer( res.getSource().getPath(), config.getString( Keys.SERVER_PORT ));
+					runServer( res.getSource(), config.getServerPort());
 				} else {
 					// use the default destination folder
-					runServer( config.getString( Keys.DESTINATION_FOLDER ), config.getString( Keys.SERVER_PORT ) );
+					runServer( config.getDestinationFolder(), config.getServerPort());
 				}
 			}
 		}
-		
+
 	}
 	private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();
@@ -155,17 +157,17 @@ public class Main {
 		parser.printUsage(System.out);
 	}
 
-	private void runServer(String path, String port) {
-		jettyServer.run(path, port);
+	private void runServer(File path, int port) {
+		jettyServer.run(path.getPath(), String.valueOf(port));
 	}
 
-	private void initStructure(CompositeConfiguration config, String type, String source) {
+	private void initStructure(String type, JBakeConfiguration config) {
         Init init = new Init(config);
 		try {
             File templateFolder = FileUtil.getRunningLocation();
             File outputFolder;
-            if(source != null){
-                outputFolder = new File(source);
+            if(config.getSourceFolder() != null){
+                outputFolder = config.getSourceFolder();
             } else{
                 outputFolder = new File(".");
             }
@@ -177,4 +179,11 @@ public class Main {
 		}
 	}
 
+	public ConfigUtil getConfigUtil() {
+		return configUtil;
+	}
+
+	public void setConfigUtil(ConfigUtil configUtil) {
+		this.configUtil = configUtil;
+	}
 }

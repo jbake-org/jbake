@@ -1,13 +1,11 @@
 package org.jbake.render;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
-import org.jbake.render.support.MockCompositeConfiguration;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -18,12 +16,13 @@ public class FeedRendererTest {
     public void returnsZeroWhenConfigDoesNotRenderFeeds() throws RenderingException {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderFeed()).thenReturn(false);
+
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
-        int renderResponse = renderer.render(mockRenderer, contentStore,
-                new File("fake"), new File("fake"), compositeConfiguration);
+        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
         assertThat(renderResponse).isEqualTo(0);
     }
@@ -32,12 +31,13 @@ public class FeedRendererTest {
     public void doesNotRenderWhenConfigDoesNotRenderFeeds() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(false);
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderFeed()).thenReturn(false);
+
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore,
-                new File("fake"), new File("fake"), compositeConfiguration);
+        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderFeed(anyString());
     }
@@ -46,43 +46,47 @@ public class FeedRendererTest {
     public void returnsOneWhenConfigRendersFeeds() throws RenderingException {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderFeed()).thenReturn(true);
+
         ContentStore contentStore = mock(ContentStore.class);
 
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore,
-                new File("fake"), new File("fake"), compositeConfiguration);
+        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
         assertThat(renderResponse).isEqualTo(1);
     }
 
     @Test
-    public void doesRenderWhenConfigDoesNotRenderFeeds() throws Exception {
+    public void doesRenderWhenConfigDoesRenderFeeds() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderFeed()).thenReturn(true);
+        when(configuration.getFeedFileName()).thenReturn("mockfeedfile.xml");
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore,
-                new File("fake"), new File("fake"), compositeConfiguration);
+        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
-        verify(mockRenderer, times(1)).renderFeed("random string");
+        verify(mockRenderer, times(1)).renderFeed(anyString());
     }
 
     @Test(expected = RenderingException.class)
     public void propogatesRenderingException() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderFeed()).thenReturn(true);
+        when(configuration.getFeedFileName()).thenReturn("mockfeedfile.xml");
+
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
         doThrow(new Exception()).when(mockRenderer).renderFeed(anyString());
 
-        int renderResponse = renderer.render(mockRenderer, contentStore,
-                new File("fake"), new File("fake"), compositeConfiguration);
+        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderFeed("random string");
     }

@@ -45,6 +45,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.File;
+import java.util.*;
 
 /**
  * @author jdlee
@@ -52,11 +54,29 @@ import java.util.Set;
 public class ContentStore {
 
     private final Logger logger = LoggerFactory.getLogger(ContentStore.class);
+    private final String type;
+    private final String name;
+
     private ODatabaseDocumentTx db;
+
     private long start = -1;
     private long limit = -1;
 
+    public ODatabaseDocumentTx getDb() {
+        return db;
+    }
+
+    public void setDb(ODatabaseDocumentTx db) {
+        this.db = db;
+    }
+
+
     public ContentStore(final String type, String name) {
+        this.type = type;
+        this.name = name;
+    }
+
+    public void startup() {
         startupIfEnginesAreMissing();
         OPartitionedDatabasePool pool = new OPartitionedDatabasePoolFactory().get(type + ":" + name, "admin", "admin");
         pool.setAutoCreate(true);
@@ -295,4 +315,39 @@ public class ContentStore {
         signatures.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
     }
+
+    public void clearCacheIfNeeded(boolean needed, File templateFolder) {
+
+        if (!needed) {
+            DocumentList docs = this.getSignaturesForTemplates();
+            String currentTemplatesSignature;
+            try {
+                currentTemplatesSignature = FileUtil.sha1(templateFolder);
+            } catch (Exception e) {
+                currentTemplatesSignature = "";
+            }
+            if (!docs.isEmpty()) {
+                String sha1 = (String) docs.get(0).get(String.valueOf(DocumentAttributes.SHA1));
+                needed = !sha1.equals(currentTemplatesSignature);
+                if (needed) {
+                    this.updateSignatures(currentTemplatesSignature);
+                }
+            } else {
+                // first computation of templates signature
+                this.insertSignature(currentTemplatesSignature);
+                needed = true;
+            }
+        }
+        if (needed) {
+            for (String docType : DocumentTypes.getDocumentTypes()) {
+                try {
+                    this.deleteAllByDocType(docType);
+                } catch (Exception e) {
+                    // maybe a non existing document type
+                }
+            }
+            this.updateSchema();
+        }
+    }
+
 }

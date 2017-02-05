@@ -1,14 +1,13 @@
 package org.jbake.util;
 
-import java.util.Map;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.Map;
 
 /**
  * 
@@ -24,13 +23,15 @@ public class HtmlUtil {
 	 * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
 	 * 
 	 * @param fileContents	Map representing file contents
-	 * @param config		Configuration object
+	 * @param configuration Configuration object
 	 */
-    public static void fixImageSourceUrls(Map<String, Object> fileContents, CompositeConfiguration config){
+
+	//TODO: use JBakeConfiguration
+    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration){
     	
     	String htmlContent = fileContents.get(Attributes.BODY).toString();
         
-    	String siteHost = config.getString(Keys.SITE_HOST);
+    	String siteHost = (String) configuration.get("site.host");
     	
     	String uri = fileContents.get(Attributes.URI).toString();
     	

@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 
+import java.util.List;
+
 /**
  * Renders documents in the Markdown format.
  *
@@ -22,12 +24,11 @@ public class MarkdownEngine extends MarkupEngine {
 
     @Override
     public void processBody(final ParserContext context) {
-        String[] mdExts = context.getConfig().getStringArray("markdown.extensions");
+        List<String> mdExts = context.getConfig().getMarkdownExtensions();
 
         int extensions = Extensions.NONE;
-        if (mdExts.length > 0) {
-            for (int index = 0; index < mdExts.length; index++) {
-                String ext = mdExts[index];
+        if (mdExts.size() > 0) {
+            for (String ext : mdExts) {
                 if (ext.startsWith("-")) {
 		    ext = ext.substring(1);
                     extensions=removeExtension(extensions, extensionFor(ext));

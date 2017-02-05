@@ -5,10 +5,9 @@ import groovy.lang.Writable;
 import groovy.text.Template;
 import groovy.text.markup.MarkupTemplateEngine;
 import groovy.text.markup.TemplateConfiguration;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
+import org.jbake.app.configuration.JBakeConfiguration;
 
-import java.io.File;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +23,8 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     private TemplateConfiguration templateConfiguration;
     private MarkupTemplateEngine templateEngine;
 
-    public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
+    public GroovyMarkupTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        super(config, db);
         setupTemplateConfiguration();
         initializeTemplateEngine();
     }
@@ -39,7 +38,7 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     }
 
     private void initializeTemplateEngine() {
-        templateEngine = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(),templatesPath,templateConfiguration);
+        templateEngine = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(), config.getTemplateFolder(), templateConfiguration);
     }
 
     @Override

@@ -7,23 +7,15 @@ import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import groovy.text.XmlTemplateEngine;
-
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
-import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import org.jbake.app.ContentStore;
 
 /**
  * Renders documents using a Groovy template engine. Depending on the file extension of the template, the template
@@ -36,8 +28,8 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
 
     private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
 
-    public GroovyTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
+    public GroovyTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        super(config, db);
     }
 
     @Override
@@ -53,10 +45,10 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
 
     private Template findTemplate(final String templateName) throws SAXException, ParserConfigurationException, ClassNotFoundException, IOException {
         TemplateEngine ste = templateName.endsWith(".gxml") ? new XmlTemplateEngine() : new SimpleTemplateEngine();
-        File sourceTemplate = new File(templatesPath, templateName);
+        File sourceTemplate = new File(config.getTemplateFolder(), templateName);
         Template template = cachedTemplates.get(templateName);
         if (template == null) {
-            template = ste.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getString(Keys.TEMPLATE_ENCODING)));
+            template = ste.createTemplate(new InputStreamReader(new BufferedInputStream(new FileInputStream(sourceTemplate)), config.getTemplateEncoding()));
             cachedTemplates.put(templateName, template);
         }
         return template;

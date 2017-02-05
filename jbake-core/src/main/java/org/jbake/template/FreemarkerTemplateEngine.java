@@ -4,12 +4,10 @@ package org.jbake.template;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.*;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
+import org.jbake.app.configuration.JBakeConfiguration;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -25,16 +23,16 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
     private Configuration templateCfg;
 
-    public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
-        createTemplateConfiguration(config, templatesPath);
+    public FreemarkerTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        super(config, db);
+        createTemplateConfiguration();
     }
 
-    private void createTemplateConfiguration(final CompositeConfiguration config, final File templatesPath) {
+    private void createTemplateConfiguration() {
         templateCfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-        templateCfg.setDefaultEncoding(config.getString(Keys.RENDER_ENCODING));
+        templateCfg.setDefaultEncoding(config.getRenderEncoding());
         try {
-            templateCfg.setDirectoryForTemplateLoading(templatesPath);
+            templateCfg.setDirectoryForTemplateLoading(config.getTemplateFolder());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,7 +67,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
         	try {
-        		
+
         		// GIT Issue#357: Accessing db in freemarker template throws exception
         		// When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
         		// All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
@@ -77,9 +75,9 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         			BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
     				BeansWrapper bw = bwb.build();
     				return bw.wrap(db);
-				} 
-        		
-        		
+				}
+
+
         		return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
 
 					@Override

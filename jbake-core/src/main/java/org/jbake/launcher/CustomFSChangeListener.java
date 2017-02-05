@@ -1,9 +1,9 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileListener;
 import org.jbake.app.Oven;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,11 +11,9 @@ public class CustomFSChangeListener implements FileListener {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(CustomFSChangeListener.class);
 	
-	private LaunchOptions options;
-	private CompositeConfiguration config;
+	private JBakeConfiguration config;
 	
-	public CustomFSChangeListener(LaunchOptions res, CompositeConfiguration config) {
-		this.options = res;
+	public CustomFSChangeListener(JBakeConfiguration config) {
 		this.config = config;
 	}
 
@@ -38,8 +36,7 @@ public class CustomFSChangeListener implements FileListener {
 	}
 
 	private void exec() {
-		final Oven oven = new Oven(options.getSource(), options.getDestination(), config, options.isClearCache());
-		oven.setupPaths();
+		final Oven oven = new Oven(config);
 		oven.bake();
 	}
 	

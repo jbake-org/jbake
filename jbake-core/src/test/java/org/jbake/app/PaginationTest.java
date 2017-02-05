@@ -23,13 +23,18 @@
  */
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.FakeDocumentBuilder;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.model.DocumentTypes;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -42,20 +47,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PaginationTest extends ContentStoreIntegrationTest {
 
-
     @Before
     public void setup() throws Exception {
-        CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
-        Iterator<String> keys = config.getKeys();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            if (key.startsWith("template") && key.endsWith(".file")) {
-                String old = (String) config.getProperty(key);
-                config.setProperty(key, old.substring(0, old.length() - 4) + ".ftl");
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
+
+        for (String docType : DocumentTypes.getDocumentTypes() ) {
+            String fileBaseName = docType;
+            if ( docType.equals("masterindex") ) {
+                fileBaseName = "index";
             }
+            config.setTemplateFileNameForDocType(docType, fileBaseName + ".ftl");
         }
-        config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
-        config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
+
+        config.setPaginateIndex(true);
+        config.setPostsPerPage(1);
+        config.setDatabaseStore("memory");
+        config.setDatabasePath("documents" + System.currentTimeMillis());
     }
 
     @Test

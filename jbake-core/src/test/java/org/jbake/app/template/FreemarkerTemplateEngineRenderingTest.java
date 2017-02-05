@@ -24,7 +24,6 @@
 package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Test;
 
 import java.io.File;
@@ -46,8 +45,8 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
     @Test
     public void renderPaginatedIndex() throws Exception {
-        config.setProperty(Keys.PAGINATE_INDEX, true);
-        config.setProperty(Keys.POSTS_PER_PAGE, 1);
+        config.setPaginateIndex(true);
+        config.setPostsPerPage(1);
 
         outputStrings.put("index", Arrays.asList(
                 "\">Previous</a>",
@@ -67,8 +66,8 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
     @Test
     public void shouldFallbackToRenderSingleIndexIfNoPostArePresent() throws Exception {
-        config.setProperty(Keys.PAGINATE_INDEX, true);
-        config.setProperty(Keys.POSTS_PER_PAGE, 1);
+        config.setPaginateIndex(true);
+        config.setPostsPerPage(1);
 
         db.deleteAllByDocType("post");
 

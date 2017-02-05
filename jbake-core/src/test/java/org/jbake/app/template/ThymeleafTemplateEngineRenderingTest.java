@@ -23,8 +23,6 @@
  */
 package org.jbake.app.template;
 
-import java.util.Arrays;
-
 /**
  *
  * @author jdlee

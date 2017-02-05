@@ -1,11 +1,10 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.LazyContextVariable;
@@ -42,8 +41,8 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
     private String templateMode;
 
-    public ThymeleafTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
+    public ThymeleafTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        super(config, db);
     }
 
     private void initializeTemplateEngine(String mode) {
@@ -52,8 +51,8 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         }
         templateMode = mode;
         FileTemplateResolver templateResolver = new FileTemplateResolver();
-        templateResolver.setPrefix(templatesPath.getAbsolutePath() + File.separatorChar);
-        templateResolver.setCharacterEncoding(config.getString(Keys.TEMPLATE_ENCODING));
+        templateResolver.setPrefix(config.getTemplateFolder().getAbsolutePath() + File.separatorChar);
+        templateResolver.setCharacterEncoding(config.getTemplateEncoding());
         templateResolver.setTemplateMode(mode);
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
@@ -61,7 +60,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
     @Override
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
-        String localeString = config.getString(Keys.THYMELEAF_LOCALE);
+        String localeString = config.getThymeleafLocale();
         Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
         Context context = new Context(locale, wrap(model));
         lock.lock();

@@ -1,8 +1,7 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.jbake.util.PagingHelper;
 import org.slf4j.Logger;
@@ -71,7 +70,7 @@ public class Renderer {
         private final Map<String, Object> model;
 
         public ModelRenderingConfig(String fileName, Map<String, Object> model, String templateType) {
-            super(new File(destination.getPath() + File.separator + fileName), fileName, findTemplateName(templateType));
+            super(new File(config.getDestinationFolder(), fileName), fileName, findTemplateName(templateType));
             this.model = model;
         }
 
@@ -96,7 +95,7 @@ public class Renderer {
         }
 
         public DefaultRenderingConfig(String filename, String allInOneName) {
-            super(new File(destination.getPath() + File.separator + filename), allInOneName, findTemplateName(allInOneName));
+            super(new File(config.getDestinationFolder(), File.separator + filename), allInOneName, findTemplateName(allInOneName));
             this.content = buildSimpleModel(allInOneName);
         }
 
@@ -106,7 +105,7 @@ public class Renderer {
          * @param allInOneName
          */
         public DefaultRenderingConfig(String allInOneName) {
-            this(new File(destination.getPath() + File.separator + allInOneName + config.getString(Keys.OUTPUT_EXTENSION)),
+            this(new File(config.getDestinationFolder().getPath() + File.separator + allInOneName + config.getOutputExtension()),
                     allInOneName);
         }
 
@@ -116,7 +115,7 @@ public class Renderer {
             model.put("renderer", renderingEngine);
             model.put("content", content);
 
-            if ( config.containsKey(Keys.PAGINATE_INDEX) && config.getBoolean(Keys.PAGINATE_INDEX) ) {
+            if ( config.getPaginateIndex() ) {
                 model.put("numberOfPages", 0);
                 model.put("currentPageNumber", 0);
                 model.put("previousFileName", "");
@@ -132,8 +131,7 @@ public class Renderer {
 
     // TODO: should all content be made available to all templates via this class??
 
-    private final File destination;
-    private final CompositeConfiguration config;
+    private final JBakeConfiguration config;
     private final DelegatingTemplateEngine renderingEngine;
     private final ContentStore db;
 
@@ -141,36 +139,30 @@ public class Renderer {
      * Creates a new instance of Renderer with supplied references to folders.
      *
      * @param db            The database holding the content
-     * @param destination   The destination folder
-     * @param templatesPath The templates folder
-     * @param config        Project configuration
+     * @param config				Project configuration
      */
-    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
-        this.destination = destination;
+    public Renderer(ContentStore db, JBakeConfiguration config) {
         this.config = config;
-        this.renderingEngine = new DelegatingTemplateEngine(config, db, destination, templatesPath);
+        this.renderingEngine = new DelegatingTemplateEngine(db, config);
         this.db = db;
     }
-    
+
     /**
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
-     * @param db                The database holding the content
-     * @param destination       The destination folder
-     * @param templatesPath     The templates folder
-     * @param config            Project configuration
-     * @param renderingEngine   The instance of DelegatingTemplateEngine to use
+     * @param db            The database holding the content
+     * @param config
+     * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
-    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config, DelegatingTemplateEngine renderingEngine) {
-        this.destination = destination;
+    public Renderer(ContentStore db, JBakeConfiguration config, DelegatingTemplateEngine renderingEngine) {
         this.config = config;
         this.renderingEngine = renderingEngine;
         this.db = db;
     }
 
     private String findTemplateName(String docType) {
-        String templateKey = "template." + docType + ".file";
-        String returned = config.getString(templateKey);
+
+        String returned = config.getTemplateFileByDocType(docType).getName();
         return returned;
     }
 
@@ -182,27 +174,28 @@ public class Renderer {
      */
     public void render(Map<String, Object> content) throws Exception {
         String docType = (String) content.get(Crawler.Attributes.TYPE);
-        String outputFilename = destination.getPath() + File.separatorChar + ((String)content.get(Attributes.URI)).replace("/",File.separator);
+        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + ((String)content.get(Attributes.URI)).replace("/",File.separator);
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'));
         }
 
         // delete existing versions if they exist in case status has changed either way
-        File draftFile = new File(outputFilename + config.getString(Keys.DRAFT_SUFFIX) + FileUtil.findExtension(config, docType));
+        String outputExtension = config.getOutputExtensionByDocType(docType);
+        File draftFile = new File(outputFilename, config.getDraftSuffix() + outputExtension);
         if (draftFile.exists()) {
             draftFile.delete();
         }
 
-        File publishedFile = new File(outputFilename + FileUtil.findExtension(config, docType));
+        File publishedFile = new File(outputFilename + outputExtension);
         if (publishedFile.exists()) {
             publishedFile.delete();
         }
 
         if (content.get(Crawler.Attributes.STATUS).equals(Crawler.Attributes.Status.DRAFT)) {
-            outputFilename = outputFilename + config.getString(Keys.DRAFT_SUFFIX);
+            outputFilename = outputFilename + config.getDraftSuffix();
         }
 
-        File outputFile = new File(outputFilename + FileUtil.findExtension(config, docType));
+        File outputFile = new File(outputFilename + outputExtension);
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("content", content);
         model.put("renderer", renderingEngine);
@@ -224,7 +217,7 @@ public class Renderer {
             file.createNewFile();
         }
 
-        return new OutputStreamWriter(new FileOutputStream(file), config.getString(ConfigUtil.Keys.RENDER_ENCODING));
+        return new OutputStreamWriter(new FileOutputStream(file), config.getRenderEncoding());
     }
 
     private void render(RenderingConfig renderConfig) throws Exception {
@@ -253,7 +246,7 @@ public class Renderer {
 
     public void renderIndexPaging(String indexFile) throws Exception {
         long totalPosts = db.getPublishedCount("post");
-        int postsPerPage = config.getInt(Keys.POSTS_PER_PAGE, 5);
+        int postsPerPage = config.getPostsPerPage();
 
         if (totalPosts == 0) {
             //paging makes no sense. render single index file instead
@@ -349,7 +342,7 @@ public class Renderer {
 				map.put(Attributes.ROOTPATH, "../");
 				model.put("content", map);
 
-				File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
+				File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
 				render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
 				renderedCount++;
@@ -358,7 +351,7 @@ public class Renderer {
 			}
 		}
 		
-		if (config.getBoolean(Keys.RENDER_TAGS_INDEX)) {
+		if (config.getRenderTagsIndex()) {
 			try{
 				// Add an index file at root folder of tags.
 				// This will prevent directory listing and also provide an option to
@@ -369,7 +362,7 @@ public class Renderer {
 				map.put(Attributes.ROOTPATH, "../");
 				model.put("content", map);
 	
-				File path = new File(destination.getPath() + File.separator + tagPath + File.separator + "index" + config.getString(Keys.OUTPUT_EXTENSION));
+				File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
 				render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
 				renderedCount++;
 			} catch(Exception e){

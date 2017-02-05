@@ -1,6 +1,6 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.Configuration;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.parser.Engines;
 import org.jbake.parser.ParserEngine;
 import org.slf4j.Logger;
@@ -17,25 +17,22 @@ import java.util.Map;
 public class Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
-    private Configuration config;
-    private String contentPath;
+    private JBakeConfiguration config;
 
     /**
      * Creates a new instance of Parser.
      *
-     * @param config         Project configuration
-     * @param contentPath    Content location
+     * @param config Project configuration
      */
-    public Parser(Configuration config, String contentPath) {
+    public Parser(JBakeConfiguration config) {
         this.config = config;
-        this.contentPath = contentPath;
     }
 
     /**
      * Process the file by parsing the contents.
      *
      * @param    file File input for parsing
-     * @return   The contents of the file as a @{@link Map}
+     * @return				The contents of the file
      */
     public Map<String, Object> processFile(File file) {
     	ParserEngine engine = Engines.get(FileUtil.fileExt(file));
@@ -44,6 +41,6 @@ public class Parser {
     		return null;
     	}
     	
-    	return engine.parse(config, file, contentPath);
+    	return engine.parse(config, file);
     }
 }

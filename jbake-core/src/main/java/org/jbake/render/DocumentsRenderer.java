@@ -1,29 +1,27 @@
 package org.jbake.render;
 
-import java.io.File;
+import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.DocumentList;
+import org.jbake.app.Renderer;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentTypes;
+import org.jbake.template.RenderingException;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler.Attributes;
-import org.jbake.app.DocumentList;
-import org.jbake.app.Renderer;
-import org.jbake.model.DocumentTypes;
-import org.jbake.template.RenderingException;
-
 public class DocumentsRenderer implements RenderingTool {
 
-	@Override
-	public int render(Renderer renderer, ContentStore db, File destination, File templatesPath,
-			CompositeConfiguration config) throws RenderingException {
+    @Override
+    public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
 		int renderedCount = 0;
 		final List<String> errors = new LinkedList<String>();
 		for (String docType : DocumentTypes.getDocumentTypes()) {
 			DocumentList documentList = db.getUnrenderedContent(docType);
-			
+
 			if(documentList == null) continue;
 
 			int index = 0;
@@ -35,7 +33,7 @@ public class DocumentsRenderer implements RenderingTool {
 					Map<String, Object> document = documentList.get(index);
 					document.put("nextContent", null);
 					document.put("previousContent", null);
-					
+
 					if (index > 0) {
 						document.put("nextContent", getContentForNav(nextDocument));
 					}
@@ -44,9 +42,9 @@ public class DocumentsRenderer implements RenderingTool {
 						Map<String, Object> tempNext = documentList.get(index + 1);
 						document.put("previousContent", getContentForNav(tempNext));
 					}
-					
+
 					nextDocument = document;
-					
+
 					renderer.render(document);
 					renderedCount++;
 
@@ -56,6 +54,8 @@ public class DocumentsRenderer implements RenderingTool {
 
 				index++;
 			}
+
+			db.markContentAsRendered(docType);
 		}
 		if (!errors.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
@@ -75,7 +75,7 @@ public class DocumentsRenderer implements RenderingTool {
 	 * @return
 	 */
 	private Map<String, Object> getContentForNav(Map<String, Object> document) {
-		Map<String, Object> navDocument = new HashMap<String, Object>();
+		Map<String, Object> navDocument = new HashMap<>();
 		navDocument.put(Attributes.NO_EXTENSION_URI, document.get(Attributes.NO_EXTENSION_URI));
 		navDocument.put(Attributes.URI, document.get(Attributes.URI));
 		navDocument.put(Attributes.TITLE, document.get(Attributes.TITLE));

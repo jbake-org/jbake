@@ -23,15 +23,10 @@
  */
 package org.jbake.app.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.ContentStore;
-import org.jbake.app.ContentStoreIntegrationTest;
-import org.jbake.app.Crawler;
-import org.jbake.app.DBUtil;
-import org.jbake.app.Parser;
-import org.jbake.app.Renderer;
+import org.jbake.app.*;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
@@ -62,12 +57,9 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     protected final String templateDir;
     protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<>();
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-    protected File sourceFolder;
+
     protected File destinationFolder;
     protected File templateFolder;
-    protected CompositeConfiguration config;
     protected Renderer renderer;
     protected Locale currentLocale;
     private Parser parser;
@@ -85,35 +77,39 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
         DocumentTypes.addListener(listener);
 
-        URL sourceUrl = this.getClass().getResource("/fixture");
-
-        sourceFolder = new File(sourceUrl.getFile());
-        if (!sourceFolder.exists()) {
-            throw new Exception("Cannot find sample data structure!");
-        }
-
-        destinationFolder = folder.getRoot();
-
         templateFolder = new File(sourceFolder, templateDir);
         if (!templateFolder.exists()) {
             throw new Exception("Cannot find template folder!");
         }
 
-        config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
-        Iterator<String> keys = config.getKeys();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            if (key.startsWith("template") && key.endsWith(".file")) {
-                String old = (String) config.getProperty(key);
-                config.setProperty(key, old.substring(0, old.length() - 4) + "." + templateExtension);
+        destinationFolder = folder.getRoot();
+        config.setDestinationFolder(destinationFolder);
+        config.setTemplateFolder(templateFolder);
+
+        for (String docType : DocumentTypes.getDocumentTypes() ) {
+            File templateFile = config.getTemplateFileByDocType(docType);
+
+            if (templateFile != null) {
+                String fileName = templateFile.getName();
+                String fileBaseName = fileName.substring(0, fileName.lastIndexOf("."));
+            /*
+            String fileBaseName = docType;
+            if ( docType.equals("masterindex") ) {
+                fileBaseName = "index";
+            }
+            if (docType.equals("tag")) {
+                fileBaseName = "tags";
+            }
+*/
+                config.setTemplateFileNameForDocType(docType, fileBaseName + "." + templateExtension);
             }
         }
-        Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
+        Assert.assertEquals(".html", config.getOutputExtension());
 
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        parser = new Parser(config, sourceFolder.getPath());
-        renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        Crawler crawler = new Crawler(db, config);
+        crawler.crawl();
+        parser = new Parser(config);
+        renderer = new Renderer(db, config);
 
         setupExpectedOutputStrings();
     }
@@ -261,7 +257,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     @Test
     public void renderSitemap() throws Exception {
         DocumentTypes.addDocumentType("paper");
-        DBUtil.updateSchema(db);
+        db.updateSchema();
 
         renderer.renderSitemap("sitemap.xml");
         File outputFile = new File(destinationFolder, "sitemap.xml");
@@ -283,8 +279,8 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     @Test
     public void checkDbTemplateModelIsPopulated() throws Exception {
 
-        config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
-        config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
+        config.setPaginateIndex(true);
+        config.setPostsPerPage(1);
 
         outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
 
