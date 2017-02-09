@@ -11,15 +11,9 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.apache.commons.lang.BooleanUtils.toBooleanObject;
-import static org.apache.commons.lang.math.NumberUtils.isNumber;
-import static org.apache.commons.lang.math.NumberUtils.toInt;
 import static org.asciidoctor.AttributesBuilder.attributes;
 import static org.asciidoctor.OptionsBuilder.options;
 import static org.asciidoctor.SafeMode.UNSAFE;
@@ -42,17 +36,17 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     public AsciidoctorEngine() {
         Class engineClass = Asciidoctor.class;
-        assert engineClass!=null;
+        assert engineClass != null;
     }
 
     private Asciidoctor getEngine(Options options) {
         try {
             lock.readLock().lock();
-            if (engine==null) {
+            if (engine == null) {
                 lock.readLock().unlock();
                 try {
                     lock.writeLock().lock();
-                    if (engine==null) {
+                    if (engine == null) {
                         LOGGER.info("Initializing Asciidoctor engine...");
                         if (options.map().containsKey(OPT_GEM_PATH)) {
                             engine = Asciidoctor.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
@@ -89,13 +83,13 @@ public class AsciidoctorEngine extends MarkupEngine {
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         Map<String, Object> contents = context.getContents();
         if (header.getDocumentTitle() != null) {
-        	contents.put("title", header.getDocumentTitle().getCombined());
+            contents.put("title", header.getDocumentTitle().getCombined());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (String key : attributes.keySet()) {
             if (key.startsWith("jbake-")) {
                 Object val = attributes.get(key);
-                if (val!=null) {
+                if (val != null) {
                     String pKey = key.substring(6);
                     contents.put(pKey, val);
                 }
@@ -106,7 +100,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                     DateFormat df = new SimpleDateFormat(context.getConfig().getDateFormat());
                     Date date = null;
                     try {
-                        date = df.parse((String)attributes.get(key));
+                        date = df.parse((String) attributes.get(key));
                         contents.put("date", date);
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -123,6 +117,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
     }
 
+    // TODO: write tests with options and attributes
     @Override
     public void processBody(ParserContext context) {
         StringBuilder body = new StringBuilder(context.getBody().length());
@@ -144,10 +139,10 @@ public class AsciidoctorEngine extends MarkupEngine {
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         JBakeConfiguration config = context.getConfig();
         final AttributesBuilder attributes = attributes((String[]) config.getAsciidoctorAttributes().toArray());
-        if (config.getExportAsciidoctorAttributes() ) {
+        if (config.getExportAsciidoctorAttributes()) {
             final String prefix = config.getAttributesExportPrefixForAsciidoctor();
 
-            for (final Iterator<String> it = config.getKeys(); it.hasNext();) {
+            for (final Iterator<String> it = config.getKeys(); it.hasNext(); ) {
                 final String key = it.next();
                 if (!key.startsWith("asciidoctor")) {
                     attributes.attribute(prefix + key.replace(".", "_"), config.get(key));
@@ -155,31 +150,35 @@ public class AsciidoctorEngine extends MarkupEngine {
             }
         }
 
-        final Map<String,Object> optionsSubset = config.getAsciidoctorOptions();
+        final List<String> optionsSubset = config.getAsciidoctorOptionKeys();
         final Options options = options().attributes(attributes.get()).get();
-        for (final String optionKey : optionsSubset.keySet()) {
+        for (final String optionKey : optionsSubset) {
+
+            Object optionValue = config.getAsciidoctorOption(optionKey);
             if (optionKey.equals(Options.TEMPLATE_DIRS)) {
-                String[] dirs = (String[]) ((List<String>) optionsSubset.get(optionKey)).toArray();
-            	options.setTemplateDirs(dirs);
+                List<String> dirs = getAsList(optionValue);
+                if (!dirs.isEmpty()) {
+                    options.setTemplateDirs(String.valueOf(dirs));
+                }
             } else {
-            	options.setOption(optionKey,  guessTypeByContent((String) optionsSubset.get(optionKey)));
+                options.setOption(optionKey, optionValue);
             }
+
         }
         options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());
         options.setSafe(UNSAFE);
         return options;
     }
 
-    /**
-     * Guess the type by content it has.
-     * @param value
-     * @return boolean,integer of string as fallback
-     */
-    private static Object guessTypeByContent(String value){
-        if (toBooleanObject(value)!=null)
-            return toBooleanObject(value);
-        if(isNumber(value))
-            return toInt(value);
-        return value;
+    private List<String> getAsList(Object asciidoctorOption) {
+        List<String> values = new ArrayList<String>();
+
+        if (asciidoctorOption instanceof List) {
+            values.addAll((List<String>) asciidoctorOption);
+        } else if (asciidoctorOption instanceof String) {
+            values.add(String.valueOf(asciidoctorOption));
+        }
+        return values;
     }
+
 }

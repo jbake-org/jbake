@@ -5,7 +5,6 @@ import org.apache.commons.configuration.Configuration;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public interface JBakeConfiguration {
 
@@ -329,26 +328,18 @@ public interface JBakeConfiguration {
     Iterator<String> getKeys();
 
     /**
-     * Get a map of asciidoctor options
+     * Get a list of asciidoctor options
      *
-     * <code>
-     *      asciidoctor.option.requires=asciidoctor-diagram
-     *      asciidcotor.option.template_dirs=src/asciidoc/templates,src/asciidoc/templates2
-     * </code>
-     *
-     * results to a map like
-     *
-     * <code>
-     *      Map<String, Object> options = new HashMap<String, Object>() {
-     *          {
-     *              put("requires", "asciidoctor-diagram");
-     *              put("template_dirs", Arrays.asList("src/asciidoc/templates","src/asciidoc/templates2") );
-     *          }
-     *      };
-     * </code>
-     * @return map of asciidoctor options
+     * @return list of asciidoctor options
      */
-    Map<String,Object> getAsciidoctorOptions();
+    List<String> getAsciidoctorOptionKeys();
+
+    /**
+     * Get an asciidoctor option by it's key
+     * @param optionKey an option key
+     * @return the value of the option key
+     */
+    Object getAsciidoctorOption(String optionKey);
 
     String HEADER_SEPARATOR = "header.separator";
     String getHeaderSeparator();

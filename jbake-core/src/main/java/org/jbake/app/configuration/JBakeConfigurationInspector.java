@@ -1,6 +1,7 @@
-package org.jbake.app;
+package org.jbake.app.configuration;
 
-import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.FileUtil;
+import org.jbake.app.JBakeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

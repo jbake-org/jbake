@@ -1,9 +1,6 @@
-package org.jbake.app;
+package org.jbake.app.configuration;
 
-import org.assertj.core.data.MapEntry;
-import org.jbake.app.configuration.ConfigUtil;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.JBakeException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,9 +10,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -171,20 +166,50 @@ public class ConfigUtilTest {
     }
 
     @Test
-    public void should_return_a_map_of_asciidoctor_options() throws Exception {
+    public void should_return_a_list_of_asciidoctor_options_keys() throws Exception {
         File sourceFolder = new File(this.getClass().getResource("/").getFile());
-        List<String> values = Arrays.asList("src/template1","src/template2");
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
 
-        Map<String,Object> options = config.getAsciidoctorOptions();
+        List<String> options = config.getAsciidoctorOptionKeys();
 
-        assertThat(options).contains(
-                MapEntry.entry("requires","asciidoctor-diagram"),
-                MapEntry.entry("template_dirs", values)
-        );
+        assertThat(options).contains("requires","template_dirs");
+    }
 
+    @Test
+    public void should_return_an_asciidoctor_option() throws Exception {
+        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
+        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
+
+        Object option = config.getAsciidoctorOption("requires");
+
+        assertThat(String.valueOf(option)).contains("asciidoctor-diagram");
+    }
+
+    @Test
+    public void should_return_an_asciidoctor_option_with_a_list_value() throws Exception {
+        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
+        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
+
+        Object option = config.getAsciidoctorOption("template_dirs");
+
+        assertThat(option instanceof List);
+        assertThat((List<String>)option).contains("src/template1","src/template2");
+    }
+
+    @Test
+    public void should_return_empty_string_if_option_not_available() throws Exception {
+        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+
+        Object option = config.getAsciidoctorOption("template_dirs");
+
+        assertThat(String.valueOf(option)).isEmpty();
     }
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {

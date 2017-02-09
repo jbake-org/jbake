@@ -5,7 +5,10 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -306,17 +309,16 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
-    public Map<String, Object> getAsciidoctorOptions() {
-        Map<String, Object> options = new HashMap<String, Object>();
-
+    public List<String> getAsciidoctorOptionKeys() {
+        List<String> options = new ArrayList<String>();
         Configuration subConfig = configuration.subset(ASCIIDOCTOR_OPTION);
 
-        for (Iterator<String> iterator = subConfig.getKeys(); iterator.hasNext();) {
+        Iterator<String> iterator = subConfig.getKeys();
+        while ( iterator.hasNext() ) {
             String key = iterator.next();
-            if (!key.isEmpty()) {
-                options.put(key, subConfig.getProperty(key));
-            }
+            options.add(key);
         }
+
         return options;
     }
 
@@ -327,6 +329,17 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     public void setRenderTagsIndex(boolean enable) {
         configuration.setProperty(RENDER_TAGS_INDEX, enable);
+    }
+
+    public Object getAsciidoctorOption(String optionKey) {
+        Configuration subConfig = configuration.subset(ASCIIDOCTOR_OPTION);
+        Object value = subConfig.getProperty(optionKey);
+
+        if ( value == null ) {
+            //TODO: log warning if option not found
+            return "";
+        }
+        return value;
     }
 
     public void setSourceFolder(File sourceFolder) {

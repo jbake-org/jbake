@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationInspector;
 
 /**
  * A factory to create a {@link Utensils} object

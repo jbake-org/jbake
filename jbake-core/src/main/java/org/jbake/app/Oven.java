@@ -3,6 +3,7 @@ package org.jbake.app;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.app.configuration.JBakeConfigurationInspector;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
 import org.jbake.template.ModelExtractors;
@@ -11,7 +12,6 @@ import org.jbake.template.RenderingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.Configuration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
