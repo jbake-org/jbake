@@ -1,6 +1,9 @@
 package org.jbake.app.configuration;
 
+import ch.qos.logback.classic.spi.LoggingEvent;
 import org.jbake.app.JBakeException;
+import org.jbake.app.LoggingTest;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,11 +16,13 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class ConfigUtilTest {
+
+public class ConfigUtilTest extends LoggingTest {
 
 
     @Rule
@@ -32,7 +37,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_load_a_default_configuration() throws Exception {
-        JBakeConfiguration config = util.loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
+        JBakeConfiguration config = util.loadConfig(getTestResourcesAsSourceFolder());
         assertDefaultPropertiesPresent(config);
     }
 
@@ -68,7 +73,7 @@ public class ConfigUtilTest {
     @Test
     public void should_add_sourcefolder_to_configuration() throws Exception {
 
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         assertThat(config.getSourceFolder()).isEqualTo(sourceFolder);
@@ -94,7 +99,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_destination_folder_from_configuration() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"output");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -103,7 +108,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_asset_folder_from_configuration() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"assets");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -112,7 +117,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_template_folder_from_configuration() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"templates");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -121,7 +126,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_get_template_file_doctype() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         File expectedTemplateFile = new File(sourceFolder, "templates/index.ftl");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -131,10 +136,25 @@ public class ConfigUtilTest {
     }
 
     @Test
+    public void should_log_warning_if_document_type_not_found() throws Exception {
+        File sourceFolder = getTestResourcesAsSourceFolder();
+        JBakeConfiguration config = util.loadConfig(sourceFolder);
+
+        File templateFile = config.getTemplateFileByDocType("none");
+
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+
+        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+
+        assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find configuration key '{}' for document type '{}'");
+
+    }
+
+    @Test
     public void should_get_template_output_extension() throws Exception {
 
         String docType = "masterindex";
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setTemplateExtensionForDocType(docType, ".xhtml");
 
@@ -145,7 +165,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_get_markdown_extensions_as_list() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         List<String> markdownExtensions = config.getMarkdownExtensions();
@@ -156,7 +176,7 @@ public class ConfigUtilTest {
     @Test
     public void should_return_configured_doc_types() throws Exception {
 
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         List<String> docTypes = config.getDocumentTypes();
@@ -167,7 +187,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_a_list_of_asciidoctor_options_keys() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
@@ -179,7 +199,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_an_asciidoctor_option() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
@@ -191,7 +211,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_an_asciidoctor_option_with_a_list_value() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
@@ -204,7 +224,7 @@ public class ConfigUtilTest {
 
     @Test
     public void should_return_empty_string_if_option_not_available() throws Exception {
-        File sourceFolder = new File(this.getClass().getResource("/").getFile());
+        File sourceFolder = getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         Object option = config.getAsciidoctorOption("template_dirs");
@@ -212,8 +232,34 @@ public class ConfigUtilTest {
         assertThat(String.valueOf(option)).isEmpty();
     }
 
-    private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
+    @Test
+    public void should_log_a_warning_if_asciidoc_option_could_not_be_found() throws Exception {
+        File sourceFolder = getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
+        Object option = config.getAsciidoctorOption("template_dirs");
+
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+
+        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+
+        assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find asciidoctor option '{}.{}'");
+    }
+
+    @Test
+    public void should_handle_non_existing_files() throws Exception {
+
+        File source = getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        config.setTemplateFolder(null);
+
+        File templateFolder = config.getTemplateFolder();
+
+        assertThat(templateFolder).isNull();
+    }
+
+    private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
         for(Field field : JBakeConfiguration.class.getFields() ) {
 
             if (field.isAccessible()) {
@@ -222,6 +268,11 @@ public class ConfigUtilTest {
                 assertThat(config.get(key)).isNotNull();
             }
         }
+    }
+
+    //TODO: move to test util. use in all tests...
+    private File getTestResourcesAsSourceFolder() {
+        return new File(this.getClass().getResource("/fixture").getFile());
     }
 
 }

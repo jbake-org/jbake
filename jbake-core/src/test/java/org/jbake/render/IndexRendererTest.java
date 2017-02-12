@@ -43,6 +43,22 @@ public class IndexRendererTest {
     }
 
     @Test
+    public void doesRenderWhenConfigDoesRenderIndices() throws Exception {
+        IndexRenderer renderer = new IndexRenderer();
+
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderIndex()).thenReturn(true);
+        when(configuration.getIndexFileName()).thenReturn("mockindex.html");
+
+        ContentStore contentStore = mock(ContentStore.class);
+        Renderer mockRenderer = mock(Renderer.class);
+
+        renderer.render(mockRenderer, contentStore, configuration);
+
+        verify(mockRenderer, times(1)).renderIndex(anyString());
+    }
+
+    @Test
     public void returnsOneWhenConfigRendersIndices() throws RenderingException {
         IndexRenderer renderer = new IndexRenderer();
 
@@ -57,6 +73,7 @@ public class IndexRendererTest {
 
         assertThat(renderResponse).isEqualTo(1);
     }
+
 
     @Test(expected = RenderingException.class)
     public void propagatesRenderingException() throws Exception {
@@ -96,6 +113,24 @@ public class IndexRendererTest {
         verify(mockRenderer, times(1)).renderIndex(anyString());
     }
 
+    @Test
+    public void should_render_paginated_index() throws Exception {
+
+        IndexRenderer renderer = new IndexRenderer();
+
+        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+        when(configuration.getRenderIndex()).thenReturn(true);
+        when(configuration.getPaginateIndex()).thenReturn(true);
+        when(configuration.getIndexFileName()).thenReturn("mockindex.html");
+
+        ContentStore contentStore = mock(ContentStore.class);
+        Renderer mockRenderer = mock(Renderer.class);
+
+        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+
+        verify(mockRenderer, times(1)).renderIndexPaging(anyString());
+
+    }
 }
 
 

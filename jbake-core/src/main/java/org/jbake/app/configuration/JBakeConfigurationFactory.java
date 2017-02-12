@@ -14,7 +14,7 @@ public class JBakeConfigurationFactory {
      * @param sourceFolder The source folder of the project
      * @param destination The destination folder to render and copy files to
      * @param isClearCache Whether to clear database cache or not
-     * @return A {@link DefaultJBakeConfiguration} by given parameters
+     * @return A {@link JBakeConfiguration} by given parameters
      * @throws ConfigurationException if loading the configuration fails
      */
     public static JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, boolean isClearCache) throws ConfigurationException {

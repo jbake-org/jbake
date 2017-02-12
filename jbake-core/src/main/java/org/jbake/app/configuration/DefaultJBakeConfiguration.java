@@ -3,6 +3,8 @@ package org.jbake.app.configuration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.regex.Pattern;
  * The default implementation of a {@link JBakeConfiguration}
  */
 public class DefaultJBakeConfiguration implements JBakeConfiguration {
+
+    private Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
 
     private static final String SOURCE_FOLDER_KEY = "sourceFolder";
     private static final String DESTINATION_FOLDER_KEY = "destinationFolder";
@@ -71,6 +75,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         if ( templateFileName != null ) {
             return new File(getTemplateFolder(), templateFileName);
         }
+        logger.warn("Cannot find configuration key '{}' for document type '{}'", templateKey,docType);
         return null;
     }
 
@@ -296,13 +301,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         configuration.setProperty(key, value);
     }
 
-/*
-    @Override
-    public Configuration getCompositeConfiguration() {
-        return configuration;
-    }
-*/
-
     @Override
     public Iterator<String> getKeys() {
         return configuration.getKeys();
@@ -336,7 +334,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         Object value = subConfig.getProperty(optionKey);
 
         if ( value == null ) {
-            //TODO: log warning if option not found
+            logger.warn("Cannot find asciidoctor option '{}.{}'", ASCIIDOCTOR_OPTION, optionKey);
             return "";
         }
         return value;
@@ -429,9 +427,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     private File getAsFolder(String key) {
-        File folder = (File) get(key);
-
-        return folder;
+        return (File) get(key);
     }
 
     private String getAsString(String key) {
@@ -442,8 +438,8 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return configuration.getString(key, defaultValue);
     }
 
-    private boolean getAsBoolean(String paginateIndex) {
-        return configuration.getBoolean(paginateIndex, false);
+    private boolean getAsBoolean(String key) {
+        return configuration.getBoolean(key, false);
     }
 
     private int getAsInt(String key, int defaultValue) {

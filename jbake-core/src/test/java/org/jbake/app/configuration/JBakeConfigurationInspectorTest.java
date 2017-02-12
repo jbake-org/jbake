@@ -1,21 +1,11 @@
 package org.jbake.app.configuration;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.LoggingEvent;
-import ch.qos.logback.core.Appender;
 import org.jbake.app.JBakeException;
-import org.junit.After;
-import org.junit.Before;
+import org.jbake.app.LoggingTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -23,31 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class JBakeConfigurationInspectorTest {
+public class JBakeConfigurationInspectorTest extends LoggingTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
-    @Mock
-    private Appender<ch.qos.logback.classic.spi.ILoggingEvent> mockAppender;
-
-    @Captor
-    private ArgumentCaptor<LoggingEvent> captorLoggingEvent;
-
-    Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-
-    @Before
-    public void setup() {
-
-        root.addAppender(mockAppender);
-        root.setLevel(Level.INFO);
-    }
-
-    @After
-    public void teardown() {
-        root.detachAppender(mockAppender);
-    }
 
     @Test
     public void should_throw_exception_if_source_folder_does_not_exist() throws Exception {
