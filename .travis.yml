@@ -3,3 +3,23 @@ language: java
 notifications:
   irc:
     - "chat.freenode.net#jbake"
+
+install: true
+
+cache:
+    directories:
+        - $HOME/.m2
+        - $HOME/.gradle
+
+before_script:
+    - ./gradlew --version
+
+script:
+    - TERM=dumb ./gradlew build jacocoTestReport
+
+jdk:
+    - oraclejdk8
+    - oraclejdk7
+
+after_success:
+    - ./gradlew coveralls

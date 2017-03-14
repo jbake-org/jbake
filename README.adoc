@@ -11,8 +11,6 @@ image:https://api.bintray.com/packages/jbake/maven/{project-name}/images/downloa
 
 ---
 
-image:https://secure.travis-ci.org/jbake-org/jbake-gradle-plugin.png?branch=master["Build Status", link="https://travis-ci.org/jbake-org/jbake-gradle-plugin"]
-
 This plugin allows rendering a site using http://www.jbake.org[JBake] directly from http://www.gradle.org[Gradle].
 
 == Examples
@@ -67,15 +65,18 @@ The default is {jbake-version}.
 
 === Render Engine configuration
 
-Jbake uses three engines. The library versions could be changed too:
+Jbake uses several engines. The library versions could be changed too:
 
 [source,groovy]
 ----
 jbake {
-    pegdownVersion = '1.4.2'
-    freemarkerVersion = '2.3.19'
+    pegdownVersion = '1.6.0'
+    freemarkerVersion = '2.3.25-incubating'
+    groovyTemplatesVersion = '2.4.7'
+    jade4jVersion = '1.2.3'
+    thymeleafVersion = '3.0.2.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'
-    asciidoctorjVersion = '1.5.4'
+    asciidoctorjVersion = '1.5.4.1'
 }
 ----
 
@@ -94,4 +95,19 @@ jbake {
    configuration['template.post.file'] = 'mypost.ftl'
 }
 ----
+
+=== Repositories configuration
+The plugin will automatically include `jcenter()` as a repository in order to resolve JBake and template engine dependencies.
+You may deactivate this feature by setting `includeDefaultRepositories` to false, like so
+
+[source,groovy]
+----
+jbake {
+   includeDefaultRepositories = false
+}
+----
+
+WARNING: You must still define at least one repository from where all JBake and template engine dependencies should
+be resolved. Failure to do so will result in a build error.
+
 
