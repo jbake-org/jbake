@@ -20,7 +20,7 @@ package me.champeau.gradle
  */
 class JBakeExtension {
 
-    String version = '2.5.0'
+    String version = '2.5.1'
     String pegdownVersion = '1.6.0'
     String freemarkerVersion = '2.3.25-incubating'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
