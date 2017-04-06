@@ -102,7 +102,7 @@ bintray {
         vcsUrl = project.project_vcs
         publicDownloadNumbers = true
         version {
-            attributes = ['gradle-plugin': 'me.champeau.jbake:me.champeau.gradle:jbake-gradle-plugin ']
+            attributes = ['gradle-plugin': 'org.jbake.site:org.jbake.gradle:jbake-gradle-plugin']
         }
     }
 }

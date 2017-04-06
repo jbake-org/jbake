@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 /**
  * Created by frank on 12.10.14.
  */
-public interface JBakeProxy {
-
+interface JBakeProxy {
     def jbake()
+
     def prepare()
+
     def getConfig()
+
     def setConfig(Object config)
 }

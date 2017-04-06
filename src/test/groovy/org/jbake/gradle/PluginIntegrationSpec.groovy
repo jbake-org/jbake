@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
@@ -64,10 +64,10 @@ class PluginIntegrationSpec extends Specification {
 
     protected GradleRunner getGradleRunner(String... arguments) {
         GradleRunner runner = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(arguments)
-                .withPluginClasspath()
-                .withDebug(debug)
+            .withProjectDir(projectDir)
+            .withArguments(arguments)
+            .withPluginClasspath()
+            .withDebug(debug)
 
         if (gradleVersion) {
             runner.withGradleVersion(gradleVersion)

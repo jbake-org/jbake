@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Unroll
@@ -21,8 +21,8 @@ import spock.lang.Unroll
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
+@Unroll
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
-    @Unroll
     def 'Setup and bake with gradle #version'() {
         given:
         gradleVersion = version
@@ -34,7 +34,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         buildFile << '''
             plugins {
-                id 'me.champeau.jbake'
+                id 'org.jbake.site'
             }
 
             jbake {
@@ -59,11 +59,10 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
             '2.12',   // introduces changes such as compileOnly
             '2.14.1', // latest release in 2.x line
             '3.0',    // first release in 3.x line, compatibility changes
-            '3.2'     // latest release, deprecations & warnings
+            '3.4.1'   // latest release, deprecations & warnings
         ]
     }
 
-    @Unroll
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
         given:
         gradleVersion = '3.2'
@@ -73,7 +72,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         buildFile << """
             plugins {
-                id 'me.champeau.jbake'
+                id 'org.jbake.site'
             }
 
             jbake {
@@ -105,7 +104,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         buildFile << """
             plugins {
-                id 'me.champeau.jbake'
+                id 'org.jbake.site'
             }
 
             repositories {

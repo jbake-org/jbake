@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
@@ -46,28 +46,27 @@ class JBakeTask extends DefaultTask {
         jbake.jbake()
     }
 
-    private def createJbake() {
-        if ( !jbake ) {
+    private JBakeProxy createJbake() {
+        if (!jbake) {
             jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: getInput(), output: getOutput(), clearCache: getClearCache())
         }
     }
 
-    private def mergeConfiguration(){
+    private mergeConfiguration() {
         //config = new CompositeConfiguration([createMapConfiguration(), jbake.getConfig()])
         def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
         Constructor constructor = delegate.getConstructor(Collection)
         def config = constructor.newInstance([createMapConfiguration(), jbake.getConfig()])
-        jbake.setConfig( config )
-
+        jbake.setConfig(config)
     }
 
-    private def createMapConfiguration(){
+    private createMapConfiguration() {
         def delegate = loadClass('org.apache.commons.configuration.MapConfiguration')
         Constructor constructor = delegate.getConstructor(Map)
         constructor.newInstance(getConfiguration())
     }
 
-    private def loadOvenDynamic() {
+    private loadOvenDynamic() {
         setupClassLoader()
         loadClass('org.jbake.app.Oven')
     }
@@ -76,7 +75,7 @@ class JBakeTask extends DefaultTask {
         cl.loadClass(className)
     }
 
-    private def setupClassLoader() {
+    private setupClassLoader() {
         if (classpath?.files) {
             def urls = classpath.files.collect { it.toURI().toURL() }
             cl = new URLClassLoader(urls as URL[], Thread.currentThread().contextClassLoader)

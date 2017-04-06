@@ -36,7 +36,7 @@ gradlePlugin {
     plugins {
         jbakePlugin {
             id = project_pluginId
-            implementationClass = 'me.champeau.gradle.JBakePlugin'
+            implementationClass = 'org.jbake.gradle.JBakePlugin'
         }
     }
 }

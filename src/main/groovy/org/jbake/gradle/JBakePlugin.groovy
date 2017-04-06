@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Plugin
@@ -29,7 +29,6 @@ class JBakePlugin implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
         project.apply(plugin: 'base')
-
 
         Configuration configuration = project.configurations.maybeCreate(JBAKE)
         extension = project.extensions.create(JBAKE, JBakeExtension)
