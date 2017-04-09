@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
-
-import groovy.transform.Field
-import org.apache.commons.configuration.CompositeConfiguration
-import org.apache.commons.configuration.MapConfiguration
+package org.jbake.gradle
 
 import java.lang.reflect.Constructor
-
 
 /**
  * Created by frank on 12.10.14.
  */
-class JBakeProxyImpl implements JBakeProxy{
-
+class JBakeProxyImpl implements JBakeProxy {
     Class delegate
     def input
     def output
@@ -35,19 +29,19 @@ class JBakeProxyImpl implements JBakeProxy{
     def jbake
 
     def jbake() {
-        if(jbake) {
+        if (jbake) {
             jbake.bake()
         }
     }
 
     def prepare() {
-        Constructor constructor = delegate.getConstructor(File.class,File.class,boolean)
+        Constructor constructor = delegate.getConstructor(File.class, File.class, boolean)
 
         jbake = constructor.newInstance(input, output, clearCache)
         jbake.setupPaths()
     }
 
-    def getConfig(){
+    def getConfig() {
         jbake.config
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ plugins {
     id 'groovy'
     id 'idea'
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
-    id 'net.nemerosa.versioning' version '2.6.0'
-    id 'com.github.ben-manes.versions' version '0.14.0'
-    id 'com.gradle.plugin-publish' version '0.9.7'
-    id 'com.github.hierynomus.license' version '0.11.0'
-    id 'com.github.kt3k.coveralls' version '2.8.1'
-    id 'java-gradle-plugin'
     id 'jacoco'
+    id 'java-gradle-plugin'
+    id 'com.jfrog.bintray'              version '1.7.3'
+    id 'net.nemerosa.versioning'        version '2.6.0'
+    id 'com.github.ben-manes.versions'  version '0.14.0'
+    id 'com.gradle.plugin-publish'      version '0.9.7'
+    id 'com.github.hierynomus.license'  version '0.11.0'
+    id 'com.github.kt3k.coveralls'      version '2.8.1'
 }
 
 apply from: 'gradle/credentials.gradle'
@@ -36,7 +36,7 @@ gradlePlugin {
     plugins {
         jbakePlugin {
             id = project_pluginId
-            implementationClass = "me.champeau.gradle.JBakePlugin"
+            implementationClass = 'org.jbake.gradle.JBakePlugin'
         }
     }
 }
@@ -45,32 +45,45 @@ repositories {
     jcenter()
 }
 
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
+
 dependencies {
     compile gradleApi()
-    compile 'com.github.zafarkhaja:java-semver:0.9.0'
-    compileOnly 'org.jbake:jbake-core:2.5.1'
-    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+    compile "com.github.zafarkhaja:java-semver:$semverVersion"
+    compileOnly "org.jbake:jbake-core:$jbakeVersion"
+    testCompile("org.spockframework:spock-core:$spockVersion") {
         exclude group:'org.codehaus.groovy'
     }
-    testCompile "commons-io:commons-io:2.5"
+    testCompile "commons-io:commons-io:$commonsIoVersion"
 }
 
 compileGroovy {
-    sourceCompatibility = '1.6'
-    targetCompatibility = '1.6'
+    sourceCompatibility = project.sourceCompatibility
+    targetCompatibility = project.targetCompatibility
 }
 
-javadoc {
-    excludes = ['**/*.html', 'META-INF/**']
-
-    options.use         = true
-    options.splitIndex  = true
-    options.encoding    = 'UTF-8'
-    options.author      = true
-    options.version     = true
-    options.windowTitle = "$project.name $project.version API"
-    options.docTitle    = "$project.name $project.version API"
-    options.links       = ['http://docs.oracle.com/javase/7/docs/api/']
+groovydoc {
+    use             = true
+    source          = project.sourceSets.main.allSource
+    classpath       = javadoc.classpath
+    ext.windowtitle = "$project.name $project.version API"
+    ext.doctitle    = "$project.name $project.version API"
+    header          = "$project.name $project.version API"
+    footer          = "Copyright &copy; ${copyrightYear} the original author or authors. All rights reserved."
+    includePrivate  = false
+    link 'https://docs.gradle.org/3.4.1/javadoc/', 'org.gradle.'
+    link 'http://docs.oracle.com/javase/7/docs/api/', 'java.', 'org.xml.', 'javax.', 'org.w3c.'
 }
 
 task sourcesJar(type: Jar) {
@@ -80,11 +93,11 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar) {
+task javadocJar(type: Jar, dependsOn: groovydoc) {
     group 'Build'
     description 'An archive of the javadoc'
     classifier 'javadoc'
-    from javadoc.destinationDir
+    from groovydoc.destinationDir
 }
 
 jar.finalizedBy sourcesJar
