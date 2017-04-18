@@ -44,29 +44,32 @@ repositories {
 }
 
 ext {
-    commonsIoVersion = '2.4'
-    commonsConfigurationVersion = '1.9'
+    asciidoctorjVersion = '1.5.4.1'
+    commonsIoVersion = '2.5'
+    commonsConfigurationVersion = '1.10'
+    commonsLangVersion = '3.4'
+    commonsVfs2Version = '2.1'
+    args4jVersion = '2.33'
+    freemarkerVersion = '2.3.25-incubating'
+    junitVersion = '4.12'
+    pegdownVersion = '1.6.0'
+    jettyServerVersion = '8.1.19.v20160209'
+    orientDbVersion = '1.7.10'
+    groovyVersion = '2.4.8'
+    slf4jVersion = '1.7.22'
+    logbackVersion = '1.1.9'
+    assertjCoreVersion = '1.7.1'
+    thymeleafVersion = '3.0.3.RELEASE'
     jsonSimpleVersion = '1.1.1'
-    args4jVersion = '2.0.26'
-    freemarkerVersion = '2.3.20'
-    orientDbVersion = '1.6.4'
-    pegdownVersion = '1.4.2'
-    asciidoctorjVersion = '1.5.2'
-    jettyServerVersion = '8.1.12.v20130726'
-    groovyVersion = '2.4.1'
-    thymeleafVersion = '2.1.3.RELEASE'
-    thymeleafExtrasVersion = '2.1.1.RELEASE'
-    slf4jVersion = '1.7.6'
-    logbackVersion = '1.1.1'
-    jade4jVersion = '0.4.2'
-    commonsVfs2Version = '2.0'
-    junitVersion = '4.11'
-    assertjCoreVersion = '1.7.0'
+    jade4jVersion = '1.2.5'
+    mockitoVersion = '1.10.19'
 }
 
 dependencies {
     compile group: 'commons-io', name: 'commons-io', version:  commonsIoVersion
     compile group: 'commons-configuration', name: 'commons-configuration', version: commonsConfigurationVersion
+    compile group: 'org.apache.commons', name: 'commons-vfs2', version: commonsVfs2Version
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
     compile group: 'args4j', name: 'args4j', version: args4jVersion
     compile group: 'org.freemarker', name: 'freemarker', version: freemarkerVersion
@@ -78,15 +81,14 @@ dependencies {
     compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
     compile group: 'org.codehaus.groovy', name: 'groovy-templates', version: groovyVersion
     compile group: 'org.thymeleaf', name: 'thymeleaf', version: thymeleafVersion
-    compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-conditionalcomments', version: thymeleafExtrasVersion
     compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     compile group: 'org.slf4j', name: 'jul-to-slf4j', version: slf4jVersion
     compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
     compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
     compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
-    compile group: 'org.apache.commons', name: 'commons-vfs2', version: commonsVfs2Version
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
+    testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
 }
 
 jacoco {

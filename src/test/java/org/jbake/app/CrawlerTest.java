@@ -1,12 +1,5 @@
 package org.jbake.app;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
@@ -18,6 +11,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest {
     private CompositeConfiguration config;
@@ -33,7 +33,7 @@ public class CrawlerTest {
             throw new Exception("Cannot find sample data structure!");
         }
 
-        config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
+        config = ConfigUtil.load(sourceFolder);
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
     }
@@ -81,23 +81,22 @@ public class CrawlerTest {
     @Test
     public void renderWithPrettyUrls() throws Exception {
         Map<String, Object> testProperties = new HashMap<String, Object>();
-        testProperties.put(Keys.URI_NO_EXTENSION, "/blog");
+        testProperties.put(Keys.URI_NO_EXTENSION, true);
+        testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
 
         CompositeConfiguration config = new CompositeConfiguration();
         config.addConfiguration(new MapConfiguration(testProperties));
-        config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile())));
+        config.addConfiguration(ConfigUtil.load(sourceFolder));
 
-        URL contentUrl = this.getClass().getResource("/fixture");
-        File content = new File(contentUrl.getFile());
-        Crawler crawler = new Crawler(db, content, config);
-        crawler.crawl(new File(content.getPath() + File.separator + "content"));
+        Crawler crawler = new Crawler(db, sourceFolder, config);
+        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
-        Assert.assertEquals(2, db.getDocumentCount("post"));
+        Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
+
         DocumentList documents = db.getPublishedPosts();
 
         for (Map<String, Object> model : documents) {
-
             String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName((String) model.get("file")) + "/";
 
             Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));

@@ -25,45 +25,16 @@ package org.jbake.app.template;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
-<<<<<<< HEAD
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
-import org.jbake.app.DBUtil;
-import org.jbake.app.Parser;
-import org.jbake.app.Renderer;
-import org.jbake.model.DocumentTypes;
-import org.jbake.template.ModelExtractorsDocumentTypeListener;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-=======
 import org.jbake.app.*;
 import org.jbake.model.DocumentTypes;
+import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
->>>>>>> 48e3cb8... added gradle application distribution
-
-import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -84,12 +55,9 @@ public abstract class AbstractTemplateEngineRenderingTest {
     protected final String templateDir;
     protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
-<<<<<<< HEAD
     private Crawler crawler;
     private Parser parser;
     protected Renderer renderer;
-=======
->>>>>>> 48e3cb8... added gradle application distribution
     protected Locale currentLocale;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
@@ -98,7 +66,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
     }
 
     @Before
-<<<<<<< HEAD
     public void setup() throws Exception {
         currentLocale = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
@@ -106,15 +73,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
         DocumentTypes.addListener(listener);
 
-        URL sourceUrl = this.getClass().getResource("/");
-=======
-    public void setup() throws Exception, IOException, URISyntaxException {
-
-        currentLocale = Locale.getDefault();
-        Locale.setDefault(Locale.ENGLISH);
-
         URL sourceUrl = this.getClass().getResource("/fixture");
->>>>>>> 48e3cb8... added gradle application distribution
 
         sourceFolder = new File(sourceUrl.getFile());
         if (!sourceFolder.exists()) {
@@ -138,7 +97,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
             }
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
-<<<<<<< HEAD
         db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
 
         crawler = new Crawler(db, sourceFolder, config);
@@ -186,19 +144,13 @@ public abstract class AbstractTemplateEngineRenderingTest {
                 "blog/2012/first-post.html",
                 "papers/published-fixture.groovyMarkupTemplates.paper.html"));
 
-=======
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
->>>>>>> 48e3cb8... added gradle application distribution
     }
 
     @After
     public void cleanup() throws InterruptedException {
         db.drop();
         db.close();
-<<<<<<< HEAD
         db.shutdown();
-=======
->>>>>>> 48e3cb8... added gradle application distribution
         Locale.setDefault(currentLocale);
     }
 
