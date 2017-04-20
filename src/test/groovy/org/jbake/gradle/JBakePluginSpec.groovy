@@ -62,14 +62,14 @@ class JBakePluginSpec extends Specification {
         }
 
         where:
-        group                 | name               | version
-        'org.jbake'           | 'jbake-core'       | '2.5.1'
-        'org.freemarker'      | 'freemarker'       | '2.3.26-incubating'
-        'org.pegdown'         | 'pegdown'          | '1.6.0'
-        'org.asciidoctor'     | 'asciidoctorj'     | '1.5.5'
-        'org.codehaus.groovy' | 'groovy-templates' | '2.4.10'
-        'org.thymeleaf'       | 'thymeleaf'        | '3.0.5.RELEASE'
-        'de.neuland-bfi'      | 'jade4j'           | '1.2.5'
+        group                   | name                  | version
+        'org.jbake'             | 'jbake-core'          | '2.5.1'
+        'org.freemarker'        | 'freemarker'          | '2.3.25-incubating'
+        'org.pegdown'           | 'pegdown'             | '1.6.0'
+        'org.asciidoctor'       | 'asciidoctorj'        | '1.5.4.1'
+        'org.codehaus.groovy'   | 'groovy-templates'    | '2.4.8'
+        'org.thymeleaf'         | 'thymeleaf'           | '3.0.3.RELEASE'
+        'de.neuland-bfi'        | 'jade4j'              | '1.2.5'
     }
 
     def "set dependency version by extension"() {

@@ -18,14 +18,14 @@ plugins {
     id 'groovy'
     id 'idea'
     id 'maven-publish'
-    id 'java-gradle-plugin'
     id 'jacoco'
-    id 'com.jfrog.bintray'             version '1.7.3'
-    id 'net.nemerosa.versioning'       version '2.6.0'
-    id 'com.github.ben-manes.versions' version '0.14.0'
-    id 'com.gradle.plugin-publish'     version '0.9.5'
-    id 'com.github.hierynomus.license' version '0.11.0'
-    id 'com.github.kt3k.coveralls'     version '2.8.1'
+    id 'java-gradle-plugin'
+    id 'com.jfrog.bintray'              version '1.7.3'
+    id 'net.nemerosa.versioning'        version '2.6.0'
+    id 'com.github.ben-manes.versions'  version '0.14.0'
+    id 'com.gradle.plugin-publish'      version '0.9.7'
+    id 'com.github.hierynomus.license'  version '0.11.0'
+    id 'com.github.kt3k.coveralls'      version '2.8.1'
 }
 
 apply from: 'gradle/credentials.gradle'
@@ -130,5 +130,12 @@ project.tasks.withType(Test) {
 }
 
 jacoco {
-    toolVersion = jacocoVersion
+    toolVersion = '0.7.9'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }

@@ -17,12 +17,18 @@ package org.jbake.gradle
 
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Unroll
+import spock.lang.Shared
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 @Unroll
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
+
+    @Shared
+    def latestGradleVersion = '3.4.1'
+
+    @Unroll
     def 'Setup and bake with gradle #version'() {
         given:
         gradleVersion = version
@@ -59,13 +65,13 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
             '2.12',   // introduces changes such as compileOnly
             '2.14.1', // latest release in 2.x line
             '3.0',    // first release in 3.x line, compatibility changes
-            '3.4.1'   // latest release, deprecations & warnings
+            latestGradleVersion     // latest release, deprecations & warnings
         ]
     }
 
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
         given:
-        gradleVersion = '3.2'
+        gradleVersion = latestGradleVersion
         File jbakeSourceDir = newFolder('src', 'jbake')
 
         copyResources('example-project', jbakeSourceDir.path)
@@ -97,7 +103,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
     def 'Bake with default repositories set to false and repositories block defined results in SUCCESS'() {
         given:
-        gradleVersion = '3.2'
+        gradleVersion = latestGradleVersion
         File jbakeSourceDir = newFolder('src', 'jbake')
 
         copyResources('example-project', jbakeSourceDir.path)
