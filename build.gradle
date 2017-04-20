@@ -82,7 +82,7 @@ groovydoc {
     header          = "$project.name $project.version API"
     footer          = "Copyright &copy; ${copyrightYear} the original author or authors. All rights reserved."
     includePrivate  = false
-    link 'https://docs.gradle.org/3.4.1/javadoc/', 'org.gradle.'
+    link 'https://docs.gradle.org/3.5/javadoc/', 'org.gradle.'
     link 'http://docs.oracle.com/javase/7/docs/api/', 'java.', 'org.xml.', 'javax.', 'org.w3c.'
 }
 

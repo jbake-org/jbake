@@ -26,7 +26,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
     @Shared
-    def latestGradleVersion = '3.4.1'
+    def latestGradleVersion = '3.5'
 
     @Unroll
     def 'Setup and bake with gradle #version'() {
