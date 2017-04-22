@@ -1,10 +1,10 @@
 package org.jbake.app;
 
-import java.io.File;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,5 +22,5 @@ public class ConfigUtilTest {
 
 		assertEquals("http://www.jbake.org", config.getString(Keys.SITE_HOST));
 
-	}
+    }
 }

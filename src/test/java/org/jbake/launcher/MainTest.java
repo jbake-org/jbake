@@ -90,7 +90,7 @@ public class MainTest {
     @Test
     public void launchJettyWithCustomDestViaConfig() throws CmdLineException {
         String[] args = {"-s"};
-        Map properties = new HashMap(){{
+        Map<String, String> properties = new HashMap<String, String>(){{
             put("destination.folder", "build/jbake");
         }};
         main.run(stubOptions(args), stubConfig(properties));

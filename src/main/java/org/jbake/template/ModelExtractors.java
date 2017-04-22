@@ -126,9 +126,9 @@ public class ModelExtractors {
     }
 
     /**
-     * @param key           Key for lookup
-     * @return              True if the key is contained by this object
      * @see java.util.Map#containsKey(java.lang.Object)
+     * @param key A key a {@link ModelExtractor} is registered with
+     * @return true if key is registered
      */
     public boolean containsKey(Object key) {
         return extractors.containsKey(key);
