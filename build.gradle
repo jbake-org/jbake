@@ -8,7 +8,7 @@ buildscript {
 
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.7.1'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1'
         classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.1"
     }
 }
@@ -18,7 +18,7 @@ plugins {
     id "eclipse"
     id "idea"
     id "jacoco"
-    id 'com.github.ben-manes.versions' version '0.13.0'
+    id 'com.github.ben-manes.versions' version '0.14.0'
 }
 
 group = 'org.jbake'
