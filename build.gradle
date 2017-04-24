@@ -1,30 +1,13 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1'
-        classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.1"
-    }
-}
-
 plugins {
     id "java"
     id "eclipse"
     id "idea"
     id "jacoco"
-    id 'com.github.ben-manes.versions' version '0.14.0'
+    id "io.sdkman.vendors"              version "1.1.1"     apply false
+    id "com.jfrog.bintray"              version "1.7.3"     apply false
+    id "com.github.kt3k.coveralls"      version "2.8.1"     apply false
+    id 'com.github.ben-manes.versions'  version '0.14.0'
 }
-
-group = 'org.jbake'
-version = '2.6.0-SNAPSHOT'
-
-description = """jbake"""
 
 if( JavaVersion.current().java7Compatible ) {
     apply plugin: 'com.github.kt3k.coveralls'
@@ -36,8 +19,8 @@ if( JavaVersion.current().java7Compatible ) {
     apply from: 'gradle/sdkman.gradle'
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     jcenter()
@@ -92,7 +75,7 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = '0.7.7.201606060606'
+    toolVersion = jacocoVersion
 }
 
 jacocoTestReport {

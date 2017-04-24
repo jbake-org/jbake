@@ -4,7 +4,7 @@ ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 def jbakePom = pom {
     project {
-        description project.project_description
+        description project.description
         url project.website
         developers {
             developer {
