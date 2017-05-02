@@ -205,7 +205,13 @@ public abstract class MarkupEngine implements ParserEngine {
                 continue;
             }
 
-            String key = parts[0].trim();
+            String utf8BOM = "\uFEFF";
+            String key;
+            if (parts[0].contains(utf8BOM)) {
+            	key = parts[0].trim().replace(utf8BOM, "");
+            } else {
+            	key = parts[0].trim();
+            }
             String value = parts[1].trim();
 
             if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
