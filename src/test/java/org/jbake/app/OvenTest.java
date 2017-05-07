@@ -10,6 +10,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.model.DocumentTypes;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +26,10 @@ public class OvenTest {
 
     @Before
     public void setup() throws Exception {
-		URL sourceUrl = this.getClass().getResource("/");
+    	// reset values to known state otherwise previous test case runs can affect the success of this test case
+    	DocumentTypes.resetDocumentTypes();
+		
+    	URL sourceUrl = this.getClass().getResource("/");
 		rootPath = new File(sourceUrl.getFile());
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");
