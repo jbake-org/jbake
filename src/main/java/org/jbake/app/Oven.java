@@ -20,6 +20,13 @@ import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.orientechnologies.orient.core.Orient;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
 /**
  * All the baking happens in the Oven!
  *
@@ -92,7 +99,7 @@ public class Oven {
     }
 
     private File setupPathFromConfig(String key) {
-        return new File(source, config.getString(key));
+    	return new File(FilenameUtils.concat(source.getAbsolutePath(), config.getString(key)));
     }
 
     /**
@@ -105,11 +112,11 @@ public class Oven {
         templatesPath = setupRequiredFolderFromConfig(Keys.TEMPLATE_FOLDER);
         contentsPath = setupRequiredFolderFromConfig(Keys.CONTENT_FOLDER);
         assetsPath = setupPathFromConfig(Keys.ASSET_FOLDER);
-        if (!assetsPath.exists()) {
-            LOGGER.warn("No asset folder was found!");
-        }
-        ensureDestination();
-    }
+		if (!assetsPath.exists()) {
+			LOGGER.warn("No asset folder was found!");
+		}
+		ensureDestination();
+	}
 
 	private File setupRequiredFolderFromConfig(final String key) {
 		final File path = setupPathFromConfig(key);

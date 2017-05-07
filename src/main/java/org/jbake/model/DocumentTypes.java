@@ -17,8 +17,7 @@ import org.jbake.parser.Engines;
  */
 public class DocumentTypes {
 
-    private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<String>(Arrays.asList("page", "post", "masterindex", "archive", "feed"));
-
+	private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<String>(Arrays.asList("page", "post", "masterindex", "archive", "feed"));
     private static final Set<DocumentTypeListener> LISTENERS = new HashSet<DocumentTypeListener>();
 
     public static void addDocumentType(String docType) {
