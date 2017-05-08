@@ -65,7 +65,7 @@ public class Crawler {
     public Crawler(ContentStore db, File source, CompositeConfiguration config) {
         this.db = db;
         this.config = config;
-        this.contentPath = source.getPath() + separator + config.getString(ConfigUtil.Keys.CONTENT_FOLDER);
+        this.contentPath = FilenameUtils.concat(source.getAbsolutePath(), config.getString(ConfigUtil.Keys.CONTENT_FOLDER));
         this.parser = new Parser(config, contentPath);
     }
 
