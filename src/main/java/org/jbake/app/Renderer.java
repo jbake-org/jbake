@@ -263,18 +263,15 @@ public class Renderer {
             //paging makes no sense. render single index file instead
             renderIndex(indexFile);
         } else {
-
             PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
 
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
             model.put("content", buildSimpleModel("masterindex"));
             model.put("numberOfPages", pagingHelper.getNumberOfPages());
-
-            db.setLimit(postsPerPage);
-
+            
             try {
-
+                db.setLimit(postsPerPage);
                 for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
                     String fileName = indexFile;
 
