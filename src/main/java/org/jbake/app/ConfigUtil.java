@@ -95,6 +95,11 @@ public class ConfigUtil {
 		 * Default status to use (in order to avoid putting it in all files)
 		 */
 		String DEFAULT_STATUS = "default.status";
+
+		/**
+		 * Default type to use (in order to avoid putting it in all files)
+		 */
+		String DEFAULT_TYPE = "default.type";
 		
 		/**
 		 * Folder where rendered files are output
