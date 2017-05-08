@@ -104,6 +104,14 @@ public abstract class MarkupEngine implements ParserEngine {
         	}
         }
 
+        if (config.getString(Keys.DEFAULT_TYPE) != null) {
+        	// default type has been set
+            if (content.get(Crawler.Attributes.TYPE) == null) {
+                // file hasn't got type so use default
+                content.put(Crawler.Attributes.TYPE, config.getString(Keys.DEFAULT_TYPE));
+            }
+        }
+
         if (content.get(Crawler.Attributes.TYPE)==null||content.get(Crawler.Attributes.STATUS)==null) {
             // output error
         	LOGGER.warn("Error parsing meta data from header (missing type or status value) for file {}!", file);

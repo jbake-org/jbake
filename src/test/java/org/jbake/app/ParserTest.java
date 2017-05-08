@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,13 +32,14 @@ public class ParserTest {
 	private File validAsciiDocFileWithoutHeader;
 	private File invalidAsciiDocFileWithoutHeader;
 	private File validAsciiDocFileWithHeaderInContent;
-	
+    private File validAsciiDocFileWithoutJBakeMetaData;
+
 	private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
 	private String invalidHeader = "title=This is a Title\n~~~~~~";
 
-  
-	
-	@Before
+
+
+    @Before
 	public void createSampleFile() throws Exception {
 		rootPath = new File(this.getClass().getResource(".").getFile());
 		config = ConfigUtil.load(rootPath);
@@ -112,6 +114,15 @@ public class ParserTest {
 		out.println("~~~~~~");
 		out.println("----");
 		out.close();
+
+        validAsciiDocFileWithoutJBakeMetaData = folder.newFile("validwojbakemetadata.ad");
+        out = new PrintWriter(validAsciiDocFileWithoutJBakeMetaData);
+        out.println("= Hello: AsciiDoc!");
+        out.println("Test User <user@test.org>");
+        out.println("2013-09-02");
+        out.println("");
+        out.println("JBake now supports AsciiDoc documents without JBake meta data.");
+        out.close();
 	}
 	
 	@Test
@@ -192,4 +203,18 @@ public class ParserTest {
 			.contains("tags=tag1, tag2");
 //		Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
 	}
+
+    @Test
+    public void parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() throws ConfigurationException {
+        CompositeConfiguration defaultConfig = ConfigUtil.load(rootPath);
+        defaultConfig.addProperty(ConfigUtil.Keys.DEFAULT_STATUS, "published");
+        defaultConfig.addProperty(ConfigUtil.Keys.DEFAULT_TYPE, "page");
+        Parser parser = new Parser(defaultConfig,rootPath.getPath());
+        Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData);
+        Assert.assertNotNull(map);
+        Assert.assertEquals("published", map.get("status"));
+        Assert.assertEquals("page", map.get("type"));
+        assertThat(map.get("body").toString())
+                .contains("<p>JBake now supports AsciiDoc documents without JBake meta data.</p>");
+    }
 }
