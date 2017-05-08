@@ -16,9 +16,9 @@ import java.util.Map;
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.
  *
- * @see <a href="http://groovy-lang.org/templating.html#_the_markuptemplateengine">Groovy MarkupTemplateEngine Documentation</a>
- *
  * The file extension to activate this Engine is .tpl
+ *
+ * @see <a href="http://groovy-lang.org/templating.html#_the_markuptemplateengine">Groovy MarkupTemplateEngine Documentation</a>
  */
 public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     private TemplateConfiguration templateConfiguration;

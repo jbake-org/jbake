@@ -10,7 +10,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Provides Zip file related functions 
  * 
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
 public class ZipUtil {
@@ -20,7 +20,7 @@ public class ZipUtil {
 	 * 
 	 * @param is 			{@link InputStream} InputStream of Zip file
 	 * @param outputFolder	folder where Zip file should be extracted to
-	 * @throws IOException
+	 * @throws IOException	if IOException occurs
 	 */
 	public static void extract(InputStream is, File outputFolder) throws IOException {
 		ZipInputStream zis = new ZipInputStream(is);

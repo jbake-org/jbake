@@ -1,5 +1,10 @@
 package org.jbake.app;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -8,15 +13,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Deals with assets (static files such as css, js or image files).
  *
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
 public class Asset {
@@ -31,6 +31,10 @@ public class Asset {
 
 	/**
 	 * Creates an instance of Asset.
+	 *
+	 * @param source			Source file for the asset
+	 * @param destination 		Destination (target) directory for asset file
+	 * @param config			Project configuration
 	 */
 	public Asset(File source, File destination, CompositeConfiguration config) {
 		this.source = source;
