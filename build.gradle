@@ -37,7 +37,7 @@ ext {
     junitVersion = '4.12'
     pegdownVersion = '1.6.0'
     jettyServerVersion = '8.1.19.v20160209'
-    orientDbVersion = '1.7.10'
+    orientDbVersion = '2.2.15'
     groovyVersion = '2.4.8'
     slf4jVersion = '1.7.22'
     logbackVersion = '1.1.9'
@@ -56,8 +56,7 @@ dependencies {
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
     compile group: 'args4j', name: 'args4j', version: args4jVersion
     compile group: 'org.freemarker', name: 'freemarker', version: freemarkerVersion
-    compile group: 'com.orientechnologies', name: 'orient-commons', version: orientDbVersion
-    compile group: 'com.orientechnologies', name: 'orientdb-core', version: orientDbVersion
+    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: orientDbVersion
     compile group: 'org.pegdown', name: 'pegdown', version: pegdownVersion
     compile group: 'org.asciidoctor', name: 'asciidoctorj', version: asciidoctorjVersion
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyServerVersion
