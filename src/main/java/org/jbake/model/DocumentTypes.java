@@ -1,17 +1,16 @@
 package org.jbake.model;
 
+import org.jbake.parser.Engines;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.jbake.parser.Engines;
-
 /**
- * Utility class used to determine the list of document types. Currently only supports "page", "post", "index",
- * "archive" and "feed".
- * <p/>
- * Additional document types are added at runtime based on the types found in the configuration.
+ * <p>Utility class used to determine the list of document types. Currently only supports "page", "post", "index",
+ * "archive" and "feed".</p>
+ * <p>Additional document types are added at runtime based on the types found in the configuration.</p>
  *
  * @author Cédric Champeau
  */

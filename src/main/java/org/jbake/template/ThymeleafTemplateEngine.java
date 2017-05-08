@@ -1,12 +1,5 @@
 package org.jbake.template;
 
-import java.io.File;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ConfigUtil.Keys;
@@ -16,6 +9,13 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
+import java.io.File;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
  *
@@ -24,7 +24,7 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
  *
  * <p>The default rendering mode is "HTML", but it is possible to use another mode
  * for each document type, by adding a key in the configuration, for example:</p>
- * <p/>
+ *
  * <code>
  *     template.feed.thymeleaf.mode=XML
  * </code>

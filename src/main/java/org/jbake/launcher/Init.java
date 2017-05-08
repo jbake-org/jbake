@@ -1,16 +1,16 @@
 package org.jbake.launcher;
 
-import java.io.File;
-import java.io.FileInputStream;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ZipUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 /**
  * Initialises sample folder structure with pre-defined template
  * 
- * @author Jonathan Bullock <jonbullock@gmail.com>
+ * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
 public class Init {
@@ -24,9 +24,10 @@ public class Init {
 	/**
 	 * Performs checks on output folder before extracting template file
 	 * 
-	 * @param outputFolder
-	 * @param templateLocationFolder
-	 * @throws Exception
+	 * @param outputFolder						Target directory for extracting template file
+	 * @param templateLocationFolder  Source location for template file
+	 * @param templateType						Type of the template to be used
+	 * @throws Exception							if required folder structure can't be achieved without content overwriting
 	 */
 	public void run(File outputFolder, File templateLocationFolder, String templateType) throws Exception {
 		if (!outputFolder.canWrite()) {

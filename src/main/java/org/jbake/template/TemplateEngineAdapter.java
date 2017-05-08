@@ -18,9 +18,9 @@ public interface TemplateEngineAdapter<Type> {
 
 	/**
 	 * Adapt value to expected output
-	 * @param key
-	 * @param extractedValue
-	 * @return
+	 * @param key							Template key
+	 * @param extractedValue  Value to be used in template model
+	 * @return								Value adapted for use in template
 	 */
 	Type adapt(String key, Object extractedValue);
 
