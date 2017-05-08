@@ -51,13 +51,13 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
 
         outputStrings.put("index", Arrays.asList(
                 "index.html\">Previous</a>",
-                "index3.html\">Next</a>",
+                "3/index.html\">Next</a>",
                 "2 of 3"
         ));
 
         renderer.renderIndexPaging("index.html");
 
-        File outputFile = new File(destinationFolder, "index2.html");
+        File outputFile = new File(destinationFolder, 2 + File.separator + "index.html");
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
 
         for (String string : getOutputStrings("index")) {
