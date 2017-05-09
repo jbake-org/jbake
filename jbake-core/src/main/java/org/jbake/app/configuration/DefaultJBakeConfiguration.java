@@ -173,7 +173,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public String getDefaultType() {
-        return getAsString(DEFAULT_TYPE);
+        String type = getAsString(DEFAULT_TYPE);
+        if ( type.isEmpty() ) {
+            return null;
+        }
+        return type;
     }
 
     @Override
@@ -292,6 +296,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getSiteHost() {
+        return getAsString(SITE_HOST,"http://www.jbake.org");
+    }
+
+    @Override
     public Object get(String key) {
         return configuration.getProperty(key);
     }
@@ -352,19 +361,31 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     public void setTemplateFolder(File templateFolder) {
-        setProperty(TEMPLATE_FOLDER_KEY, templateFolder);
+        if ( templateFolder != null ) {
+            setProperty(TEMPLATE_FOLDER_KEY, templateFolder);
+            setProperty(TEMPLATE_FOLDER, templateFolder.getName());
+        }
     }
 
-    private void setContentFolder(File contentFolder) {
-        setProperty(CONTENT_FOLDER_KEY, contentFolder);
+    public void setContentFolder(File contentFolder) {
+        if ( contentFolder != null ) {
+            setProperty(CONTENT_FOLDER_KEY, contentFolder);
+            setProperty(CONTENT_FOLDER, contentFolder.getName());
+        }
     }
 
     public void setAssetFolder(File assetFolder) {
-        setProperty(ASSET_FOLDER_KEY, assetFolder);
+        if (assetFolder != null) {
+            setProperty(ASSET_FOLDER_KEY, assetFolder);
+            setProperty(ASSET_FOLDER, assetFolder.getName());
+        }
     }
 
     public void setDestinationFolder(File destinationFolder) {
-        setProperty(DESTINATION_FOLDER_KEY, destinationFolder);
+        if (destinationFolder != null) {
+            setProperty(DESTINATION_FOLDER_KEY, destinationFolder);
+            setProperty(DESTINATION_FOLDER, destinationFolder.getName());
+        }
     }
 
     public void setAssetIgnoreHidden(boolean assetIgnoreHidden) {
@@ -426,6 +447,18 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setProperty(DB_PATH, path);
     }
 
+    public void setDefaultStatus(String status) {
+        setProperty(DEFAULT_STATUS, status);
+    }
+
+    public void setDefaultType(String type) {
+        setProperty(DEFAULT_TYPE, type);
+    }
+
+    public void setSiteHost(String siteHost) {
+        setProperty(SITE_HOST, siteHost);
+    }
+
     private File getAsFolder(String key) {
         return (File) get(key);
     }
@@ -461,31 +494,22 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     private void setupDefaultContentFolder() {
-        String destinationPath = (String) get(CONTENT_FOLDER);
-        setContentFolder(new File(getSourceFolder(),destinationPath));
+        setContentFolder(new File(getSourceFolder(),getContentFolderName()));
     }
 
     private void setupDefaultDestination() {
-        String destinationPath = (String) get(DESTINATION_FOLDER);
+        String destinationPath = getAsString(DESTINATION_FOLDER);
         setDestinationFolder(new File(getSourceFolder(),destinationPath));
     }
 
     private void setupDefaultAssetFolder() {
-        String assetFolder = (String) get(ASSET_FOLDER);
+        String assetFolder = getAsString(ASSET_FOLDER);
         setAssetFolder(new File(getSourceFolder(), assetFolder));
     }
 
     private void setupDefaultTemplateFolder() {
-        String destinationPath = (String) get(TEMPLATE_FOLDER);
+        String destinationPath = getAsString(TEMPLATE_FOLDER);
         setTemplateFolder(new File(getSourceFolder(),destinationPath));
-    }
-
-    public void setDefaultStatus(String status) {
-        configuration.setProperty(DEFAULT_STATUS, status);
-    }
-
-    public void setDefaultType(String type) {
-        configuration.setProperty(DEFAULT_TYPE, type);
     }
 
     @Override
@@ -496,4 +520,5 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setHeaderSeparator(String headerSeparator) {
         setProperty(HEADER_SEPARATOR, headerSeparator);
     }
+
 }

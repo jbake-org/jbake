@@ -1,6 +1,7 @@
 package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
 import org.junit.Assert;
@@ -36,6 +37,12 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
+    public void should_load_site_host() throws Exception {
+        JBakeConfiguration config = util.loadConfig(getTestResourcesAsSourceFolder());
+        assertThat(config.getSiteHost()).isEqualTo("http://www.jbake.org");
+    }
+
+    @Test
     public void should_load_a_default_configuration() throws Exception {
         JBakeConfiguration config = util.loadConfig(getTestResourcesAsSourceFolder());
         assertDefaultPropertiesPresent(config);
@@ -58,7 +65,7 @@ public class ConfigUtilTest extends LoggingTest {
     @Test
     public void should_throw_an_exception_if_sourcefolder_does_not_exist() throws Exception {
         File nonExistentSourceFolder = mock(File.class);
-        when(nonExistentSourceFolder.getPath()).thenReturn("/tmp/nonexistent");
+        when(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent");
         when(nonExistentSourceFolder.exists()).thenReturn(false);
 
         try {
@@ -122,6 +129,15 @@ public class ConfigUtilTest extends LoggingTest {
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         assertThat(config.getTemplateFolder()).isEqualTo(expectedDestinationFolder);
+    }
+
+    @Test
+    public void should_return_content_folder_from_configuration() throws Exception {
+        File sourceFolder = getTestResourcesAsSourceFolder();
+        File expectedDestinationFolder = new File(sourceFolder,"content");
+        JBakeConfiguration config = util.loadConfig(sourceFolder);
+
+        assertThat(config.getContentFolder()).isEqualTo(expectedDestinationFolder);
     }
 
     @Test
@@ -250,13 +266,56 @@ public class ConfigUtilTest extends LoggingTest {
     public void should_handle_non_existing_files() throws Exception {
 
         File source = getTestResourcesAsSourceFolder();
+        File expectedTemplateFolder = new File(source,"templates");
+        File expectedAssetFolder = new File(source,"assets");
+        File expectedContentFolder = new File(source,"content");
+        File expectedDestinationFolder = new File(source,"output");
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
 
         config.setTemplateFolder(null);
+        config.setAssetFolder(null);
+        config.setContentFolder(null);
+        config.setDestinationFolder(null);
 
         File templateFolder = config.getTemplateFolder();
+        File assetFolder = config.getAssetFolder();
+        File contentFolder = config.getContentFolder();
+        File destinationFolder = config.getDestinationFolder();
 
-        assertThat(templateFolder).isNull();
+        assertThat(templateFolder).isEqualTo(expectedTemplateFolder);
+        assertThat(assetFolder).isEqualTo(expectedAssetFolder);
+        assertThat(contentFolder).isEqualTo(expectedContentFolder);
+        assertThat(destinationFolder).isEqualTo(expectedDestinationFolder);
+    }
+
+    @Test
+    public void should_handle_custom_template_folder() throws Exception {
+        File source = getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        config.setTemplateFolder(sourceFolder.newFolder("my_custom_templates"));
+
+        assertThat(config.getTemplateFolderName()).isEqualTo("my_custom_templates");
+    }
+
+    @Test
+    public void should_handle_custom_content_folder() throws Exception {
+        File source = getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        config.setContentFolder(sourceFolder.newFolder("my_custom_content"));
+
+        assertThat(config.getContentFolderName()).isEqualTo("my_custom_content");
+    }
+
+    @Test
+    public void should_handle_custom_asset_folder() throws Exception {
+        File source = getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        config.setAssetFolder(sourceFolder.newFolder("my_custom_asset"));
+
+        assertThat(config.getAssetFolderName()).isEqualTo("my_custom_asset");
     }
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {

@@ -38,10 +38,11 @@ public class Oven {
      * @param source                   Project source directory
      * @param destination              The destination folder
      * @param isClearCache             Should the cache be cleaned
-     * @throws ConfigurationException  if configuration is not loaded correctly
+     * @throws Exception  if configuration is not loaded correctly
      */
-    public Oven(final File source, final File destination, final boolean isClearCache) throws ConfigurationException {
-        this( JBakeConfigurationFactory.createDefaultJbakeConfiguration(source, destination, isClearCache) );
+    @Deprecated
+    public Oven(final File source, final File destination, final boolean isClearCache) throws Exception {
+        this( new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, isClearCache) );
     }
 
     /**

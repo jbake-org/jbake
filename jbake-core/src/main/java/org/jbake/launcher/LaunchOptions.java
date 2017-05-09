@@ -1,6 +1,7 @@
 package org.jbake.launcher;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
@@ -41,8 +42,13 @@ public class LaunchOptions {
 		if (source != null) {
 			return new File(source);
 		} else {
-			return new File(".");
+			try {
+				return new File(".").getCanonicalFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		return null;
 	}
 	
 	public String getSourceValue() {
@@ -53,7 +59,7 @@ public class LaunchOptions {
 		if (destination != null) {
 			return new File(destination);
 		} else {
-			return null;
+			return new File(getSource(), "output");
 		}
 	}
 	

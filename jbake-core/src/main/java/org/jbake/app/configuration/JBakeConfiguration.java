@@ -302,6 +302,10 @@ public interface JBakeConfiguration {
      */
     String getAttributesExportPrefixForAsciidoctor();
 
+    String SITE_HOST = "site.host";
+
+    String getSiteHost();
+
     Object get(String key);
 
     String RENDER_TAGS_INDEX = "render.tagsindex";

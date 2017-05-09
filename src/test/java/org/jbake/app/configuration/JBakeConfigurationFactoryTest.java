@@ -8,24 +8,47 @@ import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Created by frank on 12.02.17.
- */
 public class JBakeConfigurationFactoryTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void should_return_a_default_configuration() throws Exception {
+    public void should_return_default_configuration_with_default_folders() throws Exception {
         File sourceFolder = folder.getRoot();
         File destinationFolder = folder.newFolder("output");
+        File templateFolder = new File(folder.getRoot(),"templates");
+        File assetFolder = new File(folder.getRoot(),"assets");
 
-        JBakeConfiguration configuration = JBakeConfigurationFactory.createDefaultJbakeConfiguration(sourceFolder,destinationFolder, true);
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder,destinationFolder, true);
 
         assertThat(configuration.getSourceFolder()).isEqualTo(sourceFolder);
         assertThat(configuration.getDestinationFolder()).isEqualTo(destinationFolder);
+        assertThat(configuration.getTemplateFolder()).isEqualTo(templateFolder);
+        assertThat(configuration.getAssetFolder()).isEqualTo(assetFolder);
         assertThat(configuration.getClearCache()).isEqualTo(true);
+    }
+
+    @Test
+    public void should_return_a_default_configuration_with_sitehost() throws Exception {
+        File sourceFolder = folder.getRoot();
+        File destinationFolder = folder.newFolder("output");
+        String siteHost = "http://www.jbake.org";
+
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder,destinationFolder, true);
+
+        assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
+    }
+
+    @Test
+    public void should_return_a_jetty_configuration() throws Exception {
+        File sourceFolder = folder.getRoot();
+        File destinationFolder = folder.newFolder("output");
+        String siteHost = "http://localhost:8820";
+
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,destinationFolder, true);
+
+        assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
     }
 
 }

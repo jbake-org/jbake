@@ -350,4 +350,7 @@ public class ContentStore {
         }
     }
 
+    public boolean isActive() {
+        return db.isActiveOnCurrentThread();
+    }
 }

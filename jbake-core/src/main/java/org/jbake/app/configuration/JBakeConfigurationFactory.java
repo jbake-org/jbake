@@ -9,6 +9,12 @@ import java.io.File;
  */
 public class JBakeConfigurationFactory {
 
+    private ConfigUtil configUtil;
+
+    public JBakeConfigurationFactory() {
+        this.configUtil = new ConfigUtil();
+    }
+
     /**
      * Creates a {@link DefaultJBakeConfiguration}
      * @param sourceFolder The source folder of the project
@@ -17,12 +23,28 @@ public class JBakeConfigurationFactory {
      * @return A {@link JBakeConfiguration} by given parameters
      * @throws ConfigurationException if loading the configuration fails
      */
-    public static JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, boolean isClearCache) throws ConfigurationException {
+    public JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, boolean isClearCache) throws ConfigurationException {
 
-        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
+        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(destination);
         configuration.setClearCache(isClearCache);
 
         return configuration;
+    }
+
+    public JBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {
+        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
+        configuration.setDestinationFolder(destinationFolder);
+        configuration.setClearCache(isClearCache);
+        configuration.setSiteHost("http://localhost:"+configuration.getServerPort());
+        return configuration;
+    }
+
+    public ConfigUtil getConfigUtil() {
+        return configUtil;
+    }
+
+    public void setConfigUtil(ConfigUtil configUtil) {
+        this.configUtil = configUtil;
     }
 }

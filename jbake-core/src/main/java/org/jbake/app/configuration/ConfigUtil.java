@@ -24,14 +24,10 @@ public class ConfigUtil {
     private static boolean LEGACY_CONFIG_FILE_WARNING_SHOWN = false;
     private static boolean LEGACY_CONFIG_FILE_EXISTS = false;
 
-	public CompositeConfiguration load(File source) throws ConfigurationException {
-		return load(source, false);
-	}
-
-    public CompositeConfiguration load(File source, boolean isRunServer) throws ConfigurationException {
+    private CompositeConfiguration load(File source) throws ConfigurationException {
 
         if (!source.exists()) {
-            throw new JBakeException("The given source folder '" + source.getPath() + "' does not exist.");
+            throw new JBakeException("The given source folder '" + source.getAbsolutePath() + "' does not exist.");
         }
         if (!source.isDirectory()) {
             throw new JBakeException("The given source folder is not a directory.");

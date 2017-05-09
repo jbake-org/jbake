@@ -6,6 +6,7 @@ import org.jbake.app.JBakeException;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -15,7 +16,7 @@ import java.io.StringWriter;
 
 /**
  * Launcher for JBake.
- * 
+ *
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
@@ -45,7 +46,7 @@ public class Main {
 	private Baker baker;
 	private JettyServer jettyServer;
 	private BakeWatcher watcher;
-	private ConfigUtil configUtil;
+	private JBakeConfigurationFactory configurationFactory;
 
 	/**
 	 * Default constructor.
@@ -65,7 +66,7 @@ public class Main {
 		this.baker = baker;
 		this.jettyServer = jetty;
 		this.watcher = watcher;
-		this.configUtil = new ConfigUtil();
+		this.configurationFactory = new JBakeConfigurationFactory();
 	}
 
 	protected void run(String[] args) {
@@ -73,13 +74,14 @@ public class Main {
 		SLF4JBridgeHandler.install();
 		LaunchOptions res = parseArguments( args );
 
-		final DefaultJBakeConfiguration config;
+		final JBakeConfiguration config;
 		try {
-			config = (DefaultJBakeConfiguration) getConfigUtil().loadConfig( res.getSource() );
-			if ( res.getDestination() != null ) {
-				config.setDestinationFolder(res.getDestination());
+			if ( res.isRunServer() ) {
+			    config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(),res.getDestination(), res.isClearCache());
 			}
-			config.setClearCache(res.isClearCache());
+			else {
+			    config = getJBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+            }
 		} catch( final ConfigurationException e ) {
 			throw new JBakeException( "Configuration error: " + e.getMessage(), e );
 		}
@@ -120,17 +122,13 @@ public class Main {
 					runServer(config.getDestinationFolder(), config.getServerPort());
 				}
 			} else {
-				// server command run on it's own
-				if (!res.getSource().getPath().equals(".")) {
-					runServer( res.getSource(), config.getServerPort());
-				} else {
 					// use the default destination folder
 					runServer( config.getDestinationFolder(), config.getServerPort());
-				}
 			}
 		}
 
 	}
+
 	private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();
 		CmdLineParser parser = new CmdLineParser(res);
@@ -144,7 +142,6 @@ public class Main {
 
 		return res;
 	}
-
 	private void printUsage(Object options) {
 		CmdLineParser parser = new CmdLineParser(options);
 		StringWriter sw = new StringWriter();
@@ -179,11 +176,13 @@ public class Main {
 		}
 	}
 
-	public ConfigUtil getConfigUtil() {
-		return configUtil;
+	public JBakeConfigurationFactory getJBakeConfigurationFactory() {
+		return configurationFactory;
 	}
 
-	public void setConfigUtil(ConfigUtil configUtil) {
-		this.configUtil = configUtil;
+	public void setJBakeConfigurationFactory(JBakeConfigurationFactory factory) {
+		configurationFactory = factory;
 	}
+
+
 }

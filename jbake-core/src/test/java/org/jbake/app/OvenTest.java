@@ -2,6 +2,7 @@ package org.jbake.app;
 
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.model.DocumentTypes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,6 +26,7 @@ public class OvenTest {
 
     @Before
     public void setUp() throws Exception {
+        DocumentTypes.resetDocumentTypes();
         sourceFolder = new File(this.getClass().getResource("/fixture").getPath());
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(folder.newFolder("output"));
@@ -33,7 +35,7 @@ public class OvenTest {
 
     @After
     public void tearDown() throws Exception {
-        if (contentStore!=null){
+        if (contentStore!=null && contentStore.isActive()){
             contentStore.close();
             contentStore.shutdown();
         }
@@ -41,6 +43,10 @@ public class OvenTest {
 
     @Test
     public void bakeWithAbsolutePaths() {
+        configuration.setTemplateFolder( new File(sourceFolder, "freemarkerTemplates") );
+        configuration.setContentFolder( new File(sourceFolder, "content") );
+        configuration.setAssetFolder( new File(sourceFolder, "assets") );
+
         final Oven oven = new Oven(configuration);
         oven.bake();
 
@@ -57,8 +63,8 @@ public class OvenTest {
     public void should_instantiate_needed_Utensils() throws Exception {
 
         configuration.setTemplateFolder( folder.newFolder("template") );
-        configuration.setTemplateFolder( folder.newFolder("content") );
-        configuration.setTemplateFolder( folder.newFolder("assets") );
+        configuration.setContentFolder( folder.newFolder("content") );
+        configuration.setAssetFolder( folder.newFolder("assets") );
 
         Oven oven = new Oven(configuration);
 
@@ -83,8 +89,8 @@ public class OvenTest {
     @Test
     public void should_crawl_render_and_copy_assets() throws Exception {
         configuration.setTemplateFolder( folder.newFolder("template") );
-        configuration.setTemplateFolder( folder.newFolder("content") );
-        configuration.setTemplateFolder( folder.newFolder("assets") );
+        configuration.setContentFolder( folder.newFolder("content") );
+        configuration.setAssetFolder( folder.newFolder("assets") );
 
         contentStore = spy(new ContentStore("memory", "documents"+ System.currentTimeMillis()));
 
