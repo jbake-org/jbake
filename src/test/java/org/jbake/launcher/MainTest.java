@@ -101,7 +101,7 @@ public class MainTest {
     @Test
     public void launchJettyWithCmdlineOverridingProperties() throws CmdLineException {
         String[] args = {"src/jbake", "build/jbake", "-s"};
-        Map properties = new HashMap(){{
+        Map<String,String> properties = new HashMap<String,String>(){{
            put("destination.folder", "target/jbake");
         }};
         main.run(stubOptions(args), stubConfig(properties));
@@ -119,10 +119,8 @@ public class MainTest {
     private CompositeConfiguration stubConfig(Map<String, String> properties) {
         CompositeConfiguration config = new CompositeConfiguration();
         config.addProperty("server.port", "8820");
-        Iterator it = properties.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry<String,String> pair = (Map.Entry<String,String>)it.next();
-            config.addProperty( pair.getKey(), pair.getValue() );
+        for (Map.Entry<String,String> pair : properties.entrySet()) {
+            config.addProperty(pair.getKey(), pair.getValue());
         }
         return config;
     }
