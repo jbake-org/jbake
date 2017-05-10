@@ -81,5 +81,26 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         assertTrue("index file exists",indexFile.exists());
 
     }
+    
+    @Test
+    public void checkDbTemplateModelIsPopulated() throws Exception {
+    	
+        config.setProperty(Keys.PAGINATE_INDEX, true);
+        config.setProperty(Keys.POSTS_PER_PAGE, 1);
+        
+        outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
+        
+        db.deleteAllByDocType("post");
+
+        renderer.renderIndexPaging("index.html");
+
+        File outputFile = new File(destinationFolder, "index.html");
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+
+        for (String string : getOutputStrings("dbSpan")) {
+            assertThat(output).contains(string);
+        }
+
+    }
 
 }
