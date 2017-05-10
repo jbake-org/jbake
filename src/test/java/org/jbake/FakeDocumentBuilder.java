@@ -42,6 +42,7 @@ public class FakeDocumentBuilder {
 
     public FakeDocumentBuilder withDate(Date date) {
     	fileModel.put(Crawler.Attributes.DATE, date);
+    	hasDate = true;
     	return this;
     }
     
