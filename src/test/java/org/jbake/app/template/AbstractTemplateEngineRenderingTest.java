@@ -142,7 +142,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
                 "blog/2012/first-post.html",
-                "papers/published-fixture.groovyMarkupTemplates.paper.html"));
+                "papers/published-paper.html"));
 
     }
 
@@ -250,7 +250,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderSitemap() throws Exception {
-        DocumentTypes.addDocumentType("fixture.groovyMarkupTemplates.paper");
+        DocumentTypes.addDocumentType("paper");
         DBUtil.updateSchema(db);
 
         renderer.renderSitemap("sitemap.xml");
@@ -262,7 +262,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         for (String string : getOutputStrings("sitemap")) {
             assertThat(output).contains(string);
         }
-        assertThat(output).doesNotContain("draft-fixture.groovyMarkupTemplates.paper.html");
+        assertThat(output).doesNotContain("draft-paper.html");
     }
 
     protected List<String> getOutputStrings(String type) {

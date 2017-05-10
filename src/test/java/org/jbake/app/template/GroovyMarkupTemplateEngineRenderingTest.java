@@ -55,15 +55,15 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     @Test
     public void renderCustomTypePaper() throws Exception {
         // setup
-        config.setProperty("template.fixture.groovyMarkupTemplates.paper.file", "fixture.groovyMarkupTemplates.paper." + templateExtension);
-        DocumentTypes.addDocumentType("fixture.groovyMarkupTemplates.paper");
+        config.setProperty("template.paper.file", "paper." + templateExtension);
+        DocumentTypes.addDocumentType("paper");
         DBUtil.updateSchema(db);
 
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         Parser parser = new Parser(config, sourceFolder.getPath());
         Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
-        String filename = "published-fixture.groovyMarkupTemplates.paper.html";
+        String filename = "published-paper.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "papers" + File.separator + filename);
         Map<String, Object> content = parser.processFile(sampleFile);
