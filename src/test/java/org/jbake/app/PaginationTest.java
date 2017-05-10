@@ -25,15 +25,18 @@ package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.jbake.FakeDocumentBuilder;
+import org.junit.*;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author jdlee
@@ -68,18 +71,17 @@ public class PaginationTest {
 
     @Test
     public void testPagination() {
-        Map<String, Object> fileContents = new HashMap<String, Object>();
         final int TOTAL_POSTS = 5;
         final int PER_PAGE = 2;
-
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         for (int i = 1; i <= TOTAL_POSTS; i++) {
-            fileContents.put("name", "dummyfile" + i);
-
-            ODocument doc = new ODocument("post");
-            doc.fields(fileContents);
-            boolean cached = fileContents.get("cached") != null ? Boolean.valueOf((String) fileContents.get("cached")) : true;
-            doc.field("cached", cached);
-            doc.save();
+        	cal.add(Calendar.SECOND, 5);
+            FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
+            builder.withName("dummyfile" + i)
+                    .withCached(true)
+                    .withStatus("published")
+                    .withDate(cal.getTime())
+                    .build();
         }
 
         int pageCount = 1;
@@ -90,9 +92,12 @@ public class PaginationTest {
             db.setStart(start);
             DocumentList posts = db.getAllContent("post");
 
-            int expectedNumber = (pageCount==1)?pageCount:((pageCount%2==0)?pageCount+1:pageCount+PER_PAGE);
+            assertThat( posts.size() ).isLessThanOrEqualTo( 2 );
 
-            Assert.assertEquals("pagcount " +pageCount,"dummyfile" + expectedNumber, posts.get(0).get("name"));
+            if( posts.size() > 1 ) {
+                assertThat((Date) posts.get(0).get("date")).isAfter((Date) posts.get(1).get("date"));
+            }
+
             pageCount++;
             start += PER_PAGE;
         }

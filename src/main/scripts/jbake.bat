@@ -1,2 +1,2 @@
 @echo off
-java -jar "%~dp0\..\jbake-core.jar" %*
+java -XX:MaxDirectMemorySize=1024m -jar "%~dp0\..\jbake-core.jar" %*

@@ -6,7 +6,7 @@ public enum DocumentAttributes {
     RENDERED("rendered"),
     CACHED("cached"),
     STATUS("status"),
-    KEY("key");
+    NAME("name");
 
     private String label;
 
