@@ -73,6 +73,10 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
 }
 
+test {
+    jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+}
+
 jacoco {
     toolVersion = jacocoVersion
 }

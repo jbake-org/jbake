@@ -80,6 +80,11 @@ distributions {
     }
 }
 
+startScripts {
+    defaultJvmOpts = ['-XX:MaxDirectMemorySize=512m']
+    classpath += files('lib/logging')
+}
+
 distZip {
     classifier = "bin"
 }
