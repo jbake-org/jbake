@@ -1,6 +1,6 @@
 = JBake
 Jonathan Bullock
-2013-10-20
+2017-05-11
 :idprefix:
 
 == JBake
@@ -54,19 +54,13 @@ Talk to other users of JBake on the forum:
 
 == Build System
 
-The project uses Apache Maven as the build system. To build the JBake distribution ZIP file execute the following command from the root of the repo:
+The project uses Gradle as the build system. To build the JBake distribution ZIP file execute the following command from the root of the repo:
 
 ----
-$ mvn package
+$ ./gradlew distZip
 ----
 
-This will build a ZIP file in the `/dist` folder.
-
-Alternatively you can run directly from the source code using the Maven exec plugin:
-
-----
-$ mvn exec:java -Dexec.mainClass=org.jbake.launcher.Main -Dexec.args="/fromFolder /tmp/toFolder/"
-----
+This will build a ZIP file in the `/build/distributions` folder.
 
 == Tools & Libraries Used
 
@@ -74,7 +68,6 @@ $ mvn exec:java -Dexec.mainClass=org.jbake.launcher.Main -Dexec.args="/fromFolde
 * http://maven.apache.org/[Apache Maven]
 * http://args4j.kohsuke.org/[Args4j]
 * http://asciidoctor.org/[AsciidoctorJ]
-* http://www.eclipse.org/[Eclipse IDE]
 * http://freemarker.org/[Freemarker]
 * http://junit.org/[JUnit]
 * http://pegdown.org/[Pegdown]
