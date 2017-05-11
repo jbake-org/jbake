@@ -20,7 +20,7 @@ after_failure:
   - ./gradlew clean check --debug
 
 notifications:
-  irc: "irc.freenode.org#anchos"
+  irc: "irc.freenode.org#jbake"
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
