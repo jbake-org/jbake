@@ -138,7 +138,7 @@ public class Renderer {
      * @param db            The database holding the content
      * @param destination   The destination folder
      * @param templatesPath The templates folder
-     * @param config				Project configuration
+     * @param config        Project configuration
      */
     public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
         this.destination = destination;
@@ -150,11 +150,11 @@ public class Renderer {
     /**
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
-     * @param db            The database holding the content
-     * @param destination   The destination folder
-     * @param templatesPath The templates folder
-     * @param config
-     * @param renderingEngine The instance of DelegatingTemplateEngine to use
+     * @param db                The database holding the content
+     * @param destination       The destination folder
+     * @param templatesPath     The templates folder
+     * @param config            Project configuration
+     * @param renderingEngine   The instance of DelegatingTemplateEngine to use
      */
     public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config, DelegatingTemplateEngine renderingEngine) {
         this.destination = destination;
@@ -172,8 +172,8 @@ public class Renderer {
     /**
      * Render the supplied content to a file.
      *
-     * @param	content 		The content to renderDocument
-     * @throws	Exception	if IOException or SecurityException are raised
+     * @param content       The content to renderDocument
+     * @throws Exception    if IOException or SecurityException are raised
      */
     public void render(Map<String, Object> content) throws Exception {
         String docType = (String) content.get(Crawler.Attributes.TYPE);
@@ -296,11 +296,10 @@ public class Renderer {
 
     /**
      * Render an XML sitemap file using the supplied content.
-     * 
-	 * @param	sitemapFile		configuration for site map
-     * @throws	Exception		if can't create correct default rendering config
      *
-     * @throws Exception
+     * @param sitemapFile       configuration for site map
+     * @throws Exception        if can't create correct default rendering config
+     *
      * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
@@ -311,8 +310,8 @@ public class Renderer {
     /**
      * Render an XML feed file using the supplied content.
      *
-     * @param feedFile The name of the output file
-     * @throws Exception	if default rendering configuration is not loaded correctly
+     * @param feedFile      The name of the output file
+     * @throws Exception    if default rendering configuration is not loaded correctly
      */
     public void renderFeed(String feedFile) throws Exception {
         render(new DefaultRenderingConfig(feedFile, "feed"));
@@ -321,8 +320,8 @@ public class Renderer {
     /**
      * Render an archive file using the supplied content.
      *
-     * @param archiveFile The name of the output file
-     * @throws Exception	if default rendering configuration is not loaded correctly
+     * @param archiveFile   The name of the output file
+     * @throws Exception    if default rendering configuration is not loaded correctly
      */
     public void renderArchive(String archiveFile) throws Exception {
         render(new DefaultRenderingConfig(archiveFile, "archive"));
@@ -332,8 +331,8 @@ public class Renderer {
      * Render tag files using the supplied content.
      *
      * @param tagPath The output path
-	 * @return	Number of rendered tags
-     * @throws Exception	if cannot render tags correctly
+     * @return Number of rendered tags
+     * @throws Exception if cannot render tags correctly
      */
     public int renderTags(String tagPath) throws Exception {
     	int renderedCount = 0;

@@ -1,0 +1,34 @@
+apply plugin: "io.sdkman.vendors"
+
+ext.sdkman_consumer_key = project.hasProperty('sdkman_consumer_key')?sdkman_consumer_key:''
+ext.sdkman_consumer_token = project.hasProperty('sdkman_consumer_token')?sdkman_consumer_token:''
+
+sdkman {
+    consumerKey = project.sdkman_consumer_key
+    consumerToken = project.sdkman_consumer_token
+    candidate = rootProject.name
+    version = rootProject.version
+    hashtag = "#JBake"
+    url = "http://jbake.org/files/${distZip.archiveName}"
+}
+
+task distributionAvailable() {
+    group = "Verification"
+    description = "Check if distribution is available on bintray"
+
+    doLast {
+        String errorMsg = "Distribution is not available at $sdkman.url"
+
+        HttpURLConnection connection = sdkman.url.toURL().openConnection()
+        connection.setRequestMethod("HEAD")
+        connection.connect()
+
+        if ( connection.responseCode != 200 ){
+            throw new GradleException(errorMsg)
+        }
+    }
+}
+
+tasks.findAll{ it.name ==~ /sdk.*(Release|Version)/ }.each {
+    it.dependsOn distributionAvailable
+}

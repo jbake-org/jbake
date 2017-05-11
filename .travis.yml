@@ -4,12 +4,30 @@ addons:
   hostname: short-hostname
 
 jdk:
-  - openjdk6
   - openjdk7
   - oraclejdk7
+  - oraclejdk8
+    
+install: true
+
+script:
+  - ./gradlew check
 
 after_success:
-  - mvn jacoco:report coveralls:jacoco
+  - ./gradlew jacocoTestReport coveralls || ./gradlew clean
+
+after_failure:
+  - ./gradlew clean check --debug
 
 notifications:
-  irc: "irc.freenode.org#jbake"
+  irc: "irc.freenode.org#anchos"
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+     - $HOME/.gradle/caches/
+     - $HOME/.gradle/wrapper/
+

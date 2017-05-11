@@ -18,11 +18,11 @@ import org.junit.rules.TemporaryFolder;
 
 public class AssetTest {
 
-	private CompositeConfiguration config;
+    private CompositeConfiguration config;
 
 	@Before
     public void setup() throws Exception {
-		config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+		config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
 		Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
 	}
 
@@ -31,7 +31,7 @@ public class AssetTest {
 
 	@Test
 	public void copy() throws Exception {
-		URL assetsUrl = this.getClass().getResource("/assets");
+		URL assetsUrl = this.getClass().getResource("/fixture/assets");
 		File assets = new File(assetsUrl.getFile());
 		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
 		asset.copy(assets);
@@ -49,7 +49,7 @@ public class AssetTest {
 	@Test
 	public void copyCustomFolder() throws Exception {
 		config.setProperty(ConfigUtil.Keys.ASSET_FOLDER, "media");
-		URL assetsUrl = this.getClass().getResource("/media");
+		URL assetsUrl = this.getClass().getResource("/fixture/media");
 		File assets = new File(assetsUrl.getFile());
 		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
 		asset.copy(assets);
@@ -64,7 +64,7 @@ public class AssetTest {
 	public void copyIgnore() throws Exception {
 		config.setProperty(Keys.ASSET_FOLDER, "ignorables");
 		config.setProperty(Keys.ASSET_IGNORE_HIDDEN, "true");
-		URL assetsUrl = this.getClass().getResource("/ignorables");
+		URL assetsUrl = this.getClass().getResource("/fixture/ignorables");
 		File assets = new File(assetsUrl.getFile());
 		hideAssets(assets);
 		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
@@ -103,7 +103,7 @@ public class AssetTest {
 	 */
 	@Test
 	public void testWriteProtected() throws Exception {
-		URL assetsUrl = this.getClass().getResource("/assets");
+		URL assetsUrl = this.getClass().getResource("/fixture/assets");
 		File assets = new File(assetsUrl.getFile());
 		final File cssFile = new File(folder.newFolder("css"), "bootstrap.min.css");
 		FileUtils.touch(cssFile);
@@ -122,7 +122,7 @@ public class AssetTest {
 	@Test
 	public void testUnlistable() throws Exception {
 		config.setProperty(Keys.ASSET_FOLDER, "non-existent");
-		URL assetsUrl = this.getClass().getResource("/");
+		URL assetsUrl = this.getClass().getResource("/fixture");
 		File assets = new File(assetsUrl.getFile() + File.separatorChar + "non-existent");
 		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
 		asset.copy(assets);

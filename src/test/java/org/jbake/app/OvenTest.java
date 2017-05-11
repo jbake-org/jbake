@@ -29,7 +29,7 @@ public class OvenTest {
     	// reset values to known state otherwise previous test case runs can affect the success of this test case
     	DocumentTypes.resetDocumentTypes();
 		
-    	URL sourceUrl = this.getClass().getResource("/");
+    	URL sourceUrl = this.getClass().getResource("/fixture");
 		rootPath = new File(sourceUrl.getFile());
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");

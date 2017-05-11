@@ -1,0 +1,90 @@
+import org.ajoberstar.grgit.Grgit
+
+import java.text.SimpleDateFormat
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:grgit:1.6.0'
+    }
+}
+
+apply plugin: 'application'
+
+mainClassName = "org.jbake.launcher.Main"
+applicationName = "jbake"
+
+ext {
+    examplesBase = "$project.buildDir/examples"
+
+    exampleRepositories = [
+            "example_project_freemarker": "git://github.com/jbake-org/jbake-example-project-freemarker.git",
+            "example_project_groovy"    : "git://github.com/jbake-org/jbake-example-project-groovy.git",
+            "example_project_thymeleaf" : "git://github.com/jbake-org/jbake-example-project-thymeleaf.git",
+            "example_project_groovy-mte": "git://github.com/jbake-org/jbake-example-project-groovy-mte.git",
+            "example_project_jade"      : "git://github.com/jbake-org/jbake-example-project-jade.git"
+    ]
+}
+
+processResources {
+    from("src/main/resources"){
+        include 'default.properties'
+        expand  jbakeVersion: project.version,
+                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format( new Date() )
+    }
+}
+
+
+task cloneProjectExampleRepositories() {
+    group = "distribution"
+    description "Clone jbake example project repositories"
+
+    outputs.dir examplesBase
+
+    doLast {
+        exampleRepositories.each { name, repository ->
+            Grgit.clone(dir: "$examplesBase/$name", uri: repository)
+        }
+    }
+}
+
+//create Zip Task for each repository
+exampleRepositories.each { name, repository ->
+
+    task "${name}Zip"(type: Zip, dependsOn: cloneProjectExampleRepositories) {
+        group "distribution"
+        description "Zip $name repository"
+
+        baseName = name
+        archiveName = "${baseName}.zip"
+
+        from "$examplesBase/$baseName"
+        exclude 'README.md'
+        exclude 'LICENSE'
+        exclude '.git'
+    }
+
+}
+
+distributions {
+    main {
+        contents {
+            //Include Outputs from zip tasks
+            exampleRepositories.each { name, repository ->
+                def task = project.tasks.getByName("${name}Zip")
+                from(task)
+            }
+        }
+    }
+}
+
+startScripts {
+    defaultJvmOpts = ['-XX:MaxDirectMemorySize=512m']
+    classpath += files('lib/logging')
+}
+
+distZip {
+    classifier = "bin"
+}

@@ -28,7 +28,7 @@ public class Main {
 
 	/**
 	 * Runs the app with the given arguments.
-	 * 
+	 *
 	 * @param args	Application arguments
 	 */
 	public static void main(final String[] args) {
@@ -58,9 +58,9 @@ public class Main {
 	/**
 	 * Optional constructor to externalize dependencies.
 	 *
-	 * @param baker
-	 * @param jetty
-	 * @param watcher
+	 * @param baker A {@link Baker} instance
+	 * @param jetty A {@link JettyServer} instance
+	 * @param watcher A {@link BakeWatcher} instance
 	 */
 	protected Main(Baker baker, JettyServer jetty, BakeWatcher watcher) {
 		this.baker = baker;
@@ -149,7 +149,7 @@ public class Main {
 		sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
 		sw.append("Options:");
 		System.out.println(sw.toString());
-		parser.setUsageWidth(100);
+		parser.getProperties().withUsageWidth(100);
 		parser.printUsage(System.out);
 	}
 

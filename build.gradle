@@ -1,0 +1,91 @@
+plugins {
+    id "java"
+    id "eclipse"
+    id "idea"
+    id "jacoco"
+    id "io.sdkman.vendors"              version "1.1.1"     apply false
+    id "com.jfrog.bintray"              version "1.7.3"     apply false
+    id "com.github.kt3k.coveralls"      version "2.8.1"     apply false
+    id 'com.github.ben-manes.versions'  version '0.14.0'
+}
+
+if( JavaVersion.current().java7Compatible ) {
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'com.jfrog.bintray'
+    apply from: 'gradle/application.gradle'
+    apply from: 'gradle/signing.gradle'
+    apply from: 'gradle/maven-publishing.gradle'
+    apply from: 'gradle/publishing.gradle'
+    apply from: 'gradle/sdkman.gradle'
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    jcenter()
+}
+
+ext {
+    asciidoctorjVersion = '1.5.4.1'
+    commonsIoVersion = '2.5'
+    commonsConfigurationVersion = '1.10'
+    commonsLangVersion = '3.4'
+    commonsVfs2Version = '2.1'
+    args4jVersion = '2.33'
+    freemarkerVersion = '2.3.25-incubating'
+    junitVersion = '4.12'
+    pegdownVersion = '1.6.0'
+    jettyServerVersion = '8.1.19.v20160209'
+    orientDbVersion = '2.2.15'
+    groovyVersion = '2.4.8'
+    slf4jVersion = '1.7.22'
+    logbackVersion = '1.1.9'
+    assertjCoreVersion = '1.7.1'
+    thymeleafVersion = '3.0.3.RELEASE'
+    jsonSimpleVersion = '1.1.1'
+    jade4jVersion = '1.2.5'
+    mockitoVersion = '1.10.19'
+}
+
+dependencies {
+    compile group: 'commons-io', name: 'commons-io', version:  commonsIoVersion
+    compile group: 'commons-configuration', name: 'commons-configuration', version: commonsConfigurationVersion
+    compile group: 'org.apache.commons', name: 'commons-vfs2', version: commonsVfs2Version
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
+    compile group: 'args4j', name: 'args4j', version: args4jVersion
+    compile group: 'org.freemarker', name: 'freemarker', version: freemarkerVersion
+    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: orientDbVersion
+    compile group: 'org.pegdown', name: 'pegdown', version: pegdownVersion
+    compile group: 'org.asciidoctor', name: 'asciidoctorj', version: asciidoctorjVersion
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyServerVersion
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
+    compile group: 'org.codehaus.groovy', name: 'groovy-templates', version: groovyVersion
+    compile group: 'org.thymeleaf', name: 'thymeleaf', version: thymeleafVersion
+    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    compile group: 'org.slf4j', name: 'jul-to-slf4j', version: slf4jVersion
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+    compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
+    compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
+    testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+}
+
+test {
+    jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+}
+
+jacoco {
+    toolVersion = jacocoVersion
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
+
+jacocoTestReport.dependsOn test

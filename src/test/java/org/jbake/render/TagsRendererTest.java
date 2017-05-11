@@ -53,7 +53,7 @@ public class TagsRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        Set<String> tags = new HashSet(Arrays.asList("tag1", "tags2"));
+        Set<String> tags = new HashSet<String>(Arrays.asList("tag1", "tags2"));
         when(contentStore.getTags()).thenReturn(tags);
 
         when(mockRenderer.renderTags("random string")).thenReturn(1);
@@ -72,7 +72,7 @@ public class TagsRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        Set<String> tags = new HashSet(Arrays.asList("tag1", "tags2"));
+        Set<String> tags = new HashSet<String>(Arrays.asList("tag1", "tags2"));
         when(contentStore.getTags()).thenReturn(tags);
 
         int renderResponse = renderer.render(mockRenderer, contentStore,

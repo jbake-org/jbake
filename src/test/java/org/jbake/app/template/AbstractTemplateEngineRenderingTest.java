@@ -25,35 +25,20 @@ package org.jbake.app.template;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
-import org.jbake.app.DBUtil;
-import org.jbake.app.Parser;
-import org.jbake.app.Renderer;
+import org.jbake.app.*;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- *
  * @author jdlee
  */
 public abstract class AbstractTemplateEngineRenderingTest {
@@ -88,7 +73,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
         DocumentTypes.addListener(listener);
 
-        URL sourceUrl = this.getClass().getResource("/");
+        URL sourceUrl = this.getClass().getResource("/fixture");
 
         sourceFolder = new File(sourceUrl.getFile());
         if (!sourceFolder.exists()) {
@@ -102,7 +87,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
             throw new Exception("Cannot find template folder!");
         }
 
-        config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+        config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -282,6 +267,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
-        
+
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
                 "<a href=\"blog/2012/first-post.html\">First Post</a></h4>"));
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
                 "blog/2012/first-post.html",
-                "papers/published-paper.html"));
+                "papers/published-fixture.groovyMarkupTemplates.paper.html"));
         outputStrings.put("paper", Arrays.asList("<h2>Published Paper</h2>",
                 "<p class=\"post-date\">24",
                 "2014</p>",
@@ -72,7 +73,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
         Assert.assertTrue(outputFile.exists());
 
         // verify
-        String output = FileUtils.readFileToString(outputFile);
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("paper")) {
             assertThat(output).contains(string);
         }

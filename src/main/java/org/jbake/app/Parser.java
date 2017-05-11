@@ -22,9 +22,9 @@ public class Parser {
 
     /**
      * Creates a new instance of Parser.
-		 *
-		 * @param config			Project configuration
-		 * @param contentPath	Content location
+     *
+     * @param config         Project configuration
+     * @param contentPath    Content location
      */
     public Parser(Configuration config, String contentPath) {
         this.config = config;
@@ -35,7 +35,7 @@ public class Parser {
      * Process the file by parsing the contents.
      *
      * @param    file File input for parsing
-     * @return				The contents of the file
+     * @return   The contents of the file as a @{@link Map}
      */
     public Map<String, Object> processFile(File file) {
     	ParserEngine engine = Engines.get(FileUtil.fileExt(file));

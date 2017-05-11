@@ -1,12 +1,5 @@
 package org.jbake.app;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
@@ -19,21 +12,28 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CrawlerTest {
     private CompositeConfiguration config;
     private ContentStore db;
     private File sourceFolder;
 
-	@Before
+    @Before
     public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/");
+        URL sourceUrl = this.getClass().getResource("/fixture");
 
         sourceFolder = new File(sourceUrl.getFile());
         if (!sourceFolder.exists()) {
             throw new Exception("Cannot find sample data structure!");
         }
 
-        config = ConfigUtil.load(new File(this.getClass().getResource("/").getFile()));
+        config = ConfigUtil.load(sourceFolder);
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
         db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
     }
@@ -86,7 +86,7 @@ public class CrawlerTest {
 
         CompositeConfiguration config = new CompositeConfiguration();
         config.addConfiguration(new MapConfiguration(testProperties));
-        config.addConfiguration(ConfigUtil.load(new File(this.getClass().getResource("/").getFile())));
+        config.addConfiguration(ConfigUtil.load(sourceFolder));
 
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));

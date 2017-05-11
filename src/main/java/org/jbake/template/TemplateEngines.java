@@ -20,7 +20,8 @@ import java.util.Set;
 
 
 /**
- * <p>A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New
+ * <p>
+ * A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New
  * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath
  * (recommanded).</p>
  * <p>The descriptor file must be found in <i>META-INF</i> directory and named

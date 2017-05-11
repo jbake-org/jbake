@@ -1,0 +1,70 @@
+apply plugin: 'maven'
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+def jbakePom = pom {
+    project {
+        description project.description
+        url project.website
+        developers {
+            developer {
+                id 'jonbullock'
+                name 'Jonathan Bullock'
+                email 'jonbullock@gmail.com'
+                url 'http://jonathanbullock.com'
+                timezone '0'
+            }
+        }
+        scm {
+            url project.vcs
+            connection 'scm:git:git@github.com:jbake-org/jbake.git'
+            developerConnection 'scm:git:https://github.com/jbake-org/jbake.git'
+        }
+        issueManagement {
+            system 'GitHub Issues'
+            url project.issues
+        }
+        mailingLists {
+
+            mailingList {
+                name 'jbake-dev'
+                subscribe 'jbake-dev@googlegroups.com'
+                unsubscribe 'jbake-dev+unsubscribe@googlegroups.com'
+                archive 'http://groups.google.com/group/jbake-dev'
+            }
+            mailingList {
+                name 'jbake-user'
+                subscribe 'jbake-user@googlegroups.com'
+                unsubscribe 'jbake-user+unsubscribe@googlegroups.com'
+                archive 'http://groups.google.com/group/jbake-user'
+            }
+        }
+
+        licenses {
+            license {
+                name 'The MIT License (MIT)'
+                url 'http://opensource.org/licenses/MIT'
+            }
+        }
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+install {
+    repositories.mavenInstaller {
+        setPom jbakePom
+    }
+}

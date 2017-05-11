@@ -61,9 +61,9 @@ public class Crawler {
 
     /**
      * Creates new instance of Crawler.
-		 * @param db			Database instance for content
-		 * @param source	Base directory where content directory is located
-		 * @param config	Project configuration
+	 * @param db		Database instance for content
+	 * @param source	Base directory where content directory is located
+	 * @param config	Project configuration
      */
     public Crawler(ContentStore db, File source, CompositeConfiguration config) {
         this.db = db;
