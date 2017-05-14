@@ -50,8 +50,8 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         config.setProperty(Keys.POSTS_PER_PAGE, 1);
 
         outputStrings.put("index", Arrays.asList(
-                "index.html\">Previous</a>",
-                "3/index.html\">Next</a>",
+                "\">Previous</a>",
+                "3/\">Next</a>",
                 "2 of 3"
         ));
 

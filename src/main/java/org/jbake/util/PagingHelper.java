@@ -17,7 +17,7 @@ public class PagingHelper {
 
     public String getNextFileName(int currentPageNumber, String fileName) {
         if (currentPageNumber < getNumberOfPages()) {
-            return (currentPageNumber + 1) + File.separator + fileName;
+            return (currentPageNumber + 1) + File.separator;
         } else {
             return null;
         }
@@ -29,10 +29,11 @@ public class PagingHelper {
             return null;
         } else {
             if ( currentPageNumber == 2 ) {
-                return fileName;
+            	// Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
+                return "";
             }
             else {
-                return (currentPageNumber - 1) + File.separator + fileName;
+                return (currentPageNumber - 1) + File.separator;
             }
         }
     }
