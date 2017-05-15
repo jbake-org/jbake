@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.vfs2.util.Os;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
@@ -13,6 +14,7 @@ import org.jbake.app.Renderer;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -51,7 +53,14 @@ public class RendererTest {
 	 */
 	@Test
     public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
-		final String FOLDER = "real.path";
+		String FOLDER;
+		if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
+			FOLDER = "real\\.path";
+		}
+		else {
+			FOLDER = "real.path";
+		}
+
 		final String FILENAME = "about";
 		config.setProperty(Keys.OUTPUT_EXTENSION, "");
 		Renderer renderer = new Renderer(db, outputPath, folder.newFolder("templates"), config, renderingEngine);
