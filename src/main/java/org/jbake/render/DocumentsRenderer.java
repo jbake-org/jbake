@@ -44,12 +44,12 @@ public class DocumentsRenderer implements RenderingTool {
 						Map<String, Object> tempNext = documentList.get(index + 1);
 						document.put("previousContent", getContentForNav(tempNext));
 					}
-
+					
+					nextDocument = document;
+					
 					renderer.render(document);
 					renderedCount++;
 
-					nextDocument = document;
-					
 				} catch (Exception e) {
 					errors.add(e.getMessage());
 				}
