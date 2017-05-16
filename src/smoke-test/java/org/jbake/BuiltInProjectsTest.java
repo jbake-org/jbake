@@ -66,12 +66,14 @@ public class BuiltInProjectsTest {
         assertThat(process.exitValue()).isEqualTo(0);
         assertThat(new File(projectFolder,"jbake.properties")).exists();
         assertThat(new File(templateFolder, String.format("index.%s", extension))).exists();
+        process.destroy();
     }
 
     private void shouldBakeProject() throws IOException, InterruptedException {
         Process process = runWithArguments(jbakeExecutable,"-b");
         assertThat(process.exitValue()).isEqualTo(0);
         assertThat(new File(outputFolder, "index.html")).exists();
+        process.destroy();
     }
 
     private Process runWithArguments(String... arguments) throws IOException, InterruptedException {
@@ -80,8 +82,9 @@ public class BuiltInProjectsTest {
         processBuilder.redirectErrorStream(true);
 
         Process process = processBuilder.start();
-        process.waitFor();
         printOutput(process.getInputStream());
+        process.waitFor();
+        
         return process;
     }
 

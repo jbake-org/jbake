@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 
+import org.apache.commons.vfs2.util.Os;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil.Keys;
@@ -62,13 +63,13 @@ public class AssetTest {
 
 	@Test
 	public void copyIgnore() throws Exception {
-		config.setProperty(Keys.ASSET_FOLDER, "ignorables");
+		File assetFolder = folder.newFolder("ignoredAssets");
+        FileUtils.copyDirectory(new File(this.getClass().getResource("/fixture/ignorables").getFile()), assetFolder);
+        config.setProperty(Keys.ASSET_FOLDER, "ignorables");
 		config.setProperty(Keys.ASSET_IGNORE_HIDDEN, "true");
-		URL assetsUrl = this.getClass().getResource("/fixture/ignorables");
-		File assets = new File(assetsUrl.getFile());
-		hideAssets(assets);
-		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
-		asset.copy(assets);
+		hideAssets(assetFolder);
+		Asset asset = new Asset(assetFolder.getParentFile(), folder.getRoot(), config);
+		asset.copy(assetFolder);
 
 		File testFile = new File(folder.getRoot(), "test.txt");
 		Assert.assertTrue("File " + testFile.getAbsolutePath() + " does not exist", testFile.exists());
@@ -82,7 +83,7 @@ public class AssetTest {
 	 * Hides the assets on windows that start with a dot (e.g. .test.txt but not test.txt) so File.isHidden() returns true for those files.
 	 */
 	private void hideAssets(File assets) throws IOException, InterruptedException {
-		if (isWindows()) {
+        if ( Os.isFamily(Os.OS_FAMILY_WINDOWS) ) {
 			final File[] hiddenFiles = assets.listFiles(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
@@ -128,8 +129,4 @@ public class AssetTest {
 		asset.copy(assets);
 	}
 
-	private boolean isWindows() {
-		final String os = System.getProperty("os.name");
-		return os != null && os.toLowerCase(Locale.ENGLISH).contains("win");
-	}
 }
