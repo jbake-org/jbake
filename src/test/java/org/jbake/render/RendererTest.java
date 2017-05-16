@@ -53,14 +53,7 @@ public class RendererTest {
 	 */
 	@Test
     public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
-		String FOLDER;
-		if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-			//skip it
-			return;
-		}
-		else {
-			FOLDER = "real.path";
-		}
+		String FOLDER = "real.path";
 
 		final String FILENAME = "about";
 		config.setProperty(Keys.OUTPUT_EXTENSION, "");
