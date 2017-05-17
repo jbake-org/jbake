@@ -1,7 +1,11 @@
 package org.jbake.app;
 
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.ConfigUtil.Keys;
@@ -12,12 +16,7 @@ import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-
-import static java.io.File.separator;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
  * Crawls a file system looking for content.
@@ -178,6 +177,10 @@ public class Crawler {
             if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
             	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
+            
+            
+            // Prevent image source url's from breaking
+            HtmlUtil.fixImageSourceUrls(fileContents);
 
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
