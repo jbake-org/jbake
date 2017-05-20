@@ -1,11 +1,12 @@
 package org.jbake.launcher;
 
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,8 @@ public class JettyServer {
 	 */
 	public void run(String path, String port) {
 		Server server = new Server();
-		SelectChannelConnector connector = new SelectChannelConnector();
+		ServerConnector connector = new ServerConnector(server);
+		connector.setHost("localhost");
         connector.setPort(Integer.parseInt(port));
         server.addConnector(connector);
  

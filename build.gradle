@@ -27,25 +27,25 @@ repositories {
 }
 
 ext {
-    asciidoctorjVersion = '1.5.4.1'
+    asciidoctorjVersion = '1.5.5'
     commonsIoVersion = '2.5'
     commonsConfigurationVersion = '1.10'
-    commonsLangVersion = '3.4'
+    commonsLangVersion = '3.5'
     commonsVfs2Version = '2.1'
     args4jVersion = '2.33'
-    freemarkerVersion = '2.3.25-incubating'
+    freemarkerVersion = '2.3.26-incubating'
     junitVersion = '4.12'
     pegdownVersion = '1.6.0'
-    jettyServerVersion = '8.1.19.v20160209'
-    orientDbVersion = '2.2.15'
-    groovyVersion = '2.4.8'
-    slf4jVersion = '1.7.22'
-    logbackVersion = '1.1.9'
-    assertjCoreVersion = '1.7.1'
-    thymeleafVersion = '3.0.3.RELEASE'
+    jettyServerVersion = '9.4.5.v20170502'
+    orientDbVersion = '2.2.20'
+    groovyVersion = '2.4.11'
+    slf4jVersion = '1.7.25'
+    logbackVersion = '1.2.3'
+    assertjCoreVersion = '3.8.0'
+    thymeleafVersion = '3.0.6.RELEASE'
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.5'
-    mockitoVersion = '1.10.19'
+    mockitoVersion = '2.8.9'
 }
 
 dependencies {
@@ -71,6 +71,19 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+}
+
+dependencyUpdates.resolutionStrategy = {
+  componentSelection { rules ->
+    rules.all { ComponentSelection selection ->
+      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+        selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
+      }
+      if (rejected) {
+        selection.reject('Release candidate')
+      }
+    }
+  }
 }
 
 test {

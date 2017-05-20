@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatchers;
 
 import java.io.File;
 import java.util.HashMap;
@@ -93,7 +94,7 @@ public class DocumentsRendererTest {
         documentList.add(document2);
 
         // throw an exception for every call of renderer's render method
-        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(anyMap());
+        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(ArgumentMatchers.<String, Object>anyMap());
         when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
         when(db.getUnrenderedContent("customType")).thenReturn(documentList);
 
