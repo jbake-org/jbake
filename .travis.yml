@@ -1,22 +1,29 @@
 language: java
 
-dist: precise
+os: linux
+dist: trusty
 
 addons:
-  hostname: short-hostname
+  hosts:
+    - jbake-builder
+  hostname: jbake-builder
 
-jdk:
-  - openjdk7
-  - oraclejdk7
-  - oraclejdk8
+matrix:
+    include:
+      - jdk: oraclejdk9
+      - jdk: oraclejdk8
+      - jdk: openjdk8
+      - jdk: openjdk7
+        dist: precise
+      - os: osx
 
 install: true
 
 script:
-  - ./gradlew check
+  - ./gradlew check -i
 
 after_success:
-  - ./gradlew jacocoTestReport coveralls || ./gradlew clean
+  - ./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean
 
 after_failure:
   - ./gradlew clean check --debug
