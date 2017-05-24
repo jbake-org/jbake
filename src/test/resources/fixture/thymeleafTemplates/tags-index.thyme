@@ -1,0 +1,22 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      <head th:replace="header.thyme::head"/>
+      <body>
+      <div th:replace="header.thyme::top"/>
+
+	<div class="row-fluid marketing">
+		<div class="span12">
+			<h1>Tags</h1>
+			<div th:each="tag : ${tags}" th:with='last_month=null' th:remove='tag'>
+			   <h2><a th:href="${tag.uri}" th:text='${tag.name}' href="foo.html">Post title</a></h2>
+			</div>
+		</div>
+	</div>
+
+	<hr/>
+
+    <div th:replace="footer.thyme::footer"></div>
+    </body>
+</html>
