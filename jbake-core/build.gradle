@@ -1,1 +1,25 @@
+import java.text.SimpleDateFormat
+
+dependencies {
+    compile "commons-io:commons-io:$commonsIoVersion"
+    compile "commons-configuration:commons-configuration:$commonsConfigurationVersion"
+    compile "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    compile "org.apache.commons:commons-lang3:$commonsLangVersion"
+    compile "com.googlecode.json-simple:json-simple:$jsonSimpleVersion"
+    compile "com.orientechnologies:orientdb-graphdb:$orientDbVersion"
+    compile "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    compile "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    compile "org.freemarker:freemarker:$freemarkerVersion"
+    compile "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    compile "de.neuland-bfi:jade4j:$jade4jVersion"
+    compile "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
+}
+
+processResources {
+    from("src/main/resources") {
+        include 'default.properties'
+        expand  jbakeVersion: project.version,
+                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format( new Date() )
+    }
+}
 

@@ -33,115 +33,65 @@ ext {
 
 subprojects {
 
-    apply plugin: 'java'
-    apply plugin: 'jacoco'
+        apply plugin: 'java'
+        apply plugin: 'jacoco'
 
-    if( JavaVersion.current().java7Compatible ) {
-        apply plugin: 'com.github.kt3k.coveralls'
-        apply plugin: 'com.jfrog.bintray'
-        apply from: "$rootDir/gradle/application.gradle"
-        apply from: "$rootDir/gradle/signing.gradle"
-        apply from: "$rootDir/gradle/maven-publishing.gradle"
-        apply from: "$rootDir/gradle/publishing.gradle"
-        apply from: "$rootDir/gradle/sdkman.gradle"
-    }
-
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
-
-    repositories {
-        jcenter()
-    }
-
-    sourceSets {
-        smokeTest {
-            java {
-                srcDir file('src/smoke-test/java')
+        if( JavaVersion.current().java7Compatible ) {
+            apply plugin: 'com.github.kt3k.coveralls'
+            apply plugin: 'com.jfrog.bintray'
+            apply from: "$rootDir/gradle/signing.gradle"
+            if ( project.name != "jbake-app" ) {
+                apply from: "$rootDir/gradle/maven-publishing.gradle"
             }
-            resources {
-                srcDir file('src/smoke-test/resources')
-            }
+            apply from: "$rootDir/gradle/publishing.gradle"
         }
-    }
 
-    configurations {
-        dist
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
 
-        runtime.extendsFrom dist
-    }
+        repositories {
+            jcenter()
+        }
 
+        dependencies {
+            compile "org.slf4j:slf4j-api:$slf4jVersion"
+            compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
+            compile "ch.qos.logback:logback-classic:$logbackVersion"
+            compile "ch.qos.logback:logback-core:$logbackVersion"
+            testCompile "junit:junit:$junit4Version"
+            testCompile "org.assertj:assertj-core:$assertjCoreVersion"
+            testCompile "org.mockito:mockito-core:$mockitoVersion"
+        }
 
-    dependencies {
-        compile group: 'commons-io', name: 'commons-io', version:  commonsIoVersion
-        compile group: 'commons-configuration', name: 'commons-configuration', version: commonsConfigurationVersion
-        compile group: 'org.apache.commons', name: 'commons-vfs2', version: commonsVfs2Version
-        compile group: 'org.apache.commons', name: 'commons-lang3', version: commonsLangVersion
-        compile group: 'com.googlecode.json-simple', name: 'json-simple', version: jsonSimpleVersion
-        compile group: 'args4j', name: 'args4j', version: args4jVersion
-        compile group: 'org.freemarker', name: 'freemarker', version: freemarkerVersion
-        compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: orientDbVersion
-        compile group: 'org.asciidoctor', name: 'asciidoctorj', version: asciidoctorjVersion
-        compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyServerVersion
-        compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
-        compile group: 'org.codehaus.groovy', name: 'groovy-templates', version: groovyVersion
-        compile group: 'org.thymeleaf', name: 'thymeleaf', version: thymeleafVersion
-        compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
-        compile group: 'org.slf4j', name: 'jul-to-slf4j', version: slf4jVersion
-        compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
-        compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
-        compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
-        compile group: 'org.jsoup', name:'jsoup', version: jsoupVersion
-        compile "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
-
-        dist group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: asciidoctorjDiagramVersion
-
-        testCompile group: 'junit', name: 'junit', version: junit4Version
-        testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
-        testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
-
-        smokeTestCompile configurations.testCompile
-        smokeTestCompile sourceSets.test.output
-        smokeTestRuntime configurations.testRuntime
-
-    }
-
-    dependencyUpdates.resolutionStrategy = {
-        componentSelection { rules ->
-            rules.all { ComponentSelection selection ->
-                boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                    selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
-                }
-                if (rejected) {
-                    selection.reject('Release candidate')
+        dependencyUpdates.resolutionStrategy = {
+            componentSelection { rules ->
+                rules.all { ComponentSelection selection ->
+                    boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                        selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
+                    }
+                    if (rejected) {
+                        selection.reject('Release candidate')
+                    }
                 }
             }
         }
-    }
 
-    test {
-        jvmArgs '-Xmx512m', '-XX:MaxPermSize=512m', '-XX:MaxDirectMemorySize=128m', '-Dorientdb.installCustomFormatter=false=false'
-    }
-
-    task smokeTest(type: Test, dependsOn: installDist) {
-        group 'Verification'
-        description 'Runs the integration tests.'
-        setTestClassesDirs sourceSets.smokeTest.output.classesDirs
-        classpath = sourceSets.smokeTest.runtimeClasspath
-        shouldRunAfter test
-    }
-
-    check.dependsOn smokeTest
-
-    jacoco {
-        toolVersion = jacocoVersion
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.enabled = true // coveralls plugin depends on xml format report
-            html.enabled = true
+        test {
+            jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
         }
-    }
 
-    jacocoTestReport.dependsOn test
+        jacoco {
+            toolVersion = jacocoVersion
+        }
+
+        jacocoTestReport {
+            reports {
+                xml.enabled = true // coveralls plugin depends on xml format report
+                html.enabled = true
+            }
+        }
+
+        jacocoTestReport.dependsOn test
+
+
 }

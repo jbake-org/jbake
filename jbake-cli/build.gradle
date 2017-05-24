@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':jbake-core')
+    compile "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+    compile "args4j:args4j:$args4jVersion"
+}
