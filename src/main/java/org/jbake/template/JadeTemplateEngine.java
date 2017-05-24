@@ -74,7 +74,7 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
             public Object get(final Object property) {
                 String key = property.toString();
                 try {
-            		return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
+            		return extractors.extractAndTransform(db, key, this, new TemplateEngineAdapter.NoopAdapter());
             	} catch(NoModelExtractorException e) {
             		// fallback to parent model
             	}
