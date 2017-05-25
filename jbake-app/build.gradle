@@ -1,6 +1,8 @@
 apply from: "$rootDir/gradle/application.gradle"
 apply from: "$rootDir/gradle/sdkman.gradle"
 
+description = "The binary distribution package that bundles JBake cli"
+
 sourceSets {
     smokeTest {
         java {

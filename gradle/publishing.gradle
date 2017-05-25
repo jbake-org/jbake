@@ -1,66 +1,88 @@
+apply plugin: 'com.jfrog.bintray'
 
 ext.bintrayUsername = project.hasProperty('bintrayUsername') ? bintrayUsername : ''
 ext.bintrayKey = project.hasProperty('bintrayKey') ? bintrayKey : ''
 
 if (project.name == "jbake-app") {
-afterEvaluate {
-    bintray {
-        user = bintrayUsername
-        key = bintrayKey
 
-        filesSpec {
-            from signArchives.outputs.files.filter { !it.name.endsWith(".jar") }
-            from signArchives.signatureFiles.filter { !it.name.endsWith(".jar.asc") }
-            into "."
-        }
+    /**
+     * jbake-app specific bintray configuration.
+     *
+     * We just need the distribution packages from the project with signatures if they are present.
+     * Notice the repository. It's a generic one. You can configure it with -PbintrayBinaryRepo=whatever
+     */
+    afterEvaluate {
+        bintray {
+            user = bintrayUsername
+            key = bintrayKey
 
-        dryRun = bintrayDryRun.toBoolean()
+            if ( !project.hasProperty('skipSigning') ) {
+                filesSpec {
+                    from signArchives.outputs.files.filter { !it.name.endsWith(".jar") }
+                    from signArchives.signatureFiles.filter { !it.name.endsWith(".jar.asc") }
 
-        pkg {
-            userOrg = bintrayOrg
-            repo = bintrayBinaryRepo
-            name = applicationName
-            desc = project.description
-            licenses = ['MIT']
-            labels = ['jbake', 'site-generator']
-            websiteUrl = project.website
-            issueTrackerUrl = project.issues
-            vcsUrl = project.vcs
-            publicDownloadNumbers = true
+                    into "."
+                }
+            }
+            else {
+                filesSpec {
+                    from distZip
+                    from distTar
+
+                    into "."
+                }
+            }
+
+            dryRun = bintrayDryRun.toBoolean()
+
+            pkg {
+                userOrg = bintrayOrg
+                repo = bintrayBinaryRepo
+                name = applicationName
+                desc = project.description
+                licenses = ['MIT']
+                labels = ['jbake', 'site-generator']
+                websiteUrl = project.website
+                issueTrackerUrl = project.issues
+                vcsUrl = project.vcs
+                publicDownloadNumbers = true
+            }
         }
     }
-}
+
 } else {
- afterEvaluate {
-     bintray {
-         user = bintrayUsername
-         key = bintrayKey
-         configurations = ['archives']
 
-         if (!project.hasProperty('skipSigning')) {
-             // Copy the signed pom to bintrayDestination
-             filesSpec {
-                 from signPom
-                 into signPom.bintrayDestination
-             }
-             signPom.dependsOn install
-             bintrayUpload.dependsOn signPom
-         }
+    afterEvaluate {
+        bintray {
+            user = bintrayUsername
+            key = bintrayKey
+            configurations = ['archives']
 
-         dryRun = bintrayDryRun.toBoolean()
-         pkg {
-             userOrg = bintrayOrg
-             repo = bintrayRepo
-             name = project.name
-             desc = project.description
-             licenses = ['MIT']
-             labels = ['jbake', 'site-generator']
-             websiteUrl = project.website
-             issueTrackerUrl = project.issues
-             vcsUrl = project.vcs
-             publicDownloadNumbers = true
-         }
-     }
- }
+            if (!project.hasProperty('skipSigning')) {
+                // Copy the signed pom to bintrayDestination
+                filesSpec {
+                    from signPom
+                    into signPom.bintrayDestination
+                }
+                signPom.dependsOn install
+                bintrayUpload.dependsOn signPom
+            }
+
+            dryRun = bintrayDryRun.toBoolean()
+            pkg {
+                userOrg = bintrayOrg
+                repo = bintrayRepo
+                name = project.name
+                desc = project.description
+                licenses = ['MIT']
+                labels = ['jbake', 'site-generator']
+                websiteUrl = project.website
+                issueTrackerUrl = project.issues
+                vcsUrl = project.vcs
+                publicDownloadNumbers = true
+            }
+        }
+    }
+
 }
 

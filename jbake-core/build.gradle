@@ -1,5 +1,7 @@
 import java.text.SimpleDateFormat
 
+description = "The core library of JBake"
+
 dependencies {
     compile "commons-io:commons-io:$commonsIoVersion"
     compile "commons-configuration:commons-configuration:$commonsConfigurationVersion"

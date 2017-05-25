@@ -7,6 +7,7 @@ plugins {
     id 'com.github.ben-manes.versions'  version '0.15.0'
 }
 
+// common variables
 ext {
     asciidoctorjVersion = '1.5.6'
     asciidoctorjDiagramVersion = '1.5.4.1'
@@ -31,67 +32,115 @@ ext {
     jsoupVersion = '1.10.3'
 }
 
+/**
+ * Apply coveralls to the root project as we just need it here to send the
+ * aggregated coverage execution data from the jacocoRootReport task
+ */
+apply plugin: 'com.github.kt3k.coveralls'
+
+/**
+ * Apply jacoco plugin to all projects and add jcenter as default repository
+ */
+allprojects {
+    apply plugin: 'jacoco'
+
+    repositories {
+        jcenter()
+    }
+
+    jacoco {
+        toolVersion = jacocoVersion
+    }
+
+}
+
+/**
+ * Common setup for all subprojects
+ */
 subprojects {
 
-        apply plugin: 'java'
-        apply plugin: 'jacoco'
+    apply plugin: 'java'
 
-        if( JavaVersion.current().java7Compatible ) {
-            apply plugin: 'com.github.kt3k.coveralls'
-            apply plugin: 'com.jfrog.bintray'
-            apply from: "$rootDir/gradle/signing.gradle"
-            if ( project.name != "jbake-app" ) {
-                apply from: "$rootDir/gradle/maven-publishing.gradle"
-            }
-            apply from: "$rootDir/gradle/publishing.gradle"
+    if( JavaVersion.current().java7Compatible ) {
+        apply from: "$rootDir/gradle/signing.gradle"
+        // We do not publish any jars from the jbake-app project
+        if ( project.name != "jbake-app" ) {
+            apply from: "$rootDir/gradle/maven-publishing.gradle"
         }
+        // bintray setup
+        apply from: "$rootDir/gradle/publishing.gradle"
+    }
 
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
 
-        repositories {
-            jcenter()
-        }
+    dependencies {
+        compile "org.slf4j:slf4j-api:$slf4jVersion"
+        compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
+        compile "ch.qos.logback:logback-classic:$logbackVersion"
+        compile "ch.qos.logback:logback-core:$logbackVersion"
+        testCompile "junit:junit:$junit4Version"
+        testCompile "org.assertj:assertj-core:$assertjCoreVersion"
+        testCompile "org.mockito:mockito-core:$mockitoVersion"
+    }
 
-        dependencies {
-            compile "org.slf4j:slf4j-api:$slf4jVersion"
-            compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
-            compile "ch.qos.logback:logback-classic:$logbackVersion"
-            compile "ch.qos.logback:logback-core:$logbackVersion"
-            testCompile "junit:junit:$junit4Version"
-            testCompile "org.assertj:assertj-core:$assertjCoreVersion"
-            testCompile "org.mockito:mockito-core:$mockitoVersion"
-        }
-
-        dependencyUpdates.resolutionStrategy = {
-            componentSelection { rules ->
-                rules.all { ComponentSelection selection ->
-                    boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                        selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
-                    }
-                    if (rejected) {
-                        selection.reject('Release candidate')
-                    }
+    dependencyUpdates.resolutionStrategy = {
+        componentSelection { rules ->
+            rules.all { ComponentSelection selection ->
+                boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                    selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
+                }
+                if (rejected) {
+                    selection.reject('Release candidate')
                 }
             }
         }
+    }
 
-        test {
-            jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+    test {
+        jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled = true // coveralls plugin depends on xml format report
+            html.enabled = true
         }
+    }
 
-        jacoco {
-            toolVersion = jacocoVersion
-        }
+    jacocoTestReport.dependsOn test
+}
 
-        jacocoTestReport {
-            reports {
-                xml.enabled = true // coveralls plugin depends on xml format report
-                html.enabled = true
-            }
-        }
+task jacocoMerge(type: JacocoMerge) {
+    description 'Merge all testreport execution data from subprojects excluding jbake-app'
+    dependsOn subprojects.test
+    executionData subprojects.findAll{it.name!="jbake-app"}.jacocoTestReport.executionData
+}
 
-        jacocoTestReport.dependsOn test
+task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    description = 'Generates an aggregate report from all subprojects'
+    dependsOn jacocoMerge
 
+    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(subprojects.sourceSets.main.output)
+    executionData = jacocoMerge.executionData
 
+    reports {
+        html.enabled = true
+        xml.enabled = true
+    }
+}
+
+coveralls {
+    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+}
+
+tasks.coveralls {
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
+
+    dependsOn jacocoRootReport
+    // Skip Task if not run on CI Server
+    onlyIf { System.env.'CI' }
 }

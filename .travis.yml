@@ -16,7 +16,7 @@ script:
   - ./gradlew check
 
 after_success:
-  - ./gradlew jacocoTestReport coveralls || ./gradlew clean
+  - ./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean
 
 after_failure:
   - ./gradlew clean check --debug
