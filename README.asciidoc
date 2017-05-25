@@ -62,6 +62,8 @@ $ ./gradlew distZip
 
 This will build a ZIP file in the `/build/distributions` folder.
 
+For more information see link:BUILD.adoc[Test, Build and Deploy]
+
 == Tools & Libraries Used
 
 * http://commons.apache.org/[Apache Commons IO, Configuration, Lang & Logging]
