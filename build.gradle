@@ -131,6 +131,14 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     }
 }
 
+task testReport(type: TestReport) {
+    description "Generate an aggregated Testreport for all projects"
+
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
+}
+
 coveralls {
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
