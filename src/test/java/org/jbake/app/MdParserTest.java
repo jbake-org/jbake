@@ -270,6 +270,18 @@ public class MdParserTest {
     }
 
     @Test
+    public void parseWithInvalidExtension() throws Exception {
+        config.clearProperty(extensions);
+        config.setProperty(extensions, "HARDWRAPS,UNDEFINED_EXTENSION");
+
+        // Test with HARDWRAPS
+        Parser parser = new Parser(config, configFile.getPath());
+        Map<String, Object> map = parser.processFile(mdFileHardWraps);
+        Assert.assertNotNull(map);
+        assertThat(map.get("body").toString()).contains("<p>First line<br />\nSecond line</p>\n");
+    }
+
+    @Test
     public void parseValidMdFileAbbreviations() throws Exception {
         config.clearProperty(extensions);
         config.setProperty(extensions, "ABBREVIATIONS");
