@@ -35,7 +35,7 @@ ext {
     args4jVersion = '2.33'
     freemarkerVersion = '2.3.25-incubating'
     junitVersion = '4.12'
-    pegdownVersion = '1.6.0'
+    flexmarkVersion = '0.19.5'
     jettyServerVersion = '8.1.19.v20160209'
     orientDbVersion = '2.2.15'
     groovyVersion = '2.4.8'
@@ -57,7 +57,6 @@ dependencies {
     compile group: 'args4j', name: 'args4j', version: args4jVersion
     compile group: 'org.freemarker', name: 'freemarker', version: freemarkerVersion
     compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: orientDbVersion
-    compile group: 'org.pegdown', name: 'pegdown', version: pegdownVersion
     compile group: 'org.asciidoctor', name: 'asciidoctorj', version: asciidoctorjVersion
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: jettyServerVersion
     compile group: 'org.codehaus.groovy', name: 'groovy', version: groovyVersion
@@ -68,6 +67,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
     compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
     compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
+    compile "com.vladsch.flexmark:flexmark-all:$flexmarkVersion"
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
