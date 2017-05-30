@@ -1,6 +1,7 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.app.configuration.JBakeConfigurationInspector;
@@ -13,11 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * All the baking happens in the Oven!
@@ -43,6 +40,41 @@ public class Oven {
     @Deprecated
     public Oven(final File source, final File destination, final boolean isClearCache) throws Exception {
         this( new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, isClearCache) );
+    }
+
+    /**
+     * Creates a new instance of the Oven with references to the source and destination folders.
+     *
+     * @param source				Project source directory
+     * @param destination		The destination folder
+     * @param config				Project configuration
+     * @param isClearCache	Should the cache be cleaned
+     */
+    @Deprecated
+    public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) throws Exception {
+        this(new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config, isClearCache));
+    }
+
+    @Deprecated
+    public CompositeConfiguration getConfig() {
+        return ((DefaultJBakeConfiguration)utensils.getConfiguration()).getCompositeConfiguration();
+    }
+
+    // TODO: do we want to use this. Else, config could be final
+    @Deprecated
+    public void setConfig(final CompositeConfiguration config) {
+        ((DefaultJBakeConfiguration)utensils.getConfiguration()).setCompositeConfiguration(config);
+    }
+
+    /**
+     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
+     *
+     * @deprecated There is no need for this method anymore. Validation is now part of the instantiation.
+     * Can be removed with 3.0.0.
+     */
+    @Deprecated
+    public void setupPaths() {
+        /* nothing to do here */
     }
 
     /**

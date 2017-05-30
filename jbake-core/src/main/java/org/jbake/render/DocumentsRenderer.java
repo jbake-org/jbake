@@ -1,14 +1,17 @@
 package org.jbake.render;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.RenderingException;
 
 import java.util.HashMap;
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -81,4 +84,9 @@ public class DocumentsRenderer implements RenderingTool {
 		navDocument.put(Attributes.TITLE, document.get(Attributes.TITLE));
 		return navDocument;
 	}
+
+    @Override
+    public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
+        return render(renderer, db, null);
+    }
 }

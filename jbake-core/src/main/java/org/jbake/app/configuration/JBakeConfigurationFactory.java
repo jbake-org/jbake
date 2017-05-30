@@ -1,5 +1,7 @@
 package org.jbake.app.configuration;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 
 import java.io.File;
@@ -30,6 +32,44 @@ public class JBakeConfigurationFactory {
         configuration.setClearCache(isClearCache);
 
         return configuration;
+    }
+
+    /**
+     * Creates a {@link DefaultJBakeConfiguration}
+     *
+     * This is a compatibility factory method
+     *
+     * @param sourceFolder The source folder of the project
+     * @param destination The destination folder to render and copy files to
+     * @param compositeConfiguration A given {@link CompositeConfiguration}
+     * @param isClearCache Whether to clear database cache or not
+     * @return A {@link JBakeConfiguration} by given parameters
+     */
+    public JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, CompositeConfiguration compositeConfiguration, boolean isClearCache) {
+        DefaultJBakeConfiguration configuration = new DefaultJBakeConfiguration(sourceFolder, compositeConfiguration);
+        configuration.setDestinationFolder(destination);
+        configuration.setClearCache(isClearCache);
+        return configuration;
+    }
+
+    /**
+     * Creates a {@link DefaultJBakeConfiguration}
+     *
+     * This is a compatibility factory method
+     *
+     * @param sourceFolder The source folder of the project
+     * @param destination The destination folder to render and copy files to
+     * @param compositeConfiguration A given {@link CompositeConfiguration}
+     * @return A {@link JBakeConfiguration} by given parameters
+     */
+    public JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, CompositeConfiguration compositeConfiguration) {
+        DefaultJBakeConfiguration configuration = new DefaultJBakeConfiguration(sourceFolder, compositeConfiguration);
+        configuration.setDestinationFolder(destination);
+        return configuration;
+    }
+
+    public JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, CompositeConfiguration config) {
+        return new DefaultJBakeConfiguration(sourceFolder,config);
     }
 
     public JBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {

@@ -1,7 +1,9 @@
 package org.jbake.app;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +28,20 @@ public class Asset {
 	private JBakeConfiguration config;
 	private final List<Throwable> errors = new LinkedList<Throwable>();
 
-	/**
+    /**
+     * Compatibility constructor.
+     * Creates an instance of Asset.
+     *
+     * @param source			Source file for the asset
+     * @param destination 		Destination (target) directory for asset file
+     * @param config			Project configuration
+     */
+    @Deprecated
+    public Asset(File source, File destination, CompositeConfiguration config) {
+        this.config = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config);
+    }
+
+    /**
 	 * Creates an instance of Asset.
 	 *
 	 * @param config The project configuration. @see{{@link JBakeConfiguration}}

@@ -1,11 +1,13 @@
 package org.jbake.launcher;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.impl.DefaultFileMonitor;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 /**
  * Delegate responsible for watching the file system for changes.
@@ -13,6 +15,20 @@ import org.jbake.app.configuration.JBakeConfiguration;
  * @author jmcgarr@gmail.com
  */
 public class BakeWatcher {
+
+    /**
+     * Starts watching the file system for changes to trigger a bake.
+     *
+     * @deprecated use {@link BakeWatcher#start(JBakeConfiguration)} instead
+     *
+     * @param res    Commandline options
+     * @param config Configuration settings
+     */
+    @Deprecated
+    public void start(final LaunchOptions res, CompositeConfiguration config) {
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), config);
+        start(configuration);
+    }
 
     /**
      * Starts watching the file system for changes to trigger a bake.

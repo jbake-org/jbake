@@ -1,6 +1,8 @@
 package org.jbake.launcher;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ZipUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.io.File;
@@ -15,7 +17,15 @@ import java.io.FileInputStream;
 public class Init {
 
 	private JBakeConfiguration config;
-	
+
+	/**
+	 * @deprecated use {@link Init#Init(JBakeConfiguration)} instead
+	 */
+	@Deprecated
+	public Init(CompositeConfiguration config) {
+		this(new DefaultJBakeConfiguration(config));
+	}
+
 	public Init(JBakeConfiguration config) {
 		this.config = config;
 	}

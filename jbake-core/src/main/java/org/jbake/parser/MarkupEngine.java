@@ -1,7 +1,10 @@
 package org.jbake.parser;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.jbake.app.Crawler;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -58,6 +61,11 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param context the parser context
      */
     public void processBody(final ParserContext context) {
+    }
+
+    @Override
+    public Map<String, Object> parse(Configuration config, File file, String contentPath) {
+        return parse(new DefaultJBakeConfiguration((CompositeConfiguration) config), file);
     }
 
     /**

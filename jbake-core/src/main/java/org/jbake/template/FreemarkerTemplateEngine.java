@@ -4,10 +4,12 @@ package org.jbake.template;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.*;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.configuration.JBakeConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -22,6 +24,12 @@ import java.util.Map;
 public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
     private Configuration templateCfg;
+
+    @Deprecated
+    public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
+        super(config, db, destination, templatesPath);
+        createTemplateConfiguration();
+    }
 
     public FreemarkerTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
         super(config, db);

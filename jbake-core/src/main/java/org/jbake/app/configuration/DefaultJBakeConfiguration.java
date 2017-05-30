@@ -29,10 +29,21 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
 
 
-    CompositeConfiguration configuration;
+    private CompositeConfiguration compositeConfiguration;
+
+    /**
+     * Some deprecated implementations just need access to the configuration without access to the source folder
+     *
+     * @deprecated use {@link #DefaultJBakeConfiguration(File, CompositeConfiguration)} instead
+     * @param configuration
+     */
+    @Deprecated
+    public DefaultJBakeConfiguration(CompositeConfiguration configuration) {
+        this.compositeConfiguration = configuration;
+    }
 
     public DefaultJBakeConfiguration(File sourceFolder, CompositeConfiguration configuration) {
-        this.configuration = configuration;
+        this.compositeConfiguration = configuration;
         setSourceFolder(sourceFolder);
         setupDefaultDestination();
         setupPathsRelativeToSourceFile();
@@ -273,7 +284,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public List<String> getDocumentTypes() {
         List<String> docTypes = new ArrayList<String>();
-        Iterator<String> keyIterator = configuration.getKeys();
+        Iterator<String> keyIterator = compositeConfiguration.getKeys();
         while (keyIterator.hasNext()) {
             String key = keyIterator.next();
             Matcher matcher = TEMPLATE_DOC_PATTERN.matcher(key);
@@ -302,23 +313,23 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public Object get(String key) {
-        return configuration.getProperty(key);
+        return compositeConfiguration.getProperty(key);
     }
 
     @Override
     public void setProperty(String key, Object value) {
-        configuration.setProperty(key, value);
+        compositeConfiguration.setProperty(key, value);
     }
 
     @Override
     public Iterator<String> getKeys() {
-        return configuration.getKeys();
+        return compositeConfiguration.getKeys();
     }
 
     @Override
     public List<String> getAsciidoctorOptionKeys() {
         List<String> options = new ArrayList<String>();
-        Configuration subConfig = configuration.subset(ASCIIDOCTOR_OPTION);
+        Configuration subConfig = compositeConfiguration.subset(ASCIIDOCTOR_OPTION);
 
         Iterator<String> iterator = subConfig.getKeys();
         while ( iterator.hasNext() ) {
@@ -331,15 +342,15 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public boolean getRenderTagsIndex() {
-        return configuration.getBoolean(RENDER_TAGS_INDEX, false);
+        return compositeConfiguration.getBoolean(RENDER_TAGS_INDEX, false);
     }
 
     public void setRenderTagsIndex(boolean enable) {
-        configuration.setProperty(RENDER_TAGS_INDEX, enable);
+        compositeConfiguration.setProperty(RENDER_TAGS_INDEX, enable);
     }
 
     public Object getAsciidoctorOption(String optionKey) {
-        Configuration subConfig = configuration.subset(ASCIIDOCTOR_OPTION);
+        Configuration subConfig = compositeConfiguration.subset(ASCIIDOCTOR_OPTION);
         Object value = subConfig.getProperty(optionKey);
 
         if ( value == null ) {
@@ -459,32 +470,40 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setProperty(SITE_HOST, siteHost);
     }
 
+    public CompositeConfiguration getCompositeConfiguration() {
+        return compositeConfiguration;
+    }
+
+    public void setCompositeConfiguration(CompositeConfiguration configuration) {
+        this.compositeConfiguration = configuration;
+    }
+
     private File getAsFolder(String key) {
         return (File) get(key);
     }
 
     private String getAsString(String key) {
-        return configuration.getString(key);
+        return compositeConfiguration.getString(key);
     }
 
     private String getAsString(String key, String defaultValue) {
-        return configuration.getString(key, defaultValue);
+        return compositeConfiguration.getString(key, defaultValue);
     }
 
     private boolean getAsBoolean(String key) {
-        return configuration.getBoolean(key, false);
+        return compositeConfiguration.getBoolean(key, false);
     }
 
     private int getAsInt(String key, int defaultValue) {
-        return configuration.getInt(key, defaultValue);
+        return compositeConfiguration.getInt(key, defaultValue);
     }
 
     private long getAsLong(String key, long defaultValue) {
-        return configuration.getLong(key, defaultValue);
+        return compositeConfiguration.getLong(key, defaultValue);
     }
 
     private List<String> getAsList(String key) {
-        return Arrays.asList(configuration.getStringArray(key));
+        return Arrays.asList(compositeConfiguration.getStringArray(key));
     }
 
     private void setupPathsRelativeToSourceFile() {

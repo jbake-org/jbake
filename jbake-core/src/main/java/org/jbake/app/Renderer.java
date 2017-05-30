@@ -1,7 +1,10 @@
 package org.jbake.app;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.jbake.util.PagingHelper;
 import org.slf4j.Logger;
@@ -134,6 +137,39 @@ public class Renderer {
     private final JBakeConfiguration config;
     private final DelegatingTemplateEngine renderingEngine;
     private final ContentStore db;
+
+    /**
+     * Creates a new instance of Renderer with supplied references to folders.
+     *
+     * @param db            The database holding the content
+     * @param destination   The destination folder
+     * @param templatesPath The templates folder
+     * @param config        Project configuration
+     */
+    @Deprecated
+    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
+        this(db, new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config));
+        DefaultJBakeConfiguration configuration = ((DefaultJBakeConfiguration)this.config);
+        configuration.setDestinationFolder(destination);
+        configuration.setTemplateFolder(templatesPath);
+    }
+
+    /**
+     * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
+     *
+     * @param db                The database holding the content
+     * @param destination       The destination folder
+     * @param templatesPath     The templates folder
+     * @param config            Project configuration
+     * @param renderingEngine   The instance of DelegatingTemplateEngine to use
+     */
+    @Deprecated
+    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config, DelegatingTemplateEngine renderingEngine) {
+        this(db, new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config), renderingEngine);
+        DefaultJBakeConfiguration configuration = ((DefaultJBakeConfiguration)this.config);
+        configuration.setDestinationFolder(destination);
+        configuration.setTemplateFolder(templatesPath);
+    }
 
     /**
      * Creates a new instance of Renderer with supplied references to folders.

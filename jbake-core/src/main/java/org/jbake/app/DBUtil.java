@@ -10,7 +10,20 @@ import java.util.Map;
 
 public class DBUtil {
     private static ContentStore contentStore;
-    
+
+    @Deprecated
+    public static ContentStore createDataStore(final String type, String name) {
+        if (contentStore == null) {
+            contentStore = new ContentStore(type, name);
+        }
+        return contentStore;
+    }
+
+    @Deprecated
+    public static void updateSchema(final ContentStore db) {
+        db.updateSchema();
+    }
+
     public static ContentStore createDataStore(JBakeConfiguration configuration) {
         if (contentStore == null) {
             contentStore = new ContentStore(configuration.getDatabaseStore(), configuration.getDatabasePath());

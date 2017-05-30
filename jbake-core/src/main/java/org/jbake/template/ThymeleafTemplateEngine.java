@@ -1,5 +1,6 @@
 package org.jbake.template;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
@@ -40,6 +41,11 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private TemplateEngine templateEngine;
 
     private String templateMode;
+
+	@Deprecated
+    public ThymeleafTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
+        super(config, db, destination, templatesPath);
+    }
 
     public ThymeleafTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
         super(config, db);

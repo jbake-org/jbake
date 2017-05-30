@@ -11,6 +11,7 @@ import de.neuland.jade4j.model.JadeModel;
 import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -35,6 +36,11 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
     private static final String FILTER_SCRIPT = "js";
 
     private JadeConfiguration jadeConfiguration = new JadeConfiguration();
+
+    @Deprecated
+    public JadeTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
+        super(config, db, destination, templatesPath);
+    }
 
     public JadeTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
         super(config, db);

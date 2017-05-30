@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Cédric Champeau
  */
 public class TemplateEngines {
+
     private final static Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
 
     private final Map<String, AbstractTemplateEngine> templateEngines;

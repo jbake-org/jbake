@@ -10,6 +10,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
@@ -60,9 +61,21 @@ public class Crawler {
 
     /**
      * Creates new instance of Crawler.
-     *
-     * @param db     Database instance for content
-     * @param config Project configuration
+     * @param db		Database instance for content
+     * @param source	Base directory where content directory is located
+     * @param config	Project configuration
+     */
+    @Deprecated
+    public Crawler(ContentStore db, File source, CompositeConfiguration config) {
+        this.db = db;
+        this.config = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, config);
+        this.parser = new Parser(this.config);
+    }
+
+    /**
+     * Creates new instance of Crawler.
+	 * @param db		Database instance for content
+	 * @param config	Project configuration
      */
     public Crawler(ContentStore db, JBakeConfiguration config) {
         this.db = db;
@@ -82,12 +95,13 @@ public class Crawler {
         }
 
     }
+
     /**
      * Crawl all files and folders looking for content.
      *
      * @param path Folder to start from
      */
-    private void crawl(File path) {
+    public void crawl(File path) {
         File[] contents = path.listFiles(FileUtil.getFileFilter());
         if (contents != null) {
             Arrays.sort(contents);

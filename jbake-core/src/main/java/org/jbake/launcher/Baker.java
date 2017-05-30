@@ -1,8 +1,10 @@
 package org.jbake.launcher;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -13,6 +15,18 @@ import java.util.List;
  * @author jmcgarr@gmail.com
  */
 public class Baker {
+
+    /**
+     * @deprecated use {@link Baker#bake(JBakeConfiguration)} instead
+     *
+     * @param options
+     * @param config
+     */
+    @Deprecated
+    public void bake(final LaunchOptions options, final CompositeConfiguration config) {
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(options.getSource(), options.getDestination(), config, options.isClearCache());
+        bake(configuration);
+    }
 
     public void bake(final JBakeConfiguration config) {
         final Oven oven = new Oven(config);

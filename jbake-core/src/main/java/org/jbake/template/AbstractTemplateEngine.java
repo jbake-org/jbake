@@ -1,10 +1,15 @@
 package org.jbake.template;
 
+import java.io.File;
 import java.io.Writer;
 import java.util.Map;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.jbake.app.ContentStore;
 
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 
 /**
@@ -28,6 +33,11 @@ public abstract class AbstractTemplateEngine {
     protected static ModelExtractors extractors = ModelExtractors.getInstance();
     protected final JBakeConfiguration config;
     protected final ContentStore db;
+
+    @Deprecated
+    protected AbstractTemplateEngine(final Configuration config, final ContentStore db, final File destination, final File templatesPath) {
+        this(new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(),destination, (CompositeConfiguration) config),db);
+    }
 
     protected AbstractTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
         this.config = config;
