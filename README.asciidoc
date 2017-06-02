@@ -1,0 +1,36 @@
+= JBake Maven Plugin
+Jonathan Bullock
+2017-06-02
+:idprefix:
+
+JBake Maven Plugin is a Maven plugin allowing you to integrate http://jbake.org[JBake] into your projects build. This is the official version published at 
+the following Maven coordinates:
+
+----
+<dependency>
+    <groupId>org.jbake</groupId>
+    <artifactId>jbake-maven-plugin</artifactId>
+    <version>0.2.0</version>
+</dependency>
+----
+
+Special thanks must go to the original author of this plugin - Aldrin Leal[https://github.com/aldrinleal].
+
+== Versioning
+
+The project adopts the http://semver.org[Semantic Versioning] spec to maintain an understandable backwards compatibility strategy.
+
+The version format is as follows:
+
+----
+<major>.<minor>.<patch>-<label>
+----
+
+* An increment of the major version represents incompatible API changes.
+* An increment of the minor version represents additional functionality in a backwards-compatible manner.
+* An increment of the patch version represents backwards-compatible bug fixes.
+* Existence of a label represents a pre-release or build metadata.
+
+== Copyright & License
+
+This plugin is licensed under the Apache 2.0 License.
