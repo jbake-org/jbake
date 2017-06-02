@@ -1,6 +1,4 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -8,17 +6,18 @@
         <version>9</version>
     </parent>
 
-    <groupId>br.com.ingenieux</groupId>
+    <groupId>org.jbake</groupId>
     <artifactId>jbake-maven-plugin</artifactId>
+    <version>0.2.0</version>
     <packaging>maven-plugin</packaging>
-    <version>0.3.0-SNAPSHOT</version>
 
     <prerequisites>
         <maven>3.1.1</maven>
     </prerequisites>
-
-    <description>jbake-maven-plugin is a plugin to integrate JBake into your projects</description>
-    <url>http://docs.ingenieux.com.br/jbake-maven-plugin/</url>
+	
+	<name>jbake-maven-plugin</name>
+    <description>jbake-maven-plugin is a Maven plugin allowing you to integrate JBake into your projects build</description>
+    <url>http://jbake.org</url>
     <inceptionYear>2013</inceptionYear>
 
     <licenses>
@@ -28,17 +27,9 @@
         </license>
     </licenses>
 
-    <distributionManagement>
-        <site>
-            <id>docs.ingenieux.com.br</id>
-            <name>ingenieux Beanstalker Site</name>
-            <url>s3://docs.ingenieux.com.br/projects/jbake-maven-plugin/</url>
-        </site>
-    </distributionManagement>
-
     <organization>
-        <name>ingenieux</name>
-        <url>http://ingenieux.com.br</url>
+        <name>JBake</name>
+        <url>http://jbake.org</url>
     </organization>
 
     <developers>
@@ -50,8 +41,8 @@
     </developers>
 
     <issueManagement>
-        <system>github</system>
-        <url>https://github.com/ingenieux/jbake-maven-plugin/</url>
+        <system>GitHub Issues</system>
+        <url>https://github.com/jbake-org/jbake-maven-plugin/issues</url>
     </issueManagement>
 
     <properties>
@@ -61,10 +52,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:http://github.com/ingenieux/jbake-maven-plugin</connection>
-        <developerConnection>scm:git:ssh://git@github.com/ingenieux/jbake-maven-plugin.git
-        </developerConnection>
-        <url>http://github.com/ingenieux/jbake-maven-plugin</url>
+        <connection>scm:git:http://github.com/jbake-org/jbake-maven-plugin</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jbake-org/jbake-maven-plugin.git</developerConnection>
+        <url>http://github.com/jbake-org/jbake-maven-plugin</url>
     </scm>
 
     <dependencies>
@@ -213,13 +203,13 @@
     </dependencyManagement>
 
     <build>
-        <extensions>
+        <!-- <extensions>
             <extension>
                 <groupId>org.kuali.maven.wagons</groupId>
                 <artifactId>maven-s3-wagon</artifactId>
                 <version>1.1.20</version>
             </extension>
-        </extensions>
+        </extensions> -->
 
         <plugins>
             <plugin>
