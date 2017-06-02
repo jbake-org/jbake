@@ -14,7 +14,7 @@ the following Maven coordinates:
 </dependency>
 ----
 
-Special thanks must go to the original author of this plugin - Aldrin Leal[https://github.com/aldrinleal].
+Special thanks must go to the original author of this plugin - https://github.com/aldrinleal[Aldrin Leal].
 
 == Versioning
 
