@@ -1,4 +1,4 @@
-package br.com.ingenieux.mojo.jbake;
+package org.jbake.maven;
 
 /*
  * Copyright 2013 ingenieux Labs

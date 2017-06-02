@@ -1,4 +1,4 @@
-package br.com.ingenieux.mojo.jbake;
+package org.jbake.maven;
 
 /*
  * Copyright 2013 ingenieux Labs
@@ -18,12 +18,11 @@ package br.com.ingenieux.mojo.jbake;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.jbake.maven.util.DirWatcher;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import br.com.ingenieux.mojo.jbake.util.DirWatcher;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
