@@ -53,7 +53,7 @@
 
     <scm>
         <connection>scm:git:http://github.com/jbake-org/jbake-maven-plugin</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jbake-org/jbake-maven-plugin.git</developerConnection>
+        <developerConnection>scm:git:https://git@github.com/jbake-org/jbake-maven-plugin.git</developerConnection>
         <url>http://github.com/jbake-org/jbake-maven-plugin</url>
     </scm>
 
