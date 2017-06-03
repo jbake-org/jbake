@@ -19,6 +19,7 @@ public class Init {
 	private JBakeConfiguration config;
 
 	/**
+	 * @param config The project configuration
 	 * @deprecated use {@link Init#Init(JBakeConfiguration)} instead
 	 */
 	@Deprecated

@@ -68,10 +68,29 @@ public class JBakeConfigurationFactory {
         return configuration;
     }
 
+    /**
+     * Creates a {@link DefaultJBakeConfiguration}
+     *
+     *
+     * @param sourceFolder The source folder of the project
+     * @param config A {@link CompositeConfiguration}
+     * @return A {{@link JBakeConfiguration}} by given parameters
+     */
     public JBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, CompositeConfiguration config) {
         return new DefaultJBakeConfiguration(sourceFolder,config);
     }
 
+    /**
+     * Creates a {@link DefaultJBakeConfiguration} with value site.host replaced
+     * by http://localhost:[server.port].
+     * The server.port is read from the project properties file.
+     *
+     * @param sourceFolder The source folder of the project
+     * @param destinationFolder The destination folder to render and copy files to
+     * @param isClearCache Whether to clear database cache or not
+     * @return A {@link JBakeConfiguration} by given parameters
+     * @throws ConfigurationException if loading the configuration fails
+     */
     public JBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(destinationFolder);

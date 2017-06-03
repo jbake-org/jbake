@@ -49,6 +49,7 @@ public class Oven {
      * @param destination		The destination folder
      * @param config				Project configuration
      * @param isClearCache	Should the cache be cleaned
+     * @throws Exception  if configuration is not loaded correctly
      */
     @Deprecated
     public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) throws Exception {
@@ -91,7 +92,7 @@ public class Oven {
     /**
      * Create an Oven instance with given {@link Utensils}
      *
-     * @param utensils
+     * @param utensils All Utensils necessary to bake
      */
     public Oven(Utensils utensils) {
         checkConfiguration(utensils.getConfiguration());

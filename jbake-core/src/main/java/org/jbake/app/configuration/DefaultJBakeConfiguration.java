@@ -33,9 +33,8 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     /**
      * Some deprecated implementations just need access to the configuration without access to the source folder
-     *
+     * @param configuration The project configuration
      * @deprecated use {@link #DefaultJBakeConfiguration(File, CompositeConfiguration)} instead
-     * @param configuration
      */
     @Deprecated
     public DefaultJBakeConfiguration(CompositeConfiguration configuration) {

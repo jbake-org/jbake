@@ -187,7 +187,7 @@ public class Renderer {
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
      * @param db            The database holding the content
-     * @param config
+     * @param config        The application specific configuration
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
     public Renderer(ContentStore db, JBakeConfiguration config, DelegatingTemplateEngine renderingEngine) {

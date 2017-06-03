@@ -17,10 +17,9 @@ import java.util.List;
 public class Baker {
 
     /**
+     * @param options The given cli options
+     * @param config  The project configuration
      * @deprecated use {@link Baker#bake(JBakeConfiguration)} instead
-     *
-     * @param options
-     * @param config
      */
     @Deprecated
     public void bake(final LaunchOptions options, final CompositeConfiguration config) {
