@@ -92,15 +92,6 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
             if (templateFile != null) {
                 String fileName = templateFile.getName();
                 String fileBaseName = fileName.substring(0, fileName.lastIndexOf("."));
-            /*
-            String fileBaseName = docType;
-            if ( docType.equals("masterindex") ) {
-                fileBaseName = "index";
-            }
-            if (docType.equals("tag")) {
-                fileBaseName = "tags";
-            }
-*/
                 config.setTemplateFileNameForDocType(docType, fileBaseName + "." + templateExtension);
             }
         }
@@ -146,6 +137,10 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
                 ">Second Post</a>",
                 "<a href=\"blog/2012/first-post.html\"",
                 ">First Post</a>"));
+
+        outputStrings.put("tags-index", Arrays.asList("<h1>Tags</h1>",
+                "<h2><a href=\"../tags/blog.html\">blog</a>",
+                "3</h2>"));
 
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
                 "blog/2012/first-post.html",
@@ -252,6 +247,20 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         for (String string : getOutputStrings("tags")) {
             assertThat(output).contains(string);
         }
+    }
+
+    @Test
+    public void renderTagsIndex() throws Exception {
+        config.setRenderTagsIndex(true);
+
+        renderer.renderTags(config.getTagPathName());
+        File outputFile = new File( destinationFolder + File.separator + "tags" + File.separator + "index.html");
+        Assert.assertTrue(outputFile.exists());
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+        for (String string : getOutputStrings("tags-index")) {
+            assertThat(output).contains(string);
+        }
+
     }
 
     @Test

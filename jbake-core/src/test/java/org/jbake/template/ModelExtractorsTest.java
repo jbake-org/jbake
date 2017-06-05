@@ -38,6 +38,7 @@ public class ModelExtractorsTest {
                 "db",
                 "tag_posts",
                 "tags",
+                "tagged_documents",
         };
 
         for (String aKey : expectedKeys) {

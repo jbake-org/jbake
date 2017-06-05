@@ -5,6 +5,7 @@ block content
         .span12
             h1 Tags
             each tag, index in tags
-                h4
-                    a(href='#{tag.uri}') #{tag.title}
+                h2
+                    a(href='#{content.rootpath}#{tag.uri}') #{tag.name}
+                    | #{tag.tagged_posts.size()}
     hr
