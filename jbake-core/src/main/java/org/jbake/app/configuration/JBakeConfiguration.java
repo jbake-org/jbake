@@ -25,8 +25,6 @@ public interface JBakeConfiguration {
      */
     File getDestinationFolder();
 
-    String ASSET_FOLDER = "asset.folder";
-
     /**
      * @return the folder where assets are stored, they are copied directly in output folder and not processed
      */
@@ -244,6 +242,8 @@ public interface JBakeConfiguration {
      */
     String getContentFolderName();
 
+    String ASSET_FOLDER = "asset.folder";
+
     /**
      * @return name of folder for assets
      */
@@ -357,12 +357,6 @@ public interface JBakeConfiguration {
     void setProperty(String key, Object value);
 
     /**
-     * Asciidoctor options to be set when processing input
-     */
-    //TODO: find usage and create appropriate getter
-    String ASCIIDOCTOR_OPTION = "asciidoctor.option";
-
-    /**
      * Get an iterator of available configuration keys
      * @return an iterator of configuration keys
      */
@@ -374,6 +368,11 @@ public interface JBakeConfiguration {
      * @return list of asciidoctor options
      */
     List<String> getAsciidoctorOptionKeys();
+
+    /**
+     * Asciidoctor options to be set when processing input
+     */
+    String ASCIIDOCTOR_OPTION = "asciidoctor.option";
 
     /**
      * Get an asciidoctor option by it's key

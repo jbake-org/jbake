@@ -164,15 +164,15 @@ public class MainTest {
         return mockedSourceFolder;
     }
 
-    private void mockDefaultJbakeConfiguration(File mockedSourceFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) new JBakeConfigurationFactory().createDefaultJbakeConfiguration(mockedSourceFolder,null,false);
-        System.setProperty("user.dir", mockedSourceFolder.getPath());
-        when(factory.createDefaultJbakeConfiguration(any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );
+    private void mockDefaultJbakeConfiguration(File sourceFolder) throws ConfigurationException {
+        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,null,false);
+        System.setProperty("user.dir", sourceFolder.getPath());
+
+        when(factory.createJettyJbakeConfiguration(any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );
     }
 
     private void mockJettyConfiguration(File sourceFolder, File destinationFolder) throws ConfigurationException {
-
-        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,destinationFolder,false);
+        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,destinationFolder,false);
         System.setProperty("user.dir", sourceFolder.getPath());
 
         when(factory.createJettyJbakeConfiguration(any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );

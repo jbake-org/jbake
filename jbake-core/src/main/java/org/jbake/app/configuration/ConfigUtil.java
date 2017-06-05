@@ -61,9 +61,6 @@ public class ConfigUtil {
 
     public JBakeConfiguration loadConfig(File source) throws ConfigurationException {
         CompositeConfiguration configuration = load(source);
-        DefaultJBakeConfiguration jBakeConfiguration = new DefaultJBakeConfiguration(source, configuration);
-        jBakeConfiguration.setSourceFolder(source);
-
-        return jBakeConfiguration;
+        return new DefaultJBakeConfiguration(source, configuration);
     }
 }
