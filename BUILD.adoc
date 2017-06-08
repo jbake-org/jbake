@@ -1,0 +1,277 @@
+= Test, Build and Deploy
+:toc:
+:gradle-home: http://gradle.org[Gradle]
+:gradle-userguide: https://docs.gradle.org/current/userguide/userguide.html[gradle userguide]
+:gradle-wrapper: https://docs.gradle.org/current/userguide/gradle_wrapper.html[gradle wrapper]
+:jacoco-web: http://www.eclemma.org/jacoco/[jacoco]
+:coveralls: https://coveralls.io/github/jbake-org/jbake[coveralls]
+:sdkman: http://sdkman.io[sdkman]
+
+...and other useful stuff you can do with the {gradle-home} build system.
+
+The project uses {gradle-home} as the build system.
+This is just a little collection of the common tasks you need to know to develop, build and deploy JBake. For more detailed information about gradle have a look at the {gradle-userguide}.
+
+To execute the tasks use the {gradle-wrapper}. That way you do not need to install
+ gradle for yourself and can be sure you are using the exact version everyone else is using to build JBake.
+
+You can execute the build using one of the following commands from the root of the project:
+
+* `./gradlew <task>` (on Unix-like platforms such as Linux and Mac OS X)
+
+* `gradlew <task>` (on Windows using the gradlew.bat batch file)
+
+To get an overview of all available tasks with a short description run `./gradlew tasks`
+
+== Test
+
+=== run the tests
+While developing this is the most common task you should execute.
+
+----
+./gradlew test
+----
+
+This task compiles and executes all tests within `src/test` and produces a report afterwards.
+
+You can find the report at `build/reports/tests/test` and can view it with your browser. This is very useful if something went wrong. You find the full stacktrace and output there.
+
+=== know what's going on
+
+The task is not very verbose. An successful execution looks like the following listing.
+
+.successful test execution
+----
+./gradlew test
+:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:compileTestJava UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test
+
+BUILD SUCCESSFUL
+
+Total time: 1 mins 2.236 secs
+----
+
+You can set different log levels with the command option `-i` for info or `-d` for debug. (e.g.: `./gradlew -i test`)
+
+=== enable continuous testing
+
+To execute the tests as soon as some input file changes run the task with
+ `-t` option.
+
+----
+./gradlew -t test
+Continuous build is an incubating feature.
+:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:compileTestJava UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test UP-TO-DATE
+
+BUILD SUCCESSFUL
+
+Total time: 0.996 secs
+
+Waiting for changes to input files of tasks... (ctrl-d to exit)
+----
+
+=== code coverage
+
+To generate a nice code coverage report run the following task.
+
+----
+./gradlew jacocoTestReport
+----
+
+It compiles your code, execute your tests, collect data and generate a report with {jacoco-web}. It produces XML and html reports. The xml file is used to trigger the {coveralls} service with the `coveralls` task.
+
+The reports can be found at `build/reports/jacoco/test/`.
+
+plugin:: https://docs.gradle.org/current/userguide/jacoco_plugin.html
+// TODO: write something about smokeTests and check
+
+== Build
+
+=== run the build
+
+The `build` task assembles and tests the project.
+
+----
+./gradlew build
+----
+
+It clones the example projects from github, creates zip files, generates start scripts for *NIX and Windows, bundles a distribution package, signs archives (if signing is configured properly), generates javadocs, assemble the packages and runs checks.
+
+----
+./gradlew build
+:cloneProjectExampleRepositories
+:example_project_freemarkerZip
+:example_project_groovy-mteZip
+:example_project_groovyZip
+:example_project_jadeZip
+:example_project_thymeleafZip
+:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:jar
+:startScripts
+:distTar
+:distZip
+:javadoc
+:javadocJar
+:sourcesJar
+:signArchives
+:assemble
+:compileTestJava UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test UP-TO-DATE
+:check UP-TO-DATE
+:build
+
+BUILD SUCCESSFUL
+
+Total time: 14.734 secs
+----
+
+If successful you can find everything in the `build` directory.
+The distribution package can be found at `build/distributions` and is called `jbake-{version}-bin.zip`
+
+=== install local
+
+You can install the distribution locally.
+
+----
+./gradlew installDist
+----
+
+The distribution can be found in an exploded directory called `build/install/jbake`.
+
+NOTE: This task does not run checks. It just compiles and bundles the distribution.
+
+plugin:: https://docs.gradle.org/current/userguide/application_plugin.html
+
+== Deploy
+
+WARNING: Never add credentials to the repository
+
+=== publish to bintray
+
+You can publish to bintray with
+
+----
+./gradlew bintrayUpload
+----
+
+If you want to see what's going on without publishing
+
+----
+./gradlew -PbintrayDryRun=true bU --info
+----
+
+You need to add two properties to your local gradle.properties file (_~/.gradle/gradle.properties_).
+
+    bintrayUsername=username
+    bintrayKey=secret
+
+It's possible to change the organization and repository too.
+The properties are called _bintrayOrg_ and _bintrayRepo_.
+To publish to your private repository in an example repository run
+
+----
+gradle -PbintrayOrg='' -PbintrayRepo=example bU
+----
+
+The default values can be found in the _gradle.properties_ file at the root of this repository.
+
+plugin:: https://plugins.gradle.org/plugin/com.jfrog.bintray
+
+=== publish to sdkman
+
+To release, set to default and announce a new candidate of JBake to {sdkman} run
+
+    ./gradlew sdkMajorRelease
+
+Add the following properties to your local _gradle.properties_ file (_~/.gradle/gradle.properties_):
+
+    sdkman_consumer_key=key
+    sdkman_consumer_token=token
+
+plugin:: https://plugins.gradle.org/plugin/io.sdkman.vendors
+
+=== signing
+
+To enable code signing you need to add some more properties to your local _gradle.properties_ file (_~/.gradle/gradle.properties_):
+
+    signing.keyId=24875D73
+    signing.password=secret
+    signing.secretKeyRingFile=/Users/me/.gnupg/secring.gpg
+
+To skip signing on purpose add `-PskipSigning=true`.
+
+plugin:: https://docs.gradle.org/current/userguide/signing_plugin.html
+
+== Other useful tasks
+
+=== keep the dependencies up-to-date
+
+It's sometimes hard to keep track of the latest versions for your dependencies.
+Fear not.
+
+----
+./gradlew dependencyUpdates
+:dependencyUpdates
+Download https://jcenter.bintray.com/org/assertj/assertj-core/3.8.0/assertj-core-3.8.0.pom
+
+------------------------------------------------------------
+: Project Dependency Updates (report to plain text file)
+------------------------------------------------------------
+
+The following dependencies are using the latest milestone version:
+ - args4j:args4j:2.33
+ - org.asciidoctor:asciidoctorj:1.5.5
+ - commons-configuration:commons-configuration:1.10
+ - commons-io:commons-io:2.5
+ - org.apache.commons:commons-lang3:3.5
+ - org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1
+ - org.freemarker:freemarker:2.3.26-incubating
+ - com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3
+ - com.github.ben-manes:gradle-versions-plugin:0.14.0
+ - org.codehaus.groovy:groovy:2.4.11
+ - org.codehaus.groovy:groovy-templates:2.4.11
+ - de.neuland-bfi:jade4j:1.2.5
+ - org.eclipse.jetty:jetty-server:9.4.5.v20170502
+ - com.googlecode.json-simple:json-simple:1.1.1
+ - org.slf4j:jul-to-slf4j:1.7.25
+ - junit:junit:4.12
+ - ch.qos.logback:logback-classic:1.2.3
+ - ch.qos.logback:logback-core:1.2.3
+ - org.mockito:mockito-core:2.8.9
+ - com.orientechnologies:orientdb-graphdb:2.2.20
+ - org.slf4j:slf4j-api:1.7.25
+ - org.thymeleaf:thymeleaf:3.0.6.RELEASE
+
+The following dependencies exceed the version found at the milestone revision level:
+ - org.pegdown:pegdown [1.6.0 <- 1.5.0]
+
+The following dependencies have later milestone versions:
+ - org.assertj:assertj-core [3.7.0 -> 3.8.0]
+ - org.apache.commons:commons-vfs2 [2.1 -> 2.1.1744488.1]
+
+Failed to determine the latest version for the following dependencies (use --info for details):
+ - gradle.plugin.io.sdkman:gradle-sdkvendor-plugin
+
+Generated report file build/dependencyUpdates/report.txt
+
+BUILD SUCCESSFUL
+
+Total time: 6.721 secs
+----
+
+plugin:: https://plugins.gradle.org/plugin/com.github.ben-manes.versions
