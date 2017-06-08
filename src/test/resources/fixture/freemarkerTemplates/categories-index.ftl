@@ -7,8 +7,8 @@
 	</div>
 	
 		<ul>
-		<#list content.categories?keys as category>
-			<li><a href="${content.categories[category]}"/>${category}</a></li>
+		<#list categories as category>
+			<li><a href="${category.uri}"/>${category.name}</a></li>
 		</#list>
 		</ul>
 	

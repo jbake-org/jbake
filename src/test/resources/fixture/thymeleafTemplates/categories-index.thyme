@@ -1,0 +1,26 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      <head th:replace="header.thyme::head"/>
+      <body>
+      <div th:replace="header.thyme::top"/>
+
+	<div class="row-fluid marketing">
+
+        <div class="span12">
+            <h1>Taglist</h1>
+            <div th:each="category : ${categories}">
+                <span>
+                    <a th:href="${category.uri}" href="tags/blog.html" th:text="${category.name}">${category.name}</a>
+                </span>
+            </div>
+        </div>
+
+	</div>
+
+	<hr/>
+
+    <div th:replace="footer.thyme::footer"></div>
+    </body>
+</html>

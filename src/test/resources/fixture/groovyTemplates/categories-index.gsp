@@ -5,8 +5,8 @@
 	</div>
 	<div class="category-posts">
 		<ul>
-		<%content.categories.each {category,path ->%>
-			<li><a href="${path}"/>${category}</a></li>
+		<%categories.each {category ->%>
+			<li><a href="${category.uri}"/>${category.name}</a></li>
 		<%}%>
 		</ul>
 		</div>

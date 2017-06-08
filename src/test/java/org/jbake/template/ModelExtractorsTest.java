@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 
 public class ModelExtractorsTest {
 
@@ -31,10 +30,13 @@ public class ModelExtractorsTest {
                 "alltags",
                 "db",
                 "tag_posts",
+                "category_posts",
+                "category_documents",
+                "categories"
         };
 
         for (String aKey : expectedKeys) {
-            assertThat(ModelExtractors.getInstance().containsKey(aKey)).isTrue();
+            assertThat(ModelExtractors.getInstance().containsKey(aKey)).as("Extractor with key %s to exist", aKey).isTrue();
         }
     }
 
