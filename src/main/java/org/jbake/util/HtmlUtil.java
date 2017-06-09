@@ -1,7 +1,9 @@
-package org.jbake.app;
+package org.jbake.util;
 
 import java.util.Map;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler.Attributes;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,18 +18,18 @@ import org.jsoup.select.Elements;
 public class HtmlUtil {
 
 	/**
-	 * Image paths are specified as w.r.t. assets folder. This function prefix rootpath to all img src except 
-	 * the ones that starts with http://, https:// or '/'.
+	 * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except 
+	 * the ones that starts with http://, https://.
 	 * 
-	 * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add rootpath.
+	 * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
 	 * 
 	 * @param fileContents
 	 */
-    public static void fixImageSourceUrls(Map<String, Object> fileContents){
+    public static void fixImageSourceUrls(Map<String, Object> fileContents, CompositeConfiguration config){
     	
     	String htmlContent = fileContents.get(Attributes.BODY).toString();
-    	
-    	String rootPath = fileContents.get(Attributes.ROOTPATH).toString();
+        
+    	String siteHost = config.getString(Keys.SITE_HOST);
     	
     	String uri = fileContents.get(Attributes.URI).toString();
     	
@@ -46,8 +48,6 @@ public class HtmlUtil {
         		uri = uri.substring(0, uri.lastIndexOf("/") + 1);
         }
     	
-    	
-		
     	Document document = Jsoup.parseBodyFragment(htmlContent);
     	
     	Elements allImgs = document.getElementsByTag("img");
@@ -62,10 +62,15 @@ public class HtmlUtil {
 			}
 			
 			// Now add the root path
-			if((source.startsWith("http://") 
-					|| source.startsWith("https://") || source.startsWith("/")) == false){
-				String relativeSource = rootPath + source;
-				img.attr("src", relativeSource);
+			if(!source.startsWith("http://") 
+					&& !source.startsWith("https://")){
+					
+				if (!siteHost.endsWith("/") && !source.startsWith("/")) siteHost = siteHost.concat("/");
+				
+				String fullUrl = siteHost + source;
+				
+				img.attr("src", fullUrl);
+				
 			}
 		}
     	

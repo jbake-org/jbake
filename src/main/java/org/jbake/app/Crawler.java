@@ -13,6 +13,7 @@ import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
+import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +181,7 @@ public class Crawler {
             
             
             // Prevent image source url's from breaking
-            HtmlUtil.fixImageSourceUrls(fileContents);
+            HtmlUtil.fixImageSourceUrls(fileContents,config);
 
             ODocument doc = new ODocument(documentType);
             doc.fields(fileContents);
