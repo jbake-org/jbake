@@ -37,30 +37,31 @@ processResources {
 }
 
 
-task cloneProjectExampleRepositories() {
-    group = "distribution"
-    description "Clone jbake example project repositories"
-
-    outputs.dir examplesBase
-
-    doLast {
-        exampleRepositories.each { name, repository ->
-            Grgit.clone(dir: "$examplesBase/$name", uri: repository)
-        }
-    }
-}
 
 //create Zip Task for each repository
 exampleRepositories.each { name, repository ->
 
-    task "${name}Zip"(type: Zip, dependsOn: cloneProjectExampleRepositories) {
+    task "clone_${name}Repository"() {
+        group = "distribution"
+        description "Clone jbake ${name} example project repositories"
+
+        def repositoryName = "$examplesBase/$name"
+
+        outputs.dir repositoryName
+
+        doLast {
+            Grgit.clone(dir: repositoryName, uri: repository)
+        }
+    }
+
+    task "${name}Zip"(type: Zip) {
         group "distribution"
         description "Zip $name repository"
 
         baseName = name
         archiveName = "${baseName}.zip"
 
-        from "$examplesBase/$baseName"
+        from project.tasks.getByName("clone_${name}Repository").outputs
         exclude 'README.md'
         exclude 'LICENSE'
         exclude '.git'
@@ -82,7 +83,20 @@ distributions {
 
 startScripts {
     defaultJvmOpts = ['-XX:MaxDirectMemorySize=512m']
-    classpath += files('lib/logging')
+    classpath = files("lib","logging")
+
+    /**
+     * The startScripts produces scripts that contain `$APP_HOME/lib/lib` in the classpath
+     * so we need to tweak it a bit to be able to add the whole lib directory to the classpath :|
+     *
+     * See https://stackoverflow.com/questions/10518603/adding-classpath-entries-using-gradles-application-plugin
+     */
+    doLast {
+        def windowsScriptFile = file getWindowsScript()
+        def unixScriptFile = file getUnixScript()
+        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\lib', '%APP_HOME%\\lib\\*')
+        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/lib', '$APP_HOME/lib/*')
+    }
 }
 
 distZip {
