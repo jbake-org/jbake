@@ -74,7 +74,8 @@ public class HtmlUtil {
 			}
 		}
     	
-    	fileContents.put(Attributes.BODY, document.body().toString());
+    	//User body().children() to prevent adding <body></body> wrap.
+    	fileContents.put(Attributes.BODY, document.body().children().toString());
     }
 	
 }

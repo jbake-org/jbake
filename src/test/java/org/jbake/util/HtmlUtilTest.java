@@ -23,6 +23,22 @@ public class HtmlUtilTest {
 	public void setUp() throws Exception{
 		config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
 	}
+	
+	@Test
+	public void shouldNotAddBodyHTMLElement(){
+		Map<String, Object> fileContent = new HashMap<String, Object>();
+		fileContent.put(Attributes.ROOTPATH, "../../../");
+		fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
+		fileContent.put(Attributes.BODY, "<div> Test <img src='blog/2017/05/first.jpg' /></div>");
+		
+		HtmlUtil.fixImageSourceUrls(fileContent, config);
+		
+		String body = fileContent.get(Attributes.BODY).toString();
+		
+		assertThat(body).doesNotContain("<body>");
+		assertThat(body).doesNotContain("</body>");
+		
+	}
 
 	@Test
 	public void shouldAddRootpath(){
