@@ -74,8 +74,9 @@ public class HtmlUtil {
 			}
 		}
     	
-    	//User body().children() to prevent adding <body></body> wrap.
-    	fileContents.put(Attributes.BODY, document.body().children().toString());
+    	
+    	//Use body().html() to prevent adding <body></body> from parsed fragment.
+    	fileContents.put(Attributes.BODY, document.body().html());
     }
 	
 }
