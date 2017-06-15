@@ -38,12 +38,12 @@ processResources {
 
 
 
-//create Zip Task for each repository
+//create clone and Zip Task for each repository
 exampleRepositories.each { name, repository ->
 
     task "clone_${name}Repository"() {
         group = "distribution"
-        description "Clone jbake ${name} example project repositories"
+        description "Clone jbake ${name} example project repository"
 
         def repositoryName = "$examplesBase/$name"
 
