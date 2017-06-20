@@ -192,7 +192,7 @@ public class Crawler {
     public String getPathToRoot(File sourceFile) {
     	File rootPath = new File(contentPath);
     	File parentPath = sourceFile.getParentFile();
-    	int parentCount = 0;
+    	int parentCount = config.getBoolean(Keys.URI_NO_EXTENSION) ? 1 : 0;
     	while (!parentPath.equals(rootPath)) {
     		parentPath = parentPath.getParentFile();
     		parentCount++;
