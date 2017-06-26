@@ -56,7 +56,7 @@ public class Asset {
         final File[] assets = sourceFolder.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return !ignoreHidden || !file.isHidden();
+                return (!ignoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file));
             }
         });
         if (assets != null) {
@@ -77,6 +77,35 @@ public class Asset {
                     }
                 } else if (asset.isDirectory()) {
                     copy(asset, target);
+                }
+            }
+        }
+    }
+    
+    public void copyAssetsFromContent(File path){
+    	copyNonContentFiles(path, destination);
+    }
+    
+    private void copyNonContentFiles(File sourceFolder, File targetFolder) {
+        final File[] nonContents = sourceFolder.listFiles(FileUtil.getNotContentFileFilter());
+        if (nonContents != null) {
+            Arrays.sort(nonContents);
+            for (File file : nonContents) {
+                final File target = new File(targetFolder, file.getName());
+                if (file.isFile()) {
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append("Copying [").append(file.getPath()).append("]... ");
+                    try {
+                        FileUtils.copyFile(file, target);
+                        sb.append("done!");
+                        LOGGER.info(sb.toString());
+                    } catch (IOException e) {
+                        sb.append("failed!");
+                        LOGGER.error(sb.toString(), e);
+                        errors.add(e);
+                    }
+                } else if (file.isDirectory()) {
+                	copyNonContentFiles(file, target);
                 }
             }
         }

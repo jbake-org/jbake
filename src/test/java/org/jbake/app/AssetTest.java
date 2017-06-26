@@ -1,14 +1,15 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Assert;
 import org.junit.Before;
@@ -132,4 +133,65 @@ public class AssetTest {
 		final String os = System.getProperty("os.name");
 		return os != null && os.toLowerCase(Locale.ENGLISH).contains("win");
 	}
+	
+	@Test
+	public void testJBakeIgnoredFolder(){
+		URL assetsUrl = this.getClass().getResource("/fixture/assets");
+		File assets = new File(assetsUrl.getFile());
+		Asset asset = new Asset(assets.getParentFile(), folder.getRoot(), config);
+		asset.copy(assets);
+
+		File cssFile = new File(folder.getRoot().getPath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
+		Assert.assertTrue("File " + cssFile.getAbsolutePath() + " does not exist", cssFile.exists());
+		File imgFile = new File(folder.getRoot().getPath() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
+		Assert.assertTrue("File " + imgFile.getAbsolutePath() + " does not exist", imgFile.exists());
+		File jsFile = new File(folder.getRoot().getPath() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
+		Assert.assertTrue("File " + jsFile.getAbsolutePath() + " does not exist", jsFile.exists());
+		File ignorableFolder = new File(folder.getRoot().getPath() + File.separatorChar + "ignorablefolder");
+		Assert.assertFalse("Folder " + ignorableFolder.getAbsolutePath() + " must not exist", ignorableFolder.exists());
+
+		Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+	}
+	
+	
+	@Test
+	public void testCopyAssetsFromContent(){
+		URL contentUrl = this.getClass().getResource("/fixture/content");
+		File contents = new File(contentUrl.getFile());
+		Asset asset = new Asset(contents.getParentFile(), folder.getRoot(), config);
+		asset.copyAssetsFromContent(contents);
+		
+		int totalFiles = countFiles(folder.getRoot());
+		int expected = 3;
+		
+		Assert.assertTrue(String.format("Number of files copied must be %d but are %d", expected, totalFiles), totalFiles == expected);
+		
+		File pngFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2012/images/custom-image.png");
+		Assert.assertTrue("File " + pngFile.getAbsolutePath() + " does not exist", pngFile.exists());
+		
+		File jpgFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2013/images/custom-image.jpg");
+		Assert.assertTrue("File " + jpgFile.getAbsolutePath() + " does not exist", jpgFile.exists());
+		
+		File jsonFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2012/sample.json");
+		Assert.assertTrue("File " + jsonFile.getAbsolutePath() + " does not exist", jsonFile.exists());
+		
+		File ignorableFolder = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2016/ignorablefolder");
+		Assert.assertFalse("Folder " + ignorableFolder.getAbsolutePath() + " must not exist", ignorableFolder.exists());
+
+		Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+	}
+	
+	private Integer countFiles(File path){
+		int total = 0;
+		FileFilter filesOnly = FileFilterUtils.fileFileFilter();
+		FileFilter dirsOnly = FileFilterUtils.directoryFileFilter();
+		File[] files = path.listFiles(filesOnly);
+		System.out.println(files);
+		total += files.length;
+		for (File file : path.listFiles(dirsOnly)){
+			total += countFiles(file);
+		}
+		return total;
+	}
+	
 }
