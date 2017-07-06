@@ -147,7 +147,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
         
         outputStrings.put("category", Arrays.asList("blog/2012/first-post.html"));
             
-        outputStrings.put("categories", Arrays.asList("categories/Technology.html"));
+        outputStrings.put("categories", Arrays.asList("categories/technology.html"));
 
     }
 

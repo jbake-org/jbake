@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
+import org.jbake.app.Renderer;
 import org.jbake.template.ModelExtractor;
 
 
@@ -28,10 +29,9 @@ public class AllCategoriesExtractor implements ModelExtractor<DocumentList> {
 		
 		for (String category : db.getCategories()){
 			Map<String, Object> newCategory = new HashMap<String, Object>();
-			String tagName = category;
-			newCategory.put("name",tagName);
+			newCategory.put("name",category);
 			
-			String uri = categoryPath + File.separator + category + config.get(Keys.OUTPUT_EXTENSION.replace(".", "_")).toString();
+			String uri = categoryPath + File.separator + Renderer.toSanitizedUriName(category) + config.get(Keys.OUTPUT_EXTENSION.replace(".", "_")).toString();
 			
 			newCategory.put("uri", uri);
 			newCategory.put("posts", db.getPublishedPostsByCategories(category));

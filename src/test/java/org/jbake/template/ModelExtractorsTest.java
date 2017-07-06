@@ -1,11 +1,27 @@
 package org.jbake.template;
 
+import static org.assertj.core.api.Assertions.*;
+
+import org.jbake.app.ContentStore;
+import org.jbake.app.DocumentList;
+import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
+import org.jbake.render.support.MockCompositeConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.configuration.CompositeConfiguration;
 
 public class ModelExtractorsTest {
 
@@ -72,5 +88,40 @@ public class ModelExtractorsTest {
 
         String unknownDocumentType = "unknown";
         ModelExtractors.getInstance().registerExtractorsForCustomTypes(unknownDocumentType);
+    }
+    
+    @Test
+    public void shouldContainCategories() throws NoModelExtractorException{
+    	
+    	Map<String, Object> config = new HashMap<String, Object>();
+    	config.put(Keys.CATEGORY_PATH.replace(".","_"), "categories");
+    	config.put(Keys.OUTPUT_EXTENSION.replace(".","_"), ".html");
+    	
+   	 	ContentStore contentStore = mock(ContentStore.class);
+        Set<String> cats = new HashSet<>();
+        cats.add("Coding");
+        
+        Mockito.when(contentStore.getCategories()).thenReturn(cats);
+        
+        Mockito.when(contentStore.getPublishedPostsByCategories(Mockito.anyString())).thenReturn(new DocumentList());
+        
+        Mockito.when(contentStore.getPublishedDocumentsByCategory(Mockito.anyString())).thenReturn(new DocumentList());
+    	
+        DocumentList list = (DocumentList) ModelExtractors.getInstance()
+    						.extractAndTransform(contentStore, "categories", 
+    								Collections.singletonMap("config", config), 
+    								new TemplateEngineAdapter.NoopAdapter());
+    								
+    	assertThat(list)
+    		.hasSize(1);
+    	
+    	for (Map<String, Object> cat : list){
+    		assertThat(cat)
+    			.containsEntry("uri", "categories/coding.html")
+    			.containsKeys("posts", "documents");
+    	}
+    		
+    	
+    	
     }
 }

@@ -262,7 +262,7 @@ public class ContentStore {
     	DocumentList docs = this.getAllCategoriesFromPublishedPosts();
 	    Set<String> result = new HashSet<String>();
 	    for (Map<String, Object> document : docs) {
-	        String[] categories = DBUtil.toStringArray(document.get("categories"));
+	        String[] categories = DBUtil.toStringArray(document.get(Crawler.Attributes.CATEGORIES));
 	        Collections.addAll(result, categories);
 	    }
 	    return result;
