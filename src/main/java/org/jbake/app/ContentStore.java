@@ -23,11 +23,20 @@
  */
 package org.jbake.app;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
-import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
@@ -35,16 +44,6 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.model.DocumentAttributes;
-import org.jbake.model.DocumentTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author jdlee
@@ -145,10 +144,23 @@ public class ContentStore {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
 
+    public DocumentList getPublishedPostsByCategories(String category) {
+        return query("select * from post where status='published' and ? in categories order by date desc", category);
+    }
+    
     public DocumentList getPublishedDocumentsByTag(String tag) {
         final DocumentList documents = new DocumentList();
         for (final String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList documentsByTag = query("select * from " + docType + " where status='published' and ? in tags order by date desc", tag);
+            documents.addAll(documentsByTag);
+        }
+        return documents;
+    }
+    
+    public DocumentList getPublishedDocumentsByCategory(String category) {
+        final DocumentList documents = new DocumentList();
+        for (final String docType : DocumentTypes.getDocumentTypes()) {
+            DocumentList documentsByTag = query("select * from " + docType + " where status='published' and ? in categories order by date desc", category);
             documents.addAll(documentsByTag);
         }
         return documents;
@@ -174,6 +186,10 @@ public class ContentStore {
         return query(query);
     }
 
+    public DocumentList getAllCategoriesFromPublishedPosts() {
+        return query("select categories from post where status='published'");
+    }
+    
     public DocumentList getAllTagsFromPublishedPosts() {
         return query("select tags from post where status='published'");
     }
@@ -240,6 +256,16 @@ public class ContentStore {
             }
         }
         return result;
+    }
+
+    public Set<String> getCategories() {
+    	DocumentList docs = this.getAllCategoriesFromPublishedPosts();
+	    Set<String> result = new HashSet<String>();
+	    for (Map<String, Object> document : docs) {
+	        String[] categories = DBUtil.toStringArray(document.get(Crawler.Attributes.CATEGORIES));
+	        Collections.addAll(result, categories);
+	    }
+	    return result;
     }
 
     private void createDocType(final OSchema schema, final String doctype) {

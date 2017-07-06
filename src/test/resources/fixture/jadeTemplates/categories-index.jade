@@ -1,0 +1,11 @@
+extends layout.jade
+
+block content
+    .row-fluid.marketing
+        .span12
+            h2 Category Posts
+            each category in categories
+                
+                    a(href='#{category.uri}') #{category.name}
+                
+    hr

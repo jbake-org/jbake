@@ -25,7 +25,11 @@ package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.Crawler;
+import org.jbake.app.Renderer;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -81,5 +85,4 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         assertTrue("index file exists",indexFile.exists());
 
     }
-
 }

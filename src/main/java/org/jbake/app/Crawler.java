@@ -50,6 +50,8 @@ public class Crawler {
 		String ALLTAGS = "alltags";
 		String PUBLISHED_DATE = "published_date";
 		String BODY = "body";
+		String CATEGORIES = "categories";
+		String CATEGORY = "category";
 	}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.Crawler;
 import org.json.simple.JSONValue;
@@ -140,6 +141,31 @@ public abstract class MarkupEngine implements ParserEngine {
             content.put(Crawler.Attributes.TAGS, tags);
         }
         
+    	// If categories are not disabled then add a default category
+		if(config.getBoolean(Keys.CATEGORIES_ENABLE)){
+			if (content.get(Crawler.Attributes.CATEGORIES) != null) {
+	        	String[] categories = (String[]) content.get(Crawler.Attributes.CATEGORIES);
+	            for( int i=0; i<categories.length; i++ ) {
+	            	categories[i]=categories[i].trim();
+	                if (config.getBoolean(Keys.CATEGORY_SANITIZE)) {
+	                	categories[i]=categories[i].replace(" ", "-");
+	                }
+	            }
+	            content.put(Crawler.Attributes.CATEGORIES, categories);
+	        } else {
+        		String defaultCategory = config.getString(Keys.CATEGORY_DEFAULT).trim();
+        		if (config.getBoolean(Keys.CATEGORY_SANITIZE,false)) {
+        			defaultCategory = defaultCategory.replace(" ", "-");
+                }
+        		content.put(Crawler.Attributes.CATEGORIES, ArrayUtils.toArray(defaultCategory));
+	        }
+			content.put("primary_category", ((String[])content.get(Crawler.Attributes.CATEGORIES))[0]);
+        } else {
+        	if (content.get(Crawler.Attributes.CATEGORIES) != null) {
+        		LOGGER.warn("categories.enable is set as false but post {} has categories specifid. Categories will be ignored.", file);
+        	}
+        }
+		
         // TODO: post parsing plugins to hook in here?
 
         return content;
@@ -233,7 +259,13 @@ public abstract class MarkupEngine implements ParserEngine {
                 }
             } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
                 content.put(key, getTags(value));
-            } else if (isJson(value)) {
+            }  else if (key.equalsIgnoreCase(Crawler.Attributes.CATEGORIES)){
+                    	List<String> categories = new ArrayList<String>();
+                    	for (String category : parts[1].split(",")){
+                    		categories.add(category.trim());
+                    	}
+                    	content.put(parts[0], categories.toArray(new String[0]));
+                    } else if (isJson(value)) {
                 content.put(key, JSONValue.parse(value));
             } else {
                 content.put(key, value);

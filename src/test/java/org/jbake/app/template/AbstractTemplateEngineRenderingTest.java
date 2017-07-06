@@ -143,6 +143,11 @@ public abstract class AbstractTemplateEngineRenderingTest {
         outputStrings.put("sitemap", Arrays.asList("blog/2013/second-post.html",
                 "blog/2012/first-post.html",
                 "papers/published-paper.html"));
+        
+        
+        outputStrings.put("category", Arrays.asList("blog/2012/first-post.html"));
+            
+        outputStrings.put("categories", Arrays.asList("categories/technology.html"));
 
     }
 
@@ -268,5 +273,27 @@ public abstract class AbstractTemplateEngineRenderingTest {
     protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
 
+    }
+    
+    @Test
+    public void renderCategories() throws Exception {
+        
+    	renderer.renderCategories("categories");
+
+        // verify
+        File outputFile = new File(destinationFolder + File.separator + "categories" + File.separator + "Technology.html");
+        Assert.assertTrue(outputFile.exists());
+        String output = FileUtils.readFileToString(outputFile);
+        for (String string : outputStrings.get("category")) {
+            assertThat(output).contains(string);
+        }
+        
+        // verify index.html file
+        File indexFile = new File(destinationFolder + File.separator + "categories" + File.separator + "index.html");
+        Assert.assertTrue(indexFile.exists());
+        String indexData = FileUtils.readFileToString(indexFile);
+        for (String string : outputStrings.get("categories")) {
+            assertThat(indexData).contains(string);
+        }
     }
 }
