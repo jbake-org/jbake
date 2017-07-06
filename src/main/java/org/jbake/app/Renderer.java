@@ -384,7 +384,7 @@ public class Renderer {
                 map.put(Attributes.ROOTPATH, "../../");
                 model.put("content", map);
 
-            	String pathCategory = category.trim().replace(" ", "-");
+            	String pathCategory = toSanitizedUriName(category);
             	String uri = File.separator + categoriesPath + File.separator + pathCategory;
             	uri = getValidExtensionUri(uri,config);
             	File path = new File(destination.getPath() + uri);
@@ -419,6 +419,10 @@ public class Renderer {
         } else {
         	return renderedCount;
         }
+    }
+    
+    public static String toSanitizedUriName(String name){
+    	return name.trim().replace(" ", "-").toLowerCase();
     }
     
     /**

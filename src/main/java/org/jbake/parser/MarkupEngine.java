@@ -143,25 +143,25 @@ public abstract class MarkupEngine implements ParserEngine {
         
     	// If categories are not disabled then add a default category
 		if(config.getBoolean(Keys.CATEGORIES_ENABLE)){
-			if (content.get("categories") != null) {
-	        	String[] categories = (String[]) content.get("categories");
+			if (content.get(Crawler.Attributes.CATEGORIES) != null) {
+	        	String[] categories = (String[]) content.get(Crawler.Attributes.CATEGORIES);
 	            for( int i=0; i<categories.length; i++ ) {
 	            	categories[i]=categories[i].trim();
 	                if (config.getBoolean(Keys.CATEGORY_SANITIZE)) {
 	                	categories[i]=categories[i].replace(" ", "-");
 	                }
 	            }
-	            content.put("categories", categories);
+	            content.put(Crawler.Attributes.CATEGORIES, categories);
 	        } else {
         		String defaultCategory = config.getString(Keys.CATEGORY_DEFAULT).trim();
         		if (config.getBoolean(Keys.CATEGORY_SANITIZE,false)) {
         			defaultCategory = defaultCategory.replace(" ", "-");
                 }
-        		content.put("categories", ArrayUtils.toArray(defaultCategory));
+        		content.put(Crawler.Attributes.CATEGORIES, ArrayUtils.toArray(defaultCategory));
 	        }
-			content.put("primary_category", ((String[])content.get("categories"))[0]);
+			content.put("primary_category", ((String[])content.get(Crawler.Attributes.CATEGORIES))[0]);
         } else {
-        	if (content.get("categories") != null) {
+        	if (content.get(Crawler.Attributes.CATEGORIES) != null) {
         		LOGGER.warn("categories.enable is set as false but post {} has categories specifid. Categories will be ignored.", file);
         	}
         }
@@ -259,7 +259,7 @@ public abstract class MarkupEngine implements ParserEngine {
                 }
             } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
                 content.put(key, getTags(value));
-            }  else if (key.equalsIgnoreCase("categories")){
+            }  else if (key.equalsIgnoreCase(Crawler.Attributes.CATEGORIES)){
                     	List<String> categories = new ArrayList<String>();
                     	for (String category : parts[1].split(",")){
                     		categories.add(category.trim());
