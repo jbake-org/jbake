@@ -25,11 +25,13 @@ public class BakeWatcher {
         try {
             FileSystemManager fsMan = VFS.getManager();
             FileObject listenPath = fsMan.resolveFile(res.getSource(), config.getString( ConfigUtil.Keys.CONTENT_FOLDER));
+            FileObject listenTemplatePath = fsMan.resolveFile(res.getSource(), config.getString( ConfigUtil.Keys.TEMPLATE_FOLDER));
 
             System.out.println("Watching for changes in [" + res.getSource() + "]");
             DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(res, config));
             monitor.setRecursive(true);
             monitor.addFile(listenPath);
+            monitor.addFile(listenTemplatePath);
             monitor.start();
         } catch (FileSystemException e) {
             e.printStackTrace();
