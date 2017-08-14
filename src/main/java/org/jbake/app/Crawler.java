@@ -202,6 +202,9 @@ public class Crawler {
     	for (int i = 0; i < parentCount; i++) {
     		sb.append("../");
     	}
+    	if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
+        	sb.append("../");
+        }
     	return sb.toString();
     }
 
