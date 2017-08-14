@@ -101,6 +101,8 @@ public class CrawlerTest {
 
             Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
             Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
+            
+            assertThat(model).containsEntry("rootpath","../../../");
         }
     }
 
