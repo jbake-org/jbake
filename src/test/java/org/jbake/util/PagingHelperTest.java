@@ -27,7 +27,7 @@ public class PagingHelperTest {
 
         String previousFileName = helper.getPreviousFileName(2, "index.html");
 
-        Assert.assertThat("index.html", is( previousFileName) );
+        Assert.assertThat("", is( previousFileName) );
     }
 
     @Test
@@ -37,7 +37,7 @@ public class PagingHelperTest {
 
         String previousFileName = helper.getPreviousFileName(3, "index.html");
 
-        Assert.assertThat("2/index.html", is( previousFileName) );
+        Assert.assertThat("2/", is( previousFileName) );
 
     }
 
@@ -66,7 +66,7 @@ public class PagingHelperTest {
 
         String nextFileName = helper.getNextFileName(2, "index.html");
 
-        Assert.assertThat("3/index.html", is( nextFileName) );
+        Assert.assertThat("3/", is( nextFileName) );
 
     }
 }
