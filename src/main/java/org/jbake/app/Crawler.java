@@ -50,6 +50,7 @@ public class Crawler {
 		String ALLTAGS = "alltags";
 		String PUBLISHED_DATE = "published_date";
 		String BODY = "body";
+		String DB = "db";
 	}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
@@ -201,6 +202,9 @@ public class Crawler {
     	for (int i = 0; i < parentCount; i++) {
     		sb.append("../");
     	}
+    	if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
+        	sb.append("../");
+        }
     	return sb.toString();
     }
 
