@@ -46,6 +46,7 @@ ext {
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.5'
     mockitoVersion = '1.10.19'
+    jsoupVersion = '1.10.2'
 }
 
 dependencies {
@@ -68,6 +69,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
     compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
     compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
+	compile group: 'org.jsoup', name:'jsoup', version: jsoupVersion
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
