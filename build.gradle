@@ -9,6 +9,7 @@ plugins {
     id 'com.github.ben-manes.versions'  version '0.14.0'
 }
 
+
 if( JavaVersion.current().java7Compatible ) {
     apply plugin: 'com.github.kt3k.coveralls'
     apply plugin: 'com.jfrog.bintray'
@@ -27,7 +28,8 @@ repositories {
 }
 
 ext {
-    asciidoctorjVersion = '1.5.4.1'
+    asciidoctorjVersion = '1.5.5'
+    asciidoctorjDiagramVersion = '1.5.4'
     commonsIoVersion = '2.5'
     commonsConfigurationVersion = '1.10'
     commonsLangVersion = '3.4'
@@ -56,6 +58,12 @@ sourceSets {
     }
 }
 
+configurations {
+    dist
+
+    runtime.extendsFrom dist
+}
+
 dependencies {
     compile group: 'commons-io', name: 'commons-io', version:  commonsIoVersion
     compile group: 'commons-configuration', name: 'commons-configuration', version: commonsConfigurationVersion
@@ -77,6 +85,9 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
     compile group: 'de.neuland-bfi', name: 'jade4j', version: jade4jVersion
 	compile group: 'org.jsoup', name:'jsoup', version: jsoupVersion
+
+    dist group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: asciidoctorjDiagramVersion
+
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
