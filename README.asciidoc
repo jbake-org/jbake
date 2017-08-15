@@ -8,7 +8,7 @@ Jonathan Bullock
 http://jbake.org[JBake] is a Java based open source static site/blog generator for developers.
 
 image:https://img.shields.io/travis/jbake-org/jbake/master.svg["Build Status", link="https://travis-ci.org/jbake-org/jbake"]
-image:https://ci.appveyor.com/api/projects/status/github/ancho/jbake?svg=true["Appveyor Status", link="https://ci.appveyor.com/project/ancho/jbake"]
+image:https://ci.appveyor.com/api/projects/status/0ifiikgp3m9btmk0?svg=true["Appveyor Status", link="https://ci.appveyor.com/project/jbake-org/jbake"]
 image:https://img.shields.io/coveralls/jbake-org/jbake/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/jbake"]
 image:https://img.shields.io/maven-central/v/org.jbake/jbake-core.svg["Maven Download", link="http://jbake.org/download.html#maven"]
 image:https://api.bintray.com/packages/jbake/maven/jbake-core/images/download.svg["Bintray Download", link="https://bintray.com/jbake/maven/jbake-core/_latestVersion"]
