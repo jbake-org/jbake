@@ -49,6 +49,13 @@ ext {
     jsoupVersion = '1.10.2'
 }
 
+sourceSets {
+    smokeTest {
+        java.srcDir file('src/smoke-test/java')
+        resources.srcDir file('src/smoke-test/resources')
+    }
+}
+
 dependencies {
     compile group: 'commons-io', name: 'commons-io', version:  commonsIoVersion
     compile group: 'commons-configuration', name: 'commons-configuration', version: commonsConfigurationVersion
@@ -73,11 +80,25 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testCompile group: 'org.assertj', name: 'assertj-core', version: assertjCoreVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+
+    smokeTestCompile configurations.testCompile
+    smokeTestCompile sourceSets.test.output
+    smokeTestRuntime configurations.testRuntime
 }
 
 test {
     jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
 }
+
+task smokeTest(type: Test, dependsOn: installDist) {
+    group 'Verification'
+    description 'Runs the integration tests.'
+    testClassesDir = sourceSets.smokeTest.output.classesDir
+    classpath = sourceSets.smokeTest.runtimeClasspath
+    shouldRunAfter test
+}
+
+check.dependsOn smokeTest
 
 jacoco {
     toolVersion = jacocoVersion

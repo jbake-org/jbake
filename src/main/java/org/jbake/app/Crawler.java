@@ -1,6 +1,5 @@
 package org.jbake.app;
 
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
@@ -25,33 +24,33 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class Crawler {
-	public interface Attributes {
-		/**
-		 * Possible values of the {@link Attributes#STATUS} property
-		 * @author ndx
-		 *
-		 */
+    public interface Attributes {
+        /**
+         * Possible values of the {@link Attributes#STATUS} property
+         *
+         * @author ndx
+         */
         interface Status {
-			String PUBLISHED_DATE = "published-date";
-			String PUBLISHED = "published";
-			String DRAFT = "draft";
-		}
-		String DATE = "date";
-		String STATUS = "status";
-		String TYPE = "type";
-		String TITLE = "title";
-		String URI = "uri";
-		String FILE = "file";
-		String TAGS = "tags";
-		String TAG = "tag";
-		String ROOTPATH = "rootpath";
-		String ID = "id";
-		String NO_EXTENSION_URI = "noExtensionUri";
-		String ALLTAGS = "alltags";
-		String PUBLISHED_DATE = "published_date";
-		String BODY = "body";
-		String DB = "db";
-	}
+            String PUBLISHED_DATE = "published-date";
+            String PUBLISHED = "published";
+            String DRAFT = "draft";
+        }
+
+        String DATE = "date";
+        String STATUS = "status";
+        String TYPE = "type";
+        String TITLE = "title";
+        String URI = "uri";
+        String FILE = "file";
+        String TAGS = "tags";
+        String TAG = "tag";
+        String ROOTPATH = "rootpath";
+        String ID = "id";
+        String NO_EXTENSION_URI = "noExtensionUri";
+        String ALLTAGS = "alltags";
+        String PUBLISHED_DATE = "published_date";
+        String BODY = "body";
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
 
@@ -62,9 +61,10 @@ public class Crawler {
 
     /**
      * Creates new instance of Crawler.
-	 * @param db		Database instance for content
-	 * @param source	Base directory where content directory is located
-	 * @param config	Project configuration
+     *
+     * @param db     Database instance for content
+     * @param source Base directory where content directory is located
+     * @param config Project configuration
      */
     public Crawler(ContentStore db, File source, CompositeConfiguration config) {
         this.db = db;
@@ -132,30 +132,51 @@ public class Crawler {
     }
 
     private String buildURI(final File sourceFile) {
-    	String uri = FileUtil.asPath(sourceFile.getPath()).replace(FileUtil.asPath( contentPath), "");
+        String uri = FileUtil.asPath(sourceFile.getPath())
+                .replace(FileUtil.asPath(contentPath), "")
+                // On windows we have to replace the backslash
+                .replace(File.separator, "/");
 
-    	boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
-    	String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
-    	if (noExtensionUri && noExtensionUriPrefix != null && noExtensionUriPrefix.length() > 0) {
-        	// convert URI from xxx.html to xxx/index.html
-    		if (uri.startsWith(noExtensionUriPrefix)) {
-    			uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getString(Keys.OUTPUT_EXTENSION);
-    		}
+        if (useNoExtensionUri(uri)) {
+            // convert URI from xxx.html to xxx/index.html
+            uri = createNoExtensionUri(uri);
         } else {
-            uri = uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
+            uri = createUri(uri);
         }
 
         // strip off leading / to enable generating non-root based sites
-    	if (uri.startsWith("/")) {
-    		uri = uri.substring(1, uri.length());
-    	}
+        if (uri.startsWith("/")) {
+            uri = uri.substring(1, uri.length());
+        }
         return uri;
+    }
+
+    private String createUri(String uri) {
+        return uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
+    }
+
+    private String createNoExtensionUri(String uri) {
+        return "/"
+                + FilenameUtils.getPath(uri)
+                + FilenameUtils.getBaseName(uri)
+                + "/index"
+                + config.getString(Keys.OUTPUT_EXTENSION);
+    }
+
+    private boolean useNoExtensionUri(String uri) {
+        boolean noExtensionUri = config.getBoolean(Keys.URI_NO_EXTENSION);
+        String noExtensionUriPrefix = config.getString(Keys.URI_NO_EXTENSION_PREFIX);
+
+        return noExtensionUri
+                && (noExtensionUriPrefix != null)
+                && (noExtensionUriPrefix.length() > 0)
+                && uri.startsWith(noExtensionUriPrefix);
     }
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         Map<String, Object> fileContents = parser.processFile(sourceFile);
         if (fileContents != null) {
-        	fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
+            fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
             fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
             fileContents.put(String.valueOf(DocumentAttributes.RENDERED), false);
             if (fileContents.get(Attributes.TAGS) != null) {
@@ -177,7 +198,7 @@ public class Crawler {
             }
 
             if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
-            	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
+                fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
             
             
@@ -185,8 +206,8 @@ public class Crawler {
             HtmlUtil.fixImageSourceUrls(fileContents,config);
 
             ODocument doc = new ODocument(documentType);
-            doc.fields(fileContents);
-            boolean cached = fileContents.get(DocumentAttributes.CACHED) != null ? Boolean.valueOf((String)fileContents.get(DocumentAttributes.CACHED)):true;
+            doc.fromMap(fileContents);
+            boolean cached = fileContents.get(DocumentAttributes.CACHED) != null ? Boolean.valueOf((String) fileContents.get(DocumentAttributes.CACHED)) : true;
             doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
             doc.save();
         } else {
