@@ -1,6 +1,7 @@
 package org.jbake.util;
 
-import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class PagingHelper {
     long totalDocuments;
@@ -15,15 +16,15 @@ public class PagingHelper {
         return (int) Math.ceil((totalDocuments * 1.0) / (postsPerPage * 1.0));
     }
 
-    public String getNextFileName(int currentPageNumber, String fileName) {
+    public String getNextFileName(int currentPageNumber, String fileName) throws URISyntaxException {
         if (currentPageNumber < getNumberOfPages()) {
-            return (currentPageNumber + 1) + File.separator;
+            return new URI((currentPageNumber + 1) + "/").toString();
         } else {
             return null;
         }
     }
 
-    public String getPreviousFileName(int currentPageNumber, String fileName) {
+    public String getPreviousFileName(int currentPageNumber, String fileName) throws URISyntaxException {
 
         if (isFirstPage(currentPageNumber)) {
             return null;
@@ -33,7 +34,7 @@ public class PagingHelper {
                 return "";
             }
             else {
-                return (currentPageNumber - 1) + File.separator;
+                return new URI((currentPageNumber - 1) + "/").toString();
             }
         }
     }
@@ -42,12 +43,12 @@ public class PagingHelper {
         return page == 1;
     }
 
-    public String getCurrentFileName(int page, String fileName) {
+    public String getCurrentFileName(int page, String fileName) throws URISyntaxException {
         if ( isFirstPage(page) ) {
             return fileName;
         }
         else {
-            return page + File.separator + fileName;
+            return new URI(page + "/" + fileName).toString();
         }
     }
 
