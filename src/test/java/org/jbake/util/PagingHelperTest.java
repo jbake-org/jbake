@@ -6,9 +6,6 @@ import org.junit.Test;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-/**
- * Created by frank on 28.10.16.
- */
 public class PagingHelperTest {
     @Test
     public void getNumberOfPages() throws Exception {
@@ -32,13 +29,11 @@ public class PagingHelperTest {
 
     @Test
     public void shouldReturnPreviousFileName() throws Exception {
-
         PagingHelper helper = new PagingHelper(5,2);
 
         String previousFileName = helper.getPreviousFileName(3, "index.html");
 
         Assert.assertThat("2/", is( previousFileName) );
-
     }
 
     @Test
@@ -57,7 +52,6 @@ public class PagingHelperTest {
         String nextFileName = helper.getNextFileName(3, "index.html");
 
         Assert.assertNull( nextFileName );
-
     }
 
     @Test
@@ -67,6 +61,5 @@ public class PagingHelperTest {
         String nextFileName = helper.getNextFileName(2, "index.html");
 
         Assert.assertThat("3/", is( nextFileName) );
-
     }
 }

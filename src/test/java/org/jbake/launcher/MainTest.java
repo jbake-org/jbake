@@ -9,8 +9,8 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
@@ -47,66 +47,76 @@ public class MainTest {
     
     @Test
     public void launchBakeAndJettyWithCustomDirForJetty() {
-        String[] args = {"-b", "-s", "src/jbake"};
+        String path = "src" + File.separator + "jbake";
+        String[] args = {"-b", "-s", path};
         main.run(args);
 
-        verify(mockJetty).run("src/jbake","8820");
+        verify(mockJetty).run(path,"8820");
     }
 
     @Test
     public void launchJettyWithCustomSourceDir() {
-        String[] args = {"src/jbake", "-s"};
+        String path = "src" + File.separator + "jbake";
+        String[] args = {path, "-s"};
         main.run(args);
 
-        verify(mockJetty).run("src/jbake","8820");
+        verify(mockJetty).run(path,"8820");
     }
     
     @Test
     public void launchJettyWithCustomServerSourceDir() {
-        String[] args = {"-s", "build/jbake"};
+        String path = "build" + File.separator + "jbake";
+        String[] args = {"-s", path};
         main.run(args);
 
-        verify(mockJetty).run("build/jbake","8820");
+        verify(mockJetty).run(path,"8820");
     }
 
     // Documentation states these two commands will define the custom output, but the LaunchOptions file isn't setup for that.
     // I have written this test to define the existing functionality of the code and not that defined in docs.
     @Test
     public void launchJettyWithCustomDestinationDir() {
-        String[] args = {"-s", "build/jbake"};
+        String path = "build" + File.separator + "jbake";
+        String[] args = {"-s", path};
         main.run(args);
 
-        verify(mockJetty).run("build/jbake","8820");
+        verify(mockJetty).run(path,"8820");
     }
 
     @Test
     public void launchJettyWithCustomSrcAndDestDir() {
-        String[] args = {"jbake", "build/jbake", "-s"};
+        String path = "build" + File.separator + "jbake";
+        String[] args = {"jbake", path, "-s"};
         main.run(args);
 
-        verify(mockJetty).run("build/jbake","8820");
+        verify(mockJetty).run(path,"8820");
     }
 
     @Test
     public void launchJettyWithCustomDestViaConfig() throws CmdLineException {
+        final String path = "build" + File.separator + "jbake";
         String[] args = {"-s"};
         Map<String, String> properties = new HashMap<String, String>(){{
-            put("destination.folder", "build/jbake");
+            put("destination.folder", path);
         }};
         main.run(stubOptions(args), stubConfig(properties));
 
-        verify(mockJetty).run("build/jbake","8820");
+        verify(mockJetty).run(path,"8820");
     }
 
     @Test
     public void launchJettyWithCmdlineOverridingProperties() throws CmdLineException {
-        String[] args = {"src/jbake", "build/jbake", "-s"};
+        String buildPath = "build" + File.separator + "jbake";
+        String sourcePath = "src" + File.separator + "jbake";
+        final String targetPath = "target" + File.separator + "jbake";
+
+        String[] args = {sourcePath, buildPath, "-s"};
         Map<String,String> properties = new HashMap<String,String>(){{
-           put("destination.folder", "target/jbake");
+           put("destination.folder", targetPath);
         }};
         main.run(stubOptions(args), stubConfig(properties));
 
-        verify(mockJetty).run("build/jbake","8820");
+        verify(mockJetty).run(buildPath,"8820");
     }
 
     private LaunchOptions stubOptions(String[] args) throws CmdLineException {
