@@ -164,6 +164,7 @@ public class Oven {
                 // copy assets
                 Asset asset = new Asset(source, destination, config);
                 asset.copy(assetsPath);
+                asset.copyAssetsFromContent(contentsPath);
                 errors.addAll(asset.getErrors());
 
                 LOGGER.info("Baking finished!");
