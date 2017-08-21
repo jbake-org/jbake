@@ -45,20 +45,22 @@ public class Asset {
 
 	/**
 	 * Copy all files from supplied path.
-	 *
+	 *	
 	 * @param path	The starting path
 	 */
 	public void copy(File path) {
-        copy(path, destination);
-    }
-
-    private void copy(File sourceFolder, File targetFolder) {
-        final File[] assets = sourceFolder.listFiles(new FileFilter() {
+		FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return (!ignoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file));
             }
-        });
+        };
+        copy(path, destination, filter);
+    }
+
+    private void copy(File sourceFolder, File targetFolder, final FileFilter filter) {
+       
+		final File[] assets = sourceFolder.listFiles(filter);
         if (assets != null) {
             Arrays.sort(assets);
             for (File asset : assets) {
@@ -76,40 +78,16 @@ public class Asset {
                         errors.add(e);
                     }
                 } else if (asset.isDirectory()) {
-                    copy(asset, target);
+                    copy(asset, target, filter);
                 }
             }
         }
     }
     
     public void copyAssetsFromContent(File path){
-    	copyNonContentFiles(path, destination);
+    		copy(path, destination, FileUtil.getNotContentFileFilter());
     }
     
-    private void copyNonContentFiles(File sourceFolder, File targetFolder) {
-        final File[] nonContents = sourceFolder.listFiles(FileUtil.getNotContentFileFilter());
-        if (nonContents != null) {
-            Arrays.sort(nonContents);
-            for (File file : nonContents) {
-                final File target = new File(targetFolder, file.getName());
-                if (file.isFile()) {
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append("Copying [").append(file.getPath()).append("]... ");
-                    try {
-                        FileUtils.copyFile(file, target);
-                        sb.append("done!");
-                        LOGGER.info(sb.toString());
-                    } catch (IOException e) {
-                        sb.append("failed!");
-                        LOGGER.error(sb.toString(), e);
-                        errors.add(e);
-                    }
-                } else if (file.isDirectory()) {
-                	copyNonContentFiles(file, target);
-                }
-            }
-        }
-    }
 
 	public List<Throwable> getErrors() {
 		return new ArrayList<Throwable>(errors);
