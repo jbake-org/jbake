@@ -11,6 +11,7 @@ import org.apache.commons.vfs2.util.Os;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.jbake.TestUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,7 +69,7 @@ public class AssetTest {
         FileUtils.copyDirectory(new File(this.getClass().getResource("/fixture/ignorables").getFile()), assetFolder);
         config.setProperty(Keys.ASSET_FOLDER, "ignorables");
 		config.setProperty(Keys.ASSET_IGNORE_HIDDEN, "true");
-		hideAssets(assetFolder);
+		TestUtils.hideAssets(assetFolder);
 		Asset asset = new Asset(assetFolder.getParentFile(), folder.getRoot(), config);
 		asset.copy(assetFolder);
 
@@ -80,23 +81,7 @@ public class AssetTest {
 		Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
 	}
 
-	/**
-	 * Hides the assets on windows that start with a dot (e.g. .test.txt but not test.txt) so File.isHidden() returns true for those files.
-	 */
-	private void hideAssets(File assets) throws IOException, InterruptedException {
-        if ( Os.isFamily(Os.OS_FAMILY_WINDOWS) ) {
-			final File[] hiddenFiles = assets.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.startsWith(".");
-				}
-			});
-			for (File file : hiddenFiles) {
-				final Process process = Runtime.getRuntime().exec(new String[] {"attrib" , "+h", file.getAbsolutePath()});
-				process.waitFor();
-			}
-		}
-	}
+	
 
 	/**
 	 * Primary intention is to extend test cases to increase coverage.
@@ -171,9 +156,6 @@ public class AssetTest {
 		File jsonFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2012/sample.json");
 		Assert.assertTrue("File " + jsonFile.getAbsolutePath() + " does not exist", jsonFile.exists());
 		
-		File ignorableFolder = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2016/ignorablefolder");
-		Assert.assertFalse("Folder " + ignorableFolder.getAbsolutePath() + " must not exist", ignorableFolder.exists());
-
 		Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
 	}
 	

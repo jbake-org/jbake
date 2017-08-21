@@ -40,7 +40,8 @@ public class FileUtil {
     
     /**
      * Gets the list of files that are not content files based on their extension.
-     * @return
+     * 
+     * @return FileFilter object
      */
     public static FileFilter getNotContentFileFilter() {
         return new FileFilter() {
@@ -58,7 +59,7 @@ public class FileUtil {
     }
     
     /**
-     * Ignores directory (& children) if it contains a file named ".jbakeignore".
+     * Ignores directory (and children) if it contains a file named ".jbakeignore".
      * @param file {@link File}
      * @return {@link Boolean} true/false
      */
