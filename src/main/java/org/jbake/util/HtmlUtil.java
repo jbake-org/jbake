@@ -23,7 +23,8 @@ public class HtmlUtil {
 	 * 
 	 * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
 	 * 
-	 * @param fileContents
+	 * @param fileContents	Map representing file contents
+	 * @param config		Configuration object
 	 */
     public static void fixImageSourceUrls(Map<String, Object> fileContents, CompositeConfiguration config){
     	
