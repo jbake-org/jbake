@@ -93,6 +93,7 @@ public class Main {
 		}
 
 		if (res.isBake()) {
+			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
 			baker.bake(res, config);
 		}
 
@@ -101,6 +102,7 @@ public class Main {
 		}
 		
 		if (res.isRunServer()) {
+			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
 			watcher.start(res, config);
 			// TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
 			if (res.isBake()) {
