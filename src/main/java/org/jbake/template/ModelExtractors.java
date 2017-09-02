@@ -54,6 +54,11 @@ public class ModelExtractors {
         loadEngines();
     }
 
+    public void reset() {
+        extractors.clear();
+        loadEngines();
+    }
+
     public void registerEngine(String key, ModelExtractor extractor) {
         ModelExtractor old = extractors.put(key, extractor);
         if (old != null) {

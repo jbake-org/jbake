@@ -7,6 +7,7 @@ import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
+import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.jbake.template.RenderingException;
 import org.slf4j.Logger;
@@ -184,6 +185,7 @@ public class Oven {
      * in order to register new document types.
      */
     private void updateDocTypesFromConfiguration() {
+        resetDocumentTypesAndExtractors();
         ModelExtractorsDocumentTypeListener listener = new ModelExtractorsDocumentTypeListener();
         DocumentTypes.addListener(listener);
 
@@ -195,6 +197,11 @@ public class Oven {
                 DocumentTypes.addDocumentType(matcher.group(1));
             }
         }
+    }
+
+    private void resetDocumentTypesAndExtractors() {
+        DocumentTypes.resetDocumentTypes();
+        ModelExtractors.getInstance().reset();
     }
 
     private void clearCacheIfNeeded(final ContentStore db) {
