@@ -27,6 +27,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.*;
 import org.jbake.model.DocumentTypes;
+import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -151,6 +152,8 @@ public abstract class AbstractTemplateEngineRenderingTest {
         db.drop();
         db.close();
         db.shutdown();
+        DocumentTypes.resetDocumentTypes();
+        ModelExtractors.getInstance().reset();
         Locale.setDefault(currentLocale);
     }
 

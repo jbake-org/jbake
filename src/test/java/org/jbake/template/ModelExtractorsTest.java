@@ -1,6 +1,7 @@
 package org.jbake.template;
 
 import org.jbake.model.DocumentTypes;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -12,6 +13,11 @@ public class ModelExtractorsTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @After
+    public void tearDown() throws Exception {
+        ModelExtractors.getInstance().reset();
+    }
 
     @Test
     public void shouldLoadExtractorsOnInstantiation() {
@@ -70,5 +76,27 @@ public class ModelExtractorsTest {
 
         String unknownDocumentType = "unknown";
         ModelExtractors.getInstance().registerExtractorsForCustomTypes(unknownDocumentType);
+    }
+
+    @Test
+    public void shouldResetToNonCustomizedExtractors() throws Exception {
+
+        //given:
+        // A document type is known
+        String newDocumentType = "project";
+        DocumentTypes.addDocumentType(newDocumentType);
+
+        // when we register extractors for the new type
+        ModelExtractors.getInstance().registerExtractorsForCustomTypes(newDocumentType);
+
+        //expect:
+        assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(16);
+
+        //when:
+        ModelExtractors.getInstance().reset();
+
+        //then:
+        assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(14);
+
     }
 }

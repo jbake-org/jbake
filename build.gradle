@@ -53,8 +53,12 @@ ext {
 
 sourceSets {
     smokeTest {
-        java.srcDir file('src/smoke-test/java')
-        resources.srcDir file('src/smoke-test/resources')
+        java {
+            srcDir file('src/smoke-test/java')
+        }
+        resources {
+            srcDir file('src/smoke-test/resources')
+        }
     }
 }
 
@@ -104,7 +108,7 @@ test {
 task smokeTest(type: Test, dependsOn: installDist) {
     group 'Verification'
     description 'Runs the integration tests.'
-    testClassesDir = sourceSets.smokeTest.output.classesDir
+    setTestClassesDirs sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
     shouldRunAfter test
 }

@@ -18,7 +18,7 @@ public class FileUtilTest {
     public void testGetRunningLocation() throws Exception {
 
         File path = FileUtil.getRunningLocation();
-        assertThat(new File("build/").getAbsolutePath()).isEqualTo(path.getPath());
+        assertThat(new File("build/classes").getAbsolutePath()).isEqualTo(path.getPath());
     }
     
     @Test
