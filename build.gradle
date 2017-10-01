@@ -38,7 +38,7 @@ ext {
     freemarkerVersion = '2.3.26-incubating'
     junit4Version = '4.12'
     pegdownVersion = '1.6.0'
-    jettyServerVersion = '9.4.7.v20170914'
+    jettyServerVersion = '9.2.22.v20170606'
     orientDbVersion = '2.2.28'
     groovyVersion = '2.4.12'
     slf4jVersion = '1.7.25'
