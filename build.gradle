@@ -115,7 +115,7 @@ dependencyUpdates.resolutionStrategy = {
 }
 
 test {
-    jvmArgs '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+    jvmArgs '-Xmx512m', '-XX:MaxPermSize=512m', '-XX:MaxDirectMemorySize=128m', '-Dorientdb.installCustomFormatter=false=false'
 }
 
 task smokeTest(type: Test, dependsOn: installDist) {
