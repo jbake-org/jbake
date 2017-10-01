@@ -11,6 +11,8 @@
 
   <logger name="org.thymeleaf" level="WARN"/>
   <logger name="org.asciidoctor" level="INFO"/>
+  <logger name="org.eclipse" level="WARN"/>
+  <logger name="org.apache" level="WARN"/>
   <logger name="org.jbake" level="INFO"/>
 
   <!-- Strictly speaking, the level attribute is not necessary since -->

@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
@@ -21,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -105,7 +105,7 @@ public class DocumentsRendererTest {
         documentList.add(document2);
 
         // throw an exception for every call of renderer's render method
-        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(anyMap());
+        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(ArgumentMatchers.<String, Object>anyMap());
         when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
         when(db.getUnrenderedContent("customType")).thenReturn(documentList);
 
