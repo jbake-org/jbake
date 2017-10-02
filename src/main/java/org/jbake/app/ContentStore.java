@@ -23,6 +23,7 @@
  */
 package org.jbake.app;
 
+import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.Orient;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
@@ -58,16 +59,12 @@ public class ContentStore {
 
     public ContentStore(final String type, String name) {
         startupIfEnginesAreMissing();
-        db = new ODatabaseDocumentTx(type + ":" + name);
-        boolean exists = db.exists();
-        if (!exists) {
-            db.create();
-        }
-        db = new OPartitionedDatabasePoolFactory().get(type+":"+name, "admin", "admin").acquire();
+        OPartitionedDatabasePool pool = new OPartitionedDatabasePoolFactory().get(type+":"+name, "admin", "admin");
+        pool.setAutoCreate(true);
+        db = pool.acquire();
+
         ODatabaseRecordThreadLocal.INSTANCE.set(db);
-        if (!exists) {
-            updateSchema();
-        }
+        updateSchema();
     }
 
     public long getStart() {
@@ -93,12 +90,13 @@ public class ContentStore {
 
     public final void updateSchema() {
         OSchema schema = db.getMetadata().getSchema();
+
         for (String docType : DocumentTypes.getDocumentTypes()) {
-            if (schema.getClass(docType) == null) {
+            if (!schema.existsClass(docType)) {
                 createDocType(schema, docType);
             }
         }
-        if (schema.getClass("Signatures") == null) {
+        if (!schema.existsClass("Signatures")) {
             createSignatureType(schema);
         }
     }
@@ -113,11 +111,17 @@ public class ContentStore {
     }
 
     private void startupIfEnginesAreMissing() {
+        // Using a jdk which doesn't bundle a javascript engine
+        // throws a NoClassDefFoundError while logging the warning
+        // see https://github.com/orientechnologies/orientdb/issues/5855
+        OLogManager.instance().setWarnEnabled(false);
+
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
         if ( Orient.instance().getEngines().size() == 0 ) {
             Orient.instance().startup();
         }
+        OLogManager.instance().setWarnEnabled(true);
     }
 
     public void drop() {
