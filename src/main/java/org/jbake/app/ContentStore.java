@@ -134,13 +134,16 @@ public class ContentStore {
 
     public DocumentList getDocumentStatus(String docType, String uri) {
         return query("select sha1,rendered from " + docType + " where sourceuri=?", uri);
-
     }
 
     public DocumentList getPublishedPosts() {
         return getPublishedContent("post");
     }
-
+    
+    public DocumentList getPublishedPosts(boolean applyPaging) {
+        return getPublishedContent("post", applyPaging);
+    }
+    
     public DocumentList getPublishedPostsByTag(String tag) {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
@@ -159,17 +162,29 @@ public class ContentStore {
     }
 
     public DocumentList getPublishedContent(String docType) {
+        return getPublishedContent(docType, false);
+    }
+    
+    public DocumentList getPublishedContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " where status='published' order by date desc";
-        if ((start >= 0) && (limit > -1)) {
-            query += " SKIP " + start + " LIMIT " + limit;
+        if (applyPaging) {
+	        if ((start >= 0) && (limit > -1)) {
+	            query += " SKIP " + start + " LIMIT " + limit;
+	        }
         }
         return query(query);
     }
 
     public DocumentList getAllContent(String docType) {
+        return getAllContent(docType, false);
+    }
+    
+    public DocumentList getAllContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " order by date desc";
-        if ((start >= 0) && (limit > -1)) {
-            query += " SKIP " + start + " LIMIT " + limit;
+        if (applyPaging) {
+	        if ((start >= 0) && (limit > -1)) {
+	            query += " SKIP " + start + " LIMIT " + limit;
+	        }
         }
         return query(query);
     }
