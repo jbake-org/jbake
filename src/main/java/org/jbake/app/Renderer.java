@@ -177,7 +177,7 @@ public class Renderer {
      */
     public void render(Map<String, Object> content) throws Exception {
         String docType = (String) content.get(Crawler.Attributes.TYPE);
-        String outputFilename = destination.getPath() + File.separatorChar + content.get(Attributes.URI);
+        String outputFilename = destination.getPath() + File.separatorChar + ((String)content.get(Attributes.URI)).replace("/",File.separator);
         if (outputFilename.lastIndexOf(".") > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
         }
@@ -267,7 +267,6 @@ public class Renderer {
 
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
-            model.put("content", buildSimpleModel("masterindex"));
             model.put("numberOfPages", pagingHelper.getNumberOfPages());
             
             try {
@@ -281,6 +280,13 @@ public class Renderer {
                     model.put("previousFileName", previous);
                     String nextFileName = pagingHelper.getNextFileName(page, fileName);
                     model.put("nextFileName", nextFileName);
+                    
+                    Map<String, Object> contentModel =  buildSimpleModel("masterindex");
+                    
+                    if(page > 1){
+                    	contentModel.put(Attributes.ROOTPATH, "../");
+                    }
+                    model.put("content", contentModel);
 
                     // Add page number to file name
                     fileName = pagingHelper.getCurrentFileName(page, fileName);

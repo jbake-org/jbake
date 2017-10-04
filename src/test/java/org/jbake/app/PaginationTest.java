@@ -90,7 +90,7 @@ public class PaginationTest {
 
         while (start < TOTAL_POSTS) {
             db.setStart(start);
-            DocumentList posts = db.getAllContent("post");
+            DocumentList posts = db.getPublishedPosts(true);
 
             assertThat( posts.size() ).isLessThanOrEqualTo( 2 );
 

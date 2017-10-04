@@ -4,16 +4,21 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.DocumentList;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.context.LazyContextVariable;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -87,15 +92,42 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     }
 
     private class JBakeMap extends HashMap<String, Object> {
-    	public JBakeMap(final Map<String, Object> model) {
-            super(model);
-            for(String key : extractors.keySet()) {
-            	try {
-					put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
-				} catch (NoModelExtractorException e) {
-					// should never happen, as we iterate over existing extractors
-				}
-            }
-        }
+	    	public JBakeMap(final Map<String, Object> model) {
+	            super(model);
+	            for(String key : extractors.keySet()) {
+		            	try {
+						put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter<LazyContextVariable>() {
+							@Override
+							public LazyContextVariable adapt(String key, final Object extractedValue) {
+								if(key.equals(Crawler.Attributes.ALLTAGS)) {
+									return new LazyContextVariable<Set<String>>() {
+										@Override
+										protected Set<String> loadValue() {
+											return (Set<String>) extractedValue; 
+										}
+									};
+								} else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
+									return new LazyContextVariable<Date>() {
+										@Override
+										protected Date loadValue() {
+											return (Date) extractedValue; 
+										}
+									};
+								} else {
+									// All other cases, as far as I know, are document collections
+									return new LazyContextVariable<DocumentList>() {
+										@Override
+										protected DocumentList loadValue() {
+											return (DocumentList) extractedValue;
+										}
+									};
+								}
+							}
+						}));
+						} catch (NoModelExtractorException e) {
+							// should never happen, as we iterate over existing extractors
+						}
+		            }
+	        }
     }
 }

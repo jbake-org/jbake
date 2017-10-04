@@ -45,20 +45,22 @@ public class Asset {
 
 	/**
 	 * Copy all files from supplied path.
-	 *
+	 *	
 	 * @param path	The starting path
 	 */
 	public void copy(File path) {
-        copy(path, destination);
-    }
-
-    private void copy(File sourceFolder, File targetFolder) {
-        final File[] assets = sourceFolder.listFiles(new FileFilter() {
+		FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return !ignoreHidden || !file.isHidden();
+                return (!ignoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file));
             }
-        });
+        };
+        copy(path, destination, filter);
+    }
+
+    private void copy(File sourceFolder, File targetFolder, final FileFilter filter) {
+       
+		final File[] assets = sourceFolder.listFiles(filter);
         if (assets != null) {
             Arrays.sort(assets);
             for (File asset : assets) {
@@ -76,11 +78,16 @@ public class Asset {
                         errors.add(e);
                     }
                 } else if (asset.isDirectory()) {
-                    copy(asset, target);
+                    copy(asset, target, filter);
                 }
             }
         }
     }
+    
+    public void copyAssetsFromContent(File path){
+    		copy(path, destination, FileUtil.getNotContentFileFilter());
+    }
+    
 
 	public List<Throwable> getErrors() {
 		return new ArrayList<Throwable>(errors);
