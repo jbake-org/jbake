@@ -1,6 +1,20 @@
 package org.jbake.template;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler;
+
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.SimpleCollection;
@@ -13,19 +27,6 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.Crawler;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-
-import org.jbake.app.ContentStore;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -79,6 +80,17 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
         	try {
+        		
+        		// GIT Issue#357: Accessing db in freemarker template throws exception
+        		// When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
+        		// All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
+        		if(key.equals(Crawler.Attributes.DB)) {
+        			BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+    				BeansWrapper bw = bwb.build();
+    				return bw.wrap(db);
+				} 
+        		
+        		
         		return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
 
 					@Override

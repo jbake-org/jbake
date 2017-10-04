@@ -217,6 +217,7 @@ public class ConfigUtil {
 	private final static String LEGACY_CONFIG_FILE = "custom.properties";
 	private final static String CONFIG_FILE = "jbake.properties";
 	private final static String DEFAULT_CONFIG_FILE = "default.properties";
+	private static boolean LEGACY_CONFIG_FILE_EXISTS = false;
 	private static boolean LEGACY_CONFIG_FILE_WARNING_SHOWN = false;
 
 	public static CompositeConfiguration load(File source) throws ConfigurationException {
@@ -228,11 +229,7 @@ public class ConfigUtil {
         config.setListDelimiter(',');
         File customConfigFile = new File(source, LEGACY_CONFIG_FILE);
         if (customConfigFile.exists()) {
-        	if (!LEGACY_CONFIG_FILE_WARNING_SHOWN) {
-	        	LOGGER.warn(String.format("You have defined a part of your JBake configuration in %s located at: %s", LEGACY_CONFIG_FILE, customConfigFile.getParent()));
-	        	LOGGER.warn(String.format("Usage of this file is being deprecated, please rename this file to: %s to remove this warning", CONFIG_FILE));
-	        	LEGACY_CONFIG_FILE_WARNING_SHOWN = true;
-        	}
+        	LEGACY_CONFIG_FILE_EXISTS = true;
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
         }
         customConfigFile = new File(source, CONFIG_FILE);
@@ -246,6 +243,16 @@ public class ConfigUtil {
 			config.setProperty(Keys.SITE_HOST, "http://localhost:"+port);
 		}
         return config;
+    }
+    
+    public static void displayLegacyConfigFileWarningIfRequired() {
+    	if (LEGACY_CONFIG_FILE_EXISTS) {
+        	if (!LEGACY_CONFIG_FILE_WARNING_SHOWN) {
+	        	LOGGER.warn(String.format("You have defined a part of your JBake configuration in %s", LEGACY_CONFIG_FILE));
+	        	LOGGER.warn(String.format("Usage of this file is being deprecated, please rename this file to: %s to remove this warning", CONFIG_FILE));
+	        	LEGACY_CONFIG_FILE_WARNING_SHOWN = true;
+        	}
+    	}
     }
 
 }

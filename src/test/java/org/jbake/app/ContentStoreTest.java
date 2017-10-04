@@ -1,21 +1,9 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.jbake.FakeDocumentBuilder;
-import org.jbake.model.DocumentAttributes;
-import org.jbake.model.DocumentStatus;
-import org.jbake.model.DocumentTypes;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.xml.bind.DatatypeConverter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 

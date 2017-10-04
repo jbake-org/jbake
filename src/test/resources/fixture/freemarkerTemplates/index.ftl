@@ -12,7 +12,7 @@
     <p>${post.body}</p>
     </#if>
 </#list>
-
+<span>${db.getPublishedPages().size()}</span>
 <hr/>
 
 <#if (config.index_paginate!false) >

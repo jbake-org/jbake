@@ -48,7 +48,7 @@ Once you're ready to start work on your pull request follow the steps outlined b
 . {uri-branch-help}[Create a topic branch].
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Implement your feature or bug fix.
-. Run `mvn test` to run the tests. If your tests fail, return to step 4.
+. Run `./gradlew test` to run the tests. If your tests fail, return to step 4.
 . Add, commit, and push your changes.
 . {uri-pr-help}[Submit a pull request].
 
@@ -73,10 +73,9 @@ following testing libraries available to you when writing your tests:
 
 Any resources, such as templates, that your tests require should be placed within `/src/test/resources`.
 
-To execute the tests from the command line you will require Maven to be installed, once you have Maven installed you
-can execute the following command from the root folder in the repository:
+To execute the tests from the command line you can execute the following command from the root folder in the repository:
 
- $ mvn test
+ $ ./gradlew test
 
 You will be able to run the unit tests in most IDE's such as Eclipse as well.
 
