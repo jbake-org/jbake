@@ -91,13 +91,13 @@ public class ModelExtractorsTest {
         ModelExtractors.getInstance().registerExtractorsForCustomTypes(newDocumentType);
 
         //expect:
-        assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(16);
+        assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(17);
 
         //when:
         ModelExtractors.getInstance().reset();
 
         //then:
-        assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(14);
+        assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(15);
 
     }
 }
