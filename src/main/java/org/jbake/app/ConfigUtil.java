@@ -158,6 +158,11 @@ public class ConfigUtil {
 		String RENDER_TAGS = "render.tags";
 		
 		/**
+		 * Flag indicating if tag index file should be generated
+		 */
+		String RENDER_TAGS_INDEX = "render.tagsindex";
+		
+		/**
 		 * Port used when running Jetty server
 		 */
 		String SERVER_PORT = "server.port";

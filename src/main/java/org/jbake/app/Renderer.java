@@ -353,7 +353,7 @@ public class Renderer {
 				map.put(Attributes.ROOTPATH, "../");
 				model.put("content", map);
 
-            	File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
+				File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
 				render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
 				renderedCount++;
@@ -361,25 +361,25 @@ public class Renderer {
 				errors.add(e);
 			}
 		}
-			
-		try{
-			// Add an index file at root folder of tags.
-			// This will prevent directory listing and also provide an option to
-			// display all tags page.
-			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("renderer", renderingEngine);
-			Map<String, Object> map = buildSimpleModel(Attributes.TAGS);
-			map.put(Attributes.ROOTPATH, "../");
-			model.put("content", map);
-
-			File path = new File(destination.getPath() + File.separator + tagPath + File.separator + "index"
-					+ config.getString(Keys.OUTPUT_EXTENSION));
-			render(new ModelRenderingConfig(path, Attributes.TAGS, model, findTemplateName(Attributes.TAGS)));
-			renderedCount++;
-		} catch(Exception e){
-			errors.add(e);
+		
+		if (config.getBoolean(Keys.RENDER_TAGS_INDEX)) {
+			try{
+				// Add an index file at root folder of tags.
+				// This will prevent directory listing and also provide an option to
+				// display all tags page.
+				Map<String, Object> model = new HashMap<String, Object>();
+				model.put("renderer", renderingEngine);
+				Map<String, Object> map = buildSimpleModel(Attributes.TAGS);
+				map.put(Attributes.ROOTPATH, "../");
+				model.put("content", map);
+	
+				File path = new File(destination.getPath() + File.separator + tagPath + File.separator + "index" + config.getString(Keys.OUTPUT_EXTENSION));
+				render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
+				renderedCount++;
+			} catch(Exception e){
+				errors.add(e);
+			}
 		}
-
 
 		if (!errors.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
