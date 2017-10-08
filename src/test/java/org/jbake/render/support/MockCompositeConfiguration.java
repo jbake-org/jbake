@@ -27,7 +27,10 @@ public class MockCompositeConfiguration extends CompositeConfiguration {
     }
 
     @Override
-    public String getString(String string) {
+    public String getString(String key) {
+    	 if ( super.containsKey(key) ) {
+             return super.getString(key);
+         }
         return _string;
     }
 }

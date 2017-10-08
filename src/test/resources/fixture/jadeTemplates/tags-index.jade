@@ -1,0 +1,10 @@
+extends layout.jade
+
+block content
+    .row-fluid.marketing
+        .span12
+            h1 Tags
+            each tag, index in tags
+                h4
+                    a(href='#{tag.uri}') #{tag.title}
+    hr
