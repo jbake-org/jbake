@@ -209,7 +209,7 @@ public class ContentStore {
         executeCommand("delete from " + docType + " where sourceuri=?", uri);
     }
 
-    public void markConentAsRendered(String docType) {
+    public void markContentAsRendered(String docType) {
         executeCommand("update " + docType + " set rendered=true where rendered=false and cached=true");
     }
 

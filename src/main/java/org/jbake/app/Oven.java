@@ -160,7 +160,7 @@ public class Oven {
 
                 // mark docs as rendered
                 for (String docType : DocumentTypes.getDocumentTypes()) {
-                        db.markConentAsRendered(docType);
+                        db.markContentAsRendered(docType);
                 }
                 // copy assets
                 Asset asset = new Asset(source, destination, config);
