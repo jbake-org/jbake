@@ -112,7 +112,7 @@ public class Crawler {
                     if (process) { // new or updated
                         crawlSourceFile(sourceFile, sha1, uri);
                     }
-                    LOGGER.info(sb.toString());
+                    LOGGER.info("{}", sb);
                 }
                 if (sourceFile.isDirectory()) {
                     crawl(sourceFile);
