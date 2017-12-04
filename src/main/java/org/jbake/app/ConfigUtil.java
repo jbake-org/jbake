@@ -253,8 +253,8 @@ public class ConfigUtil {
     public static void displayLegacyConfigFileWarningIfRequired() {
     	if (LEGACY_CONFIG_FILE_EXISTS) {
         	if (!LEGACY_CONFIG_FILE_WARNING_SHOWN) {
-	        	LOGGER.warn(String.format("You have defined a part of your JBake configuration in %s", LEGACY_CONFIG_FILE));
-	        	LOGGER.warn(String.format("Usage of this file is being deprecated, please rename this file to: %s to remove this warning", CONFIG_FILE));
+	        	LOGGER.warn("You have defined a part of your JBake configuration in " + LEGACY_CONFIG_FILE);
+	        	LOGGER.warn("Usage of this file is being deprecated, please rename this file to: " + CONFIG_FILE + " to remove this warning");
 	        	LEGACY_CONFIG_FILE_WARNING_SHOWN = true;
         	}
     	}
