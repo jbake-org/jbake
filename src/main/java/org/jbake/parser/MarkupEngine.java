@@ -125,7 +125,7 @@ public abstract class MarkupEngine implements ParserEngine {
         if (validate(context)) {
             processBody(context);
         } else {
-            LOGGER.error("Incomplete source file ({}) for markup engine:", file, getClass().getSimpleName());
+            LOGGER.error("Incomplete source file ({}) for markup engine: {}", file, getClass().getSimpleName());
             return null;
         }
 
