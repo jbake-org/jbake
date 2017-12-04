@@ -66,15 +66,11 @@ public class Asset {
             for (File asset : assets) {
                 final File target = new File(targetFolder, asset.getName());
                 if (asset.isFile()) {
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append("Copying [").append(asset.getPath()).append("]... ");
                     try {
                         FileUtils.copyFile(asset, target);
-                        sb.append("done!");
-                        LOGGER.info(sb.toString());
+                        LOGGER.info("Copying [{}]... done!", asset.getPath());
                     } catch (IOException e) {
-                        sb.append("failed!");
-                        LOGGER.error(sb.toString(), e);
+                        LOGGER.error("Copying [{}]... failed!", asset.getPath(), e);
                         errors.add(e);
                     }
                 } else if (asset.isDirectory()) {
