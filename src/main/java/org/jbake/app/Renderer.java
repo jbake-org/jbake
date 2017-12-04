@@ -203,9 +203,9 @@ public class Renderer {
         model.put("renderer", renderingEngine);
 
         try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName(docType), out);
-            out.close();
+            try (Writer out = createWriter(outputFile)) {
+                renderingEngine.renderDocument(model, findTemplateName(docType), out);
+            }
             LOGGER.info("Rendering [{}]... done!", outputFile);
         } catch (Exception e) {
             LOGGER.error("Rendering [{}]... failed!", outputFile, e);
@@ -225,9 +225,9 @@ public class Renderer {
     private void render(RenderingConfig renderConfig) throws Exception {
         File outputFile = renderConfig.getPath();
         try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(renderConfig.getModel(), renderConfig.getTemplate(), out);
-            out.close();
+            try (Writer out = createWriter(outputFile)) {
+                renderingEngine.renderDocument(renderConfig.getModel(), renderConfig.getTemplate(), out);
+            }
             LOGGER.info("Rendering {} [{}]... done!", renderConfig.getName(), outputFile);
         } catch (Exception e) {
             LOGGER.error("Rendering {} [{}]... failed!", renderConfig.getName(), outputFile, e);
