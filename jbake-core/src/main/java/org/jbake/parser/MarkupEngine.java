@@ -1,5 +1,18 @@
 package org.jbake.parser;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.jbake.app.ConfigUtil.Keys;
@@ -8,26 +21,16 @@ import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering
  * markup in a source file and exporting the result into the {@link ParserContext#getContents() contents} map.
- * <p>
+ *
  * This specific engine does nothing, meaning that the body is rendered as raw contents.
  *
  * @author Cédric Champeau
  */
 public abstract class MarkupEngine implements ParserEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarkupEngine.class);
-    private static final String HEADER_SEPARATOR = "~~~~~~";
 
     /**
      * Tests if this markup engine can process the document.
@@ -75,7 +78,8 @@ public abstract class MarkupEngine implements ParserEngine {
 
             return null;
         }
-        boolean hasHeader = hasHeader(fileContents);
+
+        boolean hasHeader = hasHeader(config, fileContents);
         ParserContext context = new ParserContext(
                 file,
                 fileContents,
@@ -119,7 +123,7 @@ public abstract class MarkupEngine implements ParserEngine {
         }
 
         // generate default body
-        processBody(fileContents, content);
+        processBody(config, fileContents, content);
 
         // eventually process body using specific engine
         if (validate(context)) {
@@ -151,7 +155,7 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param contents Contents of file
      * @return true if header exists, false if not
      */
-    private boolean hasHeader(List<String> contents) {
+    private boolean hasHeader(Configuration config, List<String> contents) {
         boolean headerValid = false;
         boolean headerSeparatorFound = false;
         boolean statusFound = false;
@@ -171,7 +175,7 @@ public abstract class MarkupEngine implements ParserEngine {
                     statusFound = true;
                 }
             }
-            if (line.equals(HEADER_SEPARATOR)) {
+            if (line.equals(config.getString(Keys.HEADER_SEPARATOR))) {
                 headerSeparatorFound = true;
                 header.remove(line);
                 break;
@@ -200,7 +204,7 @@ public abstract class MarkupEngine implements ParserEngine {
      */
     private void processHeader(Configuration config, List<String> contents, final Map<String, Object> content) {
         for (String line : contents) {
-            if (line.equals(HEADER_SEPARATOR)) {
+            if (line.equals(config.getString(Keys.HEADER_SEPARATOR))) {
                 break;
             }
 
@@ -258,14 +262,14 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param contents Contents of file
      * @param content
      */
-    private void processBody(List<String> contents, final Map<String, Object> content) {
+    private void processBody(Configuration config, List<String> contents, final Map<String, Object> content) {
         StringBuilder body = new StringBuilder();
         boolean inBody = false;
         for (String line : contents) {
             if (inBody) {
                 body.append(line).append("\n");
             }
-            if (line.equals(HEADER_SEPARATOR)) {
+            if (line.equals(config.getString(Keys.HEADER_SEPARATOR))) {
                 inBody = true;
             }
         }
