@@ -10,11 +10,10 @@ addons:
 
 matrix:
     include:
+      - jdk: oraclejdk9
       - jdk: oraclejdk8
-      - jdk: oraclejdk7
-        dist: precise
+      - jdk: openjdk8
       - jdk: openjdk7
-        dist: precise
       - os: osx
 
 install: true
