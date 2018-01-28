@@ -1,1 +1,5 @@
-rootProject.name = 'jbake-core'
+rootProject.name = 'jbake-base'
+include 'jbake-core'
+include 'jbake-cli'
+include 'jbake-app'
+
