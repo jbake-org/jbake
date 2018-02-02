@@ -4,10 +4,6 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
-import org.jbake.model.DocumentTypeUtils;
-import org.jbake.model.DocumentTypes;
-import org.jbake.template.model.PublishedCustomExtractor;
-import org.jbake.template.model.TypedDocumentsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,32 +1,20 @@
 package org.jbake.template;
 
 
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.BeansWrapperBuilder;
+import freemarker.template.*;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
-import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
-
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.beans.BeansWrapperBuilder;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.SimpleCollection;
-import freemarker.template.SimpleDate;
-import freemarker.template.SimpleHash;
-import freemarker.template.SimpleSequence;
-import freemarker.template.Template;
-import freemarker.template.TemplateDateModel;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModel;
-import freemarker.template.TemplateModelException;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -43,21 +31,20 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     }
 
     private void createTemplateConfiguration(final CompositeConfiguration config, final File templatesPath) {
-        templateCfg = new Configuration();
+        templateCfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         templateCfg.setDefaultEncoding(config.getString(Keys.RENDER_ENCODING));
         try {
             templateCfg.setDirectoryForTemplateLoading(templatesPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        templateCfg.setObjectWrapper(new DefaultObjectWrapper());
     }
 
     @Override
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateCfg.getTemplate(templateName);
-            template.process(new LazyLoadingModel(model, db), writer);
+            template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db), writer);
         } catch (IOException e) {
             throw new RenderingException(e);
         } catch (TemplateException e) {
@@ -69,12 +56,14 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
      * A custom Freemarker model that avoids loading the whole documents into memory if not necessary.
      */
     public static class LazyLoadingModel implements TemplateHashModel {
+        private final ObjectWrapper wrapper;
         private final SimpleHash eagerModel;
         private final ContentStore db;
 
-        public LazyLoadingModel(final Map<String, Object> eagerModel, final ContentStore db) {
-            this.eagerModel = new SimpleHash(eagerModel);
+        public LazyLoadingModel(ObjectWrapper wrapper, Map<String, Object> eagerModel, final ContentStore db) {
+            this.eagerModel = new SimpleHash(eagerModel, wrapper);
             this.db = db;
+            this.wrapper = wrapper;
         }
 
         @Override
@@ -96,12 +85,12 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 					@Override
 					public TemplateModel adapt(String key, Object extractedValue) {
 						if(key.equals(Crawler.Attributes.ALLTAGS)) {
-							return new SimpleCollection((Collection) extractedValue);
+							return new SimpleCollection((Collection) extractedValue, wrapper);
 						} else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
 							return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
 						} else {
 							// All other cases, as far as I know, are document collections
-							return new SimpleSequence((Collection) extractedValue);
+							return new SimpleSequence((Collection) extractedValue, wrapper);
 						}
 										
 					}
