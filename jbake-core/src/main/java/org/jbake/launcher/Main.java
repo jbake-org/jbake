@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
+import java.util.NoSuchElementException;
 
 /**
  * Launcher for JBake.
@@ -91,7 +93,7 @@ public class Main {
 			// Help was requested, so we are done here
 			return;
 		}
-
+		setupLocale(config);
 		if (res.isBake()) {
 			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
 			baker.bake(res, config);
@@ -175,6 +177,20 @@ public class Main {
 			final String msg = "Failed to initialise structure: " + e.getMessage();
 			throw new JBakeException(msg, e);
 		}
+	}
+
+	private void setupLocale(CompositeConfiguration config){
+		String language;
+		String country;
+		try {
+			language = config.getString("jvm.language");
+			country = config.getString("jvm.country");
+		} catch (NoSuchElementException e) {
+			language = "en";
+			country = "US";
+		}
+		Locale newLocale = new Locale(language, country);
+		Locale.setDefault(newLocale);
 	}
 
 }
