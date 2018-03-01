@@ -198,21 +198,17 @@ public class Renderer {
         }
 
         File outputFile = new File(outputFilename + FileUtil.findExtension(config, docType));
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering [").append(outputFile).append("]... ");
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("content", content);
         model.put("renderer", renderingEngine);
 
         try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(model, findTemplateName(docType), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
+            try (Writer out = createWriter(outputFile)) {
+                renderingEngine.renderDocument(model, findTemplateName(docType), out);
+            }
+            LOGGER.info("Rendering [{}]... done!", outputFile);
         } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
+            LOGGER.error("Rendering [{}]... failed!", outputFile, e);
             throw new Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.getMessage(), e);
         }
     }
@@ -228,18 +224,13 @@ public class Renderer {
 
     private void render(RenderingConfig renderConfig) throws Exception {
         File outputFile = renderConfig.getPath();
-        StringBuilder sb = new StringBuilder();
-        sb.append("Rendering ").append(renderConfig.getName()).append(" [").append(outputFile).append("]...");
-
         try {
-            Writer out = createWriter(outputFile);
-            renderingEngine.renderDocument(renderConfig.getModel(), renderConfig.getTemplate(), out);
-            out.close();
-            sb.append("done!");
-            LOGGER.info(sb.toString());
+            try (Writer out = createWriter(outputFile)) {
+                renderingEngine.renderDocument(renderConfig.getModel(), renderConfig.getTemplate(), out);
+            }
+            LOGGER.info("Rendering {} [{}]... done!", renderConfig.getName(), outputFile);
         } catch (Exception e) {
-            sb.append("failed!");
-            LOGGER.error(sb.toString(), e);
+            LOGGER.error("Rendering {} [{}]... failed!", renderConfig.getName(), outputFile, e);
             throw new Exception("Failed to render " + renderConfig.getName(), e);
         }
     }

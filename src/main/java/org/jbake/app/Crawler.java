@@ -112,7 +112,7 @@ public class Crawler {
                     if (process) { // new or updated
                         crawlSourceFile(sourceFile, sha1, uri);
                     }
-                    LOGGER.info(sb.toString());
+                    LOGGER.info("{}", sb);
                 }
                 if (sourceFile.isDirectory()) {
                     crawl(sourceFile);
@@ -208,7 +208,7 @@ public class Crawler {
 
             ODocument doc = new ODocument(documentType);
             doc.fromMap(fileContents);
-            boolean cached = fileContents.get(DocumentAttributes.CACHED) != null ? Boolean.valueOf((String) fileContents.get(DocumentAttributes.CACHED)) : true;
+            boolean cached = fileContents.get(String.valueOf(DocumentAttributes.CACHED)) != null ? Boolean.valueOf((String) fileContents.get(String.valueOf(DocumentAttributes.CACHED))) : true;
             doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
             doc.save();
         } else {

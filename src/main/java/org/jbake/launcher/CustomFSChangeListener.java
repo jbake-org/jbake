@@ -21,19 +21,19 @@ public class CustomFSChangeListener implements FileListener {
 
 	@Override
 	public void fileCreated(FileChangeEvent event) throws Exception {
-		LOGGER.info("File created event detected: " + event.getFile().getURL());
+		LOGGER.info("File created event detected: {}", event.getFile().getURL());
 		exec();
 	}
 
 	@Override
 	public void fileDeleted(FileChangeEvent event) throws Exception {
-		LOGGER.info("File deleted event detected: " + event.getFile().getURL());
+		LOGGER.info("File deleted event detected: {}", event.getFile().getURL());
 		exec();
 	}
 
 	@Override
 	public void fileChanged(FileChangeEvent event) throws Exception {
-		LOGGER.info("File changed event detected: " + event.getFile().getURL());
+		LOGGER.info("File changed event detected: {}", event.getFile().getURL());
 		exec();
 	}
 

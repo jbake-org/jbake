@@ -68,7 +68,7 @@ public abstract class MarkupEngine implements ParserEngine {
             is = new FileInputStream(file);
             fileContents = IOUtils.readLines(is, config.getString(Keys.RENDER_ENCODING));
         } catch (IOException e) {
-            LOGGER.error("Error while opening file {}: {}", file, e);
+            LOGGER.error("Error while opening file {}", file, e);
 
             return null;
         } finally {
@@ -125,7 +125,7 @@ public abstract class MarkupEngine implements ParserEngine {
         if (validate(context)) {
             processBody(context);
         } else {
-            LOGGER.error("Incomplete source file ({}) for markup engine:", file, getClass().getSimpleName());
+            LOGGER.error("Incomplete source file ({}) for markup engine: {}", file, getClass().getSimpleName());
             return null;
         }
 

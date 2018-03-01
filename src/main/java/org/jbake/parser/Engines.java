@@ -132,7 +132,7 @@ public class Engines {
                 register(extension, engine);
             }
             if (engine instanceof ErrorEngine) {
-                LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", Arrays.toString(extensions));
+                LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", (Object) extensions);
             }
         }
     }
