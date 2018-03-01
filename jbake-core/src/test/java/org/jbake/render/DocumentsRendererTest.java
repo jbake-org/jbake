@@ -2,9 +2,9 @@ package org.jbake.render;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
-import org.jbake.app.Crawler.Attributes;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.RenderingException;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class DocumentsRendererTest {

@@ -2,33 +2,33 @@ plugins {
     id "eclipse"
     id "idea"
     id "io.sdkman.vendors"              version "1.1.1"     apply false
-    id "com.jfrog.bintray"              version "1.7.3"     apply false
-    id "com.github.kt3k.coveralls"      version "2.8.1"     apply false
-    id 'com.github.ben-manes.versions'  version '0.15.0'
+    id "com.jfrog.bintray"              version "1.8.0"     apply false
+    id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
+    id 'com.github.ben-manes.versions'  version '0.17.0'
 }
 
 // common variables
 ext {
     asciidoctorjVersion = '1.5.6'
     asciidoctorjDiagramVersion = '1.5.4.1'
-    commonsIoVersion = '2.5'
+    commonsIoVersion = '2.6'
     commonsConfigurationVersion = '1.10'
-    commonsLangVersion = '3.6'
-    commonsVfs2Version = '2.1'
+    commonsLangVersion = '3.7'
+    commonsVfs2Version = '2.2'
     args4jVersion = '2.33'
-    freemarkerVersion = '2.3.26-incubating'
+    freemarkerVersion = '2.3.27-incubating'
     junit4Version = '4.12'
-    flexmarkVersion = '0.27.0'
-    jettyServerVersion = '9.2.22.v20170606'
-    orientDbVersion = '2.2.28'
-    groovyVersion = '2.4.12'
+    flexmarkVersion = '0.28.38'
+    jettyServerVersion = '9.2.24.v20180105'
+    orientDbVersion = '2.2.30'
+    groovyVersion = '2.4.13'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
-    assertjCoreVersion = '2.8.0'
-    thymeleafVersion = '3.0.7.RELEASE'
+    assertjCoreVersion = '2.9.0'
+    thymeleafVersion = '3.0.9.RELEASE'
     jsonSimpleVersion = '1.1.1'
-    jade4jVersion = '1.2.5'
-    mockitoVersion = '2.10.0'
+    jade4jVersion = '1.2.7'
+    mockitoVersion = '2.13.0'
     jsoupVersion = '1.10.3'
 }
 

@@ -14,7 +14,7 @@ public class TagsExtractor implements ModelExtractor<DocumentList> {
 	@Override
 	public DocumentList get(ContentStore db, Map model, String key) {
 		DocumentList dl = new DocumentList();
-		Map<String, Object> config = (Map<String, Object>) model.get("config");
+		Map<?, ?> config = (Map<?, ?>) model.get("config");
 		
 		String tagPath = config.get(Keys.TAG_PATH.replace(".", "_")).toString();
 		

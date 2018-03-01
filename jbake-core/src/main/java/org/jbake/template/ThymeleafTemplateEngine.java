@@ -14,24 +14,20 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
- *
+ * <p>
  * <p>This template engine is not recommended for large sites because the whole model
  * is loaded into memory due to Thymeleaf internal limitations.</p>
- *
+ * <p>
  * <p>The default rendering mode is "HTML", but it is possible to use another mode
  * for each document type, by adding a key in the configuration, for example:</p>
- *
+ * <p>
  * <code>
- *     template.feed.thymeleaf.mode=XML
+ * template.feed.thymeleaf.mode=XML
  * </code>
  *
  * @author Cédric Champeau
@@ -42,16 +38,16 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private TemplateEngine templateEngine;
     private FileTemplateResolver templateResolver;
 
-	private String templateMode;
+    private String templateMode;
 
     public ThymeleafTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
     }
 
     private void initializeTemplateEngine(String mode) {
-    	if (mode.equals(templateMode)) {
-    		return;
-    	}
+        if (mode.equals(templateMode)) {
+            return;
+        }
         templateMode = mode;
         templateResolver = new FileTemplateResolver();
         templateResolver.setPrefix(templatesPath.getAbsolutePath() + File.separatorChar);
@@ -92,42 +88,42 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     }
 
     private class JBakeMap extends HashMap<String, Object> {
-	    	public JBakeMap(final Map<String, Object> model) {
-	            super(model);
-	            for(String key : extractors.keySet()) {
-		            	try {
-						put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter<LazyContextVariable>() {
-							@Override
-							public LazyContextVariable adapt(String key, final Object extractedValue) {
-								if(key.equals(Crawler.Attributes.ALLTAGS)) {
-									return new LazyContextVariable<Set<String>>() {
-										@Override
-										protected Set<String> loadValue() {
-											return (Set<String>) extractedValue; 
-										}
-									};
-								} else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
-									return new LazyContextVariable<Date>() {
-										@Override
-										protected Date loadValue() {
-											return (Date) extractedValue; 
-										}
-									};
-								} else {
-									// All other cases, as far as I know, are document collections
-									return new LazyContextVariable<DocumentList>() {
-										@Override
-										protected DocumentList loadValue() {
-											return (DocumentList) extractedValue;
-										}
-									};
-								}
-							}
-						}));
-						} catch (NoModelExtractorException e) {
-							// should never happen, as we iterate over existing extractors
-						}
-		            }
-	        }
+        JBakeMap(final Map<String, Object> model) {
+            super(model);
+            for (String key : extractors.keySet()) {
+                try {
+                    put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter<LazyContextVariable>() {
+                        @Override
+                        public LazyContextVariable adapt(String key, final Object extractedValue) {
+                            if (key.equals(Crawler.Attributes.ALLTAGS)) {
+                                return new LazyContextVariable<Set<?>>() {
+                                    @Override
+                                    protected Set<?> loadValue() {
+                                        return (Set<?>) extractedValue;
+                                    }
+                                };
+                            } else if (key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
+                                return new LazyContextVariable<Date>() {
+                                    @Override
+                                    protected Date loadValue() {
+                                        return (Date) extractedValue;
+                                    }
+                                };
+                            } else {
+                                // All other cases, as far as I know, are document collections
+                                return new LazyContextVariable<DocumentList>() {
+                                    @Override
+                                    protected DocumentList loadValue() {
+                                        return (DocumentList) extractedValue;
+                                    }
+                                };
+                            }
+                        }
+                    }));
+                } catch (NoModelExtractorException e) {
+                    // should never happen, as we iterate over existing extractors
+                }
+            }
+        }
     }
 }
