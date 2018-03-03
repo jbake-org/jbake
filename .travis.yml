@@ -17,6 +17,10 @@ matrix:
         dist: precise
       - os: osx
 
+before_install:
+  - sudo apt-get install jq
+  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)
+
 install: true
 
 script:
@@ -24,6 +28,8 @@ script:
 
 after_success:
   - ./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean
+  - java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
+
 
 after_failure:
   - ./gradlew clean check --debug
