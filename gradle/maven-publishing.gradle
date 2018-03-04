@@ -11,6 +11,7 @@ ext {
 
 def jbakePom = pom {
     project {
+        name "jbake"
         description project.description
         url project.website
         developers {
