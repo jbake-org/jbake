@@ -9,7 +9,7 @@ sdkman {
     candidate = rootProject.name
     version = rootProject.version
     hashtag = "#JBake"
-    url = "http://jbake.org/files/${distZip.archiveName}"
+    url = "https://bintray.com/jbake/binary/download_file?file_path=${distZip.archiveName}"
 }
 
 task distributionAvailable() {
