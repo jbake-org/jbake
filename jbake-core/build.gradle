@@ -1,5 +1,7 @@
 import java.text.SimpleDateFormat
 
+apply from: "$rootDir/gradle/sonarqube.gradle"
+
 description = "The core library of JBake"
 
 dependencies {
@@ -24,8 +26,8 @@ dependencies {
 processResources {
     from("src/main/resources") {
         include 'default.properties'
-        expand  jbakeVersion: project.version,
-                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format( new Date() )
+        expand jbakeVersion: project.version,
+                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format(new Date())
     }
 }
 

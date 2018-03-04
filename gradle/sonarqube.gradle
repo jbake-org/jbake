@@ -1,0 +1,33 @@
+if ( JavaVersion.current().isJava8Compatible() ) {
+    apply plugin: "org.sonarqube"
+
+    sonarqube {
+        if (!hasSonar) {
+            skipProject = true
+
+            logger.error("Skipping sonar analysis. Missing environment variables SONARLOGIN or SONARORG. See https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner+for+Gradle")
+        }
+
+        properties {
+
+            property "sonar.host.url", sonarURL
+            property "sonar.organization", System.getenv('SONARORG')
+            property "sonar.login", System.getenv('SONARLOGIN')
+            property "sonar.projectKey", sonarProjectKey
+
+
+            if (isTravis && isTravisPullRequest) {
+
+                if (hasGithub) {
+                    property "sonar.analysis.mode", "preview"
+                    property "sonar.github.oauth", System.getenv("GITHUBTOKEN")
+                    property "sonar.github.repository", System.getenv("GITHUBREPO")
+                    property "sonar.github.pullRequest", pullRequestId
+                } else {
+                    logger.error("Cannot use sonar github plugin without GITHUBTOKEN (oauth token) and GITHUBREPO (e.g. jbake-org/jbake) environment variables. See https://docs.sonarqube.org/display/PLUG/GitHub+Plugin")
+                }
+            }
+
+        }
+    }
+}

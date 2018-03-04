@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
 
 public class PagingHelperTest {
     @Test
@@ -22,7 +21,7 @@ public class PagingHelperTest {
     public void shouldReturnRootIndexPage() throws Exception {
         PagingHelper helper = new PagingHelper(5,2);
 
-        String previousFileName = helper.getPreviousFileName(2, "index.html");
+        String previousFileName = helper.getPreviousFileName(2);
 
         Assert.assertThat("", is( previousFileName) );
     }
@@ -31,7 +30,7 @@ public class PagingHelperTest {
     public void shouldReturnPreviousFileName() throws Exception {
         PagingHelper helper = new PagingHelper(5,2);
 
-        String previousFileName = helper.getPreviousFileName(3, "index.html");
+        String previousFileName = helper.getPreviousFileName(3);
 
         Assert.assertThat("2/", is( previousFileName) );
     }
@@ -40,7 +39,7 @@ public class PagingHelperTest {
     public void shouldReturnNullIfNoPreviousPageAvailable() throws Exception {
         PagingHelper helper = new PagingHelper(5,2);
 
-        String previousFileName = helper.getPreviousFileName(1, "index.html");
+        String previousFileName = helper.getPreviousFileName(1);
 
         Assert.assertNull( previousFileName );
     }
@@ -49,7 +48,7 @@ public class PagingHelperTest {
     public void shouldReturnNullIfNextPageNotAvailable() throws Exception {
         PagingHelper helper = new PagingHelper(5,2);
 
-        String nextFileName = helper.getNextFileName(3, "index.html");
+        String nextFileName = helper.getNextFileName(3);
 
         Assert.assertNull( nextFileName );
     }
@@ -58,7 +57,7 @@ public class PagingHelperTest {
     public void shouldReturnNextFileName() throws Exception {
         PagingHelper helper = new PagingHelper(5,2);
 
-        String nextFileName = helper.getNextFileName(2, "index.html");
+        String nextFileName = helper.getNextFileName(2);
 
         Assert.assertThat("3/", is( nextFileName) );
     }

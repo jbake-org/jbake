@@ -113,7 +113,7 @@ public class ContentStore {
 
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
-        if ( Orient.instance().getEngines().size() == 0 ) {
+        if ( Orient.instance().getEngines().isEmpty() ) {
             Orient.instance().startup();
         }
         OLogManager.instance().setWarnEnabled(true);
@@ -166,10 +166,8 @@ public class ContentStore {
     
     public DocumentList getPublishedContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " where status='published' order by date desc";
-        if (applyPaging) {
-	        if ((start >= 0) && (limit > -1)) {
-	            query += " SKIP " + start + " LIMIT " + limit;
-	        }
+        if (applyPaging && (start >= 0) && (limit > -1)) {
+            query += " SKIP " + start + " LIMIT " + limit;
         }
         return query(query);
     }
@@ -180,10 +178,8 @@ public class ContentStore {
     
     public DocumentList getAllContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " order by date desc";
-        if (applyPaging) {
-	        if ((start >= 0) && (limit > -1)) {
-	            query += " SKIP " + start + " LIMIT " + limit;
-	        }
+        if (applyPaging && (start >= 0) && (limit > -1)) {
+            query += " SKIP " + start + " LIMIT " + limit;
         }
         return query(query);
     }
@@ -236,7 +232,7 @@ public class ContentStore {
 
     public Set<String> getTags() {
         DocumentList docs = this.getAllTagsFromPublishedPosts();
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         for (Map<String, Object> document : docs) {
             String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
             Collections.addAll(result, tags);
@@ -245,7 +241,7 @@ public class ContentStore {
     }
 
     public Set<String> getAllTags() {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList docs = query("select tags from " + docType + " where status='published'");
             for (Map<String, Object> document : docs) {

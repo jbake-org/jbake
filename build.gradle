@@ -4,6 +4,7 @@ plugins {
     id "io.sdkman.vendors"              version "1.1.1"     apply false
     id "com.jfrog.bintray"              version "1.8.0"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
+    id "org.sonarqube"                  version "2.6.2"     apply false
     id 'com.github.ben-manes.versions'  version '0.17.0'
 }
 
@@ -30,6 +31,16 @@ ext {
     jade4jVersion = '1.2.7'
     mockitoVersion = '2.13.0'
     jsoupVersion = '1.10.3'
+
+    isTravis = (System.getenv("TRAVIS") == "true")
+    isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
+    pullRequestId = System.getenv("TRAVIS_PULL_REQUEST")
+    hasGithub = System.getenv("GITHUBTOKEN") && System.getenv("GITHUBREPO")
+    hasSonar = System.getenv("SONARORG") && System.getenv("SONARLOGIN")
+    sonarDefaultURL = "https://sonarcloud.io"
+    sonarDefaultProjectKey = "org.jbake:jbake-base:jbake-core"
+    sonarURL = System.getenv("SONARHOST") ?: sonarDefaultURL
+    sonarProjectKey = System.getenv("SONARPROJECTKEY") ?: sonarDefaultProjectKey
 }
 
 /**
