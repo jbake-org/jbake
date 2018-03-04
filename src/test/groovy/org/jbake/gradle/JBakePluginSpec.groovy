@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -24,36 +24,35 @@ import spock.lang.Unroll
  * Created by frank on 03.10.14.
  */
 class JBakePluginSpec extends Specification {
+    public static final String PLUGIN_ID = 'org.jbake.site'
 
-    public static final String PLUGIN_ID = 'me.champeau.jbake'
     Project project
 
-    def setup(){
+    def setup() {
         project = ProjectBuilder.builder().build()
         project.apply plugin: PLUGIN_ID
     }
 
-    def "should add a JBakeTask"(){
+    def "should add a JBakeTask"() {
 
         expect:
         project.tasks.bake instanceof JBakeTask
     }
 
-    def "should add jbake configuration"(){
+    def "should add jbake configuration"() {
 
         expect:
         project.configurations.jbake
     }
 
-    def "should define default jbake version"(){
+    def "should define default jbake version"() {
 
         expect:
         project.jbake.version != null
     }
 
     @Unroll
-    def "should add dependency #name #version"(){
-
+    def "should add dependency #name #version"() {
         when:
         project.evaluate()
 
@@ -68,13 +67,12 @@ class JBakePluginSpec extends Specification {
         'org.freemarker'        | 'freemarker'          | '2.3.25-incubating'
         'org.pegdown'           | 'pegdown'             | '1.6.0'
         'org.asciidoctor'       | 'asciidoctorj'        | '1.5.4.1'
-        'org.codehaus.groovy'   | 'groovy-templates'    | '2.4.7'
-        'org.thymeleaf'         | 'thymeleaf'           | '3.0.2.RELEASE'
-        'de.neuland-bfi'        | 'jade4j'              | '1.2.3'
+        'org.codehaus.groovy'   | 'groovy-templates'    | '2.4.8'
+        'org.thymeleaf'         | 'thymeleaf'           | '3.0.3.RELEASE'
+        'de.neuland-bfi'        | 'jade4j'              | '1.2.5'
     }
 
-    def "set dependency version by extension"(){
-
+    def "set dependency version by extension"() {
         given:
         project.jbake.version = '2.3.0'
 
@@ -88,8 +86,7 @@ class JBakePluginSpec extends Specification {
 
     }
 
-    def "switch to asciidoctorj if version > 2.3.0"(){
-
+    def "switch to asciidoctorj if version > 2.3.0"() {
         given:
         project.jbake.version = '2.3.1'
 
@@ -102,8 +99,7 @@ class JBakePluginSpec extends Specification {
         }
     }
 
-    def "use asciidoctor-java-integration if version < 2.3.1"(){
-
+    def "use asciidoctor-java-integration if version < 2.3.1"() {
         given:
         project.jbake.version = '2.3.0'
 
@@ -113,13 +109,13 @@ class JBakePluginSpec extends Specification {
         then:
         project.configurations.jbake.dependencies.find {
             it.group == 'org.asciidoctor' &&
-            it.name == 'asciidoctor-java-integration' &&
-            it.version == '0.1.4'
+                it.name == 'asciidoctor-java-integration' &&
+                it.version == '0.1.4'
         }
 
     }
 
-    def "input dir should be configured by extension"(){
+    def "input dir should be configured by extension"() {
         given:
         def srcDirName = "src/jbake-project"
         def expectedFile = project.file("$project.rootDir/$srcDirName")
@@ -131,7 +127,7 @@ class JBakePluginSpec extends Specification {
         project.tasks.bake.input == expectedFile
     }
 
-    def "output dir should be configured by extension"(){
+    def "output dir should be configured by extension"() {
         given:
         def destDirName = "jbake-out"
         def expectedFile = project.file("$project.buildDir/$destDirName")
@@ -143,7 +139,7 @@ class JBakePluginSpec extends Specification {
         project.tasks.bake.output == expectedFile
     }
 
-    def "clearcache should be configured by extension"(){
+    def "clearcache should be configured by extension"() {
         given:
         def clearCache = true
 
@@ -154,7 +150,7 @@ class JBakePluginSpec extends Specification {
         project.tasks.bake.clearCache == clearCache
     }
 
-    def "should be configurable by extension"(){
+    def "should be configurable by extension"() {
         given:
         def configuration = [:]
         configuration['render.tags'] = false

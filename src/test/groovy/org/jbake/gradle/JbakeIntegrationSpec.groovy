@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.champeau.gradle
+package org.jbake.gradle
 
 import org.gradle.testkit.runner.BuildResult
 import spock.lang.Unroll
+import spock.lang.Shared
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
+@Unroll
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
+
+    @Shared
+    def latestGradleVersion = '3.5'
+
     @Unroll
     def 'Setup and bake with gradle #version'() {
         given:
@@ -34,7 +40,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         buildFile << '''
             plugins {
-                id 'me.champeau.jbake'
+                id 'org.jbake.site'
             }
 
             jbake {
@@ -59,21 +65,20 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
             '2.12',   // introduces changes such as compileOnly
             '2.14.1', // latest release in 2.x line
             '3.0',    // first release in 3.x line, compatibility changes
-            '3.2'     // latest release, deprecations & warnings
+            latestGradleVersion     // latest release, deprecations & warnings
         ]
     }
 
-    @Unroll
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
         given:
-        gradleVersion = '3.2'
+        gradleVersion = latestGradleVersion
         File jbakeSourceDir = newFolder('src', 'jbake')
 
         copyResources('example-project', jbakeSourceDir.path)
 
         buildFile << """
             plugins {
-                id 'me.champeau.jbake'
+                id 'org.jbake.site'
             }
 
             jbake {
@@ -98,14 +103,14 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
     def 'Bake with default repositories set to false and repositories block defined results in SUCCESS'() {
         given:
-        gradleVersion = '3.2'
+        gradleVersion = latestGradleVersion
         File jbakeSourceDir = newFolder('src', 'jbake')
 
         copyResources('example-project', jbakeSourceDir.path)
 
         buildFile << """
             plugins {
-                id 'me.champeau.jbake'
+                id 'org.jbake.site'
             }
 
             repositories {

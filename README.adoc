@@ -1,6 +1,6 @@
 = JBake plugin for Gradle
 :jbake-version: 2.5.1
-:plugin-version: 0.3.0-SNAPSHOT
+:plugin-version: 1.0.0
 :linkattrs:
 :project-name: jbake-gradle-plugin
 
@@ -29,14 +29,14 @@ A few of the sites that use the plugin and serve as a good example are:
 [subs="attributes"]
 ----
 plugins {
-    id 'me.champeau.jbake' version '{plugin-version}'
+    id 'org.jbake.site' version '{plugin-version}'
 }
 ----
 
 This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
 `src/jbake` and generate content into `$buildDir/jbake` (typically `build/jbake`).
 
-WARNING: versions prior to `0.3.0` had a task named `jbake`. This task has been renamed to `bake` since `0.3.0`.
+WARNING: versions prior to `1.0.0` had a task named `jbake`. This task has been renamed to `bake` since `1.0.0`.
 
 == Configuration
 === Plugin configuration
@@ -71,12 +71,12 @@ Jbake uses several engines. The library versions could be changed too:
 ----
 jbake {
     pegdownVersion = '1.6.0'
-    freemarkerVersion = '2.3.25-incubating'
-    groovyTemplatesVersion = '2.4.7'
-    jade4jVersion = '1.2.3'
+    freemarkerVersion = '2.3.26-incubating'
+    groovyTemplatesVersion = '2.4.10'
+    jade4jVersion = '1.2.5'
     thymeleafVersion = '3.0.2.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'
-    asciidoctorjVersion = '1.5.4.1'
+    asciidoctorjVersion = '1.5.5'
 }
 ----
 
