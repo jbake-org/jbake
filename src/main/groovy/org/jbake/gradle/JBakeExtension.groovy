@@ -22,12 +22,12 @@ class JBakeExtension {
 
     String version = '2.6.0'
     String pegdownVersion = '1.6.0'
-    String freemarkerVersion = '2.3.25-incubating'
+    String freemarkerVersion = '2.3.27-incubating'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
-    String asciidoctorjVersion = '1.5.4.1'
-    String groovyTemplatesVersion = '2.4.8'
-    String jade4jVersion = '1.2.5'
-    String thymeleafVersion = '3.0.3.RELEASE'
+    String asciidoctorjVersion = '1.5.6'
+    String groovyTemplatesVersion = '2.4.13'
+    String jade4jVersion = '1.2.7'
+    String thymeleafVersion = '3.0.9.RELEASE'
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
     boolean clearCache = false
