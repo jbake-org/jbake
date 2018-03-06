@@ -1,6 +1,7 @@
 if ( JavaVersion.current().isJava8Compatible() ) {
     apply plugin: "org.sonarqube"
 
+    println "configured sonar url: $sonarURL"
     sonarqube {
         if (!hasSonar) {
             skipProject = true
