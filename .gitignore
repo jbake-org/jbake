@@ -3,6 +3,7 @@ build
 out
 *~
 .gradle
+.gradletasknamecache
 *.iml
 *.ipr
 *.iws
