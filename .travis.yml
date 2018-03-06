@@ -1,5 +1,12 @@
 language: java
 
+dist: trusty
+
+addons:
+  hosts:
+  - jbake-gradle-builder
+  hostname: jbake-gradle-builder
+
 notifications:
   irc:
     - "chat.freenode.net#jbake"
@@ -17,9 +24,12 @@ before_script:
 script:
     - TERM=dumb ./gradlew build jacocoTestReport
 
-jdk:
-    - oraclejdk8
-    - oraclejdk7
+matrix:
+  include:
+    - jdk: oraclejdk8
+    - jdk: openjdk8
+    - jdk: openjdk7
+      dist: precise
 
 after_success:
     - ./gradlew coveralls
