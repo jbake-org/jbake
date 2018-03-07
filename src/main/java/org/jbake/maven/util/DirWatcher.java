@@ -1,4 +1,4 @@
-package br.com.ingenieux.mojo.jbake.util;
+package org.jbake.maven.util;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
