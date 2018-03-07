@@ -6,13 +6,13 @@ import org.jbake.app.ContentStore;
 
 
 /**
- * 
+ *
  * @author ndx
  *
- * @param Type the type of data returned by this model extractor
+ * T the type of data returned by this model extractor
  */
-public interface ModelExtractor<Type extends Object> {
+public interface ModelExtractor<T extends Object> {
 
-	Type get(ContentStore db, Map model, String key);
+	T get(ContentStore db, Map model, String key);
 
 }
