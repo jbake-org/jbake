@@ -130,7 +130,7 @@ project.tasks.withType(Test) {
 }
 
 jacoco {
-    version = jacocoVersion
+    toolVersion = jacocoVersion
 }
 
 jacocoTestReport {
