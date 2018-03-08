@@ -180,17 +180,11 @@ public class Main {
 	}
 
 	private void setupLocale(CompositeConfiguration config){
-		String language;
-		String country;
-		try {
-			language = config.getString("jvm.language");
-			country = config.getString("jvm.country");
-		} catch (NoSuchElementException e) {
-			language = "en";
-			country = "US";
+		if (config.containsKey("jvm.language") && config.containsKey("jvm.country")){
+			String language = config.getString("jvm.language");
+			String country = config.getString("jvm.country");
+			Locale newLocale = new Locale(language, country);
+			Locale.setDefault(newLocale);
 		}
-		Locale newLocale = new Locale(language, country);
-		Locale.setDefault(newLocale);
 	}
-
 }
