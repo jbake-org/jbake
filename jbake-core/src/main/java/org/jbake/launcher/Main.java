@@ -12,10 +12,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.util.List;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 
 /**
  * Launcher for JBake.

@@ -1,8 +1,6 @@
 package org.jbake.launcher;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.assertj.core.api.Assertions;
 import org.jbake.app.ConfigUtil;
 import org.junit.Before;
 import org.junit.Test;
