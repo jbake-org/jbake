@@ -24,33 +24,43 @@ import org.slf4j.LoggerFactory;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class Crawler {
-    public interface Attributes {
+
+    public static final String URI_SEPARATOR_CHAR = "/";
+
+    public abstract static class Attributes {
+
+        private Attributes() {
+        }
+
         /**
          * Possible values of the {@link Attributes#STATUS} property
          *
          * @author ndx
          */
-        interface Status {
-            String PUBLISHED_DATE = "published-date";
-            String PUBLISHED = "published";
-            String DRAFT = "draft";
+        public abstract static class Status {
+            private Status() {
+            }
+
+            public static final String PUBLISHED_DATE = "published-date";
+            public static final String PUBLISHED = "published";
+            public static final String DRAFT = "draft";
         }
 
-        String DATE = "date";
-        String STATUS = "status";
-        String TYPE = "type";
-        String TITLE = "title";
-        String URI = "uri";
-        String FILE = "file";
-        String TAGS = "tags";
-        String TAG = "tag";
-        String ROOTPATH = "rootpath";
-        String ID = "id";
-        String NO_EXTENSION_URI = "noExtensionUri";
-        String ALLTAGS = "alltags";
-        String PUBLISHED_DATE = "published_date";
-        String BODY = "body";
-        String DB = "db";
+        public static final String DATE = "date";
+        public static final String STATUS = "status";
+        public static final String TYPE = "type";
+        public static final String TITLE = "title";
+        public static final String URI = "uri";
+        public static final String FILE = "file";
+        public static final String TAGS = "tags";
+        public static final String TAG = "tag";
+        public static final String ROOTPATH = "rootpath";
+        public static final String ID = "id";
+        public static final String NO_EXTENSION_URI = "noExtensionUri";
+        public static final String ALLTAGS = "alltags";
+        public static final String PUBLISHED_DATE = "published_date";
+        public static final String BODY = "body";
+        public static final String DB = "db";
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
@@ -60,6 +70,8 @@ public class Crawler {
     private final ContentStore db;
 
     /**
+     * @deprecated Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.
+     *
      * Creates new instance of Crawler.
      * @param db		Database instance for content
      * @param source	Base directory where content directory is located
@@ -115,14 +127,13 @@ public class Crawler {
                     DocumentStatus status = DocumentStatus.NEW;
                     for (String docType : DocumentTypes.getDocumentTypes()) {
                         status = findDocumentStatus(docType, uri, sha1);
-                        switch (status) {
-                            case UPDATED:
-                                sb.append(" : modified ");
-                                db.deleteContent(docType, uri);
-                                break;
-                            case IDENTICAL:
-                                sb.append(" : same ");
-                                process = false;
+                        if (status == DocumentStatus.UPDATED) {
+                            sb.append(" : modified ");
+                            db.deleteContent(docType, uri);
+
+                        } else if (status == DocumentStatus.IDENTICAL) {
+                            sb.append(" : same ");
+                            process = false;
                         }
                         if (!process) {
                             break;
@@ -155,35 +166,38 @@ public class Crawler {
     }
 
     private String buildURI(final File sourceFile) {
-    	String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getContentFolder()), "");
+        String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getContentFolder()), "");
 
-    	boolean noExtensionUri = config.getUriWithoutExtension();
-    	String noExtensionUriPrefix = config.getPrefixForUriWithoutExtension();
-    	if (noExtensionUri && noExtensionUriPrefix != null && noExtensionUriPrefix.length() > 0) {
-        	// convert URI from xxx.html to xxx/index.html
-    		if (uri.startsWith(noExtensionUriPrefix)) {
-    			uri = "/" + FilenameUtils.getPath(uri) + FilenameUtils.getBaseName(uri) + "/index" + config.getOutputExtension();
-    		}
+        // On windows we have to replace the backslash
+        if ( ! File.separator.equals(URI_SEPARATOR_CHAR) ) {
+            uri = uri.replace(File.separator, URI_SEPARATOR_CHAR);
+        }
+
+        if (useNoExtensionUri(uri)) {
+            // convert URI from xxx.html to xxx/index.html
+            uri = createNoExtensionUri(uri);
         } else {
-            uri = uri.substring(0, uri.lastIndexOf(".")) + config.getOutputExtension();
+            uri = createUri(uri);
         }
 
         // strip off leading / to enable generating non-root based sites
-        if (uri.startsWith("/")) {
+        if (uri.startsWith(URI_SEPARATOR_CHAR)) {
             uri = uri.substring(1, uri.length());
         }
+
         return uri;
     }
 
     private String createUri(String uri) {
-        return uri.substring(0, uri.lastIndexOf(".")) + config.getOutputExtension();
+        return uri.substring(0, uri.lastIndexOf('.')) + config.getOutputExtension();
     }
 
     private String createNoExtensionUri(String uri) {
-        return "/"
+        return URI_SEPARATOR_CHAR
                 + FilenameUtils.getPath(uri)
                 + FilenameUtils.getBaseName(uri)
-                + "/index"
+                + URI_SEPARATOR_CHAR
+                + "index"
                 + config.getOutputExtension();
     }
 

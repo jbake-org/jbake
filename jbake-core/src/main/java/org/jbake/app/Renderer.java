@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,6 +141,7 @@ public class Renderer {
     private final ContentStore db;
 
     /**
+     * @deprecated Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
      * Creates a new instance of Renderer with supplied references to folders.
      *
      * @param db            The database holding the content
@@ -155,6 +158,7 @@ public class Renderer {
     }
 
     /**
+     * @deprecated Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
      * @param db                The database holding the content
@@ -197,9 +201,7 @@ public class Renderer {
     }
 
     private String findTemplateName(String docType) {
-
-        String returned = config.getTemplateFileByDocType(docType).getName();
-        return returned;
+        return config.getTemplateFileByDocType(docType).getName();
     }
 
     /**
@@ -210,7 +212,7 @@ public class Renderer {
      */
     public void render(Map<String, Object> content) throws Exception {
         String docType = (String) content.get(Crawler.Attributes.TYPE);
-        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + ((String)content.get(Attributes.URI)).replace("/",File.separator);
+        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + content.get(Attributes.URI);
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'));
         }
@@ -367,11 +369,11 @@ public class Renderer {
      */
     public int renderTags(String tagPath) throws Exception {
 		int renderedCount = 0;
-		final List<Throwable> errors = new LinkedList<Throwable>();
+		final List<Throwable> errors = new LinkedList<>();
 
 		for (String tag : db.getAllTags()) {
 			try {
-				Map<String, Object> model = new HashMap<String, Object>();
+				Map<String, Object> model = new HashMap<>();
 				model.put("renderer", renderingEngine);
 				model.put(Attributes.TAG, tag);
 				Map<String, Object>  map = buildSimpleModel(Attributes.TAG);
