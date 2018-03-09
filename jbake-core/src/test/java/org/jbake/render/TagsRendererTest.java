@@ -5,10 +5,7 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,10 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class TagsRendererTest {
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-
 
     @Test
     public void returnsZeroWhenConfigDoesNotRenderTags() throws RenderingException {
@@ -54,7 +47,7 @@ public class TagsRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderTags(anyString());
     }
@@ -94,7 +87,7 @@ public class TagsRendererTest {
         when(contentStore.getTags()).thenReturn(tags);
         when(configuration.getTagPathName()).thenReturn("mockTagfile.html");
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, times(1)).renderTags(anyString());
     }
@@ -112,42 +105,10 @@ public class TagsRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderTags(anyString());
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderTags(anyString());
     }
-
-    @Test
-    @Ignore /* TODO: This integration test sould be placed into a TemplateEngineTest or RendererTest */
-    public void shouldGenerateTagsHome() throws Exception {
-        /*
-        TagsRenderer renderer = new TagsRenderer();
-
-        CompositeConfiguration compositeConfiguration = new MockCompositeConfiguration().withDefaultBoolean(true);
-        compositeConfiguration.setProperty(Key.TAG_PATH.toString(), "tags");
-        compositeConfiguration.setProperty(Key.OUTPUT_EXTENSION.toString(), ".html");
-        compositeConfiguration.setProperty(Key.RENDER_ENCODING.toString(), "UTF-8");
-
-        ContentStore contentStore = mock(ContentStore.class);
-
-        File destination = folder.newFolder();
-
-        //Let it create the files in temporary folder
-        Renderer rendere = new Renderer(contentStore, destination, new File("."), compositeConfiguration);
-
-        Set<String> tags = new HashSet<String>(Arrays.asList("tag1", "tags2"));
-        when(contentStore.getAllTags()).thenReturn(tags);
-
-        int renderResponse = renderer.render(rendere, contentStore,
-                new File("fake"), new File("fake"), compositeConfiguration);
-
-        assertThat(renderResponse).isEqualTo(3);
-
-        //Verify that index.html is created as tags home.
-        assertThat(new File(destination, "tags/index.html").exists()).isEqualTo(true);
-        */
-    }
-
 }
 
 

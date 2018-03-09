@@ -1,11 +1,13 @@
 package org.jbake.render;
 
+import org.jbake.TestUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,6 +56,8 @@ public class RendererTest {
      */
     @Test
     public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
+
+        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows());
         String FOLDER = "real.path";
 
         final String FILENAME = "about";
@@ -61,7 +65,7 @@ public class RendererTest {
         config.setTemplateFolder(folder.newFolder("templates"));
         Renderer renderer = new Renderer(db, config, renderingEngine);
 
-        Map<String, Object> content = new HashMap<String, Object>();
+        Map<String, Object> content = new HashMap<>();
         content.put(Crawler.Attributes.TYPE, "page");
         content.put(Crawler.Attributes.URI, "/" + FOLDER + "/" + FILENAME);
         content.put(Crawler.Attributes.STATUS, "published");

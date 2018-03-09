@@ -49,7 +49,7 @@ public class MainTest {
     @Test
     public void launchJetty() throws Exception {
         File currentWorkingdir = folder.newFolder("src", "jbake");
-        File expectedOutput = new File(currentWorkingdir,"/output");
+        File expectedOutput = new File(currentWorkingdir,"output");
         mockJettyConfiguration(currentWorkingdir,expectedOutput);
 
         String[] args = {"-s"};
@@ -60,23 +60,25 @@ public class MainTest {
     
     @Test
     public void launchBakeAndJetty() throws Exception {
-        File sourceFolder = mockValidSourceFolder("src/jbake",true);
-        String expectedOutput = sourceFolder + "/output";
+        File sourceFolder = folder.newFolder("src", "jbake");
+        File expectedOutput = new File(sourceFolder, "output");
+        mockJettyConfiguration(sourceFolder, expectedOutput);
 
         String[] args = {"-b", "-s"};
         main.run(args);
 
-        verify(mockJetty).run( expectedOutput,"8820");
+        verify(mockJetty).run(expectedOutput.getPath(),"8820");
     }
     
     @Test
     public void launchBakeAndJettyWithCustomDirForJetty() throws ConfigurationException, IOException {
         File path = mockValidSourceFolder("src/jbake", true);
+        String expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output";
 
         String[] args = {"-b", "-s", "src/jbake"};
         main.run(args);
 
-        verify(mockJetty).run("src/jbake/output","8820");
+        verify(mockJetty).run(expectedRunPath,"8820");
     }
 
     @Test
@@ -153,8 +155,8 @@ public class MainTest {
         return configuration;
     }
 
-    private File mockValidSourceFolder(String path, boolean withJetty) throws ConfigurationException, IOException {
-        File mockedSourceFolder = folder.newFolder(path.split("/"));
+    private File mockValidSourceFolder(String sourcePath, boolean withJetty) throws IOException, ConfigurationException {
+        File mockedSourceFolder = folder.newFolder(sourcePath.split("/"));
         if ( withJetty ) {
             mockJettyConfiguration(mockedSourceFolder, mockedSourceFolder);
         }

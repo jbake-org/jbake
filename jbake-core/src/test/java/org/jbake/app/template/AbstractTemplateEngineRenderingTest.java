@@ -253,7 +253,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     public void renderTagsIndex() throws Exception {
         config.setRenderTagsIndex(true);
 
-        renderer.renderTags(config.getTagPathName());
+        renderer.renderTags("tags");
         File outputFile = new File( destinationFolder + File.separator + "tags" + File.separator + "index.html");
         Assert.assertTrue(outputFile.exists());
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
