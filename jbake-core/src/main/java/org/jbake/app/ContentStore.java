@@ -125,8 +125,10 @@ public class ContentStore {
     }
 
     public void close() {
-        activateOnCurrentThread();
-        db.close();
+        if ( db != null ) {
+            activateOnCurrentThread();
+            db.close();
+        }
         DBUtil.closeDataStore();
     }
 

@@ -24,7 +24,9 @@ import static org.asciidoctor.SafeMode.UNSAFE;
  * @author Cédric Champeau
  */
 public class AsciidoctorEngine extends MarkupEngine {
-    private final static Logger LOGGER = LoggerFactory.getLogger(AsciidoctorEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsciidoctorEngine.class);
+    public static final String JBAKE_PREFIX = "jbake-";
+    public static final String REVDATE_KEY = "revdate";
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -86,35 +88,51 @@ public class AsciidoctorEngine extends MarkupEngine {
             contents.put("title", header.getDocumentTitle().getCombined());
         }
         Map<String, Object> attributes = header.getAttributes();
-        for (String key : attributes.keySet()) {
-            if (key.startsWith("jbake-")) {
-                Object val = attributes.get(key);
-                if (val != null) {
-                    String pKey = key.substring(6);
-                    contents.put(pKey, val);
-                }
-            }
-            if (key.equals("revdate")) {
-                if (attributes.get(key) != null && attributes.get(key) instanceof String) {
+        for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+            String key = attribute.getKey();
+            Object value = attribute.getValue();
 
-                    DateFormat df = new SimpleDateFormat(context.getConfig().getDateFormat());
-                    Date date = null;
-                    try {
-                        date = df.parse((String) attributes.get(key));
-                        contents.put("date", date);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+            if (hasJBakePrefix(key)) {
+                String pKey = key.substring(6);
+                contents.put(pKey, value);
+            }
+            if (hasRevdate(key) && canCastToString(value)) {
+
+                String dateFormat = context.getConfig().getDateFormat();
+                DateFormat df = new SimpleDateFormat(dateFormat);
+                try {
+                    Date date = df.parse((String) value);
+                    contents.put("date", date);
+                } catch (ParseException e) {
+                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
                 }
             }
             if (key.equals("jbake-tags")) {
-                if (attributes.get(key) != null && attributes.get(key) instanceof String) {
-                    contents.put("tags", ((String) attributes.get(key)).split(","));
+                if (canCastToString(value)) {
+                    contents.put("tags", ((String) value).split(","));
+                } else {
+                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
                 }
             } else {
                 contents.put(key, attributes.get(key));
             }
         }
+    }
+
+    private boolean canCastToString(Object value) {
+        return value != null && value instanceof String;
+    }
+
+    private String getValueClassName(Object value) {
+        return (value == null) ? "null" : value.getClass().getCanonicalName();
+    }
+
+    private boolean hasRevdate(String key) {
+        return key.equals(REVDATE_KEY);
+    }
+
+    private boolean hasJBakePrefix(String key) {
+        return key.startsWith(JBAKE_PREFIX);
     }
 
     // TODO: write tests with options and attributes
@@ -138,7 +156,8 @@ public class AsciidoctorEngine extends MarkupEngine {
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         JBakeConfiguration config = context.getConfig();
-        final AttributesBuilder attributes = attributes((String[]) config.getAsciidoctorAttributes().toArray());
+        List<String> asciidoctorAttributes = config.getAsciidoctorAttributes();
+        final AttributesBuilder attributes = attributes(asciidoctorAttributes.toArray(new String[asciidoctorAttributes.size()]));
         if (config.getExportAsciidoctorAttributes()) {
             final String prefix = config.getAttributesExportPrefixForAsciidoctor();
 
@@ -171,7 +190,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private List<String> getAsList(Object asciidoctorOption) {
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
 
         if (asciidoctorOption instanceof List) {
             values.addAll((List<String>) asciidoctorOption);

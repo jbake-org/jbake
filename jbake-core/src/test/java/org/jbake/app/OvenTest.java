@@ -35,7 +35,7 @@ public class OvenTest {
 
     @After
     public void tearDown() throws Exception {
-        if (contentStore!=null && contentStore.isActive()){
+        if (contentStore!=null){
             contentStore.close();
             contentStore.shutdown();
         }
