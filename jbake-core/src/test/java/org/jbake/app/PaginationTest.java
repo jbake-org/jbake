@@ -24,20 +24,13 @@
 package org.jbake.app;
 
 import org.jbake.FakeDocumentBuilder;
-import org.jbake.app.configuration.ConfigUtil;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentTypes;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,12 +41,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PaginationTest extends ContentStoreIntegrationTest {
 
     @Before
-    public void setup() throws Exception {
-        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
-
-        for (String docType : DocumentTypes.getDocumentTypes() ) {
+    public void setup() {
+        for (String docType : DocumentTypes.getDocumentTypes()) {
             String fileBaseName = docType;
-            if ( docType.equals("masterindex") ) {
+            if (docType.equals("masterindex")) {
                 fileBaseName = "index";
             }
             config.setTemplateFileNameForDocType(docType, fileBaseName + ".ftl");
@@ -61,8 +52,6 @@ public class PaginationTest extends ContentStoreIntegrationTest {
 
         config.setPaginateIndex(true);
         config.setPostsPerPage(1);
-        config.setDatabaseStore("memory");
-        config.setDatabasePath("documents" + System.currentTimeMillis());
     }
 
     @Test

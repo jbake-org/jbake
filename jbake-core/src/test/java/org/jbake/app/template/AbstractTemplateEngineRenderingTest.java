@@ -24,25 +24,22 @@
 package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.*;
-import org.jbake.app.configuration.ConfigUtil;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.ContentStoreIntegrationTest;
+import org.jbake.app.Crawler;
+import org.jbake.app.Parser;
+import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -86,7 +83,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         config.setDestinationFolder(destinationFolder);
         config.setTemplateFolder(templateFolder);
 
-        for (String docType : DocumentTypes.getDocumentTypes() ) {
+        for (String docType : DocumentTypes.getDocumentTypes()) {
             File templateFile = config.getTemplateFileByDocType(docType);
 
             if (templateFile != null) {
@@ -254,7 +251,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         config.setRenderTagsIndex(true);
 
         renderer.renderTags("tags");
-        File outputFile = new File( destinationFolder + File.separator + "tags" + File.separator + "index.html");
+        File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "index.html");
         Assert.assertTrue(outputFile.exists());
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
         for (String string : getOutputStrings("tags-index")) {

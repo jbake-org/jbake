@@ -1,8 +1,8 @@
 package org.jbake.template;
 
-import java.util.Map;
-
 import org.jbake.app.ContentStore;
+
+import java.util.Map;
 
 
 /**

@@ -1,10 +1,5 @@
 package org.jbake.app;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
@@ -17,6 +12,11 @@ import org.jbake.model.DocumentTypes;
 import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Crawls a file system looking for content.

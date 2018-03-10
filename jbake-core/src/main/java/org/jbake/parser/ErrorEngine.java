@@ -1,9 +1,9 @@
 package org.jbake.parser;
 
+import org.jbake.app.Crawler.Attributes;
+
 import java.util.Date;
 import java.util.Map;
-
-import org.jbake.app.Crawler.Attributes;
 
 /**
  * An internal rendering engine used to notify the user that the markup format he used requires an engine that couldn't

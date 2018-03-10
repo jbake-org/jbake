@@ -1,7 +1,6 @@
 package org.jbake.app.configuration;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 
 import java.io.File;

@@ -1,15 +1,14 @@
 package org.jbake.template;
 
-import java.io.File;
-import java.io.Writer;
-import java.util.Map;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.jbake.app.ContentStore;
-
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+
+import java.io.File;
+import java.io.Writer;
+import java.util.Map;
 
 
 /**

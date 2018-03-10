@@ -1,11 +1,11 @@
 package org.jbake.parser;
 
+import org.jbake.app.Crawler;
+import org.jbake.app.configuration.JBakeConfiguration;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-
-import org.jbake.app.Crawler;
-import org.jbake.app.configuration.JBakeConfiguration;
 
 public class ParserContext {
     private final File file;

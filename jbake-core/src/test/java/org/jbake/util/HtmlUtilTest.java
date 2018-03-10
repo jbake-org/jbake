@@ -1,17 +1,16 @@
 package org.jbake.util;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 

@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -203,9 +204,9 @@ public class Renderer {
                     model.put("previousFileName", previous);
                     String nextFileName = pagingHelper.getNextFileName(page);
                     model.put("nextFileName", nextFileName);
-                    
+
                     Map<String, Object> contentModel =  buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
-                    
+
                     if(page > 1){
                         contentModel.put(Attributes.ROOTPATH, "../");
                     }

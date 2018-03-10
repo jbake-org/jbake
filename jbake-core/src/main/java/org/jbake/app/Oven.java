@@ -14,7 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * All the baking happens in the Oven!
@@ -26,63 +30,39 @@ public class Oven {
     private static final Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
     private Utensils utensils;
-	private List<Throwable> errors = new LinkedList<>();
-	private int renderedCount = 0;
+    private List<Throwable> errors = new LinkedList<>();
+    private int renderedCount = 0;
 
     /**
+     * @param source       Project source directory
+     * @param destination  The destination folder
+     * @param isClearCache Should the cache be cleaned
+     * @throws Exception if configuration is not loaded correctly
      * @deprecated Use {@link #Oven(JBakeConfiguration)} instead
      * Delegate c'tor to prevent API break for the moment.
-     *
-     * @param source                   Project source directory
-     * @param destination              The destination folder
-     * @param isClearCache             Should the cache be cleaned
-     * @throws Exception  if configuration is not loaded correctly
      */
     @Deprecated
     public Oven(final File source, final File destination, final boolean isClearCache) throws Exception {
-        this( new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, isClearCache) );
+        this(new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, isClearCache));
     }
 
     /**
+     * @param source       Project source directory
+     * @param destination  The destination folder
+     * @param config       Project configuration
+     * @param isClearCache Should the cache be cleaned
+     * @throws Exception if configuration is not loaded correctly
      * @deprecated Use {@link #Oven(JBakeConfiguration)} instead
      * Creates a new instance of the Oven with references to the source and destination folders.
-     *
-     * @param source				Project source directory
-     * @param destination		The destination folder
-     * @param config				Project configuration
-     * @param isClearCache	Should the cache be cleaned
-     * @throws Exception  if configuration is not loaded correctly
      */
     @Deprecated
     public Oven(final File source, final File destination, final CompositeConfiguration config, final boolean isClearCache) throws Exception {
         this(new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config, isClearCache));
     }
 
-    @Deprecated
-    public CompositeConfiguration getConfig() {
-        return ((DefaultJBakeConfiguration)utensils.getConfiguration()).getCompositeConfiguration();
-    }
-
-    // TODO: do we want to use this. Else, config could be final
-    @Deprecated
-    public void setConfig(final CompositeConfiguration config) {
-        ((DefaultJBakeConfiguration)utensils.getConfiguration()).setCompositeConfiguration(config);
-    }
-
-    /**
-     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
-     *
-     * @deprecated There is no need for this method anymore. Validation is now part of the instantiation.
-     * Can be removed with 3.0.0.
-     */
-    @Deprecated
-    public void setupPaths() {
-        /* nothing to do here */
-    }
-
     /**
      * Create an Oven instance by a {@link JBakeConfiguration}
-     *
+     * <p>
      * It creates default {@link Utensils} needed to bake sites.
      *
      * @param config The project configuration. see {@link JBakeConfiguration}
@@ -101,6 +81,28 @@ public class Oven {
         this.utensils = utensils;
     }
 
+    @Deprecated
+    public CompositeConfiguration getConfig() {
+        return ((DefaultJBakeConfiguration) utensils.getConfiguration()).getCompositeConfiguration();
+    }
+
+    // TODO: do we want to use this. Else, config could be final
+    @Deprecated
+    public void setConfig(final CompositeConfiguration config) {
+        ((DefaultJBakeConfiguration) utensils.getConfiguration()).setCompositeConfiguration(config);
+    }
+
+    /**
+     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
+     *
+     * @deprecated There is no need for this method anymore. Validation is now part of the instantiation.
+     * Can be removed with 3.0.0.
+     */
+    @Deprecated
+    public void setupPaths() {
+        /* nothing to do here */
+    }
+
     /**
      * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
      * Creates destination folder if it does not exist.
@@ -112,9 +114,9 @@ public class Oven {
         inspector.inspect();
     }
 
-	/**
-	 * All the good stuff happens in here...
-	 */
+    /**
+     * All the good stuff happens in here...
+     */
     public void bake() {
 
         ContentStore contentStore = utensils.getContentStore();
@@ -194,9 +196,9 @@ public class Oven {
     }
 
 
-	public List<Throwable> getErrors() {
-		return new ArrayList<>(errors);
-	}
+    public List<Throwable> getErrors() {
+        return new ArrayList<>(errors);
+    }
 
     public Utensils getUtensils() {
         return utensils;

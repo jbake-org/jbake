@@ -14,7 +14,12 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 

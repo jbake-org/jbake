@@ -1,10 +1,8 @@
 package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,11 +15,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 public class ConfigUtilTest extends LoggingTest {

@@ -25,12 +25,12 @@ public class ArchiveRenderer implements RenderingTool {
             return 0;
         }
     }
-    
-	@Override
-	public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
 
-	    JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(),config);
-	    return render(renderer, db, configuration);
+    @Override
+    public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
+
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config);
+        return render(renderer, db, configuration);
     }
 
 }

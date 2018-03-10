@@ -1,10 +1,10 @@
 package org.jbake.parser;
 
-import java.io.File;
-import java.util.Map;
-
 import org.apache.commons.configuration.Configuration;
 import org.jbake.app.configuration.JBakeConfiguration;
+
+import java.io.File;
+import java.util.Map;
 
 public interface ParserEngine {
 
