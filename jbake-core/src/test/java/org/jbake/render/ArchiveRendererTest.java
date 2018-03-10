@@ -43,7 +43,7 @@ public class ArchiveRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderArchive(anyString());
     }
@@ -75,7 +75,7 @@ public class ArchiveRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, times(1)).renderArchive(anyString());
     }
@@ -93,7 +93,7 @@ public class ArchiveRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderArchive(anyString());
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderArchive("random string");
     }

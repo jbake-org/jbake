@@ -30,6 +30,7 @@ public class OvenTest {
 
     @Before
     public void setUp() throws Exception {
+        // reset values to known state otherwise previous test case runs can affect the success of this test case
         DocumentTypes.resetDocumentTypes();
         sourceFolder = new File(this.getClass().getResource("/fixture").getPath());
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
@@ -38,8 +39,8 @@ public class OvenTest {
     }
 
     @After
-    public void tearDown() throws Exception {
-        if (contentStore!=null){
+    public void tearDown() {
+        if (contentStore!=null && contentStore.isActive()){
             contentStore.close();
             contentStore.shutdown();
         }
@@ -58,13 +59,13 @@ public class OvenTest {
     }
 
     @Test(expected = JBakeException.class)
-    public void should_throw_exception_if_source_folder_does_not_exist() throws Exception {
+    public void shouldThrowExceptionIfSourceFolderDoesNotExist() {
         configuration.setSourceFolder(new File(folder.getRoot(),"none"));
-        Oven oven = new Oven(configuration);
+        new Oven(configuration);
     }
 
     @Test
-    public void should_instantiate_needed_Utensils() throws Exception {
+    public void shouldInstantiateNeededUtensils() throws Exception {
 
         configuration.setTemplateFolder( folder.newFolder("template") );
         configuration.setContentFolder( folder.newFolder("content") );
@@ -81,17 +82,17 @@ public class OvenTest {
     }
 
     @Test(expected = JBakeException.class)
-    public void should_inspect_configuration_during_instantiation_from_utils() throws Exception {
+    public void shouldInspectConfigurationDuringInstantiationFromUtils() {
         configuration.setSourceFolder(new File(folder.getRoot(),"none"));
 
         Utensils utensils = new Utensils();
         utensils.setConfiguration(configuration);
 
-        Oven oven = new Oven(utensils);
+        new Oven(utensils);
     }
 
     @Test
-    public void should_crawl_render_and_copy_assets() throws Exception {
+    public void shouldCrawlRenderAndCopyAssets() throws Exception {
         configuration.setTemplateFolder( folder.newFolder("template") );
         configuration.setContentFolder( folder.newFolder("content") );
         configuration.setAssetFolder( folder.newFolder("assets") );

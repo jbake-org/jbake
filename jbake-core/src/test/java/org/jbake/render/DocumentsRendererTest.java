@@ -38,14 +38,12 @@ public class DocumentsRendererTest {
     private Renderer renderer;
     private JBakeConfiguration configuration;
     private DocumentList emptyDocumentList;
-    private File destinationFile;
-    private File templatePath;
 
     @Captor
     private ArgumentCaptor<Map<String, Object>> argument;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         MockitoAnnotations.initMocks(this);
 
@@ -168,16 +166,15 @@ public class DocumentsRendererTest {
     }
 
     private HashMap<String, Object> emptyDocument() {
-        return new HashMap<String, Object>();
+        return new HashMap<>();
     }
 
     private Map<String, Object> simpleDocument(String title) {
-        Map<String, Object> simpleDoc = new HashMap<String, Object>();
+        Map<String, Object> simpleDoc = new HashMap<>();
         String uri = title.replace(" ", "_");
         simpleDoc.put(Attributes.NO_EXTENSION_URI, uri);
         simpleDoc.put(Attributes.URI, uri);
         simpleDoc.put(Attributes.TITLE, title);
-        ;
         return simpleDoc;
     }
 

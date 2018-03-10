@@ -43,25 +43,9 @@ public class IndexRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
-
-        verify(mockRenderer, never()).renderIndex(anyString());
-    }
-
-    @Test
-    public void doesRenderWhenConfigDoesRenderIndices() throws Exception {
-        IndexRenderer renderer = new IndexRenderer();
-
-        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
-        when(configuration.getRenderIndex()).thenReturn(true);
-        when(configuration.getIndexFileName()).thenReturn("mockindex.html");
-
-        ContentStore contentStore = mock(ContentStore.class);
-        Renderer mockRenderer = mock(Renderer.class);
-
         renderer.render(mockRenderer, contentStore, configuration);
 
-        verify(mockRenderer, times(1)).renderIndex(anyString());
+        verify(mockRenderer, never()).renderIndex(anyString());
     }
 
     @Test
@@ -94,7 +78,7 @@ public class IndexRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderIndex(anyString());
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderIndex(anyString());
     }
@@ -114,13 +98,13 @@ public class IndexRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, times(1)).renderIndex(anyString());
     }
 
     @Test
-    public void should_render_paginated_index() throws Exception {
+    public void shouldRenderPaginatedIndex() throws Exception {
 
         IndexRenderer renderer = new IndexRenderer();
 
@@ -132,7 +116,7 @@ public class IndexRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, times(1)).renderIndexPaging(anyString());
 

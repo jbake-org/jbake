@@ -43,7 +43,7 @@ public class SitemapRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderSitemap(anyString());
     }
@@ -75,7 +75,7 @@ public class SitemapRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, times(1)).renderSitemap(anyString());
     }
@@ -93,7 +93,7 @@ public class SitemapRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderSitemap(anyString());
 
-        int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
+        renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, never()).renderSitemap(anyString());
     }

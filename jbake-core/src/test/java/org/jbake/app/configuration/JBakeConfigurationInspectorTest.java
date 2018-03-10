@@ -22,7 +22,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void should_throw_exception_if_source_folder_does_not_exist() throws Exception {
+    public void shouldThrowExceptionIfSourceFolderDoesNotExist() throws Exception {
         File nonExistentFile = new File(folder.getRoot(), "nofolder");
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(nonExistentFile);
@@ -38,7 +38,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     }
 
     @Test
-    public void should_throw_exception_if_source_folder_is_not_readable() throws Exception {
+    public void shouldThrowExceptionIfSourceFolderIsNotReadable() throws Exception {
         File nonReadableFile = mock(File.class);
         when(nonReadableFile.exists()).thenReturn(true);
         when(nonReadableFile.isDirectory()).thenReturn(true);
@@ -58,7 +58,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     }
 
     @Test
-    public void should_throw_exception_if_template_folder_does_not_exist() throws Exception {
+    public void shouldThrowExceptionIfTemplateFolderDoesNotExist() throws Exception {
         String templateFolderName = "template";
         File expectedFolder = new File(folder.getRoot(), templateFolderName);
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
@@ -78,7 +78,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     }
 
     @Test
-    public void should_throw_exception_if_content_folder_does_not_exist() throws Exception {
+    public void shouldThrowExceptionIfContentFolderDoesNotExist() throws Exception {
         String contentFolderName = "content";
         String templateFolderName = "template";
         File templateFolder = folder.newFolder(templateFolderName);
@@ -102,15 +102,14 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     }
 
     @Test
-    public void should_create_destination_folder_if_not_exists() throws Exception {
+    public void shouldCreateDestinationFolderIfNotExists() throws Exception {
         String contentFolderName = "content";
         String templateFolderName = "template";
         String destinationFolderName = "output";
 
         File templateFolder = folder.newFolder(templateFolderName);
         File contentFolder = folder.newFolder(contentFolderName);
-        File destinationFolder = new File(folder.getRoot(),destinationFolderName);
-        File assetFolder = folder.newFolder("assets");
+        File destinationFolder = new File(folder.getRoot(), destinationFolderName);
 
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
@@ -129,17 +128,14 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     }
 
     @Test
-    public void should_throw_exception_if_destination_folder_not_writable() throws Exception {
+    public void shouldThrowExceptionIfDestinationFolderNotWritable() throws Exception {
         String contentFolderName = "content";
         String templateFolderName = "template";
-        String destinationFolderName = "output";
 
         File templateFolder = folder.newFolder(templateFolderName);
         File contentFolder = folder.newFolder(contentFolderName);
         File destinationFolder = mock(File.class);
         when(destinationFolder.exists()).thenReturn(true);
-//        when(destinationFolder.isDirectory()).thenReturn(true);
-//        when(destinationFolder.canWrite()).thenReturn(false);
 
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
@@ -161,7 +157,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     }
 
     @Test
-    public void should_log_warning_if_asset_folder_does_not_exist() throws Exception {
+    public void shouldLogWarningIfAssetFolderDoesNotExist() throws Exception {
         String contentFolderName = "content";
         String templateFolderName = "template";
         String destinationFolderName = "output";
@@ -180,7 +176,6 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         when(configuration.getContentFolderName()).thenReturn(contentFolderName);
         when(configuration.getDestinationFolder()).thenReturn(destinationFolder);
         when(configuration.getAssetFolder()).thenReturn(assetFolder);
-//        when(configuration.getAssetFolderName()).thenReturn(assetFolderName);
 
 
         JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(configuration);
@@ -192,7 +187,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         LoggingEvent loggingEvent = captorLoggingEvent.getValue();
 
         assertThat(loggingEvent.getMessage()).isEqualTo("No asset folder '{}' was found!");
-        assertThat(loggingEvent.getFormattedMessage()).isEqualTo("No asset folder '"+assetFolder.getAbsolutePath()+"' was found!");
+        assertThat(loggingEvent.getFormattedMessage()).isEqualTo("No asset folder '" + assetFolder.getAbsolutePath() + "' was found!");
 
     }
 

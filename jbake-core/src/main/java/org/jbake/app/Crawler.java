@@ -76,7 +76,7 @@ public class Crawler {
      *
      * @param path Folder to start from
      */
-    public void crawl(File path) {
+    private void crawl(File path) {
         File[] contents = path.listFiles(FileUtil.getFileFilter());
         if (contents != null) {
             Arrays.sort(contents);
@@ -122,7 +122,7 @@ public class Crawler {
         try {
             sha1 = FileUtil.sha1(sourceFile);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("unable to build sha1 hash for source file '{}'", sourceFile);
             sha1 = "";
         }
         return sha1;
@@ -216,7 +216,7 @@ public class Crawler {
         }
     }
 
-    public String getPathToRoot(File sourceFile) {
+    private String getPathToRoot(File sourceFile) {
         File rootPath = config.getContentFolder();
         File parentPath = sourceFile.getParentFile();
         int parentCount = 0;
@@ -266,8 +266,6 @@ public class Crawler {
         public static final String PUBLISHED_DATE = "published_date";
         public static final String BODY = "body";
         public static final String DB = "db";
-        private Attributes() {
-        }
 
         /**
          * Possible values of the {@link Attributes#STATUS} property
@@ -278,8 +276,13 @@ public class Crawler {
             public static final String PUBLISHED_DATE = "published-date";
             public static final String PUBLISHED = "published";
             public static final String DRAFT = "draft";
+
             private Status() {
             }
         }
+
+        private Attributes() {
+        }
+
     }
 }

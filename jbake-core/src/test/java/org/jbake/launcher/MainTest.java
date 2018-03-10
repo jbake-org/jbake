@@ -35,10 +35,10 @@ public class MainTest {
     @Mock private ConfigUtil configUtil;
     @Mock private JBakeConfigurationFactory factory;
 
-    String workingdir;
+    private String workingdir;
 
     @Before
-    public void setup() {
+    public void setUp() {
         this.main = new Main(mockBaker, mockJetty, mockWatcher);
         workingdir = System.getProperty("user.dir");
         factory.setConfigUtil(configUtil);
@@ -46,7 +46,7 @@ public class MainTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         System.setProperty("user.dir", workingdir);
     }
 
@@ -76,7 +76,7 @@ public class MainTest {
     
     @Test
     public void launchBakeAndJettyWithCustomDirForJetty() throws ConfigurationException, IOException {
-        File path = mockValidSourceFolder("src/jbake", true);
+        mockValidSourceFolder("src/jbake", true);
         String expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output";
 
         String[] args = {"-b", "-s", "src/jbake"};

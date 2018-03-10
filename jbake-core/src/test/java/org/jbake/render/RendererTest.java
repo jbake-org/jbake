@@ -29,18 +29,18 @@ public class RendererTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     private DefaultJBakeConfiguration config;
-    private File sourcePath;
     private File outputPath;
 
     @Mock
     private ContentStore db;
+
     @Mock
     private DelegatingTemplateEngine renderingEngine;
 
     @Before
     public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/");
-        sourcePath = new File(sourceUrl.getFile());
+        URL sourceUrl = this.getClass().getResource("/fixture");
+        File sourcePath = new File(sourceUrl.getFile());
         if (!sourcePath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }

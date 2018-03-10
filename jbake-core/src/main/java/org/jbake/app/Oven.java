@@ -131,7 +131,7 @@ public class Oven {
             contentStore.startup();
             updateDocTypesFromConfiguration();
             contentStore.updateSchema();
-            contentStore.clearCacheIfNeeded(config.getClearCache(), config.getTemplateFolder());
+            contentStore.updateAndClearCacheIfNeeded(config.getClearCache(), config.getTemplateFolder());
 
             // process source content
             crawler.crawl();

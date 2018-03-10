@@ -14,13 +14,13 @@ public class JBakeConfigurationFactoryTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void should_return_default_configuration_with_default_folders() throws Exception {
+    public void shouldReturnDefaultConfigurationWithDefaultFolders() throws Exception {
         File sourceFolder = folder.getRoot();
         File destinationFolder = folder.newFolder("output");
-        File templateFolder = new File(folder.getRoot(),"templates");
-        File assetFolder = new File(folder.getRoot(),"assets");
+        File templateFolder = new File(folder.getRoot(), "templates");
+        File assetFolder = new File(folder.getRoot(), "assets");
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder,destinationFolder, true);
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
 
         assertThat(configuration.getSourceFolder()).isEqualTo(sourceFolder);
         assertThat(configuration.getDestinationFolder()).isEqualTo(destinationFolder);
@@ -30,23 +30,23 @@ public class JBakeConfigurationFactoryTest {
     }
 
     @Test
-    public void should_return_a_default_configuration_with_sitehost() throws Exception {
+    public void shouldReturnADefaultConfigurationWithSitehost() throws Exception {
         File sourceFolder = folder.getRoot();
         File destinationFolder = folder.newFolder("output");
         String siteHost = "http://www.jbake.org";
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder,destinationFolder, true);
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
 
         assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
     }
 
     @Test
-    public void should_return_a_jetty_configuration() throws Exception {
+    public void shouldReturnAJettyConfiguration() throws Exception {
         File sourceFolder = folder.getRoot();
         File destinationFolder = folder.newFolder("output");
         String siteHost = "http://localhost:8820";
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,destinationFolder, true);
+        JBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true);
 
         assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
     }
