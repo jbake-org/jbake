@@ -23,13 +23,14 @@ import java.util.*;
  */
 public class Oven {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(Oven.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
     private Utensils utensils;
-	private List<Throwable> errors = new LinkedList<Throwable>();
+	private List<Throwable> errors = new LinkedList<>();
 	private int renderedCount = 0;
 
     /**
+     * @deprecated Use {@link #Oven(JBakeConfiguration)} instead
      * Delegate c'tor to prevent API break for the moment.
      *
      * @param source                   Project source directory
@@ -43,6 +44,7 @@ public class Oven {
     }
 
     /**
+     * @deprecated Use {@link #Oven(JBakeConfiguration)} instead
      * Creates a new instance of the Oven with references to the source and destination folders.
      *
      * @param source				Project source directory
@@ -144,7 +146,7 @@ public class Oven {
             LOGGER.info("Baking finished!");
             long end = new Date().getTime();
             LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
-            if (errors.size() > 0) {
+            if (!errors.isEmpty()) {
                 LOGGER.error("Failed to bake {} item(s)!", errors.size());
             }
         } finally {
@@ -193,7 +195,7 @@ public class Oven {
 
 
 	public List<Throwable> getErrors() {
-		return new ArrayList<Throwable>(errors);
+		return new ArrayList<>(errors);
 	}
 
     public Utensils getUtensils() {

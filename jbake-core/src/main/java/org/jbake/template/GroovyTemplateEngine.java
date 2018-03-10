@@ -27,8 +27,11 @@ import java.util.Map;
  */
 public class GroovyTemplateEngine extends AbstractTemplateEngine {
 
-    private final Map<String, Template> cachedTemplates = new HashMap<String, Template>();
+    private final Map<String, Template> cachedTemplates = new HashMap<>();
 
+    /**
+     * @deprecated Use {@link #GroovyTemplateEngine(JBakeConfiguration, ContentStore)} instead
+     */
     @Deprecated
     public GroovyTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
@@ -61,7 +64,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     }
 
     private Map<String, Object> wrap(final Map<String, Object> model) {
-    	return new HashMap<String, Object>(model) {
+        return new HashMap<String, Object>(model) {
             @Override
             public Object get(final Object property) {
                 if (property instanceof String || property instanceof GString) {
@@ -69,11 +72,11 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
                     if ("include".equals(key)) {
                         return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
                     }
-                	try {
-                		return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
-                	} catch(NoModelExtractorException e) {
-                		// fallback to parent model
-                	}
+                    try {
+                        return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
+                    } catch (NoModelExtractorException e) {
+                        // fallback to parent model
+                    }
                 }
 
                 return super.get(property);

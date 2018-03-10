@@ -17,12 +17,10 @@ import java.io.File;
  */
 public class ConfigUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
-    private final static String LEGACY_CONFIG_FILE = "custom.properties";
-    private final static String CONFIG_FILE = "jbake.properties";
-    private final static String DEFAULT_CONFIG_FILE = "default.properties";
-    private static boolean LEGACY_CONFIG_FILE_WARNING_SHOWN = false;
-    private static boolean LEGACY_CONFIG_FILE_EXISTS = false;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
+    private static final String LEGACY_CONFIG_FILE = "custom.properties";
+    private static final String CONFIG_FILE = "jbake.properties";
+    private static final String DEFAULT_CONFIG_FILE = "default.properties";
 
     private CompositeConfiguration load(File source) throws ConfigurationException {
 
@@ -37,7 +35,7 @@ public class ConfigUtil {
         config.setListDelimiter(',');
         File customConfigFile = new File(source, LEGACY_CONFIG_FILE);
         if (customConfigFile.exists()) {
-        	LEGACY_CONFIG_FILE_EXISTS = true;
+            displayLegacyConfigFileWarningIfRequired();
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
         }
         customConfigFile = new File(source, CONFIG_FILE);
@@ -49,14 +47,9 @@ public class ConfigUtil {
         return config;
     }
 
-    public static void displayLegacyConfigFileWarningIfRequired() {
-    	if (LEGACY_CONFIG_FILE_EXISTS) {
-        	if (!LEGACY_CONFIG_FILE_WARNING_SHOWN) {
-	        	LOGGER.warn(String.format("You have defined a part of your JBake configuration in %s", LEGACY_CONFIG_FILE));
-	        	LOGGER.warn(String.format("Usage of this file is being deprecated, please rename this file to: %s to remove this warning", CONFIG_FILE));
-	        	LEGACY_CONFIG_FILE_WARNING_SHOWN = true;
-        	}
-    	}
+    private void displayLegacyConfigFileWarningIfRequired() {
+        LOGGER.warn("You have defined a part of your JBake configuration in {}", LEGACY_CONFIG_FILE);
+        LOGGER.warn("Usage of this file is being deprecated, please rename this file to: {} to remove this warning", CONFIG_FILE);
     }
 
     public JBakeConfiguration loadConfig(File source) throws ConfigurationException {

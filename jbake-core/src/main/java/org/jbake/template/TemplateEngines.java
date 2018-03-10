@@ -1,20 +1,14 @@
 package org.jbake.template;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import org.jbake.app.ContentStore;
-
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.util.*;
 
 
 /**
@@ -39,28 +33,28 @@ import org.slf4j.LoggerFactory;
  */
 public class TemplateEngines {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
 
-    private final Map<String, AbstractTemplateEngine> templateEngines;
+    private final Map<String, AbstractTemplateEngine> engines;
 
     public Set<String> getRecognizedExtensions() {
-        return Collections.unmodifiableSet(templateEngines.keySet());
+        return Collections.unmodifiableSet(engines.keySet());
     }
 
     public TemplateEngines(final JBakeConfiguration config, final ContentStore db) {
-        templateEngines = new HashMap<String, AbstractTemplateEngine>();
+        engines = new HashMap<>();
         loadEngines(config, db);
     }
 
     private void registerEngine(String fileExtension, AbstractTemplateEngine templateEngine) {
-        AbstractTemplateEngine old = templateEngines.put(fileExtension, templateEngine);
+        AbstractTemplateEngine old = engines.put(fileExtension, templateEngine);
         if (old != null) {
             LOGGER.warn("Registered a template engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
         }
     }
 
     public AbstractTemplateEngine getEngine(String fileExtension) {
-        return templateEngines.get(fileExtension);
+        return engines.get(fileExtension);
     }
 
     /**
@@ -78,18 +72,8 @@ public class TemplateEngines {
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
             Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(JBakeConfiguration.class, ContentStore.class);
             return ctor.newInstance(config, db);
-        } catch (ClassNotFoundException e) {
-            return null;
-        } catch (InstantiationException e) {
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
-        } catch (NoClassDefFoundError e) {
-            // a dependency of the engine may not be found on classpath
-            return null;
-        } catch (NoSuchMethodException e) {
-            return null;
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
+            LOGGER.error("unable to load engine", e);
             return null;
         }
     }
@@ -113,7 +97,7 @@ public class TemplateEngines {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error loading engines", e);
         }
     }
 

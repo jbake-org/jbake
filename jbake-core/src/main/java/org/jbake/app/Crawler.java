@@ -25,57 +25,19 @@ import org.slf4j.LoggerFactory;
  */
 public class Crawler {
 
-    public static final String URI_SEPARATOR_CHAR = "/";
-
-    public abstract static class Attributes {
-
-        private Attributes() {
-        }
-
-        /**
-         * Possible values of the {@link Attributes#STATUS} property
-         *
-         * @author ndx
-         */
-        public abstract static class Status {
-            private Status() {
-            }
-
-            public static final String PUBLISHED_DATE = "published-date";
-            public static final String PUBLISHED = "published";
-            public static final String DRAFT = "draft";
-        }
-
-        public static final String DATE = "date";
-        public static final String STATUS = "status";
-        public static final String TYPE = "type";
-        public static final String TITLE = "title";
-        public static final String URI = "uri";
-        public static final String FILE = "file";
-        public static final String TAGS = "tags";
-        public static final String TAG = "tag";
-        public static final String ROOTPATH = "rootpath";
-        public static final String ID = "id";
-        public static final String NO_EXTENSION_URI = "noExtensionUri";
-        public static final String ALLTAGS = "alltags";
-        public static final String PUBLISHED_DATE = "published_date";
-        public static final String BODY = "body";
-        public static final String DB = "db";
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
-
+    public static final String URI_SEPARATOR_CHAR = "/";
+    private final ContentStore db;
     private JBakeConfiguration config;
     private Parser parser;
-    private final ContentStore db;
 
     /**
+     * @param db     Database instance for content
+     * @param source Base directory where content directory is located
+     * @param config Project configuration
      * @deprecated Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.
-     *
+     * <p>
      * Creates new instance of Crawler.
-     * @param db		Database instance for content
-     * @param source	Base directory where content directory is located
-     * @param config	Project configuration
      */
     @Deprecated
     public Crawler(ContentStore db, File source, CompositeConfiguration config) {
@@ -86,8 +48,9 @@ public class Crawler {
 
     /**
      * Creates new instance of Crawler.
-	 * @param db		Database instance for content
-	 * @param config	Project configuration
+     *
+     * @param db     Database instance for content
+     * @param config Project configuration
      */
     public Crawler(ContentStore db, JBakeConfiguration config) {
         this.db = db;
@@ -169,7 +132,7 @@ public class Crawler {
         String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getContentFolder()), "");
 
         // On windows we have to replace the backslash
-        if ( ! File.separator.equals(URI_SEPARATOR_CHAR) ) {
+        if (!File.separator.equals(URI_SEPARATOR_CHAR)) {
             uri = uri.replace(File.separator, URI_SEPARATOR_CHAR);
         }
 
@@ -236,7 +199,7 @@ public class Crawler {
             }
 
             if (config.getUriWithoutExtension()) {
-            	fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
+                fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
 
 
@@ -254,21 +217,21 @@ public class Crawler {
     }
 
     public String getPathToRoot(File sourceFile) {
-    	File rootPath = config.getContentFolder();
-    	File parentPath = sourceFile.getParentFile();
-    	int parentCount = 0;
-    	while (!parentPath.equals(rootPath)) {
-    		parentPath = parentPath.getParentFile();
-    		parentCount++;
-    	}
-    	StringBuilder sb = new StringBuilder();
-    	for (int i = 0; i < parentCount; i++) {
-    		sb.append("../");
-    	}
-    	if (config.getUriWithoutExtension()) {
-        	sb.append("../");
+        File rootPath = config.getContentFolder();
+        File parentPath = sourceFile.getParentFile();
+        int parentCount = 0;
+        while (!parentPath.equals(rootPath)) {
+            parentPath = parentPath.getParentFile();
+            parentCount++;
         }
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parentCount; i++) {
+            sb.append("../");
+        }
+        if (config.getUriWithoutExtension()) {
+            sb.append("../");
+        }
+        return sb.toString();
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
@@ -283,6 +246,40 @@ public class Crawler {
             }
         } else {
             return DocumentStatus.NEW;
+        }
+    }
+
+    public abstract static class Attributes {
+
+        public static final String DATE = "date";
+        public static final String STATUS = "status";
+        public static final String TYPE = "type";
+        public static final String TITLE = "title";
+        public static final String URI = "uri";
+        public static final String FILE = "file";
+        public static final String TAGS = "tags";
+        public static final String TAG = "tag";
+        public static final String ROOTPATH = "rootpath";
+        public static final String ID = "id";
+        public static final String NO_EXTENSION_URI = "noExtensionUri";
+        public static final String ALLTAGS = "alltags";
+        public static final String PUBLISHED_DATE = "published_date";
+        public static final String BODY = "body";
+        public static final String DB = "db";
+        private Attributes() {
+        }
+
+        /**
+         * Possible values of the {@link Attributes#STATUS} property
+         *
+         * @author ndx
+         */
+        public abstract static class Status {
+            public static final String PUBLISHED_DATE = "published-date";
+            public static final String PUBLISHED = "published";
+            public static final String DRAFT = "draft";
+            private Status() {
+            }
         }
     }
 }

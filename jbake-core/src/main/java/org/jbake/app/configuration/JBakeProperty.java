@@ -2,8 +2,6 @@ package org.jbake.app.configuration;
 
 public class JBakeProperty {
 
-    private JBakeProperty() {}
-
     public static final String ARCHIVE_FILE = "archive.file";
     public static final String ASCIIDOCTOR_ATTRIBUTES = "asciidoctor.attributes";
     public static final String ASCIIDOCTOR_ATTRIBUTES_EXPORT = "asciidoctor.attributes.export";
@@ -46,4 +44,7 @@ public class JBakeProperty {
     public static final String URI_NO_EXTENSION = "uri.noExtension";
     public static final String URI_NO_EXTENSION_PREFIX = "uri.noExtension.prefix";
     public static final String VERSION = "version";
+
+    private JBakeProperty() {}
+
 }

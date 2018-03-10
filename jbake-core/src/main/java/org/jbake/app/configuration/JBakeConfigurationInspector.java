@@ -9,7 +9,7 @@ import java.io.File;
 
 public class JBakeConfigurationInspector {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(JBakeConfigurationInspector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JBakeConfigurationInspector.class);
 
     private final JBakeConfiguration configuration;
 

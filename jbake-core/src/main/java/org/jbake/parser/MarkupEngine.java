@@ -109,20 +109,16 @@ public abstract class MarkupEngine implements ParserEngine {
             content.put(Crawler.Attributes.DATE, new Date(file.lastModified()));
         }
 
-        if (config.getDefaultStatus() != null) {
-        	// default status has been set
-        	if (content.get(Crawler.Attributes.STATUS) == null) {
-        		// file hasn't got status so use default
-        		content.put(Crawler.Attributes.STATUS, config.getDefaultStatus());
-        	}
+        // default status has been set
+        if (config.getDefaultStatus() != null && content.get(Crawler.Attributes.STATUS) == null) {
+            // file hasn't got status so use default
+            content.put(Crawler.Attributes.STATUS, config.getDefaultStatus());
         }
 
-        if (config.getDefaultType() != null) {
-        	// default type has been set
-            if (content.get(Crawler.Attributes.TYPE) == null) {
-                // file hasn't got type so use default
-                content.put(Crawler.Attributes.TYPE, config.getDefaultType());
-            }
+        // default type has been set
+        if (config.getDefaultType() != null && content.get(Crawler.Attributes.TYPE) == null) {
+            // file hasn't got type so use default
+            content.put(Crawler.Attributes.TYPE, config.getDefaultType());
         }
 
         if (content.get(Crawler.Attributes.TYPE) == null || content.get(Crawler.Attributes.STATUS) == null) {
@@ -170,7 +166,7 @@ public abstract class MarkupEngine implements ParserEngine {
         boolean statusFound = false;
         boolean typeFound = false;
 
-        List<String> header = new ArrayList<String>();
+        List<String> header = new ArrayList<>();
 
         for (String line : contents) {
             if (!line.isEmpty()) {
@@ -191,14 +187,12 @@ public abstract class MarkupEngine implements ParserEngine {
             }
         }
 
-        if (headerSeparatorFound) {
-            if ( !header.isEmpty() ) {
-                headerValid = true;
-                for (String headerLine : header) {
-                    if (!headerLine.contains("=")) {
-                        headerValid = false;
-                        break;
-                    }
+        if (headerSeparatorFound && !header.isEmpty()) {
+            headerValid = true;
+            for (String headerLine : header) {
+                if (!headerLine.contains("=")) {
+                    headerValid = false;
+                    break;
                 }
             }
         }
@@ -214,16 +208,13 @@ public abstract class MarkupEngine implements ParserEngine {
      */
     private void processHeader(JBakeConfiguration config, List<String> contents, final Map<String, Object> content) {
         for (String line : contents) {
+            String[] parts = line.split("=", 2);
+
             if (line.equals(config.getHeaderSeparator())) {
                 break;
             }
 
-            if (line.isEmpty()) {
-                continue;
-            }
-
-            String[] parts = line.split("=", 2);
-            if (parts.length != 2) {
+            if (line.isEmpty() || parts.length != 2) {
                 continue;
             }
 
@@ -238,12 +229,11 @@ public abstract class MarkupEngine implements ParserEngine {
 
             if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
                 DateFormat df = new SimpleDateFormat(config.getDateFormat());
-                Date date = null;
                 try {
-                    date = df.parse(value);
+                    Date date = df.parse(value);
                     content.put(key, date);
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    LOGGER.error("unable to parse date {}", value);
                 }
             } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
                 content.put(key, getTags(value));

@@ -19,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
@@ -234,7 +235,7 @@ public class ConfigUtilTest extends LoggingTest {
 
         Object option = config.getAsciidoctorOption("template_dirs");
 
-        assertThat(option instanceof List);
+        assertTrue(option instanceof List);
         assertThat((List<String>)option).contains("src/template1","src/template2");
     }
 

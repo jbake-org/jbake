@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class JettyServer {
-    private final static Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);
 
     /**
      * Run Jetty web server serving out supplied path on supplied port
@@ -48,7 +48,7 @@ public class JettyServer {
             server.start();
             server.join();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("unable to start server", e);
         }
     }
 }
