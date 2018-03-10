@@ -4,6 +4,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,10 +21,13 @@ import java.util.Map;
  * @author Cédric Champeau
  */
 public class DelegatingTemplateEngine extends AbstractTemplateEngine {
-    private final static Logger LOGGER = LoggerFactory.getLogger(DelegatingTemplateEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingTemplateEngine.class);
 
     private final TemplateEngines renderers;
 
+    /**
+     * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
+     */
     @Deprecated
     public DelegatingTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
@@ -40,13 +44,13 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
         model.put("version", config.getVersion());
 
         // TODO: create config model from configuration
-        Map<String, Object> configModel = new HashMap<String, Object>();
+        Map<String, Object> configModel = new HashMap<>();
         Iterator<String> configKeys = config.getKeys();
         while (configKeys.hasNext()) {
             String key = configKeys.next();
             Object valueObject;
 
-            if ( key.equals(JBakeConfiguration.PAGINATE_INDEX) ){
+            if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
                 valueObject = config.getPaginateIndex();
             }
             else {

@@ -19,20 +19,22 @@ import java.util.regex.Pattern;
  */
 public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
-    private Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
 
     private static final String SOURCE_FOLDER_KEY = "sourceFolder";
     private static final String DESTINATION_FOLDER_KEY = "destinationFolder";
     private static final String ASSET_FOLDER_KEY = "assetFolder";
     private static final String TEMPLATE_FOLDER_KEY = "templateFolder";
     private static final String CONTENT_FOLDER_KEY = "contentFolder";
-    private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
-
-
+    private static final Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
+    private static final String DOCTYPE_FILE_POSTFIX = ".file";
+    private static final String DOCTYPE_EXTENSION_POSTFIX = ".extension";
+    private static final String DOCTYPE_TEMPLATE_PREFIX = "template.";
+    private Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
     private CompositeConfiguration compositeConfiguration;
 
     /**
      * Some deprecated implementations just need access to the configuration without access to the source folder
+     *
      * @param configuration The project configuration
      * @deprecated use {@link #DefaultJBakeConfiguration(File, CompositeConfiguration)} instead
      */
@@ -49,13 +51,67 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
-    public File getSourceFolder() {
-        return getAsFolder(SOURCE_FOLDER_KEY);
+    public Object get(String key) {
+        return compositeConfiguration.getProperty(key);
     }
 
     @Override
-    public File getDestinationFolder() {
-        return getAsFolder(DESTINATION_FOLDER_KEY);
+    public String getArchiveFileName() {
+        return getAsString(JBakeProperty.ARCHIVE_FILE);
+    }
+
+    private boolean getAsBoolean(String key) {
+        return compositeConfiguration.getBoolean(key, false);
+    }
+
+    private File getAsFolder(String key) {
+        return (File) get(key);
+    }
+
+    private int getAsInt(String key, int defaultValue) {
+        return compositeConfiguration.getInt(key, defaultValue);
+    }
+
+    private List<String> getAsList(String key) {
+        return Arrays.asList(compositeConfiguration.getStringArray(key));
+    }
+
+    private String getAsString(String key) {
+        return compositeConfiguration.getString(key);
+    }
+
+    private String getAsString(String key, String defaultValue) {
+        return compositeConfiguration.getString(key, defaultValue);
+    }
+
+    @Override
+    public List<String> getAsciidoctorAttributes() {
+        return getAsList(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES);
+    }
+
+    public Object getAsciidoctorOption(String optionKey) {
+        Configuration subConfig = compositeConfiguration.subset(JBakeProperty.ASCIIDOCTOR_OPTION);
+        Object value = subConfig.getProperty(optionKey);
+
+        if (value == null) {
+            logger.warn("Cannot find asciidoctor option '{}.{}'", JBakeProperty.ASCIIDOCTOR_OPTION, optionKey);
+            return "";
+        }
+        return value;
+    }
+
+    @Override
+    public List<String> getAsciidoctorOptionKeys() {
+        List<String> options = new ArrayList<>();
+        Configuration subConfig = compositeConfiguration.subset(JBakeProperty.ASCIIDOCTOR_OPTION);
+
+        Iterator<String> iterator = subConfig.getKeys();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            options.add(key);
+        }
+
+        return options;
     }
 
     @Override
@@ -63,9 +119,52 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsFolder(ASSET_FOLDER_KEY);
     }
 
+    public void setAssetFolder(File assetFolder) {
+        if (assetFolder != null) {
+            setProperty(ASSET_FOLDER_KEY, assetFolder);
+            setProperty(JBakeProperty.ASSET_FOLDER, assetFolder.getName());
+        }
+    }
+
     @Override
-    public File getTemplateFolder() {
-        return getAsFolder(TEMPLATE_FOLDER_KEY);
+    public String getAssetFolderName() {
+        return getAsString(JBakeProperty.ASSET_FOLDER);
+    }
+
+    @Override
+    public boolean getAssetIgnoreHidden() {
+        return getAsBoolean(JBakeProperty.ASSET_IGNORE_HIDDEN);
+    }
+
+    public void setAssetIgnoreHidden(boolean assetIgnoreHidden) {
+        setProperty(JBakeProperty.ASSET_IGNORE_HIDDEN, assetIgnoreHidden);
+    }
+
+    @Override
+    public String getAttributesExportPrefixForAsciidoctor() {
+        return getAsString(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX, "");
+    }
+
+    @Override
+    public String getBuildTimeStamp() {
+        return getAsString(JBakeProperty.BUILD_TIMESTAMP);
+    }
+
+    @Override
+    public boolean getClearCache() {
+        return getAsBoolean(JBakeProperty.CLEAR_CACHE);
+    }
+
+    public void setClearCache(boolean clearCache) {
+        setProperty(JBakeProperty.CLEAR_CACHE, clearCache);
+    }
+
+    public CompositeConfiguration getCompositeConfiguration() {
+        return compositeConfiguration;
+    }
+
+    public void setCompositeConfiguration(CompositeConfiguration configuration) {
+        this.compositeConfiguration = configuration;
     }
 
     @Override
@@ -73,216 +172,78 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsFolder(CONTENT_FOLDER_KEY);
     }
 
-    @Override
-    public String getOutputExtension() {
-        return getAsString(OUTPUT_EXTENSION);
-    }
-
-    @Override
-    public File getTemplateFileByDocType(String docType) {
-        String templateKey = "template." + docType + ".file";
-        String templateFileName = getAsString(templateKey);
-        if ( templateFileName != null ) {
-            return new File(getTemplateFolder(), templateFileName);
+    public void setContentFolder(File contentFolder) {
+        if (contentFolder != null) {
+            setProperty(CONTENT_FOLDER_KEY, contentFolder);
+            setProperty(JBakeProperty.CONTENT_FOLDER, contentFolder.getName());
         }
-        logger.warn("Cannot find configuration key '{}' for document type '{}'", templateKey,docType);
-        return null;
     }
 
     @Override
-    public String getOutputExtensionByDocType(String docType) {
-        String templateExtensionKey = "template."+docType+".extension";
-        String defaultOutputExtension = getOutputExtension();
-        return getAsString(templateExtensionKey, defaultOutputExtension);
+    public String getContentFolderName() {
+        return getAsString(JBakeProperty.CONTENT_FOLDER);
     }
 
     @Override
-    public boolean getPaginateIndex() {
-        return getAsBoolean(PAGINATE_INDEX);
+    public String getDatabasePath() {
+        return getAsString(JBakeProperty.DB_PATH);
+    }
+
+    public void setDatabasePath(String path) {
+        setProperty(JBakeProperty.DB_PATH, path);
     }
 
     @Override
-    public boolean getAssetIgnoreHidden() {
-        return getAsBoolean(ASSET_IGNORE_HIDDEN);
+    public String getDatabaseStore() {
+        return getAsString(JBakeProperty.DB_STORE);
+    }
+
+    public void setDatabaseStore(String storeType) {
+        setProperty(JBakeProperty.DB_STORE, storeType);
     }
 
     @Override
-    public boolean getUriWithoutExtension() {
-        return getAsBoolean(URI_NO_EXTENSION);
-    }
-
-    @Override
-    public boolean getSanitizeTag() {
-        return getAsBoolean(TAG_SANITIZE);
-    }
-
-    @Override
-    public boolean getRenderArchive() {
-        return getAsBoolean(RENDER_ARCHIVE);
-    }
-
-    @Override
-    public boolean getRenderFeed() {
-        return getAsBoolean(RENDER_FEED);
-    }
-
-    @Override
-    public boolean getRenderIndex() {
-        return getAsBoolean(RENDER_INDEX);
-    }
-
-    @Override
-    public boolean getRenderSiteMap() {
-        return getAsBoolean(RENDER_SITEMAP);
-    }
-
-    @Override
-    public boolean getRenderTags() {
-        return getAsBoolean(RENDER_TAGS);
-    }
-
-    @Override
-    public boolean getClearCache() {
-        return getAsBoolean(CLEAR_CACHE);
-    }
-
-    @Override
-    public String getDraftSuffix() {
-        return getAsString(DRAFT_SUFFIX, "");
-    }
-
-    @Override
-    public String getRenderEncoding() {
-        return getAsString(RENDER_ENCODING);
-    }
-
-    @Override
-    public String getTemplateEncoding() {
-        return getAsString(TEMPLATE_ENCODING);
-    }
-
-    @Override
-    public String getThymeleafLocale() {
-        return getAsString(THYMELEAF_LOCALE);
-    }
-
-    @Override
-    public String getVersion() {
-        return getAsString(VERSION);
-    }
-
-    @Override
-    public String getPrefixForUriWithoutExtension() {
-        return getAsString(URI_NO_EXTENSION_PREFIX);
+    public String getDateFormat() {
+        return getAsString(JBakeProperty.DATE_FORMAT);
     }
 
     @Override
     public String getDefaultStatus() {
-        return getAsString(DEFAULT_STATUS);
+        return getAsString(JBakeProperty.DEFAULT_STATUS);
+    }
+
+    public void setDefaultStatus(String status) {
+        setProperty(JBakeProperty.DEFAULT_STATUS, status);
     }
 
     @Override
     public String getDefaultType() {
-        String type = getAsString(DEFAULT_TYPE);
-        if ( type.isEmpty() ) {
+        String type = getAsString(JBakeProperty.DEFAULT_TYPE);
+        if (type.isEmpty()) {
             return null;
         }
         return type;
     }
 
-    @Override
-    public String getDateFormat() {
-        return getAsString(DATE_FORMAT);
+    public void setDefaultType(String type) {
+        setProperty(JBakeProperty.DEFAULT_TYPE, type);
     }
 
     @Override
-    public String getArchiveFileName() {
-        return getAsString(ARCHIVE_FILE);
+    public File getDestinationFolder() {
+        return getAsFolder(DESTINATION_FOLDER_KEY);
     }
 
-    @Override
-    public String getFeedFileName() {
-        return getAsString(FEED_FILE);
-    }
-
-    @Override
-    public String getIndexFileName() {
-        return getAsString(INDEX_FILE);
-    }
-
-    @Override
-    public String getSiteMapFileName() {
-        return getAsString(SITEMAP_FILE);
-    }
-
-    @Override
-    public String getTagPathName() {
-        return getAsString(TAG_PATH);
-    }
-
-    @Override
-    public String getBuildTimeStamp() {
-        return getAsString(BUILD_TIMESTAMP);
-    }
-
-    @Override
-    public String getTemplateFolderName() {
-        return getAsString(TEMPLATE_FOLDER);
-    }
-
-    @Override
-    public String getContentFolderName() {
-        return getAsString(CONTENT_FOLDER);
-    }
-
-    @Override
-    public String getAssetFolderName() {
-        return getAsString(ASSET_FOLDER);
-    }
-
-    @Override
-    public String getExampleProjectByType(String templateType) {
-        return getAsString("example.project."+templateType);
-    }
-
-    @Override
-    public String getDatabaseStore() {
-        return getAsString(DB_STORE);
-    }
-
-    @Override
-    public String getDatabasePath() {
-        return getAsString(DB_PATH);
-    }
-
-    @Override
-    public int getServerPort() {
-        return getAsInt(SERVER_PORT,8080);
-    }
-
-    @Override
-    public int getPostsPerPage() {
-        return getAsInt(POSTS_PER_PAGE, 5);
-    }
-
-    @Override
-    public long getMarkdownMaxParsingTime(long defaultMaxParsingTime) {
-        return getAsLong(MARKDOWN_MAX_PARSING_TIME, defaultMaxParsingTime);
-    }
-
-    @Override
-    public List<String> getMarkdownExtensions() {
-        return getAsList(MARKDOWN_EXTENSIONS);
-    }
-
-    @Override
-    public List<String> getAsciidoctorAttributes() {
-        return getAsList(ASCIIDOCTOR_ATTRIBUTES);
+    public void setDestinationFolder(File destinationFolder) {
+        if (destinationFolder != null) {
+            setProperty(DESTINATION_FOLDER_KEY, destinationFolder);
+            setProperty(JBakeProperty.DESTINATION_FOLDER, destinationFolder.getName());
+        }
     }
 
     @Override
     public List<String> getDocumentTypes() {
-        List<String> docTypes = new ArrayList<String>();
+        List<String> docTypes = new ArrayList<>();
         Iterator<String> keyIterator = compositeConfiguration.getKeys();
         while (keyIterator.hasNext()) {
             String key = keyIterator.next();
@@ -296,28 +257,28 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getDraftSuffix() {
+        return getAsString(JBakeProperty.DRAFT_SUFFIX, "");
+    }
+
+    @Override
+    public String getExampleProjectByType(String templateType) {
+        return getAsString("example.project." + templateType);
+    }
+
+    @Override
     public boolean getExportAsciidoctorAttributes() {
-        return getAsBoolean(ASCIIDOCTOR_ATTRIBUTES_EXPORT);
+        return getAsBoolean(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES_EXPORT);
     }
 
     @Override
-    public String getAttributesExportPrefixForAsciidoctor() {
-        return getAsString(ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX, "");
+    public String getFeedFileName() {
+        return getAsString(JBakeProperty.FEED_FILE);
     }
 
     @Override
-    public String getSiteHost() {
-        return getAsString(SITE_HOST,"http://www.jbake.org");
-    }
-
-    @Override
-    public Object get(String key) {
-        return compositeConfiguration.getProperty(key);
-    }
-
-    @Override
-    public void setProperty(String key, Object value) {
-        compositeConfiguration.setProperty(key, value);
+    public String getIndexFileName() {
+        return getAsString(JBakeProperty.INDEX_FILE);
     }
 
     @Override
@@ -326,37 +287,127 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
-    public List<String> getAsciidoctorOptionKeys() {
-        List<String> options = new ArrayList<String>();
-        Configuration subConfig = compositeConfiguration.subset(ASCIIDOCTOR_OPTION);
+    public List<String> getMarkdownExtensions() {
+        return getAsList(JBakeProperty.MARKDOWN_EXTENSIONS);
+    }
 
-        Iterator<String> iterator = subConfig.getKeys();
-        while ( iterator.hasNext() ) {
-            String key = iterator.next();
-            options.add(key);
-        }
+    public void setMarkdownExtensions(String... extensions) {
+        setProperty(JBakeProperty.MARKDOWN_EXTENSIONS, StringUtils.join(extensions, ","));
+    }
 
-        return options;
+    @Override
+    public String getOutputExtension() {
+        return getAsString(JBakeProperty.OUTPUT_EXTENSION);
+    }
+
+    public void setOutputExtension(String outputExtension) {
+        setProperty(JBakeProperty.OUTPUT_EXTENSION, outputExtension);
+    }
+
+    @Override
+    public String getOutputExtensionByDocType(String docType) {
+        String templateExtensionKey = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_EXTENSION_POSTFIX;
+        String defaultOutputExtension = getOutputExtension();
+        return getAsString(templateExtensionKey, defaultOutputExtension);
+    }
+
+    @Override
+    public boolean getPaginateIndex() {
+        return getAsBoolean(JBakeProperty.PAGINATE_INDEX);
+    }
+
+    public void setPaginateIndex(boolean paginateIndex) {
+        setProperty(JBakeProperty.PAGINATE_INDEX, paginateIndex);
+    }
+
+    @Override
+    public int getPostsPerPage() {
+        return getAsInt(JBakeProperty.POSTS_PER_PAGE, 5);
+    }
+
+    public void setPostsPerPage(int postsPerPage) {
+        setProperty(JBakeProperty.POSTS_PER_PAGE, postsPerPage);
+    }
+
+    @Override
+    public String getPrefixForUriWithoutExtension() {
+        return getAsString(JBakeProperty.URI_NO_EXTENSION_PREFIX);
+    }
+
+    public void setPrefixForUriWithoutExtension(String prefix) {
+        setProperty(JBakeProperty.URI_NO_EXTENSION_PREFIX, prefix);
+    }
+
+    @Override
+    public boolean getRenderArchive() {
+        return getAsBoolean(JBakeProperty.RENDER_ARCHIVE);
+    }
+
+    @Override
+    public String getRenderEncoding() {
+        return getAsString(JBakeProperty.RENDER_ENCODING);
+    }
+
+    @Override
+    public boolean getRenderFeed() {
+        return getAsBoolean(JBakeProperty.RENDER_FEED);
+    }
+
+    @Override
+    public boolean getRenderIndex() {
+        return getAsBoolean(JBakeProperty.RENDER_INDEX);
+    }
+
+    @Override
+    public boolean getRenderSiteMap() {
+        return getAsBoolean(JBakeProperty.RENDER_SITEMAP);
+    }
+
+    @Override
+    public boolean getRenderTags() {
+        return getAsBoolean(JBakeProperty.RENDER_TAGS);
     }
 
     @Override
     public boolean getRenderTagsIndex() {
-        return compositeConfiguration.getBoolean(RENDER_TAGS_INDEX, false);
+        return compositeConfiguration.getBoolean(JBakeProperty.RENDER_TAGS_INDEX, false);
     }
 
     public void setRenderTagsIndex(boolean enable) {
-        compositeConfiguration.setProperty(RENDER_TAGS_INDEX, enable);
+        compositeConfiguration.setProperty(JBakeProperty.RENDER_TAGS_INDEX, enable);
     }
 
-    public Object getAsciidoctorOption(String optionKey) {
-        Configuration subConfig = compositeConfiguration.subset(ASCIIDOCTOR_OPTION);
-        Object value = subConfig.getProperty(optionKey);
+    @Override
+    public boolean getSanitizeTag() {
+        return getAsBoolean(JBakeProperty.TAG_SANITIZE);
+    }
 
-        if ( value == null ) {
-            logger.warn("Cannot find asciidoctor option '{}.{}'", ASCIIDOCTOR_OPTION, optionKey);
-            return "";
-        }
-        return value;
+    @Override
+    public int getServerPort() {
+        return getAsInt(JBakeProperty.SERVER_PORT, 8080);
+    }
+
+    public void setServerPort(int port) {
+        setProperty(JBakeProperty.SERVER_PORT, port);
+    }
+
+    @Override
+    public String getSiteHost() {
+        return getAsString(JBakeProperty.SITE_HOST, "http://www.jbake.org");
+    }
+
+    public void setSiteHost(String siteHost) {
+        setProperty(JBakeProperty.SITE_HOST, siteHost);
+    }
+
+    @Override
+    public String getSiteMapFileName() {
+        return getAsString(JBakeProperty.SITEMAP_FILE);
+    }
+
+    @Override
+    public File getSourceFolder() {
+        return getAsFolder(SOURCE_FOLDER_KEY);
     }
 
     public void setSourceFolder(File sourceFolder) {
@@ -364,145 +415,105 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setupPathsRelativeToSourceFile();
     }
 
+    @Override
+    public String getTagPathName() {
+        return getAsString(JBakeProperty.TAG_PATH);
+    }
 
-    public void setDestinationFolderName(String folderName) {
-        setProperty(DESTINATION_FOLDER, folderName);
-        setupDefaultDestination();
+    @Override
+    public String getTemplateEncoding() {
+        return getAsString(JBakeProperty.TEMPLATE_ENCODING);
+    }
+
+    @Override
+    public File getTemplateFileByDocType(String docType) {
+        String templateKey = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_FILE_POSTFIX;
+        String templateFileName = getAsString(templateKey);
+        if (templateFileName != null) {
+            return new File(getTemplateFolder(), templateFileName);
+        }
+        logger.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, docType);
+        return null;
+    }
+
+    @Override
+    public File getTemplateFolder() {
+        return getAsFolder(TEMPLATE_FOLDER_KEY);
     }
 
     public void setTemplateFolder(File templateFolder) {
-        if ( templateFolder != null ) {
+        if (templateFolder != null) {
             setProperty(TEMPLATE_FOLDER_KEY, templateFolder);
-            setProperty(TEMPLATE_FOLDER, templateFolder.getName());
+            setProperty(JBakeProperty.TEMPLATE_FOLDER, templateFolder.getName());
         }
     }
 
-    public void setContentFolder(File contentFolder) {
-        if ( contentFolder != null ) {
-            setProperty(CONTENT_FOLDER_KEY, contentFolder);
-            setProperty(CONTENT_FOLDER, contentFolder.getName());
-        }
+    @Override
+    public String getTemplateFolderName() {
+        return getAsString(JBakeProperty.TEMPLATE_FOLDER);
     }
 
-    public void setAssetFolder(File assetFolder) {
-        if (assetFolder != null) {
-            setProperty(ASSET_FOLDER_KEY, assetFolder);
-            setProperty(ASSET_FOLDER, assetFolder.getName());
-        }
+    @Override
+    public String getThymeleafLocale() {
+        return getAsString(JBakeProperty.THYMELEAF_LOCALE);
     }
 
-    public void setDestinationFolder(File destinationFolder) {
-        if (destinationFolder != null) {
-            setProperty(DESTINATION_FOLDER_KEY, destinationFolder);
-            setProperty(DESTINATION_FOLDER, destinationFolder.getName());
-        }
+    @Override
+    public boolean getUriWithoutExtension() {
+        return getAsBoolean(JBakeProperty.URI_NO_EXTENSION);
     }
 
-    public void setAssetIgnoreHidden(boolean assetIgnoreHidden) {
-        setProperty(ASSET_IGNORE_HIDDEN, assetIgnoreHidden);
+    public void setUriWithoutExtension(boolean withoutExtension) {
+        setProperty(JBakeProperty.URI_NO_EXTENSION, withoutExtension);
     }
 
-    public void setOutputExtension(String outputExtension) {
-        setProperty(OUTPUT_EXTENSION, outputExtension);
+    @Override
+    public String getVersion() {
+        return getAsString(JBakeProperty.VERSION);
+    }
+
+    public void setDestinationFolderName(String folderName) {
+        setProperty(JBakeProperty.DESTINATION_FOLDER, folderName);
+        setupDefaultDestination();
+    }
+
+    public void setExampleProject(String type, String fileName) {
+        String projectKey = "example.project." + type;
+        setProperty(projectKey, fileName);
+    }
+
+    @Override
+    public void setProperty(String key, Object value) {
+        compositeConfiguration.setProperty(key, value);
     }
 
     public void setTemplateExtensionForDocType(String docType, String extension) {
-        String templateExtensionKey = "template."+docType+".extension";
+        String templateExtensionKey = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_EXTENSION_POSTFIX;
         setProperty(templateExtensionKey, extension);
     }
 
     public void setTemplateFileNameForDocType(String docType, String fileName) {
-        String templateKey = "template." + docType + ".file";
+        String templateKey = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_FILE_POSTFIX;
         setProperty(templateKey, fileName);
     }
 
-    public void setPaginateIndex(boolean paginateIndex) {
-        setProperty(PAGINATE_INDEX, paginateIndex);
+    private void setupDefaultAssetFolder() {
+        String assetFolder = getAsString(JBakeProperty.ASSET_FOLDER);
+        setAssetFolder(new File(getSourceFolder(), assetFolder));
     }
 
-    public void setPostsPerPage(int postsPerPage) {
-        setProperty(POSTS_PER_PAGE, postsPerPage);
+    private void setupDefaultContentFolder() {
+        setContentFolder(new File(getSourceFolder(), getContentFolderName()));
     }
 
-    public void setUriWithoutExtension(boolean withoutExtension) {
-        setProperty(URI_NO_EXTENSION, withoutExtension);
+    private void setupDefaultDestination() {
+        String destinationPath = getAsString(JBakeProperty.DESTINATION_FOLDER);
+        setDestinationFolder(new File(getSourceFolder(), destinationPath));
     }
 
-    public void setPrefixForUriWithoutExtension(String prefix) {
-        setProperty(URI_NO_EXTENSION_PREFIX, prefix);
-    }
-
-    public void setMarkdownExtensions(String... extensions) {
-        setProperty(MARKDOWN_EXTENSIONS, StringUtils.join(extensions, ","));
-    }
-
-    public void setClearCache(boolean clearCache) {
-        setProperty(CLEAR_CACHE, clearCache);
-    }
-
-    public void setServerPort(int port) {
-        setProperty(SERVER_PORT, port);
-    }
-
-    public void setExampleProject(String type, String fileName) {
-        String projectKey = "example.project."+type;
-        setProperty(projectKey, fileName);
-    }
-
-    public void setDatabaseStore(String storeType) {
-        setProperty(DB_STORE, storeType);
-    }
-
-    public void setDatabasePath(String path) {
-        setProperty(DB_PATH, path);
-    }
-
-    public void setDefaultStatus(String status) {
-        setProperty(DEFAULT_STATUS, status);
-    }
-
-    public void setDefaultType(String type) {
-        setProperty(DEFAULT_TYPE, type);
-    }
-
-    public void setSiteHost(String siteHost) {
-        setProperty(SITE_HOST, siteHost);
-    }
-
-    public CompositeConfiguration getCompositeConfiguration() {
-        return compositeConfiguration;
-    }
-
-    public void setCompositeConfiguration(CompositeConfiguration configuration) {
-        this.compositeConfiguration = configuration;
-    }
-
-    private File getAsFolder(String key) {
-        return (File) get(key);
-    }
-
-    private String getAsString(String key) {
-        return compositeConfiguration.getString(key);
-    }
-
-    private String getAsString(String key, String defaultValue) {
-        return compositeConfiguration.getString(key, defaultValue);
-    }
-
-    private boolean getAsBoolean(String key) {
-        return compositeConfiguration.getBoolean(key, false);
-    }
-
-    private int getAsInt(String key, int defaultValue) {
-        return compositeConfiguration.getInt(key, defaultValue);
-    }
-
-    private long getAsLong(String key, long defaultValue) {
-        return compositeConfiguration.getLong(key, defaultValue);
-    }
-
-    private List<String> getAsList(String key) {
-        return Arrays.asList(compositeConfiguration.getStringArray(key));
+    private void setupDefaultTemplateFolder() {
+        String destinationPath = getAsString(JBakeProperty.TEMPLATE_FOLDER);
+        setTemplateFolder(new File(getSourceFolder(), destinationPath));
     }
 
     private void setupPathsRelativeToSourceFile() {
@@ -511,32 +522,13 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setupDefaultContentFolder();
     }
 
-    private void setupDefaultContentFolder() {
-        setContentFolder(new File(getSourceFolder(),getContentFolderName()));
-    }
-
-    private void setupDefaultDestination() {
-        String destinationPath = getAsString(DESTINATION_FOLDER);
-        setDestinationFolder(new File(getSourceFolder(),destinationPath));
-    }
-
-    private void setupDefaultAssetFolder() {
-        String assetFolder = getAsString(ASSET_FOLDER);
-        setAssetFolder(new File(getSourceFolder(), assetFolder));
-    }
-
-    private void setupDefaultTemplateFolder() {
-        String destinationPath = getAsString(TEMPLATE_FOLDER);
-        setTemplateFolder(new File(getSourceFolder(),destinationPath));
-    }
-
     @Override
     public String getHeaderSeparator() {
-        return getAsString(HEADER_SEPARATOR);
+        return getAsString(JBakeProperty.HEADER_SEPARATOR);
     }
 
     public void setHeaderSeparator(String headerSeparator) {
-        setProperty(HEADER_SEPARATOR, headerSeparator);
+        setProperty(JBakeProperty.HEADER_SEPARATOR, headerSeparator);
     }
 
 }
