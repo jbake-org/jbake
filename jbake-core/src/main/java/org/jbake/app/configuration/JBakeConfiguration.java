@@ -221,7 +221,7 @@ public interface JBakeConfiguration {
     boolean getRenderTags();
 
     /**
-     * Flag indicating if tag index file should be generated
+     * @return Flag indicating if tag index file should be generated
      */
     boolean getRenderTagsIndex();
 
