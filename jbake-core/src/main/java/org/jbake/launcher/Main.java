@@ -2,7 +2,6 @@ package org.jbake.launcher;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.FileUtil;
@@ -13,7 +12,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.Locale;
 
 /**
  * Launcher for JBake.
@@ -91,7 +89,7 @@ public class Main {
 			// Help was requested, so we are done here
 			return;
 		}
-		setupLocale(config);
+
 		if (res.isBake()) {
 			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
 			baker.bake(res, config);
@@ -177,9 +175,4 @@ public class Main {
 		}
 	}
 
-	private void setupLocale(CompositeConfiguration config){
-		String localeString = config.getString(Keys.JVM_LOCALE);
-		Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
-		Locale.setDefault(locale);
-	}
 }

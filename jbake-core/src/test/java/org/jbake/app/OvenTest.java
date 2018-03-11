@@ -1,11 +1,5 @@
 package org.jbake.app;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -15,6 +9,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Locale;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class OvenTest {
 
@@ -59,6 +61,29 @@ public class OvenTest {
         oven.bake();
 
         assertThat("There shouldn't be any errors: " + oven.getErrors(), oven.getErrors().isEmpty());
+    }
+
+    @Test
+    public void localeConfiguration() throws Exception {
+        String language = config.getString(ConfigUtil.Keys.JVM_LOCALE);
+
+        final Oven oven = new Oven(rootPath, outputPath, config, true);
+        oven.setupPaths();
+        oven.bake();
+
+        assertThat(Locale.getDefault(), is(new Locale(language)));
+    }
+
+    @Test
+    public void noLocaleConfiguration() throws Exception {
+        config.clearProperty(ConfigUtil.Keys.JVM_LOCALE);
+
+        String language = Locale.getDefault().getLanguage();
+        final Oven oven = new Oven(rootPath, outputPath, config, true);
+        oven.setupPaths();
+        oven.bake();
+
+        assertThat(Locale.getDefault(), is(new Locale(language)));
     }
 
     private void makeAbsolute(Configuration configuration, File source, String key) {

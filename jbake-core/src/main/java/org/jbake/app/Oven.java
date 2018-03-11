@@ -3,6 +3,7 @@ package org.jbake.app;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
@@ -130,6 +131,7 @@ public class Oven {
 	 */
 	public void bake() {
 			final ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+            setupLocale(config);
             updateDocTypesFromConfiguration();
             DBUtil.updateSchema(db);
             try {
@@ -242,4 +244,9 @@ public class Oven {
 		return new ArrayList<Throwable>(errors);
 	}
 
+    private void setupLocale(CompositeConfiguration config){
+        String localeString = config.getString(Keys.JVM_LOCALE);
+        Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
+        Locale.setDefault(locale);
+    }
 }

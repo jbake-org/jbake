@@ -1,7 +1,6 @@
 package org.jbake.launcher;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,10 +11,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 @RunWith( MockitoJUnitRunner.class )
@@ -120,29 +117,6 @@ public class MainTest {
         main.run(stubOptions(args), stubConfig(properties));
 
         verify(mockJetty).run(buildPath,"8820");
-    }
-
-    @Test
-    public void localeConfiguration() throws Exception {
-        CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
-        String language = config.getString(ConfigUtil.Keys.JVM_LOCALE);
-
-        String[] args = {"-s"};
-        main.run(stubOptions(args), config);
-
-        assertThat(Locale.getDefault()).isEqualToComparingOnlyGivenFields(new Locale(language), "language");
-    }
-
-    @Test
-    public void noLocaleConfiguration() throws Exception {
-        CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
-        config.clearProperty(ConfigUtil.Keys.JVM_LOCALE);
-
-        String[] args = {"-s"};
-        String language = Locale.getDefault().getLanguage();
-        main.run(stubOptions(args), config);
-
-        assertThat(Locale.getDefault()).isEqualToComparingOnlyGivenFields(new Locale(language), "language");
     }
 
     private LaunchOptions stubOptions(String[] args) throws CmdLineException {
