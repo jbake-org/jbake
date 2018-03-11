@@ -216,6 +216,8 @@ public class ConfigUtil {
 		 * The configured base URI for the hosted content
 		 */
 		String SITE_HOST = "site.host";
+
+		String JVM_LOCALE = "jvm.locale";
 	}
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);

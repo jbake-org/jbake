@@ -125,13 +125,24 @@ public class MainTest {
     @Test
     public void localeConfiguration() throws Exception {
         CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
-        String language = config.getString("jvm.language");
-        String country = config.getString("jvm.country");
+        String language = config.getString(ConfigUtil.Keys.JVM_LOCALE);
 
         String[] args = {"-s"};
         main.run(stubOptions(args), config);
 
-        assertThat(Locale.getDefault()).isEqualToComparingOnlyGivenFields(new Locale(language, country), "language", "country");
+        assertThat(Locale.getDefault()).isEqualToComparingOnlyGivenFields(new Locale(language), "language");
+    }
+
+    @Test
+    public void noLocaleConfiguration() throws Exception {
+        CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
+        config.clearProperty(ConfigUtil.Keys.JVM_LOCALE);
+
+        String[] args = {"-s"};
+        String language = Locale.getDefault().getLanguage();
+        main.run(stubOptions(args), config);
+
+        assertThat(Locale.getDefault()).isEqualToComparingOnlyGivenFields(new Locale(language), "language");
     }
 
     private LaunchOptions stubOptions(String[] args) throws CmdLineException {
