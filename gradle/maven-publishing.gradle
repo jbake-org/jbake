@@ -19,7 +19,17 @@ def jbakePom = pom {
                 name 'Jonathan Bullock'
                 email 'jonbullock@gmail.com'
                 url 'http://jonathanbullock.com'
-                timezone '0'
+                timezone 'Europe/London'
+            }
+            developer {
+                id 'ancho'
+                name 'Frank Becker'
+                timezone 'Europe/Berlin'
+            }
+            developer {
+                id 'manikmagar'
+                name 'Manik Magar'
+                timezone 'America/New_York'
             }
         }
         scm {
