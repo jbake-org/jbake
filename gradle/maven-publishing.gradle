@@ -30,6 +30,7 @@ def jbakePom = pom {
             developer {
                 id 'manikmagar'
                 name 'Manik Magar'
+                url 'https://manik.magar.me/'
                 timezone 'America/New_York'
             }
         }
