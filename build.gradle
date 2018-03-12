@@ -98,7 +98,7 @@ subprojects {
     }
 
     test {
-        jvmArgs '-XX:MaxPermSize=2048m', '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+        jvmArgs '-Xmx3g', '-Xms512m', '-XX:MaxPermSize=2g', '-XX:MaxDirectMemorySize=2g', '-Dorientdb.installCustomFormatter=false=false'
     }
 
     jacocoTestReport {
