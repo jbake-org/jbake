@@ -25,6 +25,7 @@ def jbakePom = pom {
             developer {
                 id 'ancho'
                 name 'Frank Becker'
+                email 'frank@calmdevelopment.de'
                 timezone 'Europe/Berlin'
             }
             developer {
