@@ -40,7 +40,11 @@ import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author jdlee
@@ -54,7 +58,7 @@ public class ContentStore {
 
     public ContentStore(final String type, String name) {
         startupIfEnginesAreMissing();
-        OPartitionedDatabasePool pool = new OPartitionedDatabasePoolFactory().get(type+":"+name, "admin", "admin");
+        OPartitionedDatabasePool pool = new OPartitionedDatabasePoolFactory().get(type + ":" + name, "admin", "admin");
         pool.setAutoCreate(true);
         db = pool.acquire();
 
@@ -84,6 +88,10 @@ public class ContentStore {
     }
 
     public final void updateSchema() {
+        if (db.isClosed()) {
+            db.create();
+        }
+
         OSchema schema = db.getMetadata().getSchema();
 
         for (String docType : DocumentTypes.getDocumentTypes()) {
@@ -97,6 +105,7 @@ public class ContentStore {
     }
 
     public void close() {
+        db.activateOnCurrentThread();
         db.close();
         DBUtil.closeDataStore();
     }
@@ -113,17 +122,23 @@ public class ContentStore {
 
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
-        if ( Orient.instance().getEngines().size() == 0 ) {
+        if (Orient.instance().getEngines().isEmpty()) {
             Orient.instance().startup();
         }
         OLogManager.instance().setWarnEnabled(true);
     }
 
     public void drop() {
+        db.activateOnCurrentThread();
         db.drop();
     }
 
+    private void activateOnCurrentThread() {
+        db.activateOnCurrentThread();
+    }
+
     public long getDocumentCount(String docType) {
+        activateOnCurrentThread();
         return db.countClass(docType);
     }
 
@@ -138,11 +153,11 @@ public class ContentStore {
     public DocumentList getPublishedPosts() {
         return getPublishedContent("post");
     }
-    
+
     public DocumentList getPublishedPosts(boolean applyPaging) {
         return getPublishedContent("post", applyPaging);
     }
-    
+
     public DocumentList getPublishedPostsByTag(String tag) {
         return query("select * from post where status='published' and ? in tags order by date desc", tag);
     }
@@ -163,13 +178,13 @@ public class ContentStore {
     public DocumentList getPublishedContent(String docType) {
         return getPublishedContent(docType, false);
     }
-    
+
     public DocumentList getPublishedContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " where status='published' order by date desc";
         if (applyPaging) {
-	        if ((start >= 0) && (limit > -1)) {
-	            query += " SKIP " + start + " LIMIT " + limit;
-	        }
+            if ((start >= 0) && (limit > -1)) {
+                query += " SKIP " + start + " LIMIT " + limit;
+            }
         }
         return query(query);
     }
@@ -177,13 +192,13 @@ public class ContentStore {
     public DocumentList getAllContent(String docType) {
         return getAllContent(docType, false);
     }
-    
+
     public DocumentList getAllContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " order by date desc";
         if (applyPaging) {
-	        if ((start >= 0) && (limit > -1)) {
-	            query += " SKIP " + start + " LIMIT " + limit;
-	        }
+            if ((start >= 0) && (limit > -1)) {
+                query += " SKIP " + start + " LIMIT " + limit;
+            }
         }
         return query(query);
     }
@@ -221,22 +236,25 @@ public class ContentStore {
     }
 
     private DocumentList query(String sql) {
+        activateOnCurrentThread();
         List<ODocument> results = db.query(new OSQLSynchQuery<ODocument>(sql));
         return DocumentList.wrap(results.iterator());
     }
 
     private DocumentList query(String sql, Object... args) {
+        activateOnCurrentThread();
         List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(args);
         return DocumentList.wrap(results.iterator());
     }
 
     private void executeCommand(String query, Object... args) {
+        activateOnCurrentThread();
         db.command(new OCommandSQL(query)).execute(args);
     }
 
     public Set<String> getTags() {
         DocumentList docs = this.getAllTagsFromPublishedPosts();
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         for (Map<String, Object> document : docs) {
             String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
             Collections.addAll(result, tags);
@@ -245,7 +263,7 @@ public class ContentStore {
     }
 
     public Set<String> getAllTags() {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList docs = query("select tags from " + docType + " where status='published'");
             for (Map<String, Object> document : docs) {
@@ -257,7 +275,7 @@ public class ContentStore {
     }
 
     private void createDocType(final OSchema schema, final String doctype) {
-        logger.debug("Create document class '{}'", doctype );
+        logger.debug("Create document class '{}'", doctype);
 
         OClass page = schema.createClass(doctype);
         page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);

@@ -1,11 +1,5 @@
 package org.jbake.app;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -15,6 +9,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class OvenTest {
 
@@ -41,7 +41,7 @@ public class OvenTest {
 
     @Test
     public void bakeWithRelativePaths() throws IOException, ConfigurationException {
-        final Oven oven = new Oven(rootPath, outputPath, config, true);
+        Oven oven = new Oven(rootPath, outputPath, config, true);
         oven.setupPaths();
         oven.bake();
 
@@ -54,7 +54,7 @@ public class OvenTest {
         makeAbsolute(config, rootPath, Keys.CONTENT_FOLDER);
         makeAbsolute(config, rootPath, Keys.ASSET_FOLDER);
 
-        final Oven oven = new Oven(rootPath, outputPath, config, true);
+        Oven oven = new Oven(rootPath, outputPath, config, true);
         oven.setupPaths();
         oven.bake();
 

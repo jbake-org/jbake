@@ -26,8 +26,10 @@ package org.jbake.app;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.FakeDocumentBuilder;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -43,12 +45,22 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PaginationTest {
 
-    private CompositeConfiguration config;
-    private ContentStore db;
+    private static ContentStore db;
+
+    @BeforeClass
+    public static void setUpClass() {
+        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
+    }
+
+    @AfterClass
+    public static void cleanUpClass() {
+        db.close();
+        db.shutdown();
+    }
 
     @Before
     public void setup() throws Exception {
-        config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
+        CompositeConfiguration config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
         Iterator<String> keys = config.getKeys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -59,14 +71,13 @@ public class PaginationTest {
         }
         config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
         config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
+
+        db.updateSchema();
     }
 
     @After
-    public void cleanup() throws InterruptedException {
+    public void cleanup() {
         db.drop();
-        db.close();
-        db.shutdown();
     }
 
     @Test
@@ -75,7 +86,7 @@ public class PaginationTest {
         final int PER_PAGE = 2;
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         for (int i = 1; i <= TOTAL_POSTS; i++) {
-        	cal.add(Calendar.SECOND, 5);
+            cal.add(Calendar.SECOND, 5);
             FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
             builder.withName("dummyfile" + i)
                     .withCached(true)
@@ -92,9 +103,9 @@ public class PaginationTest {
             db.setStart(start);
             DocumentList posts = db.getPublishedPosts(true);
 
-            assertThat( posts.size() ).isLessThanOrEqualTo( 2 );
+            assertThat(posts.size()).isLessThanOrEqualTo(2);
 
-            if( posts.size() > 1 ) {
+            if (posts.size() > 1) {
                 assertThat((Date) posts.get(0).get("date")).isAfter((Date) posts.get(1).get("date"));
             }
 

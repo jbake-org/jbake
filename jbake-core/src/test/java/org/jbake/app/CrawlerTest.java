@@ -8,8 +8,10 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,9 +22,20 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest {
+    private static ContentStore db;
     private CompositeConfiguration config;
-    private ContentStore db;
     private File sourceFolder;
+
+    @BeforeClass
+    public static void setUpClass() {
+        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
+    }
+
+    @AfterClass
+    public static void cleanUpClass() {
+        db.close();
+        db.shutdown();
+    }
 
     @Before
     public void setup() throws Exception {
@@ -33,16 +46,15 @@ public class CrawlerTest {
             throw new Exception("Cannot find sample data structure!");
         }
 
+        db.updateSchema();
+
         config = ConfigUtil.load(sourceFolder);
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
     }
 
     @After
-    public void cleanup() throws InterruptedException {
+    public void cleanup() {
         db.drop();
-        db.close();
-        db.shutdown();
     }
 
     @Test
@@ -101,8 +113,8 @@ public class CrawlerTest {
 
             Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
             Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-            
-            assertThat(model).containsEntry("rootpath","../../../");
+
+            assertThat(model).containsEntry("rootpath", "../../../");
         }
     }
 
@@ -111,6 +123,10 @@ public class CrawlerTest {
 
         public RegexMatcher(String regex) {
             this.regex = regex;
+        }
+
+        public static RegexMatcher matches(String regex) {
+            return new RegexMatcher(regex);
         }
 
         @Override
@@ -122,10 +138,6 @@ public class CrawlerTest {
         @Override
         public void describeTo(Description description) {
             description.appendText("matches regex: " + regex);
-        }
-
-        public static RegexMatcher matches(String regex) {
-            return new RegexMatcher(regex);
         }
     }
 }
