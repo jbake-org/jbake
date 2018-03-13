@@ -2,7 +2,6 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.model.DocumentTypes;
 import org.junit.Before;
@@ -11,7 +10,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,25 +20,25 @@ public class OvenTest {
     public TemporaryFolder folder = new TemporaryFolder();
     private CompositeConfiguration config;
     private File rootPath;
-	private File outputPath;
+    private File outputPath;
 
     @Before
     public void setup() throws Exception {
-    	// reset values to known state otherwise previous test case runs can affect the success of this test case
-    	DocumentTypes.resetDocumentTypes();
-		
-    	URL sourceUrl = this.getClass().getResource("/fixture");
-		rootPath = new File(sourceUrl.getFile());
+        // reset values to known state otherwise previous test case runs can affect the success of this test case
+        DocumentTypes.resetDocumentTypes();
+
+        URL sourceUrl = this.getClass().getResource("/fixture");
+        rootPath = new File(sourceUrl.getFile());
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
         outputPath = folder.newFolder("destination");
-		config = ConfigUtil.load(rootPath);
-		config.setProperty(Keys.TEMPLATE_FOLDER, "freemarkerTemplates");
-	}
+        config = ConfigUtil.load(rootPath);
+        config.setProperty(Keys.TEMPLATE_FOLDER, "freemarkerTemplates");
+    }
 
     @Test
-    public void bakeWithRelativePaths() throws IOException, ConfigurationException {
+    public void bakeWithRelativePaths() {
         Oven oven = new Oven(rootPath, outputPath, config, true);
         oven.setupPaths();
         oven.bake();
@@ -49,7 +47,7 @@ public class OvenTest {
     }
 
     @Test
-    public void bakeWithAbsolutePaths() throws IOException, ConfigurationException {
+    public void bakeWithAbsolutePaths() {
         makeAbsolute(config, rootPath, Keys.TEMPLATE_FOLDER);
         makeAbsolute(config, rootPath, Keys.CONTENT_FOLDER);
         makeAbsolute(config, rootPath, Keys.ASSET_FOLDER);

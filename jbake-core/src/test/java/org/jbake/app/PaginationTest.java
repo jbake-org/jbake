@@ -25,11 +25,8 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.FakeDocumentBuilder;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -43,20 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author jdlee
  */
-public class PaginationTest {
+public class PaginationTest extends ContentStoreIntegrationTest {
 
-    private static ContentStore db;
-
-    @BeforeClass
-    public static void setUpClass() {
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
-    }
-
-    @AfterClass
-    public static void cleanUpClass() {
-        db.close();
-        db.shutdown();
-    }
 
     @Before
     public void setup() throws Exception {
@@ -71,13 +56,6 @@ public class PaginationTest {
         }
         config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
         config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
-
-        db.updateSchema();
-    }
-
-    @After
-    public void cleanup() {
-        db.drop();
     }
 
     @Test

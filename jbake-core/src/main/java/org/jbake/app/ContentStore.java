@@ -105,7 +105,7 @@ public class ContentStore {
     }
 
     public void close() {
-        db.activateOnCurrentThread();
+        activateOnCurrentThread();
         db.close();
         DBUtil.closeDataStore();
     }
@@ -129,7 +129,7 @@ public class ContentStore {
     }
 
     public void drop() {
-        db.activateOnCurrentThread();
+        activateOnCurrentThread();
         db.drop();
     }
 
@@ -181,10 +181,8 @@ public class ContentStore {
 
     public DocumentList getPublishedContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " where status='published' order by date desc";
-        if (applyPaging) {
-            if ((start >= 0) && (limit > -1)) {
-                query += " SKIP " + start + " LIMIT " + limit;
-            }
+        if (applyPaging && hasStartAndLimitBoundary()) {
+            query += " SKIP " + start + " LIMIT " + limit;
         }
         return query(query);
     }
@@ -195,12 +193,14 @@ public class ContentStore {
 
     public DocumentList getAllContent(String docType, boolean applyPaging) {
         String query = "select * from " + docType + " order by date desc";
-        if (applyPaging) {
-            if ((start >= 0) && (limit > -1)) {
-                query += " SKIP " + start + " LIMIT " + limit;
-            }
+        if (applyPaging && hasStartAndLimitBoundary()) {
+            query += " SKIP " + start + " LIMIT " + limit;
         }
         return query(query);
+    }
+
+    private boolean hasStartAndLimitBoundary() {
+        return (start >= 0) && (limit > -1);
     }
 
     public DocumentList getAllTagsFromPublishedPosts() {

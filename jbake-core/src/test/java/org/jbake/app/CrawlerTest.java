@@ -1,17 +1,13 @@
 package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jbake.app.ConfigUtil.Keys;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,21 +17,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CrawlerTest {
-    private static ContentStore db;
+public class CrawlerTest extends ContentStoreIntegrationTest {
     private CompositeConfiguration config;
     private File sourceFolder;
 
-    @BeforeClass
-    public static void setUpClass() {
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
-    }
-
-    @AfterClass
-    public static void cleanUpClass() {
-        db.close();
-        db.shutdown();
-    }
 
     @Before
     public void setup() throws Exception {
@@ -46,19 +31,12 @@ public class CrawlerTest {
             throw new Exception("Cannot find sample data structure!");
         }
 
-        db.updateSchema();
-
         config = ConfigUtil.load(sourceFolder);
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
     }
 
-    @After
-    public void cleanup() {
-        db.drop();
-    }
-
     @Test
-    public void crawl() throws ConfigurationException {
+    public void crawl() {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
@@ -92,7 +70,7 @@ public class CrawlerTest {
 
     @Test
     public void renderWithPrettyUrls() throws Exception {
-        Map<String, Object> testProperties = new HashMap<String, Object>();
+        Map<String, Object> testProperties = new HashMap<>();
         testProperties.put(Keys.URI_NO_EXTENSION, true);
         testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
 

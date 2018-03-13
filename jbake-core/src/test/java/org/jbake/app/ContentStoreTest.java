@@ -1,38 +1,11 @@
 package org.jbake.app;
 
 import org.jbake.FakeDocumentBuilder;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ContentStoreTest {
-
-    private static ContentStore db;
-
-    @BeforeClass
-    public static void setUpClass() {
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
-    }
-
-    @AfterClass
-    public static void cleanUpClass() {
-        db.close();
-        db.shutdown();
-    }
-
-    @Before
-    public void setUp() {
-        db.updateSchema();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        db.drop();
-    }
+public class ContentStoreTest extends ContentStoreIntegrationTest {
 
     @Test
     public void shouldGetCountForPublishedDocuments() throws Exception {

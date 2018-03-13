@@ -26,7 +26,7 @@ package org.jbake.app.template;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil;
-import org.jbake.app.ContentStore;
+import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
@@ -35,10 +35,8 @@ import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -58,9 +56,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author jdlee
  */
-public abstract class AbstractTemplateEngineRenderingTest {
+public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIntegrationTest {
 
-    protected static ContentStore db;
     protected final String templateDir;
     protected final String templateExtension;
     protected final Map<String, List<String>> outputStrings = new HashMap<>();
@@ -77,17 +74,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
         this.templateExtension = templateExtension;
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
-    }
-
-    @AfterClass
-    public static void cleanUpClass() {
-        db.close();
-        db.shutdown();
     }
 
     @Before
@@ -122,8 +108,6 @@ public abstract class AbstractTemplateEngineRenderingTest {
             }
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
-
-        db.updateSchema();
 
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
@@ -173,8 +157,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     }
 
     @After
-    public void cleanup() throws InterruptedException {
-        db.drop();
+    public void cleanup() {
         DocumentTypes.resetDocumentTypes();
         ModelExtractors.getInstance().reset();
         Locale.setDefault(currentLocale);
