@@ -75,31 +75,10 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         renderer.renderIndexPaging("index.html");
 
         File paginatedFile = new File(destinationFolder, "index2.html");
-        assertFalse("paginated file is not rendered",paginatedFile.exists());
+        assertFalse("paginated file is not rendered", paginatedFile.exists());
 
         File indexFile = new File(destinationFolder, "index.html");
-        assertTrue("index file exists",indexFile.exists());
-
-    }
-    
-    @Test
-    public void checkDbTemplateModelIsPopulated() throws Exception {
-    	
-        config.setProperty(Keys.PAGINATE_INDEX, true);
-        config.setProperty(Keys.POSTS_PER_PAGE, 1);
-        
-        outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
-        
-        db.deleteAllByDocType("post");
-
-        renderer.renderIndexPaging("index.html");
-
-        File outputFile = new File(destinationFolder, "index.html");
-        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
-
-        for (String string : getOutputStrings("dbSpan")) {
-            assertThat(output).contains(string);
-        }
+        assertTrue("index file exists", indexFile.exists());
 
     }
 

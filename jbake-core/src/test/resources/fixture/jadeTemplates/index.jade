@@ -10,4 +10,6 @@ block content
                     p #{formatter.format(post.date, 'dd MMMM yyyy')} - #{post.body.substring(0, 150)}...
 
             a(href='/archive.html') Archive
+
+    span #{db.getPublishedPages().size()}
     hr

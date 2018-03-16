@@ -25,17 +25,31 @@ package org.jbake.app.template;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.*;
+import org.jbake.app.ConfigUtil;
+import org.jbake.app.ContentStore;
+import org.jbake.app.Crawler;
+import org.jbake.app.DBUtil;
+import org.jbake.app.Parser;
+import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -270,6 +284,27 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
+
+    }
+
+    @Test
+    public void checkDbTemplateModelIsPopulated() throws Exception {
+
+        config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
+        config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
+
+        outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
+
+        db.deleteAllByDocType("post");
+
+        renderer.renderIndexPaging("index.html");
+
+        File outputFile = new File(destinationFolder, "index.html");
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+
+        for (String string : getOutputStrings("dbSpan")) {
+            assertThat(output).contains(string);
+        }
 
     }
 }
