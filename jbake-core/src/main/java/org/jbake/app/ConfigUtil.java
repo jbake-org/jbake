@@ -136,7 +136,7 @@ public class ConfigUtil {
         /**
          * String used to separate the header from the body.
          */
-        String HEADER_SEPARATOR = "render.separator";
+		String HEADER_SEPARATOR = "header.separator";
 		/**
 		 * Port used when running Jetty server
 		 */
