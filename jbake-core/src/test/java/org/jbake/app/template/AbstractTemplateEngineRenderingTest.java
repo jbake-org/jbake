@@ -27,6 +27,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil;
 import org.jbake.app.ContentStore;
+import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
@@ -56,24 +57,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author jdlee
  */
-public abstract class AbstractTemplateEngineRenderingTest {
+public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIntegrationTest {
 
+    protected final String templateDir;
+    protected final String templateExtension;
+    protected final Map<String, List<String>> outputStrings = new HashMap<>();
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
     protected File sourceFolder;
     protected File destinationFolder;
     protected File templateFolder;
     protected CompositeConfiguration config;
-    protected ContentStore db;
-
-    protected final String templateDir;
-    protected final String templateExtension;
-    protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
-    private Crawler crawler;
-    private Parser parser;
     protected Renderer renderer;
     protected Locale currentLocale;
+    private Parser parser;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
@@ -112,9 +109,8 @@ public abstract class AbstractTemplateEngineRenderingTest {
             }
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
 
-        crawler = new Crawler(db, sourceFolder, config);
+        Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         parser = new Parser(config, sourceFolder.getPath());
         renderer = new Renderer(db, destinationFolder, templateFolder, config);
@@ -162,10 +158,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     }
 
     @After
-    public void cleanup() throws InterruptedException {
-        db.drop();
-        db.close();
-        db.shutdown();
+    public void cleanup() {
         DocumentTypes.resetDocumentTypes();
         ModelExtractors.getInstance().reset();
         Locale.setDefault(currentLocale);
@@ -254,7 +247,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderTags() throws Exception {
-        renderer.renderTags( "tags");
+        renderer.renderTags("tags");
 
         // verify
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");

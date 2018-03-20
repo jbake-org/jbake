@@ -1,27 +1,11 @@
 package org.jbake.app;
 
 import org.jbake.FakeDocumentBuilder;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ContentStoreTest {
-
-    private ContentStore db;
-
-    @Before
-    public void setUp() throws Exception {
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        db.drop();
-        db.close();
-        db.shutdown();
-    }
+public class ContentStoreTest extends ContentStoreIntegrationTest {
 
     @Test
     public void shouldGetCountForPublishedDocuments() throws Exception {
@@ -40,8 +24,8 @@ public class ContentStoreTest {
                 .withRandomSha1()
                 .build();
 
-        assertEquals( 6, db.getDocumentCount("post"));
-        assertEquals( 5, db.getPublishedCount("post"));
+        assertEquals(6, db.getDocumentCount("post"));
+        assertEquals(5, db.getPublishedCount("post"));
     }
 
 }

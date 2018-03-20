@@ -17,6 +17,9 @@ matrix:
         dist: precise
       - os: osx
 
+before_install:
+  - unset _JAVA_OPTIONS
+
 install: true
 
 script:
