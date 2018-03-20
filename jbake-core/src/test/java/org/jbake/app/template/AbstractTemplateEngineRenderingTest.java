@@ -26,6 +26,7 @@ package org.jbake.app.template;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil;
+import org.jbake.app.ContentStore;
 import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.DBUtil;
@@ -276,6 +277,27 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
 
     protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
+
+    }
+
+    @Test
+    public void checkDbTemplateModelIsPopulated() throws Exception {
+
+        config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
+        config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
+
+        outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
+
+        db.deleteAllByDocType("post");
+
+        renderer.renderIndexPaging("index.html");
+
+        File outputFile = new File(destinationFolder, "index.html");
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+
+        for (String string : getOutputStrings("dbSpan")) {
+            assertThat(output).contains(string);
+        }
 
     }
 }

@@ -6,7 +6,6 @@ import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.Crawler.Attributes;
-import org.jbake.app.DocumentList;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.LazyContextVariable;
@@ -14,18 +13,22 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>A template engine which renders pages using Thymeleaf.</p>
- * <p>
+ *
  * <p>This template engine is not recommended for large sites because the whole model
  * is loaded into memory due to Thymeleaf internal limitations.</p>
- * <p>
+ *
  * <p>The default rendering mode is "HTML", but it is possible to use another mode
  * for each document type, by adding a key in the configuration, for example:</p>
- * <p>
+ *
  * <code>
  * template.feed.thymeleaf.mode=XML
  * </code>
@@ -36,7 +39,6 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private final ReentrantLock lock = new ReentrantLock();
 
     private TemplateEngine templateEngine;
-    private FileTemplateResolver templateResolver;
 
     private String templateMode;
 
@@ -49,7 +51,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
             return;
         }
         templateMode = mode;
-        templateResolver = new FileTemplateResolver();
+        FileTemplateResolver templateResolver = new FileTemplateResolver();
         templateResolver.setPrefix(templatesPath.getAbsolutePath() + File.separatorChar);
         templateResolver.setCharacterEncoding(config.getString(Keys.TEMPLATE_ENCODING));
         templateResolver.setTemplateMode(mode);
@@ -110,11 +112,10 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
                                     }
                                 };
                             } else {
-                                // All other cases, as far as I know, are document collections
-                                return new LazyContextVariable<DocumentList>() {
+                                return new LazyContextVariable<Object>() {
                                     @Override
-                                    protected DocumentList loadValue() {
-                                        return (DocumentList) extractedValue;
+                                    protected Object loadValue() {
+                                        return extractedValue;
                                     }
                                 };
                             }
