@@ -10,7 +10,7 @@ plugins {
 // common variables
 ext {
     asciidoctorjVersion = '1.5.6'
-    asciidoctorjDiagramVersion = '1.5.4.1'
+    asciidoctorjDiagramVersion = '1.5.8'
     commonsIoVersion = '2.6'
     commonsConfigurationVersion = '1.10'
     commonsLangVersion = '3.7'
@@ -18,18 +18,18 @@ ext {
     args4jVersion = '2.33'
     freemarkerVersion = '2.3.27-incubating'
     junit4Version = '4.12'
-    flexmarkVersion = '0.28.38'
+    flexmarkVersion = '0.32.18'
     jettyServerVersion = '9.2.24.v20180105'
     orientDbVersion = '2.2.33'
-    groovyVersion = '2.4.13'
+    groovyVersion = '2.4.14'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
     assertjCoreVersion = '2.9.0'
     thymeleafVersion = '3.0.9.RELEASE'
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.7'
-    mockitoVersion = '2.13.0'
-    jsoupVersion = '1.10.3'
+    mockitoVersion = '2.16.0'
+    jsoupVersion = '1.11.2'
 }
 
 /**
