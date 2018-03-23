@@ -4,7 +4,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.jbake.app.Crawler;
 import org.jbake.model.DocumentAttributes;
 
-import javax.xml.bind.DatatypeConverter;
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -88,7 +88,7 @@ public class FakeDocumentBuilder {
         byte[] content = new byte[size];
 
         random.nextBytes(content);
-        return DatatypeConverter.printHexBinary(sha1Digest.digest(content));
+        return new BigInteger(sha1Digest.digest(content)).toString(16);
     }
 
     private boolean hasDate() {
