@@ -1,11 +1,11 @@
 package org.jbake.template;
 
+import org.apache.commons.configuration.Configuration;
+import org.jbake.app.ContentStore;
+
 import java.io.File;
 import java.io.Writer;
 import java.util.Map;
-import org.jbake.app.ContentStore;
-
-import org.apache.commons.configuration.Configuration;
 
 
 /**
@@ -39,5 +39,5 @@ public abstract class AbstractTemplateEngine {
         this.templatesPath = templatesPath;
     }
 
-    public abstract void renderDocument(Map<String,Object> model, String templateName, Writer writer) throws RenderingException;
+    public abstract void renderDocument(Map<String, Object> model, String templateName, Writer writer) throws RenderingException;
 }

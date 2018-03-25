@@ -25,41 +25,52 @@ package org.jbake.app.template;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.jbake.app.*;
+import org.jbake.app.ConfigUtil;
+import org.jbake.app.ContentStore;
+import org.jbake.app.ContentStoreIntegrationTest;
+import org.jbake.app.Crawler;
+import org.jbake.app.DBUtil;
+import org.jbake.app.Parser;
+import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author jdlee
  */
-public abstract class AbstractTemplateEngineRenderingTest {
+public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIntegrationTest {
 
+    protected final String templateDir;
+    protected final String templateExtension;
+    protected final Map<String, List<String>> outputStrings = new HashMap<>();
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
     protected File sourceFolder;
     protected File destinationFolder;
     protected File templateFolder;
     protected CompositeConfiguration config;
-    protected ContentStore db;
-
-    protected final String templateDir;
-    protected final String templateExtension;
-    protected final Map<String, List<String>> outputStrings = new HashMap<String, List<String>>();
-    private Crawler crawler;
-    private Parser parser;
     protected Renderer renderer;
     protected Locale currentLocale;
+    private Parser parser;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
@@ -98,9 +109,8 @@ public abstract class AbstractTemplateEngineRenderingTest {
             }
         }
         Assert.assertEquals(".html", config.getString(ConfigUtil.Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDataStore("memory", "documents"+System.currentTimeMillis());
 
-        crawler = new Crawler(db, sourceFolder, config);
+        Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
         parser = new Parser(config, sourceFolder.getPath());
         renderer = new Renderer(db, destinationFolder, templateFolder, config);
@@ -148,10 +158,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
     }
 
     @After
-    public void cleanup() throws InterruptedException {
-        db.drop();
-        db.close();
-        db.shutdown();
+    public void cleanup() {
         DocumentTypes.resetDocumentTypes();
         ModelExtractors.getInstance().reset();
         Locale.setDefault(currentLocale);
@@ -240,7 +247,7 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     @Test
     public void renderTags() throws Exception {
-        renderer.renderTags( "tags");
+        renderer.renderTags("tags");
 
         // verify
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
@@ -270,6 +277,27 @@ public abstract class AbstractTemplateEngineRenderingTest {
 
     protected List<String> getOutputStrings(String type) {
         return outputStrings.get(type);
+
+    }
+
+    @Test
+    public void checkDbTemplateModelIsPopulated() throws Exception {
+
+        config.setProperty(ConfigUtil.Keys.PAGINATE_INDEX, true);
+        config.setProperty(ConfigUtil.Keys.POSTS_PER_PAGE, 1);
+
+        outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
+
+        db.deleteAllByDocType("post");
+
+        renderer.renderIndexPaging("index.html");
+
+        File outputFile = new File(destinationFolder, "index.html");
+        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+
+        for (String string : getOutputStrings("dbSpan")) {
+            assertThat(output).contains(string);
+        }
 
     }
 }

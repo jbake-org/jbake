@@ -20,7 +20,7 @@ ext {
     junit4Version = '4.12'
     flexmarkVersion = '0.28.38'
     jettyServerVersion = '9.2.24.v20180105'
-    orientDbVersion = '2.2.30'
+    orientDbVersion = '2.2.33'
     groovyVersion = '2.4.13'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
@@ -98,7 +98,7 @@ subprojects {
     }
 
     test {
-        jvmArgs '-XX:MaxPermSize=2048m', '-XX:MaxDirectMemorySize=512m', '-Dorientdb.installCustomFormatter=false=false'
+        jvmArgs '-Xmx3g', '-Xms512m', '-XX:MaxPermSize=2g', '-XX:MaxDirectMemorySize=2g', '-Dorientdb.installCustomFormatter=false=false'
     }
 
     jacocoTestReport {
