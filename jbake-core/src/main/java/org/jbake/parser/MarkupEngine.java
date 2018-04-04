@@ -114,7 +114,7 @@ public abstract class MarkupEngine implements ParserEngine {
 
         if (content.get(Crawler.Attributes.TYPE) == null || content.get(Crawler.Attributes.STATUS) == null) {
             // output error
-            LOGGER.warn("Error parsing meta data from header (missing type or status value) for file {}!", file);
+            LOGGER.warn("Parsing skipped (missing type or status value in header meta data) for file {}!", file);
             return null;
         }
 
