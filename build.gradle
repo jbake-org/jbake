@@ -71,8 +71,20 @@ subprojects {
         apply from: "$rootDir/gradle/publishing.gradle"
     }
 
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    // add source and target compatibility for all JavaCompile tasks
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
+
+        /**
+         *  Fix for warning: [options] bootstrap class path not set in conjunction with -source
+         *  See https://stackoverflow.com/questions/42599422/warning-options-bootstrap-class-path-not-set-in-conjunction-with-source-1-7
+         */
+        File file = file("${System.properties.getProperty("java.home")}/lib/rt.jar")
+        if ( file.exists() ) {
+            options.setBootstrapClasspath(files(file))
+        }
+    }
 
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
@@ -97,8 +109,19 @@ subprojects {
         }
     }
 
-    test {
-        jvmArgs '-Xmx3g', '-Xms512m', '-XX:MaxPermSize=2g', '-XX:MaxDirectMemorySize=2g', '-Dorientdb.installCustomFormatter=false=false'
+    //set jvm for all Test tasks (like test and smokeTest)
+    tasks.withType(Test) {
+
+        def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']
+
+        /**
+         * jdk9 build is unable to determine the amount of MaxDirectMemorySize
+         * See https://pastebin.com/ECvQeHx0
+         */
+        if ( JavaVersion.current().java9Compatible ) {
+            args << '-XX:MaxDirectMemorySize=2g'
+        }
+        jvmArgs args
     }
 
     jacocoTestReport {
