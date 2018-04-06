@@ -23,6 +23,25 @@ You can execute the build using one of the following commands from the root of t
 
 To get an overview of all available tasks with a short description run `./gradlew tasks`
 
+== Structure
+
+There are 3 projects
+
+root aka. jbake-base::
+    configures subprojects, jacoco execution aggregation and coveralls
+
+jbake-core::
+    - the core library. produces jbake-core-{version}.jar (`build/libs`)
+    - publishes to bintray maven repository jbake-core
+
+jbake-dist::
+    - bundles the cli to an distribution (`build/distribution`)
+    - publishes to bintray binary repository jbake
+    - publish to sdkman
+
+If you want to run a task in a specific project from root run ./gradlew :jbake-core:test for example.
+
+
 == Test
 
 === run the tests
@@ -34,7 +53,9 @@ While developing this is the most common task you should execute.
 
 This task compiles and executes all tests within `src/test` and produces a report afterwards.
 
-You can find the report at `build/reports/tests/test` and can view it with your browser. This is very useful if something went wrong. You find the full stacktrace and output there.
+You can find the report at `jbake-core/build/reports/tests/test/index.html` and can view it with your browser.
+This is very useful if something went wrong.
+You find the full stacktrace and output there.
 
 === know what's going on
 
@@ -43,17 +64,21 @@ The task is not very verbose. An successful execution looks like the following l
 .successful test execution
 ----
 ./gradlew test
-:compileJava UP-TO-DATE
-:processResources UP-TO-DATE
-:classes UP-TO-DATE
-:compileTestJava UP-TO-DATE
-:processTestResources UP-TO-DATE
-:testClasses UP-TO-DATE
-:test
 
-BUILD SUCCESSFUL
+> Task :jbake-core:compileJava
+warning: [options] bootstrap class path not set in conjunction with -source 1.7
+1 warning
 
-Total time: 1 mins 2.236 secs
+> Task :jbake-core:compileTestJava
+warning: [options] bootstrap class path not set in conjunction with -source 1.7
+1 warning
+
+> Task :jbake-core:test
+OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=2g; support was removed in 8.0
+
+
+BUILD SUCCESSFUL in 53s
+6 actionable tasks: 6 executed
 ----
 
 You can set different log levels with the command option `-i` for info or `-d` for debug. (e.g.: `./gradlew -i test`)
@@ -66,19 +91,13 @@ To execute the tests as soon as some input file changes run the task with
 ----
 ./gradlew -t test
 Continuous build is an incubating feature.
-:compileJava UP-TO-DATE
-:processResources UP-TO-DATE
-:classes UP-TO-DATE
-:compileTestJava UP-TO-DATE
-:processTestResources UP-TO-DATE
-:testClasses UP-TO-DATE
-:test UP-TO-DATE
 
-BUILD SUCCESSFUL
-
-Total time: 0.996 secs
+BUILD SUCCESSFUL in 0s
+6 actionable tasks: 1 executed, 5 up-to-date
 
 Waiting for changes to input files of tasks... (ctrl-d to exit)
+<-------------> 0% WAITING
+> IDLE
 ----
 
 === smoke tests
@@ -87,20 +106,29 @@ The `jbake-dist` module has a task called `smokeTest`.
 It executes the produced application, initializes a jbake project for each supported example project and bake it.
 
 The `check` task depends on the `smokeTest` task and is part of the travis CI execution.
+You can find the report at `jbake-dist/build/reports/tests/smokeTest/`
 
 === code coverage
 
 To generate a nice code coverage report run the following task.
 
 ----
-./gradlew jacocoRootTestReport
+./gradlew jacocoRootReport
 ----
 
 It compiles your code, execute your tests, collect data and generate a report with {jacoco-web}. It produces XML and html reports. The xml file is used to trigger the {coveralls} service with the `coveralls` task.
 
 The reports can be found at `build/reports/jacoco/jacocoRootReport/html`.
 
-NOTE: This is an aggregation of all project modules. You can generate coverage reports for each module with `./gradlew jacocoTestReport` or for a particular module `./gradlew :jbake-cli:jacocoTestReport`
+[NOTE]
+====
+This is an aggregation of all project modules.
+
+You can generate coverage reports for each module with `./gradlew jacocoTestReport`
+or for a particular module `./gradlew :jbake-core:jacocoTestReport`.
+
+The report can be found at `<module>/build/reports/jacoco/test/html/`
+====
 
 plugin:: https://docs.gradle.org/current/userguide/jacoco_plugin.html
 // TODO: write something about smokeTests and check
@@ -119,38 +147,13 @@ It clones the example projects from github, creates zip files, generates start s
 
 ----
 ./gradlew build
-:cloneProjectExampleRepositories
-:example_project_freemarkerZip
-:example_project_groovy-mteZip
-:example_project_groovyZip
-:example_project_jadeZip
-:example_project_thymeleafZip
-:compileJava UP-TO-DATE
-:processResources UP-TO-DATE
-:classes UP-TO-DATE
-:jar
-:startScripts
-:distTar
-:distZip
-:javadoc
-:javadocJar
-:sourcesJar
-:signArchives
-:assemble
-:compileTestJava UP-TO-DATE
-:processTestResources UP-TO-DATE
-:testClasses UP-TO-DATE
-:test UP-TO-DATE
-:check UP-TO-DATE
-:build
 
-BUILD SUCCESSFUL
-
-Total time: 14.734 secs
+BUILD SUCCESSFUL in 47s
+28 actionable tasks: 10 executed, 18 up-to-date
 ----
 
-If successful you can find everything in the `build` directory.
-The distribution package can be found at `build/distributions` and is called `jbake-{version}-bin.zip`
+If successful you can find everything in the `jbake-dist/build` directory.
+The distribution package can be found at `jbake-dist/build/distributions` and is called `jbake-{version}-bin.zip`
 
 === install local
 
@@ -160,7 +163,7 @@ You can install the distribution locally.
 ./gradlew installDist
 ----
 
-The distribution can be found in an exploded directory called `build/install/jbake`.
+The distribution can be found in an exploded directory called `jbake-dist/build/install/jbake`.
 
 NOTE: This task does not run checks. It just compiles and bundles the distribution.
 
