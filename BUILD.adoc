@@ -39,7 +39,7 @@ jbake-dist::
     - publishes to bintray binary repository jbake
     - publish to sdkman
 
-If you want to run a task in a specific project from root run ./gradlew :jbake-core:test for example.
+If you want to run a task in a specific project from root run `./gradlew :jbake-core:test` for example.
 
 
 == Test
