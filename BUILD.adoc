@@ -65,18 +65,6 @@ The task is not very verbose. An successful execution looks like the following l
 ----
 ./gradlew test
 
-> Task :jbake-core:compileJava
-warning: [options] bootstrap class path not set in conjunction with -source 1.7
-1 warning
-
-> Task :jbake-core:compileTestJava
-warning: [options] bootstrap class path not set in conjunction with -source 1.7
-1 warning
-
-> Task :jbake-core:test
-OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=2g; support was removed in 8.0
-
-
 BUILD SUCCESSFUL in 53s
 6 actionable tasks: 6 executed
 ----
