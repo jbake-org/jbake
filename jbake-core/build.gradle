@@ -5,24 +5,24 @@ description = "The core library of JBake"
 dependencies {
     compile "commons-io:commons-io:$commonsIoVersion"
     compile "commons-configuration:commons-configuration:$commonsConfigurationVersion"
-    compile "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    compile "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
     compile "org.apache.commons:commons-lang3:$commonsLangVersion"
     compile("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {
         exclude group: "junit", module: "junit"
     }
     compile "com.orientechnologies:orientdb-core:$orientDbVersion"
-    compile "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
-    compile "org.codehaus.groovy:groovy-templates:$groovyVersion"
-    compile "org.freemarker:freemarker:$freemarkerVersion"
-    compile "org.thymeleaf:thymeleaf:$thymeleafVersion"
-    compile "de.neuland-bfi:jade4j:$jade4jVersion"
-    compile "com.vladsch.flexmark:flexmark:$flexmarkVersion"
-    compile "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    compile "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
+    compile "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
+    compile "org.freemarker:freemarker:$freemarkerVersion", optional
+    compile "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
+    compile "de.neuland-bfi:jade4j:$jade4jVersion", optional
+    compile "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
+    compile "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     compile "org.jsoup:jsoup:$jsoupVersion"
 
     // cli specific dependencies
-    compile "org.eclipse.jetty:jetty-server:$jettyServerVersion"
-    compile "args4j:args4j:$args4jVersion"
+    compile "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
+    compile "args4j:args4j:$args4jVersion", optional
 }
 
 processResources {

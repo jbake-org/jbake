@@ -5,6 +5,7 @@ plugins {
     id "com.jfrog.bintray"              version "1.8.0"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
     id 'com.github.ben-manes.versions'  version '0.17.0'
+    id "nebula.optional-base"           version "3.3.0"     apply false
 }
 
 // common variables
@@ -60,6 +61,7 @@ allprojects {
 subprojects {
 
     apply plugin: 'java'
+    apply plugin: 'nebula.optional-base'
 
     if( JavaVersion.current().java7Compatible ) {
         apply from: "$rootDir/gradle/signing.gradle"
@@ -77,8 +79,8 @@ subprojects {
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
         compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
-        compile "ch.qos.logback:logback-classic:$logbackVersion"
-        compile "ch.qos.logback:logback-core:$logbackVersion"
+        compile "ch.qos.logback:logback-classic:$logbackVersion", optional
+        compile "ch.qos.logback:logback-core:$logbackVersion", optional
         testCompile "junit:junit:$junit4Version"
         testCompile "org.assertj:assertj-core:$assertjCoreVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
