@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.After;
@@ -25,7 +26,7 @@ public abstract class ContentStoreIntegrationTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        URL sourceUrl = ContentStoreIntegrationTest.class.getClass().getResource("/fixture");
+        URL sourceUrl = TestUtils.class.getResource("/fixture");
 
         sourceFolder = new File(sourceUrl.getFile());
         if (!sourceFolder.exists()) {
