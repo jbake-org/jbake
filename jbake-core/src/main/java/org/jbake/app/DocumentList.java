@@ -23,7 +23,4 @@ public class DocumentList extends LinkedList<Map<String,Object>> {
         return list;
     }
 
-    public DocumentList() {
-    }
-
 }
