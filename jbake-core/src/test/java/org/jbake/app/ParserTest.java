@@ -190,7 +190,7 @@ public class ParserTest {
     }
 
     @Test
-    public void parseFileWithInvalidExtension(){
+    public void parseInvalidExtension(){
         Map<String, Object> map = parser.processFile(invalidFileExtension);
         Assert.assertNull(map);
     }
