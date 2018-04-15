@@ -5,17 +5,8 @@ dist: trusty
 
 addons:
   hosts:
-    - jbake-builder
+  - jbake-builder
   hostname: jbake-builder
-
-matrix:
-    include:
-      - jdk: oraclejdk9
-      - jdk: oraclejdk8
-      - jdk: openjdk8
-      - jdk: openjdk7
-        dist: precise
-      - os: osx
 
 before_install:
   - unset _JAVA_OPTIONS
@@ -23,13 +14,36 @@ before_install:
 install: true
 
 script:
-  - ./gradlew check -i
-
-after_success:
-  - ./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean
+- "./gradlew check -i"
 
 after_failure:
-  - ./gradlew clean check --debug
+- "./gradlew clean check -debug --stacktrace"
+
+after_success:
+- "./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean"
+
+jdk:
+  - oraclejdk9
+  - oraclejdk8
+  - openjdk8
+
+jobs:
+  include:
+
+  - script: "./gradlew check"
+    jdk: openjdk7
+    dist: precise
+
+  - script: "./gradlew check"
+    jdk:
+    os: osx
+
+  - stage: Quality Check
+    jdk: oraclejdk8
+    script:
+    - "./gradlew jacocoRootReport"
+    after_success:
+    - "./gradlew sonarqube -i --stacktrace"
 
 notifications:
   irc: "irc.freenode.org#jbake"
@@ -46,5 +60,8 @@ before_cache:
 
 cache:
   directories:
-     - $HOME/.gradle/caches/
-     - $HOME/.gradle/wrapper/
+     - "$HOME/.m2/repository"
+     - "$HOME/.gradle/caches/"
+     - "$HOME/.gradle/wrapper/"
+     - "$HOME/.sonar/cache"
+     - ".gradle"
