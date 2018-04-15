@@ -102,6 +102,10 @@ public class ConfigUtil {
 		 */
 		String INDEX_FILE = "index.file";
 		/**
+		 * Output filename for error 404 file, is only used when {@link #RENDER_ERROR404} is true
+		 */
+		String ERROR404_FILE = "error404.file";
+		/**
 		 * File extension to be used for all output files
 		 */
 		String OUTPUT_EXTENSION = "output.extension";
@@ -133,6 +137,10 @@ public class ConfigUtil {
 		 * Flag indicating if tag index file should be generated
 		 */
 		String RENDER_TAGS_INDEX = "render.tagsindex";
+		/**
+		 * Flag indicating if error 404 file should be generated
+		 */
+		String RENDER_ERROR404= "render.error404";
         /**
          * String used to separate the header from the body.
          */

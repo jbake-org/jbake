@@ -325,6 +325,16 @@ public class Renderer {
     }
 
     /**
+     * Render an 404 file using the predefined template.
+     *
+     * @param errorFile      The name of the output file
+     * @throws Exception    if default rendering configuration is not loaded correctly
+     */
+    public void renderError404(String errorFile) throws Exception {
+        render(new DefaultRenderingConfig(errorFile, "error404"));
+    }
+
+    /**
      * Render tag files using the supplied content.
      *
      * @param tagPath The output path

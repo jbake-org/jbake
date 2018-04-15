@@ -1,0 +1,13 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+      <head th:replace="header.thyme::head"/>
+      <body>
+      <div th:replace="header.thyme::top"/>
+
+      <h1>404 Not found</h1>
+      <h2>The requested page is not found.</h2>
+    <div th:replace="footer.thyme::footer"></div>
+    </body>
+</html>
