@@ -39,7 +39,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         given:
 
         if (Jvm.current.java9Compatible) {
-            Assume.assumeTrue("Skipping if jdk9 compatible",jdk9Compatible)
+            Assume.assumeTrue("Skip. Not jdk9 compatible",jdk9Compatible)
         }
 
         gradleVersion = version
