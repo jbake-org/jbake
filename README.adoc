@@ -71,9 +71,10 @@ Jbake uses several engines. The library versions could be changed too:
 ----
 jbake {
     pegdownVersion = '1.6.0'
-    freemarkerVersion = '2.3.26-incubating'
-    groovyTemplatesVersion = '2.4.10'
-    jade4jVersion = '1.2.5'
+    flexmarkVersion = '0.32.20'
+    freemarkerVersion = '2.3.28'
+    groovyTemplatesVersion = '2.4.15'
+    jade4jVersion = '1.2.7'
     thymeleafVersion = '3.0.2.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'
     asciidoctorjVersion = '1.5.5'
@@ -84,6 +85,8 @@ Notice the `asciidoctorJavaIntegrationVersion` and `asciidoctorjVersion`. Since 
 to the asciidoctorj library.
 
 This plugin handles this change internally. If you use a Version > 2.3.0 of jbake, the dependency switch to the new one.
+
+Since Version 2.6.0 jbake uses https://github.com/vsch/flexmark-java[flexmark] as replacement for https://github.com/sirthias/pegdown[pegdown].
 
 === JBake configuration
 There are several options to configure http://www.jbake.org[JBake]. One is to have the regular `jbake.properties` file
@@ -109,5 +112,15 @@ jbake {
 
 WARNING: You must still define at least one repository from where all JBake and template engine dependencies should
 be resolved. Failure to do so will result in a build error.
+
+== JDK 9 Compatibility Notes
+
+JBake uses a jdk7 compatible version of orientdb. There are issues with jdk9 builds which are unable to determine the `MaxDirectMemorySize`.
+
+If you are running into this issue you can add the `-XX:MaxDirectMemorySize` JVM Option to your _gradle.properties_ file.
+
+```
+org.gradle.jvmargs=-XX:MaxDirectMemorySize=1g
+```
 
 

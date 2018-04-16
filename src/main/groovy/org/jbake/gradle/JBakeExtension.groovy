@@ -20,12 +20,13 @@ package org.jbake.gradle
  */
 class JBakeExtension {
 
-    String version = '2.6.0'
+    String version = '2.6.1'
     String pegdownVersion = '1.6.0'
-    String freemarkerVersion = '2.3.27-incubating'
+    String flexmarkVersion = '0.32.20'
+    String freemarkerVersion = '2.3.28'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
     String asciidoctorjVersion = '1.5.6'
-    String groovyTemplatesVersion = '2.4.13'
+    String groovyTemplatesVersion = '2.4.15'
     String jade4jVersion = '1.2.7'
     String thymeleafVersion = '3.0.9.RELEASE'
     String srcDirName = 'src/jbake'

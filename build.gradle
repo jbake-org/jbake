@@ -42,6 +42,7 @@ gradlePlugin {
 }
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 
@@ -127,6 +128,25 @@ project.tasks.withType(Test) {
             }
         }
     }
+
+    def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']
+
+    /**
+     * AppVeyor breaks with mockito throwing a java.lang.OutOfMemoryError: PermGen space
+     */
+    if ( JavaVersion.current().java7 ) {
+        args << '-XX:MaxPermSize=2g'
+    }
+
+    /**
+     * jdk9 build is unable to determine the amount of MaxDirectMemorySize
+     * See https://pastebin.com/ECvQeHx0
+     */
+    if ( JavaVersion.current().java9Compatible ) {
+        args << '-XX:MaxDirectMemorySize=2g'
+    }
+    jvmArgs args
+
 }
 
 jacoco {
