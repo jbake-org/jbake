@@ -62,14 +62,15 @@ class JBakePluginSpec extends Specification {
         }
 
         where:
-        group                   | name                  | version
-        'org.jbake'             | 'jbake-core'          | '2.6.0'
-        'org.freemarker'        | 'freemarker'          | '2.3.27-incubating'
-        'org.pegdown'           | 'pegdown'             | '1.6.0'
-        'org.asciidoctor'       | 'asciidoctorj'        | '1.5.6'
-        'org.codehaus.groovy'   | 'groovy-templates'    | '2.4.13'
-        'org.thymeleaf'         | 'thymeleaf'           | '3.0.9.RELEASE'
-        'de.neuland-bfi'        | 'jade4j'              | '1.2.7'
+        group                   | name                          | version
+        'org.jbake'             | 'jbake-core'                  | '2.6.1'
+        'org.freemarker'        | 'freemarker'                  | '2.3.28'
+        'com.vladsch.flexmark'  | 'flexmark'                    | '0.32.20'
+        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.32.20'
+        'org.asciidoctor'       | 'asciidoctorj'                | '1.5.6'
+        'org.codehaus.groovy'   | 'groovy-templates'            | '2.4.15'
+        'org.thymeleaf'         | 'thymeleaf'                   | '3.0.9.RELEASE'
+        'de.neuland-bfi'        | 'jade4j'                      | '1.2.7'
     }
 
     def "set dependency version by extension"() {
@@ -111,6 +112,34 @@ class JBakePluginSpec extends Specification {
             it.group == 'org.asciidoctor' &&
                 it.name == 'asciidoctor-java-integration' &&
                 it.version == '0.1.4'
+        }
+
+    }
+
+    def "switch to flexmark if version >= 2.6.0"() {
+        given:
+        project.jbake.version = '2.6.0'
+
+        when:
+        project.evaluate()
+
+        then:
+        project.configurations.jbake.dependencies.find {
+            it.group == 'com.vladsch.flexmark' && it.name == 'flexmark'
+        }
+
+    }
+
+    def "use pegdown if version is < 2.6.0"() {
+        given:
+        project.jbake.version = '2.5.1'
+
+        when:
+        project.evaluate()
+
+        then:
+        project.configurations.jbake.dependencies.find {
+            it.group == 'org.pegdown' && it.name == 'pegdown'
         }
 
     }

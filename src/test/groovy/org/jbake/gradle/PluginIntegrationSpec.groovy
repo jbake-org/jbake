@@ -31,6 +31,11 @@ class PluginIntegrationSpec extends Specification {
     void setup() {
         folder.create()
         buildFile = folder.newFile('build.gradle')
+        File gradleProperties = folder.newFile('gradle.properties')
+
+        gradleProperties.withWriter {
+            it.append("org.gradle.jvmargs=-XX:MaxDirectMemorySize=1g")
+        }
     }
 
     void cleanup() {

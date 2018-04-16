@@ -63,14 +63,23 @@ class JBakePlugin implements Plugin<Project> {
 
             Version currentVersion = Version.valueOf(extension.version)
             Version jbake2_3_0 = Version.valueOf('2.3.0')
+            Version jbake2_6_0 = Version.valueOf('2.6.0')
+
             if (currentVersion.greaterThan(jbake2_3_0)) {
                 jbake("org.asciidoctor:asciidoctorj:${extension.asciidoctorjVersion}")
             } else {
                 jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorJavaIntegrationVersion}")
             }
 
+            if (currentVersion.greaterThanOrEqualTo(jbake2_6_0)) {
+                jbake("com.vladsch.flexmark:flexmark:${extension.flexmarkVersion}")
+                jbake("com.vladsch.flexmark:flexmark-profile-pegdown:${extension.flexmarkVersion}")
+            }
+            else {
+                jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
+            }
+
             jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
-            jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
             jbake("org.codehaus.groovy:groovy-templates:${extension.groovyTemplatesVersion}")
             jbake("de.neuland-bfi:jade4j:${extension.jade4jVersion}")
             jbake("org.thymeleaf:thymeleaf:${extension.thymeleafVersion}")

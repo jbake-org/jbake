@@ -16,8 +16,10 @@
 package org.jbake.gradle
 
 import org.gradle.testkit.runner.BuildResult
-import spock.lang.Unroll
+import org.junit.Assume
 import spock.lang.Shared
+import spock.lang.Unroll
+import spock.util.environment.Jvm
 
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -28,9 +30,18 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
     @Shared
     def latestGradleVersion = '4.6'
 
+    @Shared
+    def latestJbakeVersion = '2.6.1'
+
     @Unroll
     def 'Setup and bake with gradle #version'() {
+
         given:
+
+        if (Jvm.current.java9Compatible) {
+            Assume.assumeTrue("Skipping if jdk9 compatible",jdk9Compatible)
+        }
+
         gradleVersion = version
         File jbakeSourceDir = newFolder('src', 'jbake')
         File jbakeDestinationDir = new File(projectDir, 'build/jbake')
@@ -38,35 +49,34 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         copyResources('example-project', jbakeSourceDir.path)
 
-        buildFile << '''
+        buildFile << """
             plugins {
                 id 'org.jbake.site'
             }
 
             jbake {
-                asciidoctorjVersion = '1.5.4.1'
-                version = '2.4.0'
+                version = '$latestJbakeVersion'
                 configuration['render.tags'] = true
             }
-        '''
+        """
 
         when:
         BuildResult result = runTasksWithSucess('bake', '--info')
 
         then:
         result.task(':bake').outcome == SUCCESS
-        result.output.contains('Baked 5 items')
+        result.output.contains('Baked 11 items')
 
         blogTagFile.size() > 0
 
         where:
-        version << [
-            '2.8',    // lower limit of Tooling API compatibility for TestKit
-            '2.12',   // introduces changes such as compileOnly
-            '2.14.1', // latest release in 2.x line
-            '3.0',    // first release in 3.x line, compatibility changes
-            latestGradleVersion     // latest release, deprecations & warnings
-        ]
+        version                 | jdk9Compatible
+          '2.8'                 | false     // lower limit of Tooling API compatibility for TestKit
+          '2.12'                | false     // introduces changes such as compileOnly
+          '2.14.1'              | false     // latest release in 2.x line
+          '3.0'                 | false     // first release in 3.x line, compatibility changes
+           latestGradleVersion  | true      // latest release, deprecations & warnings
+
     }
 
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
@@ -82,8 +92,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
             }
 
             jbake {
-                asciidoctorjVersion = '1.5.4.1'
-                version = '2.4.0'
+                version = '$latestJbakeVersion'
                 includeDefaultRepositories = $includeDefaultRepositories
                 configuration['render.tags'] = true
             }
@@ -118,8 +127,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
             }
 
             jbake {
-                asciidoctorjVersion = '1.5.4.1'
-                version = '2.4.0'
+                version = '$latestJbakeVersion'
                 includeDefaultRepositories = false
                 configuration['render.tags'] = true
             }

@@ -26,6 +26,7 @@ script:
 
 matrix:
   include:
+    - jdk: oraclejdk9
     - jdk: oraclejdk8
     - jdk: openjdk8
     - jdk: openjdk7
