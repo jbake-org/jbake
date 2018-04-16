@@ -19,15 +19,14 @@ public class TagsExtractor implements ModelExtractor<DocumentList> {
 		String tagPath = config.get(Keys.TAG_PATH.replace(".", "_")).toString();
 		
 		for (String tag : db.getAllTags()){
-			Map<String, Object> newTag = new HashMap<String, Object>();
-			String tagName = tag;
-			newTag.put("name",tagName);
+			Map<String, Object> newTag = new HashMap<>();
+			newTag.put("name", tag);
 			
 			String uri = tagPath + File.separator + tag + config.get(Keys.OUTPUT_EXTENSION.replace(".", "_")).toString();
 			
 			newTag.put("uri", uri);
-			newTag.put("tagged_posts", db.getPublishedPostsByTag(tagName));
-			newTag.put("tagged_documents", db.getPublishedDocumentsByTag(tagName));
+			newTag.put("tagged_posts", db.getPublishedPostsByTag(tag));
+			newTag.put("tagged_documents", db.getPublishedDocumentsByTag(tag));
 			dl.push(newTag);
 		}
 		return dl;

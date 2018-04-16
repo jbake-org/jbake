@@ -16,13 +16,15 @@ import java.util.Set;
  */
 public class DocumentTypes {
 
-	private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<String>();
-    private static final Set<DocumentTypeListener> LISTENERS = new HashSet<DocumentTypeListener>();
+	private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<>();
+    private static final Set<DocumentTypeListener> LISTENERS = new HashSet<>();
 
     static {
     	resetDocumentTypes();
     }
-    
+
+    private DocumentTypes() {}
+
     public static void resetDocumentTypes() {
     	DEFAULT_DOC_TYPES.clear();
     	DEFAULT_DOC_TYPES.addAll(Arrays.asList("page", "post", "masterindex", "archive", "feed"));

@@ -153,7 +153,7 @@ public class Crawler {
     }
 
     private String createUri(String uri) {
-        return uri.substring(0, uri.lastIndexOf(".")) + config.getString(Keys.OUTPUT_EXTENSION);
+        return uri.substring(0, uri.lastIndexOf('.')) + config.getString(Keys.OUTPUT_EXTENSION);
     }
 
     private String createNoExtensionUri(String uri) {

@@ -21,6 +21,11 @@ import java.util.Map;
  */
 public class Renderer {
 
+    private static final String MASTERINDEX_TEMPLATE_NAME = "masterindex";
+    private static final String SITEMAP_TEMPLATE_NAME = "sitemap";
+    private static final String FEED_TEMPLATE_NAME = "feed";
+    private static final String ARCHIVE_TEMPLATE_NAME = "archive";
+
     private interface RenderingConfig {
 
         File getPath();
@@ -178,8 +183,8 @@ public class Renderer {
     public void render(Map<String, Object> content) throws Exception {
         String docType = (String) content.get(Crawler.Attributes.TYPE);
         String outputFilename = destination.getPath() + File.separatorChar + ((String)content.get(Attributes.URI)).replace("/",File.separator);
-        if (outputFilename.lastIndexOf(".") > outputFilename.lastIndexOf(File.separatorChar)) {
-            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf("."));
+        if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
+            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'));
         }
 
         // delete existing versions if they exist in case status has changed either way
@@ -243,7 +248,7 @@ public class Renderer {
      */
     public void renderIndex(String indexFile) throws Exception {
 
-        render(new DefaultRenderingConfig(indexFile, "masterindex"));
+        render(new DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME));
     }
 
     public void renderIndexPaging(String indexFile) throws Exception {
@@ -267,12 +272,12 @@ public class Renderer {
 
                     db.setStart(pageStart);
                     model.put("currentPageNumber", page);
-                    String previous = pagingHelper.getPreviousFileName(page, fileName);
+                    String previous = pagingHelper.getPreviousFileName(page);
                     model.put("previousFileName", previous);
-                    String nextFileName = pagingHelper.getNextFileName(page, fileName);
+                    String nextFileName = pagingHelper.getNextFileName(page);
                     model.put("nextFileName", nextFileName);
                     
-                    Map<String, Object> contentModel =  buildSimpleModel("masterindex");
+                    Map<String, Object> contentModel =  buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
                     
                     if(page > 1){
                     	contentModel.put(Attributes.ROOTPATH, "../");
@@ -281,7 +286,7 @@ public class Renderer {
 
                     // Add page number to file name
                     fileName = pagingHelper.getCurrentFileName(page, fileName);
-                    ModelRenderingConfig renderConfig = new ModelRenderingConfig(fileName, model, "masterindex");
+                    ModelRenderingConfig renderConfig = new ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME);
                     render(renderConfig);
                 }
                 db.resetPagination();
@@ -301,7 +306,7 @@ public class Renderer {
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
     public void renderSitemap(String sitemapFile) throws Exception {
-        render(new DefaultRenderingConfig(sitemapFile, "sitemap"));
+        render(new DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME));
     }
 
     /**
@@ -311,7 +316,7 @@ public class Renderer {
      * @throws Exception    if default rendering configuration is not loaded correctly
      */
     public void renderFeed(String feedFile) throws Exception {
-        render(new DefaultRenderingConfig(feedFile, "feed"));
+        render(new DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME));
     }
 
     /**
@@ -321,7 +326,7 @@ public class Renderer {
      * @throws Exception    if default rendering configuration is not loaded correctly
      */
     public void renderArchive(String archiveFile) throws Exception {
-        render(new DefaultRenderingConfig(archiveFile, "archive"));
+        render(new DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME));
     }
 
     /**

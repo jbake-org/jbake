@@ -4,6 +4,7 @@ plugins {
     id "io.sdkman.vendors"              version "1.1.1"     apply false
     id "com.jfrog.bintray"              version "1.8.0"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
+    id "org.sonarqube"                  version "2.6.2"     apply false
     id 'com.github.ben-manes.versions'  version '0.17.0'
     id "nebula.optional-base"           version "3.3.0"     apply false
 }
@@ -17,12 +18,12 @@ ext {
     commonsLangVersion = '3.7'
     commonsVfs2Version = '2.2'
     args4jVersion = '2.33'
-    freemarkerVersion = '2.3.27-incubating'
+    freemarkerVersion = '2.3.28'
     junit4Version = '4.12'
-    flexmarkVersion = '0.32.18'
+    flexmarkVersion = '0.32.20'
     jettyServerVersion = '9.2.24.v20180105'
     orientDbVersion = '2.2.33'
-    groovyVersion = '2.4.14'
+    groovyVersion = '2.4.15'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
     assertjCoreVersion = '2.9.0'
@@ -31,6 +32,16 @@ ext {
     jade4jVersion = '1.2.7'
     mockitoVersion = '2.16.0'
     jsoupVersion = '1.11.2'
+
+    isTravis = (System.getenv("TRAVIS") == "true")
+    isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
+    pullRequestId = System.getenv("TRAVIS_PULL_REQUEST")
+    hasGithub = System.getenv("GITHUBTOKEN") && System.getenv("GITHUBREPO")
+    hasSonar = System.getenv("SONARORG") && System.getenv("SONARLOGIN")
+    sonarDefaultURL = "https://sonarcloud.io"
+    sonarDefaultProjectKey = "org.jbake:jbake-base:jbake-core"
+    sonarURL = System.getenv("SONARHOST") ?: sonarDefaultURL
+    sonarProjectKey = System.getenv("SONARPROJECTKEY") ?: sonarDefaultProjectKey
 }
 
 /**
@@ -73,8 +84,20 @@ subprojects {
         apply from: "$rootDir/gradle/publishing.gradle"
     }
 
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
+    // add source and target compatibility for all JavaCompile tasks
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
+
+        /**
+         *  Fix for warning: [options] bootstrap class path not set in conjunction with -source
+         *  See https://stackoverflow.com/questions/42599422/warning-options-bootstrap-class-path-not-set-in-conjunction-with-source-1-7
+         */
+        File file = file("${System.properties.getProperty("java.home")}/lib/rt.jar")
+        if ( file.exists() ) {
+            options.setBootstrapClasspath(files(file))
+        }
+    }
 
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
@@ -99,8 +122,26 @@ subprojects {
         }
     }
 
-    test {
-        jvmArgs '-Xmx3g', '-Xms512m', '-XX:MaxPermSize=2g', '-XX:MaxDirectMemorySize=2g', '-Dorientdb.installCustomFormatter=false=false'
+    //set jvm for all Test tasks (like test and smokeTest)
+    tasks.withType(Test) {
+
+        def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']
+
+        /**
+         * AppVeyor breaks with mockito throwing a java.lang.OutOfMemoryError: PermGen space
+         */
+        if ( JavaVersion.current().java7 ) {
+            args << '-XX:MaxPermSize=2g'
+        }
+
+        /**
+         * jdk9 build is unable to determine the amount of MaxDirectMemorySize
+         * See https://pastebin.com/ECvQeHx0
+         */
+        if ( JavaVersion.current().java9Compatible ) {
+            args << '-XX:MaxDirectMemorySize=2g'
+        }
+        jvmArgs args
     }
 
     jacocoTestReport {
