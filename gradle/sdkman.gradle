@@ -6,10 +6,10 @@ ext.sdkman_consumer_token = project.hasProperty('sdkman_consumer_token')?sdkman_
 sdkman {
     consumerKey = project.sdkman_consumer_key
     consumerToken = project.sdkman_consumer_token
-    candidate = rootProject.name
+    candidate = "jbake"
     version = rootProject.version
     hashtag = "#JBake"
-    url = "https://bintray.com/jbake/binary/download_file?file_path=${distZip.archiveName}"
+    url = "https://dl.bintray.com/jbake/binary/${distZip.archiveName}"
 }
 
 task distributionAvailable() {

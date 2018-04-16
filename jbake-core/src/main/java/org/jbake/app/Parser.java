@@ -15,7 +15,7 @@ import java.util.Map;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class Parser {
-    private final static Logger LOGGER = LoggerFactory.getLogger(Parser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Parser.class);
 
     private Configuration config;
     private String contentPath;
