@@ -12,19 +12,22 @@
         <a class="btn btn-large btn-success" href="#">Sign up today</a>
       </div>
 
-	<hr/>-->
+    <hr/>-->
 
-	<div class="row-fluid marketing">
-		<div class="span12">
-			<div th:each="post : ${posts}">
-			<h4><a th:href='${post.uri}' th:text='${post.title}' href="post_uri.html">Post title</a></h4>
-			<p th:text='${#dates.format(post.date,"dd MMMM yyyy") + " - " + #strings.substring(post.body,0, 150)}'>...</p>
-			</div>
-			<a href="/archive.html">Archive</a>
-		</div>
-	</div>
+    <div class="row-fluid marketing">
+        <div class="span12">
+            <div th:each="post : ${posts}">
+            <h4><a th:href='${post.uri}' th:text='${post.title}' href="post_uri.html">Post title</a></h4>
+            <p th:text='${#dates.format(post.date,"dd MMMM yyyy") + " - " + #strings.substring(post.body,0, 150)}'>...</p>
+            </div>
+            <a href="/archive.html">Archive</a>
+        </div>
+    </div>
+
+    <span th:text='${db.getPublishedPages().size()}'>count of published pages</span>
 
 	<hr/>
+
 
     <div th:replace="footer.thyme::footer"></div>
     </body>

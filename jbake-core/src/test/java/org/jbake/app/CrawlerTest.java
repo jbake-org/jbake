@@ -1,13 +1,11 @@
 package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jbake.app.ConfigUtil.Keys;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,10 +17,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CrawlerTest {
+public class CrawlerTest extends ContentStoreIntegrationTest {
     private CompositeConfiguration config;
-    private ContentStore db;
     private File sourceFolder;
+
 
     @Before
     public void setup() throws Exception {
@@ -35,18 +33,10 @@ public class CrawlerTest {
 
         config = ConfigUtil.load(sourceFolder);
         Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
-    }
-
-    @After
-    public void cleanup() throws InterruptedException {
-        db.drop();
-        db.close();
-        db.shutdown();
     }
 
     @Test
-    public void crawl() throws ConfigurationException {
+    public void crawl() {
         Crawler crawler = new Crawler(db, sourceFolder, config);
         crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
 
@@ -80,7 +70,7 @@ public class CrawlerTest {
 
     @Test
     public void renderWithPrettyUrls() throws Exception {
-        Map<String, Object> testProperties = new HashMap<String, Object>();
+        Map<String, Object> testProperties = new HashMap<>();
         testProperties.put(Keys.URI_NO_EXTENSION, true);
         testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
 
@@ -101,8 +91,8 @@ public class CrawlerTest {
 
             Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
             Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-            
-            assertThat(model).containsEntry("rootpath","../../../");
+
+            assertThat(model).containsEntry("rootpath", "../../../");
         }
     }
 
@@ -111,6 +101,10 @@ public class CrawlerTest {
 
         public RegexMatcher(String regex) {
             this.regex = regex;
+        }
+
+        public static RegexMatcher matches(String regex) {
+            return new RegexMatcher(regex);
         }
 
         @Override
@@ -122,10 +116,6 @@ public class CrawlerTest {
         @Override
         public void describeTo(Description description) {
             description.appendText("matches regex: " + regex);
-        }
-
-        public static RegexMatcher matches(String regex) {
-            return new RegexMatcher(regex);
         }
     }
 }

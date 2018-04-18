@@ -1,6 +1,9 @@
 package org.jbake.model;
 
 public class DocumentTypeUtils {
+
+    private DocumentTypeUtils() {}
+
     public static String unpluralize(String pluralized) {
 
         if ((pluralized == null) || (pluralized.length() == 0)) {

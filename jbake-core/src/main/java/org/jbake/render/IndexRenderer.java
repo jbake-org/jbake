@@ -1,7 +1,6 @@
 package org.jbake.render;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil;
 import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
