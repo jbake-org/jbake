@@ -37,14 +37,12 @@ public class ZipUtil {
 					outputFile.mkdir();
 				}
 			} else {
-				FileOutputStream fos = new FileOutputStream(outputFile);
-				
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
+				try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+					int len;
+					while ((len = zis.read(buffer)) > 0) {
+						fos.write(buffer, 0, len);
+					}
 				}
-
-				fos.close();
 			}
 		}
 	}
