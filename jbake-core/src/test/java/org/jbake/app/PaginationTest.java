@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PaginationTest extends ContentStoreIntegrationTest {
 
     @Before
-    public void setup() {
+    public void setUpOwn() {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             String fileBaseName = docType;
             if (docType.equals("masterindex")) {

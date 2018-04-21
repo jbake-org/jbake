@@ -29,8 +29,6 @@ public class MdParserTest {
 
     public DefaultJBakeConfiguration config;
 
-    private File configFile;
-
     private File validMdFileBasic;
 
     private File invalidMdFileBasic;
@@ -75,12 +73,10 @@ public class MdParserTest {
 
     private String invalidHeader = "title=Title\n~~~~~~";
 
-    private String extensions = "markdown.extensions";
-
     @Before
     public void createSampleFile() throws Exception {
 
-        configFile = new File(this.getClass().getResource("/fixture").getFile());
+        File configFile = new File(this.getClass().getResource("/fixture").getFile());
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(configFile);
 
         validMdFileBasic = folder.newFile("validBasic.md");

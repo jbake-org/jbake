@@ -44,7 +44,7 @@ public class ParserTest {
     @Before
     public void createSampleFile() throws Exception {
         rootPath = new File(this.getClass().getResource("/fixture").getFile());
-        config = (DefaultJBakeConfiguration) new org.jbake.app.configuration.ConfigUtil().loadConfig(rootPath);
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(rootPath);
         parser = new Parser(config);
 
         validHTMLFile = folder.newFile("valid.html");

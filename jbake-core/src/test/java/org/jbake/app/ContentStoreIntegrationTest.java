@@ -29,9 +29,7 @@ public abstract class ContentStoreIntegrationTest {
         URL sourceUrl = TestUtils.class.getResource("/fixture");
 
         sourceFolder = new File(sourceUrl.getFile());
-        if (!sourceFolder.exists()) {
-            throw new Exception("Cannot find sample data structure!");
-        }
+        Assert.assertTrue("Cannot find sample data structure!", sourceFolder.exists());
 
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         config.setSourceFolder(sourceFolder);
