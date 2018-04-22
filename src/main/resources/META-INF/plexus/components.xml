@@ -9,7 +9,7 @@
                     <lifecycle>
                         <id>default</id>
                         <phases>
-                            <process-classes>${project.groupId}:${project.artifactId}:${project.version}:generate</process-resources>
+                            <process-resources>${project.groupId}:${project.artifactId}:${project.version}:generate</process-resources>
                         </phases>
                     </lifecycle>
                     <lifecycle>
