@@ -34,6 +34,7 @@ public class ParserTest {
     private File validAsciiDocFileWithHeaderInContent;
     private File validAsciiDocFileWithoutJBakeMetaData;
     private File validMarkdownFileWithCustomHeader;
+    private File invalidExtensionFile;
 
     private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
     private String invalidHeader = "title=This is a Title\n~~~~~~";
@@ -142,6 +143,10 @@ public class ParserTest {
         out.println("* List");
         out.close();
 
+        invalidExtensionFile = folder.newFile("invalid.invalid");
+        out = new PrintWriter(invalidExtensionFile);
+        out.println("invalid content");
+        out.close();
     }
 
     @Test
@@ -181,6 +186,12 @@ public class ParserTest {
     @Test
     public void parseInvalidAsciiDocFile() {
         Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
+        Assert.assertNull(map);
+    }
+
+    @Test
+    public void parseInvalidExtension(){
+        Map<String, Object> map = parser.processFile(invalidExtensionFile);
         Assert.assertNull(map);
     }
 
