@@ -29,8 +29,12 @@ public class HtmlUtil {
     public static void fixImageSourceUrls(Map<String, Object> fileContents, CompositeConfiguration config){
     	
     	String htmlContent = fileContents.get(Attributes.BODY).toString();
+
+    	boolean prependSiteHost = config.getBoolean(Keys.IMG_PATH_PREPEND_HOST);
         
     	String siteHost = config.getString(Keys.SITE_HOST);
+
+        String rootPath = fileContents.get(Attributes.ROOTPATH).toString();
     	
     	String uri = fileContents.get(Attributes.URI).toString();
     	
@@ -56,21 +60,21 @@ public class HtmlUtil {
     	for (Element img : allImgs) {
 			String source = img.attr("src");
 			
-			if(source.startsWith("./")){
-				// image relative to current content is specified,
-				// lets add current url to it.
-				source = source.replaceFirst("./", uri);
-			}
-			
 			// Now add the root path
 			if(!source.startsWith("http://") 
 					&& !source.startsWith("https://")){
+
+                if(!source.startsWith("/")){
+                    source = rootPath + uri + source.replaceFirst("./", "");
+                }
 					
 				if (!siteHost.endsWith("/") && !source.startsWith("/")) siteHost = siteHost.concat("/");
+
+                if(prependSiteHost) {
+                    source = siteHost + source;
+                }
 				
-				String fullUrl = siteHost + source;
-				
-				img.attr("src", fullUrl);
+				img.attr("src", source);
 				
 			}
 		}

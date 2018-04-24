@@ -29,7 +29,7 @@ public class HtmlUtilTest {
 		Map<String, Object> fileContent = new HashMap<String, Object>();
 		fileContent.put(Attributes.ROOTPATH, "../../../");
 		fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-		fileContent.put(Attributes.BODY, "<div> Test <img src='blog/2017/05/first.jpg' /></div>");
+		fileContent.put(Attributes.BODY, "<div> Test <img src='/blog/2017/05/first.jpg' /></div>");
 		
 		HtmlUtil.fixImageSourceUrls(fileContent, config);
 		
@@ -40,23 +40,24 @@ public class HtmlUtilTest {
 		
 	}
 
+    @Test
+    public void shouldNotAddSiteHost(){
+        Map<String, Object> fileContent = new HashMap<String, Object>();
+        fileContent.put(Attributes.ROOTPATH, "../../../");
+        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
+        fileContent.put(Attributes.BODY, "<div> Test <img src='./first.jpg' /></div>");
+        config.setProperty(ConfigUtil.Keys.IMG_PATH_PREPEND_HOST,false);
+
+        HtmlUtil.fixImageSourceUrls(fileContent, config);
+
+        String body = fileContent.get(Attributes.BODY).toString();
+
+        assertThat(body).contains("src=\"../../../blog/2017/05/first.jpg\"");
+
+    }
+
 	@Test
-	public void shouldAddRootpath(){
-		Map<String, Object> fileContent = new HashMap<String, Object>();
-		fileContent.put(Attributes.ROOTPATH, "../../../");
-		fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-		fileContent.put(Attributes.BODY, "<div> Test <img src='blog/2017/05/first.jpg' /></div>");
-		
-		HtmlUtil.fixImageSourceUrls(fileContent, config);
-		
-		String body = fileContent.get(Attributes.BODY).toString();
-		
-		assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
-		
-	}
-	
-	@Test
-	public void shouldAddContentpath(){
+	public void shouldAddContentPath(){
 		Map<String, Object> fileContent = new HashMap<String, Object>();
 		fileContent.put(Attributes.ROOTPATH, "../../../");
 		fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
@@ -66,8 +67,23 @@ public class HtmlUtilTest {
 		
 		String body = fileContent.get(Attributes.BODY).toString();
 		
-		assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
+		assertThat(body).contains("src=\"http://www.jbake.org/../../../blog/2017/05/first.jpg\"");
 		
+	}
+
+	@Test
+	public void shouldAddContentPathForCurrentDirectory(){
+		Map<String, Object> fileContent = new HashMap<String, Object>();
+		fileContent.put(Attributes.ROOTPATH, "../../../");
+		fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
+		fileContent.put(Attributes.BODY, "<div> Test <img src='first.jpg' /></div>");
+
+		HtmlUtil.fixImageSourceUrls(fileContent, config);
+
+		String body = fileContent.get(Attributes.BODY).toString();
+
+		assertThat(body).contains("src=\"http://www.jbake.org/../../../blog/2017/05/first.jpg\"");
+
 	}
 	
 	@Test
@@ -86,12 +102,12 @@ public class HtmlUtilTest {
 	}
 	
 	@Test
-	public void shouldAddRootPathForNoExtension(){
+	public void shouldNotAddRootPathForNoExtension(){
 		Map<String, Object> fileContent = new HashMap<String, Object>();
 		fileContent.put(Attributes.ROOTPATH, "../../../");
 		fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
 		fileContent.put(Attributes.NO_EXTENSION_URI, "blog/2017/05/first_post/");
-		fileContent.put(Attributes.BODY, "<div> Test <img src='blog/2017/05/first.jpg' /></div>");
+		fileContent.put(Attributes.BODY, "<div> Test <img src='/blog/2017/05/first.jpg' /></div>");
 		
 		HtmlUtil.fixImageSourceUrls(fileContent, config);
 		
@@ -113,7 +129,7 @@ public class HtmlUtilTest {
 		
 		String body = fileContent.get(Attributes.BODY).toString();
 		
-		assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
+		assertThat(body).contains("src=\"http://www.jbake.org/../../../blog/2017/05/first.jpg\"");
 	}
 	
 	@Test
