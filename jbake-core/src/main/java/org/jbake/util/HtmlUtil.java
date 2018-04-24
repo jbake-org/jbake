@@ -30,9 +30,13 @@ public class HtmlUtil {
     public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration){
     	
     	String htmlContent = fileContents.get(Attributes.BODY).toString();
-        
-    	String siteHost = (String) configuration.get("site.host");
-    	
+
+    	boolean prependSiteHost = config.getBoolean(Keys.IMG_PATH_PREPEND_HOST);
+
+        String siteHost = (String) configuration.get("site.host");
+
+        String rootPath = fileContents.get(Attributes.ROOTPATH).toString();
+
     	String uri = fileContents.get(Attributes.URI).toString();
     	
     	if(fileContents.get(Attributes.NO_EXTENSION_URI) != null){
@@ -56,22 +60,22 @@ public class HtmlUtil {
     	
     	for (Element img : allImgs) {
 			String source = img.attr("src");
-			
-			if(source.startsWith("./")){
-				// image relative to current content is specified,
-				// lets add current url to it.
-				source = source.replaceFirst("./", uri);
-			}
-			
+
 			// Now add the root path
 			if(!source.startsWith("http://") 
 					&& !source.startsWith("https://")){
-					
+
+                if(!source.startsWith("/")){
+                    source = rootPath + uri + source.replaceFirst("./", "");
+                }
+
 				if (!siteHost.endsWith("/") && !source.startsWith("/")) siteHost = siteHost.concat("/");
+
+                if(prependSiteHost) {
+                    source = siteHost + source;
+                }
 				
-				String fullUrl = siteHost + source;
-				
-				img.attr("src", fullUrl);
+				img.attr("src", source);
 				
 			}
 		}
