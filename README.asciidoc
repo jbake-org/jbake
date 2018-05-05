@@ -76,7 +76,7 @@ For more information see link:BUILD.adoc[Test, Build and Deploy]
 * http://gradle.org[Gradle]
 * http://groovy-lang.org/[Groovy]
 * http://junit.org/[JUnit]
-* http://pegdown.org/[Pegdown]
+* https://github.com/vsch/flexmark-java[Flexmark]
 * http://www.eclipse.org/jetty/[Jetty Server]
 * http://www.orientdb.org/[OrientDB]
 
