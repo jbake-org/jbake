@@ -3,7 +3,6 @@ package org.jbake.template;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.thymeleaf.TemplateEngine;
@@ -92,10 +91,10 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         String localeString = config.getThymeleafLocale();
         Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
 
-        Context context = wrap(locale,model);
 
         lock.lock();
         try {
+            initializeContext(locale,model);
             updateTemplateMode(model);
             templateEngine.process(templateName, context, writer);
         } finally {
@@ -103,7 +102,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    private Context wrap(Locale locale,Map<String, Object> model) {
+    private void initializeContext(Locale locale, Map<String, Object> model) {
         context.clearVariables();
         context.setLocale(locale);
         context.setVariables(model);
@@ -111,8 +110,6 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         for (String key : extractors.keySet()) {
             context.setVariable(key, new ContextVariable(db,key,model));
         }
-
-        return context;
     }
 
     /**
