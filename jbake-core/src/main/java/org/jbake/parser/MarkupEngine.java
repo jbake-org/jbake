@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.jbake.app.ConfigUtil.Keys;
@@ -58,6 +62,27 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param context the parser context
      */
     public void processBody(final ParserContext context) {
+    }
+
+    /**
+     * Processes the summary of the document. Usually subclasses will parse the document body and render
+     * it, exporting the result using the {@link org.jbake.parser.ParserContext#setSummary(String)} method.
+     *
+     * @param context the parser context
+     */
+    public void processSummary(final ParserContext context, int maxLength) {
+        Document document = Jsoup.parse(context.getBody());
+        StringBuilder builder = new StringBuilder();
+        int count = 0;
+        for (Element element : document.body().children()) {
+            builder.append(element.outerHtml());
+            builder.append("\n");
+            count += element.text().length();
+            if (count >= maxLength)
+                break;
+        }
+
+        context.setSummary(builder.toString());
     }
 
     /**
@@ -128,6 +153,7 @@ public abstract class MarkupEngine implements ParserEngine {
         // eventually process body using specific engine
         if (validate(context)) {
             processBody(context);
+            processSummary(context, config.getInt(Keys.POST_SUMMARY_LENGTH, 500));
         } else {
             LOGGER.error("Incomplete source file ({}) for markup engine: {}", file, getClass().getSimpleName());
             return null;

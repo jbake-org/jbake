@@ -178,6 +178,10 @@ public class ConfigUtil {
 		 */
 		String POSTS_PER_PAGE = "index.posts_per_page";
 		/**
+		 * How many posts per page on index
+		 */
+		String POST_SUMMARY_LENGTH = "index.post_summary_length";
+		/**
 		 * The configured base URI for the hosted content
 		 */
 		String SITE_HOST = "site.host";

@@ -75,9 +75,39 @@ public class HtmlUtil {
 			}
 		}
     	
-    	
-    	//Use body().html() to prevent adding <body></body> from parsed fragment.
+		//Use body().html() to prevent adding <body></body> from parsed fragment.
     	fileContents.put(Attributes.BODY, document.body().html());
+
+		// Fixed image urls for Summary
+    	String htmlSummary = fileContents.get(Attributes.SUMMARY).toString();
+    	
+    	Document summary = Jsoup.parseBodyFragment(htmlSummary);
+    	
+    	Elements allSummaryImgs = summary.getElementsByTag("img");
+    	
+    	for (Element img : allSummaryImgs) {
+			String source = img.attr("src");
+			
+			if(source.startsWith("./")){
+				// image relative to current content is specified,
+				// lets add current url to it.
+				source = source.replaceFirst("./", uri);
+			}
+			
+			// Now add the root path
+			if(!source.startsWith("http://") 
+					&& !source.startsWith("https://")){
+					
+				if (!siteHost.endsWith("/") && !source.startsWith("/")) siteHost = siteHost.concat("/");
+				
+				String fullUrl = siteHost + source;
+				
+				img.attr("src", fullUrl);
+				
+			}
+		}
+
+    	fileContents.put(Attributes.SUMMARY, summary.body().html());
     }
 	
 }
