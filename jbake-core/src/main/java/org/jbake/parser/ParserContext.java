@@ -62,4 +62,12 @@ public class ParserContext {
     public void setBody(String str) {
         contents.put(Crawler.Attributes.BODY, str);
     }
+
+    public String getSummary() {
+        return contents.get(Crawler.Attributes.SUMMARY).toString();
+    }
+
+    public void setSummary(String str) {
+        contents.put(Crawler.Attributes.SUMMARY, str);
+    }
 }

@@ -49,6 +49,7 @@ public class Crawler {
         String NO_EXTENSION_URI = "noExtensionUri";
         String ALLTAGS = "alltags";
         String PUBLISHED_DATE = "published_date";
+        String SUMMARY = "summary";
         String BODY = "body";
         String DB = "db";
     }
