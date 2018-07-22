@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
  */
 public class MarkdownEngine extends MarkupEngine {
 
-    private Logger logger = LoggerFactory.getLogger(MarkdownEngine.class);
+    private static final Logger logger = LoggerFactory.getLogger(MarkdownEngine.class);
 
     @Override
     public void processBody(final ParserContext context) {
