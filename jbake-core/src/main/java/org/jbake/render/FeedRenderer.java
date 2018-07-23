@@ -1,5 +1,6 @@
 package org.jbake.render;
 
+import java.io.File;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
@@ -10,7 +11,7 @@ import org.jbake.template.RenderingException;
 import java.io.File;
 
 
-public class FeedRenderer implements RenderingTool {
+public class FeedRenderer extends BaseRenderingTool implements RenderingTool {
 
     @Override
     public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
@@ -27,6 +28,7 @@ public class FeedRenderer implements RenderingTool {
         }
     }
 
+    ///REBASE isn't this in BaseRenderingTool?
     @Override
     public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
         JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config);

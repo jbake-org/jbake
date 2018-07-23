@@ -83,7 +83,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     @Override
-    public void processHeader(final ParserContext context) {
+    public void parseHeaderBlock(final ParserContext context) {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());

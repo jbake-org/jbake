@@ -45,7 +45,17 @@ public class JBakeProperty {
     public static final String URI_NO_EXTENSION_PREFIX = "uri.noExtension.prefix";
     public static final String IMG_PATH_UPDATE = "img.path.update";
     public static final String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
+    public static final String IMG_URL_MAKE_ABSOLUTE = "img.url.makeAbsolute";
+    public static final String IMG_PATH_RELATIVE_POINTS_TO_ASSETS = "img.path.relativePointsToAssets";
+
     public static final String VERSION = "version";
+
+    public static final String EXTRACT_TITLE_FROM_DOC = "extract.title";
+    public static final String HTML_NORMALIZE = "output.html.normalize";
+    public static final String HTML_CONVERT_TO_XHTML = "output.html.convertToXhtml";
+    public static final String HTML_PRETTY_PRINT = "output.html.prettyPrint";
+    public static final String HTML_OUTPUT_CHARSET = "output.html.charset";
+    public static final String INPUT_CHARSET = "input.charset";
 
     private JBakeProperty() {}
 

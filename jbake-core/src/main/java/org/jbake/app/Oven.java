@@ -1,5 +1,12 @@
 package org.jbake.app;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -10,15 +17,9 @@ import org.jbake.render.RenderingTool;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.jbake.template.RenderingException;
+import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
 
 /**
  * All the baking happens in the Oven!
@@ -139,11 +140,13 @@ public class Oven {
             // render content
             renderContent();
 
-            // copy assets
-            asset.copy();
-            asset.copyAssetsFromContent(config.getContentFolder());
+            {
+                // copy assets
+                asset.copy();
+                asset.copyAssetsFromContent(config.getContentFolder());
 
-            errors.addAll(asset.getErrors());
+                errors.addAll(asset.getErrors());
+            }
 
             LOGGER.info("Baking finished!");
             long end = new Date().getTime();
@@ -154,6 +157,40 @@ public class Oven {
         } finally {
             contentStore.close();
             contentStore.shutdown();
+        }
+    }
+
+    /**
+     * Replaces the URLs to resources in documents so that they are pointing to the resources even if the rendered document is placed
+     * somewhere else than the source markup.
+     */
+    private void makeUrlsAbsolute(ContentStore db, CompositeConfiguration config)
+    {
+        int renderedCount = 0;
+        final List<String> errors = new LinkedList<String>();
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            DocumentList documentList = db.getUnrenderedContent(docType);
+            if(documentList == null) continue;
+
+            for (Map<String, Object> documentMap : documentList) {
+                try {
+                    HtmlUtil.fixImageSourceUrls(documentMap, config);
+                    // Save
+                    documentMap = db.mergeDocument(documentMap).toMap();
+                }
+                catch (Exception e) {
+                    errors.add(e.getMessage());
+                }
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Failed to render documents. Cause(s):");
+            for (String error : errors) {
+                sb.append("\n  ").append(error);
+            }
+            throw new RuntimeException(sb.toString());
         }
     }
 
@@ -186,12 +223,45 @@ public class Oven {
         Renderer renderer = utensils.getRenderer();
         ContentStore contentStore = utensils.getContentStore();
 
-        for (RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
+        ServiceLoader<RenderingTool> renderTools = ServiceLoader.load(RenderingTool.class);
+
+        // If this is enabled, then this already happened in Crawler.
+        // TODO: Remove the fixing from Crawler.
+        //       We should keep the pristine doc body as long as possible, or change it locally.
+        boolean fixedAlready = config.getMakeImagesUrlAbolute();
+
+        // 1st pass without altered URLs.
+        for (RenderingTool tool : renderTools) {
+            if (!tool.isRendersInPlace() || fixedAlready)
+                continue;
             try {
                 renderedCount += tool.render(renderer, contentStore, config);
-            } catch (RenderingException e) {
+            }
+            catch (RenderingException e) {
                 errors.add(e);
             }
+        }
+
+        // Make the URLs absolute.
+        if (!fixedAlready) {
+            makeUrlsAbsolute(contentStore, config);
+
+            // 2nd pass with absolutized URLs.
+            for (RenderingTool tool : renderTools) {
+                if (tool.isRendersInPlace())
+                    continue;
+                try {
+                    renderedCount += tool.render(renderer, contentStore, config);
+                }
+                catch (RenderingException e) {
+                    errors.add(e);
+                }
+            }
+        }
+
+        // mark docs as rendered
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            contentStore.markContentAsRendered(docType);
         }
     }
 

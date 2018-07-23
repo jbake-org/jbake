@@ -1,15 +1,5 @@
 package org.jbake.parser;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.io.IOUtils;
-import org.jbake.app.Crawler;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,9 +7,24 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jbake.app.Crawler;
+import org.jbake.app.DebugUtil;
+import org.jbake.app.JBakeException;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering
@@ -35,6 +40,10 @@ public abstract class MarkupEngine implements ParserEngine {
 
     private JBakeConfiguration configuration;
 
+    public static final int MAX_HEADER_LINES = 50;
+    public static final Pattern HEADER_LINE_REGEX = Pattern.compile("^[\\p{Alnum}.-_]+\\p{Blank}*(=|:)\\p{Blank}*[^\\n\\p{Cntrl}]*\\p{Blank}*");
+
+
     /**
      * Tests if this markup engine can process the document.
      *
@@ -46,13 +55,32 @@ public abstract class MarkupEngine implements ParserEngine {
     }
 
     /**
+     * Validates the core requirements the documents have to fulfil.
+     */
+    protected void validateInternal(ParserContext context) {
+        validateDocumentAttribute(context, Crawler.Attributes.TITLE, String.class);
+        validateDocumentAttribute(context, Crawler.Attributes.DATE, Date.class);
+        validateDocumentAttribute(context, Crawler.Attributes.TYPE, String.class);
+    }
+
+    private void validateDocumentAttribute(ParserContext context, String attrName, Class<?> expectedType)
+    {
+        Object type = context.getDocumentModel().get(attrName);
+        if (null == type)
+            throw new JBakeException("Document doesn't have a " + attrName + ": " + context.getFile().getPath());
+        if (!expectedType.isAssignableFrom(type.getClass()))
+            throw new JBakeException("Document's " + attrName + " is not a " + expectedType.getName() + ", but " + type.getClass().getCanonicalName() + ": " + context.getFile().getPath());
+    }
+
+
+    /**
      * Processes the document header. Usually subclasses will parse the document body and look for
      * specific header metadata and export it into {@link ParserContext#getDocumentModel() contents} map.
      *
      * @param context the parser context
      */
-    public void processHeader(final ParserContext context) {
-    }
+    /*public void parseHeaderBlock(final ParserContext context) {
+    }*/
 
     /**
      * Processes the body of the document. Usually subclasses will parse the document body and render
@@ -76,30 +104,29 @@ public abstract class MarkupEngine implements ParserEngine {
      */
     public Map<String, Object> parse(JBakeConfiguration config, File file) {
         this.configuration = config;
-        List<String> fileContents;
-        try (InputStream is = new FileInputStream(file)) {
+        List<String> fileLines;
 
-            fileContents = IOUtils.readLines(is, config.getRenderEncoding());
+        try (InputStream is = new FileInputStream(file)) {
+            // TODO: This should be done using streams for performance and memory reasons.
+            fileLines = IOUtils.readLines(is, config.getInputCharset());
         } catch (IOException e) {
             LOGGER.error("Error while opening file {}", file, e);
 
             return null;
         }
 
-        boolean hasHeader = hasHeader(fileContents);
+        boolean hasHeader = hasHeader(fileLines);
+
         ParserContext context = new ParserContext(
                 file,
-                fileContents,
+                fileLines,
                 config,
-                hasHeader
-        );
+                hasHeader);
 
-        if (hasHeader) {
-            // read header from file
-            processDefaultHeader(context);
-        }
-        // then read engine specific headers
-        processHeader(context);
+        Map<String, String> headersMap = parseHeaderBlock(context);
+        DebugUtil.printMap(headersMap, System.out);
+
+        applyHeadersToDocument(headersMap, context.getDocumentModel());
 
         setModelDefaultsIfNotSetInHeader(context);
         sanitizeTags(context);
@@ -120,6 +147,9 @@ public abstract class MarkupEngine implements ParserEngine {
             LOGGER.error("Incomplete source file ({}) for markup engine: {}", file, getClass().getSimpleName());
             return null;
         }
+
+        validateInternal(context);
+
         // TODO: post parsing plugins to hook in here?
 
         return context.getDocumentModel();
@@ -159,135 +189,80 @@ public abstract class MarkupEngine implements ParserEngine {
     /**
      * Checks if the file has a meta-data header.
      *
-     * @param contents Contents of file
+     * @param fileLines Contents of file
      * @return true if header exists, false if not
      */
-    private boolean hasHeader(List<String> contents) {
-        boolean headerValid = true;
+    private boolean hasHeader(List<String> fileLines)
+    {
+        boolean headerSeparatorFound = false;
         boolean statusFound = false;
         boolean typeFound = false;
 
-        if (!headerSeparatorDemarcatesHeader(contents)) {
-            return false;
-        }
+        for (int i = 0; i < fileLines.size() && i < MAX_HEADER_LINES; i++) {
+            String line = fileLines.get(i);
 
-        for (String line : contents) {
-            if (hasHeaderSeparator(line)) {
-                LOGGER.debug("Header separator found");
+            if (line.equals(configuration.getHeaderSeparator())) {
+                headerSeparatorFound = true;
                 break;
             }
-            if (isTypeProperty(line)) {
-                LOGGER.debug("Type property found");
-                typeFound = true;
-            }
-
-            if (isStatusProperty(line)) {
-                LOGGER.debug("Status property found");
-                statusFound = true;
-            }
-            if (!line.isEmpty() && !line.contains("=")) {
-                LOGGER.error("Property found without assignment [{}]", line);
-                headerValid = false;
-            }
         }
-        return headerValid && (statusFound || hasDefaultStatus()) && (typeFound || hasDefaultType());
+
+        return headerSeparatorFound;
     }
 
-    private boolean hasDefaultType() {
-        return !configuration.getDefaultType().isEmpty();
-    }
-
-    private boolean hasDefaultStatus() {
-        return !configuration.getDefaultStatus().isEmpty();
-    }
-
-    private boolean hasHeaderSeparatorInContent(List<String> contents) {
-        return contents.indexOf(configuration.getHeaderSeparator()) != -1;
-    }
-
-    /**
-     * Checks if header separator demarcates end of metadata header
-     *
-     * @param contents
-     * @return true if header separator resides at end of metadata header, false if not
-     */
-    private boolean headerSeparatorDemarcatesHeader(List<String> contents) {
-        List<String> subContents = null;
-        int index = contents.indexOf(configuration.getHeaderSeparator());
-        if (index != -1) {
-            // get every line above header separator
-            subContents = contents.subList(0, index);
-
-            for (String line : subContents) {
-                // header should only contain empty lines or lines with '=' in
-                if (!line.contains("=") && !line.isEmpty())  {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean hasHeaderSeparator(String line) {
-        return line.equals(configuration.getHeaderSeparator());
-    }
-
-    private boolean isStatusProperty(String line) {
-        return line.startsWith("status=");
-    }
-
-    private boolean isTypeProperty(String line) {
-        return line.startsWith("type=");
-    }
 
     /**
      * Process the header of the file.
      *
      * @param context the parser context
      */
-    private void processDefaultHeader(ParserContext context) {
-        for (String line : context.getFileLines()) {
+    private Map<String, String> parseHeaderBlock(ParserContext context)
+    {
+        String headerSeparator = configuration.getHeaderSeparator();
 
-            if (hasHeaderSeparator(line)) {
-                break;
+        Map<String, String> headers = new HashMap<>();
+
+        List<String> fileLines = context.getFileLines();
+
+        for (int i = 0; i < fileLines.size() && i < MAX_HEADER_LINES; i++) {
+            String line = fileLines.get(i);
+
+            if (line.equals(headerSeparator)) {
+                return headers;
             }
-            processLine(line, context.getDocumentModel());
+
+            parsePotentialHeader(line, headers);
         }
+        // Only return headers if a separator line was found.
+        // Otherwise, prevent returning some randomly matching file content.
+        return Collections.emptyMap();
     }
 
-    private void processLine(String line, Map<String, Object> content) {
-        String[] parts = line.split("=", 2);
-        if (!line.isEmpty() && parts.length == 2) {
+    private void parsePotentialHeader(String line, Map<String, String> headersToFill) {
+        if (StringUtils.isBlank(line))
+            return;
 
+        if (line.startsWith("#"))
+            return;
 
-            String key = sanitizeKey(parts[0]);
-            String value = sanitizeValue(parts[1]);
+        if (!HEADER_LINE_REGEX.matcher(line).matches())
+            return;
 
-            if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
-                DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
-                try {
-                    Date date = df.parse(value);
-                    content.put(key, date);
-                } catch (ParseException e) {
-                    LOGGER.error("unable to parse date {}", value);
-                }
-            } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
-                content.put(key, getTags(value));
-            } else if (isJson(value)) {
-                content.put(key, JSONValue.parse(value));
-            } else {
-                content.put(key, value);
-            }
-        }
+        String[] parts = StringUtils.split(line, "=:", 2);
+        if (parts.length != 2)
+            return;
+
+        String key = sanitizeKey(parts[0]);
+        String value = sanitizeValue(parts[1]);
+
+        headersToFill.put(key, value);
     }
 
-    private String sanitizeValue(String part) {
+    private static String sanitizeValue(String part) {
         return part.trim();
     }
 
-    private String sanitizeKey(String part) {
+    private static String sanitizeKey(String part) {
         String key;
         if (part.contains(UTF_8_BOM)) {
             key = part.trim().replace(UTF_8_BOM, "");
@@ -297,16 +272,49 @@ public abstract class MarkupEngine implements ParserEngine {
         return key;
     }
 
-    private String[] getTags(String tagsPart) {
+
+    private void applyHeadersToDocument(Map<String, String> headers, Map<String, Object> documentModel) {
+
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            String key = header.getKey();
+            String value = header.getValue();
+
+            // Convert date to Date
+            if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
+                DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
+                try {
+                    Date date = df.parse(value);
+                    documentModel.put(key, date);
+                } catch (ParseException e) {
+                    LOGGER.error("Unable to parse date: {}", value);
+                }
+            }
+            // Tags
+            else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
+                documentModel.put(key, parseTags(value));
+            }
+            // JSON
+            else if (isJson(value)) {
+                documentModel.put(key, JSONValue.parse(value));
+            }
+            // Ordinary String
+            else {
+                documentModel.put(key, value);
+            }
+        }
+    }
+
+    private static String[] parseTags(String tagsPart) {
         String[] tags = tagsPart.split(",");
         for (int i = 0; i < tags.length; i++)
             tags[i] = sanitizeValue(tags[i]);
         return tags;
     }
 
-    private boolean isJson(String part) {
+    private static boolean isJson(String part) {
         return part.startsWith("{") && part.endsWith("}");
     }
+
 
     /**
      * Process the body of the file.

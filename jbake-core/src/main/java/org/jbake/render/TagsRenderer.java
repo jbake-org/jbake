@@ -1,5 +1,6 @@
 package org.jbake.render;
 
+import java.io.File;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
@@ -7,10 +8,8 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.template.RenderingException;
 
-import java.io.File;
 
-
-public class TagsRenderer implements RenderingTool {
+public class TagsRenderer extends BaseRenderingTool implements RenderingTool {
 
     @Override
     public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {

@@ -1,8 +1,11 @@
 package org.jbake.app.configuration;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
+import org.jbake.app.JBakeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -468,6 +471,69 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsString(JBakeProperty.VERSION);
     }
 
+
+    @Override
+    public boolean getExtractTitleFromDoc()
+    {
+        return getAsBoolean(JBakeProperty.EXTRACT_TITLE_FROM_DOC);
+    }
+
+    @Override
+    public boolean getNormalizeHtml()
+    {
+        return getAsBoolean(JBakeProperty.HTML_NORMALIZE);
+    }
+
+    @Override
+    public boolean getConvertHtmlToXhtml()
+    {
+        return getAsBoolean(JBakeProperty.HTML_CONVERT_TO_XHTML);
+    }
+
+    @Override
+    public boolean getPrettyPrintHtml()
+    {
+        return getAsBoolean(JBakeProperty.HTML_PRETTY_PRINT);
+    }
+
+    @Override
+    public Charset getOutputHtmlCharset()
+    {
+        String charsetStr = getAsString(JBakeProperty.HTML_OUTPUT_CHARSET);
+        try {
+            return Charset.forName(charsetStr);
+        }
+        catch (Exception ex) {
+            throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+        }
+    }
+
+    @Override
+    public Charset getInputCharset()
+    {
+        String charsetStr = getAsString(JBakeProperty.INPUT_CHARSET);
+        try {
+            return Charset.forName(charsetStr);
+        }
+        catch (Exception ex) {
+            throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+        }
+    }
+
+    @Override
+    public boolean getMakeImagesUrlAbolute()
+    {
+        return getAsBoolean(JBakeProperty.IMG_URL_MAKE_ABSOLUTE);
+    }
+
+    @Override
+    public boolean getRelativeImagePathsPointToAssets()
+    {
+        return getAsBoolean(JBakeProperty.IMG_PATH_RELATIVE_POINTS_TO_ASSETS);
+    }
+
+
+
     public void setDestinationFolderName(String folderName) {
         setProperty(JBakeProperty.DESTINATION_FOLDER, folderName);
         setupDefaultDestination();
@@ -544,4 +610,5 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setImgPathUPdate(boolean imgPathUpdate) {
         setProperty(JBakeProperty.IMG_PATH_UPDATE, imgPathUpdate);
     }
+
 }

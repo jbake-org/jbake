@@ -1,13 +1,13 @@
 package org.jbake.util;
 
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import java.util.Map;
 
 /**
  * @author Manik Magar
@@ -21,61 +21,79 @@ public class HtmlUtil {
      * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except
      * the ones that starts with http://, https://.
      * <p>
-     * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
+     * If the image path is relative to the source file (doesn't start with "/"),
+     * then it first replace that with output file directory and the add site host.
      *
      * @param fileContents  Map representing file contents
      * @param configuration Configuration object
+     *
+     * TODO: This is too complicated, will need a refactor again.
      */
-    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
-        String htmlContent = fileContents.get(Attributes.BODY).toString();
-        boolean prependSiteHost = configuration.getImgPathPrependHost();
+    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration)
+    {
         String siteHost = configuration.getSiteHost();
-        String uri = getDocumentUri(fileContents);
+        siteHost = StringUtils.appendIfMissing(siteHost, "/");
 
+        boolean prependSiteHost = configuration.getImgPathPrependHost();
+        boolean relativePointsToAssets = configuration.getRelativeImagePathsPointToAssets();
+
+        String dirUri = getDocumentUri(fileContents);
+
+        String htmlContent = fileContents.get(Attributes.BODY).toString();
         Document document = Jsoup.parseBodyFragment(htmlContent);
-        Elements allImgs = document.getElementsByTag("img");
 
+        Elements allImgs = document.getElementsByTag("img");
         for (Element img : allImgs) {
-            transformImageSource(img, uri, siteHost, prependSiteHost);
+            transformImageSource(img, dirUri, siteHost, prependSiteHost, relativePointsToAssets);
         }
 
-        //Use body().html() to prevent adding <body></body> from parsed fragment.
+        // Use body().html() to prevent adding <body></body> from parsed fragment.
         fileContents.put(Attributes.BODY, document.body().html());
     }
 
     private static String getDocumentUri(Map<String, Object> fileContents) {
-        String uri = fileContents.get(Attributes.URI).toString();
+        String dirUri = fileContents.get(Attributes.URI).toString();
 
         if (fileContents.get(Attributes.NO_EXTENSION_URI) != null) {
-            uri = fileContents.get(Attributes.NO_EXTENSION_URI).toString();
-            uri = removeTrailingSlash(uri);
+            dirUri = fileContents.get(Attributes.NO_EXTENSION_URI).toString();
+            dirUri = removeTrailingSlash(dirUri);
         }
 
-        if (uri.contains("/")) {
-            uri = removeFilename(uri);
+        if (dirUri.contains("/")) {
+            dirUri = removeFilename(dirUri);
         }
-        return uri;
+        return dirUri;
     }
 
-    private static void transformImageSource(Element img, String uri, String siteHost, boolean prependSiteHost) {
-        String source = img.attr("src");
+    private static void transformImageSource(Element img, String dirUri, String siteHost,
+                                             boolean prependSiteHost,
+                                             boolean relativePointsToAssets) {
+        String srcUrl = img.attr("src");
+        if (srcUrl.startsWith("http://") || srcUrl.startsWith("https://"))
+            return;
 
-        // Now add the root path
-        if (!source.startsWith("http://") && !source.startsWith("https://")) {
-
-            if (isRelative(source)) {
-                source = uri + source.replaceFirst("\\./", "");
-            }
-
-            if (prependSiteHost) {
-                if (!siteHost.endsWith("/") && isRelative(source)) {
-                    siteHost = siteHost.concat("/");
-                }
-                source = siteHost + source;
-            }
-
-            img.attr("src", source);
+        if (isRelativeToSourceMarkup(srcUrl, relativePointsToAssets))
+        {
+            // Image relative to current content is explicitly specified, lets add dir URI to it.
+            srcUrl = dirUri + srcUrl;
         }
+
+        //source = StringUtils.removeStart(source, "/");
+
+        if (prependSiteHost) {
+            if (!siteHost.endsWith("/") && isRelative(srcUrl)) {
+                siteHost = siteHost.concat("/");
+            }
+            // Now add the base URL.
+            srcUrl = siteHost + srcUrl;
+        }
+
+        img.attr("src", srcUrl);
+    }
+
+    private static boolean isRelativeToSourceMarkup(String srcUrl, boolean relativePointsToAssets)
+    {
+        return (relativePointsToAssets ? srcUrl.startsWith("./") : !srcUrl.startsWith("/"));
     }
 
     private static String removeFilename(String uri) {
@@ -93,4 +111,5 @@ public class HtmlUtil {
     private static boolean isRelative(String source) {
         return !source.startsWith("/");
     }
+
 }

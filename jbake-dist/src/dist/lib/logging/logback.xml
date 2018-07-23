@@ -14,6 +14,7 @@
     <logger name="org.eclipse" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
     <logger name="org.jbake" level="INFO"/>
+    <logger name="org.jbake.parser.texy" level="DEBUG"/>
 
     <!-- Strictly speaking, the level attribute is not necessary since -->
     <!-- the level of the root logger is set to DEBUG by default.       -->
