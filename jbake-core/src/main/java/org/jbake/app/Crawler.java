@@ -1,6 +1,13 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.Crawler.Attributes.Status;
@@ -12,14 +19,6 @@ import org.jbake.model.DocumentTypes;
 import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * Crawls a file system looking for content.
@@ -190,28 +189,29 @@ public class Crawler {
     }
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
-        Map<String, Object> fileContents = parser.processFile(sourceFile);
-        if (fileContents != null) {
-            fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
-            fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
-            fileContents.put(String.valueOf(DocumentAttributes.RENDERED), false);
-            if (fileContents.get(Attributes.TAGS) != null) {
-                // store them as a String[]
-                String[] tags = (String[]) fileContents.get(Attributes.TAGS);
-                fileContents.put(Attributes.TAGS, tags);
-            }
-            fileContents.put(Attributes.FILE, sourceFile.getPath());
-            fileContents.put(String.valueOf(DocumentAttributes.SOURCE_URI), uri);
-            fileContents.put(Attributes.URI, uri);
+        try {
+            Map<String, Object> fileContents = parser.processFile(sourceFile);
+            if (fileContents != null) {
+                fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
+                fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
+                fileContents.put(String.valueOf(DocumentAttributes.RENDERED), false);
+                if (fileContents.get(Attributes.TAGS) != null) {
+                    // store them as a String[]
+                    String[] tags = (String[]) fileContents.get(Attributes.TAGS);
+                    fileContents.put(Attributes.TAGS, tags);
+                }
+                fileContents.put(Attributes.FILE, sourceFile.getPath());
+                fileContents.put(String.valueOf(DocumentAttributes.SOURCE_URI), uri);
+                fileContents.put(Attributes.URI, uri);
 
-            String documentType = (String) fileContents.get(Attributes.TYPE);
-            if (fileContents.get(Attributes.STATUS).equals(Status.PUBLISHED_DATE)) {
-                if (fileContents.get(Attributes.DATE) != null && (fileContents.get(Attributes.DATE) instanceof Date)) {
-                    if (new Date().after((Date) fileContents.get(Attributes.DATE))) {
-                        fileContents.put(Attributes.STATUS, Status.PUBLISHED);
+                String documentType = (String) fileContents.get(Attributes.TYPE);
+                if (fileContents.get(Attributes.STATUS).equals(Status.PUBLISHED_DATE)) {
+                    if (fileContents.get(Attributes.DATE) != null && (fileContents.get(Attributes.DATE) instanceof Date)) {
+                        if (new Date().after((Date) fileContents.get(Attributes.DATE))) {
+                            fileContents.put(Attributes.STATUS, Status.PUBLISHED);
+                        }
                     }
                 }
-            }
 
             if (config.getUriWithoutExtension()) {
                 fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
@@ -222,13 +222,18 @@ public class Crawler {
                 HtmlUtil.fixImageSourceUrls(fileContents, config);
             }
 
-            ODocument doc = new ODocument(documentType);
-            doc.fromMap(fileContents);
-            boolean cached = fileContents.get(String.valueOf(DocumentAttributes.CACHED)) != null ? Boolean.valueOf((String) fileContents.get(String.valueOf(DocumentAttributes.CACHED))) : true;
-            doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
-            doc.save();
-        } else {
-            LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
+                ODocument doc = new ODocument(documentType);
+                doc.fromMap(fileContents);
+                boolean cached = fileContents.get(String.valueOf(DocumentAttributes.CACHED)) != null ? Boolean.valueOf((String) fileContents.get(String.valueOf(DocumentAttributes.CACHED))) : true;
+                doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
+                doc.save();
+            }
+            else {
+                LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
+            }
+        }
+        catch (Exception ex) {
+            throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
         }
     }
 
