@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Launcher for JBake.
- * 
+ *
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  *
  */
@@ -36,10 +36,11 @@ public class Main {
 			new Main().run(args);
 		} catch (final JBakeException e) {
 			System.err.println(e.getMessage());
-			e.printStackTrace(System.err);
+			e.printStackTrace();
 			System.exit(1);
 		} catch (final Throwable e) {
 			System.err.println("An unexpected error occurred: " + e.getMessage());
+			e.printStackTrace();
 			System.exit(2);
 		}
 	}
@@ -85,7 +86,7 @@ public class Main {
 	protected void run(LaunchOptions res, CompositeConfiguration config) {
 		System.out.println("JBake " + config.getString(Keys.VERSION) + " (" + config.getString(Keys.BUILD_TIMESTAMP) + ") [http://jbake.org]");
 		System.out.println();
-		
+
 		if (res.isHelpNeeded()) {
 			printUsage(res);
 			// Help was requested, so we are done here
@@ -100,7 +101,7 @@ public class Main {
 		if (res.isInit()) {
 			initStructure(config, res.getTemplate(), res.getSourceValue());
 		}
-		
+
 		if (res.isRunServer()) {
 			ConfigUtil.displayLegacyConfigFileWarningIfRequired();
 			watcher.start(res, config);
@@ -127,7 +128,7 @@ public class Main {
 				}
 			}
 		}
-		
+
 	}
 	private LaunchOptions parseArguments(String[] args) {
 		LaunchOptions res = new LaunchOptions();
