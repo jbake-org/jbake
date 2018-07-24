@@ -31,7 +31,7 @@ ext {
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.7'
     mockitoVersion = '2.16.0'
-    jsoupVersion = '1.11.2'
+    jsoupVersion = '1.11.3'
 
     isTravis = (System.getenv("TRAVIS") == "true")
     isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
