@@ -1,6 +1,9 @@
 package org.jbake.app;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -132,8 +135,11 @@ public class Crawler {
         return sha1;
     }
 
-    private String buildURI(final File sourceFile) {
+    private String buildURI(final File sourceFile)
+    {
+        /*  /jbake-web/content/path/to/file.ext ->  */
         String uri = FileUtil.asPath(sourceFile.getPath())
+                /*  path/to/file.ext  */
                 .replace(FileUtil.asPath(contentPath), "")
                 // On windows we have to replace the backslash
                 .replace(File.separator, "/");
@@ -152,16 +158,30 @@ public class Crawler {
         return uri;
     }
 
+    // TODO: Refactor - parametrize the following two methods into one.
+    // commons-codec's URLCodec could be used when we add that dependency.
     private String createUri(String uri) {
-        return uri.substring(0, uri.lastIndexOf('.')) + config.getString(Keys.OUTPUT_EXTENSION);
+        ///return uri.substring(0, uri.lastIndexOf('.')) + config.getString(Keys.OUTPUT_EXTENSION);
+        try {
+            return "/" + FilenameUtils.getPath(uri)
+                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                    + config.getString(Keys.OUTPUT_EXTENSION);
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+        }
     }
 
     private String createNoExtensionUri(String uri) {
-        return "/"
-                + FilenameUtils.getPath(uri)
-                + FilenameUtils.getBaseName(uri)
-                + "/index"
-                + config.getString(Keys.OUTPUT_EXTENSION);
+        try {
+            return "/" + FilenameUtils.getPath(uri)
+                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                    + "/index"
+                    + config.getString(Keys.OUTPUT_EXTENSION);
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+        }
     }
 
     private boolean useNoExtensionUri(String uri) {
