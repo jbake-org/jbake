@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * @author jdlee
  */
@@ -172,6 +173,36 @@ public class ContentStore {
     private void activateOnCurrentThread() {
         db.activateOnCurrentThread();
     }
+
+
+    /**
+     * Get a document by sourceUri and update it from the given map.
+     * @return the saved document.
+     * @throws Exception if sourceUri or docType are null, or if the document doesn't exist.
+     */
+    public ODocument mergeDocument(Map<String, Object> incomingDocMap)
+    {
+        String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
+        if (null == sourceUri)
+            throw new IllegalArgumentException("Document sourceUri is null.");
+        String docType = (String) incomingDocMap.get(Crawler.Attributes.TYPE);
+        if (null == docType)
+            throw new IllegalArgumentException("Document docType is null.");
+
+        // Get a document by sourceUri
+        String sql = "SELECT * FROM " + docType + " WHERE sourceuri=?";
+        activateOnCurrentThread();
+        List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
+        if (results.size() == 0)
+            throw new RuntimeException("No document with sourceUri '"+sourceUri+"'.");
+
+        // Update it from the given map.
+        ODocument incomingDoc = new ODocument(docType);
+        incomingDoc.fromMap(incomingDocMap);
+        ODocument merged = results.get(0).merge(incomingDoc, true, false);
+        return merged;
+    }
+
 
     public long getDocumentCount(String docType) {
         activateOnCurrentThread();
