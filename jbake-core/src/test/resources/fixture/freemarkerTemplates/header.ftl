@@ -10,18 +10,18 @@
     <meta name="generator" content="JBake">
 
     <!-- Le styles -->
-    <link href="<#if (content.rootpath)??>${content.rootpath}</#if>css/bootstrap.min.css" rel="stylesheet">
-    <link href="<#if (content.rootpath)??>${content.rootpath}</#if>css/asciidoctor.css" rel="stylesheet">
-    <link href="<#if (content.rootpath)??>${content.rootpath}</#if>css/base.css" rel="stylesheet">
-    <link href="<#if (content.rootpath)??>${content.rootpath}</#if>css/prettify.css" rel="stylesheet">
+    <link href="${content.rootpath!}css/bootstrap.min.css" rel="stylesheet">
+    <link href="${content.rootpath!}css/asciidoctor.css" rel="stylesheet">
+    <link href="${content.rootpath!}css/base.css" rel="stylesheet">
+    <link href="${content.rootpath!}css/prettify.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="<#if (content.rootpath)??>${content.rootpath}</#if>js/html5shiv.min.js"></script>
+      <script src="${content.rootpath!}js/html5shiv.min.js"></script>
     <![endif]-->
 
     <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="<#if (content.rootpath)??>${content.rootpath}</#if>favicon.ico">
+    <link rel="shortcut icon" href="${content.rootpath!}favicon.ico">
     <#if content?? && content.og??>
         <meta property="og:description" content="${content.og.description}"/>
     </#if>
