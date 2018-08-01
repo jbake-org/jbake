@@ -20,7 +20,7 @@ public class ConfigUtilTest {
         // check custom.properties values exist
         assertEquals("testing123", config.getString("test.property"));
 
-		assertEquals("http://www.jbake.org", config.getString(Keys.SITE_HOST));
+        assertEquals("http://www.jbake.org", config.getString(Keys.SITE_HOST));
 
     }
 }

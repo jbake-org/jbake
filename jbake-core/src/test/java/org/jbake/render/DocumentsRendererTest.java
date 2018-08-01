@@ -36,15 +36,15 @@ public class DocumentsRendererTest {
     private DocumentList emptyDocumentList;
     private File destinationFile;
     private File templatePath;
-    
+
     @Captor
     private ArgumentCaptor<Map<String, Object>> argument;
 
     @Before
     public void setUp() throws Exception {
-    	
-    	MockitoAnnotations.initMocks(this);
-    	
+
+        MockitoAnnotations.initMocks(this);
+
         documentsRenderer = new DocumentsRenderer();
 
         db = mock(ContentStore.class);
@@ -60,7 +60,7 @@ public class DocumentsRendererTest {
     public void shouldReturnZeroIfNothingHasRendered() throws Exception {
 
         when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
-        
+
         int renderResponse = documentsRenderer.render(renderer,db,destinationFile,templatePath,configuration);
 
         assertThat(renderResponse).isEqualTo(0);
@@ -115,68 +115,68 @@ public class DocumentsRendererTest {
         // then
         assertThat(renderResponse).isEqualTo(2);
     }
-    
+
     @Test
     public void shouldContainPostNavigation()  throws Exception{
-    	DocumentTypes.addDocumentType("customType");
-    	
-    	String first = "First Document";
-    	String second = "Second Document";
-    	String third = "Third Document";
-    	String fourth = "Fourth Document";
-    	
-    	DocumentList documents = new DocumentList();
-    	documents.add(simpleDocument(fourth));
-    	documents.add(simpleDocument(third));
-    	documents.add(simpleDocument(second));
-    	documents.add(simpleDocument(first));
-    	
-    	when(db.getUnrenderedContent("customType")).thenReturn(documents);
-    	
-    	int renderResponse = documentsRenderer.render(renderer,db,destinationFile,templatePath,configuration);
-    	
-    	Map<String, Object> fourthDoc = simpleDocument(fourth);
-    	fourthDoc.put("previousContent", simpleDocument(third));
-    	fourthDoc.put("nextContent", null);
-   
-    	Map<String, Object> thirdDoc = simpleDocument(third);
-    	thirdDoc.put("nextContent", simpleDocument(fourth));
-    	thirdDoc.put("previousContent", simpleDocument(second));
-    	
-    	Map<String, Object> secondDoc = simpleDocument(second);
-    	secondDoc.put("nextContent", simpleDocument(third));
-    	secondDoc.put("previousContent", simpleDocument(first));
-    	
-    	Map<String, Object> firstDoc = simpleDocument(first);
-    	firstDoc.put("nextContent", simpleDocument(second));
-    	firstDoc.put("previousContent", null);
-    	
-    	verify(renderer,times(4)).render(argument.capture());
-    	
-    	List<Map<String, Object>> maps = argument.getAllValues();
-    	
-    	assertThat(maps).contains(fourthDoc);
-    	
-    	assertThat(maps).contains(thirdDoc);
-    	
-    	assertThat(maps).contains(secondDoc);
-    	
-    	assertThat(maps).contains(firstDoc);
-    	
-    	assertThat(renderResponse).isEqualTo(4);
+        DocumentTypes.addDocumentType("customType");
+
+        String first = "First Document";
+        String second = "Second Document";
+        String third = "Third Document";
+        String fourth = "Fourth Document";
+
+        DocumentList documents = new DocumentList();
+        documents.add(simpleDocument(fourth));
+        documents.add(simpleDocument(third));
+        documents.add(simpleDocument(second));
+        documents.add(simpleDocument(first));
+
+        when(db.getUnrenderedContent("customType")).thenReturn(documents);
+
+        int renderResponse = documentsRenderer.render(renderer,db,destinationFile,templatePath,configuration);
+
+        Map<String, Object> fourthDoc = simpleDocument(fourth);
+        fourthDoc.put("previousContent", simpleDocument(third));
+        fourthDoc.put("nextContent", null);
+
+        Map<String, Object> thirdDoc = simpleDocument(third);
+        thirdDoc.put("nextContent", simpleDocument(fourth));
+        thirdDoc.put("previousContent", simpleDocument(second));
+
+        Map<String, Object> secondDoc = simpleDocument(second);
+        secondDoc.put("nextContent", simpleDocument(third));
+        secondDoc.put("previousContent", simpleDocument(first));
+
+        Map<String, Object> firstDoc = simpleDocument(first);
+        firstDoc.put("nextContent", simpleDocument(second));
+        firstDoc.put("previousContent", null);
+
+        verify(renderer,times(4)).render(argument.capture());
+
+        List<Map<String, Object>> maps = argument.getAllValues();
+
+        assertThat(maps).contains(fourthDoc);
+
+        assertThat(maps).contains(thirdDoc);
+
+        assertThat(maps).contains(secondDoc);
+
+        assertThat(maps).contains(firstDoc);
+
+        assertThat(renderResponse).isEqualTo(4);
     }
 
     private HashMap<String, Object> emptyDocument() {
         return new HashMap<String,Object>();
     }
-    
+
     private Map<String, Object> simpleDocument(String title) {
-    	Map<String, Object> simpleDoc = new HashMap<String, Object>();
-    	String uri = title.replace(" ", "_");
-    	simpleDoc.put(Attributes.NO_EXTENSION_URI, uri);
-    	simpleDoc.put(Attributes.URI, uri);
-    	simpleDoc.put(Attributes.TITLE, title);;
-		return simpleDoc;
+        Map<String, Object> simpleDoc = new HashMap<String, Object>();
+        String uri = title.replace(" ", "_");
+        simpleDoc.put(Attributes.NO_EXTENSION_URI, uri);
+        simpleDoc.put(Attributes.URI, uri);
+        simpleDoc.put(Attributes.TITLE, title);;
+        return simpleDoc;
     }
-    
+
 }

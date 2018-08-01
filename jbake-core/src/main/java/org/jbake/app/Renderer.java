@@ -151,7 +151,7 @@ public class Renderer {
         this.renderingEngine = new DelegatingTemplateEngine(config, db, destination, templatesPath);
         this.db = db;
     }
-    
+
     /**
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
@@ -264,7 +264,7 @@ public class Renderer {
             Map<String, Object> model = new HashMap<String, Object>();
             model.put("renderer", renderingEngine);
             model.put("numberOfPages", pagingHelper.getNumberOfPages());
-            
+
             try {
                 db.setLimit(postsPerPage);
                 for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
@@ -276,11 +276,11 @@ public class Renderer {
                     model.put("previousFileName", previous);
                     String nextFileName = pagingHelper.getNextFileName(page);
                     model.put("nextFileName", nextFileName);
-                    
+
                     Map<String, Object> contentModel =  buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
-                    
+
                     if(page > 1){
-                    	contentModel.put(Attributes.ROOTPATH, "../");
+                        contentModel.put(Attributes.ROOTPATH, "../");
                     }
                     model.put("content", contentModel);
 
@@ -337,57 +337,57 @@ public class Renderer {
      * @throws Exception if cannot render tags correctly
      */
     public int renderTags(String tagPath) throws Exception {
-		int renderedCount = 0;
-		final List<Throwable> errors = new LinkedList<Throwable>();
+        int renderedCount = 0;
+        final List<Throwable> errors = new LinkedList<Throwable>();
 
-		for (String tag : db.getAllTags()) {
-			try {
-				Map<String, Object> model = new HashMap<String, Object>();
-				model.put("renderer", renderingEngine);
-				model.put(Attributes.TAG, tag);
-				Map<String, Object>  map = buildSimpleModel(Attributes.TAG);
-				map.put(Attributes.ROOTPATH, "../");
-				model.put("content", map);
+        for (String tag : db.getAllTags()) {
+            try {
+                Map<String, Object> model = new HashMap<String, Object>();
+                model.put("renderer", renderingEngine);
+                model.put(Attributes.TAG, tag);
+                Map<String, Object>  map = buildSimpleModel(Attributes.TAG);
+                map.put(Attributes.ROOTPATH, "../");
+                model.put("content", map);
 
-				File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
-				render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
+                File path = new File(destination.getPath() + File.separator + tagPath + File.separator + tag + config.getString(Keys.OUTPUT_EXTENSION));
+                render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
-				renderedCount++;
-			} catch (Exception e) {
-				errors.add(e);
-			}
-		}
-		
-		if (config.getBoolean(Keys.RENDER_TAGS_INDEX)) {
-			try{
-				// Add an index file at root folder of tags.
-				// This will prevent directory listing and also provide an option to
-				// display all tags page.
-				Map<String, Object> model = new HashMap<String, Object>();
-				model.put("renderer", renderingEngine);
-				Map<String, Object> map = buildSimpleModel(Attributes.TAGS);
-				map.put(Attributes.ROOTPATH, "../");
-				model.put("content", map);
-	
-				File path = new File(destination.getPath() + File.separator + tagPath + File.separator + "index" + config.getString(Keys.OUTPUT_EXTENSION));
-				render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
-				renderedCount++;
-			} catch(Exception e){
-				errors.add(e);
-			}
-		}
+                renderedCount++;
+            } catch (Exception e) {
+                errors.add(e);
+            }
+        }
 
-		if (!errors.isEmpty()) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Failed to render tags. Cause(s):");
-			for (Throwable error : errors) {
-				sb.append("\n").append(error.getMessage());
-			}
-			throw new Exception(sb.toString(), errors.get(0));
-		} else {
-			return renderedCount;
-		}
-	}
+        if (config.getBoolean(Keys.RENDER_TAGS_INDEX)) {
+            try{
+                // Add an index file at root folder of tags.
+                // This will prevent directory listing and also provide an option to
+                // display all tags page.
+                Map<String, Object> model = new HashMap<String, Object>();
+                model.put("renderer", renderingEngine);
+                Map<String, Object> map = buildSimpleModel(Attributes.TAGS);
+                map.put(Attributes.ROOTPATH, "../");
+                model.put("content", map);
+
+                File path = new File(destination.getPath() + File.separator + tagPath + File.separator + "index" + config.getString(Keys.OUTPUT_EXTENSION));
+                render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
+                renderedCount++;
+            } catch(Exception e){
+                errors.add(e);
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Failed to render tags. Cause(s):");
+            for (Throwable error : errors) {
+                sb.append("\n").append(error.getMessage());
+            }
+            throw new Exception(sb.toString(), errors.get(0));
+        } else {
+            return renderedCount;
+        }
+    }
 
     /**
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.

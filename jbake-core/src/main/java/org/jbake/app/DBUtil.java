@@ -9,18 +9,18 @@ import java.util.Map;
 
 public class DBUtil {
     private static ContentStore contentStore;
-    
+
     public static ContentStore createDataStore(final String type, String name) {
         if (contentStore == null) {
             contentStore = new ContentStore(type, name);
         }
         return contentStore;
     }
-    
+
     public static void closeDataStore() {
         contentStore = null;
     }
-    
+
     public static void updateSchema(final ContentStore db) {
         db.updateSchema();
     }
@@ -42,13 +42,13 @@ public class DBUtil {
      */
     @SuppressWarnings("unchecked")
     public static String[] toStringArray(Object entry) {
-    	if (entry instanceof String[]) {
+        if (entry instanceof String[]) {
             return (String[]) entry;
         } else if (entry instanceof OTrackedList) {
             OTrackedList<String> list = (OTrackedList<String>) entry;
             return list.toArray(new String[list.size()]);
         }
-    	return new String[0];
+        return new String[0];
     }
 
 }

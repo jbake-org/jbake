@@ -20,34 +20,34 @@ public class FileUtilTest {
         File path = FileUtil.getRunningLocation();
         assertThat(new File("build/classes").getAbsolutePath()).isEqualTo(path.getPath());
     }
-    
+
     @Test
     public void testFileIgnore() throws IOException, InterruptedException {
-    	URL sourceUrl = this.getClass().getResource("/fixture");
-    	File contentFolder = new File(sourceUrl.getFile(), "content");
-    	
-    	//Without filter, make sure ignorable file is selected
-    	File files1[] = contentFolder.listFiles();
-    	assertThat(files1).contains(new File(contentFolder, ".ignorablefile.html"));
-    	
-    	TestUtils.hideAssets(contentFolder);
-    	
-    	//When using filter, ignorable file should not be selected
-    	File files2[] = contentFolder.listFiles(FileUtil.getFileFilter());
-    	assertThat(files2).doesNotContain(new File(contentFolder, ".ignorablefile.html"));
+        URL sourceUrl = this.getClass().getResource("/fixture");
+        File contentFolder = new File(sourceUrl.getFile(), "content");
+
+        //Without filter, make sure ignorable file is selected
+        File files1[] = contentFolder.listFiles();
+        assertThat(files1).contains(new File(contentFolder, ".ignorablefile.html"));
+
+        TestUtils.hideAssets(contentFolder);
+
+        //When using filter, ignorable file should not be selected
+        File files2[] = contentFolder.listFiles(FileUtil.getFileFilter());
+        assertThat(files2).doesNotContain(new File(contentFolder, ".ignorablefile.html"));
     }
-    
+
     @Test
     public void testFolderIgnore(){
-    	URL sourceUrl = this.getClass().getResource("/fixture");
-    	File contentFolder = new File(sourceUrl.getFile());
-    	
-    	//Without filter, make sure ignorable folder is selected
-    	File files1[] = contentFolder.listFiles();
-    	assertThat(files1).contains(new File(contentFolder, "ignorablefolder"));
-    	
-    	//When using filter, ignorable folder should not be selected
-    	File files2[] = contentFolder.listFiles(FileUtil.getFileFilter());
-    	assertThat(files2).doesNotContain(new File(contentFolder, "ignorablefolder"));
+        URL sourceUrl = this.getClass().getResource("/fixture");
+        File contentFolder = new File(sourceUrl.getFile());
+
+        //Without filter, make sure ignorable folder is selected
+        File files1[] = contentFolder.listFiles();
+        assertThat(files1).contains(new File(contentFolder, "ignorablefolder"));
+
+        //When using filter, ignorable folder should not be selected
+        File files2[] = contentFolder.listFiles(FileUtil.getFileFilter());
+        assertThat(files2).doesNotContain(new File(contentFolder, "ignorablefolder"));
     }
 }

@@ -68,36 +68,36 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
         @Override
         public TemplateModel get(final String key) throws TemplateModelException {
-        	try {
-        		
-        		// GIT Issue#357: Accessing db in freemarker template throws exception
-        		// When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
-        		// All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
-        		if(key.equals(Crawler.Attributes.DB)) {
-        			BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-    				BeansWrapper bw = bwb.build();
-    				return bw.wrap(db);
-				} 
-        		
-        		
-        		return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
+            try {
 
-					@Override
-					public TemplateModel adapt(String key, Object extractedValue) {
-						if(key.equals(Crawler.Attributes.ALLTAGS)) {
-							return new SimpleCollection((Collection) extractedValue, wrapper);
-						} else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
-							return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
-						} else {
-							// All other cases, as far as I know, are document collections
-							return new SimpleSequence((Collection) extractedValue, wrapper);
-						}
-										
-					}
-				});
-        	} catch(NoModelExtractorException e) {
-        		return eagerModel.get(key);
-        	}
+                // GIT Issue#357: Accessing db in freemarker template throws exception
+                // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
+                // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
+                if(key.equals(Crawler.Attributes.DB)) {
+                    BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+                    BeansWrapper bw = bwb.build();
+                    return bw.wrap(db);
+                }
+
+
+                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
+
+                    @Override
+                    public TemplateModel adapt(String key, Object extractedValue) {
+                        if(key.equals(Crawler.Attributes.ALLTAGS)) {
+                            return new SimpleCollection((Collection) extractedValue, wrapper);
+                        } else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
+                            return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
+                        } else {
+                            // All other cases, as far as I know, are document collections
+                            return new SimpleSequence((Collection) extractedValue, wrapper);
+                        }
+
+                    }
+                });
+            } catch(NoModelExtractorException e) {
+                return eagerModel.get(key);
+            }
         }
 
         @Override

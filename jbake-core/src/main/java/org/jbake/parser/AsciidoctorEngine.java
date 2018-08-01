@@ -89,7 +89,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         Map<String, Object> contents = context.getContents();
         if (header.getDocumentTitle() != null) {
-        	contents.put("title", header.getDocumentTitle().getCombined());
+            contents.put("title", header.getDocumentTitle().getCombined());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (String key : attributes.keySet()) {
@@ -158,9 +158,9 @@ public class AsciidoctorEngine extends MarkupEngine {
         for (final Iterator<String> iterator = optionsSubset.getKeys(); iterator.hasNext();) {
             final String name = iterator.next();
             if (name.equals(Options.TEMPLATE_DIRS)) {
-            	options.setTemplateDirs(optionsSubset.getString(name));
+                options.setTemplateDirs(optionsSubset.getString(name));
             } else {
-            	options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
+                options.setOption(name,  guessTypeByContent(optionsSubset.getString(name)));
             }
         }
         options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());

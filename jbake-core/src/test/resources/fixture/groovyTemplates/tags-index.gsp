@@ -6,21 +6,21 @@
         <a class="btn btn-large btn-success" href="#">Sign up today</a>
       </div>
 
-	<hr>-->
+    <hr>-->
 
-	<div class="row-fluid marketing">
-		<div class="span12">
-			<h1>Tags</h1>
+    <div class="row-fluid marketing">
+        <div class="span12">
+            <h1>Tags</h1>
             <%def last_month=null;%>
             <%tags.each {tag ->%>
-				
-				
-				<h2><a href="${tag.uri}">${tag.name}</a></h2>
-				
-			<%}%>
-		</div>
-	</div>
 
-	<hr>
+
+                <h2><a href="${tag.uri}">${tag.name}</a></h2>
+
+            <%}%>
+        </div>
+    </div>
+
+    <hr>
 
 <%include "footer.gsp"%>

@@ -58,14 +58,14 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
         return new HashMap<String, Object>(model) {
             @Override
             public Object get(final Object property) {
-            	if (property instanceof String || property instanceof GString) {
-            		String key = property.toString();
-					try {
-						put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
-					} catch (NoModelExtractorException e) {
-						// should never happen, as we iterate over existing extractors
-					}
-            	}
+                if (property instanceof String || property instanceof GString) {
+                    String key = property.toString();
+                    try {
+                        put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
+                    } catch (NoModelExtractorException e) {
+                        // should never happen, as we iterate over existing extractors
+                    }
+                }
 
                 return super.get(property);
             }

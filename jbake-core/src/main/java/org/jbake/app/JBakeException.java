@@ -7,20 +7,20 @@ package org.jbake.app;
  * It always contains an error message and if available the cause.
  */
 public class JBakeException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param message
-	 *            The error message.
-	 * @param cause
-	 *            The causing exception or <code>null</code> if no cause
-	 *            available.
-	 */
-	public JBakeException(final String message, final Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     *            The error message.
+     * @param cause
+     *            The causing exception or <code>null</code> if no cause
+     *            available.
+     */
+    public JBakeException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-	public JBakeException(final String message) {
-		this(message, null);
-	}
+    public JBakeException(final String message) {
+        this(message, null);
+    }
 }

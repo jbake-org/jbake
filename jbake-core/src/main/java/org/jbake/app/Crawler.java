@@ -201,8 +201,8 @@ public class Crawler {
             if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
                 fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
-            
-            
+
+
             // Prevent image source url's from breaking
             HtmlUtil.fixImageSourceUrls(fileContents,config);
 
@@ -217,21 +217,21 @@ public class Crawler {
     }
 
     public String getPathToRoot(File sourceFile) {
-    	File rootPath = new File(contentPath);
-    	File parentPath = sourceFile.getParentFile();
-    	int parentCount = 0;
-    	while (!parentPath.equals(rootPath)) {
-    		parentPath = parentPath.getParentFile();
-    		parentCount++;
-    	}
-    	StringBuilder sb = new StringBuilder();
-    	for (int i = 0; i < parentCount; i++) {
-    		sb.append("../");
-    	}
-    	if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
-        	sb.append("../");
+        File rootPath = new File(contentPath);
+        File parentPath = sourceFile.getParentFile();
+        int parentCount = 0;
+        while (!parentPath.equals(rootPath)) {
+            parentPath = parentPath.getParentFile();
+            parentCount++;
         }
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parentCount; i++) {
+            sb.append("../");
+        }
+        if (config.getBoolean(Keys.URI_NO_EXTENSION)) {
+            sb.append("../");
+        }
+        return sb.toString();
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {

@@ -13,6 +13,6 @@ import org.jbake.app.ContentStore;
  */
 public interface ModelExtractor<T extends Object> {
 
-	T get(ContentStore db, Map model, String key);
+    T get(ContentStore db, Map model, String key);
 
 }

@@ -30,17 +30,17 @@ public class FileUtil {
 
             @Override
             public boolean accept(File pathname) {
-            	//Accept if input  is a non-hidden file with registered extension
-            	//or if a non-hidden and not-ignored directory 
+                //Accept if input  is a non-hidden file with registered extension
+                //or if a non-hidden and not-ignored directory
                 return   !pathname.isHidden() && (pathname.isFile()
                         && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
             }
         };
     }
-    
+
     /**
      * Gets the list of files that are not content files based on their extension.
-     * 
+     *
      * @return FileFilter object
      */
     public static FileFilter getNotContentFileFilter() {
@@ -48,34 +48,34 @@ public class FileUtil {
 
             @Override
             public boolean accept(File pathname) {
-            	//Accept if input  is a non-hidden file with NOT-registered extension
-            	//or if a non-hidden and not-ignored directory 
+                //Accept if input  is a non-hidden file with NOT-registered extension
+                //or if a non-hidden and not-ignored directory
                 return  !pathname.isHidden() && (pathname.isFile()
-                		//extension should not be from registered content extensions
-                        && !Engines.getRecognizedExtensions().contains(fileExt(pathname))) 
-                			|| (directoryOnlyIfNotIgnored(pathname));
+                        //extension should not be from registered content extensions
+                        && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
+                            || (directoryOnlyIfNotIgnored(pathname));
             }
         };
     }
-    
+
     /**
      * Ignores directory (and children) if it contains a file named ".jbakeignore".
      * @param file {@link File}
      * @return {@link Boolean} true/false
      */
     public static boolean directoryOnlyIfNotIgnored(File file){
-    	boolean accept = false;
-    	
-    	FilenameFilter ignoreFile = new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.equalsIgnoreCase(".jbakeignore");
-			}
-		}; 
-    	
-    	accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
-    	
-    	return accept;
+        boolean accept = false;
+
+        FilenameFilter ignoreFile = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.equalsIgnoreCase(".jbakeignore");
+            }
+        };
+
+        accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
+
+        return accept;
     }
 
     public static boolean isExistingFolder(File f) {
@@ -86,7 +86,7 @@ public class FileUtil {
      * Works out the folder where JBake is running from.
      *
      * @return File referencing folder JBake is running from
-     * @throws Exception	when application is not able to work out where is JBake running from
+     * @throws Exception    when application is not able to work out where is JBake running from
      */
     public static File getRunningLocation() throws Exception {
         String codePath = FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -158,38 +158,38 @@ public class FileUtil {
     }
 
     public static String findExtension(CompositeConfiguration config, String docType) {
-    	String extension = config.getString("template."+docType+".extension");
-    	if (extension != null) {
-    		return extension;
-    	} else {
-    		return config.getString(Keys.OUTPUT_EXTENSION);
-    	}
+        String extension = config.getString("template."+docType+".extension");
+        if (extension != null) {
+            return extension;
+        } else {
+            return config.getString(Keys.OUTPUT_EXTENSION);
+        }
     }
-    
-	/**
-	 * platform independent file.getPath() 
-	 * 
-	 * @param file the file to transform, or {@code null}
-	 * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null} 
-	 *         Needed to transform Windows path separators into slashes.
-	 */
-	public static String asPath(File file) {
-		if(file == null) {
-			return null;
-		}
-	    return asPath(file.getPath());
-	}
-	
-	/**
-	 * platform independent file.getPath() 
-	 * 
-	 * @param path the path to transform, or {@code null}
-	 * @return The result will have alle platform path separators replaced by "/".
-	 */
-	public static String asPath(String path) {
-		if(path == null) {
-			return null;
-		}
-		return path.replace(File.separator, "/");
-	}
+
+    /**
+     * platform independent file.getPath()
+     *
+     * @param file the file to transform, or {@code null}
+     * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null}
+     *         Needed to transform Windows path separators into slashes.
+     */
+    public static String asPath(File file) {
+        if(file == null) {
+            return null;
+        }
+        return asPath(file.getPath());
+    }
+
+    /**
+     * platform independent file.getPath()
+     *
+     * @param path the path to transform, or {@code null}
+     * @return The result will have alle platform path separators replaced by "/".
+     */
+    public static String asPath(String path) {
+        if(path == null) {
+            return null;
+        }
+        return path.replace(File.separator, "/");
+    }
 }

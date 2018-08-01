@@ -6,16 +6,16 @@
       <body>
       <div th:replace="header.thyme::top"/>
 
-	<div class="row-fluid marketing">
-		<div class="span12">
-			<h1>Tags</h1>
-			<div th:each="tag : ${tags}" th:with='last_month=null' th:remove='tag'>
-			   <h2><a th:href="${tag.uri}" th:text='${tag.name}' href="foo.html">Post title</a></h2>
-			</div>
-		</div>
-	</div>
+    <div class="row-fluid marketing">
+        <div class="span12">
+            <h1>Tags</h1>
+            <div th:each="tag : ${tags}" th:with='last_month=null' th:remove='tag'>
+               <h2><a th:href="${tag.uri}" th:text='${tag.name}' href="foo.html">Post title</a></h2>
+            </div>
+        </div>
+    </div>
 
-	<hr/>
+    <hr/>
 
     <div th:replace="footer.thyme::footer"></div>
     </body>

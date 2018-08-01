@@ -25,47 +25,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith( MockitoJUnitRunner.class )
 public class RendererTest {
 
-	@Rule
+    @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-	private CompositeConfiguration config;
-	private File rootPath;
-	private File outputPath;
-	
-	@Mock private ContentStore db;
-	@Mock private DelegatingTemplateEngine renderingEngine;
-	
-	@Before
+    private CompositeConfiguration config;
+    private File rootPath;
+    private File outputPath;
+
+    @Mock private ContentStore db;
+    @Mock private DelegatingTemplateEngine renderingEngine;
+
+    @Before
     public void setup() throws Exception {
-		URL sourceUrl = this.getClass().getResource("/");
-		rootPath = new File(sourceUrl.getFile());
+        URL sourceUrl = this.getClass().getResource("/");
+        rootPath = new File(sourceUrl.getFile());
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
         outputPath = folder.newFolder("output");
-		config = ConfigUtil.load(rootPath);		
-	}
-	
-	/**
-	 * See issue #300
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-    public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
-		String FOLDER = "real.path";
+        config = ConfigUtil.load(rootPath);
+    }
 
-		final String FILENAME = "about";
-		config.setProperty(Keys.OUTPUT_EXTENSION, "");
-		Renderer renderer = new Renderer(db, outputPath, folder.newFolder("templates"), config, renderingEngine);
-		
-		Map<String, Object> content = new HashMap<String, Object>();
-		content.put(Crawler.Attributes.TYPE, "page");
-		content.put(Crawler.Attributes.URI, "/" + FOLDER + "/" + FILENAME);
-		content.put(Crawler.Attributes.STATUS, "published");
-		
-		renderer.render(content);
-		
-		File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
-		assertThat(outputFile).isFile();
-	}
+    /**
+     * See issue #300
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
+        String FOLDER = "real.path";
+
+        final String FILENAME = "about";
+        config.setProperty(Keys.OUTPUT_EXTENSION, "");
+        Renderer renderer = new Renderer(db, outputPath, folder.newFolder("templates"), config, renderingEngine);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put(Crawler.Attributes.TYPE, "page");
+        content.put(Crawler.Attributes.URI, "/" + FOLDER + "/" + FILENAME);
+        content.put(Crawler.Attributes.STATUS, "published");
+
+        renderer.render(content);
+
+        File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
+        assertThat(outputFile).isFile();
+    }
 }

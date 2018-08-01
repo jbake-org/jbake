@@ -7,6 +7,6 @@ import org.apache.commons.configuration.Configuration;
 
 public interface ParserEngine {
 
-	Map<String, Object> parse(Configuration config, File file, String contentPath);
+    Map<String, Object> parse(Configuration config, File file, String contentPath);
 
 }

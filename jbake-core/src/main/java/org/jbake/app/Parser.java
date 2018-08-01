@@ -38,12 +38,12 @@ public class Parser {
      * @return   The contents of the file as a @{@link Map}
      */
     public Map<String, Object> processFile(File file) {
-    	ParserEngine engine = Engines.get(FileUtil.fileExt(file));
-    	if (engine==null) {
-    		LOGGER.error("Unable to find suitable markup engine for {}",file);
-    		return null;
-    	}
-    	
-    	return engine.parse(config, file, contentPath);
+        ParserEngine engine = Engines.get(FileUtil.fileExt(file));
+        if (engine==null) {
+            LOGGER.error("Unable to find suitable markup engine for {}",file);
+            return null;
+        }
+
+        return engine.parse(config, file, contentPath);
     }
 }

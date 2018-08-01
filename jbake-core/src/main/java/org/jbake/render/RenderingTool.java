@@ -9,6 +9,6 @@ import org.jbake.template.RenderingException;
 
 public interface RenderingTool {
 
-	int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException;
+    int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException;
 
 }

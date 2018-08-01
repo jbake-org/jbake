@@ -30,14 +30,14 @@ public class Oven {
     private final static Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
 
     private CompositeConfiguration config;
-	private File source;
-	private File destination;
-	private File templatesPath;
-	private File contentsPath;
-	private File assetsPath;
-	private boolean isClearCache;
-	private List<Throwable> errors = new LinkedList<Throwable>();
-	private int renderedCount = 0;
+    private File source;
+    private File destination;
+    private File templatesPath;
+    private File contentsPath;
+    private File assetsPath;
+    private boolean isClearCache;
+    private List<Throwable> errors = new LinkedList<Throwable>();
+    private int renderedCount = 0;
 
     /**
      * Delegate c'tor to prevent API break for the moment.
@@ -97,7 +97,7 @@ public class Oven {
     }
 
     private File setupPathFromConfig(String key) {
-    	return new File(FilenameUtils.concat(source.getAbsolutePath(), config.getString(key)));
+        return new File(FilenameUtils.concat(source.getAbsolutePath(), config.getString(key)));
     }
 
     /**
@@ -110,26 +110,26 @@ public class Oven {
         templatesPath = setupRequiredFolderFromConfig(Keys.TEMPLATE_FOLDER);
         contentsPath = setupRequiredFolderFromConfig(Keys.CONTENT_FOLDER);
         assetsPath = setupPathFromConfig(Keys.ASSET_FOLDER);
-		if (!assetsPath.exists()) {
-			LOGGER.warn("No asset folder was found!");
-		}
-		ensureDestination();
-	}
+        if (!assetsPath.exists()) {
+            LOGGER.warn("No asset folder was found!");
+        }
+        ensureDestination();
+    }
 
-	private File setupRequiredFolderFromConfig(final String key) {
-		final File path = setupPathFromConfig(key);
-		if (!FileUtil.isExistingFolder(path)) {
-			throw new JBakeException("Error: Required folder cannot be found! Expected to find [" + key + "] at: " + path.getAbsolutePath());
-		}
-		return path;
-	}
+    private File setupRequiredFolderFromConfig(final String key) {
+        final File path = setupPathFromConfig(key);
+        if (!FileUtil.isExistingFolder(path)) {
+            throw new JBakeException("Error: Required folder cannot be found! Expected to find [" + key + "] at: " + path.getAbsolutePath());
+        }
+        return path;
+    }
 
-	/**
-	 * All the good stuff happens in here...
-	 *
-	 */
-	public void bake() {
-			final ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
+    /**
+     * All the good stuff happens in here...
+     *
+     */
+    public void bake() {
+            final ContentStore db = DBUtil.createDataStore(config.getString(Keys.DB_STORE), config.getString(Keys.DB_PATH));
             updateDocTypesFromConfiguration();
             DBUtil.updateSchema(db);
             try {
@@ -142,20 +142,20 @@ public class Oven {
                 crawler.crawl(contentsPath);
                 LOGGER.info("Content detected:");
                 for (String docType : DocumentTypes.getDocumentTypes()) {
-                	long count = db.getDocumentCount(docType);
-                	if (count > 0) {
-                		LOGGER.info("Parsed {} files of type: {}", count, docType);
-            		}
+                    long count = db.getDocumentCount(docType);
+                    if (count > 0) {
+                        LOGGER.info("Parsed {} files of type: {}", count, docType);
+                    }
                 }
 
                 Renderer renderer = new Renderer(db, destination, templatesPath, config);
 
                 for(RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
-                	try {
-                		renderedCount += tool.render(renderer, db, destination, templatesPath, config);
-                	} catch(RenderingException e) {
-                		errors.add(e);
-                	}
+                    try {
+                        renderedCount += tool.render(renderer, db, destination, templatesPath, config);
+                    } catch(RenderingException e) {
+                        errors.add(e);
+                    }
                 }
 
                 // mark docs as rendered
@@ -238,8 +238,8 @@ public class Oven {
         }
     }
 
-	public List<Throwable> getErrors() {
-		return new ArrayList<Throwable>(errors);
-	}
+    public List<Throwable> getErrors() {
+        return new ArrayList<Throwable>(errors);
+    }
 
 }
