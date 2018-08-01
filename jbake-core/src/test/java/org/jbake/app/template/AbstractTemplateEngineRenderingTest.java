@@ -26,7 +26,6 @@ package org.jbake.app.template;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.ConfigUtil;
-import org.jbake.app.ContentStore;
 import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.DBUtil;
