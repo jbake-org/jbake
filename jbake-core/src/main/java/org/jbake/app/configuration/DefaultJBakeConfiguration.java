@@ -1,11 +1,5 @@
 package org.jbake.app.configuration;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation of a {@link JBakeConfiguration}
@@ -31,6 +30,9 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     private static final String DOCTYPE_TEMPLATE_PREFIX = "template.";
     private Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
     private CompositeConfiguration compositeConfiguration;
+
+    public static final int MAX_HEADER_LINES_DEFAULT = 50;
+
 
     /**
      * Some deprecated implementations just need access to the configuration without access to the source folder
@@ -466,6 +468,12 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public String getVersion() {
         return getAsString(JBakeProperty.VERSION);
+    }
+
+    @Override
+    public int getMaxHeaderLinesScan()
+    {
+        return getAsInt(JBakeProperty.MAX_HEADER_LINES_SCAN, MAX_HEADER_LINES_DEFAULT);
     }
 
     public void setDestinationFolderName(String folderName) {

@@ -300,6 +300,12 @@ public interface JBakeConfiguration {
     String getVersion();
 
     /**
+     * @return Maximum lines to scan when looking for a JBake in-file header.
+     */
+    int getMaxHeaderLinesScan();
+
+
+    /**
      * Set a property value for the given key
      *
      * @param key   the key for the property

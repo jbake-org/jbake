@@ -36,9 +36,6 @@ public abstract class MarkupEngine implements ParserEngine {
 
     private JBakeConfiguration configuration;
 
-    public static final int MAX_HEADER_LINES = 50;
-
-
     /**
      * Tests if this markup engine can process the document.
      *
@@ -174,9 +171,10 @@ public abstract class MarkupEngine implements ParserEngine {
 
         List<String> headerLines = new ArrayList<>();
 
+        int scanMaxLines = configuration.getMaxHeaderLinesScan();
 
         //for (String line : contents) {
-        for (int i = 0; i < contents.size() && i < MAX_HEADER_LINES; i++) {
+        for (int i = 0; i < contents.size() && i < scanMaxLines; i++) {
             String line = contents.get(i);
             if (StringUtils.isBlank(line))
                 continue;
