@@ -1,9 +1,9 @@
 <#include "header.ftl">
-	
+
 	<#include "menu.ftl">
-	
+
 	<div class="page-header">
-		<h2><#escape x as x?xml>${content.title}</#escape></h2>
+		<h2>${content.title}</h2>
 	</div>
 
 	<p class="post-date">${content.date?string("dd MMMM yyyy")}</p>
