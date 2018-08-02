@@ -181,6 +181,10 @@ public class ConfigUtil {
 		 * The configured base URI for the hosted content
 		 */
 		String SITE_HOST = "site.host";
+		/**
+		 * Property to define if image paths should be prepended with site.host url
+		 */
+		String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
 	}
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
