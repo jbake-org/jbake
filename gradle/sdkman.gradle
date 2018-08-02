@@ -1,3 +1,17 @@
+buildscript {
+    repositories {
+        maven {
+            //https://plugins.gradle.org/m2/io/sdkman/vendors/io.sdkman.vendors.gradle.plugin/1.1.1/io.sdkman.vendors.gradle.plugin-1.1.1.jar
+            //url "https://plugins.gradle.org/m2/"
+            //https://mvnrepository.com/artifact/gradle.plugin.io.sdkman/gradle-sdkvendor-plugin
+            url "https://mvnrepository.com/artifact/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.1"
+    }
+}
+
 apply plugin: "io.sdkman.vendors"
 
 ext.sdkman_consumer_key = project.hasProperty('sdkman_consumer_key')?sdkman_consumer_key:''
