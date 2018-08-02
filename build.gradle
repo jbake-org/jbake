@@ -1,13 +1,44 @@
+buildscript {
+    repositories {
+        maven {
+            // 404: https://plugins.gradle.org/m2/io/sdkman/vendors/io.sdkman.vendors.gradle.plugin/1.1.1/io.sdkman.vendors.gradle.plugin-1.1.1.jar
+            // 200: https://plugins.gradle.org/m2/gradle/plugin/io/sdkman/gradle-sdkvendor-plugin/1.1.1/gradle-sdkvendor-plugin-1.1.1.jar
+            url "https://plugins.gradle.org/m2/"
+            // https://mvnrepository.com/artifact/gradle.plugin.io.sdkman/gradle-sdkvendor-plugin
+            //url "https://mvnrepository.com/artifact/"
+
+            // https://repo.jfrog.org/artifactory/libs-release-bintray/com/jfrog/bintray/com.jfrog.bintray.gradle.plugin/1.8.0/com.jfrog.bintray.gradle.plugin-1.8.0.jar?referrer
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.io.sdkman:gradle-sdkvendor-plugin:1.1.1"
+    }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+    }
+}
+
+
 plugins {
     id "eclipse"
     id "idea"
-    id "io.sdkman.vendors"              version "1.1.1"     apply false
-    id "com.jfrog.bintray"              version "1.8.0"     apply false
+    //id "io.sdkman.vendors"              version "1.1.1"     apply false
+    //id "com.jfrog.bintray"              version "1.8.0"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
     id "org.sonarqube"                  version "2.6.2"     apply false
     id 'com.github.ben-manes.versions'  version '0.17.0'
     id "nebula.optional-base"           version "3.3.0"     apply false
 }
+
+apply plugin: "io.sdkman.vendors"
+apply plugin: 'com.jfrog.bintray'
+
 
 // common variables
 ext {

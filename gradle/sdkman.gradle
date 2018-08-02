@@ -1,3 +1,4 @@
+
 apply plugin: "io.sdkman.vendors"
 
 ext.sdkman_consumer_key = project.hasProperty('sdkman_consumer_key')?sdkman_consumer_key:''
