@@ -177,10 +177,11 @@ public class ContentStore {
 
     /**
      * Get a document by sourceUri and update it from the given map.
-     * @return the saved document.
-     * @throws Exception if sourceUri or docType are null, or if the document doesn't exist.
+     * @param incomingDocMap The document's db columns.
+     * @return The saved document.
+     * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.
      */
-    public ODocument mergeDocument(Map<String, Object> incomingDocMap)
+    public ODocument mergeDocument(Map<String, ? extends Object> incomingDocMap)
     {
         String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
         if (null == sourceUri)
@@ -212,6 +213,13 @@ public class ContentStore {
     public long getPublishedCount(String docType) {
         String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType);
         return (Long) query(statement).get(0).get("count");
+    }
+
+    /*
+     * In fact, the URI should be the only input as there can only be one document at given URI; but the DB is split per document type for some reason.
+     */
+    public DocumentList getDocumentByUri(String docType, String uri) {
+        return query("select * from " + docType + " where sourceuri=?", uri);
     }
 
     public DocumentList getDocumentStatus(String docType, String uri) {
