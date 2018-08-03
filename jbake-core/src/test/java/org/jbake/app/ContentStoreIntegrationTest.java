@@ -11,7 +11,7 @@ public abstract class ContentStoreIntegrationTest {
 
     @BeforeClass
     public static void setUpClass() {
-        db = DBUtil.createDataStore("memory", "documents" + System.currentTimeMillis());
+        db = DBUtil.createDataStore("plocal", "documents" + System.currentTimeMillis());
     }
 
     @AfterClass
