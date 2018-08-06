@@ -1,26 +1,29 @@
 package org.jbake.app;
 
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest extends ContentStoreIntegrationTest {
     private CompositeConfiguration config;
     private File sourceFolder;
 
+    @BeforeClass
+    public static void setUpClass() {
+        setUpDatabase(StorageType.MEMORY);
+    }
 
     @Before
     public void setup() throws Exception {

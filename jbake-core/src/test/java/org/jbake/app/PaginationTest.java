@@ -23,25 +23,28 @@
  */
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.FakeDocumentBuilder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
-
+import org.apache.commons.configuration.CompositeConfiguration;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.jbake.FakeDocumentBuilder;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author jdlee
  */
 public class PaginationTest extends ContentStoreIntegrationTest {
 
+    @BeforeClass
+    public static void setUpClass() {
+        setUpDatabase(StorageType.MEMORY);
+    }
 
     @Before
     public void setup() throws Exception {

@@ -23,10 +23,19 @@
  */
 package org.jbake.app.template;
 
+import java.io.File;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.jbake.app.ConfigUtil;
-import org.jbake.app.ContentStore;
 import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.DBUtil;
@@ -38,21 +47,10 @@ import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author jdlee
@@ -76,6 +74,12 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         this.templateDir = templateDir;
         this.templateExtension = templateExtension;
     }
+
+    @BeforeClass
+    public static void setUpClass() {
+        setUpDatabase(StorageType.MEMORY);
+    }
+
 
     @Before
     public void setup() throws Exception {
