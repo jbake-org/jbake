@@ -32,57 +32,50 @@ public class HtmlUtil {
     	String htmlContent = fileContents.get(Attributes.BODY).toString();
 
     	boolean prependSiteHost = config.getBoolean(Keys.IMG_PATH_PREPEND_HOST);
-
-        String siteHost = (String) configuration.get("site.host");
-
+        String siteHost = config.getString(Keys.SITE_HOST);
         String rootPath = fileContents.get(Attributes.ROOTPATH).toString();
-
     	String uri = fileContents.get(Attributes.URI).toString();
     	
-    	if(fileContents.get(Attributes.NO_EXTENSION_URI) != null){
+    	if (fileContents.get(Attributes.NO_EXTENSION_URI) != null){
     		uri = fileContents.get(Attributes.NO_EXTENSION_URI).toString();
     		
     		//remove trailing "/"
     		if(uri.endsWith("/")) {
-    			uri = uri.substring(0, uri.length() - 1);
-    		}
-    		
+				uri = uri.substring(0, uri.length() - 1);
+			}
     	}
     	
-    	if(uri.contains("/")){
+    	if (uri.contains("/")){
         	//strip that file name, leaving end "/"
-        		uri = uri.substring(0, uri.lastIndexOf("/") + 1);
+			uri = uri.substring(0, uri.lastIndexOf("/") + 1);
         }
     	
     	Document document = Jsoup.parseBodyFragment(htmlContent);
-    	
     	Elements allImgs = document.getElementsByTag("img");
     	
     	for (Element img : allImgs) {
 			String source = img.attr("src");
 
 			// Now add the root path
-			if(!source.startsWith("http://") 
-					&& !source.startsWith("https://")){
+			if (!source.startsWith("http://") && !source.startsWith("https://")){
 
-                if(!source.startsWith("/")){
-                    source = rootPath + uri + source.replaceFirst("./", "");
+                if (!source.startsWith("/")){
+                	source = uri + source.replaceFirst("./", "");
                 }
+					
+				if (!siteHost.endsWith("/") && !source.startsWith("/")) {
+                	siteHost = siteHost.concat("/");
+				}
 
-				if (!siteHost.endsWith("/") && !source.startsWith("/")) siteHost = siteHost.concat("/");
-
-                if(prependSiteHost) {
+                if (prependSiteHost) {
                     source = siteHost + source;
                 }
 				
 				img.attr("src", source);
-				
 			}
 		}
-    	
     	
     	//Use body().html() to prevent adding <body></body> from parsed fragment.
     	fileContents.put(Attributes.BODY, document.body().html());
     }
-	
 }

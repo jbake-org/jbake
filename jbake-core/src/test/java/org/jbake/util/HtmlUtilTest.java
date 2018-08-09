@@ -51,7 +51,7 @@ public class HtmlUtilTest {
 
         String body = fileContent.get(Attributes.BODY).toString();
 
-        assertThat(body).contains("src=\"../../../blog/2017/05/first.jpg\"");
+        assertThat(body).contains("src=\"blog/2017/05/first.jpg\"");
 
     }
 
@@ -66,7 +66,7 @@ public class HtmlUtilTest {
 		
 		String body = fileContent.get(Attributes.BODY).toString();
 		
-		assertThat(body).contains("src=\"http://www.jbake.org/../../../blog/2017/05/first.jpg\"");
+		assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 		
 	}
 
@@ -81,7 +81,7 @@ public class HtmlUtilTest {
 
 		String body = fileContent.get(Attributes.BODY).toString();
 
-		assertThat(body).contains("src=\"http://www.jbake.org/../../../blog/2017/05/first.jpg\"");
+		assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 
 	}
 	
@@ -128,7 +128,7 @@ public class HtmlUtilTest {
 		
 		String body = fileContent.get(Attributes.BODY).toString();
 		
-		assertThat(body).contains("src=\"http://www.jbake.org/../../../blog/2017/05/first.jpg\"");
+		assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 	}
 	
 	@Test
