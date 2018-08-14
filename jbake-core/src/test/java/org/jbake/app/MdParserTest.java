@@ -1,7 +1,8 @@
 
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,9 +27,7 @@ public class MdParserTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    public CompositeConfiguration config;
-
-    private File configFile;
+    public DefaultJBakeConfiguration config;
 
     private File validMdFileBasic;
 
@@ -74,13 +73,11 @@ public class MdParserTest {
 
     private String invalidHeader = "title=Title\n~~~~~~";
 
-    private String extensions = "markdown.extensions";
-
     @Before
     public void createSampleFile() throws Exception {
 
-        configFile = new File(this.getClass().getResource(".").getFile());
-        config = ConfigUtil.load(configFile);
+        File configFile = new File(this.getClass().getResource("/fixture").getFile());
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(configFile);
 
         validMdFileBasic = folder.newFile("validBasic.md");
         PrintWriter out = new PrintWriter(validMdFileBasic);
@@ -235,35 +232,34 @@ public class MdParserTest {
 
     @Test
     public void parseValidMarkdownFileBasic() throws Exception {
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(validMdFileBasic);
         Assert.assertNotNull(map);
         Assert.assertEquals("draft", map.get("status"));
         Assert.assertEquals("post", map.get("type"));
-        assertThat((String)map.get("body")).contains("<h1>This is a test</h1>");
+        Assert.assertEquals("<h1>This is a test</h1>\n", map.get("body"));
     }
 
     @Test
     public void parseInvalidMarkdownFileBasic() {
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(invalidMdFileBasic);
         Assert.assertNull(map);
     }
 
     @Test
     public void parseValidMdFileHardWraps() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "HARDWRAPS");
+        config.setMarkdownExtensions("HARDWRAPS");
 
         // Test with HARDWRAPS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileHardWraps);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>First line<br />\nSecond line</p>\n");
 
         // Test without HARDWRAPS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileHardWraps);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>First line Second line</p>");
@@ -271,11 +267,10 @@ public class MdParserTest {
 
     @Test
     public void parseWithInvalidExtension() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "HARDWRAPS,UNDEFINED_EXTENSION");
+        config.setMarkdownExtensions("HARDWRAPS,UNDEFINED_EXTENSION");
 
         // Test with HARDWRAPS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileHardWraps);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>First line<br />\nSecond line</p>\n");
@@ -283,11 +278,10 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileAbbreviations() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "ABBREVIATIONS");
+        config.setMarkdownExtensions("ABBREVIATIONS");
 
         // Test with ABBREVIATIONS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileAbbreviations);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -295,8 +289,8 @@ public class MdParserTest {
         );
 
         // Test without ABBREVIATIONS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileAbbreviations);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>*[HTML]: Hyper Text Markup Language HTML</p>");
@@ -304,11 +298,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileAutolinks() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "AUTOLINKS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("AUTOLINKS");
 
         // Test with AUTOLINKS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileAutolinks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -316,8 +310,8 @@ public class MdParserTest {
         );
 
         // Test without AUTOLINKS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileAutolinks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>http://github.com</p>");
@@ -325,11 +319,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileDefinitions() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "DEFINITIONS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("DEFINITIONS");
 
         // Test with DEFINITIONS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileDefinitions);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -337,8 +331,8 @@ public class MdParserTest {
         );
 
         // Test without DEFNITIONS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileDefinitions);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>Apple :   Pomaceous fruit</p>");
@@ -346,11 +340,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileFencedCodeBlocks() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "FENCED_CODE_BLOCKS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("FENCED_CODE_BLOCKS");
 
         // Test with FENCED_CODE_BLOCKS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileFencedCodeBlocks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -358,8 +352,8 @@ public class MdParserTest {
         );
 
         // Test without FENCED_CODE_BLOCKS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileFencedCodeBlocks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -369,18 +363,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileQuotes() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "QUOTES");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("QUOTES");
 
         // Test with QUOTES
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileQuotes);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>&ldquo;quotes&rdquo;</p>");
 
         // Test without QUOTES
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileQuotes);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>&quot;quotes&quot;</p>");
@@ -388,18 +382,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileSmarts() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "SMARTS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("SMARTS");
 
         // Test with SMARTS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileSmarts);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>&hellip;</p>");
 
         // Test without SMARTS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileSmarts);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>...</p>");
@@ -407,18 +401,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileSmartypants() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "SMARTYPANTS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("SMARTYPANTS");
 
         // Test with SMARTYPANTS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileSmartypants);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>&ldquo;&hellip;&rdquo;</p>");
 
         // Test without SMARTYPANTS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileSmartypants);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>&quot;...&quot;</p>");
@@ -426,18 +420,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileSuppressAllHTML() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "SUPPRESS_ALL_HTML");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("SUPPRESS_ALL_HTML");
 
         // Test with SUPPRESS_ALL_HTML
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileSuppressAllHTML);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("");
 
         // Test without SUPPRESS_ALL_HTML
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileSuppressAllHTML);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<div>!</div><em>!</em>");
@@ -445,18 +439,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileSuppressHTMLBlocks() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "SUPPRESS_HTML_BLOCKS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("SUPPRESS_HTML_BLOCKS");
 
         // Test with SUPPRESS_HTML_BLOCKS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileSuppressHTMLBlocks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("");
 
         // Test without SUPPRESS_HTML_BLOCKS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileSuppressHTMLBlocks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<div>!</div><em>!</em>");
@@ -464,18 +458,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileSuppressInlineHTML() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "SUPPRESS_INLINE_HTML");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("SUPPRESS_INLINE_HTML");
 
         // Test with SUPPRESS_INLINE_HTML
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileSuppressInlineHTML);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>This is the first paragraph.  with  inline html</p>");
 
         // Test without SUPPRESS_INLINE_HTML
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileSuppressInlineHTML);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>This is the first paragraph. <span> with </span> inline html</p>");
@@ -483,11 +477,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileTables() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "TABLES");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("TABLES");
 
         // Test with TABLES
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileTables);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -503,8 +497,8 @@ public class MdParserTest {
         );
 
         // Test without TABLES
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileTables);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -514,11 +508,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileWikilinks() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "WIKILINKS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("WIKILINKS");
 
         // Test with WIKILINKS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileWikilinks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -526,8 +520,8 @@ public class MdParserTest {
         );
 
         // Test without WIKILINKS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileWikilinks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>[[Wiki-style links]]</p>");
@@ -535,18 +529,18 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileAtxheaderspace() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "ATXHEADERSPACE");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("ATXHEADERSPACE");
 
         // Test with ATXHEADERSPACE
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileAtxheaderspace);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<p>#Test</p>");
 
         // Test without ATXHEADERSPACE
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileAtxheaderspace);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<h1>Test</h1>");
@@ -554,11 +548,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileForcelistitempara() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "FORCELISTITEMPARA");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("FORCELISTITEMPARA");
 
         // Test with FORCELISTITEMPARA
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileForcelistitempara);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -570,8 +564,8 @@ public class MdParserTest {
                 "</ol>");
 
         // Test without FORCELISTITEMPARA
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileForcelistitempara);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -585,11 +579,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileRelaxedhrules() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "RELAXEDHRULES");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("RELAXEDHRULES");
 
         // Test with RELAXEDHRULES
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdFileRelaxedhrules);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -607,8 +601,8 @@ public class MdParserTest {
         );
 
         // Test without RELAXEDHRULES
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdFileRelaxedhrules);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -624,11 +618,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileTasklistitems() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "TASKLISTITEMS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("TASKLISTITEMS");
 
         // Test with TASKLISTITEMS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdTasklistitems);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -640,8 +634,8 @@ public class MdParserTest {
         );
 
         // Test without TASKLISTITEMS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdTasklistitems);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -654,11 +648,11 @@ public class MdParserTest {
 
     @Test
     public void parseValidMdFileExtanchorlinks() throws Exception {
-        config.clearProperty(extensions);
-        config.setProperty(extensions, "EXTANCHORLINKS");
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("EXTANCHORLINKS");
 
         // Test with EXTANCHORLINKS
-        Parser parser = new Parser(config, configFile.getPath());
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(mdExtanchorlinks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains(
@@ -666,8 +660,8 @@ public class MdParserTest {
         );
 
         // Test without EXTANCHORLINKS
-        config.clearProperty(extensions);
-        parser = new Parser(config, configFile.getPath());
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
         map = parser.processFile(mdExtanchorlinks);
         Assert.assertNotNull(map);
         assertThat(map.get("body").toString()).contains("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>");

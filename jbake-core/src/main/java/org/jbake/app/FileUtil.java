@@ -1,7 +1,5 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.parser.Engines;
 
 import java.io.File;
@@ -31,16 +29,16 @@ public class FileUtil {
             @Override
             public boolean accept(File pathname) {
             	//Accept if input  is a non-hidden file with registered extension
-            	//or if a non-hidden and not-ignored directory 
+            	//or if a non-hidden and not-ignored directory
                 return   !pathname.isHidden() && (pathname.isFile()
                         && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
             }
         };
     }
-    
+
     /**
      * Gets the list of files that are not content files based on their extension.
-     * 
+     *
      * @return FileFilter object
      */
     public static FileFilter getNotContentFileFilter() {
@@ -49,15 +47,15 @@ public class FileUtil {
             @Override
             public boolean accept(File pathname) {
             	//Accept if input  is a non-hidden file with NOT-registered extension
-            	//or if a non-hidden and not-ignored directory 
+            	//or if a non-hidden and not-ignored directory
                 return  !pathname.isHidden() && (pathname.isFile()
                 		//extension should not be from registered content extensions
-                        && !Engines.getRecognizedExtensions().contains(fileExt(pathname))) 
+                        && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
                 			|| (directoryOnlyIfNotIgnored(pathname));
             }
         };
     }
-    
+
     /**
      * Ignores directory (and children) if it contains a file named ".jbakeignore".
      * @param file {@link File}
@@ -65,16 +63,16 @@ public class FileUtil {
      */
     public static boolean directoryOnlyIfNotIgnored(File file){
     	boolean accept = false;
-    	
+
     	FilenameFilter ignoreFile = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
 				return name.equalsIgnoreCase(".jbakeignore");
 			}
-		}; 
-    	
+		};
+
     	accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
-    	
+
     	return accept;
     }
 
@@ -157,15 +155,6 @@ public class FileUtil {
         }
     }
 
-    public static String findExtension(CompositeConfiguration config, String docType) {
-    	String extension = config.getString("template."+docType+".extension");
-    	if (extension != null) {
-    		return extension;
-    	} else {
-    		return config.getString(Keys.OUTPUT_EXTENSION);
-    	}
-    }
-    
 	/**
 	 * platform independent file.getPath() 
 	 * 

@@ -40,6 +40,7 @@ import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -51,12 +52,45 @@ import java.util.Set;
  */
 public class ContentStore {
 
+    private static final String STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "select * from %s where status='published' and ? in tags order by date desc";
+    private static final String STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "select sha1,rendered from %s where sourceuri=?";
+    private static final String STATEMENT_GET_PUBLISHED_COUNT = "select count(*) as count from %s where status='published'";
+    private static final String STATEMENT_MARK_CONTENT_AS_RENDERD = "update %s set rendered=true where rendered=false and cached=true";
+    private static final String STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from %s where sourceuri=?";
+    private static final String STATEMENT_GET_UNDRENDERED_CONTENT = "select * from %s where rendered=false order by date desc";
+    private static final String STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "select sha1 from Signatures where key='templates'";
+    private static final String STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "select tags from post where status='published'";
+    private static final String STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "select * from %s order by date desc";
+    private static final String STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "select * from %s where status='published' order by date desc";
+    private static final String STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "select * from post where status='published' and ? in tags order by date desc";
+    private static final String STATEMENT_GET_TAGS_BY_DOCTYPE = "select tags from %s where status='published'";
+    private static final String STATEMENT_INSERT_TEMPLATES_SIGNATURE = "insert into Signatures(key,sha1) values('templates',?)";
+    private static final String STATEMENT_DELETE_ALL = "delete from %s";
+    private static final String STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "update Signatures set sha1=? where key='templates'";
+
     private final Logger logger = LoggerFactory.getLogger(ContentStore.class);
+    private final String type;
+    private final String name;
+
     private ODatabaseDocumentTx db;
+
     private long start = -1;
     private long limit = -1;
 
     public ContentStore(final String type, String name) {
+        this.type = type;
+        this.name = name;
+    }
+
+    public ODatabaseDocumentTx getDb() {
+        return db;
+    }
+
+    public void setDb(ODatabaseDocumentTx db) {
+        this.db = db;
+    }
+
+    public void startup() {
         startupIfEnginesAreMissing();
         OPartitionedDatabasePool pool = new OPartitionedDatabasePoolFactory().get(type + ":" + name, "admin", "admin");
         pool.setAutoCreate(true);
@@ -105,8 +139,10 @@ public class ContentStore {
     }
 
     public void close() {
-        activateOnCurrentThread();
-        db.close();
+        if (db != null) {
+            activateOnCurrentThread();
+            db.close();
+        }
         DBUtil.closeDataStore();
     }
 
@@ -143,11 +179,13 @@ public class ContentStore {
     }
 
     public long getPublishedCount(String docType) {
-        return (Long) query("select count(*) as count from " + docType + " where status='published'").get(0).get("count");
+        String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType);
+        return (Long) query(statement).get(0).get("count");
     }
 
     public DocumentList getDocumentStatus(String docType, String uri) {
-        return query("select sha1,rendered from " + docType + " where sourceuri=?", uri);
+        String statement = String.format(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, docType);
+        return query(statement, uri);
     }
 
     public DocumentList getPublishedPosts() {
@@ -159,13 +197,15 @@ public class ContentStore {
     }
 
     public DocumentList getPublishedPostsByTag(String tag) {
-        return query("select * from post where status='published' and ? in tags order by date desc", tag);
+        return query(STATEMENT_GET_PUBLISHED_POSTS_BY_TAG, tag);
     }
 
     public DocumentList getPublishedDocumentsByTag(String tag) {
         final DocumentList documents = new DocumentList();
+
         for (final String docType : DocumentTypes.getDocumentTypes()) {
-            DocumentList documentsByTag = query("select * from " + docType + " where status='published' and ? in tags order by date desc", tag);
+            String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType);
+            DocumentList documentsByTag = query(statement, tag);
             documents.addAll(documentsByTag);
         }
         return documents;
@@ -179,8 +219,8 @@ public class ContentStore {
         return getPublishedContent(docType, false);
     }
 
-    public DocumentList getPublishedContent(String docType, boolean applyPaging) {
-        String query = "select * from " + docType + " where status='published' order by date desc";
+    private DocumentList getPublishedContent(String docType, boolean applyPaging) {
+        String query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType);
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
@@ -192,7 +232,7 @@ public class ContentStore {
     }
 
     public DocumentList getAllContent(String docType, boolean applyPaging) {
-        String query = "select * from " + docType + " order by date desc";
+        String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType);
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
@@ -203,36 +243,40 @@ public class ContentStore {
         return (start >= 0) && (limit > -1);
     }
 
-    public DocumentList getAllTagsFromPublishedPosts() {
-        return query("select tags from post where status='published'");
+    private DocumentList getAllTagsFromPublishedPosts() {
+        return query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS);
     }
 
-    public DocumentList getSignaturesForTemplates() {
-        return query("select sha1 from Signatures where key='templates'");
+    private DocumentList getSignaturesForTemplates() {
+        return query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES);
     }
 
     public DocumentList getUnrenderedContent(String docType) {
-        return query("select * from " + docType + " where rendered=false order by date desc");
+        String statement = String.format(STATEMENT_GET_UNDRENDERED_CONTENT, docType);
+        return query(statement);
     }
 
     public void deleteContent(String docType, String uri) {
-        executeCommand("delete from " + docType + " where sourceuri=?", uri);
+        String statement = String.format(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, docType);
+        executeCommand(statement, uri);
     }
 
     public void markContentAsRendered(String docType) {
-        executeCommand("update " + docType + " set rendered=true where rendered=false and cached=true");
+        String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, docType);
+        executeCommand(statement);
     }
 
-    public void updateSignatures(String currentTemplatesSignature) {
-        executeCommand("update Signatures set sha1=? where key='templates'", currentTemplatesSignature);
+    private void updateSignatures(String currentTemplatesSignature) {
+        executeCommand(STATEMENT_UPDATE_TEMPLATE_SIGNATURE, currentTemplatesSignature);
     }
 
     public void deleteAllByDocType(String docType) {
-        executeCommand("delete from " + docType);
+        String statement = String.format(STATEMENT_DELETE_ALL, docType);
+        executeCommand(statement);
     }
 
-    public void insertSignature(String currentTemplatesSignature) {
-        executeCommand("insert into Signatures(key,sha1) values('templates',?)", currentTemplatesSignature);
+    private void insertTemplatesSignature(String currentTemplatesSignature) {
+        executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
     }
 
     private DocumentList query(String sql) {
@@ -265,7 +309,8 @@ public class ContentStore {
     public Set<String> getAllTags() {
         Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
-            DocumentList docs = query("select tags from " + docType + " where status='published'");
+            String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType);
+            DocumentList docs = query(statement);
             for (Map<String, Object> document : docs) {
                 String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
                 Collections.addAll(result, tags);
@@ -274,25 +319,77 @@ public class ContentStore {
         return result;
     }
 
-    private void createDocType(final OSchema schema, final String doctype) {
-        logger.debug("Create document class '{}'", doctype);
+    private void createDocType(final OSchema schema, final String docType) {
+        logger.debug("Create document class '{}'", docType);
 
-        OClass page = schema.createClass(doctype);
+        OClass page = schema.createClass(docType);
         page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
-        page.createIndex(doctype + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.SHA1.toString());
+        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.SHA1.toString());
         page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
-        page.createIndex(doctype + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
+        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
         page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(doctype + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.CACHED.toString());
+        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.CACHED.toString());
         page.createProperty(String.valueOf(DocumentAttributes.RENDERED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(doctype + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.RENDERED.toString());
+        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.RENDERED.toString());
         page.createProperty(String.valueOf(DocumentAttributes.STATUS), OType.STRING).setNotNull(true);
-        page.createIndex(doctype + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.STATUS.toString());
+        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.STATUS.toString());
     }
 
     private void createSignatureType(OSchema schema) {
         OClass signatures = schema.createClass("Signatures");
         signatures.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
+    }
+
+    public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
+
+        boolean clearCache = needed;
+
+        if (!needed) {
+            clearCache = updateTemplateSignatureIfChanged(templateFolder);
+        }
+
+        if (clearCache) {
+            deleteAllDocumentTypes();
+            this.updateSchema();
+        }
+    }
+
+    private boolean updateTemplateSignatureIfChanged(File templateFolder) {
+        boolean templateSignatureChanged = false;
+
+        DocumentList docs = this.getSignaturesForTemplates();
+        String currentTemplatesSignature;
+        try {
+            currentTemplatesSignature = FileUtil.sha1(templateFolder);
+        } catch (Exception e) {
+            currentTemplatesSignature = "";
+        }
+        if (!docs.isEmpty()) {
+            String sha1 = (String) docs.get(0).get(String.valueOf(DocumentAttributes.SHA1));
+            if (!sha1.equals(currentTemplatesSignature)) {
+                this.updateSignatures(currentTemplatesSignature);
+                templateSignatureChanged = true;
+            }
+        } else {
+            // first computation of templates signature
+            this.insertTemplatesSignature(currentTemplatesSignature);
+            templateSignatureChanged = true;
+        }
+        return templateSignatureChanged;
+    }
+
+    private void deleteAllDocumentTypes() {
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            try {
+                this.deleteAllByDocType(docType);
+            } catch (Exception e) {
+                // maybe a non existing document type
+            }
+        }
+    }
+
+    public boolean isActive() {
+        return db.isActiveOnCurrentThread();
     }
 }

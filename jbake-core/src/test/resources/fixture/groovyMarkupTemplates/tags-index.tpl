@@ -9,7 +9,8 @@ layout 'layout/main.tpl',
                     tags.each {tag ->
 
                         h2 {
-                            a(href:"${tag.uri}","${tag.name}")
+                            a(href:"${content.rootpath}${tag.uri}","${tag.name}")
+                            yield "${tag.tagged_posts.size()}"
                         }
                     }
                 }

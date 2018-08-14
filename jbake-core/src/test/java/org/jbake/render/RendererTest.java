@@ -1,12 +1,13 @@
 package org.jbake.render;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.TestUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.Renderer;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.template.DelegatingTemplateEngine;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,50 +23,56 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class RendererTest {
 
-	@Rule
+    @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-	private CompositeConfiguration config;
-	private File rootPath;
-	private File outputPath;
-	
-	@Mock private ContentStore db;
-	@Mock private DelegatingTemplateEngine renderingEngine;
-	
-	@Before
+    private DefaultJBakeConfiguration config;
+    private File outputPath;
+
+    @Mock
+    private ContentStore db;
+
+    @Mock
+    private DelegatingTemplateEngine renderingEngine;
+
+    @Before
     public void setup() throws Exception {
-		URL sourceUrl = this.getClass().getResource("/");
-		rootPath = new File(sourceUrl.getFile());
-        if (!rootPath.exists()) {
+        URL sourceUrl = this.getClass().getResource("/fixture");
+        File sourcePath = new File(sourceUrl.getFile());
+        if (!sourcePath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
         outputPath = folder.newFolder("output");
-		config = ConfigUtil.load(rootPath);		
-	}
-	
-	/**
-	 * See issue #300
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-    public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
-		String FOLDER = "real.path";
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourcePath);
+        config.setDestinationFolder(outputPath);
+    }
 
-		final String FILENAME = "about";
-		config.setProperty(Keys.OUTPUT_EXTENSION, "");
-		Renderer renderer = new Renderer(db, outputPath, folder.newFolder("templates"), config, renderingEngine);
-		
-		Map<String, Object> content = new HashMap<String, Object>();
-		content.put(Crawler.Attributes.TYPE, "page");
-		content.put(Crawler.Attributes.URI, "/" + FOLDER + "/" + FILENAME);
-		content.put(Crawler.Attributes.STATUS, "published");
-		
-		renderer.render(content);
-		
-		File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
-		assertThat(outputFile).isFile();
-	}
+    /**
+     * See issue #300
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
+
+        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows());
+        String FOLDER = "real.path";
+
+        final String FILENAME = "about";
+        config.setOutputExtension("");
+        config.setTemplateFolder(folder.newFolder("templates"));
+        Renderer renderer = new Renderer(db, config, renderingEngine);
+
+        Map<String, Object> content = new HashMap<>();
+        content.put(Crawler.Attributes.TYPE, "page");
+        content.put(Crawler.Attributes.URI, "/" + FOLDER + "/" + FILENAME);
+        content.put(Crawler.Attributes.STATUS, "published");
+
+        renderer.render(content);
+
+        File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
+        assertThat(outputFile).isFile();
+    }
 }

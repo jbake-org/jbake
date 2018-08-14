@@ -1,17 +1,17 @@
 package org.jbake.template;
 
-import java.util.Map;
-
 import org.jbake.app.ContentStore;
+
+import java.util.Map;
 
 
 /**
  *
  * @author ndx
  *
- * T the type of data returned by this model extractor
+ * @param <T> the type of data returned by this model extractor
  */
-public interface ModelExtractor<T extends Object> {
+public interface ModelExtractor<T> {
 
 	T get(ContentStore db, Map model, String key);
 

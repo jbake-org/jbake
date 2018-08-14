@@ -13,8 +13,8 @@ import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
+import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,10 +37,15 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
 
     private JadeConfiguration jadeConfiguration = new JadeConfiguration();
 
+    @Deprecated
     public JadeTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
+    }
 
-        TemplateLoader loader = new FileTemplateLoader(templatesPath.getAbsolutePath() + File.separatorChar, config.getString(Keys.TEMPLATE_ENCODING));
+    public JadeTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        super(config, db);
+
+        TemplateLoader loader = new FileTemplateLoader(config.getTemplateFolder().getPath() + File.separatorChar, config.getTemplateEncoding());
         jadeConfiguration.setTemplateLoader(loader);
         jadeConfiguration.setMode(Jade4J.Mode.XHTML);
         jadeConfiguration.setPrettyPrint(true);

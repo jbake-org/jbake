@@ -1,7 +1,10 @@
 package org.jbake.template;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.jbake.app.ContentStore;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 import java.io.File;
 import java.io.Writer;
@@ -27,17 +30,18 @@ import java.util.Map;
 public abstract class AbstractTemplateEngine {
 
     protected static ModelExtractors extractors = ModelExtractors.getInstance();
-    protected final Configuration config;
+    protected final JBakeConfiguration config;
     protected final ContentStore db;
-    protected final File destination;
-    protected final File templatesPath;
 
+    @Deprecated
     protected AbstractTemplateEngine(final Configuration config, final ContentStore db, final File destination, final File templatesPath) {
-        this.config = config;
-        this.db = db;
-        this.destination = destination;
-        this.templatesPath = templatesPath;
+        this(new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(),destination, (CompositeConfiguration) config),db);
     }
 
-    public abstract void renderDocument(Map<String, Object> model, String templateName, Writer writer) throws RenderingException;
+    protected AbstractTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        this.config = config;
+        this.db = db;
+    }
+
+    public abstract void renderDocument(Map<String,Object> model, String templateName, Writer writer) throws RenderingException;
 }

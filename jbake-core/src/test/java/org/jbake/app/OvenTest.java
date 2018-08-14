@@ -1,67 +1,122 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentTypes;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.net.URL;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class OvenTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-    private CompositeConfiguration config;
-    private File rootPath;
-    private File outputPath;
+
+    private DefaultJBakeConfiguration configuration;
+    private File sourceFolder;
+    private ContentStore contentStore;
 
     @Before
-    public void setup() throws Exception {
+    public void setUp() throws Exception {
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         DocumentTypes.resetDocumentTypes();
-
-        URL sourceUrl = this.getClass().getResource("/fixture");
-        rootPath = new File(sourceUrl.getFile());
-        if (!rootPath.exists()) {
-            throw new Exception("Cannot find base path for test!");
-        }
-        outputPath = folder.newFolder("destination");
-        config = ConfigUtil.load(rootPath);
-        config.setProperty(Keys.TEMPLATE_FOLDER, "freemarkerTemplates");
+        sourceFolder = new File(this.getClass().getResource("/fixture").getPath());
+        configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
+        configuration.setDestinationFolder(folder.newFolder("output"));
+        configuration.setTemplateFolder(new File(sourceFolder,"freemarkerTemplates"));
     }
 
-    @Test
-    public void bakeWithRelativePaths() {
-        Oven oven = new Oven(rootPath, outputPath, config, true);
-        oven.setupPaths();
-        oven.bake();
-
-        assertThat("There shouldn't be any errors: " + oven.getErrors(), oven.getErrors().isEmpty());
+    @After
+    public void tearDown() {
+        if (contentStore!=null && contentStore.isActive()){
+            contentStore.close();
+            contentStore.shutdown();
+        }
     }
 
     @Test
     public void bakeWithAbsolutePaths() {
-        makeAbsolute(config, rootPath, Keys.TEMPLATE_FOLDER);
-        makeAbsolute(config, rootPath, Keys.CONTENT_FOLDER);
-        makeAbsolute(config, rootPath, Keys.ASSET_FOLDER);
+        configuration.setTemplateFolder( new File(sourceFolder, "freemarkerTemplates") );
+        configuration.setContentFolder( new File(sourceFolder, "content") );
+        configuration.setAssetFolder( new File(sourceFolder, "assets") );
 
-        Oven oven = new Oven(rootPath, outputPath, config, true);
-        oven.setupPaths();
+        final Oven oven = new Oven(configuration);
         oven.bake();
 
-        assertThat("There shouldn't be any errors: " + oven.getErrors(), oven.getErrors().isEmpty());
+        assertThat(oven.getErrors()).isEmpty();
     }
 
-    private void makeAbsolute(Configuration configuration, File source, String key) {
-        final File folder = new File(source, configuration.getString(key));
-        configuration.setProperty(key, folder.getAbsolutePath());
+    @Test(expected = JBakeException.class)
+    public void shouldThrowExceptionIfSourceFolderDoesNotExist() {
+        configuration.setSourceFolder(new File(folder.getRoot(),"none"));
+        new Oven(configuration);
     }
 
+    @Test
+    public void shouldInstantiateNeededUtensils() throws Exception {
+
+        configuration.setTemplateFolder( folder.newFolder("template") );
+        configuration.setContentFolder( folder.newFolder("content") );
+        configuration.setAssetFolder( folder.newFolder("assets") );
+
+        Oven oven = new Oven(configuration);
+
+        assertThat(oven.getUtensils().getContentStore()).isNotNull();
+        assertThat(oven.getUtensils().getCrawler()).isNotNull();
+        assertThat(oven.getUtensils().getRenderer()).isNotNull();
+        assertThat(oven.getUtensils().getAsset()).isNotNull();
+        assertThat(oven.getUtensils().getConfiguration()).isEqualTo(configuration);
+
+    }
+
+    @Test(expected = JBakeException.class)
+    public void shouldInspectConfigurationDuringInstantiationFromUtils() {
+        configuration.setSourceFolder(new File(folder.getRoot(),"none"));
+
+        Utensils utensils = new Utensils();
+        utensils.setConfiguration(configuration);
+
+        new Oven(utensils);
+    }
+
+    @Test
+    public void shouldCrawlRenderAndCopyAssets() throws Exception {
+        configuration.setTemplateFolder( folder.newFolder("template") );
+        configuration.setContentFolder( folder.newFolder("content") );
+        configuration.setAssetFolder( folder.newFolder("assets") );
+
+        contentStore = spy(new ContentStore("memory", "documents"+ System.currentTimeMillis()));
+
+        Crawler crawler = mock(Crawler.class);
+        Renderer renderer = mock(Renderer.class);
+        Asset asset = mock(Asset.class);
+
+        Utensils utensils = new Utensils();
+        utensils.setConfiguration(configuration);
+        utensils.setContentStore(contentStore);
+        utensils.setRenderer(renderer);
+        utensils.setCrawler(crawler);
+        utensils.setAsset(asset);
+
+        Oven oven = new Oven(utensils);
+
+        oven.bake();
+
+        verify(contentStore, times(1)).startup();
+        verify(renderer,atLeastOnce()).renderIndex(anyString());
+        verify(crawler,times(1)).crawl();
+        verify(asset,times(1)).copy();
+    }
 }

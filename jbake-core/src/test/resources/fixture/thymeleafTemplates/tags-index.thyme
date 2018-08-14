@@ -10,7 +10,7 @@
 		<div class="span12">
 			<h1>Tags</h1>
 			<div th:each="tag : ${tags}" th:with='last_month=null' th:remove='tag'>
-			   <h2><a th:href="${tag.uri}" th:text='${tag.name}' href="foo.html">Post title</a></h2>
+			   <h2><a href="http://jbake.org" th:href="@{${content.rootpath}+${tag.uri}}" th:text="${tag.name}">Tag</a>[[${tag.tagged_posts.size()}]]</h2>
 			</div>
 		</div>
 	</div>

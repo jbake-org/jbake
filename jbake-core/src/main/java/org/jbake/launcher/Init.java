@@ -1,8 +1,9 @@
 package org.jbake.launcher;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ZipUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,9 +16,18 @@ import java.io.FileInputStream;
  */
 public class Init {
 
-	private CompositeConfiguration config;
-	
+	private JBakeConfiguration config;
+
+	/**
+	 * @param config The project configuration
+	 * @deprecated use {@link Init#Init(JBakeConfiguration)} instead
+	 */
+	@Deprecated
 	public Init(CompositeConfiguration config) {
+		this(new DefaultJBakeConfiguration(config));
+	}
+
+	public Init(JBakeConfiguration config) {
 		this.config = config;
 	}
 	
@@ -39,13 +49,13 @@ public class Init {
 		if (contents != null) {
 			for (File content : contents) {
 				if (content.isDirectory()) {
-					if (content.getName().equalsIgnoreCase(config.getString(Keys.TEMPLATE_FOLDER))) {
+					if (content.getName().equalsIgnoreCase(config.getTemplateFolderName())) {
 						safe = false;
 					}
-					if (content.getName().equalsIgnoreCase(config.getString(Keys.CONTENT_FOLDER))) {
+					if (content.getName().equalsIgnoreCase(config.getContentFolderName())) {
 						safe = false;
 					}
-					if (content.getName().equalsIgnoreCase(config.getString(Keys.ASSET_FOLDER))) {
+					if (content.getName().equalsIgnoreCase(config.getAssetFolderName())) {
 						safe = false;
 					}
 				}
@@ -56,8 +66,8 @@ public class Init {
 			throw new Exception(String.format("Output folder '%s' already contains structure!",
                     outputFolder.getAbsolutePath()));
 		}
-		if (config.getString("example.project."+templateType) != null) {
-			File templateFile = new File(templateLocationFolder, config.getString("example.project."+templateType));
+		if (config.getExampleProjectByType(templateType) != null) {
+			File templateFile = new File(templateLocationFolder, config.getExampleProjectByType(templateType));
 			if (!templateFile.exists()) {
 				throw new Exception("Cannot find example project file: " + templateFile.getPath());
 			}

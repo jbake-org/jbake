@@ -1,15 +1,12 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
 import org.jbake.app.ContentStore;
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -40,28 +37,29 @@ import java.util.Set;
  * @author Cédric Champeau
  */
 public class TemplateEngines {
-    private final static Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
 
-    private final Map<String, AbstractTemplateEngine> templateEngines;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
+
+    private final Map<String, AbstractTemplateEngine> engines;
 
     public Set<String> getRecognizedExtensions() {
-        return Collections.unmodifiableSet(templateEngines.keySet());
+        return Collections.unmodifiableSet(engines.keySet());
     }
 
-    public TemplateEngines(final Configuration config, final ContentStore db, final File destination, final File templatesPath) {
-        templateEngines = new HashMap<String, AbstractTemplateEngine>();
-        loadEngines(config, db, destination, templatesPath);
+    public TemplateEngines(final JBakeConfiguration config, final ContentStore db) {
+        engines = new HashMap<>();
+        loadEngines(config, db);
     }
 
     private void registerEngine(String fileExtension, AbstractTemplateEngine templateEngine) {
-        AbstractTemplateEngine old = templateEngines.put(fileExtension, templateEngine);
+        AbstractTemplateEngine old = engines.put(fileExtension, templateEngine);
         if (old != null) {
             LOGGER.warn("Registered a template engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
         }
     }
 
     public AbstractTemplateEngine getEngine(String fileExtension) {
-        return templateEngines.get(fileExtension);
+        return engines.get(fileExtension);
     }
 
     /**
@@ -71,28 +69,16 @@ public class TemplateEngines {
      *
      * @param config the configuration
      * @param db database instance
-     * @param destination target directory
-     * @param templatesPath path to template directory
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
-    private static AbstractTemplateEngine tryLoadEngine(final Configuration config, final ContentStore db, final File destination, final File templatesPath, String engineClassName) {
+    private static AbstractTemplateEngine tryLoadEngine(final JBakeConfiguration config, final ContentStore db, String engineClassName) {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
-            Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(CompositeConfiguration.class, ContentStore.class, File.class, File.class);
-            return ctor.newInstance(config, db, destination, templatesPath);
-        } catch (ClassNotFoundException e) {
-            return null;
-        } catch (InstantiationException e) {
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
-        } catch (NoClassDefFoundError e) {
-            // a dependency of the engine may not be found on classpath
-            return null;
-        } catch (NoSuchMethodException e) {
-            return null;
-        } catch (InvocationTargetException e) {
+            Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(JBakeConfiguration.class, ContentStore.class);
+            return ctor.newInstance(config, db);
+        } catch (Exception e) {
+            LOGGER.error("unable to load engine", e);
             return null;
         }
     }
@@ -101,7 +87,7 @@ public class TemplateEngines {
      * This method is used internally to load markup engines. Markup engines are found using descriptor files on
      * classpath, so adding an engine is as easy as adding a jar on classpath with the descriptor file included.
      */
-    private void loadEngines(final Configuration config, final ContentStore db, final File destination, final File templatesPath) {
+    private void loadEngines(final JBakeConfiguration config, final ContentStore db) {
         try {
             ClassLoader cl = TemplateEngines.class.getClassLoader();
             Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.TemplateEngines.properties");
@@ -112,16 +98,16 @@ public class TemplateEngines {
                 for (Map.Entry<Object, Object> entry : props.entrySet()) {
                     String className = (String) entry.getKey();
                     String[] extensions = ((String) entry.getValue()).split(",");
-                    registerEngine(config, db, destination, templatesPath, className, extensions);
+                    registerEngine(config, db, className, extensions);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error loading engines", e);
         }
     }
 
-    private void registerEngine(final Configuration config, final ContentStore db, final File destination, final File templatesPath, String className, String... extensions) {
-        AbstractTemplateEngine engine = tryLoadEngine(config, db, destination, templatesPath, className);
+    private void registerEngine(final JBakeConfiguration config, final ContentStore db, String className, String... extensions) {
+        AbstractTemplateEngine engine = tryLoadEngine(config, db, className);
         if (engine != null) {
             for (String extension : extensions) {
                 registerEngine(extension, engine);

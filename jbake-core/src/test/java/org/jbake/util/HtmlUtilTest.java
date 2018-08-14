@@ -1,27 +1,26 @@
 package org.jbake.util;
 
-import static org.assertj.core.api.Assertions.*;
+import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.Crawler.Attributes;
-import org.jbake.util.HtmlUtil;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 
 public class HtmlUtilTest {
 	
-	private CompositeConfiguration config;
+	private DefaultJBakeConfiguration config;
 	
 	@Before
 	public void setUp() throws Exception{
-		config = ConfigUtil.load(new File(this.getClass().getResource("/fixture").getFile()));
+		config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
 	}
 	
 	@Test

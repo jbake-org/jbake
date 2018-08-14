@@ -2,7 +2,6 @@ package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.Crawler;
-import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
@@ -55,14 +54,14 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     @Test
     public void renderCustomTypePaper() throws Exception {
         // setup
-        config.setProperty("template.paper.file", "paper." + templateExtension);
+        config.setTemplateFileNameForDocType("paper", "paper." + templateExtension);
         DocumentTypes.addDocumentType("paper");
-        DBUtil.updateSchema(db);
+        db.updateSchema();
 
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Parser parser = new Parser(config, sourceFolder.getPath());
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        Crawler crawler = new Crawler(db, config);
+        crawler.crawl();
+        Parser parser = new Parser(config);
+        Renderer renderer = new Renderer(db, config);
         String filename = "published-paper.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "papers" + File.separator + filename);

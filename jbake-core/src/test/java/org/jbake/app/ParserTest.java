@@ -1,7 +1,7 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,7 +21,7 @@ public class ParserTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    public CompositeConfiguration config;
+    public DefaultJBakeConfiguration config;
     public Parser parser;
     private File rootPath;
 
@@ -43,9 +43,9 @@ public class ParserTest {
 
     @Before
     public void createSampleFile() throws Exception {
-        rootPath = new File(this.getClass().getResource(".").getFile());
-        config = ConfigUtil.load(rootPath);
-        parser = new Parser(config, rootPath.getPath());
+        rootPath = new File(this.getClass().getResource("/fixture").getFile());
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(rootPath);
+        parser = new Parser(config);
 
         validHTMLFile = folder.newFile("valid.html");
         PrintWriter out = new PrintWriter(validHTMLFile);
@@ -233,11 +233,10 @@ public class ParserTest {
     }
 
     @Test
-    public void parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() throws ConfigurationException {
-
-        config.addProperty(ConfigUtil.Keys.DEFAULT_STATUS, "published");
-        config.addProperty(ConfigUtil.Keys.DEFAULT_TYPE, "page");
-
+    public void parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() {
+        config.setDefaultStatus("published");
+        config.setDefaultType("page");
+        Parser parser = new Parser(config);
         Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData);
         Assert.assertNotNull(map);
         Assert.assertEquals("published", map.get("status"));
@@ -248,7 +247,7 @@ public class ParserTest {
 
     @Test
     public void parseMarkdownFileWithCustomHeaderSeparator() {
-        config.setProperty(ConfigUtil.Keys.HEADER_SEPARATOR, customHeaderSeparator);
+        config.setHeaderSeparator(customHeaderSeparator);
 
         Map<String, Object> map = parser.processFile(validMarkdownFileWithCustomHeader);
         Assert.assertNotNull(map);

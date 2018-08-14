@@ -1,31 +1,28 @@
 package org.jbake.parser;
 
+import org.jbake.app.Crawler;
+import org.jbake.app.configuration.JBakeConfiguration;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.Configuration;
-import org.jbake.app.Crawler;
-
 public class ParserContext {
     private final File file;
     private final List<String> fileLines;
-    private final Configuration config;
-    private final String contentPath;
+    private final JBakeConfiguration config;
     private final boolean hasHeader;
     private final Map<String,Object> contents;
 
     public ParserContext(
             File file,
             List<String> fileLines,
-            Configuration config,
-            String contentPath,
+            JBakeConfiguration config,
             boolean hasHeader,
             Map<String, Object> contents) {
         this.file = file;
         this.fileLines = fileLines;
         this.config = config;
-        this.contentPath = contentPath;
         this.hasHeader = hasHeader;
         this.contents = contents;
     }
@@ -38,12 +35,8 @@ public class ParserContext {
         return fileLines;
     }
 
-    public Configuration getConfig() {
+    public JBakeConfiguration getConfig() {
         return config;
-    }
-
-    public String getContentPath() {
-        return contentPath;
     }
 
     public Map<String, Object> getContents() {

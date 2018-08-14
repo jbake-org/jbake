@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -40,16 +40,16 @@ import java.util.Set;
  *
  */
 public class Engines {
-    private final static Logger LOGGER = LoggerFactory.getLogger(Engines.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Engines.class);
+    private static final Engines INSTANCE;
 
-    private final static Engines INSTANCE;
+    private final Map<String, ParserEngine> parsers;
+
 
     static {
         INSTANCE = new Engines();
         loadEngines();
     }
-
-    private final Map<String, ParserEngine> parsers;
 
     public static ParserEngine get(String fileExtension) {
         return INSTANCE.getEngine(fileExtension);
@@ -64,7 +64,7 @@ public class Engines {
     }
 
     private Engines() {
-        parsers = new HashMap<String, ParserEngine>();
+        parsers = new HashMap<>();
     }
 
     private void registerEngine(String fileExtension, ParserEngine markupEngine) {
@@ -89,17 +89,13 @@ public class Engines {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends ParserEngine> engineClass = (Class<? extends ParserEngine>) Class.forName(engineClassName, false, Engines.class.getClassLoader());
-            return engineClass.newInstance();
-        } catch (ClassNotFoundException e) {
+            return engineClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException | NoClassDefFoundError | IllegalAccessException | InstantiationException e) {
             return new ErrorEngine(engineClassName);
-        } catch (InstantiationException e) {
-            return new ErrorEngine(engineClassName);
-        } catch (IllegalAccessException e) {
-            return new ErrorEngine(engineClassName);
-        } catch (NoClassDefFoundError e) {
-            // a dependency of the engine may not be found on classpath
-            return new ErrorEngine(engineClassName);
+        } catch (NoSuchMethodException | InvocationTargetException e) {
+            LOGGER.error("unable to instantiate ParserEngine {}", engineClassName);
         }
+        return null;
     }
 
     /**
@@ -121,7 +117,7 @@ public class Engines {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error loading Engines", e);
         }
     }
 
