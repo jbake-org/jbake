@@ -56,10 +56,11 @@ public class Main {
             new Main().run(args);
         } catch (final JBakeException e) {
             System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            e.printStackTrace();
             System.exit(1);
         } catch (final Throwable e) {
             System.err.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
             System.exit(2);
         }
     }
