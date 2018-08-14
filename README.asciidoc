@@ -57,7 +57,8 @@ Talk to other users of JBake on the forum:
 
 == Build System
 
-The project uses http://gradle.org[Gradle] as the build system. To build the JBake distribution ZIP file execute the following command from the root of the repo:
+The project uses http://gradle.org[Gradle] 4.9+ as the build system.
+To build the JBake distribution ZIP file execute the following command from the root of the repo:
 
 ----
 $ ./gradlew distZip
