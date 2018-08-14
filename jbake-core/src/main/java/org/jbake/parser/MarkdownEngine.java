@@ -29,11 +29,11 @@ public class MarkdownEngine extends MarkupEngine {
         if (mdExts.size() > 0) {
             for (String ext : mdExts) {
                 if (ext.startsWith("-")) {
-		    ext = ext.substring(1);
+		            ext = ext.substring(1);
                     extensions=removeExtension(extensions, extensionFor(ext));
                 } else {
                     if (ext.startsWith("+")) {
-		      ext = ext.substring(1);
+		                ext = ext.substring(1);
                     }
                     extensions=addExtension(extensions, extensionFor(ext));
                 }
