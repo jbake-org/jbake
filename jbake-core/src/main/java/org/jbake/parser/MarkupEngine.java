@@ -147,13 +147,13 @@ public abstract class MarkupEngine implements ParserEngine {
         }
 
         // default status has been set
-        if (config.getDefaultStatus() != null && content.get(Crawler.Attributes.STATUS) == null) {
+        if (hasDefaultStatus() && content.get(Crawler.Attributes.STATUS) == null) {
             // file hasn't got status so use default
             content.put(Crawler.Attributes.STATUS, config.getDefaultStatus());
         }
 
         // default type has been set
-        if (config.getDefaultType() != null && content.get(Crawler.Attributes.TYPE) == null) {
+        if (hasDefaultType() && content.get(Crawler.Attributes.TYPE) == null) {
             // file hasn't got type so use default
             content.put(Crawler.Attributes.TYPE, config.getDefaultType());
         }
@@ -193,7 +193,15 @@ public abstract class MarkupEngine implements ParserEngine {
                 headerValid = false;
             }
         }
-        return headerValid && statusFound && typeFound;
+        return headerValid && (statusFound || hasDefaultStatus()) && (typeFound || hasDefaultType());
+    }
+
+    private boolean hasDefaultType() {
+        return !configuration.getDefaultType().isEmpty();
+    }
+
+    private boolean hasDefaultStatus() {
+        return !configuration.getDefaultStatus().isEmpty();
     }
 
     private boolean hasHeaderSeparatorInContent(List<String> contents) {
