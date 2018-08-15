@@ -26,23 +26,20 @@ public class MarkdownEngine extends MarkupEngine {
         List<String> mdExts = context.getConfig().getMarkdownExtensions();
 
         int extensions = Extensions.NONE;
-        if (mdExts.size() > 0) {
-            for (String ext : mdExts) {
-                if (ext.startsWith("-")) {
-		            ext = ext.substring(1);
-                    extensions=removeExtension(extensions, extensionFor(ext));
-                } else {
-                    if (ext.startsWith("+")) {
-		                ext = ext.substring(1);
-                    }
-                    extensions=addExtension(extensions, extensionFor(ext));
+
+        for (String ext : mdExts) {
+            if (ext.startsWith("-")) {
+                ext = ext.substring(1);
+                extensions = removeExtension(extensions, extensionFor(ext));
+            } else {
+                if (ext.startsWith("+")) {
+                    ext = ext.substring(1);
                 }
+                extensions = addExtension(extensions, extensionFor(ext));
             }
         }
 
-        DataHolder options = PegdownOptionsAdapter.flexmarkOptions(
-                extensions
-        );
+        DataHolder options = PegdownOptionsAdapter.flexmarkOptions(extensions);
 
         Parser parser = Parser.builder(options).build();
         HtmlRenderer renderer = HtmlRenderer.builder(options).build();
