@@ -24,7 +24,7 @@ public class ErrorEngine extends MarkupEngine {
 
     @Override
     public void processHeader(final ParserContext context) {
-        Map<String, Object> contents = context.getContents();
+        Map<String, Object> contents = context.getDocumentModel();
         contents.put(Attributes.TYPE, "post");
         contents.put(Attributes.STATUS, "published");
         contents.put(Attributes.TITLE, "Rendering engine missing");

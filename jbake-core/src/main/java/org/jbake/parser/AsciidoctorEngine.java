@@ -87,9 +87,9 @@ public class AsciidoctorEngine extends MarkupEngine {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
-        Map<String, Object> contents = context.getContents();
+        Map<String, Object> documentModel = context.getDocumentModel();
         if (header.getDocumentTitle() != null) {
-            contents.put("title", header.getDocumentTitle().getCombined());
+            documentModel.put("title", header.getDocumentTitle().getCombined());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
@@ -98,7 +98,7 @@ public class AsciidoctorEngine extends MarkupEngine {
 
             if (hasJBakePrefix(key)) {
                 String pKey = key.substring(6);
-                contents.put(pKey, value);
+                documentModel.put(pKey, value);
             }
             if (hasRevdate(key) && canCastToString(value)) {
 
@@ -106,19 +106,19 @@ public class AsciidoctorEngine extends MarkupEngine {
                 DateFormat df = new SimpleDateFormat(dateFormat);
                 try {
                     Date date = df.parse((String) value);
-                    contents.put("date", date);
+                    context.setDate(date);
                 } catch (ParseException e) {
                     LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
                 }
             }
             if (key.equals("jbake-tags")) {
                 if (canCastToString(value)) {
-                    contents.put("tags", ((String) value).split(","));
+                    context.setTags(((String) value).split(","));
                 } else {
                     LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
                 }
             } else {
-                contents.put(key, attributes.get(key));
+                documentModel.put(key, attributes.get(key));
             }
         }
     }
