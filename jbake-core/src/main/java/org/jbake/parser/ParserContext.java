@@ -1,5 +1,6 @@
 package org.jbake.parser;
 
+import com.orientechnologies.orient.core.hook.ORecordHook;
 import org.jbake.app.Crawler;
 import org.jbake.app.configuration.JBakeConfiguration;
 
