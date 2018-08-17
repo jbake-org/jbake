@@ -61,10 +61,11 @@ public class MarkdownEngine extends MarkupEngine {
     }
 
     private int addExtension(int previousExtensions, int additionalExtension) {
-    	return previousExtensions | additionalExtension;
+        return previousExtensions | additionalExtension;
     }
+
     private int removeExtension(int previousExtensions, int unwantedExtension) {
-    	return previousExtensions & (~unwantedExtension);
+        return previousExtensions & (~unwantedExtension);
     }
 
 }
