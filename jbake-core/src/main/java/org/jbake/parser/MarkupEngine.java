@@ -3,9 +3,10 @@ package org.jbake.parser;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
-import org.jbake.app.Crawler;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param file file to process
      * @return a map containing all infos. Returning null indicates an error, even if an exception would be better.
      */
-    public Map<String, Object> parse(JBakeConfiguration config, File file) {
+    public DocumentModel parse(JBakeConfiguration config, File file) {
         this.configuration = config;
         List<String> fileContent = getFileContent(file, config.getRenderEncoding());
 
@@ -276,7 +277,7 @@ public abstract class MarkupEngine implements ParserEngine {
         String key = sanitize(inputKey);
         String value = sanitize(inputValue);
 
-        if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
+        if (key.equalsIgnoreCase(DocumentAttributes.DATE.toString())) {
             DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
             try {
                 Date date = df.parse(value);
@@ -284,7 +285,7 @@ public abstract class MarkupEngine implements ParserEngine {
             } catch (ParseException e) {
                 LOGGER.error("unable to parse date {}", value);
             }
-        } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
+        } else if (key.equalsIgnoreCase(DocumentAttributes.TAGS.toString())) {
             content.put(key, getTags(value));
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value));

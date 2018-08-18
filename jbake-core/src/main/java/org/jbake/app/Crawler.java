@@ -7,6 +7,7 @@ import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
 import org.jbake.util.HtmlUtil;
@@ -186,48 +187,45 @@ public class Crawler {
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
         try {
-            Map<String, Object> fileContents = parser.processFile(sourceFile);
+            DocumentModel fileContents = parser.processFile(sourceFile);
             if (fileContents != null) {
-                fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
-                fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
-                fileContents.put(String.valueOf(DocumentAttributes.RENDERED), false);
-                if (fileContents.get(Attributes.TAGS) != null) {
-                    // store them as a String[]
-                    String[] tags = (String[]) fileContents.get(Attributes.TAGS);
-                    fileContents.put(Attributes.TAGS, tags);
-                }
-                fileContents.put(Attributes.FILE, sourceFile.getPath());
-                fileContents.put(String.valueOf(DocumentAttributes.SOURCE_URI), uri);
-                fileContents.put(Attributes.URI, uri);
-
-                String documentType = (String) fileContents.get(Attributes.TYPE);
-                if (fileContents.get(Attributes.STATUS).equals(Status.PUBLISHED_DATE)) {
-                    if (fileContents.get(Attributes.DATE) != null && (fileContents.get(Attributes.DATE) instanceof Date)) {
-                        if (new Date().after((Date) fileContents.get(Attributes.DATE))) {
-                            fileContents.put(Attributes.STATUS, Status.PUBLISHED);
-                        }
-                    }
-                }
-
-                if (config.getUriWithoutExtension()) {
-                    fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
-                }
+                addAdditionalDocumentAttributes(fileContents, sourceFile, sha1, uri);
 
                 if (config.getImgPathUpdate()) {
                     // Prevent image source url's from breaking
                     HtmlUtil.fixImageSourceUrls(fileContents, config);
                 }
 
-                ODocument doc = new ODocument(documentType);
+                ODocument doc = new ODocument(fileContents.getType());
                 doc.fromMap(fileContents);
-                boolean cached = fileContents.get(String.valueOf(DocumentAttributes.CACHED)) != null ? Boolean.valueOf((String) fileContents.get(String.valueOf(DocumentAttributes.CACHED))) : true;
-                doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
                 doc.save();
             } else {
                 LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
             }
         } catch (Exception ex) {
             throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
+        }
+
+    }
+
+    private void addAdditionalDocumentAttributes(DocumentModel documentModel, File sourceFile, String sha1, String uri) {
+        documentModel.setRootPath(getPathToRoot(sourceFile));
+        documentModel.setSha1(sha1);
+        documentModel.setRendered(false);
+        documentModel.setFile(sourceFile.getPath());
+        documentModel.setSourceUri(uri);
+        documentModel.setUri(uri);
+
+        if (documentModel.getStatus().equals(Status.PUBLISHED_DATE)) {
+            if (documentModel.getDate() != null) {
+                if (new Date().after(documentModel.getDate())) {
+                    documentModel.setStatus(Status.PUBLISHED);
+                }
+            }
+        }
+
+        if (config.getUriWithoutExtension()) {
+            documentModel.setNoExtensionUri(uri.replace("/index.html", "/"));
         }
     }
 
@@ -252,27 +250,16 @@ public class Crawler {
 
     public abstract static class Attributes {
 
-        public static final String DATE = "date";
-        public static final String STATUS = "status";
-        public static final String TYPE = "type";
-        public static final String TITLE = "title";
-        public static final String URI = "uri";
-        public static final String FILE = "file";
-        public static final String TAGS = "tags";
         public static final String TAG = "tag";
-        public static final String ROOTPATH = "rootpath";
-        public static final String ID = "id";
-        public static final String NO_EXTENSION_URI = "noExtensionUri";
         public static final String ALLTAGS = "alltags";
         public static final String PUBLISHED_DATE = "published_date";
-        public static final String BODY = "body";
         public static final String DB = "db";
 
         private Attributes() {
         }
 
         /**
-         * Possible values of the {@link Attributes#STATUS} property
+         * Possible values of the {@link DocumentAttributes#STATUS} property
          *
          * @author ndx
          */

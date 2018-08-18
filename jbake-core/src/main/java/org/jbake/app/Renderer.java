@@ -5,16 +5,14 @@ import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.jbake.util.PagingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -107,8 +105,8 @@ public class Renderer {
      * @throws Exception if IOException or SecurityException are raised
      */
     public void render(Map<String, Object> content) throws Exception {
-        String docType = (String) content.get(Crawler.Attributes.TYPE);
-        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + content.get(Attributes.URI);
+        String docType = (String) content.get(DocumentAttributes.TYPE.toString());
+        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + content.get(DocumentAttributes.URI.toString());
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'));
         }
@@ -125,7 +123,7 @@ public class Renderer {
             publishedFile.delete();
         }
 
-        if (content.get(Crawler.Attributes.STATUS).equals(Crawler.Attributes.Status.DRAFT)) {
+        if (content.get(DocumentAttributes.STATUS.toString()).equals(Crawler.Attributes.Status.DRAFT)) {
             outputFilename = outputFilename + config.getDraftSuffix();
         }
 
@@ -204,10 +202,10 @@ public class Renderer {
                     String nextFileName = pagingHelper.getNextFileName(page);
                     model.put("nextFileName", nextFileName);
 
-                    Map<String, Object> contentModel =  buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
+                    DocumentModel contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
 
-                    if(page > 1){
-                        contentModel.put(Attributes.ROOTPATH, "../");
+                    if (page > 1) {
+                        contentModel.setRootPath("../");
                     }
                     model.put("content", contentModel);
 
@@ -268,14 +266,16 @@ public class Renderer {
 
         for (String tag : db.getAllTags()) {
             try {
+
                 Map<String, Object> model = new HashMap<>();
+                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
+
                 model.put("renderer", renderingEngine);
                 model.put(Attributes.TAG, tag);
-                Map<String, Object> map = buildSimpleModel(Attributes.TAG);
+                DocumentModel map = buildSimpleModel(Attributes.TAG);
+                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
                 model.put("content", map);
 
-                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
-                map.put(Attributes.ROOTPATH, FileUtil.getUriPathToDestinationRoot(config, path));
 
                 render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
@@ -291,12 +291,14 @@ public class Renderer {
                 // This will prevent directory listing and also provide an option to
                 // display all tags page.
                 Map<String, Object> model = new HashMap<String, Object>();
+                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
+
                 model.put("renderer", renderingEngine);
-                Map<String, Object> map = buildSimpleModel(Attributes.TAGS);
+                DocumentModel map = buildSimpleModel(DocumentAttributes.TAGS.toString());
+                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
                 model.put("content", map);
 
-                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
-                map.put(Attributes.ROOTPATH, FileUtil.getUriPathToDestinationRoot(config, path));
+
                 render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
                 renderedCount++;
             } catch (Exception e) {
@@ -320,12 +322,12 @@ public class Renderer {
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
      *
      * @param type
-     * @return
+     * @return a basic {@link DocumentModel}
      */
-    private Map<String, Object> buildSimpleModel(String type) {
-        Map<String, Object> content = new HashMap<String, Object>();
-        content.put(Attributes.TYPE, type);
-        content.put(Attributes.ROOTPATH, "");
+    private DocumentModel buildSimpleModel(String type) {
+        DocumentModel content = new DocumentModel();
+        content.setType(type);
+        content.setRootPath("");
         // add any more keys here that need to have a default value to prevent need to perform null check in templates
         return content;
     }

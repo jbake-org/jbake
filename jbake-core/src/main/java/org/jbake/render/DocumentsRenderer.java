@@ -2,15 +2,15 @@ package org.jbake.render;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.RenderingException;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,11 +79,11 @@ public class DocumentsRenderer implements RenderingTool {
      * @param document
      * @return
      */
-    private Map<String, Object> getContentForNav(Map<String, Object> document) {
-        Map<String, Object> navDocument = new HashMap<>();
-        navDocument.put(Attributes.NO_EXTENSION_URI, document.get(Attributes.NO_EXTENSION_URI));
-        navDocument.put(Attributes.URI, document.get(Attributes.URI));
-        navDocument.put(Attributes.TITLE, document.get(Attributes.TITLE));
+    private DocumentModel getContentForNav(Map<String, Object> document) {
+        DocumentModel navDocument = new DocumentModel();
+        navDocument.setNoExtensionUri((String) document.get(DocumentAttributes.NO_EXTENSION_URI.toString()));
+        navDocument.setUri((String) document.get(DocumentAttributes.URI.toString()));
+        navDocument.setTitle((String) document.get(DocumentAttributes.TITLE.toString()));
         return navDocument;
     }
 
