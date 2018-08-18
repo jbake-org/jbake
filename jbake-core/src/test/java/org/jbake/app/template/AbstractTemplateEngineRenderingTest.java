@@ -82,6 +82,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         config.setDestinationFolder(destinationFolder);
         config.setTemplateFolder(templateFolder);
 
+
         for (String docType : DocumentTypes.getDocumentTypes()) {
             File templateFile = config.getTemplateFileByDocType(docType);
 
@@ -91,6 +92,11 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
                 config.setTemplateFileNameForDocType(docType, fileBaseName + "." + templateExtension);
             }
         }
+
+        config.setTemplateFileNameForDocType("paper", "paper." + templateExtension);
+        DocumentTypes.addDocumentType("paper");
+        db.updateSchema();
+
         Assert.assertEquals(".html", config.getOutputExtension());
 
         Crawler crawler = new Crawler(db, config);

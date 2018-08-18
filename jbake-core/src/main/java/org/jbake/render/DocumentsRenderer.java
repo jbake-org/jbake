@@ -6,7 +6,6 @@ import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
 import org.jbake.template.RenderingException;
 
 import java.io.File;
@@ -18,47 +17,39 @@ public class DocumentsRenderer implements RenderingTool {
     @Override
     public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
         int renderedCount = 0;
+        int index = 0;
         final List<String> errors = new LinkedList<>();
-        for (String docType : DocumentTypes.getDocumentTypes()) {
-            DocumentList<DocumentModel> documentList = db.getUnrenderedContent(docType);
+        DocumentModel nextDocument = null;
 
-            if (documentList == null) {
-                continue;
-            }
+        DocumentList<DocumentModel> documentList = db.getUnrenderedContent();
 
-            int index = 0;
+        for (DocumentModel document : documentList) {
+            try {
+                document.setNextContent(null);
+                document.setPreviousContent(null);
 
-            DocumentModel nextDocument = null;
-
-            while (index < documentList.size()) {
-                try {
-                    DocumentModel document = documentList.get(index);
-                    document.setNextContent(null);
-                    document.setPreviousContent(null);
-
-                    if (nextDocument != null && index > 0) {
-                        document.setNextContent(getContentForNav(nextDocument));
-                    }
-
-                    if (index < documentList.size() - 1) {
-                        DocumentModel tempNext = documentList.get(index + 1);
-                        document.setPreviousContent(getContentForNav(tempNext));
-                    }
-
-                    nextDocument = document;
-
-                    renderer.render(document);
-                    renderedCount++;
-
-                } catch (Exception e) {
-                    errors.add(e.getMessage());
+                if (nextDocument != null && index > 0) {
+                    document.setNextContent(getContentForNav(nextDocument));
                 }
 
-                index++;
+                if (index < documentList.size() - 1) {
+                    DocumentModel tempNext = documentList.get(index + 1);
+                    document.setPreviousContent(getContentForNav(tempNext));
+                }
+
+                nextDocument = document;
+
+                renderer.render(document);
+                db.markContentAsRendered(document);
+                renderedCount++;
+
+            } catch (Exception e) {
+                errors.add(e.getMessage());
             }
 
-            db.markContentAsRendered(docType);
+            index++;
         }
+
         if (!errors.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             sb.append("Failed to render documents. Cause(s):");

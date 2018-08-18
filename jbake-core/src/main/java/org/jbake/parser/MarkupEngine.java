@@ -287,6 +287,8 @@ public abstract class MarkupEngine implements ParserEngine {
             }
         } else if (key.equalsIgnoreCase(ModelAttributes.TAGS)) {
             content.setTags(getTags(value));
+        } else if (key.equalsIgnoreCase(ModelAttributes.CACHED)) {
+            content.setCached(Boolean.valueOf(value));
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value));
         } else {

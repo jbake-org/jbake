@@ -23,7 +23,8 @@ public class DocumentTypes {
         resetDocumentTypes();
     }
 
-    private DocumentTypes() {}
+    private DocumentTypes() {
+    }
 
     public static void resetDocumentTypes() {
         DEFAULT_DOC_TYPES.clear();
@@ -37,17 +38,18 @@ public class DocumentTypes {
     }
 
     private static void notifyListener(String docType) {
-        for ( DocumentTypeListener listener : LISTENERS) {
+        for (DocumentTypeListener listener : LISTENERS) {
             listener.added(docType);
         }
     }
 
-    public static void addListener( DocumentTypeListener listener ) {
+    public static void addListener(DocumentTypeListener listener) {
         LISTENERS.add(listener);
     }
 
     /**
      * Notice additional document types are added automagically before returning them
+     *
      * @return all supported document types
      */
     public static String[] getDocumentTypes() {

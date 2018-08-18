@@ -19,6 +19,7 @@ public class FakeDocumentBuilder {
 
     public FakeDocumentBuilder(String type) {
         this.type = type;
+        fileModel.setType(type);
     }
 
     public FakeDocumentBuilder withStatus(String status) {
@@ -66,7 +67,7 @@ public class FakeDocumentBuilder {
             if (!hasDate()) {
                 this.withCurrentDate();
             }
-            ODocument document = new ODocument(type).fromMap(fileModel);
+            ODocument document = new ODocument("Documents").fromMap(fileModel);
             document.save();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

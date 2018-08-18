@@ -9,6 +9,7 @@ public class DocumentModel extends BaseModel {
     public static DocumentModel createDefaultDocumentModel() {
         DocumentModel documentModel = new DocumentModel();
         documentModel.setCached(true);
+        documentModel.setRendered(false);
         return documentModel;
     }
 
@@ -67,6 +68,10 @@ public class DocumentModel extends BaseModel {
         put(ModelAttributes.SHA1, sha1);
     }
 
+    public String getSourceuri() {
+        return (String) get(ModelAttributes.SOURCE_URI);
+    }
+
     public void setSourceUri(String uri) {
         put(ModelAttributes.SOURCE_URI, uri);
     }
@@ -80,7 +85,7 @@ public class DocumentModel extends BaseModel {
     }
 
     public Boolean getRendered() {
-        return (Boolean) get(ModelAttributes.RENDERED);
+        return (Boolean) getOrDefault(ModelAttributes.RENDERED, false);
     }
 
     public void setRendered(boolean rendered) {

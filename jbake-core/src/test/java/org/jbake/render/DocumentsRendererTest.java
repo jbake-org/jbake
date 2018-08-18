@@ -18,8 +18,12 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DocumentsRendererTest {
 
@@ -50,7 +54,7 @@ public class DocumentsRendererTest {
     @Test
     public void shouldReturnZeroIfNothingHasRendered() throws Exception {
 
-        when(db.getUnrenderedContent(anyString())).thenReturn(emptyTemplateModelList);
+        when(db.getUnrenderedContent()).thenReturn(emptyTemplateModelList);
 
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
@@ -67,10 +71,8 @@ public class DocumentsRendererTest {
         templateModelList.add(emptyDocument());
         templateModelList.add(emptyDocument());
 
-        // return empty DocumentList independent from DocumentType
-        when(db.getUnrenderedContent(anyString())).thenReturn(emptyTemplateModelList);
         // return given DocumentList for DocumentType 'custom type'
-        when(db.getUnrenderedContent("customType")).thenReturn(templateModelList);
+        when(db.getUnrenderedContent()).thenReturn(templateModelList);
 
         // when:
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
@@ -97,8 +99,7 @@ public class DocumentsRendererTest {
 
         // throw an exception for every call of renderer's render method
         doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(any(DocumentModel.class));
-        when(db.getUnrenderedContent(anyString())).thenReturn(emptyTemplateModelList);
-        when(db.getUnrenderedContent("customType")).thenReturn(templateModelList);
+        when(db.getUnrenderedContent()).thenReturn(templateModelList);
 
         // when
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
@@ -122,7 +123,7 @@ public class DocumentsRendererTest {
         documents.add(simpleDocument(second));
         documents.add(simpleDocument(first));
 
-        when(db.getUnrenderedContent("customType")).thenReturn(documents);
+        when(db.getUnrenderedContent()).thenReturn(documents);
 
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
