@@ -6,6 +6,7 @@ import org.asciidoctor.Options;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.jruby.AsciidoctorJRuby;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +89,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
-        Map<String, Object> documentModel = context.getDocumentModel();
+        DocumentModel documentModel = context.getDocumentModel();
         if (header.getDocumentTitle() != null) {
             documentModel.put("title", header.getDocumentTitle().getCombined());
         }

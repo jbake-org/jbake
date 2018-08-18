@@ -1,7 +1,14 @@
 package org.jbake.model;
 
+import org.jbake.app.Crawler;
+import org.jbake.app.DBUtil;
+import org.jbake.app.DocumentList;
+import org.jbake.template.DelegatingTemplateEngine;
+
+import javax.swing.text.Document;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DocumentModel extends HashMap<String, Object> {
 
@@ -50,7 +57,7 @@ public class DocumentModel extends HashMap<String, Object> {
     }
 
     public String[] getTags() {
-        return (String[]) get(DocumentAttributes.TAGS.toString());
+        return DBUtil.toStringArray(get(DocumentAttributes.TAGS.toString()));
     }
 
     public void setTags(String[] tags) {
@@ -81,6 +88,10 @@ public class DocumentModel extends HashMap<String, Object> {
         put(DocumentAttributes.ROOTPATH.toString(), pathToRoot);
     }
 
+    public Boolean getRendered() {
+        return (Boolean) get(DocumentAttributes.RENDERED.toString());
+    }
+
     public void setRendered(boolean rendered) {
         put(DocumentAttributes.RENDERED.toString(), rendered);
     }
@@ -97,6 +108,10 @@ public class DocumentModel extends HashMap<String, Object> {
         put(DocumentAttributes.NO_EXTENSION_URI.toString(), noExtensionUri);
     }
 
+    public String getTitle() {
+        return (String) get(DocumentAttributes.TITLE.toString());
+    }
+
     public void setTitle(String title) {
         put(DocumentAttributes.TITLE.toString(), title);
     }
@@ -111,5 +126,61 @@ public class DocumentModel extends HashMap<String, Object> {
 
     public boolean getCached() {
         return (boolean) get(DocumentAttributes.CACHED.toString());
+    }
+
+    public void setTaggedPosts(DocumentList taggedPosts) {
+        put(DocumentAttributes.TAGGED_POSTS.toString(), taggedPosts);
+    }
+
+    public void setTaggedDocuments(DocumentList taggedDocuments) {
+        put(DocumentAttributes.TAGGED_DOCUMENTS.toString(), taggedDocuments);
+    }
+
+    public void setNextContent(DocumentModel nextDocumentModel) {
+        put(DocumentAttributes.NEXT_CONTENT.toString(), nextDocumentModel);
+    }
+
+    public void setPreviousContent(DocumentModel previousDocumentModel) {
+        put(DocumentAttributes.PREVIOUS_CONTENT.toString(), previousDocumentModel);
+    }
+
+    public Map<String, Object> getConfig() {
+        return (Map<String, Object>) get(DocumentAttributes.CONFIG.toString());
+    }
+
+    public void setConfig(Map<String, Object> configModel) {
+        put(DocumentAttributes.CONFIG.toString(), configModel);
+    }
+
+    public void setContent(DocumentModel content) {
+        put(DocumentAttributes.CONTENT.toString(), content);
+    }
+
+    public DocumentModel getContent() {
+        return (DocumentModel) get(DocumentAttributes.CONTENT.toString());
+    }
+
+    public void setRenderer(DelegatingTemplateEngine renderingEngine) {
+        put(DocumentAttributes.RENDERER.toString(), renderingEngine);
+    }
+
+    public void setNumberOfPages(int numberOfPages) {
+        put(DocumentAttributes.NUMBER_OF_PAGES.toString(), numberOfPages);
+    }
+
+    public void setCurrentPageNuber(int currentPageNumber) {
+        put(DocumentAttributes.CURRENT_PAGE_NUMBERS.toString(), currentPageNumber);
+    }
+
+    public void setPreviousFilename(String previousFilename) {
+        put(DocumentAttributes.PREVIOUS_FILENAME.toString(), previousFilename);
+    }
+
+    public void setNextFileName(String nextFilename) {
+        put(DocumentAttributes.NEXT_FILENAME.toString(), nextFilename);
+    }
+
+    public void setTag(String tag) {
+        put(DocumentAttributes.TAG.toString(), tag);
     }
 }

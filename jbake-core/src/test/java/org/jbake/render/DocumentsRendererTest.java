@@ -12,13 +12,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,7 +32,7 @@ public class DocumentsRendererTest {
     private DocumentList emptyDocumentList;
 
     @Captor
-    private ArgumentCaptor<Map<String, Object>> argument;
+    private ArgumentCaptor<DocumentModel> argument;
 
     @Before
     public void setUp() {
@@ -93,13 +90,13 @@ public class DocumentsRendererTest {
         DocumentTypes.addDocumentType("customType");
 
         DocumentList documentList = new DocumentList();
-        HashMap<String, Object> document = emptyDocument();
-        HashMap<String, Object> document2 = emptyDocument();
+        DocumentModel document = emptyDocument();
+        DocumentModel document2 = emptyDocument();
         documentList.add(document);
         documentList.add(document2);
 
         // throw an exception for every call of renderer's render method
-        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(ArgumentMatchers.<String, Object>anyMap());
+        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(any(DocumentModel.class));
         when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
         when(db.getUnrenderedContent("customType")).thenReturn(documentList);
 
@@ -129,25 +126,25 @@ public class DocumentsRendererTest {
 
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
-        Map<String, Object> fourthDoc = simpleDocument(fourth);
+        DocumentModel fourthDoc = simpleDocument(fourth);
         fourthDoc.put("previousContent", simpleDocument(third));
         fourthDoc.put("nextContent", null);
 
-        Map<String, Object> thirdDoc = simpleDocument(third);
+        DocumentModel thirdDoc = simpleDocument(third);
         thirdDoc.put("nextContent", simpleDocument(fourth));
         thirdDoc.put("previousContent", simpleDocument(second));
 
-        Map<String, Object> secondDoc = simpleDocument(second);
+        DocumentModel secondDoc = simpleDocument(second);
         secondDoc.put("nextContent", simpleDocument(third));
         secondDoc.put("previousContent", simpleDocument(first));
 
-        Map<String, Object> firstDoc = simpleDocument(first);
+        DocumentModel firstDoc = simpleDocument(first);
         firstDoc.put("nextContent", simpleDocument(second));
         firstDoc.put("previousContent", null);
 
         verify(renderer, times(4)).render(argument.capture());
 
-        List<Map<String, Object>> maps = argument.getAllValues();
+        List<DocumentModel> maps = argument.getAllValues();
 
         assertThat(maps).contains(fourthDoc);
 
@@ -160,8 +157,8 @@ public class DocumentsRendererTest {
         assertThat(renderResponse).isEqualTo(4);
     }
 
-    private HashMap<String, Object> emptyDocument() {
-        return new HashMap<>();
+    private DocumentModel emptyDocument() {
+        return new DocumentModel();
     }
 
     private DocumentModel simpleDocument(String title) {

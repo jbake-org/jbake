@@ -8,6 +8,7 @@ import groovy.text.markup.TemplateConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 
 import java.io.File;
 import java.io.Writer;
@@ -59,7 +60,7 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final DocumentModel model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateEngine.createTemplateByPath(templateName);
             Map<String, Object> wrappedModel = wrap(model);
@@ -70,7 +71,7 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    private Map<String, Object> wrap(final Map<String, Object> model) {
+    private Map<String, Object> wrap(final DocumentModel model) {
         return new HashMap<String, Object>(model) {
             @Override
             public Object get(final Object property) {

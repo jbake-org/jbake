@@ -307,6 +307,13 @@ public interface JBakeConfiguration {
      */
     void setProperty(String key, Object value);
 
+    /**
+     *
+     * @param type the documents type
+     * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
+     */
+    String getThymeleafModeByType(String type);
+
     String getServerContextPath();
 
     String getServerHostname();

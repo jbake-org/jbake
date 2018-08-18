@@ -15,7 +15,19 @@ public enum DocumentAttributes {
     ROOTPATH("rootpath"),
     FILE("file"),
     NO_EXTENSION_URI("noExtensionUri"),
-    TITLE("title");
+    TITLE("title"),
+    TAGGED_POSTS("tagged_posts"),
+    TAGGED_DOCUMENTS("tagged_documents"),
+    NEXT_CONTENT("nextContent"),
+    PREVIOUS_CONTENT("previousContent"),
+    CONFIG("config"),
+    CONTENT("content"),
+    RENDERER("renderer"),
+    NUMBER_OF_PAGES("numberOfPages"),
+    CURRENT_PAGE_NUMBERS("currentPageNumber"),
+    PREVIOUS_FILENAME("previousFileName"),
+    NEXT_FILENAME("nextFileName"),
+    TAG("tag");
 
     private String label;
 

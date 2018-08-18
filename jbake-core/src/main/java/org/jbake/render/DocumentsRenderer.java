@@ -5,7 +5,6 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.RenderingException;
@@ -13,7 +12,6 @@ import org.jbake.template.RenderingException;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class DocumentsRenderer implements RenderingTool {
 
@@ -30,21 +28,21 @@ public class DocumentsRenderer implements RenderingTool {
 
             int index = 0;
 
-            Map<String, Object> nextDocument = null;
+            DocumentModel nextDocument = null;
 
             while (index < documentList.size()) {
                 try {
-                    Map<String, Object> document = documentList.get(index);
-                    document.put("nextContent", null);
-                    document.put("previousContent", null);
+                    DocumentModel document = documentList.get(index);
+                    document.setNextContent(null);
+                    document.setPreviousContent(null);
 
-                    if (index > 0) {
-                        document.put("nextContent", getContentForNav(nextDocument));
+                    if (nextDocument != null && index > 0) {
+                        document.setNextContent(getContentForNav(nextDocument));
                     }
 
                     if (index < documentList.size() - 1) {
-                        Map<String, Object> tempNext = documentList.get(index + 1);
-                        document.put("previousContent", getContentForNav(tempNext));
+                        DocumentModel tempNext = documentList.get(index + 1);
+                        document.setPreviousContent(getContentForNav(tempNext));
                     }
 
                     nextDocument = document;
@@ -79,11 +77,11 @@ public class DocumentsRenderer implements RenderingTool {
      * @param document
      * @return
      */
-    private DocumentModel getContentForNav(Map<String, Object> document) {
+    private DocumentModel getContentForNav(DocumentModel document) {
         DocumentModel navDocument = new DocumentModel();
-        navDocument.setNoExtensionUri((String) document.get(DocumentAttributes.NO_EXTENSION_URI.toString()));
-        navDocument.setUri((String) document.get(DocumentAttributes.URI.toString()));
-        navDocument.setTitle((String) document.get(DocumentAttributes.TITLE.toString()));
+        navDocument.setNoExtensionUri(document.getNoExtensionUri());
+        navDocument.setUri(document.getUri());
+        navDocument.setTitle(document.getTitle());
         return navDocument;
     }
 

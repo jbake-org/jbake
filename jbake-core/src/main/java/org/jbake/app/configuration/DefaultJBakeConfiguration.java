@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
 
+    public static final String DEFAULT_TYHMELEAF_TEMPLATE_MODE = "HTML";
     private static final String SOURCE_FOLDER_KEY = "sourceFolder";
     private static final String DESTINATION_FOLDER_KEY = "destinationFolder";
     private static final String ASSET_FOLDER_KEY = "assetFolder";
@@ -478,6 +479,12 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public void setProperty(String key, Object value) {
         compositeConfiguration.setProperty(key, value);
+    }
+
+    @Override
+    public String getThymeleafModeByType(String type) {
+        String key = "template_" + type + "_thymeleaf_mode";
+        return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE);
     }
 
     @Override

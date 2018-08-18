@@ -266,14 +266,14 @@ public abstract class MarkupEngine implements ParserEngine {
         }
     }
 
-    private void processHeaderLine(String line, Map<String, Object> content) {
+    private void processHeaderLine(String line, DocumentModel content) {
         String[] parts = line.split("=", 2);
         if (!line.isEmpty() && parts.length == 2) {
             storeHeaderValue(parts[0], parts[1], content);
         }
     }
 
-    void storeHeaderValue(String inputKey, String inputValue, Map<String, Object> content) {
+    void storeHeaderValue(String inputKey, String inputValue, DocumentModel content) {
         String key = sanitize(inputKey);
         String value = sanitize(inputValue);
 
@@ -281,17 +281,18 @@ public abstract class MarkupEngine implements ParserEngine {
             DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
             try {
                 Date date = df.parse(value);
-                content.put(key, date);
+                content.setDate(date);
             } catch (ParseException e) {
                 LOGGER.error("unable to parse date {}", value);
             }
         } else if (key.equalsIgnoreCase(DocumentAttributes.TAGS.toString())) {
-            content.put(key, getTags(value));
+            content.setTags(getTags(value));
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value));
         } else {
             content.put(key, value);
         }
+
     }
 
     private String sanitize(String part) {

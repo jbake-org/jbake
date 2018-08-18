@@ -2,9 +2,10 @@ package org.jbake.app;
 
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import org.jbake.model.DocumentModel;
 
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * Wraps an OrientDB document iterator into a model usable by
@@ -12,7 +13,7 @@ import java.util.Map;
  *
  * @author Cédric Champeau
  */
-public class DocumentList extends LinkedList<Map<String, Object>> {
+public class DocumentList extends LinkedList<DocumentModel> {
 
     public static DocumentList wrap(OResultSet docs) {
         DocumentList list = new DocumentList();
