@@ -11,7 +11,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
+import org.jbake.template.model.TemplateModel;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,7 +48,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final DocumentModel model, final String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = findTemplate(templateName);
             Writable writable = template.make(wrap(model));
@@ -93,9 +93,9 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     private void doInclude(Map<String, Object> model, String templateName) throws Exception {
         AbstractTemplateEngine engine = (AbstractTemplateEngine) model.get("renderer");
         Writer out = (Writer) model.get("out");
-        DocumentModel documentModel = new DocumentModel();
-        documentModel.putAll(model);
-        engine.renderDocument(documentModel, templateName, out);
+        TemplateModel templateModel = new TemplateModel();
+        templateModel.putAll(model);
+        engine.renderDocument(templateModel, templateName, out);
         model.put("out", out);
     }
 }

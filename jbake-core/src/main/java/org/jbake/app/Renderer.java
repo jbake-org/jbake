@@ -4,9 +4,10 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentModel;
+import org.jbake.model.ModelAttributes;
 import org.jbake.template.DelegatingTemplateEngine;
+import org.jbake.template.model.TemplateModel;
 import org.jbake.util.PagingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +127,7 @@ public class Renderer {
         }
 
         File outputFile = new File(outputFilename + outputExtension);
-        DocumentModel model = new DocumentModel();
+        TemplateModel model = new TemplateModel();
         model.setContent(content);
         model.setRenderer(renderingEngine);
 
@@ -184,7 +185,7 @@ public class Renderer {
         } else {
             PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
 
-            DocumentModel model = new DocumentModel();
+            TemplateModel model = new TemplateModel();
             model.setRenderer(renderingEngine);
             model.setNumberOfPages(pagingHelper.getNumberOfPages());
 
@@ -264,15 +265,16 @@ public class Renderer {
 
         for (String tag : db.getAllTags()) {
             try {
-                DocumentModel model = new DocumentModel();
-                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
+                TemplateModel model = new TemplateModel();
                 model.setRenderer(renderingEngine);
                 model.setTag(tag);
-                DocumentModel map = buildSimpleModel(DocumentAttributes.TAG.toString());
+                DocumentModel map = buildSimpleModel(ModelAttributes.TAG.toString());
+                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
+
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
                 model.setContent(map);
 
-                render(new ModelRenderingConfig(path, DocumentAttributes.TAG.toString(), model, findTemplateName(DocumentAttributes.TAG.toString())));
+                render(new ModelRenderingConfig(path, ModelAttributes.TAG.toString(), model, findTemplateName(ModelAttributes.TAG.toString())));
 
                 renderedCount++;
             } catch (Exception e) {
@@ -285,11 +287,11 @@ public class Renderer {
                 // Add an index file at root folder of tags.
                 // This will prevent directory listing and also provide an option to
                 // display all tags page.
-                DocumentModel model = new DocumentModel();
+                TemplateModel model = new TemplateModel();
+                model.put("renderer", renderingEngine);
+                DocumentModel map = buildSimpleModel(ModelAttributes.TAGS.toString());
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
 
-                model.put("renderer", renderingEngine);
-                DocumentModel map = buildSimpleModel(DocumentAttributes.TAGS.toString());
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
                 model.put("content", map);
 
@@ -335,7 +337,7 @@ public class Renderer {
 
         String getTemplate();
 
-        DocumentModel getModel();
+        TemplateModel getModel();
     }
 
     private abstract static class AbstractRenderingConfig implements RenderingConfig {
@@ -369,27 +371,27 @@ public class Renderer {
     }
 
     public class ModelRenderingConfig extends AbstractRenderingConfig {
-        private final DocumentModel model;
+        private final TemplateModel model;
 
-        public ModelRenderingConfig(String fileName, DocumentModel model, String templateType) {
+        public ModelRenderingConfig(String fileName, TemplateModel model, String templateType) {
             super(new File(config.getDestinationFolder(), fileName), fileName, findTemplateName(templateType));
             this.model = model;
         }
 
-        public ModelRenderingConfig(File path, String name, DocumentModel model, String template) {
+        public ModelRenderingConfig(File path, String name, TemplateModel model, String template) {
             super(path, name, template);
             this.model = model;
         }
 
         @Override
-        public DocumentModel getModel() {
+        public TemplateModel getModel() {
             return model;
         }
     }
 
     class DefaultRenderingConfig extends AbstractRenderingConfig {
 
-        private final Object content;
+        private final DocumentModel content;
 
         private DefaultRenderingConfig(File path, String allInOneName) {
             super(path, allInOneName, findTemplateName(allInOneName));
@@ -412,10 +414,10 @@ public class Renderer {
         }
 
         @Override
-        public DocumentModel getModel() {
-            DocumentModel model = new DocumentModel();
-            model.put("renderer", renderingEngine);
-            model.put("content", content);
+        public TemplateModel getModel() {
+            TemplateModel model = new TemplateModel();
+            model.setRenderer(renderingEngine);
+            model.setContent(content);
 
             if (config.getPaginateIndex()) {
                 model.put("numberOfPages", 0);

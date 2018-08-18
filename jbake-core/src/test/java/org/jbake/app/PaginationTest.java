@@ -63,8 +63,7 @@ public class PaginationTest extends ContentStoreIntegrationTest {
         for (int i = 1; i <= TOTAL_POSTS; i++) {
             cal.add(Calendar.SECOND, 5);
             FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
-            builder.withName("dummyfile" + i)
-                    .withCached(true)
+            builder.withCached(true)
                     .withStatus("published")
                     .withDate(cal.getTime())
                     .build();

@@ -5,8 +5,8 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentModel;
+import org.jbake.model.ModelAttributes;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,7 +277,7 @@ public abstract class MarkupEngine implements ParserEngine {
         String key = sanitize(inputKey);
         String value = sanitize(inputValue);
 
-        if (key.equalsIgnoreCase(DocumentAttributes.DATE.toString())) {
+        if (key.equalsIgnoreCase(ModelAttributes.DATE.toString())) {
             DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
             try {
                 Date date = df.parse(value);
@@ -285,7 +285,7 @@ public abstract class MarkupEngine implements ParserEngine {
             } catch (ParseException e) {
                 LOGGER.error("unable to parse date {}", value);
             }
-        } else if (key.equalsIgnoreCase(DocumentAttributes.TAGS.toString())) {
+        } else if (key.equalsIgnoreCase(ModelAttributes.TAGS.toString())) {
             content.setTags(getTags(value));
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value));

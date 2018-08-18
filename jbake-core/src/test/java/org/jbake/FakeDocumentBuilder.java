@@ -21,11 +21,6 @@ public class FakeDocumentBuilder {
         this.type = type;
     }
 
-    public FakeDocumentBuilder withName(String name) {
-        fileModel.setName(name);
-        return this;
-    }
-
     public FakeDocumentBuilder withStatus(String status) {
         fileModel.setStatus(status);
         return this;

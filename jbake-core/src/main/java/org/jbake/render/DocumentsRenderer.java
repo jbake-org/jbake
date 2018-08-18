@@ -32,7 +32,7 @@ public class DocumentsRenderer implements RenderingTool {
 
             while (index < documentList.size()) {
                 try {
-                    DocumentModel document = documentList.get(index);
+                    DocumentModel document = documentList.getDocumentModel(index);
                     document.setNextContent(null);
                     document.setPreviousContent(null);
 
@@ -41,7 +41,7 @@ public class DocumentsRenderer implements RenderingTool {
                     }
 
                     if (index < documentList.size() - 1) {
-                        DocumentModel tempNext = documentList.get(index + 1);
+                        DocumentModel tempNext = (DocumentModel) documentList.get(index + 1);
                         document.setPreviousContent(getContentForNav(tempNext));
                     }
 

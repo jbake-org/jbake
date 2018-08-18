@@ -3,7 +3,7 @@ package org.jbake.app;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.jbake.model.DocumentAttributes;
+import org.jbake.model.ModelAttributes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,7 +29,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         for (Map<String, Object> content : results) {
             assertThat(content)
-                    .containsKey(DocumentAttributes.ROOTPATH.toString())
+                    .containsKey(ModelAttributes.ROOTPATH.toString())
                     .containsValue("../../../");
         }
 
@@ -38,8 +38,8 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         assertThat(allPosts.size()).isEqualTo(4);
 
         for (Map<String, Object> content : allPosts) {
-            if (content.get(DocumentAttributes.TITLE.toString()).equals("Draft Post")) {
-                assertThat(content).containsKey(DocumentAttributes.DATE.toString());
+            if (content.get(ModelAttributes.TITLE.toString()).equals("Draft Post")) {
+                assertThat(content).containsKey(ModelAttributes.DATE.toString());
             }
         }
 
@@ -49,7 +49,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
     }
 
     @Test
-    public void renderWithPrettyUrls() throws Exception {
+    public void renderWithPrettyUrls() {
 
         config.setUriWithoutExtension(true);
         config.setPrefixForUriWithoutExtension("/blog");

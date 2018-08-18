@@ -3,9 +3,9 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.jbake.FakeDocumentBuilder;
 import org.jbake.app.Crawler.Attributes.Status;
-import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jbake.app.ContentStore.quoteIdentifier;
+import static org.jbake.model.ModelAttributes.RENDERED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -26,15 +27,13 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         for (int i = 0; i < 5; i++) {
             FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
-            builder.withName("dummyfile" + i)
-                    .withStatus("published")
+            builder.withStatus("published")
                     .withRandomSha1()
                     .build();
         }
 
         FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
-        builder.withName("draftdummy")
-                .withStatus("draft")
+        builder.withStatus("draft")
                 .withRandomSha1()
                 .build();
 
@@ -117,7 +116,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         DocumentList documentList4 = db.getDocumentStatus(typeWithHyphen, uri);
 
         assertEquals(1, documentList4.size());
-        assertEquals(Boolean.FALSE, documentList4.get(0).get(DocumentAttributes.RENDERED.toString()));
+        assertEquals(Boolean.FALSE, documentList4.get(0).get(RENDERED.toString()));
 
         long documentCount2 = db.getPublishedCount(typeWithHyphen);
         assertEquals(0, documentCount2);
@@ -130,9 +129,9 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         DocumentList documentList5 = db.getUnrenderedContent(typeWithHyphen);
         assertEquals(1, documentList5.size());
-        assertEquals(Boolean.FALSE, documentList5.get(0).get(DocumentAttributes.RENDERED.toString()));
-        assertEquals(typeWithHyphen, documentList5.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertThat((String[])documentList5.get(0).get(DocumentAttributes.TAGS.toString())).contains(tagWithHyphen);
+        assertEquals(Boolean.FALSE, documentList5.get(0).get(ModelAttributes.RENDERED.toString()));
+        assertEquals(typeWithHyphen, documentList5.get(0).get(ModelAttributes.TYPE.toString()));
+        assertThat((String[])documentList5.get(0).get(ModelAttributes.TAGS.toString())).contains(tagWithHyphen);
 
         long documentCount3 = db.getPublishedCount(typeWithHyphen);
         assertEquals(1, documentCount3);
@@ -141,15 +140,15 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         DocumentList documentList6 = db.getPublishedContent(typeWithHyphen);
         assertEquals(1, documentList6.size());
-        assertEquals(Boolean.TRUE, documentList6.get(0).get(DocumentAttributes.RENDERED.toString()));
-        assertEquals(typeWithHyphen, documentList6.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertThat((String[])documentList6.get(0).get(DocumentAttributes.TAGS.toString())).contains(tagWithHyphen);
+        assertEquals(Boolean.TRUE, documentList6.get(0).get(ModelAttributes.RENDERED.toString()));
+        assertEquals(typeWithHyphen, documentList6.get(0).get(ModelAttributes.TYPE.toString()));
+        assertThat((String[])documentList6.get(0).get(ModelAttributes.TAGS.toString())).contains(tagWithHyphen);
 
         DocumentList documentList7 = db.getPublishedDocumentsByTag(tagWithHyphen);
         assertEquals(1, documentList7.size());
-        assertEquals(Boolean.TRUE, documentList7.get(0).get(DocumentAttributes.RENDERED.toString()));
-        assertEquals(typeWithHyphen, documentList7.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertThat((String[])documentList7.get(0).get(DocumentAttributes.TAGS.toString())).contains(tagWithHyphen);
+        assertEquals(Boolean.TRUE, documentList7.get(0).get(ModelAttributes.RENDERED.toString()));
+        assertEquals(typeWithHyphen, documentList7.get(0).get(ModelAttributes.TYPE.toString()));
+        assertThat((String[])documentList7.get(0).get(ModelAttributes.TAGS.toString())).contains(tagWithHyphen);
 
         DocumentList documentList8 = db.getPublishedPostsByTag(tagWithHyphen);
         assertEquals(0, documentList8.size());

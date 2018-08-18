@@ -14,7 +14,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
+import org.jbake.template.model.TemplateModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(DocumentModel model, String templateName, Writer writer) throws RenderingException {
+    public void renderDocument(TemplateModel model, String templateName, Writer writer) throws RenderingException {
         try {
             JadeTemplate template = jadeConfiguration.getTemplate(templateName);
 
@@ -66,13 +66,13 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    public void renderTemplate(JadeTemplate template, Map<String, Object> model, Writer writer) {
-        JadeModel jadeModel = wrap(jadeConfiguration.getSharedVariables());
-        jadeModel.putAll(model);
+    public void renderTemplate(JadeTemplate template, TemplateModel model, Writer writer) {
+        JadeModel jadeModel = wrap(model);
+        jadeModel.putAll(jadeConfiguration.getSharedVariables());
         template.process(jadeModel, writer);
     }
 
-    private JadeModel wrap(final Map<String, Object> model) {
+    private JadeModel wrap(final TemplateModel model) {
         return new JadeModel(model) {
 
             @Override

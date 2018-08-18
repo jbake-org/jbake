@@ -5,7 +5,7 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeProperty;
-import org.jbake.model.DocumentModel;
+import org.jbake.template.model.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,8 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final DocumentModel model, String templateName, final Writer writer) throws RenderingException {
-        model.put("version", config.getVersion());
+    public void renderDocument(final TemplateModel model, String templateName, final Writer writer) throws RenderingException {
+        model.setVersion(config.getVersion());
 
         // TODO: create config model from configuration
         Map<String, Object> configModel = new HashMap<>();

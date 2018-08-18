@@ -1,6 +1,6 @@
 package org.jbake.model;
 
-public enum DocumentAttributes {
+public enum ModelAttributes {
     SHA1("sha1"),
     SOURCE_URI("sourceuri"),
     RENDERED("rendered"),
@@ -27,11 +27,12 @@ public enum DocumentAttributes {
     CURRENT_PAGE_NUMBERS("currentPageNumber"),
     PREVIOUS_FILENAME("previousFileName"),
     NEXT_FILENAME("nextFileName"),
-    TAG("tag");
+    TAG("tag"),
+    VERSION("version");
 
     private String label;
 
-    DocumentAttributes(String label) {
+    ModelAttributes(String label) {
         this.label = label;
     }
 

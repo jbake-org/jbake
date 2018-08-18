@@ -36,9 +36,10 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.model.DocumentAttributes;
+import org.jbake.model.BaseModel;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,14 +196,11 @@ public class ContentStore {
      * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.
      */
     public ODocument mergeDocument(Map<String, ? extends Object> incomingDocMap) {
-        String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
-
+        String sourceUri = (String) incomingDocMap.get(ModelAttributes.SOURCE_URI.toString());
         if (null == sourceUri) {
             throw new IllegalArgumentException("Document sourceUri is null.");
         }
-
-        String docType = (String) incomingDocMap.get(DocumentAttributes.TYPE.toString());
-
+        String docType = (String) incomingDocMap.get(ModelAttributes.TYPE.toString());
         if (null == docType) {
             throw new IllegalArgumentException("Document docType is null.");
         }
@@ -356,8 +354,8 @@ public class ContentStore {
     public Set<String> getTags() {
         DocumentList docs = this.getAllTagsFromPublishedPosts();
         Set<String> result = new HashSet<>();
-        for (DocumentModel document : docs) {
-            String[] tags = document.getTags();
+        for (BaseModel document : docs) {
+            String[] tags = ((DocumentModel) document).getTags();
             Collections.addAll(result, tags);
         }
         return result;
@@ -368,8 +366,8 @@ public class ContentStore {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, quoteIdentifier(docType));
             DocumentList docs = query(statement);
-            for (DocumentModel document : docs) {
-                String[] tags = document.getTags();
+            for (BaseModel document : docs) {
+                String[] tags = ((DocumentModel) document).getTags();
                 Collections.addAll(result, tags);
             }
         }
@@ -383,31 +381,31 @@ public class ContentStore {
         OClass page = schema.createClass(docType);
 
         // Primary key
-        String attribName = DocumentAttributes.SOURCE_URI.toString();
+        String attribName = ModelAttributes.SOURCE_URI.toString();
         page.createProperty(attribName, OType.STRING).setNotNull(true);
         page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, attribName);
 
-        attribName = DocumentAttributes.SHA1.toString();
+        attribName = ModelAttributes.SHA1.toString();
         page.createProperty(attribName, OType.STRING).setNotNull(true);
         page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
 
-        attribName = DocumentAttributes.CACHED.toString();
+        attribName = ModelAttributes.CACHED.toString();
         page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
         page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
 
-        attribName = DocumentAttributes.RENDERED.toString();
+        attribName = ModelAttributes.RENDERED.toString();
         page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
         page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
 
-        attribName = DocumentAttributes.STATUS.toString();
+        attribName = ModelAttributes.STATUS.toString();
         page.createProperty(attribName, OType.STRING).setNotNull(true);
         page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
     }
 
     private void createSignatureType(OSchema schema) {
         OClass signatures = schema.createClass("Signatures");
-        signatures.createProperty(DocumentAttributes.SHA1.toString(), OType.STRING).setNotNull(true);
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
+        signatures.createProperty(ModelAttributes.SHA1.toString(), OType.STRING).setNotNull(true);
+        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1.toString());
     }
 
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
@@ -435,7 +433,7 @@ public class ContentStore {
             currentTemplatesSignature = "";
         }
         if (!docs.isEmpty()) {
-            String sha1 = docs.get(0).getSha1();
+            String sha1 = ((DocumentModel) docs.get(0)).getSha1();
             if (!sha1.equals(currentTemplatesSignature)) {
                 this.updateSignatures(currentTemplatesSignature);
                 templateSignatureChanged = true;

@@ -29,7 +29,7 @@ public class DocumentsRendererTest {
     private ContentStore db;
     private Renderer renderer;
     private JBakeConfiguration configuration;
-    private DocumentList emptyDocumentList;
+    private DocumentList emptyTemplateModelList;
 
     @Captor
     private ArgumentCaptor<DocumentModel> argument;
@@ -44,13 +44,13 @@ public class DocumentsRendererTest {
         db = mock(ContentStore.class);
         renderer = mock(Renderer.class);
         configuration = mock(JBakeConfiguration.class);
-        emptyDocumentList = new DocumentList();
+        emptyTemplateModelList = new DocumentList();
     }
 
     @Test
     public void shouldReturnZeroIfNothingHasRendered() throws Exception {
 
-        when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
+        when(db.getUnrenderedContent(anyString())).thenReturn(emptyTemplateModelList);
 
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
@@ -63,14 +63,14 @@ public class DocumentsRendererTest {
         // given:
         DocumentTypes.addDocumentType("customType");
 
-        DocumentList documentList = new DocumentList();
-        documentList.add(emptyDocument());
-        documentList.add(emptyDocument());
+        DocumentList templateModelList = new DocumentList();
+        templateModelList.add(emptyDocument());
+        templateModelList.add(emptyDocument());
 
         // return empty DocumentList independent from DocumentType
-        when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
+        when(db.getUnrenderedContent(anyString())).thenReturn(emptyTemplateModelList);
         // return given DocumentList for DocumentType 'custom type'
-        when(db.getUnrenderedContent("customType")).thenReturn(documentList);
+        when(db.getUnrenderedContent("customType")).thenReturn(templateModelList);
 
         // when:
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
@@ -89,16 +89,16 @@ public class DocumentsRendererTest {
         // given
         DocumentTypes.addDocumentType("customType");
 
-        DocumentList documentList = new DocumentList();
+        DocumentList templateModelList = new DocumentList();
         DocumentModel document = emptyDocument();
         DocumentModel document2 = emptyDocument();
-        documentList.add(document);
-        documentList.add(document2);
+        templateModelList.add(document);
+        templateModelList.add(document2);
 
         // throw an exception for every call of renderer's render method
         doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(any(DocumentModel.class));
-        when(db.getUnrenderedContent(anyString())).thenReturn(emptyDocumentList);
-        when(db.getUnrenderedContent("customType")).thenReturn(documentList);
+        when(db.getUnrenderedContent(anyString())).thenReturn(emptyTemplateModelList);
+        when(db.getUnrenderedContent("customType")).thenReturn(templateModelList);
 
         // when
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
