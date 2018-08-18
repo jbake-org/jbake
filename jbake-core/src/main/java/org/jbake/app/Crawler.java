@@ -6,10 +6,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,7 +142,7 @@ public class Crawler {
 
         // strip off leading / to enable generating non-root based sites
         if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1, uri.length());
+            uri = uri.substring(1);
         }
 
         return uri;
@@ -233,7 +233,7 @@ public class Crawler {
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
         DocumentList match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
-            DocumentModel documentModel = match.get(0);
+            DocumentModel documentModel = match.getDocumentModel(0);
             String oldHash = documentModel.getSha1();
             if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(documentModel.getRendered())) {
                 return DocumentStatus.UPDATED;
@@ -255,7 +255,7 @@ public class Crawler {
         }
 
         /**
-         * Possible values of the {@link DocumentAttributes#STATUS} property
+         * Possible values of the {@link ModelAttributes#STATUS} property
          *
          * @author ndx
          */

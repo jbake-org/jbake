@@ -6,14 +6,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.assertj.core.api.Assertions;
 import org.jbake.FakeDocumentBuilder;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.jbake.app.ContentStore.quoteIdentifier;
 
 import org.jbake.app.Crawler.Attributes.Status;
-import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import static org.junit.Assert.assertEquals;
+
+import org.jbake.model.ModelAttributes;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
@@ -26,15 +31,13 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         for (int i = 0; i < 5; i++) {
             FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
-            builder.withName("dummyfile" + i)
-                    .withStatus("published")
+            builder.withStatus("published")
                     .withRandomSha1()
                     .build();
         }
 
         FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
-        builder.withName("draftdummy")
-                .withStatus("draft")
+        builder.withStatus("draft")
                 .withRandomSha1()
                 .build();
 
@@ -48,8 +51,8 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         ODocument doc = new ODocument(DOC_TYPE_POST);
         Map<String, String> values = new HashMap();
-        values.put(DocumentAttributes.TYPE.toString(), DOC_TYPE_POST);
-        values.put(DocumentAttributes.SOURCE_URI.toString(), uri);
+        values.put(ModelAttributes.TYPE.toString(), DOC_TYPE_POST);
+        values.put(ModelAttributes.SOURCE_URI.toString(), uri);
         values.put("foo", "originalValue");
         doc.fromMap(values);
         doc.save();
@@ -86,7 +89,6 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         DocumentModel model = new DocumentModel();
         model.setType(typeWithHyphen);
-        model.setTag(tagWithHyphen);
         model.setTags(new String[]{tagWithHyphen});
         model.setStatus(Status.DRAFT);
         model.setDate(new Date());
@@ -118,22 +120,22 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         DocumentList documentList4 = db.getDocumentStatus(typeWithHyphen, uri);
 
         assertEquals(1, documentList4.size());
-        assertEquals(Boolean.FALSE, documentList4.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
+        assertEquals(Boolean.FALSE, documentList4.get(0).get(String.valueOf(ModelAttributes.RENDERED)));
 
         long documentCount2 = db.getPublishedCount(typeWithHyphen);
         assertEquals(0, documentCount2);
 
         Map<String,Object> published = new HashMap<>();
-        published.put(DocumentAttributes.SOURCE_URI.toString(), uri);
-        published.put(DocumentAttributes.TYPE.toString(), typeWithHyphen);
-        published.put(DocumentAttributes.STATUS.toString(), Status.PUBLISHED);
+        published.put(ModelAttributes.SOURCE_URI.toString(), uri);
+        published.put(ModelAttributes.TYPE.toString(), typeWithHyphen);
+        published.put(ModelAttributes.STATUS.toString(), Status.PUBLISHED);
         db.mergeDocument(published);
 
         DocumentList documentList5 = db.getUnrenderedContent(typeWithHyphen);
         assertEquals(1, documentList5.size());
-        assertEquals(Boolean.FALSE, documentList5.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
-        assertEquals(typeWithHyphen, documentList5.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertEquals(tagWithHyphen, documentList5.get(0).get(DocumentAttributes.TAG.toString()));
+        assertEquals(Boolean.FALSE, documentList5.get(0).get(String.valueOf(ModelAttributes.RENDERED)));
+        assertEquals(typeWithHyphen, documentList5.get(0).get(ModelAttributes.TYPE.toString()));
+        assertThat((String[])documentList5.get(0).get(ModelAttributes.TAGS.toString())).contains(tagWithHyphen);
 
         long documentCount3 = db.getPublishedCount(typeWithHyphen);
         assertEquals(1, documentCount3);
@@ -142,15 +144,15 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         DocumentList documentList6 = db.getPublishedContent(typeWithHyphen);
         assertEquals(1, documentList6.size());
-        assertEquals(Boolean.TRUE, documentList6.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
-        assertEquals(typeWithHyphen, documentList6.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertEquals(tagWithHyphen, documentList6.get(0).get(DocumentAttributes.TAG.toString()));
+        assertEquals(Boolean.TRUE, documentList6.get(0).get(String.valueOf(ModelAttributes.RENDERED)));
+        assertEquals(typeWithHyphen, documentList6.get(0).get(ModelAttributes.TYPE.toString()));
+        assertThat((String[])documentList6.get(0).get(ModelAttributes.TAGS.toString())).contains(tagWithHyphen);
 
         DocumentList documentList7 = db.getPublishedDocumentsByTag(tagWithHyphen);
         assertEquals(1, documentList7.size());
-        assertEquals(Boolean.TRUE, documentList7.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
-        assertEquals(typeWithHyphen, documentList7.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertEquals(tagWithHyphen, documentList7.get(0).get(DocumentAttributes.TAG.toString()));
+        assertEquals(Boolean.TRUE, documentList7.get(0).get(String.valueOf(ModelAttributes.RENDERED)));
+        assertEquals(typeWithHyphen, documentList7.get(0).get(ModelAttributes.TYPE.toString()));
+        assertThat((String[])documentList7.get(0).get(ModelAttributes.TAGS.toString())).contains(tagWithHyphen);
 
         DocumentList documentList8 = db.getPublishedPostsByTag(tagWithHyphen);
         assertEquals(0, documentList8.size());

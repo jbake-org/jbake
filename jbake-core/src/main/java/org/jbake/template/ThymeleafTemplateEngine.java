@@ -7,6 +7,7 @@ import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
+import org.jbake.template.model.TemplateModel;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.LazyContextVariable;
@@ -72,17 +73,17 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         templateEngine.clearTemplateCache();
     }
 
-    private void updateTemplateMode(DocumentModel model) {
+    private void updateTemplateMode(TemplateModel model) {
         templateResolver.setTemplateMode(getTemplateModeByModel(model));
     }
 
-    private String getTemplateModeByModel(DocumentModel model) {
+    private String getTemplateModeByModel(TemplateModel model) {
         DocumentModel content = model.getContent();
         return config.getThymeleafModeByType(content.getType());
     }
 
     @Override
-    public void renderDocument(DocumentModel model, String templateName, Writer writer) throws RenderingException {
+    public void renderDocument(TemplateModel model, String templateName, Writer writer) {
 
         String localeString = config.getThymeleafLocale();
         Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();

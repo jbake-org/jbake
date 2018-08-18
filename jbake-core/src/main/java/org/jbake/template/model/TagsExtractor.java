@@ -3,7 +3,6 @@ package org.jbake.template.model;
 import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.app.FileUtil;
-import org.jbake.model.DocumentModel;
 import org.jbake.template.ModelExtractor;
 
 import java.util.Map;
@@ -17,12 +16,14 @@ public class TagsExtractor implements ModelExtractor<DocumentList> {
     @Override
     public DocumentList get(ContentStore db, Map model, String key) {
         DocumentList dl = new DocumentList();
-        Map<?, ?> config = (Map<?, ?>) model.get("config");
+        TemplateModel templateModel = new TemplateModel();
+        templateModel.putAll(model);
+        Map<?, ?> config = templateModel.getConfig();
 
         String tagPath = config.get(TAG_PATH.replace(".", "_")).toString();
 
         for (String tag : db.getAllTags()) {
-            DocumentModel newTag = new DocumentModel();
+            TemplateModel newTag = new TemplateModel();
             String tagName = tag;
             newTag.setName(tagName);
 

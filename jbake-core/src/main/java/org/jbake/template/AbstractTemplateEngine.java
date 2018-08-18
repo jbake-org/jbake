@@ -5,7 +5,7 @@ import org.apache.commons.configuration.Configuration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.model.DocumentModel;
+import org.jbake.template.model.TemplateModel;
 
 import java.io.File;
 import java.io.Writer;
@@ -22,7 +22,7 @@ import java.io.Writer;
  * data access based on the underlying template engine capabilities.
  * <p>
  * Note that some rendering engines may rely on a different rendering model than the one
- * provided by the first argument of {@link #renderDocument(DocumentModel, String, Writer)}.
+ * provided by the first argument of {@link #renderDocument(TemplateModel, String, Writer)}.
  * In this case, it is the responsibility of the engine to convert it.
  *
  * @author Cédric Champeau
@@ -46,5 +46,5 @@ public abstract class AbstractTemplateEngine {
         this.db = db;
     }
 
-    public abstract void renderDocument(DocumentModel model, String templateName, Writer writer) throws RenderingException;
+    public abstract void renderDocument(TemplateModel model, String templateName, Writer writer) throws RenderingException;
 }

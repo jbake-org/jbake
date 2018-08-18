@@ -8,7 +8,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
+import org.jbake.template.model.TemplateModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final DocumentModel model, final String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateCfg.getTemplate(templateName);
             template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db), writer);
@@ -72,7 +72,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         }
 
         @Override
-        public TemplateModel get(final String key) throws TemplateModelException {
+        public freemarker.template.TemplateModel get(final String key) throws TemplateModelException {
             try {
 
                 // GIT Issue#357: Accessing db in freemarker template throws exception
@@ -85,10 +85,10 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                 }
 
 
-                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
+                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<freemarker.template.TemplateModel>() {
 
                     @Override
-                    public TemplateModel adapt(String key, Object extractedValue) {
+                    public freemarker.template.TemplateModel adapt(String key, Object extractedValue) {
                         if (key.equals(Crawler.Attributes.ALLTAGS)) {
                             return new SimpleCollection((Collection) extractedValue, wrapper);
                         } else if (key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
@@ -106,7 +106,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         }
 
         @Override
-        public boolean isEmpty() throws TemplateModelException {
+        public boolean isEmpty() {
             return false;
         }
 
