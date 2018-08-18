@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import org.jbake.FakeDocumentBuilder;
 import static org.jbake.app.ContentStore.quoteIdentifier;
+
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
@@ -46,7 +47,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         ODocument doc = new ODocument(DOC_TYPE_POST);
         Map<String, String> values = new HashMap();
-        values.put(Crawler.Attributes.TYPE, DOC_TYPE_POST);
+        values.put(DocumentAttributes.TYPE.toString(), DOC_TYPE_POST);
         values.put(DocumentAttributes.SOURCE_URI.toString(), uri);
         values.put("foo", "originalValue");
         doc.fromMap(values);
@@ -83,11 +84,11 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         final String uri = "test/testMergeDocument";
 
         Map<String, Object> values = new HashMap();
-        values.put(Crawler.Attributes.TYPE, typeWithHyphen);
+        values.put(DocumentAttributes.TYPE.toString(), typeWithHyphen);
         values.put(Crawler.Attributes.TAG, tagWithHyphen);
-        values.put(Crawler.Attributes.TAGS, new String[]{tagWithHyphen});
-        values.put(Crawler.Attributes.STATUS, Status.DRAFT);
-        values.put(Crawler.Attributes.DATE, new Date());
+        values.put(DocumentAttributes.TAGS.toString(), new String[]{tagWithHyphen});
+        values.put(DocumentAttributes.STATUS.toString(), Status.DRAFT);
+        values.put(DocumentAttributes.DATE.toString(), new Date());
         values.put(DocumentAttributes.RENDERED.toString(), false);
         values.put(DocumentAttributes.SOURCE_URI.toString(), uri);
         values.put(DocumentAttributes.CACHED.toString(), true);
@@ -124,14 +125,14 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
 
         Map<String,Object> published = new HashMap<>();
         published.put(DocumentAttributes.SOURCE_URI.toString(), uri);
-        published.put(Crawler.Attributes.TYPE, typeWithHyphen);
-        published.put(Crawler.Attributes.STATUS, Status.PUBLISHED);
+        published.put(DocumentAttributes.TYPE.toString(), typeWithHyphen);
+        published.put(DocumentAttributes.STATUS.toString(), Status.PUBLISHED);
         db.mergeDocument(published);
 
         DocumentList documentList5 = db.getUnrenderedContent(typeWithHyphen);
         assertEquals(1, documentList5.size());
         assertEquals(Boolean.FALSE, documentList5.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
-        assertEquals(typeWithHyphen, documentList5.get(0).get(Crawler.Attributes.TYPE));
+        assertEquals(typeWithHyphen, documentList5.get(0).get(DocumentAttributes.TYPE.toString()));
         assertEquals(tagWithHyphen, documentList5.get(0).get(Crawler.Attributes.TAG));
 
         long documentCount3 = db.getPublishedCount(typeWithHyphen);
@@ -142,13 +143,13 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         DocumentList documentList6 = db.getPublishedContent(typeWithHyphen);
         assertEquals(1, documentList6.size());
         assertEquals(Boolean.TRUE, documentList6.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
-        assertEquals(typeWithHyphen, documentList6.get(0).get(Crawler.Attributes.TYPE));
+        assertEquals(typeWithHyphen, documentList6.get(0).get(DocumentAttributes.TYPE.toString()));
         assertEquals(tagWithHyphen, documentList6.get(0).get(Crawler.Attributes.TAG));
 
         DocumentList documentList7 = db.getPublishedDocumentsByTag(tagWithHyphen);
         assertEquals(1, documentList7.size());
         assertEquals(Boolean.TRUE, documentList7.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
-        assertEquals(typeWithHyphen, documentList7.get(0).get(Crawler.Attributes.TYPE));
+        assertEquals(typeWithHyphen, documentList7.get(0).get(DocumentAttributes.TYPE.toString()));
         assertEquals(tagWithHyphen, documentList7.get(0).get(Crawler.Attributes.TAG));
 
         DocumentList documentList8 = db.getPublishedPostsByTag(tagWithHyphen);

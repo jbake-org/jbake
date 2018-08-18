@@ -1,20 +1,17 @@
 package org.jbake;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.jbake.app.Crawler;
-import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class FakeDocumentBuilder {
 
-    Map<String, Object> fileModel = new HashMap<String, Object>();
+    DocumentModel fileModel = new DocumentModel();
     String type;
     private boolean hasSourceUri = false;
     private boolean hasSha1 = false;
@@ -25,53 +22,53 @@ public class FakeDocumentBuilder {
     }
 
     public FakeDocumentBuilder withName(String name) {
-        fileModel.put(DocumentAttributes.NAME.toString(), name);
+        fileModel.setName(name);
         return this;
     }
 
     public FakeDocumentBuilder withStatus(String status) {
-        fileModel.put(DocumentAttributes.STATUS.toString(), status);
+        fileModel.setStatus(status);
         return this;
     }
 
     public FakeDocumentBuilder withRandomSha1() throws NoSuchAlgorithmException {
-        fileModel.put(DocumentAttributes.SHA1.toString(), getRandomSha1());
+        fileModel.setSha1(getRandomSha1());
         hasSha1 = true;
         return this;
     }
 
     public FakeDocumentBuilder withDate(Date date) {
-        fileModel.put(Crawler.Attributes.DATE, date);
+        fileModel.setDate(date);
         hasDate = true;
         return this;
     }
 
     private FakeDocumentBuilder withCurrentDate() {
-        fileModel.put(Crawler.Attributes.DATE, new Date() );
+        fileModel.setDate(new Date());
         return this;
     }
 
     private FakeDocumentBuilder withRandomSourceUri() throws NoSuchAlgorithmException {
         String path = "/tmp/" + getRandomSha1() + ".txt";
-        fileModel.put(DocumentAttributes.SOURCE_URI.toString(), path);
+        fileModel.setSourceUri(path);
         return this;
     }
 
     public FakeDocumentBuilder withCached(boolean cached) {
-        fileModel.put(DocumentAttributes.CACHED.toString(), cached);
+        fileModel.setCached(cached);
         return this;
     }
 
     public void build() {
 
         try {
-            if ( ! hasSourceUri() ) {
+            if (!hasSourceUri()) {
                 this.withRandomSourceUri();
             }
-            if ( ! hasSha1() ) {
+            if (!hasSha1()) {
                 this.withRandomSha1();
             }
-            if ( ! hasDate() ) {
+            if (!hasDate()) {
                 this.withCurrentDate();
             }
             ODocument document = new ODocument(type).fromMap(fileModel);

@@ -28,6 +28,7 @@ import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractors;
 import org.jbake.template.ModelExtractorsDocumentTypeListener;
@@ -40,11 +41,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -161,8 +158,8 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content"
                 + File.separator + "blog" + File.separator + "2013" + File.separator + filename);
-        Map<String, Object> content = parser.processFile(sampleFile);
-        content.put(Crawler.Attributes.URI, "/" + filename);
+        DocumentModel content = parser.processFile(sampleFile);
+        content.setUri("/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
@@ -180,8 +177,8 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         String filename = "about.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + filename);
-        Map<String, Object> content = parser.processFile(sampleFile);
-        content.put(Crawler.Attributes.URI, "/" + filename);
+        DocumentModel content = parser.processFile(sampleFile);
+        content.setUri("/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());

@@ -3,6 +3,7 @@ package org.jbake.app;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jbake.model.DocumentAttributes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,7 +29,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         for (Map<String, Object> content : results) {
             assertThat(content)
-                    .containsKey(Crawler.Attributes.ROOTPATH)
+                    .containsKey(DocumentAttributes.ROOTPATH.toString())
                     .containsValue("../../../");
         }
 
@@ -37,8 +38,8 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         assertThat(allPosts.size()).isEqualTo(4);
 
         for (Map<String, Object> content : allPosts) {
-            if (content.get(Crawler.Attributes.TITLE).equals("Draft Post")) {
-                assertThat(content).containsKey(Crawler.Attributes.DATE);
+            if (content.get(DocumentAttributes.TITLE.toString()).equals("Draft Post")) {
+                assertThat(content).containsKey(DocumentAttributes.DATE.toString());
             }
         }
 

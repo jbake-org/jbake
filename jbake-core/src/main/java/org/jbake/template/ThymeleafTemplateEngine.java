@@ -5,6 +5,7 @@ import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentAttributes;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.LazyContextVariable;
@@ -81,7 +82,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         @SuppressWarnings("unchecked")
         Map<String, Object> content = (Map<String, Object>) model.get("content");
         if (config != null && content != null) {
-            String key = "template_" + content.get(Attributes.TYPE) + "_thymeleaf_mode";
+            String key = "template_" + content.get(DocumentAttributes.TYPE.toString()) + "_thymeleaf_mode";
             String configMode = (String) config.get(key);
             if (configMode != null) {
                 return configMode;
@@ -99,7 +100,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
         lock.lock();
         try {
-            initializeContext(locale,model);
+            initializeContext(locale, model);
             updateTemplateMode(model);
             templateEngine.process(templateName, context, writer);
         } finally {
@@ -113,7 +114,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         context.setVariables(model);
 
         for (String key : extractors.keySet()) {
-            context.setVariable(key, new ContextVariable(db,key,model));
+            context.setVariable(key, new ContextVariable(db, key, model));
         }
     }
 
@@ -124,7 +125,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
         private ContentStore db;
         private String key;
-        private Map<String,Object> model;
+        private Map<String, Object> model;
 
         public ContextVariable(ContentStore db, String key, Map<String, Object> model) {
             this.db = db;

@@ -1,9 +1,8 @@
 package org.jbake.parser;
 
-import org.jbake.app.Crawler.Attributes;
+import org.jbake.model.DocumentModel;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * An internal rendering engine used to notify the user that the markup format he used requires an engine that couldn't
@@ -24,13 +23,12 @@ public class ErrorEngine extends MarkupEngine {
 
     @Override
     public void processHeader(final ParserContext context) {
-        Map<String, Object> contents = context.getDocumentModel();
-        contents.put(Attributes.TYPE, "post");
-        contents.put(Attributes.STATUS, "published");
-        contents.put(Attributes.TITLE, "Rendering engine missing");
-        contents.put(Attributes.DATE, new Date());
-        contents.put(Attributes.TAGS, new String[0]);
-        contents.put(Attributes.ID, context.getFile().getName());
+        DocumentModel documentModel = context.getDocumentModel();
+        documentModel.setType("post");
+        documentModel.setStatus("published");
+        documentModel.setTitle("Rendering engine missing");
+        documentModel.setDate(new Date());
+        documentModel.setTags(new String[0]);
     }
 
     @Override

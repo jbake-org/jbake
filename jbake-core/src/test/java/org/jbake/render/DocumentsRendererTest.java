@@ -1,10 +1,10 @@
 package org.jbake.render;
 
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.RenderingException;
 import org.junit.Before;
@@ -22,11 +22,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DocumentsRendererTest {
 
@@ -168,12 +164,12 @@ public class DocumentsRendererTest {
         return new HashMap<>();
     }
 
-    private Map<String, Object> simpleDocument(String title) {
-        Map<String, Object> simpleDoc = new HashMap<>();
+    private DocumentModel simpleDocument(String title) {
+        DocumentModel simpleDoc = new DocumentModel();
         String uri = title.replace(" ", "_");
-        simpleDoc.put(Attributes.NO_EXTENSION_URI, uri);
-        simpleDoc.put(Attributes.URI, uri);
-        simpleDoc.put(Attributes.TITLE, title);
+        simpleDoc.setNoExtensionUri(uri);
+        simpleDoc.setUri(uri);
+        simpleDoc.setTitle(title);
         return simpleDoc;
     }
 
