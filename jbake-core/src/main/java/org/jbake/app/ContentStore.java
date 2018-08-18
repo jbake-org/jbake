@@ -37,6 +37,7 @@ import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -355,8 +356,8 @@ public class ContentStore {
     public Set<String> getTags() {
         DocumentList docs = this.getAllTagsFromPublishedPosts();
         Set<String> result = new HashSet<>();
-        for (Map<String, Object> document : docs) {
-            String[] tags = DBUtil.toStringArray(document.get(DocumentAttributes.TAGS.toString()));
+        for (DocumentModel document : docs) {
+            String[] tags = document.getTags();
             Collections.addAll(result, tags);
         }
         return result;
@@ -367,8 +368,8 @@ public class ContentStore {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, quoteIdentifier(docType));
             DocumentList docs = query(statement);
-            for (Map<String, Object> document : docs) {
-                String[] tags = DBUtil.toStringArray(document.get(DocumentAttributes.TAGS.toString()));
+            for (DocumentModel document : docs) {
+                String[] tags = document.getTags();
                 Collections.addAll(result, tags);
             }
         }
@@ -405,7 +406,7 @@ public class ContentStore {
 
     private void createSignatureType(OSchema schema) {
         OClass signatures = schema.createClass("Signatures");
-        signatures.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
+        signatures.createProperty(DocumentAttributes.SHA1.toString(), OType.STRING).setNotNull(true);
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
     }
 
@@ -434,7 +435,7 @@ public class ContentStore {
             currentTemplatesSignature = "";
         }
         if (!docs.isEmpty()) {
-            String sha1 = (String) docs.get(0).get(String.valueOf(DocumentAttributes.SHA1));
+            String sha1 = docs.get(0).getSha1();
             if (!sha1.equals(currentTemplatesSignature)) {
                 this.updateSignatures(currentTemplatesSignature);
                 templateSignatureChanged = true;

@@ -5,6 +5,7 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.model.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final DocumentModel model, String templateName, final Writer writer) throws RenderingException {
         model.put("version", config.getVersion());
 
         // TODO: create config model from configuration
@@ -55,7 +56,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
             String key = configKeys.next();
             Object valueObject;
 
-            if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
+            if (key.equals(JBakeProperty.PAGINATE_INDEX)) {
                 valueObject = config.getPaginateIndex();
             } else {
                 valueObject = config.get(key);
@@ -63,7 +64,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
             //replace "." in key so you can use dot notation in templates
             configModel.put(key.replace(".", "_"), valueObject);
         }
-        model.put("config", configModel);
+        model.setConfig(configModel);
         // if default template exists we will use it
         File templateFolder = config.getTemplateFolder();
         File templateFile = new File(templateFolder, templateName);

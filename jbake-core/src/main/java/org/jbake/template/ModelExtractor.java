@@ -6,10 +6,8 @@ import java.util.Map;
 
 
 /**
- *
- * @author ndx
- *
  * @param <T> the type of data returned by this model extractor
+ * @author ndx
  */
 public interface ModelExtractor<T> {
 

@@ -11,6 +11,7 @@ import static org.jbake.app.ContentStore.quoteIdentifier;
 
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -83,20 +84,19 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         final String tagWithHyphen = "tag-with-hyphen";
         final String uri = "test/testMergeDocument";
 
-        Map<String, Object> values = new HashMap();
-        values.put(DocumentAttributes.TYPE.toString(), typeWithHyphen);
-        values.put(Crawler.Attributes.TAG, tagWithHyphen);
-        values.put(DocumentAttributes.TAGS.toString(), new String[]{tagWithHyphen});
-        values.put(DocumentAttributes.STATUS.toString(), Status.DRAFT);
-        values.put(DocumentAttributes.DATE.toString(), new Date());
-        values.put(DocumentAttributes.RENDERED.toString(), false);
-        values.put(DocumentAttributes.SOURCE_URI.toString(), uri);
-        values.put(DocumentAttributes.CACHED.toString(), true);
-        values.put(DocumentAttributes.RENDERED.toString(), false);
-        values.put("foo", "originalValue");
+        DocumentModel model = new DocumentModel();
+        model.setType(typeWithHyphen);
+        model.setTag(tagWithHyphen);
+        model.setTags(new String[]{tagWithHyphen});
+        model.setStatus(Status.DRAFT);
+        model.setDate(new Date());
+        model.setRendered(false);
+        model.setSourceUri(uri);
+        model.setCached(true);
+        model.put("foo", "originalValue");
 
         ODocument doc = new ODocument(typeWithHyphen);
-        doc.fromMap(values);
+        doc.fromMap(model);
         doc.save();
 
         DocumentList documentList1 = db.getAllContent(typeWithHyphen);
@@ -133,7 +133,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         assertEquals(1, documentList5.size());
         assertEquals(Boolean.FALSE, documentList5.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
         assertEquals(typeWithHyphen, documentList5.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertEquals(tagWithHyphen, documentList5.get(0).get(Crawler.Attributes.TAG));
+        assertEquals(tagWithHyphen, documentList5.get(0).get(DocumentAttributes.TAG.toString()));
 
         long documentCount3 = db.getPublishedCount(typeWithHyphen);
         assertEquals(1, documentCount3);
@@ -144,13 +144,13 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         assertEquals(1, documentList6.size());
         assertEquals(Boolean.TRUE, documentList6.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
         assertEquals(typeWithHyphen, documentList6.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertEquals(tagWithHyphen, documentList6.get(0).get(Crawler.Attributes.TAG));
+        assertEquals(tagWithHyphen, documentList6.get(0).get(DocumentAttributes.TAG.toString()));
 
         DocumentList documentList7 = db.getPublishedDocumentsByTag(tagWithHyphen);
         assertEquals(1, documentList7.size());
         assertEquals(Boolean.TRUE, documentList7.get(0).get(String.valueOf(DocumentAttributes.RENDERED)));
         assertEquals(typeWithHyphen, documentList7.get(0).get(DocumentAttributes.TYPE.toString()));
-        assertEquals(tagWithHyphen, documentList7.get(0).get(Crawler.Attributes.TAG));
+        assertEquals(tagWithHyphen, documentList7.get(0).get(DocumentAttributes.TAG.toString()));
 
         DocumentList documentList8 = db.getPublishedPostsByTag(tagWithHyphen);
         assertEquals(0, documentList8.size());

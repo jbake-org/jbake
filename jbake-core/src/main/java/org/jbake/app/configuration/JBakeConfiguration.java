@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
- *
+ * <p>
  * Use one of {@link JBakeConfigurationFactory} methods to create an instance.
  */
 public interface JBakeConfiguration {
@@ -306,6 +306,13 @@ public interface JBakeConfiguration {
      * @param value the value of the property
      */
     void setProperty(String key, Object value);
+
+    /**
+     *
+     * @param type the documents type
+     * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
+     */
+    String getThymeleafModeByType(String type);
 
     String getServerContextPath();
 

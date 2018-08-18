@@ -4,8 +4,9 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.LazyContextVariable;
@@ -35,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Cédric Champeau
  */
 public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
-    private static final String DEFAULT_TEMPLATE_MODE = "HTML";
     private final ReentrantLock lock = new ReentrantLock();
     private TemplateEngine templateEngine;
     private Context context;
@@ -66,37 +66,26 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         templateResolver = new FileTemplateResolver();
         templateResolver.setPrefix(config.getTemplateFolder().getAbsolutePath() + File.separatorChar);
         templateResolver.setCharacterEncoding(config.getTemplateEncoding());
-        templateResolver.setTemplateMode(DEFAULT_TEMPLATE_MODE);
+        templateResolver.setTemplateMode(DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE);
         templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
         templateEngine.clearTemplateCache();
     }
 
-    private void updateTemplateMode(Map<String, Object> model) {
+    private void updateTemplateMode(DocumentModel model) {
         templateResolver.setTemplateMode(getTemplateModeByModel(model));
     }
 
-    private String getTemplateModeByModel(Map<String, Object> model) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> config = (Map<String, Object>) model.get("config");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> content = (Map<String, Object>) model.get("content");
-        if (config != null && content != null) {
-            String key = "template_" + content.get(DocumentAttributes.TYPE.toString()) + "_thymeleaf_mode";
-            String configMode = (String) config.get(key);
-            if (configMode != null) {
-                return configMode;
-            }
-        }
-        return DEFAULT_TEMPLATE_MODE;
+    private String getTemplateModeByModel(DocumentModel model) {
+        DocumentModel content = model.getContent();
+        return config.getThymeleafModeByType(content.getType());
     }
 
     @Override
-    public void renderDocument(Map<String, Object> model, String templateName, Writer writer) throws RenderingException {
+    public void renderDocument(DocumentModel model, String templateName, Writer writer) throws RenderingException {
 
         String localeString = config.getThymeleafLocale();
         Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
-
 
         lock.lock();
         try {

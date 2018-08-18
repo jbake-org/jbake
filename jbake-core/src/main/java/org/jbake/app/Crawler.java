@@ -20,7 +20,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Crawls a file system looking for content.
@@ -216,12 +215,10 @@ public class Crawler {
         documentModel.setSourceUri(uri);
         documentModel.setUri(uri);
 
-        if (documentModel.getStatus().equals(Status.PUBLISHED_DATE)) {
-            if (documentModel.getDate() != null) {
-                if (new Date().after(documentModel.getDate())) {
-                    documentModel.setStatus(Status.PUBLISHED);
-                }
-            }
+        if (documentModel.getStatus().equals(Status.PUBLISHED_DATE)
+                && (documentModel.getDate() != null)
+                && new Date().after(documentModel.getDate())) {
+            documentModel.setStatus(Status.PUBLISHED);
         }
 
         if (config.getUriWithoutExtension()) {
@@ -236,9 +233,9 @@ public class Crawler {
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
         DocumentList match = db.getDocumentStatus(docType, uri);
         if (!match.isEmpty()) {
-            Map entries = match.get(0);
-            String oldHash = (String) entries.get(String.valueOf(DocumentAttributes.SHA1));
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.get(String.valueOf(DocumentAttributes.RENDERED)))) {
+            DocumentModel documentModel = match.get(0);
+            String oldHash = documentModel.getSha1();
+            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(documentModel.getRendered())) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;
@@ -250,7 +247,6 @@ public class Crawler {
 
     public abstract static class Attributes {
 
-        public static final String TAG = "tag";
         public static final String ALLTAGS = "alltags";
         public static final String PUBLISHED_DATE = "published_date";
         public static final String DB = "db";

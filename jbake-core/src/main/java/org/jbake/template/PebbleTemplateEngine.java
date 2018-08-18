@@ -8,6 +8,7 @@ import com.mitchellbosecke.pebble.loader.Loader;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -42,7 +43,7 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer)
+    public void renderDocument(final DocumentModel model, final String templateName, final Writer writer)
         throws RenderingException {
 
         PebbleTemplate template;
