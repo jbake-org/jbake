@@ -30,4 +30,24 @@ public abstract class ModelAttributes {
     public static final String TAG = "tag";
     public static final String VERSION = "version";
     public static final String OUT = "out";
+    public static final String ALLTAGS = "alltags";
+    public static final String PUBLISHED_DATE = "published_date";
+    public static final String DB = "db";
+
+    private ModelAttributes() {
+    }
+
+    /**
+     * Possible values of the {@link ModelAttributes#STATUS} property
+     *
+     * @author ndx
+     */
+    public abstract static class Status {
+        public static final String PUBLISHED_DATE = "published-date";
+        public static final String PUBLISHED = "published";
+        public static final String DRAFT = "draft";
+
+        private Status() {
+        }
+    }
 }

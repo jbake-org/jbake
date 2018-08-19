@@ -3,10 +3,10 @@ package org.jbake.template;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
+import org.jbake.model.ModelAttributes;
 import org.jbake.template.model.TemplateModel;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -130,14 +130,14 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
                 return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter<LazyContextVariable>() {
                     @Override
                     public LazyContextVariable adapt(String key, final Object extractedValue) {
-                        if (key.equals(Attributes.ALLTAGS)) {
+                        if (key.equals(ModelAttributes.ALLTAGS)) {
                             return new LazyContextVariable<Set<?>>() {
                                 @Override
                                 protected Set<?> loadValue() {
                                     return (Set<?>) extractedValue;
                                 }
                             };
-                        } else if (key.equals(Attributes.PUBLISHED_DATE)) {
+                        } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
                             return new LazyContextVariable<Date>() {
                                 @Override
                                 protected Date loadValue() {

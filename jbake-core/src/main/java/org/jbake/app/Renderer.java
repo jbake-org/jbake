@@ -126,7 +126,7 @@ public class Renderer {
             Files.delete(publishedFile.toPath());
         }
 
-        if (content.getStatus().equals(Crawler.Attributes.Status.DRAFT)) {
+        if (content.getStatus().equals(ModelAttributes.Status.DRAFT)) {
             outputFilename = outputFilename + config.getDraftSuffix();
         }
 

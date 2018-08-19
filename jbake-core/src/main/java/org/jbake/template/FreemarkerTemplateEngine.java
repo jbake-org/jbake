@@ -6,8 +6,8 @@ import freemarker.ext.beans.BeansWrapperBuilder;
 import freemarker.template.*;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.ModelAttributes;
 import org.jbake.template.model.TemplateModel;
 
 import java.io.File;
@@ -78,7 +78,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                 // GIT Issue#357: Accessing db in freemarker template throws exception
                 // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
                 // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
-                if (key.equals(Crawler.Attributes.DB)) {
+                if (key.equals(ModelAttributes.DB)) {
                     BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
                     BeansWrapper bw = bwb.build();
                     return bw.wrap(db);
@@ -89,9 +89,9 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
                     @Override
                     public freemarker.template.TemplateModel adapt(String key, Object extractedValue) {
-                        if (key.equals(Crawler.Attributes.ALLTAGS)) {
+                        if (key.equals(ModelAttributes.ALLTAGS)) {
                             return new SimpleCollection((Collection) extractedValue, wrapper);
-                        } else if (key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
+                        } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
                             return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
                         } else {
                             // All other cases, as far as I know, are document collections
