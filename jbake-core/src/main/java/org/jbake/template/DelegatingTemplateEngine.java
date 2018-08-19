@@ -42,13 +42,14 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final TemplateModel model, String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
         model.setVersion(config.getVersion());
         model.setConfig(config.asHashMap());
 
         // if default template exists we will use it
         File templateFolder = config.getTemplateFolder();
         File templateFile = new File(templateFolder, templateName);
+        String theTemplateName = templateName;
         if (!templateFile.exists()) {
             LOGGER.info("Default template: {} was not found, searching for others...", templateName);
             // if default template does not exist then check if any alternative engine templates exist
@@ -57,17 +58,17 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
                 templateFile = new File(templateFolder, templateNameWithoutExt + "." + extension);
                 if (templateFile.exists()) {
                     LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName());
-                    templateName = templateFile.getName();
+                    theTemplateName = templateFile.getName();
                     break;
                 }
             }
         }
-        String ext = FileUtil.fileExt(templateName);
+        String ext = FileUtil.fileExt(theTemplateName);
         AbstractTemplateEngine engine = renderers.getEngine(ext);
         if (engine != null) {
-            engine.renderDocument(model, templateName, writer);
+            engine.renderDocument(model, theTemplateName, writer);
         } else {
-            LOGGER.error("Warning - No template engine found for template: {}", templateName);
+            LOGGER.error("Warning - No template engine found for template: {}", theTemplateName);
         }
     }
 }
