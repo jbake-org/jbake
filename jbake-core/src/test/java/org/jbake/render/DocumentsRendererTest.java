@@ -127,20 +127,20 @@ public class DocumentsRendererTest {
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
         DocumentModel fourthDoc = simpleDocument(fourth);
-        fourthDoc.put("previousContent", simpleDocument(third));
-        fourthDoc.put("nextContent", null);
+        fourthDoc.setPreviousContent(simpleDocument(third));
+        fourthDoc.setNextContent(null);
 
         DocumentModel thirdDoc = simpleDocument(third);
-        thirdDoc.put("nextContent", simpleDocument(fourth));
-        thirdDoc.put("previousContent", simpleDocument(second));
+        thirdDoc.setNextContent(simpleDocument(fourth));
+        thirdDoc.setPreviousContent(simpleDocument(second));
 
         DocumentModel secondDoc = simpleDocument(second);
-        secondDoc.put("nextContent", simpleDocument(third));
-        secondDoc.put("previousContent", simpleDocument(first));
+        secondDoc.setNextContent(simpleDocument(third));
+        secondDoc.setPreviousContent(simpleDocument(first));
 
         DocumentModel firstDoc = simpleDocument(first);
-        firstDoc.put("nextContent", simpleDocument(second));
-        firstDoc.put("previousContent", null);
+        firstDoc.setNextContent(simpleDocument(second));
+        firstDoc.setPreviousContent(null);
 
         verify(renderer, times(4)).render(argument.capture());
 

@@ -3,6 +3,8 @@ package org.jbake.app;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jbake.model.BaseModel;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.ModelAttributes;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 
 public class CrawlerTest extends ContentStoreIntegrationTest {
 
@@ -29,7 +32,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         for (Map<String, Object> content : results) {
             assertThat(content)
-                    .containsKey(ModelAttributes.ROOTPATH.toString())
+                    .containsKey(ModelAttributes.ROOTPATH)
                     .containsValue("../../../");
         }
 
@@ -37,9 +40,10 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         assertThat(allPosts.size()).isEqualTo(4);
 
-        for (Map<String, Object> content : allPosts) {
-            if (content.get(ModelAttributes.TITLE.toString()).equals("Draft Post")) {
-                assertThat(content).containsKey(ModelAttributes.DATE.toString());
+        for (BaseModel content : allPosts) {
+            DocumentModel documentModel = (DocumentModel) content;
+            if (documentModel.getTitle().equals("Draft Post")) {
+                assertThat(content).containsKey(ModelAttributes.DATE);
             }
         }
 
@@ -62,13 +66,13 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         DocumentList documents = db.getPublishedPosts();
 
-        for (Map<String, Object> model : documents) {
-            String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName((String) model.get("file")) + "/";
+        for (BaseModel model : documents) {
+            DocumentModel documentModel = (DocumentModel) model;
+            String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(documentModel.getFile()) + "/";
 
-            Assert.assertThat(model.get("noExtensionUri"), RegexMatcher.matches(noExtensionUri));
-            Assert.assertThat(model.get("uri"), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-
-            assertThat(model).containsEntry("rootpath", "../../../");
+            Assert.assertThat(documentModel.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
+            Assert.assertThat(documentModel.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
+            Assert.assertThat(documentModel.getRootPath(), is("../../../"));
         }
     }
 

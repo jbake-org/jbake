@@ -288,12 +288,12 @@ public class Renderer {
                 // This will prevent directory listing and also provide an option to
                 // display all tags page.
                 TemplateModel model = new TemplateModel();
-                model.put("renderer", renderingEngine);
+                model.setRenderer(renderingEngine);
                 DocumentModel map = buildSimpleModel(ModelAttributes.TAGS.toString());
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
 
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
-                model.put("content", map);
+                model.setContent(map);
 
 
                 render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
@@ -420,10 +420,10 @@ public class Renderer {
             model.setContent(content);
 
             if (config.getPaginateIndex()) {
-                model.put("numberOfPages", 0);
-                model.put("currentPageNumber", 0);
-                model.put("previousFileName", "");
-                model.put("nextFileName", "");
+                model.setNumberOfPages(0);
+                model.setCurrentPageNuber(0);
+                model.setPreviousFilename("");
+                model.setNextFileName("");
             }
 
             return model;

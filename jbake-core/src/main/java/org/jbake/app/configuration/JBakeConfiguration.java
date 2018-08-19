@@ -3,6 +3,7 @@ package org.jbake.app.configuration;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
@@ -317,5 +318,7 @@ public interface JBakeConfiguration {
     String getServerContextPath();
 
     String getServerHostname();
+
+    Map<String, Object> asHashMap();
 }
 

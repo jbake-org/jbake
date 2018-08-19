@@ -13,11 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.asciidoctor.AttributesBuilder.attributes;
@@ -91,7 +87,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
         DocumentModel documentModel = context.getDocumentModel();
         if (header.getDocumentTitle() != null) {
-            documentModel.put("title", header.getDocumentTitle().getCombined());
+            documentModel.setTitle(header.getDocumentTitle().getCombined());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
