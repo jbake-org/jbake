@@ -1,14 +1,11 @@
 package org.jbake.util;
 
 import org.jbake.TestUtils;
-import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentModel;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

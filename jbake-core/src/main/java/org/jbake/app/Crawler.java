@@ -3,7 +3,6 @@ package org.jbake.app;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
-import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.model.DocumentModel;
@@ -28,7 +27,7 @@ import java.util.Date;
  */
 public class Crawler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
+    private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
     private final ContentStore db;
     private JBakeConfiguration config;
     private Parser parser;
@@ -63,11 +62,11 @@ public class Crawler {
     public void crawl() {
         crawl(config.getContentFolder());
 
-        LOGGER.info("Content detected:");
+        logger.info("Content detected:");
         for (String docType : DocumentTypes.getDocumentTypes()) {
             long count = db.getDocumentCount(docType);
             if (count > 0) {
-                LOGGER.info("Parsed {} files of type: {}", count, docType);
+                logger.info("Parsed {} files of type: {}", count, docType);
             }
         }
 
@@ -84,39 +83,39 @@ public class Crawler {
             Arrays.sort(contents);
             for (File sourceFile : contents) {
                 if (sourceFile.isFile()) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
-                    String sha1 = buildHash(sourceFile);
-                    String uri = buildURI(sourceFile);
-                    boolean process = true;
-                    DocumentStatus status = DocumentStatus.NEW;
-                    for (String docType : DocumentTypes.getDocumentTypes()) {
-                        status = findDocumentStatus(docType, uri, sha1);
-                        if (status == DocumentStatus.UPDATED) {
-                            sb.append(" : modified ");
-                            db.deleteContent(docType, uri);
-
-                        } else if (status == DocumentStatus.IDENTICAL) {
-                            sb.append(" : same ");
-                            process = false;
-                        }
-                        if (!process) {
-                            break;
-                        }
-                    }
-                    if (DocumentStatus.NEW == status) {
-                        sb.append(" : new ");
-                    }
-                    if (process) { // new or updated
-                        crawlSourceFile(sourceFile, sha1, uri);
-                    }
-                    LOGGER.info("{}", sb);
-                }
-                if (sourceFile.isDirectory()) {
+                    crawlFile(sourceFile);
+                } else if (sourceFile.isDirectory()) {
                     crawl(sourceFile);
                 }
             }
         }
+    }
+
+    private void crawlFile(File sourceFile) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
+        String sha1 = buildHash(sourceFile);
+        String uri = buildURI(sourceFile);
+        boolean process = true;
+        for (String docType : DocumentTypes.getDocumentTypes()) {
+            DocumentStatus status = findDocumentStatus(docType, uri, sha1);
+            if (status == DocumentStatus.UPDATED) {
+                sb.append(" : modified ");
+                db.deleteContent(docType, uri);
+            } else if (status == DocumentStatus.IDENTICAL) {
+                sb.append(" : same ");
+                process = false;
+            } else if (DocumentStatus.NEW == status) {
+                sb.append(" : new ");
+            }
+            if (!process || status != DocumentStatus.NEW) {
+                break;
+            }
+        }
+        if (process) { // new or updated
+            processSourceFile(sourceFile, sha1, uri);
+        }
+        logger.info("{}", sb);
     }
 
     private String buildHash(final File sourceFile) {
@@ -124,7 +123,7 @@ public class Crawler {
         try {
             sha1 = FileUtil.sha1(sourceFile);
         } catch (Exception e) {
-            LOGGER.error("unable to build sha1 hash for source file '{}'", sourceFile);
+            logger.error("unable to build sha1 hash for source file '{}'", sourceFile);
             sha1 = "";
         }
         return sha1;
@@ -184,7 +183,7 @@ public class Crawler {
             && uri.startsWith(noExtensionUriPrefix);
     }
 
-    private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
+    private void processSourceFile(final File sourceFile, final String sha1, final String uri) {
         try {
             DocumentModel fileContents = parser.processFile(sourceFile);
             if (fileContents != null) {
@@ -199,7 +198,7 @@ public class Crawler {
                 doc.fromMap(fileContents);
                 doc.save();
             } else {
-                LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
+                logger.warn("{} has an invalid header, it has been ignored!", sourceFile);
             }
         } catch (Exception ex) {
             throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
@@ -215,10 +214,10 @@ public class Crawler {
         documentModel.setSourceUri(uri);
         documentModel.setUri(uri);
 
-        if (documentModel.getStatus().equals(Status.PUBLISHED_DATE)
+        if (documentModel.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
                 && (documentModel.getDate() != null)
                 && new Date().after(documentModel.getDate())) {
-            documentModel.setStatus(Status.PUBLISHED);
+            documentModel.setStatus(ModelAttributes.Status.PUBLISHED);
         }
 
         if (config.getUriWithoutExtension()) {
@@ -235,7 +234,7 @@ public class Crawler {
         if (!match.isEmpty()) {
             DocumentModel documentModel = match.getDocumentModel(0);
             String oldHash = documentModel.getSha1();
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(documentModel.getRendered())) {
+            if (!oldHash.equals(sha1) || !documentModel.getRendered()) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;
@@ -245,28 +244,4 @@ public class Crawler {
         }
     }
 
-    public abstract static class Attributes {
-
-        public static final String ALLTAGS = "alltags";
-        public static final String PUBLISHED_DATE = "published_date";
-        public static final String DB = "db";
-
-        private Attributes() {
-        }
-
-        /**
-         * Possible values of the {@link ModelAttributes#STATUS} property
-         *
-         * @author ndx
-         */
-        public abstract static class Status {
-            public static final String PUBLISHED_DATE = "published-date";
-            public static final String PUBLISHED = "published";
-            public static final String DRAFT = "draft";
-
-            private Status() {
-            }
-        }
-
-    }
 }
