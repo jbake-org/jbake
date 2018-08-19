@@ -23,7 +23,7 @@ public class ParserContext {
         this.fileLines = fileLines;
         this.config = config;
         this.hasHeader = hasHeader;
-        this.documentModel = new DocumentModel();
+        this.documentModel = DocumentModel.createDefaultDocumentModel();
     }
 
     public File getFile() {

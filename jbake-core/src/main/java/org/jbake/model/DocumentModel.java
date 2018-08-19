@@ -7,6 +7,12 @@ import java.util.Date;
 
 public class DocumentModel extends BaseModel {
 
+    public static DocumentModel createDefaultDocumentModel() {
+        DocumentModel documentModel = new DocumentModel();
+        documentModel.setCached(true);
+        return documentModel;
+    }
+
     public String getBody() {
         return (String) get(ModelAttributes.BODY);
     }
@@ -104,6 +110,16 @@ public class DocumentModel extends BaseModel {
 
     public void setTitle(String title) {
         put(ModelAttributes.TITLE, title);
+    }
+
+    public Boolean getCached() {
+
+        Object value = get(ModelAttributes.CACHED);
+        if ( value instanceof String ) {
+            return Boolean.valueOf((String) value);
+        } else {
+            return (Boolean) value;
+        }
     }
 
     public void setCached(boolean cached) {

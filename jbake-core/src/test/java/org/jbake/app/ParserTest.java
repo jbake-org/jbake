@@ -105,6 +105,7 @@ public class ParserTest {
 
         out = new PrintWriter(validMarkdownFileWithDefaultTypeAndStatus);
         out.println("title=Custom Header separator");
+        out.println("cached=false");
         out.println(config.getHeaderSeparator());
         out.println("# Hello Markdown!");
         out.println("");
@@ -256,6 +257,7 @@ public class ParserTest {
         Assert.assertNotNull(documentModel);
         Assert.assertEquals("published", documentModel.getStatus());
         Assert.assertEquals("post", documentModel.getType());
+        Assert.assertEquals(true, documentModel.getCached());
     }
 
     @Test
@@ -267,6 +269,15 @@ public class ParserTest {
         Assert.assertNotNull(documentModel);
         Assert.assertEquals("published", documentModel.getStatus());
         Assert.assertEquals("page", documentModel.getType());
+    }
+
+    @Test
+    public void parseMarkdownFileWithDisabledCache() {
+        config.setDefaultStatus("published");
+        config.setDefaultType("page");
+
+        DocumentModel documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus);
+        Assert.assertEquals(false, documentModel.getCached());
     }
 
     @Test
