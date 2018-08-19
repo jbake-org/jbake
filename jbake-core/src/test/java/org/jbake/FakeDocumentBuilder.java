@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class FakeDocumentBuilder {
 
-    DocumentModel fileModel = new DocumentModel();
-    String type;
+    private DocumentModel fileModel = new DocumentModel();
+    private String type;
     private boolean hasSourceUri = false;
     private boolean hasSha1 = false;
     private boolean hasDate = false;
