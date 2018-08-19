@@ -213,6 +213,7 @@ public class Crawler {
         documentModel.setFile(sourceFile.getPath());
         documentModel.setSourceUri(uri);
         documentModel.setUri(uri);
+        documentModel.setCached(true);
 
         if (documentModel.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
                 && (documentModel.getDate() != null)

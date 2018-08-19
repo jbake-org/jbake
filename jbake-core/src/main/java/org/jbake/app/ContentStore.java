@@ -381,23 +381,23 @@ public class ContentStore {
         OClass page = schema.createClass(docType);
 
         // Primary key
-        String attribName = ModelAttributes.SOURCE_URI.toString();
+        String attribName = ModelAttributes.SOURCE_URI;
         page.createProperty(attribName, OType.STRING).setNotNull(true);
         page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, attribName);
 
-        attribName = ModelAttributes.SHA1.toString();
+        attribName = ModelAttributes.SHA1;
         page.createProperty(attribName, OType.STRING).setNotNull(true);
         page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
 
-        attribName = ModelAttributes.CACHED.toString();
+        attribName = ModelAttributes.CACHED;
         page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
         page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
 
-        attribName = ModelAttributes.RENDERED.toString();
+        attribName = ModelAttributes.RENDERED;
         page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
         page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
 
-        attribName = ModelAttributes.STATUS.toString();
+        attribName = ModelAttributes.STATUS;
         page.createProperty(attribName, OType.STRING).setNotNull(true);
         page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
     }

@@ -4,7 +4,7 @@ public abstract class ModelAttributes {
     public static final String SHA1 = "sha1";
     public static final String SOURCE_URI = "sourceuri";
     public static final String RENDERED = "rendered";
-    public static final String CACHED = "cached"; //TODO: Do we need this?
+    public static final String CACHED = "cached";
     public static final String STATUS = "status";
     public static final String NAME = "name";
     public static final String BODY = "body";
