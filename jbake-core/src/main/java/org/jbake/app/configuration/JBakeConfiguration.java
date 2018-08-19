@@ -3,6 +3,7 @@ package org.jbake.app.configuration;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
@@ -313,6 +314,8 @@ public interface JBakeConfiguration {
      * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
      */
     String getThymeleafModeByType(String type);
+
+    Map<String, Object> asHashMap();
 
     String getServerContextPath();
 

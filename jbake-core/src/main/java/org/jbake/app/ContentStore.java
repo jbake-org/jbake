@@ -404,8 +404,8 @@ public class ContentStore {
 
     private void createSignatureType(OSchema schema) {
         OClass signatures = schema.createClass("Signatures");
-        signatures.createProperty(ModelAttributes.SHA1.toString(), OType.STRING).setNotNull(true);
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1.toString());
+        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
+        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
     }
 
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {

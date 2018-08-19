@@ -4,16 +4,12 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
 import org.jbake.template.model.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * A template which is responsible for delegating to a supported template engine,
@@ -48,23 +44,8 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     @Override
     public void renderDocument(final TemplateModel model, String templateName, final Writer writer) throws RenderingException {
         model.setVersion(config.getVersion());
+        model.setConfig(config.asHashMap());
 
-        // TODO: create config model from configuration
-        Map<String, Object> configModel = new HashMap<>();
-        Iterator<String> configKeys = config.getKeys();
-        while (configKeys.hasNext()) {
-            String key = configKeys.next();
-            Object valueObject;
-
-            if (key.equals(JBakeProperty.PAGINATE_INDEX)) {
-                valueObject = config.getPaginateIndex();
-            } else {
-                valueObject = config.get(key);
-            }
-            //replace "." in key so you can use dot notation in templates
-            configModel.put(key.replace(".", "_"), valueObject);
-        }
-        model.setConfig(configModel);
         // if default template exists we will use it
         File templateFolder = config.getTemplateFolder();
         File templateFile = new File(templateFolder, templateName);

@@ -4,6 +4,7 @@ import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.model.DocumentModel;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
@@ -17,8 +18,6 @@ import java.io.PrintWriter;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -209,14 +208,14 @@ public class ParserTest {
 
     @Test
     public void parseValidHTMLFile() {
-        Map<String, Object> map = parser.processFile(validHTMLFile);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("draft", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
-        Assert.assertEquals("This is a Title = This is a valid Title", map.get("title"));
-        Assert.assertNotNull(map.get("date"));
+        DocumentModel documentModel = parser.processFile(validHTMLFile);
+        Assert.assertNotNull(documentModel);
+        Assert.assertEquals("draft", documentModel.getStatus());
+        Assert.assertEquals("post", documentModel.getType());
+        Assert.assertEquals("This is a Title = This is a valid Title", documentModel.getTitle());
+        Assert.assertNotNull(documentModel.getDate());
         Calendar cal = Calendar.getInstance();
-        cal.setTime((Date) map.get("date"));
+        cal.setTime(documentModel.getDate());
         Assert.assertEquals(8, cal.get(Calendar.MONTH));
         Assert.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH));
         Assert.assertEquals(2013, cal.get(Calendar.YEAR));
@@ -225,14 +224,14 @@ public class ParserTest {
 
     @Test
     public void parseInvalidHTMLFile() {
-        Map<String, Object> map = parser.processFile(invalidHTMLFile);
-        Assert.assertNull(map);
+        DocumentModel documentModel = parser.processFile(invalidHTMLFile);
+        Assert.assertNull(documentModel);
     }
 
     @Test
     public void parseInvalidExtension(){
-        Map<String, Object> map = parser.processFile(invalidExtensionFile);
-        Assert.assertNull(map);
+        DocumentModel documentModel = parser.processFile(invalidExtensionFile);
+        Assert.assertNull(documentModel);
     }
 
 
@@ -240,11 +239,11 @@ public class ParserTest {
     public void parseMarkdownFileWithCustomHeaderSeparator() {
         config.setHeaderSeparator(customHeaderSeparator);
 
-        Map<String, Object> map = parser.processFile(validMarkdownFileWithCustomHeader);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("draft", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
-        assertThat(map.get("body").toString())
+        DocumentModel documentModel = parser.processFile(validMarkdownFileWithCustomHeader);
+        Assert.assertNotNull(documentModel);
+        Assert.assertEquals("draft", documentModel.getStatus());
+        Assert.assertEquals("post", documentModel.getType());
+        assertThat(documentModel.getBody())
                 .contains("<p>A paragraph</p>");
 
     }
@@ -253,10 +252,10 @@ public class ParserTest {
     public void parseMarkdownFileWithDefaultStatus() {
         config.setDefaultStatus("published");
 
-        Map<String, Object> map = parser.processFile(validMarkdownFileWithDefaultStatus);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
+        DocumentModel documentModel = parser.processFile(validMarkdownFileWithDefaultStatus);
+        Assert.assertNotNull(documentModel);
+        Assert.assertEquals("published", documentModel.getStatus());
+        Assert.assertEquals("post", documentModel.getType());
     }
 
     @Test
@@ -264,10 +263,10 @@ public class ParserTest {
         config.setDefaultStatus("published");
         config.setDefaultType("page");
 
-        Map<String, Object> map = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
+        DocumentModel documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus);
+        Assert.assertNotNull(documentModel);
+        Assert.assertEquals("published", documentModel.getStatus());
+        Assert.assertEquals("page", documentModel.getType());
     }
 
     @Test
@@ -275,52 +274,52 @@ public class ParserTest {
         config.setDefaultStatus("");
         config.setDefaultType("page");
 
-        Map<String, Object> map = parser.processFile(invalidMarkdownFileWithoutDefaultStatus);
-        Assert.assertNull(map);
+        DocumentModel documentModel = parser.processFile(invalidMarkdownFileWithoutDefaultStatus);
+        Assert.assertNull(documentModel);
     }
 
     @Test
     public void parseInvalidMarkdownFile() {
-        Map<String, Object> map = parser.processFile(invalidMDFile);
-        Assert.assertNull(map);
+        DocumentModel documentModel = parser.processFile(invalidMDFile);
+        Assert.assertNull(documentModel);
     }
 
     @Test
     public void sanitizeKeysAndValues() {
-        Map<String, Object> map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
+        DocumentModel map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
 
-        assertThat(map.get("status")).isEqualTo("draft");
-        assertThat(map.get("title")).isEqualTo("Title");
-        assertThat(map.get("type")).isEqualTo("post");
+        assertThat(map.getStatus()).isEqualTo("draft");
+        assertThat(map.getTitle()).isEqualTo("Title");
+        assertThat(map.getType()).isEqualTo("post");
         assertThat(map.get("custom")).isEqualTo("custom without bom's");
-        assertThat(map.get("tags")).isEqualTo(Arrays.asList("jbake", "java", "tag with space").toArray());
+        assertThat(map.getTags()).isEqualTo(Arrays.asList("jbake", "java", "tag with space").toArray());
     }
 
     @Test
     public void sanitizeTags() {
         config.setProperty(JBakeProperty.TAG_SANITIZE, true);
-        Map<String, Object> map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
+        DocumentModel map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
 
-        assertThat(map.get("tags")).isEqualTo(Arrays.asList("jbake", "java", "tag-with-space").toArray());
+        assertThat(map.getTags()).isEqualTo(Arrays.asList("jbake", "java", "tag-with-space").toArray());
     }
 
 
     @Test
     public void parseValidHTMLWithJSONFile() {
-        Map<String, Object> map = parser.processFile(validHTMLWithJSONFile);
-        assertJSONExtracted(map.get("jsondata"));
+        DocumentModel documentModel = parser.processFile(validHTMLWithJSONFile);
+        assertJSONExtracted(documentModel.get("jsondata"));
     }
 
     @Test
     public void parseValidAsciiDocWithJSONFile() {
-        Map<String, Object> map = parser.processFile(validAsciiDocWithJSONFile);
-        assertJSONExtracted(map.get("jsondata"));
+        DocumentModel documentModel = parser.processFile(validAsciiDocWithJSONFile);
+        assertJSONExtracted(documentModel.get("jsondata"));
     }
 
     @Test
     public void testValidAsciiDocWithADHeaderJSONFile() {
-        Map<String, Object> map = parser.processFile(validAsciiDocWithADHeaderJSONFile);
-        assertJSONExtracted(map.get("jsondata"));
+        DocumentModel documentModel = parser.processFile(validAsciiDocWithADHeaderJSONFile);
+        assertJSONExtracted(documentModel.get("jsondata"));
     }
 
     private void assertJSONExtracted(Object jsonDataEntry) {

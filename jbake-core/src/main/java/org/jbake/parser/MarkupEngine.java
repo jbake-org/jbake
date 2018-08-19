@@ -277,7 +277,7 @@ public abstract class MarkupEngine implements ParserEngine {
         String key = sanitize(inputKey);
         String value = sanitize(inputValue);
 
-        if (key.equalsIgnoreCase(ModelAttributes.DATE.toString())) {
+        if (key.equalsIgnoreCase(ModelAttributes.DATE)) {
             DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
             try {
                 Date date = df.parse(value);
@@ -285,7 +285,7 @@ public abstract class MarkupEngine implements ParserEngine {
             } catch (ParseException e) {
                 LOGGER.error("unable to parse date {}", value);
             }
-        } else if (key.equalsIgnoreCase(ModelAttributes.TAGS.toString())) {
+        } else if (key.equalsIgnoreCase(ModelAttributes.TAGS)) {
             content.setTags(getTags(value));
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value));

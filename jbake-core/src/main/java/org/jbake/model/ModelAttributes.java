@@ -1,43 +1,33 @@
 package org.jbake.model;
 
-public enum ModelAttributes {
-    SHA1("sha1"),
-    SOURCE_URI("sourceuri"),
-    RENDERED("rendered"),
-    CACHED("cached"), //TODO: Do we need this?
-    STATUS("status"),
-    NAME("name"),
-    BODY("body"),
-    DATE("date"),
-    TYPE("type"),
-    TAGS("tags"),
-    URI("uri"),
-    ROOTPATH("rootpath"),
-    FILE("file"),
-    NO_EXTENSION_URI("noExtensionUri"),
-    TITLE("title"),
-    TAGGED_POSTS("tagged_posts"),
-    TAGGED_DOCUMENTS("tagged_documents"),
-    NEXT_CONTENT("nextContent"),
-    PREVIOUS_CONTENT("previousContent"),
-    CONFIG("config"),
-    CONTENT("content"),
-    RENDERER("renderer"),
-    NUMBER_OF_PAGES("numberOfPages"),
-    CURRENT_PAGE_NUMBERS("currentPageNumber"),
-    PREVIOUS_FILENAME("previousFileName"),
-    NEXT_FILENAME("nextFileName"),
-    TAG("tag"),
-    VERSION("version");
-
-    private String label;
-
-    ModelAttributes(String label) {
-        this.label = label;
-    }
-
-    @Override
-    public String toString() {
-        return label;
-    }
+public abstract class ModelAttributes {
+    public static final String SHA1 = "sha1";
+    public static final String SOURCE_URI = "sourceuri";
+    public static final String RENDERED = "rendered";
+    public static final String CACHED = "cached"; //TODO: Do we need this?
+    public static final String STATUS = "status";
+    public static final String NAME = "name";
+    public static final String BODY = "body";
+    public static final String DATE = "date";
+    public static final String TYPE = "type";
+    public static final String TAGS = "tags";
+    public static final String URI = "uri";
+    public static final String ROOTPATH = "rootpath";
+    public static final String FILE = "file";
+    public static final String NO_EXTENSION_URI = "noExtensionUri";
+    public static final String TITLE = "title";
+    public static final String TAGGED_POSTS = "tagged_posts";
+    public static final String TAGGED_DOCUMENTS = "tagged_documents";
+    public static final String NEXT_CONTENT = "nextContent";
+    public static final String PREVIOUS_CONTENT = "previousContent";
+    public static final String CONFIG = "config";
+    public static final String CONTENT = "content";
+    public static final String RENDERER = "renderer";
+    public static final String NUMBER_OF_PAGES = "numberOfPages";
+    public static final String CURRENT_PAGE_NUMBERS = "currentPageNumber";
+    public static final String PREVIOUS_FILENAME = "previousFileName";
+    public static final String NEXT_FILENAME = "nextFileName";
+    public static final String TAG = "tag";
+    public static final String VERSION = "version";
+    public static final String OUT = "out";
 }
