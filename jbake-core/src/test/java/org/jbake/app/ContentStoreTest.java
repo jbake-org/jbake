@@ -1,11 +1,16 @@
 package org.jbake.app;
 
 import org.jbake.FakeDocumentBuilder;
+import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class ContentStoreTest extends ContentStoreIntegrationTest {
+
+    @BeforeClass
+    public static void setUpClass() {
+        setUpDatabase(StorageType.MEMORY);
+    }
 
     @Test
     public void shouldGetCountForPublishedDocuments() throws Exception {

@@ -28,6 +28,7 @@ import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.BeforeClass;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +40,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author jdlee
  */
 public class PaginationTest extends ContentStoreIntegrationTest {
+
+    @BeforeClass
+    public static void setUpClass() {
+        setUpDatabase(StorageType.MEMORY);
+    }
 
     @Before
     public void setUpOwn() {

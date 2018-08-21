@@ -34,6 +34,8 @@ import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -65,6 +67,12 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         this.templateDir = templateDir;
         this.templateExtension = templateExtension;
     }
+
+    @BeforeClass
+    public static void setUpClass() {
+        setUpDatabase(StorageType.MEMORY);
+    }
+
 
     @Before
     public void setup() throws Exception {

@@ -41,6 +41,16 @@ public abstract class ContentStoreIntegrationTest {
         db = DBUtil.createDataStore(config);
     }
 
+    protected static void setUpDatabase(StorageType storageType)
+    {
+        db = DBUtil.createDataStore(storageType.toString(), "documents" + System.currentTimeMillis());
+    }
+
+    /**
+     * Override this in the test to use other storage type.
+     * @return The storage type string for the OrientDB URL.
+     */
+
     @AfterClass
     public static void cleanUpClass() {
         db.close();
@@ -56,4 +66,17 @@ public abstract class ContentStoreIntegrationTest {
     public void tearDown() {
         db.drop();
     }
+
+
+
+    protected enum StorageType {
+        MEMORY, PLOCAL;
+
+        @Override
+        public String toString()
+        {
+            return this.name().toLowerCase();
+        }
+    }
+
 }

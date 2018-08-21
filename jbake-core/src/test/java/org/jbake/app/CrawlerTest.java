@@ -4,6 +4,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -11,6 +13,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest extends ContentStoreIntegrationTest {
+
+    @BeforeClass
+    public static void setUpClass() {
+        //setUpDatabase(StorageType.MEMORY);
+    }
 
 
     @Test
