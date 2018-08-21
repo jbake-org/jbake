@@ -18,6 +18,7 @@ public abstract class ContentStoreIntegrationTest {
 
     protected static ContentStore db;
     protected static DefaultJBakeConfiguration config;
+    protected static StorageType storageType = StorageType.MEMORY;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -25,7 +26,6 @@ public abstract class ContentStoreIntegrationTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-
         URL sourceUrl = TestUtils.class.getResource("/fixture");
 
         sourceFolder = new File(sourceUrl.getFile());
@@ -35,21 +35,10 @@ public abstract class ContentStoreIntegrationTest {
         config.setSourceFolder(sourceFolder);
 
         Assert.assertEquals(".html", config.getOutputExtension());
-        config.setDatabaseStore("memory");
+        config.setDatabaseStore(storageType.toString());
         config.setDatabasePath("documents" + System.currentTimeMillis());
-
         db = DBUtil.createDataStore(config);
     }
-
-    protected static void setUpDatabase(StorageType storageType)
-    {
-        db = DBUtil.createDataStore(storageType.toString(), "documents" + System.currentTimeMillis());
-    }
-
-    /**
-     * Override this in the test to use other storage type.
-     * @return The storage type string for the OrientDB URL.
-     */
 
     @AfterClass
     public static void cleanUpClass() {
@@ -66,8 +55,6 @@ public abstract class ContentStoreIntegrationTest {
     public void tearDown() {
         db.drop();
     }
-
-
 
     protected enum StorageType {
         MEMORY, PLOCAL;

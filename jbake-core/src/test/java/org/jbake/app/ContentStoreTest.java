@@ -7,11 +7,6 @@ import org.junit.Test;
 
 public class ContentStoreTest extends ContentStoreIntegrationTest {
 
-    @BeforeClass
-    public static void setUpClass() {
-        setUpDatabase(StorageType.MEMORY);
-    }
-
     @Test
     public void shouldGetCountForPublishedDocuments() throws Exception {
 

@@ -14,12 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest extends ContentStoreIntegrationTest {
 
-    @BeforeClass
-    public static void setUpClass() {
-        //setUpDatabase(StorageType.MEMORY);
-    }
-
-
     @Test
     public void crawl() {
         Crawler crawler = new Crawler(db, config);

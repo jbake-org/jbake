@@ -68,12 +68,6 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         this.templateExtension = templateExtension;
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-        setUpDatabase(StorageType.MEMORY);
-    }
-
-
     @Before
     public void setup() throws Exception {
         currentLocale = Locale.getDefault();

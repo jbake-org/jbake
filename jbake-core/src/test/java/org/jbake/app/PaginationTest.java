@@ -41,11 +41,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PaginationTest extends ContentStoreIntegrationTest {
 
-    @BeforeClass
-    public static void setUpClass() {
-        setUpDatabase(StorageType.MEMORY);
-    }
-
     @Before
     public void setUpOwn() {
         for (String docType : DocumentTypes.getDocumentTypes()) {
