@@ -2,10 +2,12 @@ package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.Crawler;
+import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -16,6 +18,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
+
+    @BeforeClass
+    public static void setUpTest() {
+        //switch to PLOCAL mode for this test class as Travis sometimes runs out of memory
+        DBUtil.closeDataStore();
+        config.setDatabaseStore(StorageType.PLOCAL.toString());
+        db = DBUtil.createDataStore(config);
+    }
 
     public GroovyMarkupTemplateEngineRenderingTest() {
         super("groovyMarkupTemplates", "tpl");

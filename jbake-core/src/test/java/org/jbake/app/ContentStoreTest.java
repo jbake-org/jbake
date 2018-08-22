@@ -1,9 +1,9 @@
 package org.jbake.app;
 
 import org.jbake.FakeDocumentBuilder;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ContentStoreTest extends ContentStoreIntegrationTest {
 
