@@ -234,7 +234,7 @@ public class ContentStore {
     /*
      * In fact, the URI should be the only input as there can only be one document at given URI; but the DB is split per document type for some reason.
      */
-    public DocumentList getDocumentByUri(String docType, String uri) {
+    public DocumentList<DocumentModel> getDocumentByUri(String docType, String uri) {
         return query(String.format(STATEMENT_GET_POST_BY_TYPE_AND_URI, quoteIdentifier(docType)), uri);
     }
 
@@ -243,20 +243,20 @@ public class ContentStore {
         return query(statement, uri);
     }
 
-    public DocumentList getPublishedPosts() {
+    public DocumentList<DocumentModel> getPublishedPosts() {
         return getPublishedContent("post");
     }
 
-    public DocumentList getPublishedPosts(boolean applyPaging) {
+    public DocumentList<DocumentModel> getPublishedPosts(boolean applyPaging) {
         return getPublishedContent("post", applyPaging);
     }
 
-    public DocumentList getPublishedPostsByTag(String tag) {
+    public DocumentList<DocumentModel> getPublishedPostsByTag(String tag) {
         return query(STATEMENT_GET_PUBLISHED_POSTS_BY_TAG, tag);
     }
 
-    public DocumentList getPublishedDocumentsByTag(String tag) {
-        final DocumentList documents = new DocumentList();
+    public DocumentList<DocumentModel> getPublishedDocumentsByTag(String tag) {
+        final DocumentList<DocumentModel> documents = new DocumentList<>();
 
         for (final String docType : DocumentTypes.getDocumentTypes()) {
             String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, quoteIdentifier(docType));
@@ -266,11 +266,11 @@ public class ContentStore {
         return documents;
     }
 
-    public DocumentList getPublishedPages() {
+    public DocumentList<DocumentModel> getPublishedPages() {
         return getPublishedContent("page");
     }
 
-    public DocumentList getPublishedContent(String docType) {
+    public DocumentList<DocumentModel> getPublishedContent(String docType) {
         return getPublishedContent(docType, false);
     }
 
@@ -282,11 +282,11 @@ public class ContentStore {
         return query(query);
     }
 
-    public DocumentList getAllContent(String docType) {
+    public DocumentList<DocumentModel> getAllContent(String docType) {
         return getAllContent(docType, false);
     }
 
-    public DocumentList getAllContent(String docType, boolean applyPaging) {
+    public DocumentList<DocumentModel> getAllContent(String docType, boolean applyPaging) {
         String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, quoteIdentifier(docType));
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
@@ -298,11 +298,11 @@ public class ContentStore {
         return (start >= 0) && (limit > -1);
     }
 
-    private DocumentList getAllTagsFromPublishedPosts() {
+    private DocumentList<DocumentModel> getAllTagsFromPublishedPosts() {
         return query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS);
     }
 
-    private DocumentList getSignaturesForTemplates() {
+    private DocumentList<DocumentModel> getSignaturesForTemplates() {
         return query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES);
     }
 
@@ -334,13 +334,13 @@ public class ContentStore {
         executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
     }
 
-    private DocumentList query(String sql) {
+    private DocumentList<DocumentModel> query(String sql) {
         activateOnCurrentThread();
         OResultSet results = db.query(sql);
         return DocumentList.wrap(results);
     }
 
-    private DocumentList query(String sql, Object... args) {
+    private DocumentList<DocumentModel> query(String sql, Object... args) {
         activateOnCurrentThread();
         OResultSet results = db.command(sql, args);
         return DocumentList.wrap(results);
@@ -352,10 +352,10 @@ public class ContentStore {
     }
 
     public Set<String> getTags() {
-        DocumentList docs = this.getAllTagsFromPublishedPosts();
+        DocumentList<DocumentModel> docs = this.getAllTagsFromPublishedPosts();
         Set<String> result = new HashSet<>();
-        for (BaseModel document : docs) {
-            String[] tags = ((DocumentModel) document).getTags();
+        for (DocumentModel document : docs) {
+            String[] tags = document.getTags();
             Collections.addAll(result, tags);
         }
         return result;
@@ -365,8 +365,8 @@ public class ContentStore {
         Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
             String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, quoteIdentifier(docType));
-            DocumentList docs = query(statement);
-            for (BaseModel document : docs) {
+            DocumentList<DocumentModel> docs = query(statement);
+            for (DocumentModel document : docs) {
                 String[] tags = ((DocumentModel) document).getTags();
                 Collections.addAll(result, tags);
             }

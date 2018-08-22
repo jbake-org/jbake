@@ -15,7 +15,7 @@ public class TagsExtractor implements ModelExtractor<DocumentList> {
 
     @Override
     public DocumentList get(ContentStore db, Map model, String key) {
-        DocumentList dl = new DocumentList();
+        DocumentList<TemplateModel> dl = new DocumentList<>();
         TemplateModel templateModel = new TemplateModel();
         templateModel.putAll(model);
         Map<?, ?> config = templateModel.getConfig();

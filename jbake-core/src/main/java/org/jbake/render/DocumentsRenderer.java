@@ -20,7 +20,7 @@ public class DocumentsRenderer implements RenderingTool {
         int renderedCount = 0;
         final List<String> errors = new LinkedList<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
-            DocumentList documentList = db.getUnrenderedContent(docType);
+            DocumentList<DocumentModel> documentList = db.getUnrenderedContent(docType);
 
             if (documentList == null) {
                 continue;
@@ -32,7 +32,7 @@ public class DocumentsRenderer implements RenderingTool {
 
             while (index < documentList.size()) {
                 try {
-                    DocumentModel document = documentList.getDocumentModel(index);
+                    DocumentModel document = documentList.get(index);
                     document.setNextContent(null);
                     document.setPreviousContent(null);
 
@@ -41,7 +41,7 @@ public class DocumentsRenderer implements RenderingTool {
                     }
 
                     if (index < documentList.size() - 1) {
-                        DocumentModel tempNext = (DocumentModel) documentList.get(index + 1);
+                        DocumentModel tempNext = documentList.get(index + 1);
                         document.setPreviousContent(getContentForNav(tempNext));
                     }
 

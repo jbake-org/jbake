@@ -2,9 +2,9 @@ package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.jbake.FakeDocumentBuilder;
-import org.jbake.app.Crawler.Attributes.Status;
+import static org.junit.Assert.assertEquals;
+
 import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
 import org.junit.Test;
 
@@ -57,7 +57,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         values.put("foo", "newValue");
         db.mergeDocument(values);
 
-        DocumentList docs = db.getDocumentByUri(DOC_TYPE_POST, uri);
+        DocumentList<DocumentModel> docs = db.getDocumentByUri(DOC_TYPE_POST, uri);
         assertEquals(1, docs.size());
         assertEquals("newValue", docs.get(0).get("foo"));
 

@@ -29,7 +29,7 @@ public class DocumentsRendererTest {
     private ContentStore db;
     private Renderer renderer;
     private JBakeConfiguration configuration;
-    private DocumentList emptyTemplateModelList;
+    private DocumentList<DocumentModel> emptyTemplateModelList;
 
     @Captor
     private ArgumentCaptor<DocumentModel> argument;
@@ -44,7 +44,7 @@ public class DocumentsRendererTest {
         db = mock(ContentStore.class);
         renderer = mock(Renderer.class);
         configuration = mock(JBakeConfiguration.class);
-        emptyTemplateModelList = new DocumentList();
+        emptyTemplateModelList = new DocumentList<>();
     }
 
     @Test
@@ -63,7 +63,7 @@ public class DocumentsRendererTest {
         // given:
         DocumentTypes.addDocumentType("customType");
 
-        DocumentList templateModelList = new DocumentList();
+        DocumentList<DocumentModel> templateModelList = new DocumentList<>();
         templateModelList.add(emptyDocument());
         templateModelList.add(emptyDocument());
 
@@ -89,7 +89,7 @@ public class DocumentsRendererTest {
         // given
         DocumentTypes.addDocumentType("customType");
 
-        DocumentList templateModelList = new DocumentList();
+        DocumentList<DocumentModel> templateModelList = new DocumentList<>();
         DocumentModel document = emptyDocument();
         DocumentModel document2 = emptyDocument();
         templateModelList.add(document);
@@ -116,7 +116,7 @@ public class DocumentsRendererTest {
         String third = "Third Document";
         String fourth = "Fourth Document";
 
-        DocumentList documents = new DocumentList();
+        DocumentList<DocumentModel> documents = new DocumentList<>();
         documents.add(simpleDocument(fourth));
         documents.add(simpleDocument(third));
         documents.add(simpleDocument(second));

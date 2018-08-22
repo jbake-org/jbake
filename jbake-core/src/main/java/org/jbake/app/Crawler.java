@@ -230,12 +230,12 @@ public class Crawler {
         return FileUtil.getUriPathToContentRoot(config, sourceFile);
     }
 
-    private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
-        DocumentList match = db.getDocumentStatus(docType, uri);
+    private DocumentStatus findDocumentStatus(String documentType, String uri, String sha1) {
+        DocumentList<DocumentModel> match = db.getDocumentStatus(documentType, uri);
         if (!match.isEmpty()) {
-            DocumentModel documentModel = match.getDocumentModel(0);
-            String oldHash = documentModel.getSha1();
-            if (!oldHash.equals(sha1) || !documentModel.getRendered()) {
+            DocumentModel document = match.get(0);
+            String oldHash = document.getSha1();
+            if (!oldHash.equals(sha1) || !document.getRendered()) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;

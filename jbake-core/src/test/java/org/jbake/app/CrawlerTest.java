@@ -3,7 +3,6 @@ package org.jbake.app;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.jbake.model.BaseModel;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.ModelAttributes;
 import org.junit.Assert;
@@ -26,7 +25,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
-        DocumentList results = db.getPublishedPosts();
+        DocumentList<DocumentModel> results = db.getPublishedPosts();
 
         assertThat(results.size()).isEqualTo(3);
 
@@ -36,19 +35,18 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
                     .containsValue("../../../");
         }
 
-        DocumentList allPosts = db.getAllContent("post");
+        DocumentList<DocumentModel> allPosts = db.getAllContent("post");
 
         assertThat(allPosts.size()).isEqualTo(4);
 
-        for (BaseModel content : allPosts) {
-            DocumentModel documentModel = (DocumentModel) content;
-            if (documentModel.getTitle().equals("Draft Post")) {
+        for (DocumentModel content : allPosts) {
+            if (content.getTitle().equals("Draft Post")) {
                 assertThat(content).containsKey(ModelAttributes.DATE);
             }
         }
 
         // covers bug #213
-        DocumentList publishedPostsByTag = db.getPublishedPostsByTag("blog");
+        DocumentList<DocumentModel> publishedPostsByTag = db.getPublishedPostsByTag("blog");
         Assert.assertEquals(3, publishedPostsByTag.size());
     }
 
@@ -64,15 +62,14 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
-        DocumentList documents = db.getPublishedPosts();
+        DocumentList<DocumentModel> documents = db.getPublishedPosts();
 
-        for (BaseModel model : documents) {
-            DocumentModel documentModel = (DocumentModel) model;
-            String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(documentModel.getFile()) + "/";
+        for (DocumentModel model : documents) {
+            String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.getFile()) + "/";
 
-            Assert.assertThat(documentModel.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
-            Assert.assertThat(documentModel.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-            Assert.assertThat(documentModel.getRootPath(), is("../../../"));
+            Assert.assertThat(model.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
+            Assert.assertThat(model.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
+            Assert.assertThat(model.getRootPath(), is("../../../"));
         }
     }
 
