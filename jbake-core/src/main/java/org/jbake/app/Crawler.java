@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -151,17 +154,38 @@ public class Crawler {
         return uri;
     }
 
+    // TODO: Refactor - parametrize the following two methods into one.
+    // commons-codec's URLCodec could be used when we add that dependency.
     private String createUri(String uri) {
-        return uri.substring(0, uri.lastIndexOf('.')) + config.getOutputExtension();
+        //return uri.substring(0, uri.lastIndexOf('.')) + config.getOutputExtension();
+        try {
+            return URI_SEPARATOR_CHAR + FilenameUtils.getPath(uri)
+                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                    + config.getOutputExtension();
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+        }
     }
 
     private String createNoExtensionUri(String uri) {
-        return URI_SEPARATOR_CHAR
-                + FilenameUtils.getPath(uri)
-                + FilenameUtils.getBaseName(uri)
-                + URI_SEPARATOR_CHAR
-                + "index"
-                + config.getOutputExtension();
+//        return URI_SEPARATOR_CHAR
+//                + FilenameUtils.getPath(uri)
+//                + FilenameUtils.getBaseName(uri)
+//                + URI_SEPARATOR_CHAR
+//                + "index"
+//                + config.getOutputExtension();
+        try {
+            return URI_SEPARATOR_CHAR
+                    + FilenameUtils.getPath(uri)
+                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                    + URI_SEPARATOR_CHAR
+                    + "index"
+                    + config.getOutputExtension();
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+        }
     }
 
     private boolean useNoExtensionUri(String uri) {
