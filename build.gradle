@@ -55,6 +55,7 @@ apply plugin: 'com.github.kt3k.coveralls'
  */
 allprojects {
     apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
 
     repositories {
         jcenter()
@@ -62,6 +63,13 @@ allprojects {
 
     jacoco {
         toolVersion = jacocoVersion
+    }
+
+    tasks.withType(Checkstyle) {
+        reports {
+            xml.enabled false
+            html.enabled true
+        }
     }
 
 }
