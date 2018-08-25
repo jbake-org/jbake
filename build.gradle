@@ -55,7 +55,19 @@ apply plugin: 'com.github.kt3k.coveralls'
  */
 allprojects {
     apply plugin: 'jacoco'
-    apply plugin: 'checkstyle'
+
+    if ( JavaVersion.current().isJava8Compatible() ) {
+
+        apply plugin: 'checkstyle'
+
+        tasks.withType(Checkstyle) {
+            reports {
+                xml.enabled false
+                html.enabled true
+            }
+        }
+
+    }
 
     repositories {
         jcenter()
@@ -63,13 +75,6 @@ allprojects {
 
     jacoco {
         toolVersion = jacocoVersion
-    }
-
-    tasks.withType(Checkstyle) {
-        reports {
-            xml.enabled false
-            html.enabled true
-        }
     }
 
 }
