@@ -25,14 +25,12 @@ public class HtmlUtil {
 	 * @param fileContents	Map representing file contents
 	 * @param configuration Configuration object
 	 */
-
-	//TODO: use JBakeConfiguration
     public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration){
     	
     	String htmlContent = fileContents.get(Attributes.BODY).toString();
 
-    	boolean prependSiteHost = config.getBoolean(Keys.IMG_PATH_PREPEND_HOST);
-        String siteHost = config.getString(Keys.SITE_HOST);
+    	boolean prependSiteHost = configuration.getImgPathPrependHost();
+        String siteHost = configuration.getSiteHost();
         String rootPath = fileContents.get(Attributes.ROOTPATH).toString();
     	String uri = fileContents.get(Attributes.URI).toString();
     	
