@@ -60,7 +60,7 @@ public class HtmlUtil {
                 if (!source.startsWith("/")){
                 	source = uri + source.replaceFirst("./", "");
                 }
-					
+
 				if (!siteHost.endsWith("/") && !source.startsWith("/")) {
                 	siteHost = siteHost.concat("/");
 				}
