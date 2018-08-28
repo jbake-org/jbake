@@ -45,7 +45,7 @@ public class HtmlUtilTest {
         fileContent.put(Attributes.ROOTPATH, "../../../");
         fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
         fileContent.put(Attributes.BODY, "<div> Test <img src='./first.jpg' /></div>");
-        config.setProperty(ConfigUtil.Keys.IMG_PATH_PREPEND_HOST,false);
+        config.setImgPathPrependHost(false);
 
         HtmlUtil.fixImageSourceUrls(fileContent, config);
 

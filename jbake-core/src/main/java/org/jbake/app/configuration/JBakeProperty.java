@@ -43,6 +43,7 @@ public class JBakeProperty {
     public static final String THYMELEAF_LOCALE = "thymeleaf.locale";
     public static final String URI_NO_EXTENSION = "uri.noExtension";
     public static final String URI_NO_EXTENSION_PREFIX = "uri.noExtension.prefix";
+    public static final String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
     public static final String VERSION = "version";
 
     private JBakeProperty() {}
