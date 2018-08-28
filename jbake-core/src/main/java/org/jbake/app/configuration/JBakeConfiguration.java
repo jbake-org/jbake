@@ -283,6 +283,11 @@ public interface JBakeConfiguration {
     boolean getUriWithoutExtension();
 
     /**
+     * @return Flag indicating if image paths should be prepended with {@link #getSiteHost()} value
+     */
+    boolean getImgPathPrependHost();
+
+    /**
      * @return Version of JBake
      */
     String getVersion();
