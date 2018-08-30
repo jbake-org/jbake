@@ -531,4 +531,12 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setProperty(JBakeProperty.HEADER_SEPARATOR, headerSeparator);
     }
 
+    @Override
+    public boolean getImgPathPrependHost() {
+        return getAsBoolean(JBakeProperty.IMG_PATH_PREPEND_HOST);
+    }
+
+    public void setImgPathPrependHost(boolean imgPathPrependHost) {
+        setProperty(JBakeProperty.IMG_PATH_PREPEND_HOST, imgPathPrependHost);
+    }
 }
