@@ -31,7 +31,6 @@ public class HtmlUtil {
 
     	boolean prependSiteHost = configuration.getImgPathPrependHost();
         String siteHost = configuration.getSiteHost();
-        String rootPath = fileContents.get(Attributes.ROOTPATH).toString();
     	String uri = fileContents.get(Attributes.URI).toString();
     	
     	if (fileContents.get(Attributes.NO_EXTENSION_URI) != null){
