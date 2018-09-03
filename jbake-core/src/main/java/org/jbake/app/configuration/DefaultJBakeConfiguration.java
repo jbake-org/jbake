@@ -209,7 +209,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public String getDefaultStatus() {
-        return getAsString(JBakeProperty.DEFAULT_STATUS);
+        return getAsString(JBakeProperty.DEFAULT_STATUS, "");
     }
 
     public void setDefaultStatus(String status) {
@@ -218,11 +218,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public String getDefaultType() {
-        String type = getAsString(JBakeProperty.DEFAULT_TYPE);
-        if (type.isEmpty()) {
-            return null;
-        }
-        return type;
+        return getAsString(JBakeProperty.DEFAULT_TYPE, "");
     }
 
     public void setDefaultType(String type) {

@@ -18,14 +18,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering
- * markup in a source file and exporting the result into the {@link ParserContext#getContents() contents} map.
- *
+ * markup in a source file and exporting the result into the {@link ParserContext#getDocumentModel() contents} map.
+ * <p>
  * This specific engine does nothing, meaning that the body is rendered as raw contents.
  *
  * @author Cédric Champeau
@@ -48,7 +47,7 @@ public abstract class MarkupEngine implements ParserEngine {
 
     /**
      * Processes the document header. Usually subclasses will parse the document body and look for
-     * specific header metadata and export it into {@link ParserContext#getContents() contents} map.
+     * specific header metadata and export it into {@link ParserContext#getDocumentModel() contents} map.
      *
      * @param context the parser context
      */
@@ -77,7 +76,6 @@ public abstract class MarkupEngine implements ParserEngine {
      */
     public Map<String, Object> parse(JBakeConfiguration config, File file) {
         this.configuration = config;
-        Map<String, Object> documentModel = new HashMap<>();
         List<String> fileContents;
         try (InputStream is = new FileInputStream(file)) {
 
@@ -93,28 +91,27 @@ public abstract class MarkupEngine implements ParserEngine {
                 file,
                 fileContents,
                 config,
-                hasHeader,
-                documentModel
+                hasHeader
         );
 
         if (hasHeader) {
             // read header from file
-            processHeader(fileContents, documentModel);
+            processDefaultHeader(context);
         }
         // then read engine specific headers
         processHeader(context);
 
-        setModelDefaultsIfNotSetInHeader(config, file, documentModel);
-        sanitizeTags(config, documentModel);
+        setModelDefaultsIfNotSetInHeader(context);
+        sanitizeTags(context);
 
-        if (documentModel.get(Crawler.Attributes.TYPE) == null || documentModel.get(Crawler.Attributes.STATUS) == null) {
+        if (context.getType().isEmpty() || context.getStatus().isEmpty()) {
             // output error
             LOGGER.warn("Parsing skipped (missing type or status value in header meta data) for file {}!", file);
             return null;
         }
 
         // generate default body
-        processBody(fileContents, documentModel);
+        processDefaultBody(context);
 
         // eventually process body using specific engine
         if (validate(context)) {
@@ -125,37 +122,37 @@ public abstract class MarkupEngine implements ParserEngine {
         }
         // TODO: post parsing plugins to hook in here?
 
-        return documentModel;
+        return context.getDocumentModel();
     }
 
-    private void sanitizeTags(JBakeConfiguration config, Map<String, Object> content) {
-        if (content.get(Crawler.Attributes.TAGS) != null) {
-            String[] tags = (String[]) content.get(Crawler.Attributes.TAGS);
+    private void sanitizeTags(ParserContext context) {
+        if (context.getTags() != null) {
+            String[] tags = (String[]) context.getTags();
             for (int i = 0; i < tags.length; i++) {
                 tags[i] = sanitizeValue(tags[i]);
-                if (config.getSanitizeTag()) {
+                if (context.getConfig().getSanitizeTag()) {
                     tags[i] = tags[i].replace(" ", "-");
                 }
             }
-            content.put(Crawler.Attributes.TAGS, tags);
+            context.setTags(tags);
         }
     }
 
-    private void setModelDefaultsIfNotSetInHeader(JBakeConfiguration config, File file, Map<String, Object> content) {
-        if (content.get(Crawler.Attributes.DATE) == null) {
-            content.put(Crawler.Attributes.DATE, new Date(file.lastModified()));
+    private void setModelDefaultsIfNotSetInHeader(ParserContext context) {
+        if (context.getDate() == null) {
+            context.setDate(new Date(context.getFile().lastModified()));
         }
 
         // default status has been set
-        if (config.getDefaultStatus() != null && content.get(Crawler.Attributes.STATUS) == null) {
+        if (context.getConfig().getDefaultStatus() != null && context.getStatus().isEmpty()) {
             // file hasn't got status so use default
-            content.put(Crawler.Attributes.STATUS, config.getDefaultStatus());
+            context.setDefaultStatus();
         }
 
         // default type has been set
-        if (config.getDefaultType() != null && content.get(Crawler.Attributes.TYPE) == null) {
+        if (context.getConfig().getDefaultType() != null && context.getType().isEmpty()) {
             // file hasn't got type so use default
-            content.put(Crawler.Attributes.TYPE, config.getDefaultType());
+            context.setDefaultType();
         }
     }
 
@@ -170,7 +167,7 @@ public abstract class MarkupEngine implements ParserEngine {
         boolean statusFound = false;
         boolean typeFound = false;
 
-        if ( ! hasHeaderSeparatorInContent( contents ) ) {
+        if (!hasHeaderSeparatorInContent(contents)) {
             return false;
         }
 
@@ -179,21 +176,29 @@ public abstract class MarkupEngine implements ParserEngine {
                 LOGGER.debug("Header separator found");
                 break;
             }
-            if ( isTypeProperty(line) ) {
+            if (isTypeProperty(line)) {
                 LOGGER.debug("Type property found");
                 typeFound = true;
             }
 
-            if ( isStatusProperty(line) ) {
+            if (isStatusProperty(line)) {
                 LOGGER.debug("Status property found");
                 statusFound = true;
             }
-            if ( !line.isEmpty() && !line.contains("=") ) {
+            if (!line.isEmpty() && !line.contains("=")) {
                 LOGGER.error("Property found without assignment [{}]", line);
                 headerValid = false;
             }
         }
-        return headerValid && statusFound && typeFound;
+        return headerValid && (statusFound || hasDefaultStatus()) && (typeFound || hasDefaultType());
+    }
+
+    private boolean hasDefaultType() {
+        return !configuration.getDefaultType().isEmpty();
+    }
+
+    private boolean hasDefaultStatus() {
+        return !configuration.getDefaultStatus().isEmpty();
     }
 
     private boolean hasHeaderSeparatorInContent(List<String> contents) {
@@ -214,17 +219,16 @@ public abstract class MarkupEngine implements ParserEngine {
 
     /**
      * Process the header of the file.
-     *  @param contents Contents of file
-     * @param content
+     *
+     * @param context the parser context
      */
-    private void processHeader(List<String> contents, final Map<String, Object> content) {
-        for (String line : contents) {
+    private void processDefaultHeader(ParserContext context) {
+        for (String line : context.getFileLines()) {
 
             if (hasHeaderSeparator(line)) {
                 break;
             }
-
-            processLine(line, content);
+            processLine(line, context.getDocumentModel());
         }
     }
 
@@ -282,13 +286,12 @@ public abstract class MarkupEngine implements ParserEngine {
     /**
      * Process the body of the file.
      *
-     * @param contents Contents of file
-     * @param content
+     * @param context the parser context
      */
-    private void processBody(List<String> contents, final Map<String, Object> content) {
+    private void processDefaultBody(ParserContext context) {
         StringBuilder body = new StringBuilder();
         boolean inBody = false;
-        for (String line : contents) {
+        for (String line : context.getFileLines()) {
             if (inBody) {
                 body.append(line).append("\n");
             }
@@ -298,11 +301,10 @@ public abstract class MarkupEngine implements ParserEngine {
         }
 
         if (body.length() == 0) {
-            for (String line : contents) {
+            for (String line : context.getFileLines()) {
                 body.append(line).append("\n");
             }
         }
-
-        content.put(Crawler.Attributes.BODY, body.toString());
+        context.setBody(body.toString());
     }
 }
