@@ -535,4 +535,13 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setImgPathPrependHost(boolean imgPathPrependHost) {
         setProperty(JBakeProperty.IMG_PATH_PREPEND_HOST, imgPathPrependHost);
     }
+
+    @Override
+    public boolean getImgPathUpdate() {
+        return getAsBoolean(JBakeProperty.IMG_PATH_UPDATE);
+    }
+
+    public void setImgPathUPdate(boolean imgPathUpdate) {
+        setProperty(JBakeProperty.IMG_PATH_UPDATE, imgPathUpdate);
+    }
 }
