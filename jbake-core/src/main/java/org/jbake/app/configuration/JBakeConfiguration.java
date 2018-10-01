@@ -283,12 +283,14 @@ public interface JBakeConfiguration {
     boolean getUriWithoutExtension();
 
     /**
-     * @return Flag indicating if image paths should be prepended with {@link #getSiteHost()} value - see {@link #getImgPathUpdate()}
+     * @return Flag indicating if image paths should be prepended with {@link #getSiteHost()} value - only has an effect if
+     * {@link #getImgPathUpdate()} is set to true
      */
     boolean getImgPathPrependHost();
 
     /**
-     * @return Flag indicating if image paths should be updated
+     * @return Flag indicating if image paths in content should be updated with absolute path (using URI value of content file),
+     * see {@link #getImgPathUpdate()} which allows you to control the absolute path used
      */
     boolean getImgPathUpdate();
 
