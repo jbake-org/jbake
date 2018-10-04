@@ -171,6 +171,10 @@ public abstract class MarkupEngine implements ParserEngine {
             return false;
         }
 
+        if (!headerSeparatorDemarcatesHeader(contents)) {
+            return false;
+        }
+
         for (String line : contents) {
             if (hasHeaderSeparator(line)) {
                 LOGGER.debug("Header separator found");
@@ -203,6 +207,30 @@ public abstract class MarkupEngine implements ParserEngine {
 
     private boolean hasHeaderSeparatorInContent(List<String> contents) {
         return contents.indexOf(configuration.getHeaderSeparator()) != -1;
+    }
+
+    /**
+     * Checks if header separator demarcates end of metadata header
+     *
+     * @param contents
+     * @return true if header separator resides at end of metadata header, false if not
+     */
+    private boolean headerSeparatorDemarcatesHeader(List<String> contents) {
+        List<String> subContents = null;
+        int index = contents.indexOf(configuration.getHeaderSeparator());
+        if (index != -1) {
+            subContents = contents.subList(0, index);
+
+            for (String line : subContents) {
+                // header should only contain empty lines or lines with '=' in
+                if (!line.contains("=") && !line.isEmpty())  {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean hasHeaderSeparator(String line) {
