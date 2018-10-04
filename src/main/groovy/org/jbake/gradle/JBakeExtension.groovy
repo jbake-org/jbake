@@ -19,16 +19,16 @@ package org.jbake.gradle
  * Created by frank on 12.10.14.
  */
 class JBakeExtension {
-
     String version = '2.6.1'
     String pegdownVersion = '1.6.0'
-    String flexmarkVersion = '0.32.20'
+    String flexmarkVersion = '0.34.24'
     String freemarkerVersion = '2.3.28'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
-    String asciidoctorjVersion = '1.5.6'
-    String groovyTemplatesVersion = '2.4.15'
+    String asciidoctorjVersion = '1.5.7'
+    String groovyTemplatesVersion = '2.5.2'
     String jade4jVersion = '1.2.7'
     String thymeleafVersion = '3.0.9.RELEASE'
+    String jettyVersion = '9.2.24.v20180105'
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
     boolean clearCache = false

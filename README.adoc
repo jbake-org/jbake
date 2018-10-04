@@ -38,6 +38,23 @@ This will add a `bake` task to your build, which will search for a standard http
 
 WARNING: versions prior to `1.0.0` had a task named `jbake`. This task has been renamed to `bake` since `1.0.0`.
 
+=== Previewing
+You can preview your content by running the following command:
+
+----
+gradle bake jbakePreview
+----
+
+This will start up a jetty container and serve your baked site on http://localhost:8820 by default.  You can change the
+port by adding this to your build.gradle file.
+
+[source,groovy]
+----
+jbakePreview {
+    port = '8080'
+}
+----
+
 == Configuration
 === Plugin configuration
 
@@ -99,28 +116,5 @@ jbake {
 }
 ----
 
-=== Repositories configuration
-The plugin will automatically include `jcenter()` as a repository in order to resolve JBake and template engine dependencies.
-You may deactivate this feature by setting `includeDefaultRepositories` to false, like so
-
-[source,groovy]
-----
-jbake {
-   includeDefaultRepositories = false
-}
-----
-
-WARNING: You must still define at least one repository from where all JBake and template engine dependencies should
-be resolved. Failure to do so will result in a build error.
-
-== JDK 9 Compatibility Notes
-
-JBake uses a jdk7 compatible version of orientdb. There are issues with jdk9 builds which are unable to determine the `MaxDirectMemorySize`.
-
-If you are running into this issue you can add the `-XX:MaxDirectMemorySize` JVM Option to your _gradle.properties_ file.
-
-```
-org.gradle.jvmargs=-XX:MaxDirectMemorySize=1g
-```
 
 

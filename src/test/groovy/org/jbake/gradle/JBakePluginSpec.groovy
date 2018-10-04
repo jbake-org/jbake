@@ -65,10 +65,10 @@ class JBakePluginSpec extends Specification {
         group                   | name                          | version
         'org.jbake'             | 'jbake-core'                  | '2.6.1'
         'org.freemarker'        | 'freemarker'                  | '2.3.28'
-        'com.vladsch.flexmark'  | 'flexmark'                    | '0.32.20'
-        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.32.20'
-        'org.asciidoctor'       | 'asciidoctorj'                | '1.5.6'
-        'org.codehaus.groovy'   | 'groovy-templates'            | '2.4.15'
+        'com.vladsch.flexmark'  | 'flexmark'                    | '0.34.24'
+        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.34.24'
+        'org.asciidoctor'       | 'asciidoctorj'                | '1.5.7'
+        'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.2'
         'org.thymeleaf'         | 'thymeleaf'                   | '3.0.9.RELEASE'
         'de.neuland-bfi'        | 'jade4j'                      | '1.2.7'
     }

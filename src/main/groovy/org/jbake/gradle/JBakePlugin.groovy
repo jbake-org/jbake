@@ -42,6 +42,12 @@ class JBakePlugin implements Plugin<Project> {
             conventionMapping.clearCache = { project.jbake.clearCache }
             conventionMapping.configuration = { project.jbake.configuration }
         }
+
+        project.task('bakePreview', type: JBakeServeTask, description: 'Preview a jbake project') {
+            classpath = configuration
+            conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
+            conventionMapping.configuration = { project.jbake.configuration }
+        }
     }
 
     private void addDependenciesAfterEvaluate() {
@@ -83,6 +89,8 @@ class JBakePlugin implements Plugin<Project> {
             jbake("org.codehaus.groovy:groovy-templates:${extension.groovyTemplatesVersion}")
             jbake("de.neuland-bfi:jade4j:${extension.jade4jVersion}")
             jbake("org.thymeleaf:thymeleaf:${extension.thymeleafVersion}")
+            jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
+            jbake("org.eclipse.jetty:jetty-server:${extension.jettyVersion}")
         }
     }
 }
