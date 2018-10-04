@@ -45,7 +45,7 @@ class JBakePlugin implements Plugin<Project> {
 
         project.task('bakePreview', type: JBakeServeTask, description: 'Preview a jbake project') {
             classpath = configuration
-            conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
+            conventionMapping.input = { project.file("$project.buildDir/$project.jbake.destDirName") }
             conventionMapping.configuration = { project.jbake.configuration }
         }
     }
