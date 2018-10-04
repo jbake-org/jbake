@@ -17,63 +17,47 @@ package org.jbake.gradle
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
-import java.lang.reflect.Constructor
-
-class JBakeTask extends DefaultTask {
+class JBakeServeTask extends DefaultTask {
     @InputDirectory File input
-    @OutputDirectory File output
     @Input Map<String, Object> configuration = [:]
-    @Input @Optional
-    boolean clearCache
+    @Input String port = '8080'
 
     @Input @Optional
     Configuration classpath
     private static ClassLoader cl
 
-    private JBakeProxy jbake
 
-    JBakeTask() {
-        group = 'jbake'
-        description = 'Bakes your website with JBake'
+    private JettyServerProxy jettyServer
+
+    JBakeServeTask() {
+        group = 'Documentation'
+        description = 'Starts up a Jetty container to preview your JBake site locally.'
     }
 
     @TaskAction
-    void bake() {
-        createJbake()
-        jbake.prepare()
-        mergeConfiguration()
-        jbake.jbake()
+    void serve() {
+        logging.level = LogLevel.INFO
+        createJettyServer()
+        jettyServer.prepare()
+        println("Starting server. Browse to http://localhost:$port")
+        jettyServer.run(input.absolutePath, port)
     }
 
-    private JBakeProxy createJbake() {
-        if (!jbake) {
-            jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: getInput(), output: getOutput(), clearCache: getClearCache())
+    private JettyServerProxy createJettyServer() {
+        if (!jettyServer) {
+            jettyServer = new JettyServerProxyImpl(delegate: loadJettyServerDynamic())
         }
     }
 
-    private mergeConfiguration() {
-        //config = new CompositeConfiguration([createMapConfiguration(), jbake.getConfig()])
-        def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
-        Constructor constructor = delegate.getConstructor(Collection)
-        def config = constructor.newInstance([createMapConfiguration(), jbake.getConfig()])
-        jbake.setConfig(config)
-    }
-
-    private createMapConfiguration() {
-        def delegate = loadClass('org.apache.commons.configuration.MapConfiguration')
-        Constructor constructor = delegate.getConstructor(Map)
-        constructor.newInstance(getConfiguration())
-    }
-
-    private loadOvenDynamic() {
+    private loadJettyServerDynamic() {
         setupClassLoader()
-        loadClass('org.jbake.app.Oven')
+        loadClass('org.jbake.launcher.JettyServer')
     }
 
     private static Class loadClass(String className) {

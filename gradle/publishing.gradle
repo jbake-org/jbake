@@ -18,55 +18,24 @@ import java.text.SimpleDateFormat
 
 Date buildTimeAndDate = new Date()
 ext {
+    buildBy = System.properties['user.name']
     buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
     buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    buildRevision = versioning.info.commit
+    buildJdk = "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString()
+    buildCreatedBy = "Gradle ${gradle.gradleVersion}"
 }
 
 jar {
     manifest {
         attributes(
-            'Built-By': System.properties['user.name'],
-            'Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString(),
+            'Created-By': buildCreatedBy,
+            'Built-By': buildBy,
+            'Build-Jdk': buildJdk,
             'Build-Date': buildDate,
             'Build-Time': buildTime,
-            'Build-Revision': versioning.info.commit,
-            'Specification-Title': project.name,
-            'Specification-Version': project.version,
-            'Specification-Vendor': project.name,
-            'Implementation-Title': project.name,
-            'Implementation-Version': project.version,
-            'Implementation-Vendor': project.name
+            'Build-Revision': buildRevision
         )
-    }
-}
-
-def pomConfig = {
-    name project.name
-    description project.project_description
-    url project.project_website
-    inceptionYear '2014'
-    licenses {
-        license([:]) {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution 'repo'
-        }
-    }
-    scm {
-        url project.project_vcs
-    }
-    developers {
-        [
-            melix : 'Cedric Champeau'
-        ].each { devId, devName ->
-            developer {
-                id devId
-                name devName
-                roles {
-                    role 'Developer'
-                }
-            }
-        }
     }
 }
 
@@ -77,9 +46,33 @@ publishing {
             artifact sourcesJar
             artifact javadocJar
 
-            pom.withXml {
-                asNode().children().last() + pomConfig
-                asNode().appendNode('description', project.project_description)
+            pom {
+                name = project.name
+                description = project.project_description
+                url = project.project_website
+                inceptionYear = '2014'
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+                scm {
+                    url = project.project_vcs
+                }
+                developers {
+                    [
+                        melix : 'Cedric Champeau',
+                        aalmiray: 'Andres Almiray'
+                    ].each { devId, devName ->
+                        developer {
+                            id = devId
+                            name = devName
+                            roles = ['Developer']
+                        }
+                    }
+                }
             }
         }
     }

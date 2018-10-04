@@ -20,10 +20,10 @@ plugins {
     id 'maven-publish'
     id 'jacoco'
     id 'java-gradle-plugin'
-    id 'com.jfrog.bintray'             version '1.8.0'
-    id 'net.nemerosa.versioning'       version '2.6.1'
-    id 'com.github.ben-manes.versions' version '0.17.0'
-    id 'com.gradle.plugin-publish'     version '0.9.10'
+    id 'com.jfrog.bintray'             version '1.8.4'
+    id 'net.nemerosa.versioning'       version '2.7.1'
+    id 'com.github.ben-manes.versions' version '0.20.0'
+    id 'com.gradle.plugin-publish'     version '0.10.0'
     id 'com.github.hierynomus.license' version '0.14.0'
     id 'com.github.kt3k.coveralls'     version '2.8.2'
 }
@@ -62,9 +62,10 @@ dependencyUpdates.resolutionStrategy = {
 dependencies {
     compile gradleApi()
     compile "com.github.zafarkhaja:java-semver:$semverVersion"
+    compileOnly "org.eclipse.jetty:jetty-server:$jettyVersion"
     compileOnly "org.jbake:jbake-core:$jbakeVersion"
     testCompile("org.spockframework:spock-core:$spockVersion") {
-        exclude group:'org.codehaus.groovy'
+        exclude group: 'org.codehaus.groovy'
     }
     testCompile "commons-io:commons-io:$commonsIoVersion"
 }
