@@ -48,4 +48,13 @@ class JBakeProxyImpl implements JBakeProxy {
     def setConfig(Object config) {
         jbake.config = config
     }
+
+    List<String> getErrors() {
+        try {
+            return jbake.getErrors()
+        } catch (Exception e) {
+            // older versions of the Oven class do not have a getErrors() method
+            return []
+        }
+    }
 }

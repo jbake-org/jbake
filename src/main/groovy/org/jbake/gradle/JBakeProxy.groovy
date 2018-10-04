@@ -26,4 +26,6 @@ interface JBakeProxy {
     def getConfig()
 
     def setConfig(Object config)
+
+    List<String> getErrors()
 }

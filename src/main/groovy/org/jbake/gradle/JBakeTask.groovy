@@ -22,6 +22,7 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskExecutionException
 
 import java.lang.reflect.Constructor
 
@@ -49,6 +50,11 @@ class JBakeTask extends DefaultTask {
         jbake.prepare()
         mergeConfiguration()
         jbake.jbake()
+        List<String> errors = jbake.getErrors()
+        if (errors) {
+            errors.each { logger.error(it) }
+            throw new TaskExecutionException(this, new IllegalStateException(errors.join('\n')))
+        }
     }
 
     private JBakeProxy createJbake() {
@@ -58,7 +64,6 @@ class JBakeTask extends DefaultTask {
     }
 
     private mergeConfiguration() {
-        //config = new CompositeConfiguration([createMapConfiguration(), jbake.getConfig()])
         def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
         Constructor constructor = delegate.getConstructor(Collection)
         def config = constructor.newInstance([createMapConfiguration(), jbake.getConfig()])
