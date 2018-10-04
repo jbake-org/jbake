@@ -29,8 +29,6 @@ matrix:
     - jdk: oraclejdk9
     - jdk: oraclejdk8
     - jdk: openjdk8
-    - jdk: openjdk7
-      dist: precise
 
 after_success:
     - ./gradlew coveralls
