@@ -217,9 +217,10 @@ public class Crawler {
                 fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
             }
 
-
-            // Prevent image source url's from breaking
-            HtmlUtil.fixImageSourceUrls(fileContents, config);
+            if (config.getImgPathUpdate()) {
+                // Prevent image source url's from breaking
+                HtmlUtil.fixImageSourceUrls(fileContents, config);
+            }
 
             ODocument doc = new ODocument(documentType);
             doc.fromMap(fileContents);
