@@ -167,10 +167,6 @@ public abstract class MarkupEngine implements ParserEngine {
         boolean statusFound = false;
         boolean typeFound = false;
 
-        if (!hasHeaderSeparatorInContent(contents)) {
-            return false;
-        }
-
         if (!headerSeparatorDemarcatesHeader(contents)) {
             return false;
         }
@@ -219,6 +215,7 @@ public abstract class MarkupEngine implements ParserEngine {
         List<String> subContents = null;
         int index = contents.indexOf(configuration.getHeaderSeparator());
         if (index != -1) {
+            // get every line above header separator
             subContents = contents.subList(0, index);
 
             for (String line : subContents) {
