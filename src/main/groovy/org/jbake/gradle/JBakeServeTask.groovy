@@ -46,7 +46,7 @@ class JBakeServeTask extends DefaultTask {
         createJettyServer()
         jettyServer.prepare()
         println("Starting server. Browse to http://localhost:$port")
-        jettyServer.run(input.absolutePath, port)
+        jettyServer.run(getInput().absolutePath, port)
     }
 
     private JettyServerProxy createJettyServer() {
