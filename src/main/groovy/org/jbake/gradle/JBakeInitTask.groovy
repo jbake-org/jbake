@@ -15,60 +15,52 @@
  */
 package org.jbake.gradle
 
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskExecutionException
-import org.jbake.gradle.impl.JBakeProxyImpl
+import org.jbake.gradle.impl.JBakeInitProxyImpl
 
 import java.lang.reflect.Constructor
 
-class JBakeTask extends DefaultTask {
-    @InputDirectory File input
-    @OutputDirectory File output
+class JBakeInitTask extends DefaultTask {
+    @Input String template
+    @OutputDirectory File outputDir
     @Input Map<String, Object> configuration = [:]
-    @Input @Optional
-    boolean clearCache
 
     @Input @Optional
     Configuration classpath
     private static ClassLoader cl
 
-    private JBakeProxy jbake
+    private JBakeInitProxy init
 
-    JBakeTask() {
-        group = 'jbake'
-        description = 'Bakes your website with JBake'
+    JBakeInitTask() {
+        group = 'Documentation'
+        description = 'Initializes the directory structure for a new JBake site'
     }
 
     @TaskAction
-    void bake() {
-        createJbake()
-        jbake.prepare()
+    void init() {
+        createJBakeInit()
+        init.prepare()
         mergeConfiguration()
-        jbake.jbake()
-        List<String> errors = jbake.getErrors()
-        if (errors) {
-            errors.each { logger.error(it) }
-            throw new TaskExecutionException(this, new IllegalStateException(errors.join('\n')))
-        }
+        init.init(getTemplate(), getOutputDir())
     }
 
-    private JBakeProxy createJbake() {
-        if (!jbake) {
-            jbake = new JBakeProxyImpl(delegate: loadOvenDynamic(), input: getInput(), output: getOutput(), clearCache: getClearCache())
+    private JBakeInitProxy createJBakeInit() {
+        if (!init) {
+            loadInitDynamic().newInstance()
+            init = new JBakeInitProxyImpl(delegate: loadInitDynamic())
         }
     }
 
     private mergeConfiguration() {
         def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
-        Constructor constructor = delegate.getConstructor(Collection)
-        def config = constructor.newInstance([createMapConfiguration(), jbake.getConfig()])
-        jbake.setConfig(config)
+        Constructor constructor = delegate.getConstructor(loadClass('org.apache.commons.configuration.Configuration'))
+        init.config = constructor.newInstance(createMapConfiguration())
     }
 
     private createMapConfiguration() {
@@ -77,9 +69,9 @@ class JBakeTask extends DefaultTask {
         constructor.newInstance(getConfiguration())
     }
 
-    private loadOvenDynamic() {
+    private loadInitDynamic() {
         setupClassLoader()
-        loadClass('org.jbake.app.Oven')
+        loadClass('org.jbake.gradle.impl.Init')
     }
 
     private static Class loadClass(String className) {

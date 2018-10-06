@@ -22,6 +22,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.jbake.gradle.impl.JettyServerProxyImpl
 
 class JBakeServeTask extends DefaultTask {
     @InputDirectory File input
@@ -45,8 +46,8 @@ class JBakeServeTask extends DefaultTask {
         logging.level = LogLevel.INFO
         createJettyServer()
         jettyServer.prepare()
-        println("Starting server. Browse to http://localhost:$port")
-        jettyServer.run(getInput().absolutePath, port)
+        println("Starting server. Browse to http://localhost:${getPort()}")
+        jettyServer.run(getInput().absolutePath, getPort())
     }
 
     private JettyServerProxy createJettyServer() {

@@ -31,6 +31,7 @@ class JBakeExtension {
     String jettyVersion = '9.2.24.v20180105'
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
+    String template = 'groovy'
     boolean clearCache = false
     Map<String, Object> configuration = [:]
     boolean includeDefaultRepositories = true

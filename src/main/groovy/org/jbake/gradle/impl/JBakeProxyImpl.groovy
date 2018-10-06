@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jbake.gradle
+package org.jbake.gradle.impl
+
+import org.jbake.gradle.JBakeProxy
 
 import java.lang.reflect.Constructor
 

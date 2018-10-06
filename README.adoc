@@ -38,6 +38,17 @@ This will add a `bake` task to your build, which will search for a standard http
 
 WARNING: versions prior to `1.0.0` had a task named `jbake`. This task has been renamed to `bake` since `1.0.0`.
 
+=== Init
+
+You can initialise the project structure by running the following command:
+
+----
+gradle bakeInit
+----
+
+The default template is set to `groovy`. You may change this setting by updating the `template` property of the `jbake`
+configuration. Accepted values are `freemarker`, `groovy`, `groovy-mte`, thymeleaf`, `jade`.
+
 === Previewing
 
 You can preview your content by running the following command:
@@ -65,7 +76,6 @@ bakePreview {
     input = project.file('path/to/content')
 }
 ----
-
 
 == Configuration
 === Plugin configuration
@@ -118,6 +128,7 @@ This plugin handles this change internally. If you use a Version > 2.3.0 of jbak
 Since Version 2.6.0 jbake uses https://github.com/vsch/flexmark-java[flexmark] as replacement for https://github.com/sirthias/pegdown[pegdown].
 
 === JBake configuration
+
 There are several options to configure http://www.jbake.org[JBake]. One is to have the regular `jbake.properties` file
 into the source directory. The other is to use the plugin configuration block:
 
