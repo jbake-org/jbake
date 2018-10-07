@@ -21,7 +21,7 @@ package org.jbake.gradle
 class JBakeExtension {
     String version = '2.6.2'
     String pegdownVersion = '1.6.0'
-    String flexmarkVersion = '0.34.24'
+    String flexmarkVersion = '0.34.48'
     String freemarkerVersion = '2.3.28'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
     String asciidoctorjVersion = '1.5.7'
