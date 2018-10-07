@@ -32,6 +32,7 @@ class JBakeExtension {
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
     String template = 'groovy'
+    String templateUrl
     boolean clearCache = false
     Map<String, Object> configuration = [:]
     boolean includeDefaultRepositories = true

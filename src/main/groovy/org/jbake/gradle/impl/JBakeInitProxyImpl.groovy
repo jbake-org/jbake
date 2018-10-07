@@ -33,9 +33,20 @@ class JBakeInitProxyImpl implements JBakeInitProxy {
     }
 
     @Override
-    void init(String type, File outputDir) {
+    void initFromTemplate(String type, File outputDir) {
         try {
             init.run(outputDir, type)
+            println("Base folder structure successfully created.")
+        } catch (final Exception e) {
+            final String msg = "Failed to initialise structure: " + e.getMessage()
+            throw new IllegalStateException(msg, e)
+        }
+    }
+
+    @Override
+    void initFromTemplateUrl(String templateUrl, File outputDir) {
+        try {
+            init.run(outputDir, templateUrl.toURL())
             println("Base folder structure successfully created.")
         } catch (final Exception e) {
             final String msg = "Failed to initialise structure: " + e.getMessage()

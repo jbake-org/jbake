@@ -15,7 +15,6 @@
  */
 package org.jbake.gradle
 
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Input
@@ -27,7 +26,8 @@ import org.jbake.gradle.impl.JBakeInitProxyImpl
 import java.lang.reflect.Constructor
 
 class JBakeInitTask extends DefaultTask {
-    @Input String template
+    @Input @Optional String template
+    @Input @Optional String templateUrl
     @OutputDirectory File outputDir
     @Input Map<String, Object> configuration = [:]
 
@@ -44,10 +44,19 @@ class JBakeInitTask extends DefaultTask {
 
     @TaskAction
     void init() {
+        String _template = getTemplate()
+        String _templateUrl = getTemplateUrl()
+
+        if(!_template && _templateUrl) {
+            throw new IllegalStateException("You must define a value for either 'template' or 'templateUrl")
+        }
+
         createJBakeInit()
         init.prepare()
         mergeConfiguration()
-        init.init(getTemplate(), getOutputDir())
+
+        _templateUrl ? init.initFromTemplateUrl(_templateUrl, getOutputDir()) :
+            init.initFromTemplate(_template, getOutputDir())
     }
 
     private JBakeInitProxy createJBakeInit() {

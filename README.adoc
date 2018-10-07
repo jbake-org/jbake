@@ -49,6 +49,15 @@ gradle bakeInit
 The default template is set to `groovy`. You may change this setting by updating the `template` property of the `jbake`
 configuration. Accepted values are `freemarker`, `groovy`, `groovy-mte`, thymeleaf`, `jade`.
 
+Alternatively you may define a value for `templateUrl` that points to a custom template, for example
+
+[source,groovy]
+----
+bakeInit {
+    templateUrl = 'http://server.acme.com/path/to/template.zip'
+}
+----
+
 === Previewing
 
 You can preview your content by running the following command:
@@ -63,7 +72,7 @@ port by adding this to your build file.
 [source,groovy]
 ----
 bakePreview {
-    port = '8080'
+    port = '8090'
 }
 ----
 

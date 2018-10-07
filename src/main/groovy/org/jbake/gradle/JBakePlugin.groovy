@@ -52,6 +52,7 @@ class JBakePlugin implements Plugin<Project> {
         project.task('bakeInit', type: JBakeInitTask, description: 'Setup a jbake project') {
             classpath = configuration
             conventionMapping.template = { project.jbake.template }
+            conventionMapping.templateUrl = { project.jbake.templateUrl }
             conventionMapping.outputDir = { project.file("${project.jbake.srcDirName}") }
             conventionMapping.configuration = { project.jbake.configuration }
         }

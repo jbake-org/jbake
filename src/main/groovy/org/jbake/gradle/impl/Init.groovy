@@ -14,11 +14,21 @@ class Init {
      * Performs checks on output folder before extracting template file
      *
      * @param outputFolder Target directory for extracting template file
-     * @param templateLocationFolder Source location for template file
      * @param templateType Type of the template to be used
-     * @throws Exception                            if required folder structure can't be achieved without content overwriting
      */
-    void run(File outputFolder, String templateType) throws Exception {
+    void run(File outputFolder, String templateType) {
+        String templateFileName = "jbake-example-project-$templateType"
+        URL url = "https://github.com/jbake-org/${templateFileName}/archive/master.zip".toURL()
+        run(outputFolder, url)
+    }
+
+    /**
+     * Performs checks on output folder before extracting template file
+     *
+     * @param outputFolder Target directory for extracting template file
+     * @param templateUrl URL of the template to be used
+     */
+    void run(File outputFolder, URL url) {
         if (!outputFolder.canWrite()) {
             throw new IllegalStateException("Output folder is not writeable!")
         }
@@ -46,17 +56,16 @@ class Init {
                 outputFolder.getAbsolutePath()))
         }
 
-        String templateFileName = "jbake-example-project-$templateType"
-        URL url = "https://github.com/jbake-org/${templateFileName}/archive/master.zip".toURL()
-        File tmpJbake = File.createTempDir()
-        File templateFile = new File(tmpJbake, templateFileName)
-        templateFile.withOutputStream { it.write(url.bytes) }
-        if (!templateFile.exists()) {
-            throw new IllegalStateException("Cannot find example project file: " + templateFile.getPath())
+        File tmpZipFile = File.createTempFile('jbake-template-', '')
+        tmpZipFile.withOutputStream { it.write(url.bytes) }
+        File tmpOutput = File.createTempDir('jbake-extracted-', '')
+        extract(new FileInputStream(tmpZipFile), tmpOutput)
+
+        if (tmpOutput.listFiles().size()) {
+            tmpOutput.listFiles()[0].renameTo(outputFolder)
+        } else {
+            tmpOutput.renameTo(outputFolder)
         }
-        File tmpOutput = File.createTempDir('extracted-', '-' + UUID.randomUUID().toString())
-        extract(new FileInputStream(templateFile), tmpOutput)
-        tmpOutput.listFiles({it.name.startsWith(templateFileName)} as FileFilter)*.renameTo(outputFolder)
     }
 
     /**

@@ -20,5 +20,7 @@ interface JBakeInitProxy {
 
     void setConfig(Object config)
 
-    void init(String type, File outputDir)
+    void initFromTemplateUrl(String url, File outputDir)
+
+    void initFromTemplate(String type, File outputDir)
 }
