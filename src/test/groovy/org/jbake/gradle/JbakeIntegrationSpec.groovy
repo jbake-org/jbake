@@ -31,7 +31,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
     def latestGradleVersion = '4.10'
 
     @Shared
-    def latestJbakeVersion = '2.6.1'
+    def latestJbakeVersion = '2.6.2'
 
     @Unroll
     def 'Setup and bake with gradle #version'() {

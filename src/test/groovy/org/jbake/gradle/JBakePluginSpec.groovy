@@ -63,7 +63,7 @@ class JBakePluginSpec extends Specification {
 
         where:
         group                   | name                          | version
-        'org.jbake'             | 'jbake-core'                  | '2.6.1'
+        'org.jbake'             | 'jbake-core'                  | '2.6.2'
         'org.freemarker'        | 'freemarker'                  | '2.3.28'
         'com.vladsch.flexmark'  | 'flexmark'                    | '0.34.24'
         'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.34.24'

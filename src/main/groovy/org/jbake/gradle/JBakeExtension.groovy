@@ -19,7 +19,7 @@ package org.jbake.gradle
  * Created by frank on 12.10.14.
  */
 class JBakeExtension {
-    String version = '2.6.1'
+    String version = '2.6.2'
     String pegdownVersion = '1.6.0'
     String flexmarkVersion = '0.34.24'
     String freemarkerVersion = '2.3.28'
