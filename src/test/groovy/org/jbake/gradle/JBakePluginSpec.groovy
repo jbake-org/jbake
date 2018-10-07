@@ -65,8 +65,8 @@ class JBakePluginSpec extends Specification {
         group                   | name                          | version
         'org.jbake'             | 'jbake-core'                  | '2.6.2'
         'org.freemarker'        | 'freemarker'                  | '2.3.28'
-        'com.vladsch.flexmark'  | 'flexmark'                    | '0.34.24'
-        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.34.24'
+        'com.vladsch.flexmark'  | 'flexmark'                    | '0.34.48'
+        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.34.48'
         'org.asciidoctor'       | 'asciidoctorj'                | '1.5.7'
         'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.2'
         'org.thymeleaf'         | 'thymeleaf'                   | '3.0.9.RELEASE'
