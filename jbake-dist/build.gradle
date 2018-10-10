@@ -23,7 +23,16 @@ configurations {
 
 dependencies {
     compile project(':jbake-core')
-    dist group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: asciidoctorjDiagramVersion
+    compile("org.asciidoctor:asciidoctorj-diagram:$asciidoctorjDiagramVersion") {
+        exclude group: 'org.asciidoctor', module: 'asciidoctorj'
+    }
+
+    // TODO: remove as soon as java 7 support drops
+    if ( JavaVersion.current().isJava7() ) {
+        smokeTestCompile'org.eclipse.jgit:org.eclipse.jgit:4.5.3.201708160445-r'
+    } else {
+        smokeTestCompile'org.eclipse.jgit:org.eclipse.jgit:5.1.2.201810061102-r'
+    }
     smokeTestCompile configurations.testCompile
     smokeTestCompile sourceSets.test.output
     smokeTestRuntime configurations.testRuntime

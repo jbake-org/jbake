@@ -14,6 +14,11 @@ dependencies {
     }
     compile "com.orientechnologies:orientdb-core:$orientDbVersion"
     compile "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
+
+    //--> TODO: temporary fix for #542 - remove with next version of asciidoctorj
+    compile 'org.jruby:jruby-complete:9.1.17.0'
+    //-->
+
     compile "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
     compile "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
     compile "org.freemarker:freemarker:$freemarkerVersion", optional
