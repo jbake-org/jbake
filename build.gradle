@@ -30,7 +30,7 @@ ext {
     thymeleafVersion = '3.0.9.RELEASE'
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.7'
-    mockitoVersion = '2.16.0'
+    mockitoVersion = '2.23.0'
     jsoupVersion = '1.11.3'
 
     isTravis = (System.getenv("TRAVIS") == "true")
