@@ -8,7 +8,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -20,8 +20,8 @@ public abstract class ContentStoreIntegrationTest {
     protected static DefaultJBakeConfiguration config;
     protected static StorageType storageType = StorageType.MEMORY;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @ClassRule
+    public static TemporaryFolder folder = new TemporaryFolder();
     protected static File sourceFolder;
 
     @BeforeClass
@@ -36,7 +36,8 @@ public abstract class ContentStoreIntegrationTest {
 
         Assert.assertEquals(".html", config.getOutputExtension());
         config.setDatabaseStore(storageType.toString());
-        config.setDatabasePath("documents" + System.currentTimeMillis());
+        String dbPath = folder.newFolder("documents" + System.currentTimeMillis()).getAbsolutePath();
+        config.setDatabasePath(dbPath);
         db = DBUtil.createDataStore(config);
     }
 

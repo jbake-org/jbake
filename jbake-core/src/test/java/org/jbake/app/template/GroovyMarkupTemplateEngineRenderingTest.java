@@ -22,7 +22,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     @BeforeClass
     public static void setUpTest() {
         //switch to PLOCAL mode for this test class as Travis sometimes runs out of memory
-        DBUtil.closeDataStore();
+        db.close();
         config.setDatabaseStore(StorageType.PLOCAL.toString());
         db = DBUtil.createDataStore(config);
     }
