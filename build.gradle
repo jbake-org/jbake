@@ -80,8 +80,6 @@ subprojects {
         if ( project.name != "jbake-dist" ) {
             apply from: "$rootDir/gradle/maven-publishing.gradle"
         }
-        // bintray setup
-        apply from: "$rootDir/gradle/publishing.gradle"
     }
 
     // add source and target compatibility for all JavaCompile tasks
