@@ -23,6 +23,7 @@ after_success:
 - "./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean"
 
 jdk:
+  - openjdk11
   - openjdk10
   - oraclejdk9
   - oraclejdk8

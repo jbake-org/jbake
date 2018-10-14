@@ -23,7 +23,7 @@ ext {
     flexmarkVersion = '0.34.48'
     jettyServerVersion = '9.2.24.v20180105'
     orientDbVersion = '2.2.37'
-    groovyVersion = '2.5.2'
+    groovyVersion = '2.5.3'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
     assertjCoreVersion = '2.9.1'
