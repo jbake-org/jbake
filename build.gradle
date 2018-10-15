@@ -87,18 +87,16 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'nebula.optional-base'
 
-    if( JavaVersion.current().java7Compatible ) {
-        apply from: "$rootDir/gradle/signing.gradle"
-        // We do not publish any jars from the jbake-dist project
-        if ( project.name != "jbake-dist" ) {
-            apply from: "$rootDir/gradle/maven-publishing.gradle"
-        }
+    apply from: "$rootDir/gradle/signing.gradle"
+    // We do not publish any jars from the jbake-dist project
+    if ( project.name != "jbake-dist" ) {
+      apply from: "$rootDir/gradle/maven-publishing.gradle"
     }
 
     // add source and target compatibility for all JavaCompile tasks
     tasks.withType(JavaCompile) {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
 
         /**
          *  Fix for warning: [options] bootstrap class path not set in conjunction with -source

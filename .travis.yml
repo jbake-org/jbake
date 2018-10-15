@@ -33,10 +33,6 @@ jobs:
   include:
 
   - script: "./gradlew check"
-    jdk: openjdk7
-    dist: precise
-
-  - script: "./gradlew check"
     jdk:
     os: osx
 
