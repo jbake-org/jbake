@@ -1,13 +1,17 @@
 package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
+import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
+import org.junitpioneer.jupiter.TempDirectory.TempDir;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
@@ -16,14 +20,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(TempDirectory.class)
 public class JBakeConfigurationInspectorTest extends LoggingTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    private Path folder;
+
+    @BeforeEach
+    public void setup(@TempDir Path folder) {
+        this.folder = folder;
+    }
+
 
     @Test
     public void shouldThrowExceptionIfSourceFolderDoesNotExist() throws Exception {
-        File nonExistentFile = new File(folder.getRoot(), "nofolder");
+        File nonExistentFile = new File(folder.toFile(), "nofolder");
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(nonExistentFile);
 
@@ -60,9 +70,9 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     @Test
     public void shouldThrowExceptionIfTemplateFolderDoesNotExist() throws Exception {
         String templateFolderName = "template";
-        File expectedFolder = new File(folder.getRoot(), templateFolderName);
+        File expectedFolder = new File(folder.toFile(), templateFolderName);
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
-        when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
+        when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(expectedFolder);
         when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
 
@@ -81,11 +91,11 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
     public void shouldThrowExceptionIfContentFolderDoesNotExist() throws Exception {
         String contentFolderName = "content";
         String templateFolderName = "template";
-        File templateFolder = folder.newFolder(templateFolderName);
-        File contentFolder = new File(folder.getRoot(), contentFolderName);
+        File templateFolder = TestUtils.newFolder(folder.toFile(), templateFolderName);
+        File contentFolder = new File(folder.toFile(), contentFolderName);
 
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
-        when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
+        when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
         when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
@@ -107,12 +117,12 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         String templateFolderName = "template";
         String destinationFolderName = "output";
 
-        File templateFolder = folder.newFolder(templateFolderName);
-        File contentFolder = folder.newFolder(contentFolderName);
-        File destinationFolder = new File(folder.getRoot(), destinationFolderName);
+        File templateFolder = TestUtils.newFolder(folder.toFile(), templateFolderName);
+        File contentFolder = TestUtils.newFolder(folder.toFile(), contentFolderName);
+        File destinationFolder = new File(folder.toFile(), destinationFolderName);
 
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
-        when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
+        when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
         when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
@@ -132,13 +142,13 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         String contentFolderName = "content";
         String templateFolderName = "template";
 
-        File templateFolder = folder.newFolder(templateFolderName);
-        File contentFolder = folder.newFolder(contentFolderName);
+        File templateFolder = TestUtils.newFolder(folder.toFile(), templateFolderName);
+        File contentFolder = TestUtils.newFolder(folder.toFile(), contentFolderName);
         File destinationFolder = mock(File.class);
         when(destinationFolder.exists()).thenReturn(true);
 
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
-        when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
+        when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
         when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
@@ -163,13 +173,13 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         String destinationFolderName = "output";
         String assetFolderName = "assets";
 
-        File templateFolder = folder.newFolder(templateFolderName);
-        File contentFolder = folder.newFolder(contentFolderName);
-        File destinationFolder = folder.newFolder(destinationFolderName);
-        File assetFolder = new File(folder.getRoot(), assetFolderName);
+        File templateFolder = TestUtils.newFolder(folder.toFile(), templateFolderName);
+        File contentFolder = TestUtils.newFolder(folder.toFile(), contentFolderName);
+        File destinationFolder = TestUtils.newFolder(folder.toFile(), destinationFolderName);
+        File assetFolder = new File(folder.toFile(), assetFolderName);
 
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
-        when(configuration.getSourceFolder()).thenReturn(folder.getRoot());
+        when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
         when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
