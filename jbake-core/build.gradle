@@ -2,6 +2,11 @@ import java.text.SimpleDateFormat
 
 apply from: "$rootDir/gradle/sonarqube.gradle"
 
+if( JavaVersion.current().java7Compatible ) {
+    apply from: "$rootDir/gradle/publishing.gradle"
+}
+
+
 description = "The core library of JBake"
 
 dependencies {
