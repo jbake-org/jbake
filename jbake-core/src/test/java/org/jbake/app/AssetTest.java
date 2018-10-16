@@ -159,6 +159,7 @@ public class AssetTest extends LoggingTest {
         Asset asset = new Asset(config);
         asset.copy();
 
+        cssFile.setWritable(true);
         Assertions.assertFalse(asset.getErrors().isEmpty(), "At least one error during copy expected");
     }
 
