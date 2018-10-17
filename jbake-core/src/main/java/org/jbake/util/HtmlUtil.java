@@ -14,6 +14,9 @@ import java.util.Map;
  */
 public class HtmlUtil {
 
+    private HtmlUtil() {
+    }
+
     /**
      * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except
      * the ones that starts with http://, https://.
@@ -24,11 +27,23 @@ public class HtmlUtil {
      * @param configuration Configuration object
      */
     public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
-
         String htmlContent = fileContents.get(Attributes.BODY).toString();
-
         boolean prependSiteHost = configuration.getImgPathPrependHost();
         String siteHost = configuration.getSiteHost();
+        String uri = getDocumentUri(fileContents);
+
+        Document document = Jsoup.parseBodyFragment(htmlContent);
+        Elements allImgs = document.getElementsByTag("img");
+
+        for (Element img : allImgs) {
+            transformImageSource(img, uri, siteHost, prependSiteHost);
+        }
+
+        //Use body().html() to prevent adding <body></body> from parsed fragment.
+        fileContents.put(Attributes.BODY, document.body().html());
+    }
+
+    private static String getDocumentUri(Map<String, Object> fileContents) {
         String uri = fileContents.get(Attributes.URI).toString();
 
         if (fileContents.get(Attributes.NO_EXTENSION_URI) != null) {
@@ -39,37 +54,32 @@ public class HtmlUtil {
         if (uri.contains("/")) {
             uri = removeFilename(uri);
         }
+        return uri;
+    }
 
-        Document document = Jsoup.parseBodyFragment(htmlContent);
-        Elements allImgs = document.getElementsByTag("img");
+    private static void transformImageSource(Element img, String uri, String siteHost, boolean prependSiteHost) {
+        String source = img.attr("src");
 
-        for (Element img : allImgs) {
-            String source = img.attr("src");
+        // Now add the root path
+        if (!source.startsWith("http://") && !source.startsWith("https://")) {
 
-            // Now add the root path
-            if (!source.startsWith("http://") && !source.startsWith("https://")) {
-
-                if (isRelative(source)) {
-                    source = uri + source.replaceFirst("\\./", "");
-                }
-
-                if (prependSiteHost) {
-                    if (!siteHost.endsWith("/") && isRelative(source)) {
-                        siteHost = siteHost.concat("/");
-                    }
-                    source = siteHost + source;
-                }
-
-                img.attr("src", source);
+            if (isRelative(source)) {
+                source = uri + source.replaceFirst("\\./", "");
             }
-        }
 
-        //Use body().html() to prevent adding <body></body> from parsed fragment.
-        fileContents.put(Attributes.BODY, document.body().html());
+            if (prependSiteHost) {
+                if (!siteHost.endsWith("/") && isRelative(source)) {
+                    siteHost = siteHost.concat("/");
+                }
+                source = siteHost + source;
+            }
+
+            img.attr("src", source);
+        }
     }
 
     private static String removeFilename(String uri) {
-        uri = uri.substring(0, uri.lastIndexOf("/") + 1);
+        uri = uri.substring(0, uri.lastIndexOf('/') + 1);
         return uri;
     }
 
