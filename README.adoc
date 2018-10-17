@@ -1,6 +1,6 @@
 = JBake plugin for Gradle
-:jbake-version: 2.6.2
-:plugin-version: 1.4.0
+:jbake-version: 2.6.3
+:plugin-version: 1.5.0-SNAPSHOT
 :linkattrs:
 :project-name: jbake-gradle-plugin
 
@@ -119,9 +119,9 @@ Jbake uses several engines. The library versions could be changed too:
 ----
 jbake {
     pegdownVersion = '1.6.0'
-    flexmarkVersion = '0.34.24'
+    flexmarkVersion = '0.34.48'
     freemarkerVersion = '2.3.28'
-    groovyTemplatesVersion = '2.5.2'
+    groovyTemplatesVersion = '2.5.3'
     jade4jVersion = '1.2.7'
     thymeleafVersion = '3.0.9.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'

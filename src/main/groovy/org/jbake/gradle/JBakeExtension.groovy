@@ -19,13 +19,13 @@ package org.jbake.gradle
  * Created by frank on 12.10.14.
  */
 class JBakeExtension {
-    String version = '2.6.2'
+    String version = '2.6.3'
     String pegdownVersion = '1.6.0'
     String flexmarkVersion = '0.34.48'
     String freemarkerVersion = '2.3.28'
     String asciidoctorJavaIntegrationVersion = '0.1.4'
     String asciidoctorjVersion = '1.5.7'
-    String groovyTemplatesVersion = '2.5.2'
+    String groovyTemplatesVersion = '2.5.3'
     String jade4jVersion = '1.2.7'
     String thymeleafVersion = '3.0.9.RELEASE'
     String jettyVersion = '9.4.12.v20180830'
