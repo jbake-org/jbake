@@ -10,69 +10,87 @@ import org.jsoup.select.Elements;
 import java.util.Map;
 
 /**
- * 
  * @author Manik Magar
- *
  */
 public class HtmlUtil {
 
-	/**
-	 * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except 
-	 * the ones that starts with http://, https://.
-	 * 
-	 * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
-	 * 
-	 * @param fileContents	Map representing file contents
-	 * @param configuration Configuration object
-	 */
-    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration){
-    	
-    	String htmlContent = fileContents.get(Attributes.BODY).toString();
+    private HtmlUtil() {
+    }
 
-    	boolean prependSiteHost = configuration.getImgPathPrependHost();
+    /**
+     * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except
+     * the ones that starts with http://, https://.
+     * <p>
+     * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
+     *
+     * @param fileContents  Map representing file contents
+     * @param configuration Configuration object
+     */
+    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
+        String htmlContent = fileContents.get(Attributes.BODY).toString();
+        boolean prependSiteHost = configuration.getImgPathPrependHost();
         String siteHost = configuration.getSiteHost();
-    	String uri = fileContents.get(Attributes.URI).toString();
-    	
-    	if (fileContents.get(Attributes.NO_EXTENSION_URI) != null){
-    		uri = fileContents.get(Attributes.NO_EXTENSION_URI).toString();
-    		
-    		//remove trailing "/"
-    		if(uri.endsWith("/")) {
-				uri = uri.substring(0, uri.length() - 1);
-			}
-    	}
-    	
-    	if (uri.contains("/")){
-        	//strip that file name, leaving end "/"
-			uri = uri.substring(0, uri.lastIndexOf("/") + 1);
+        String uri = getDocumentUri(fileContents);
+
+        Document document = Jsoup.parseBodyFragment(htmlContent);
+        Elements allImgs = document.getElementsByTag("img");
+
+        for (Element img : allImgs) {
+            transformImageSource(img, uri, siteHost, prependSiteHost);
         }
-    	
-    	Document document = Jsoup.parseBodyFragment(htmlContent);
-    	Elements allImgs = document.getElementsByTag("img");
-    	
-    	for (Element img : allImgs) {
-			String source = img.attr("src");
 
-			// Now add the root path
-			if (!source.startsWith("http://") && !source.startsWith("https://")){
+        //Use body().html() to prevent adding <body></body> from parsed fragment.
+        fileContents.put(Attributes.BODY, document.body().html());
+    }
 
-                if (!source.startsWith("/")){
-                	source = uri + source.replaceFirst("./", "");
+    private static String getDocumentUri(Map<String, Object> fileContents) {
+        String uri = fileContents.get(Attributes.URI).toString();
+
+        if (fileContents.get(Attributes.NO_EXTENSION_URI) != null) {
+            uri = fileContents.get(Attributes.NO_EXTENSION_URI).toString();
+            uri = removeTrailingSlash(uri);
+        }
+
+        if (uri.contains("/")) {
+            uri = removeFilename(uri);
+        }
+        return uri;
+    }
+
+    private static void transformImageSource(Element img, String uri, String siteHost, boolean prependSiteHost) {
+        String source = img.attr("src");
+
+        // Now add the root path
+        if (!source.startsWith("http://") && !source.startsWith("https://")) {
+
+            if (isRelative(source)) {
+                source = uri + source.replaceFirst("\\./", "");
+            }
+
+            if (prependSiteHost) {
+                if (!siteHost.endsWith("/") && isRelative(source)) {
+                    siteHost = siteHost.concat("/");
                 }
-					
-				if (!siteHost.endsWith("/") && !source.startsWith("/")) {
-                	siteHost = siteHost.concat("/");
-				}
+                source = siteHost + source;
+            }
 
-                if (prependSiteHost) {
-                    source = siteHost + source;
-                }
-				
-				img.attr("src", source);
-			}
-		}
-    	
-    	//Use body().html() to prevent adding <body></body> from parsed fragment.
-    	fileContents.put(Attributes.BODY, document.body().html());
+            img.attr("src", source);
+        }
+    }
+
+    private static String removeFilename(String uri) {
+        uri = uri.substring(0, uri.lastIndexOf('/') + 1);
+        return uri;
+    }
+
+    private static String removeTrailingSlash(String uri) {
+        if (uri.endsWith("/")) {
+            uri = uri.substring(0, uri.length() - 1);
+        }
+        return uri;
+    }
+
+    private static boolean isRelative(String source) {
+        return !source.startsWith("/");
     }
 }
