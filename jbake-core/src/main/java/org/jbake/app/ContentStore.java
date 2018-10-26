@@ -195,7 +195,7 @@ public class ContentStore {
         activateOnCurrentThread();
         List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
         if (results.size() == 0)
-            throw new RuntimeException("No document with sourceUri '"+sourceUri+"'.");
+            throw new JBakeException("No document with sourceUri '"+sourceUri+"'.");
 
         // Update it from the given map.
         ODocument incomingDoc = new ODocument(docType);

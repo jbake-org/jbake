@@ -38,11 +38,10 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         final String uri = "test/testMergeDocument";
 
         ODocument doc = new ODocument(DOC_TYPE_POST);
-        Map<String, String> values = new HashMap(){{
-            put(Crawler.Attributes.TYPE, DOC_TYPE_POST);
-            put(DocumentAttributes.SOURCE_URI.toString(), uri);
-            put("foo", "originalValue");
-        }};
+        Map<String, String> values = new HashMap();
+        values.put(Crawler.Attributes.TYPE, DOC_TYPE_POST);
+        values.put(DocumentAttributes.SOURCE_URI.toString(), uri);
+        values.put("foo", "originalValue");
         doc.fromMap(values);
         doc.save();
 
