@@ -35,7 +35,7 @@ public class DBUtil {
     public static void closeDataStore() {
         contentStore = null;
     }
-    
+
     public static Map<String, Object> documentToModel(ODocument doc) {
         Map<String, Object> result = new HashMap<>();
         Iterator<Map.Entry<String, Object>> fieldIterator = doc.iterator();
@@ -53,13 +53,13 @@ public class DBUtil {
      */
     @SuppressWarnings("unchecked")
     public static String[] toStringArray(Object entry) {
-    	if (entry instanceof String[]) {
+        if (entry instanceof String[]) {
             return (String[]) entry;
         } else if (entry instanceof OTrackedList) {
             OTrackedList<String> list = (OTrackedList<String>) entry;
             return list.toArray(new String[list.size()]);
         }
-    	return new String[0];
+        return new String[0];
     }
 
 }

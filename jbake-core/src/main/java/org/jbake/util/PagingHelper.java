@@ -31,7 +31,7 @@ public class PagingHelper {
             return null;
         } else {
             if ( currentPageNumber == 2 ) {
-            	// Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
+                // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
                 return "";
             }
             else {
