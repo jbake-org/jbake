@@ -6,9 +6,9 @@
         <a class="btn btn-large btn-success" href="#">Sign up today</a>
       </div>
 
-	<hr>-->
+    <hr>-->
 
-	<div class="row-fluid marketing">
+    <div class="row-fluid marketing">
 
         <div class="span12">
             <h1>Taglist</h1>
@@ -23,23 +23,23 @@
         </div>
 
         <div class="span12">
-			<h2>Tags</h2>
+            <h2>Tags</h2>
             <%def last_month=null;%>
-			<%tag_posts.each {post ->%>
-				<%if (last_month) {%>
-					<%if (new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date) != last_month) {%>
-						<h3>${new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date)}</h3>
-					<%}%>
-				<%} else {%>
-					<h3>${new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date)}</h3>
-				<%}%>
-				
-				<h4>${post.date.format("dd MMMM")} - <a href="${post.uri}">${post.title}</a></h4>
-				<% last_month = new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date)%>
-			<%}%>
-		</div>
-	</div>
+            <%tag_posts.each {post ->%>
+                <%if (last_month) {%>
+                    <%if (new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date) != last_month) {%>
+                        <h3>${new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date)}</h3>
+                    <%}%>
+                <%} else {%>
+                    <h3>${new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date)}</h3>
+                <%}%>
 
-	<hr>
+                <h4>${post.date.format("dd MMMM")} - <a href="${post.uri}">${post.title}</a></h4>
+                <% last_month = new java.text.SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(post.date)%>
+            <%}%>
+        </div>
+    </div>
+
+    <hr>
 
 <%include "footer.gsp"%>
