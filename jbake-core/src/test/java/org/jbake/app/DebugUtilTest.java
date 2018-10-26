@@ -16,15 +16,14 @@ public class DebugUtilTest
     {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream ps = new PrintStream(baos, true, "UTF-8")) {
-            DebugUtil.printMap(new HashMap<String, Object>() {{
-                                       put("stringKey", "stringVal");
-                                       put("forNullVal", null);
-                                       put(null, "forNullKey");
-                                       put("forObject", new Object());
-                                       put("forCharset", StandardCharsets.UTF_8);
-                                       put("forNonSerializableVal", new Exception("nonSerializableVal"));
-                                   }},
-                    ps);
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("stringKey", "stringVal");
+            map.put("forNullVal", null);
+            map.put(null, "forNullKey");
+            map.put("forObject", new Object());
+            map.put("forCharset", StandardCharsets.UTF_8);
+            map.put("forNonSerializableVal", new Exception("nonSerializableVal"));
+            DebugUtil.printMap(map, ps);
         }
         String printed = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         System.out.println(printed);
