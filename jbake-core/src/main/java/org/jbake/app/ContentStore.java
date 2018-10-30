@@ -176,7 +176,7 @@ public class ContentStore {
     /**
      * Get a document by sourceUri and update it from the given map.
      * @return the saved document.
-     * @throws Exception if sourceUri or docType are null, or if the document doesn't exist.
+     * throws {@link IllegalArgumentException} if sourceUri or docType are null, or if the document doesn't exist.
      */
     public ODocument mergeDocument(Map<String, Object> incomingDocMap)
     {

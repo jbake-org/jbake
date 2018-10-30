@@ -121,7 +121,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                 documentModel.put(key, attributes.get(key));
             }
         }
-        
+
         return null; // TODO: Create the header map first, then apply to the doc.
     }
 

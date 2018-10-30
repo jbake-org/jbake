@@ -332,12 +332,12 @@ public interface JBakeConfiguration {
     Charset getInputCharset();
 
     /**
-     * Should JBake prefix <img src="..."> with site base URL?
+     * Should JBake prefix &lt;img src="..."&gt; with site base URL?
      */
     boolean getMakeImagesUrlAbolute();
 
     /**
-     * Should JBake prefix <img src="..."> with site base URL relative URLs?
+     * Should JBake prefix &lt;img src="..."&gt; with site base URL relative URLs?
      * This is not disjunctive from IMAGES_URL_MAKE_ABSOLUTE.
      */
     boolean getRelativeImagePathsPointToAssets();

@@ -76,7 +76,7 @@ public class TitleExtractor
 
     /**
      * Getting an inner XML is a bit complicated in JDK.
-     * TODO: All this just to get rid if the previously added <div>? Let's use JSoup I guess.
+     * TODO: All this just to get rid if the previously added &lt;div/&gt;? Let's use JSoup I guess.
      */
     public static String innerXml(Node docRootNode)
     {
