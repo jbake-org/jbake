@@ -525,7 +525,8 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
             return Charset.forName(charsetStr);
         }
         catch (Exception ex) {
-            throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+            //throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+            return StandardCharsets.UTF_8;
         }
     }
 
@@ -537,7 +538,8 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
             return Charset.forName(charsetStr);
         }
         catch (Exception ex) {
-            throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+            //throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+            return StandardCharsets.UTF_8;
         }
     }
 
