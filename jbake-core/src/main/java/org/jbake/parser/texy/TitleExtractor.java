@@ -64,7 +64,7 @@ public class TitleExtractor
                     continue;
                 Element titleElm = (Element) nodeList.item(0);
                 titleElm.setAttribute("class", titleElm.getAttribute("class") + " " + RawMarkupEngine.CSS_CLASS_EXTRACTED_TITLE);
-                context.getContents().put(Crawler.Attributes.TITLE, titleElm.getTextContent());
+                context.getDocumentModel().put(Crawler.Attributes.TITLE, titleElm.getTextContent());
                 context.setBody(innerXml(xmlDocument));
                 return;
             }

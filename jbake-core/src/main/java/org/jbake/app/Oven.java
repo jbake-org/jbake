@@ -164,7 +164,7 @@ public class Oven {
      * Replaces the URLs to resources in documents so that they are pointing to the resources even if the rendered document is placed
      * somewhere else than the source markup.
      */
-    private void makeUrlsAbsolute(ContentStore db, CompositeConfiguration config)
+    private void makeUrlsAbsolute(ContentStore db, JBakeConfiguration config)
     {
         int renderedCount = 0;
         final List<String> errors = new LinkedList<String>();

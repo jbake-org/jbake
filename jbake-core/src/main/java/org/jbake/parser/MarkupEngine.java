@@ -216,7 +216,7 @@ public abstract class MarkupEngine implements ParserEngine {
      *
      * @param context the parser context
      */
-    private Map<String, String> parseHeaderBlock(ParserContext context)
+    public Map<String, String> parseHeaderBlock(ParserContext context)
     {
         String headerSeparator = configuration.getHeaderSeparator();
 

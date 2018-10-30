@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jbake.app.Crawler;
 import org.jbake.parser.MarkupEngine;
@@ -24,9 +25,9 @@ public class TexyServiceEngine extends MarkupEngine
 
 
     @Override
-    public void parseHeaderBlock(ParserContext context)
+    public Map<String, String> parseHeaderBlock(ParserContext context)
     {
-        super.parseHeaderBlock(context);
+        return super.parseHeaderBlock(context);
     }
 
     @Override
@@ -42,19 +43,19 @@ public class TexyServiceEngine extends MarkupEngine
                 xhtmlString = s.hasNext() ? s.next() : "";
                 context.setBody(xhtmlString);
 
-                if (!context.getContents().containsKey(Crawler.Attributes.TITLE)) {
+                if (!context.getDocumentModel().containsKey(Crawler.Attributes.TITLE)) {
                     try {
                         new TitleExtractor().tryExtractHighestHeader(context);
                     }
                     catch (Exception ex){
                         LOG.warn("Could not extract title from '{}': {}\nConverted XHTML: \n{}", context.getFile().getName(), ex.getMessage(), xhtmlString);
                     }
-                    if (StringUtils.isBlank((String) context.getContents().get(Crawler.Attributes.TITLE)))
-                        context.getContents().put(Crawler.Attributes.TITLE, context.getFile().getName());
+                    if (StringUtils.isBlank((String) context.getDocumentModel().get(Crawler.Attributes.TITLE)))
+                        context.getDocumentModel().put(Crawler.Attributes.TITLE, context.getFile().getName());
                 }
             }
             catch (IOException ex) {
-                String msg = "Couldn't convert:'" + context.getContentPath() + "': " + ex.getMessage();
+                String msg = "Couldn't convert:'" + context.getFile().getPath() + "': " + ex.getMessage();
                 throw new RuntimeException(msg, ex);
                 // TOOO: I am not sure how to handle errors in JBake. The exception stops the whole process.
                 //LOG.warn(msg, ex);
