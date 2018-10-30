@@ -140,13 +140,11 @@ public class Oven {
             // render content
             renderContent();
 
-            {
-                // copy assets
-                asset.copy();
-                asset.copyAssetsFromContent(config.getContentFolder());
+            // copy assets
+            asset.copy();
+            asset.copyAssetsFromContent(config.getContentFolder());
 
-                errors.addAll(asset.getErrors());
-            }
+            errors.addAll(asset.getErrors());
 
             LOGGER.info("Baking finished!");
             long end = new Date().getTime();

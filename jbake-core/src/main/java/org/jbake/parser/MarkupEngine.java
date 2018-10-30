@@ -124,9 +124,10 @@ public abstract class MarkupEngine implements ParserEngine {
                 hasHeader);
 
         Map<String, String> headersMap = parseHeaderBlock(context);
-        DebugUtil.printMap(headersMap, System.out);
+        DebugUtil.printMap("Headers of " + file, headersMap, System.out);
 
-        applyHeadersToDocument(headersMap, context.getDocumentModel());
+        if (headersMap != null)
+            applyHeadersToDocument(headersMap, context.getDocumentModel());
 
         setModelDefaultsIfNotSetInHeader(context);
         sanitizeTags(context);
@@ -212,7 +213,14 @@ public abstract class MarkupEngine implements ParserEngine {
 
 
     /**
-     * Process the header of the file.
+     * Parse the headers of the file being parsed in given context.
+     *
+     * This method should parse the headers and return them for further processing.
+     * Otherwise the implementation may opt to apply the headers to the document itself and return null.
+     *
+     * TODO: The processing should be flatter in general, IMHO.
+     *       Rather than nesting X levels deep to process a document, config overlays, an index, etc.,
+     *       the code blocks should pass packages of information around. Otherwise making JBake pluggable would be harder.
      *
      * @param context the parser context
      */
