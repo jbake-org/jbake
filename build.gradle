@@ -11,8 +11,8 @@ plugins {
 
 // common variables
 ext {
-    asciidoctorjVersion = '1.5.7'
-    asciidoctorjDiagramVersion = '1.5.9'
+    asciidoctorjVersion = '1.5.8.1'
+    asciidoctorjDiagramVersion = '1.5.10'
     commonsIoVersion = '2.6'
     commonsConfigurationVersion = '1.10'
     commonsLangVersion = '3.8.1'
