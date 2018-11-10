@@ -89,13 +89,15 @@ startScripts {
      * The startScripts produces scripts that contain `$APP_HOME/lib/lib` in the classpath
      * so we need to tweak it a bit to be able to add the whole lib directory to the classpath :|
      *
+     * While we are add it we add current dir + lib/logging and lib/* to allow user to setup logging
+     * and additional/override jar dependencies.
      * See https://stackoverflow.com/questions/10518603/adding-classpath-entries-using-gradles-application-plugin
      */
     doLast {
         def windowsScriptFile = file getWindowsScript()
         def unixScriptFile = file getUnixScript()
-        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\lib', '%APP_HOME%\\lib\\*')
-        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/lib', '$APP_HOME/lib/*')
+        windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\lib', '%DIRNAME%\\lib\\logging;%DIRNAME%\\lib\\*;%APP_HOME%\\lib\\*')
+        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/lib', '$SAVED/lib/logging:$SAVED/lib/*:$APP_HOME/lib/*')
     }
 }
 
