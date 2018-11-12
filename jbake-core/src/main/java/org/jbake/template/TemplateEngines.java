@@ -77,8 +77,9 @@ public class TemplateEngines {
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
             Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(JBakeConfiguration.class, ContentStore.class);
             return ctor.newInstance(config, db);
-        } catch (Exception e) {
-            LOGGER.error("unable to load engine", e);
+        } catch (Throwable e) {
+            // not all engines might be necessary, therefore only emit class loading issue with level warn
+            LOGGER.warn("unable to load engine", e);
             return null;
         }
     }
