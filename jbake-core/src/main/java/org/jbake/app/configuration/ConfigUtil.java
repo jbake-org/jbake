@@ -56,4 +56,38 @@ public class ConfigUtil {
         CompositeConfiguration configuration = load(source);
         return new DefaultJBakeConfiguration(source, configuration);
     }
+
+     /**
+     * Given a file inside content it return
+     * the relative path to get to the root.
+     * 
+     * Example: /content and /content/tags/blog will return '../..'
+     * 
+     * @param sourceFile the file to calculate relative path for
+     * @return
+     */
+    static public String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
+        File parentPath = sourceFile.getParentFile();
+        int parentCount = 0;
+        while (!parentPath.equals(rootPath) && parentPath.getParentFile()!=null) {
+            parentPath = parentPath.getParentFile();
+            parentCount++;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parentCount; i++) {
+            sb.append("../");
+        }
+        if (config.getUriWithoutExtension()) {
+            sb.append("../");
+        }
+        return sb.toString();
+    }
+
+    static public String getPathtoDestinationRoot(JBakeConfiguration config, File sourceFile) {
+        return getPathToRoot(config, config.getDestinationFolder(), sourceFile);
+    }   
+    
+    static public String getPathToContentRoot(JBakeConfiguration config, File sourceFile) {
+        return getPathToRoot(config, config.getContentFolder(), sourceFile);
+    }
 }

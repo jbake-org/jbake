@@ -6,6 +6,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
@@ -233,21 +234,7 @@ public class Crawler {
     }
 
     private String getPathToRoot(File sourceFile) {
-        File rootPath = config.getContentFolder();
-        File parentPath = sourceFile.getParentFile();
-        int parentCount = 0;
-        while (!parentPath.equals(rootPath)) {
-            parentPath = parentPath.getParentFile();
-            parentCount++;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parentCount; i++) {
-            sb.append("../");
-        }
-        if (config.getUriWithoutExtension()) {
-            sb.append("../");
-        }
-        return sb.toString();
+        return ConfigUtil.getPathToContentRoot(config, sourceFile);
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {

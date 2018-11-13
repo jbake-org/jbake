@@ -2,6 +2,7 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.Crawler.Attributes;
+import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -272,10 +273,11 @@ public class Renderer {
                 model.put("renderer", renderingEngine);
                 model.put(Attributes.TAG, tag);
                 Map<String, Object> map = buildSimpleModel(Attributes.TAG);
-                map.put(Attributes.ROOTPATH, "../");
                 model.put("content", map);
 
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
+                map.put(Attributes.ROOTPATH, ConfigUtil.getPathtoDestinationRoot(config, path));
+                
                 render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
                 renderedCount++;
@@ -292,10 +294,10 @@ public class Renderer {
                 Map<String, Object> model = new HashMap<String, Object>();
                 model.put("renderer", renderingEngine);
                 Map<String, Object> map = buildSimpleModel(Attributes.TAGS);
-                map.put(Attributes.ROOTPATH, "../");
                 model.put("content", map);
 
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
+                map.put(Attributes.ROOTPATH, ConfigUtil.getPathToContentRoot(config, path));
                 render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
                 renderedCount++;
             } catch (Exception e) {

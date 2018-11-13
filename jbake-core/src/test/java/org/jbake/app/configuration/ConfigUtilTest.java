@@ -334,4 +334,21 @@ public class ConfigUtilTest extends LoggingTest {
         return new File(this.getClass().getResource("/fixture").getFile());
     }
 
+    @Test
+    public void testGetContentRoothPath() throws Exception {
+        File source = getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        String path = ConfigUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "index.html"));
+
+        assertThat(path).isEqualTo("");
+        
+        path = ConfigUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "/blog/index.html"));
+
+        assertThat(path).isEqualTo("../");
+
+        path = ConfigUtil.getPathToContentRoot(config, new File(config.getDestinationFolder(), "/blog/index.html"));
+
+        assertThat(path).isEqualTo("/somethingelse");
+    }
 }
