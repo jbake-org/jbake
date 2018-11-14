@@ -97,22 +97,27 @@ public class Crawler {
         String sha1 = buildHash(sourceFile);
         String uri = buildURI(sourceFile);
         boolean process = true;
+        DocumentStatus status = DocumentStatus.NEW;
+
         for (String docType : DocumentTypes.getDocumentTypes()) {
-            DocumentStatus status = findDocumentStatus(docType, uri, sha1);
+            status = findDocumentStatus(docType, uri, sha1);
+            if ( status == null ) continue;
             if (status == DocumentStatus.UPDATED) {
                 sb.append(" : modified ");
                 db.deleteContent(docType, uri);
+                break;
             } else if (status == DocumentStatus.IDENTICAL) {
                 sb.append(" : same ");
                 process = false;
-            } else if (DocumentStatus.NEW == status) {
-                sb.append(" : new ");
             }
             if (!process || status != DocumentStatus.NEW) {
                 break;
             }
         }
         if (process) { // new or updated
+            if (status == DocumentStatus.NEW) {
+                sb.append(" : new ");
+            }
             processSourceFile(sourceFile, sha1, uri);
         }
         logger.info("{}", sb);
