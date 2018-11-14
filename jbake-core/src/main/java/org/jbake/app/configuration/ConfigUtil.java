@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Provides Configuration related functions.
@@ -67,24 +69,26 @@ public class ConfigUtil {
      * @return
      */
     static public String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
-        File parentPath = sourceFile.getParentFile();
-        int parentCount = 0;
-        while (!parentPath.equals(rootPath) && parentPath.getParentFile()!=null) {
-            parentPath = parentPath.getParentFile();
-            parentCount++;
-        }
+
+        Path r = Paths.get(rootPath.toURI());
+        Path s = Paths.get(sourceFile.getParentFile().toURI());
+        Path relativePath = s.relativize(r);
+
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parentCount; i++) {
-            sb.append("../");
-        }
+
+        sb.append(relativePath.toString());
+
         if (config.getUriWithoutExtension()) {
-            sb.append("../");
+            sb.append("/..");
+        }
+        if(sb.length()>0) {  // added as calling logic assumes / at end.
+            sb.append("/");
         }
         return sb.toString();
     }
 
     static public String getPathtoDestinationRoot(JBakeConfiguration config, File sourceFile) {
-        return getPathToRoot(config, config.getDestinationFolder(), sourceFile);
+        return  getPathToRoot(config, config.getDestinationFolder(), sourceFile);
     }   
     
     static public String getPathToContentRoot(JBakeConfiguration config, File sourceFile) {

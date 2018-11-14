@@ -347,6 +347,10 @@ public class ConfigUtilTest extends LoggingTest {
 
         assertThat(path).isEqualTo("../");
 
+        path = ConfigUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "/blog/level2/index.html"));
+
+        assertThat(path).isEqualTo("../../");
+
        
     }
 }

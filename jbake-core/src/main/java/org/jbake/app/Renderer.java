@@ -297,7 +297,7 @@ public class Renderer {
                 model.put("content", map);
 
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
-                map.put(Attributes.ROOTPATH, ConfigUtil.getPathToContentRoot(config, path));
+                map.put(Attributes.ROOTPATH, ConfigUtil.getPathtoDestinationRoot(config, path));
                 render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
                 renderedCount++;
             } catch (Exception e) {
