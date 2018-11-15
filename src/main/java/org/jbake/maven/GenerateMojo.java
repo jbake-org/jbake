@@ -27,9 +27,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.jbake.app.ConfigUtil;
-import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 import java.io.File;
 
@@ -88,7 +89,7 @@ public class GenerateMojo extends AbstractMojo {
       Orient.instance().startup();
 
       // TODO: At some point, reuse Oven
-      Oven oven = new Oven(inputDirectory, outputDirectory, createConfiguration(), isClearCache);
+      Oven oven = new Oven(createConfiguration());
 
       oven.setupPaths();
 
@@ -100,14 +101,19 @@ public class GenerateMojo extends AbstractMojo {
     }
   }
 
-  protected CompositeConfiguration createConfiguration() throws ConfigurationException {
+  protected JBakeConfiguration createConfiguration() throws ConfigurationException {
+    JBakeConfigurationFactory jbakeConfigurationFactory = new JBakeConfigurationFactory();
+      
+    // load base config (cast to DefaultJBakeConfig)
+    DefaultJBakeConfiguration baseConfiguration = (DefaultJBakeConfiguration)jbakeConfigurationFactory.getConfigUtil().loadConfig(inputDirectory);
+    
     final CompositeConfiguration config = new CompositeConfiguration();
 
-    config.addConfiguration(ConfigUtil.load(inputDirectory));
+    config.addConfiguration(baseConfiguration.getCompositeConfiguration());
 
     config.addConfiguration(new MapConfiguration(this.project.getProperties()));
 
-    return config;
+    return jbakeConfigurationFactory.createDefaultJbakeConfiguration(inputDirectory, outputDirectory, config, isClearCache);
   }
 
 }
