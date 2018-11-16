@@ -17,6 +17,7 @@ package org.jbake.maven;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.jbake.maven.util.DirWatcher;
 
@@ -32,7 +33,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 @Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 public class WatchMojo extends GenerateMojo {
 
-  public void executeInternal() throws MojoExecutionException {
+  public void executeInternal() throws MojoExecutionException, MojoFailureException {
     reRender();
 
     Long lastProcessed = Long.valueOf(System.currentTimeMillis());
