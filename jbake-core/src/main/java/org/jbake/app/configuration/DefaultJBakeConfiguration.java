@@ -1,8 +1,11 @@
 package org.jbake.app.configuration;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
+import org.jbake.app.JBakeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +22,7 @@ import java.util.regex.Pattern;
  */
 public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
 
     private static final String SOURCE_FOLDER_KEY = "sourceFolder";
     private static final String DESTINATION_FOLDER_KEY = "destinationFolder";
@@ -29,7 +33,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     private static final String DOCTYPE_FILE_POSTFIX = ".file";
     private static final String DOCTYPE_EXTENSION_POSTFIX = ".extension";
     private static final String DOCTYPE_TEMPLATE_PREFIX = "template.";
-    private Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
+
     private CompositeConfiguration compositeConfiguration;
 
     /**
@@ -64,6 +68,10 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return compositeConfiguration.getBoolean(key, false);
     }
 
+    private boolean getAsBoolean(String key, boolean defaultValue) {
+        return compositeConfiguration.getBoolean(key, defaultValue);
+    }
+
     private File getAsFolder(String key) {
         return (File) get(key);
     }
@@ -84,6 +92,22 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return compositeConfiguration.getString(key, defaultValue);
     }
 
+    /**
+     * Handle invalid or unavailable charset.
+     */
+    private Charset getAsCharset(String key, Charset defaultCharset)
+    {
+        String charsetName = compositeConfiguration.getString(key);
+        try {
+            return Charset.forName(charsetName);
+        }
+        catch (Exception ex) {
+            LOG.warn("Invalid charset '{}' in '{}', resorting to '{}'", charsetName, key, defaultCharset);
+            return defaultCharset;
+        }
+    }
+
+
     @Override
     public List<String> getAsciidoctorAttributes() {
         return getAsList(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES);
@@ -94,7 +118,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         Object value = subConfig.getProperty(optionKey);
 
         if (value == null) {
-            logger.warn("Cannot find asciidoctor option '{}.{}'", JBakeProperty.ASCIIDOCTOR_OPTION, optionKey);
+            LOG.warn("Cannot find asciidoctor option '{}.{}'", JBakeProperty.ASCIIDOCTOR_OPTION, optionKey);
             return "";
         }
         return value;
@@ -428,7 +452,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         if (templateFileName != null) {
             return new File(getTemplateFolder(), templateFileName);
         }
-        logger.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, docType);
+        LOG.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, docType);
         return null;
     }
 
@@ -467,6 +491,71 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public String getVersion() {
         return getAsString(JBakeProperty.VERSION);
     }
+
+
+    @Override
+    public boolean getExtractTitleFromDoc()
+    {
+        return getAsBoolean(JBakeProperty.EXTRACT_TITLE_FROM_DOC, true);
+    }
+
+    @Override
+    public boolean getNormalizeHtml()
+    {
+        return getAsBoolean(JBakeProperty.HTML_NORMALIZE);
+    }
+
+    @Override
+    public boolean getConvertHtmlToXhtml()
+    {
+        return getAsBoolean(JBakeProperty.HTML_CONVERT_TO_XHTML);
+    }
+
+    @Override
+    public boolean getPrettyPrintHtml()
+    {
+        return getAsBoolean(JBakeProperty.HTML_PRETTY_PRINT);
+    }
+
+    @Override
+    public Charset getOutputHtmlCharset()
+    {
+        String charsetStr = getAsString(JBakeProperty.HTML_OUTPUT_CHARSET);
+        try {
+            return Charset.forName(charsetStr);
+        }
+        catch (Exception ex) {
+            //throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+            return StandardCharsets.UTF_8;
+        }
+    }
+
+    @Override
+    public Charset getInputCharset()
+    {
+        String charsetStr = getAsString(JBakeProperty.INPUT_CHARSET);
+        try {
+            return Charset.forName(charsetStr);
+        }
+        catch (Exception ex) {
+            //throw new JBakeException("Unknown character set: " + charsetStr + " Try " + StandardCharsets.UTF_8.name());
+            return StandardCharsets.UTF_8;
+        }
+    }
+
+    @Override
+    public boolean getMakeImagesUrlAbolute()
+    {
+        return getAsBoolean(JBakeProperty.IMG_URL_MAKE_ABSOLUTE);
+    }
+
+    @Override
+    public boolean getRelativeImagePathsPointToAssets()
+    {
+        return getAsBoolean(JBakeProperty.IMG_PATH_RELATIVE_POINTS_TO_ASSETS);
+    }
+
+
 
     public void setDestinationFolderName(String folderName) {
         setProperty(JBakeProperty.DESTINATION_FOLDER, folderName);
@@ -544,4 +633,5 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setImgPathUPdate(boolean imgPathUpdate) {
         setProperty(JBakeProperty.IMG_PATH_UPDATE, imgPathUpdate);
     }
+
 }

@@ -23,7 +23,7 @@ public class ErrorEngine extends MarkupEngine {
     }
 
     @Override
-    public void processHeader(final ParserContext context) {
+    public Map<String, String> parseHeaderBlock(final ParserContext context) {
         Map<String, Object> contents = context.getDocumentModel();
         contents.put(Attributes.TYPE, "post");
         contents.put(Attributes.STATUS, "published");
@@ -31,6 +31,7 @@ public class ErrorEngine extends MarkupEngine {
         contents.put(Attributes.DATE, new Date());
         contents.put(Attributes.TAGS, new String[0]);
         contents.put(Attributes.ID, context.getFile().getName());
+        return null; // TODO: Create the header map first, then apply to the doc.
     }
 
     @Override

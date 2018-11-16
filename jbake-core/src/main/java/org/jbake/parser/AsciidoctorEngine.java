@@ -83,7 +83,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     @Override
-    public void processHeader(final ParserContext context) {
+    public Map<String, String> parseHeaderBlock(final ParserContext context) {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
@@ -121,6 +121,8 @@ public class AsciidoctorEngine extends MarkupEngine {
                 documentModel.put(key, attributes.get(key));
             }
         }
+
+        return null; // TODO: Create the header map first, then apply to the doc.
     }
 
     private boolean canCastToString(Object value) {

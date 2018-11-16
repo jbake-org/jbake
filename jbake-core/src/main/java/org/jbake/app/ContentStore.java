@@ -35,17 +35,16 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.model.DocumentAttributes;
-import org.jbake.model.DocumentTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jdlee
@@ -172,6 +171,36 @@ public class ContentStore {
     private void activateOnCurrentThread() {
         db.activateOnCurrentThread();
     }
+
+
+    /**
+     * Get a document by sourceUri and update it from the given map.
+     * @return the saved document.
+     * throws {@link IllegalArgumentException} if sourceUri or docType are null, or if the document doesn't exist.
+     */
+    public ODocument mergeDocument(Map<String, Object> incomingDocMap)
+    {
+        String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
+        if (null == sourceUri)
+            throw new IllegalArgumentException("Document sourceUri is null.");
+        String docType = (String) incomingDocMap.get(Crawler.Attributes.TYPE);
+        if (null == docType)
+            throw new IllegalArgumentException("Document docType is null.");
+
+        // Get a document by sourceUri
+        String sql = "SELECT * FROM " + docType + " WHERE sourceuri=?";
+        activateOnCurrentThread();
+        List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
+        if (results.size() == 0)
+            throw new RuntimeException("No document with sourceUri '"+sourceUri+"'.");
+
+        // Update it from the given map.
+        ODocument incomingDoc = new ODocument(docType);
+        incomingDoc.fromMap(incomingDocMap);
+        ODocument merged = results.get(0).merge(incomingDoc, true, false);
+        return merged;
+    }
+
 
     public long getDocumentCount(String docType) {
         activateOnCurrentThread();
@@ -323,16 +352,27 @@ public class ContentStore {
         logger.debug("Create document class '{}'", docType);
 
         OClass page = schema.createClass(docType);
-        page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.SHA1.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.CACHED.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.RENDERED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.RENDERED.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.STATUS), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.STATUS.toString());
+
+        // Primary key
+        String attribName = DocumentAttributes.SOURCE_URI.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, attribName);
+
+        attribName = DocumentAttributes.SHA1.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.CACHED.toString();
+        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.RENDERED.toString();
+        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.STATUS.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
     }
 
     private void createSignatureType(OSchema schema) {

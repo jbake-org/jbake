@@ -1,6 +1,7 @@
 package org.jbake.app.configuration;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 
@@ -298,6 +299,49 @@ public interface JBakeConfiguration {
      * @return Version of JBake
      */
     String getVersion();
+
+
+    /**
+     * Should JBake extract the title from the document?
+     */
+    boolean getExtractTitleFromDoc();
+
+    /**
+     * Should JBake normalize HTML documents? true | false
+     */
+   boolean getNormalizeHtml();
+
+    /**
+     * Should JBake convert HTML documents to XHTML? true | false
+     */
+    boolean getConvertHtmlToXhtml();
+
+    /**
+     * Should JBake (and the Markup converters) pretty-print HTML output (if supported)? true | false
+     */
+    boolean getPrettyPrintHtml();
+
+    /**
+     * The charset in which the resulting HTML files should be encoded.
+     */
+    Charset getOutputHtmlCharset();
+
+    /**
+     * The charset in which the source files are encoded.
+     */
+    Charset getInputCharset();
+
+    /**
+     * Should JBake prefix &lt;img src="..."&gt; with site base URL?
+     */
+    boolean getMakeImagesUrlAbolute();
+
+    /**
+     * Should JBake prefix &lt;img src="..."&gt; with site base URL relative URLs?
+     * This is not disjunctive from IMAGES_URL_MAKE_ABSOLUTE.
+     */
+    boolean getRelativeImagePathsPointToAssets();
+
 
     /**
      * Set a property value for the given key

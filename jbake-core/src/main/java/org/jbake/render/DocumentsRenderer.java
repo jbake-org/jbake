@@ -17,6 +17,12 @@ import java.util.Map;
 
 public class DocumentsRenderer implements RenderingTool {
 
+
+    @Override
+    public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
+        return render(renderer, db, null);
+    }
+
     @Override
     public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
         int renderedCount = 0;
@@ -71,22 +77,22 @@ public class DocumentsRenderer implements RenderingTool {
         }
     }
 
-    /**
-     * Creates a simple content model to use in individual post navigations.
-     *
-     * @param document
-     * @return
-     */
-    private Map<String, Object> getContentForNav(Map<String, Object> document) {
-        Map<String, Object> navDocument = new HashMap<>();
-        navDocument.put(Attributes.NO_EXTENSION_URI, document.get(Attributes.NO_EXTENSION_URI));
-        navDocument.put(Attributes.URI, document.get(Attributes.URI));
-        navDocument.put(Attributes.TITLE, document.get(Attributes.TITLE));
-        return navDocument;
-    }
+	@Override
+	public boolean isRendersInPlace()
+	{
+		return true;
+	}
 
-    @Override
-    public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
-        return render(renderer, db, null);
-    }
+	/**
+	 * Creates a simple content model to use in individual post navigations.
+	 * @param document
+	 * @return
+	 */
+	private Map<String, Object> getContentForNav(Map<String, Object> document) {
+		Map<String, Object> navDocument = new HashMap<String, Object>();
+		navDocument.put(Attributes.NO_EXTENSION_URI, document.get(Attributes.NO_EXTENSION_URI));
+		navDocument.put(Attributes.URI, document.get(Attributes.URI));
+		navDocument.put(Attributes.TITLE, document.get(Attributes.TITLE));
+		return navDocument;
+	}
 }
