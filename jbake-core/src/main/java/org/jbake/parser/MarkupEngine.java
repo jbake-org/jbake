@@ -1,15 +1,5 @@
 package org.jbake.parser;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.io.IOUtils;
-import org.jbake.app.Crawler;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,9 +7,20 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jbake.app.Crawler;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering
@@ -156,12 +157,59 @@ public abstract class MarkupEngine implements ParserEngine {
         }
     }
 
+
     /**
      * Checks if the file has a meta-data header.
      *
      * @param contents Contents of file
      * @return true if header exists, false if not
      */
+    private boolean hasHeader2(Configuration config, List<String> contents) {
+        boolean headerSeparatorFound = false;
+        boolean statusFound = false;
+        boolean typeFound = false;
+
+        List<String> headerLines = new ArrayList<>();
+
+        int scanMaxLines = configuration.getMaxHeaderLinesScan();
+
+        //for (String line : contents) {
+        for (int i = 0; i < contents.size() && i < scanMaxLines; i++) {
+            String line = contents.get(i);
+            if (StringUtils.isBlank(line))
+                continue;
+
+            if (line.startsWith("#"))
+                continue;
+
+            if (line.equals(configuration.getHeaderSeparator())) {
+                headerSeparatorFound = true;
+                break;
+            }
+
+            if (!line.matches("^\\p{Graph}+\\p{Blank}*(=|:)\\p{Blank}*\\p{Graph}*"))
+                continue;
+
+            headerLines.add(line);
+
+            typeFound |= line.startsWith("type=");
+            statusFound |= line.startsWith("status=");
+        }
+
+        if (headerSeparatorFound) {
+            for (String headerLine : headerLines) {
+                if (!headerLine.contains("=")) {
+                    LOGGER.warn("Document has invalid header line (without '='):\n{}", headerLines);
+                    return false;
+                }
+            }
+        }
+
+        return     (statusFound || null != configuration.getDefaultStatus())
+                && (typeFound   || null != configuration.getDefaultType());
+    }
+
+
     private boolean hasHeader(List<String> contents) {
         boolean headerValid = true;
         boolean statusFound = false;

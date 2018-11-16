@@ -46,6 +46,7 @@ public class JBakeProperty {
     public static final String IMG_PATH_UPDATE = "img.path.update";
     public static final String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
     public static final String VERSION = "version";
+    public static final String MAX_HEADER_LINES_SCAN = "header.maxLines";
 
     private JBakeProperty() {}
 
