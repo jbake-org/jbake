@@ -23,6 +23,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -58,12 +59,18 @@ public class GenerateMojo extends AbstractMojo {
   protected File inputDirectory;
 
   /**
+   * Breaks the build when {@code true} and errors occur during baking in JBake oven.
+   */
+  @Parameter(property = "jbake.failOnError", defaultValue = "true")
+  protected boolean failOnError;
+
+  /**
    * Set if cache is present or clear
    */
   @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
   protected boolean isClearCache;
 
-  public final void execute() throws MojoExecutionException {
+  public final void execute() throws MojoExecutionException, MojoFailureException {
     try {
       executeInternal();
     } finally {
@@ -79,11 +86,11 @@ public class GenerateMojo extends AbstractMojo {
     }
   }
 
-  protected void executeInternal() throws MojoExecutionException {
+  protected void executeInternal() throws MojoExecutionException, MojoFailureException {
     reRender();
   }
 
-  protected void reRender() throws MojoExecutionException {
+  protected void reRender() throws MojoExecutionException, MojoFailureException {
     try {
       // TODO: Smells bad. A lot
       Orient.instance().startup();
@@ -94,6 +101,9 @@ public class GenerateMojo extends AbstractMojo {
       oven.setupPaths();
 
       oven.bake();
+      if (failOnError && !oven.getErrors().isEmpty()) {
+          throw new MojoFailureException("Baked with " + oven.getErrors().size() + " errors. Check output above for details!");
+      }
     } catch (Exception e) {
       getLog().info("Oops", e);
 
