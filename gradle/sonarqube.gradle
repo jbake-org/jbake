@@ -38,7 +38,9 @@ if ( JavaVersion.current().isJava8Compatible() ) {
                 }
             }
             else {
-                logger.info("This is not a travis build. Skipping pullrequest configuration.")
+                logger.info("This is not a travis build. Skipping pullrequest configuration.") 
+                logger.info("isTravis: {}, isTravisPullRequest: {}. Env TRAVIS: {}, Env TRAVIS_PULL_REQUEST", isTravis, isTravisPullRequest, System.getenv("TRAVIS"), System.getenv("TRAVIS_PULL_REQUEST"))
+                
             }
 
         }
