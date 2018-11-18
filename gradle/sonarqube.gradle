@@ -20,13 +20,25 @@ if ( JavaVersion.current().isJava8Compatible() ) {
             if (isTravis && isTravisPullRequest) {
 
                 if (hasGithub) {
-                    property "sonar.analysis.mode", "preview"
-                    property "sonar.github.oauth", System.getenv("GITHUBTOKEN")
-                    property "sonar.github.repository", System.getenv("GITHUBREPO")
-                    property "sonar.github.pullRequest", pullRequestId
+
+                    /**
+                     * For further information see:
+                     * - https://sonarcloud.io/documentation/analysis/pull-request/
+                     * - https://sonarcloud.io/documentation/integrations/github/
+                     * - https://docs.travis-ci.com/user/environment-variables/
+                     */
+                    property "sonar.pullrequest.base", System.getenv('TRAVIS_BRANCH')
+                    property "sonar.pullrequest.branch", System.getenv('TRAVIS_PULL_REQUEST_BRANCH')
+                    property "sonar.pullrequest.key", pullRequestId
+                    property "sonar.pullrequest.provider", "github"
+                    property "sonar.pullrequest.github.repository", System.getenv('TRAVIS_PULL_REQUEST_SLUG')
+
                 } else {
                     logger.error("Cannot use sonar github plugin without GITHUBTOKEN (oauth token) and GITHUBREPO (e.g. jbake-org/jbake) environment variables. See https://docs.sonarqube.org/display/PLUG/GitHub+Plugin")
                 }
+            }
+            else {
+                logger.info("This is not a travis build. Skipping pullrequest configuration.")
             }
 
         }
