@@ -24,13 +24,18 @@ after_success:
 
 jdk:
   - openjdk11
-  - openjdk10
   - oraclejdk9
   - oraclejdk8
   - openjdk8
 
 jobs:
   include:
+
+  - script: "./gradlew check"
+    jdk: openjdk10
+    before_install:
+    - rm "${JAVA_HOME}/lib/security/cacerts"
+    - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
 
   - script: "./gradlew check"
     jdk: openjdk7
