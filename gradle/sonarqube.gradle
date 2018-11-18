@@ -32,6 +32,7 @@ if ( JavaVersion.current().isJava8Compatible() ) {
                     property "sonar.pullrequest.key", pullRequestId
                     property "sonar.pullrequest.provider", "github"
                     property "sonar.pullrequest.github.repository", System.getenv('TRAVIS_PULL_REQUEST_SLUG')
+                    property "sonar.pullrequest.github.endpoint", "https://api.github.com/"
 
                 } else {
                     logger.error("Cannot use sonar github plugin without GITHUBTOKEN (oauth token) and GITHUBREPO (e.g. jbake-org/jbake) environment variables. See https://docs.sonarqube.org/display/PLUG/GitHub+Plugin")
