@@ -1,8 +1,8 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -12,14 +12,15 @@ import java.util.Map;
  *
  * @author Cédric Champeau
  */
-public class DocumentList extends LinkedList<Map<String,Object>> {
+public class DocumentList extends LinkedList<Map<String, Object>> {
 
-    public static DocumentList wrap(Iterator<ODocument> docs) {
+    public static DocumentList wrap(OResultSet docs) {
         DocumentList list = new DocumentList();
         while (docs.hasNext()) {
-            ODocument next = docs.next();
+            OResult next = docs.next();
             list.add(DBUtil.documentToModel(next));
         }
+        docs.close();
         return list;
     }
 

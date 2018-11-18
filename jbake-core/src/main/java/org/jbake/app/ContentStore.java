@@ -25,16 +25,15 @@ package org.jbake.app;
 
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.Orient;
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
-import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
-import com.orientechnologies.orient.core.db.OPartitionedDatabasePoolFactory;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.ODatabaseType;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
@@ -43,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,31 +70,33 @@ public class ContentStore {
     private final String type;
     private final String name;
 
-    private ODatabaseDocumentTx db;
+    private ODatabaseSession db;
 
     private long start = -1;
     private long limit = -1;
+    private OrientDB orient;
 
     public ContentStore(final String type, String name) {
         this.type = type;
         this.name = name;
     }
 
-    public ODatabaseDocumentTx getDb() {
-        return db;
-    }
-
-    public void setDb(ODatabaseDocumentTx db) {
-        this.db = db;
-    }
 
     public void startup() {
         startupIfEnginesAreMissing();
-        OPartitionedDatabasePool pool = new OPartitionedDatabasePoolFactory().get(type + ":" + name, "admin", "admin");
-        pool.setAutoCreate(true);
-        db = pool.acquire();
 
-        ODatabaseRecordThreadLocal.instance().set(db);
+        if (type.equalsIgnoreCase(ODatabaseType.PLOCAL.name())) {
+            orient = new OrientDB(type + ":" + name, OrientDBConfig.defaultConfig());
+        } else {
+            orient = new OrientDB(type + ":", OrientDBConfig.defaultConfig());
+        }
+
+        orient.createIfNotExists(name, ODatabaseType.valueOf(type.toUpperCase()));
+
+        db = orient.open(name, "admin", "admin");
+
+        activateOnCurrentThread();
+
         updateSchema();
     }
 
@@ -122,9 +122,6 @@ public class ContentStore {
     }
 
     public final void updateSchema() {
-        if (db.isClosed()) {
-            db.create();
-        }
 
         OSchema schema = db.getMetadata().getSchema();
 
@@ -143,11 +140,16 @@ public class ContentStore {
             activateOnCurrentThread();
             db.close();
         }
+
+        if (orient != null) {
+            orient.close();
+        }
         DBUtil.closeDataStore();
     }
 
     public void shutdown() {
-        Orient.instance().shutdown();
+
+//        Orient.instance().shutdown();
     }
 
     private void startupIfEnginesAreMissing() {
@@ -166,11 +168,16 @@ public class ContentStore {
 
     public void drop() {
         activateOnCurrentThread();
-        db.drop();
+//        db.drop();
+
+        orient.drop(name);
     }
 
     private void activateOnCurrentThread() {
-        db.activateOnCurrentThread();
+        if (db != null)
+            db.activateOnCurrentThread();
+        else
+            System.out.println("db is null on activate");
     }
 
     public long getDocumentCount(String docType) {
@@ -281,14 +288,14 @@ public class ContentStore {
 
     private DocumentList query(String sql) {
         activateOnCurrentThread();
-        List<ODocument> results = db.query(new OSQLSynchQuery<ODocument>(sql));
-        return DocumentList.wrap(results.iterator());
+        OResultSet results = db.query(sql);
+        return DocumentList.wrap(results);
     }
 
     private DocumentList query(String sql, Object... args) {
         activateOnCurrentThread();
-        List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(args);
-        return DocumentList.wrap(results.iterator());
+        OResultSet results = db.command(sql, args);
+        return DocumentList.wrap(results);
     }
 
     private void executeCommand(String query, Object... args) {

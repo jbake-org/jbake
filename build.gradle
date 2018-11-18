@@ -22,7 +22,7 @@ ext {
     junit4Version = '4.12'
     flexmarkVersion = '0.34.48'
     jettyServerVersion = '9.2.24.v20180105'
-    orientDbVersion = '2.2.37'
+    orientDbVersion = '3.0.10'
     groovyVersion = '2.5.3'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
@@ -84,8 +84,8 @@ subprojects {
 
     // add source and target compatibility for all JavaCompile tasks
     tasks.withType(JavaCompile) {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
 
         /**
          *  Fix for warning: [options] bootstrap class path not set in conjunction with -source

@@ -1,7 +1,8 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.db.record.OTrackedList;
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.record.OElement;
+import com.orientechnologies.orient.core.sql.executor.OResult;
 import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.util.HashMap;
@@ -35,31 +36,32 @@ public class DBUtil {
     public static void closeDataStore() {
         contentStore = null;
     }
-    
-    public static Map<String, Object> documentToModel(ODocument doc) {
+
+    public static Map<String, Object> documentToModel(OResult doc) {
         Map<String, Object> result = new HashMap<>();
-        Iterator<Map.Entry<String, Object>> fieldIterator = doc.iterator();
+        Iterator<String> fieldIterator = doc.getPropertyNames().iterator();
         while (fieldIterator.hasNext()) {
-            Map.Entry<String, Object> entry = fieldIterator.next();
-            result.put(entry.getKey(), entry.getValue());
+            String entry = fieldIterator.next();
+            result.put(entry, doc.getProperty(entry));
         }
         return result;
     }
 
     /**
      * Converts a DB list into a String array
-     * @param entry     Entry input to be converted
-     * @return          input entry as String[]
+     *
+     * @param entry Entry input to be converted
+     * @return input entry as String[]
      */
     @SuppressWarnings("unchecked")
     public static String[] toStringArray(Object entry) {
-    	if (entry instanceof String[]) {
+        if (entry instanceof String[]) {
             return (String[]) entry;
         } else if (entry instanceof OTrackedList) {
             OTrackedList<String> list = (OTrackedList<String>) entry;
             return list.toArray(new String[list.size()]);
         }
-    	return new String[0];
+        return new String[0];
     }
 
 }
