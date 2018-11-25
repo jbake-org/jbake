@@ -6,7 +6,6 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import java.net.URL;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.jbake.app.configuration.PropertyList.IGNORE_FILE;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -196,7 +196,7 @@ public class AssetTest extends LoggingTest {
 
     @Test
     public void testFooIgnoredFolder() {
-        config.setProperty(JBakeProperty.IGNORE_FILE, ".fooignore");
+        config.setProperty(IGNORE_FILE.getKey(), ".fooignore");
 
         URL assetsUrl = this.getClass().getResource("/fixture/assets");
         File assets = new File(assetsUrl.getFile());

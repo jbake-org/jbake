@@ -340,5 +340,7 @@ public interface JBakeConfiguration {
      * @return Abbreviated hash of latest git commit
      */
     String getAbbreviatedGitHash();
+
+    List<Property> getJbakeProperties();
 }
 
