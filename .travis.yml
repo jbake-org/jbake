@@ -24,8 +24,6 @@ after_success:
 
 jdk:
   - openjdk11
-  - openjdk10
-  - oraclejdk9
   - oraclejdk8
   - openjdk8
 
