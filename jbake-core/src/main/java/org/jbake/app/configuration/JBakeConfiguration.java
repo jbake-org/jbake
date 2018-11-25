@@ -310,5 +310,7 @@ public interface JBakeConfiguration {
     String getServerContextPath();
 
     String getServerHostname();
+
+    List<Property> getJbakeProperties();
 }
 

@@ -4,7 +4,6 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +12,8 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static org.jbake.app.configuration.PropertyList.PAGINATE_INDEX;
 
 /**
  * A template which is responsible for delegating to a supported template engine,
@@ -55,7 +56,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
             String key = configKeys.next();
             Object valueObject;
 
-            if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
+            if (key.equals(PAGINATE_INDEX.getKey())) {
                 valueObject = config.getPaginateIndex();
             } else {
                 valueObject = config.get(key);
