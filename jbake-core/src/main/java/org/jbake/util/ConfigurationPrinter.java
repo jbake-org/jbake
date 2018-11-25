@@ -38,13 +38,15 @@ public class ConfigurationPrinter {
 
     private void printHeader() {
         out.printf("%1$-40s %2$-40s%n", "Key", "Value");
-        out.println(String.format("%080d%n", 0).replace("0", "-"));
+        out.println(getHorizontalLine());
+    }
+
+    private String getHorizontalLine() {
+        return String.format("%080d%n", 0).replace("0", "-");
     }
 
     private void printGroup(Property property) {
-        out.printf("##%n");
-        out.printf("# GROUP: %s%n", property.getGroup());
-        out.printf("##%n%n");
+        out.printf("%n%s - Settings%n%n", property.getGroup());
     }
 
     private void printDescription(Property property) {

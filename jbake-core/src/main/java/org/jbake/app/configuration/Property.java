@@ -57,7 +57,12 @@ public class Property implements Comparable {
     @Override
     public int compareTo(Object o) {
         Property other = (Property) o;
-        return this.getGroup().compareTo(other.getGroup());
+        int result = this.getGroup().compareTo(other.getGroup());
+
+        if (result == 0) {
+            result = this.getKey().compareTo(other.getKey());
+        }
+        return result;
     }
 
     public enum Group {

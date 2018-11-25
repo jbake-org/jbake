@@ -634,7 +634,10 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
             if (!(configuration instanceof SystemConfiguration)) {
                 for (Iterator<String> it = configuration.getKeys(); it.hasNext(); ) {
                     String key = it.next();
-                    jbakeKeys.add(PropertyList.getPropertyByKey(key));
+                    Property property = PropertyList.getPropertyByKey(key);
+                    if (!jbakeKeys.contains(property)) {
+                        jbakeKeys.add(property);
+                    }
                 }
             }
         }

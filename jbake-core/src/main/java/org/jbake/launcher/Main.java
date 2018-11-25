@@ -5,6 +5,7 @@ import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.util.ConfigurationPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -97,6 +98,12 @@ public class Main {
         if (res.isHelpNeeded()) {
             printUsage(res);
             // Help was requested, so we are done here
+            return;
+        }
+
+        if (res.isListConfig()) {
+            ConfigurationPrinter printer = new ConfigurationPrinter(config, System.out);
+            printer.print();
             return;
         }
 

@@ -334,7 +334,7 @@ public abstract class PropertyList {
     private PropertyList() {
     }
 
-    public static final Property getPropertyByKey(String key) {
+    public static Property getPropertyByKey(String key) {
 
         for (Field field : PropertyList.class.getFields()) {
             try {

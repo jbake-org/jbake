@@ -43,6 +43,9 @@ public class LaunchOptions {
     @Option(names = {"--reset"}, description = "clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
 
+    @Option(names = {"-ls", "--list-settings"}, description = "list configuration settings")
+    private boolean listConfig;
+
     public String getTemplate() {
         return initGroup.template;
     }
@@ -72,7 +75,7 @@ public class LaunchOptions {
     }
 
     public boolean isHelpNeeded() {
-        return helpRequested || !(isBake() || isRunServer() || isInit() || source != null || destination != null);
+        return helpRequested || !(isListConfig() || isBake() || isRunServer() || isInit() || source != null || destination != null);
     }
 
     public boolean isRunServer() {
@@ -89,5 +92,9 @@ public class LaunchOptions {
 
     public boolean isBake() {
         return bake || (source != null && destination != null);
+    }
+
+    public boolean isListConfig() {
+        return listConfig;
     }
 }

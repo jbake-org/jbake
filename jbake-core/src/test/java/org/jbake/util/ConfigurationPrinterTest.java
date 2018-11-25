@@ -23,12 +23,10 @@ public class ConfigurationPrinterTest {
 
         printer.print();
 
-        assertThat(data.toString(), CoreMatchers.containsString("DEFAULT"));
-        assertThat(data.toString(), CoreMatchers.containsString("CUSTOM"));
+        assertThat(data.toString(), CoreMatchers.containsString("DEFAULT - Settings"));
+        assertThat(data.toString(), CoreMatchers.containsString("CUSTOM - Settings"));
         assertThat(data.toString(), CoreMatchers.containsString("Key"));
         assertThat(data.toString(), CoreMatchers.containsString("Value"));
-
-        System.out.println(data.toString());
     }
 
 
