@@ -7,8 +7,7 @@ environment:
   TERM: dumb
   matrix:
     - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-    - JAVA_HOME: C:\Program Files\Java\jdk9
-    - JAVA_HOME: C:\Program Files\Java\jdk10
+    - JAVA_HOME: C:\Program Files\Java\jdk11
 
 install:
   - SET PATH=%JAVA_HOME%\bin;%PATH%
@@ -16,6 +15,6 @@ install:
   - java -version
   - gradlew.bat --version
 build_script:
-  - gradlew.bat -u -i assemble
+  - gradlew.bat -i assemble
 test_script:
-  - gradlew.bat -u -i -S check
+  - gradlew.bat -i -S check
