@@ -322,17 +322,29 @@ public class ContentStore {
     private void createDocType(final OSchema schema, final String docType) {
         logger.debug("Create document class '{}'", docType);
 
+
         OClass page = schema.createClass(docType);
-        page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.SHA1.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.CACHED.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.RENDERED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.RENDERED.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.STATUS), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.STATUS.toString());
+
+        // Primary key
+        String attribName = DocumentAttributes.SOURCE_URI.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, attribName);
+
+        attribName = DocumentAttributes.SHA1.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.CACHED.toString();
+        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.RENDERED.toString();
+        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.STATUS.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
     }
 
     private void createSignatureType(OSchema schema) {
