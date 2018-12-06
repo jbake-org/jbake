@@ -15,6 +15,6 @@ public interface RenderingTool {
 
     @Deprecated
     //TODO: remove at 3.0.0
-	int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException;
+    int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException;
 
 }

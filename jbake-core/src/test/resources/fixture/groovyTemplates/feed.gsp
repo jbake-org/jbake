@@ -15,11 +15,11 @@
       <link>http://jonathanbullock.com${post.uri}</link>
       <pubDate>${post.date.format("EEE, d MMM yyyy HH:mm:ss Z")}</pubDate>
       <guid isPermaLink="false">${post.uri}</guid>
-      	<description>
-	${post.body}
-	</description>
+          <description>
+    ${post.body}
+    </description>
     </item>
     <%}%>
 
-  </channel> 
+  </channel>
 </rss>
