@@ -21,7 +21,7 @@ ext {
     freemarkerVersion = '2.3.28'
     junit4Version = '4.12'
     flexmarkVersion = '0.34.48'
-    jettyServerVersion = '9.2.24.v20180105'
+    jettyServerVersion = '9.2.26.v20180806'
     orientDbVersion = '2.2.37'
     groovyVersion = '2.5.3'
     slf4jVersion = '1.7.25'
