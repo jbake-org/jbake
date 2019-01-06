@@ -98,7 +98,11 @@ public class AsciidoctorEngine extends MarkupEngine {
 
             if (hasJBakePrefix(key)) {
                 String pKey = key.substring(6);
-                documentModel.put(pKey, value);
+                if(value instanceof String) {
+                    processHeader(pKey, (String) value, documentModel);
+                } else {
+                    documentModel.put(pKey, value);
+                }
             }
             if (hasRevdate(key) && canCastToString(value)) {
 
