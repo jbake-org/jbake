@@ -18,10 +18,12 @@ import java.net.URL;
 public class AssetTest {
 
     private DefaultJBakeConfiguration config;
+    private File fixtureDir;
 
     @Before
     public void setup() throws Exception {
-        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
+        fixtureDir = new File(this.getClass().getResource("/fixture").getFile());
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(fixtureDir);
         config.setDestinationFolder(folder.getRoot());
         Assert.assertEquals(".html", config.getOutputExtension());
     }
@@ -30,7 +32,7 @@ public class AssetTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void copy() throws Exception {
+    public void testCopy() throws Exception {
         Asset asset = new Asset(config);
         asset.copy();
 
@@ -45,7 +47,29 @@ public class AssetTest {
     }
 
     @Test
-    public void copyCustomFolder() throws Exception {
+    public void testCopySingleFile() throws Exception {
+        Asset asset = new Asset(config);
+        String cssSubPath = File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css";
+        String contentImgPath = File.separatorChar + "blog" + File.separatorChar + "2013" + File.separatorChar
+            + "images" + File.separatorChar + "custom-image.jpg";
+
+        // Copy single Asset File
+        File expected = new File(folder.getRoot().getPath() + cssSubPath);
+        Assert.assertFalse("cssFile should not exist before running the test; avoids false positives", expected.exists());
+        File cssFile = new File(fixtureDir.getPath() + File.separatorChar + "assets" + cssSubPath);
+        asset.copySingleFile(cssFile);
+        Assert.assertTrue("Css asset file did not copy", expected.exists());
+
+        // Copy single Content file
+        expected = new File(folder.getRoot().getPath() + contentImgPath);
+        Assert.assertFalse("content image file should not exist before running the test", expected.exists());
+        File imgFile = new File(fixtureDir.getPath() + File.separatorChar + "content" + contentImgPath);
+        asset.copySingleFile(imgFile);
+        Assert.assertTrue("Content img file did not copy", expected.exists());
+    }
+
+    @Test
+    public void testCopyCustomFolder() throws Exception {
         config.setAssetFolder(new File(config.getSourceFolder(),"/media"));
         Asset asset = new Asset(config);
         asset.copy();
@@ -57,7 +81,7 @@ public class AssetTest {
     }
 
     @Test
-    public void copyIgnore() throws Exception {
+    public void testCopyIgnore() throws Exception {
         File assetFolder = folder.newFolder("ignoredAssets");
         FileUtils.copyDirectory(new File(this.getClass().getResource("/fixture/ignorables").getFile()), assetFolder);
         config.setAssetFolder(assetFolder);
@@ -151,6 +175,31 @@ public class AssetTest {
 
         Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
     }
+
+    @Test
+    public void testIsFileAsset() {
+        File cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
+        Assert.assertTrue(cssAsset.exists());
+        File contentFile = new File(config.getContentFolder().getAbsolutePath() + File.separatorChar + "about.html");
+        Assert.assertTrue(contentFile.exists());
+        Asset asset = new Asset(config);
+
+        Assert.assertTrue(asset.isAssetFile(cssAsset));
+        Assert.assertFalse(asset.isAssetFile(contentFile));
+    }
+
+    /*
+    @Test
+    public void testAssetTargetFolder() throws Exception {
+        Asset asset = new Asset(config);
+
+        File cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
+        Assert.assertEquals("css", asset.assetTargetFolder(cssAsset));
+
+        cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "foobar" + File.separatorChar + "bootstrap.min.css");
+        Assert.assertEquals("css/foobar", asset.assetTargetFolder(cssAsset));
+    }
+    */
 
     private Integer countFiles(File path){
         int total = 0;

@@ -4,7 +4,9 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Created by frank on 28.03.16.
@@ -16,5 +18,18 @@ public class FileUtilTest {
 
         File path = FileUtil.getRunningLocation();
         assertEquals(new File("build/classes").getAbsolutePath(), path.getPath());
+    }
+
+    @Test
+    public void testIsFileInDirectory() throws Exception {
+        File fixtureDir = new File(this.getClass().getResource("/fixture").getFile());
+        File jbakeFile = new File(fixtureDir.getCanonicalPath() + File.separatorChar + "jbake.properties");
+        assertTrue("jbake.properties expected to be in /fixture directory", FileUtil.isFileInDirectory(jbakeFile, fixtureDir));
+
+        File contentFile = new File(fixtureDir.getCanonicalPath() + File.separatorChar + "content" + File.separatorChar + "projects.html");
+        assertTrue("projects.html expected to be nested in the /fixture directory", FileUtil.isFileInDirectory(contentFile, fixtureDir));
+
+        File contentDir = contentFile.getParentFile();
+        assertFalse("jbake.properties file should not be in the /fixture/content directory", FileUtil.isFileInDirectory(jbakeFile, contentDir));
     }
 }

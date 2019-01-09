@@ -181,4 +181,19 @@ public class FileUtil {
         }
         return path.replace(File.separator, "/");
     }
+
+    /**
+     * Utility method to determine if a given file is located somewhere in the directory provided.
+     *
+     * @param file used to check if it is located in the provided directory.
+     * @param directory to validate whether or not the provided file resides.
+     * @return true if the file is somewhere in the provided directory, false if it is not.
+     * @throws IOException if the canonical path for either of the input directories can't be determined.
+     */
+    public static boolean isFileInDirectory(File file, File directory) throws IOException {
+        return (file.exists()
+             && !file.isHidden()
+             && directory.isDirectory()
+             && file.getCanonicalPath().startsWith(directory.getCanonicalPath()));
+    }
 }

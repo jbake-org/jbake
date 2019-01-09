@@ -115,6 +115,22 @@ public class Oven {
     }
 
     /**
+     * Responsible for incremental baking, typically a single file at a time.
+     *
+     * @param fileToBake The file to bake
+     */
+    public void bake(File fileToBake) {
+        Asset asset = utensils.getAsset();
+        if(asset.isAssetFile(fileToBake)) {
+            LOGGER.info("Baking a change to an asset [" + fileToBake.getPath() + "]");
+            asset.copySingleFile(fileToBake);
+        } else {
+            LOGGER.info("Playing it safe and running a full bake...");
+            bake();
+        }
+    }
+
+    /**
      * All the good stuff happens in here...
      */
     public void bake() {
@@ -194,7 +210,6 @@ public class Oven {
             }
         }
     }
-
 
     public List<Throwable> getErrors() {
         return new ArrayList<>(errors);
