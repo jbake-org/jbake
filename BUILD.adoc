@@ -219,6 +219,15 @@ plugin:: https://docs.gradle.org/current/userguide/signing_plugin.html
 
 == Other useful tasks
 
+=== check code convention violations
+
+The Checkstyle Plugin is configured to use our code conventions defined in `config/checkstyle/checkstyle.xml`.
+
+It gets executed with the `check` Task and prints warnings about violations to the console.
+A report can be found at jbake-core/build/reports/checkstyle/.
+
+plugin:: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+
 === keep the dependencies up-to-date
 
 It's sometimes hard to keep track of the latest versions for your dependencies.
