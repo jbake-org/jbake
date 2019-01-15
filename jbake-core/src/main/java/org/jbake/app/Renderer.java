@@ -2,7 +2,6 @@ package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.Crawler.Attributes;
-import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -276,7 +275,7 @@ public class Renderer {
                 model.put("content", map);
 
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
-                map.put(Attributes.ROOTPATH, ConfigUtil.getPathtoDestinationRoot(config, path));
+                map.put(Attributes.ROOTPATH, FileUtil.getPathtoDestinationRoot(config, path));
                 
                 render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
@@ -297,7 +296,7 @@ public class Renderer {
                 model.put("content", map);
 
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
-                map.put(Attributes.ROOTPATH, ConfigUtil.getPathtoDestinationRoot(config, path));
+                map.put(Attributes.ROOTPATH, FileUtil.getPathtoDestinationRoot(config, path));
                 render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
                 renderedCount++;
             } catch (Exception e) {

@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentTypes;
@@ -32,7 +33,7 @@ public class OvenTest {
     public void setUp() throws Exception {
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         DocumentTypes.resetDocumentTypes();
-        sourceFolder = new File(this.getClass().getResource("/fixture").getPath());
+        sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(folder.newFolder("output"));
         configuration.setTemplateFolder(new File(sourceFolder,"freemarkerTemplates"));

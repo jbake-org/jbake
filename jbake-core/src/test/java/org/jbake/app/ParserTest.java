@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Assert;
@@ -47,7 +48,7 @@ public class ParserTest {
 
     @Before
     public void createSampleFile() throws Exception {
-        rootPath = new File(this.getClass().getResource("/fixture").getFile());
+        rootPath = TestUtils.getTestResourcesAsSourceFolder();
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(rootPath);
         parser = new Parser(config);
 

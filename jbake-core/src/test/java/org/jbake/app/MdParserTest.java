@@ -1,6 +1,7 @@
 
 package org.jbake.app;
 
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Assert;
@@ -76,7 +77,7 @@ public class MdParserTest {
     @Before
     public void createSampleFile() throws Exception {
 
-        File configFile = new File(this.getClass().getResource("/fixture").getFile());
+        File configFile = TestUtils.getTestResourcesAsSourceFolder();
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(configFile);
 
         validMdFileBasic = folder.newFile("validBasic.md");

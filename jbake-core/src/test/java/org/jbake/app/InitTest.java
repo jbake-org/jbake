@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.launcher.Init;
@@ -25,8 +26,8 @@ public class InitTest {
 	
 	@Before
 	public void setup() throws Exception {
-		URL sourceUrl = this.getClass().getResource("/fixture");
-		rootPath = new File(sourceUrl.getFile());
+
+		rootPath = TestUtils.getTestResourcesAsSourceFolder();
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }

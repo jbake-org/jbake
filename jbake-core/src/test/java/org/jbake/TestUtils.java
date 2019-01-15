@@ -29,4 +29,9 @@ public class TestUtils {
     public static boolean isWindows() {
         return Os.isFamily(Os.OS_FAMILY_WINDOWS);
     }
+
+    public static File getTestResourcesAsSourceFolder() {
+        return new File(TestUtils.class.getResource("/fixture").getFile());
+    }
+
 }

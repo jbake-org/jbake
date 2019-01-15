@@ -6,7 +6,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
@@ -30,7 +29,6 @@ import java.util.Map;
 public class Crawler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
-    public static final String URI_SEPARATOR_CHAR = "/";
     private final ContentStore db;
     private JBakeConfiguration config;
     private Parser parser;
@@ -135,11 +133,6 @@ public class Crawler {
     private String buildURI(final File sourceFile) {
         String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getContentFolder()), "");
 
-        // On windows we have to replace the backslash
-        if (!File.separator.equals(URI_SEPARATOR_CHAR)) {
-            uri = uri.replace(File.separator, URI_SEPARATOR_CHAR);
-        }
-
         if (useNoExtensionUri(uri)) {
             // convert URI from xxx.html to xxx/index.html
             uri = createNoExtensionUri(uri);
@@ -148,7 +141,7 @@ public class Crawler {
         }
 
         // strip off leading / to enable generating non-root based sites
-        if (uri.startsWith(URI_SEPARATOR_CHAR)) {
+        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
             uri = uri.substring(1, uri.length());
         }
 
@@ -159,7 +152,7 @@ public class Crawler {
     // commons-codec's URLCodec could be used when we add that dependency.
     private String createUri(String uri) {
         try {
-            return URI_SEPARATOR_CHAR + FilenameUtils.getPath(uri)
+            return FileUtil.URI_SEPARATOR_CHAR + FilenameUtils.getPath(uri)
                     + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
                     + config.getOutputExtension();
         } catch (UnsupportedEncodingException e) {
@@ -169,10 +162,10 @@ public class Crawler {
 
     private String createNoExtensionUri(String uri) {
         try {
-            return URI_SEPARATOR_CHAR
+            return FileUtil.URI_SEPARATOR_CHAR
                     + FilenameUtils.getPath(uri)
                     + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
-                    + URI_SEPARATOR_CHAR
+                    + FileUtil.URI_SEPARATOR_CHAR
                     + "index"
                     + config.getOutputExtension();
         } catch (UnsupportedEncodingException e) {
@@ -234,7 +227,7 @@ public class Crawler {
     }
 
     private String getPathToRoot(File sourceFile) {
-        return ConfigUtil.getPathToContentRoot(config, sourceFile);
+        return FileUtil.getPathToContentRoot(config, sourceFile);
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {

@@ -1,6 +1,7 @@
 package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
+import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
 import org.junit.Before;
@@ -38,13 +39,13 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldLoadSiteHost() throws Exception {
-        JBakeConfiguration config = util.loadConfig(getTestResourcesAsSourceFolder());
+        JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         assertThat(config.getSiteHost()).isEqualTo("http://www.jbake.org");
     }
 
     @Test
     public void shouldLoadADefaultConfiguration() throws Exception {
-        JBakeConfiguration config = util.loadConfig(getTestResourcesAsSourceFolder());
+        JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         assertDefaultPropertiesPresent(config);
     }
 
@@ -80,7 +81,7 @@ public class ConfigUtilTest extends LoggingTest {
     @Test
     public void shouldAddSourcefolderToConfiguration() throws Exception {
 
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         assertThat(config.getSourceFolder()).isEqualTo(sourceFolder);
@@ -106,7 +107,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnDestinationFolderFromConfiguration() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"output");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -115,7 +116,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnAssetFolderFromConfiguration() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"assets");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -124,7 +125,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnTemplateFolderFromConfiguration() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"templates");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -133,7 +134,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnContentFolderFromConfiguration() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder,"content");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -142,7 +143,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldGetTemplateFileDoctype() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedTemplateFile = new File(sourceFolder, "templates/index.ftl");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -153,7 +154,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldLogWarningIfDocumentTypeNotFound() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         config.getTemplateFileByDocType("none");
@@ -170,7 +171,7 @@ public class ConfigUtilTest extends LoggingTest {
     public void shouldGetTemplateOutputExtension() throws Exception {
 
         String docType = "masterindex";
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setTemplateExtensionForDocType(docType, ".xhtml");
 
@@ -181,7 +182,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldGetMarkdownExtensionsAsList() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         List<String> markdownExtensions = config.getMarkdownExtensions();
@@ -192,7 +193,7 @@ public class ConfigUtilTest extends LoggingTest {
     @Test
     public void shouldReturnConfiguredDocTypes() throws Exception {
 
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         List<String> docTypes = config.getDocumentTypes();
@@ -203,7 +204,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnAListOfAsciidoctorOptionsKeys() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
@@ -215,7 +216,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnAnAsciidoctorOption() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
@@ -227,7 +228,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnAnAsciidoctorOptionWithAListValue() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
@@ -240,7 +241,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldReturnEmptyStringIfOptionNotAvailable() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         Object option = config.getAsciidoctorOption("template_dirs");
@@ -250,7 +251,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldLogAWarningIfAsciidocOptionCouldNotBeFound() throws Exception {
-        File sourceFolder = getTestResourcesAsSourceFolder();
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
         config.getAsciidoctorOption("template_dirs");
@@ -265,7 +266,7 @@ public class ConfigUtilTest extends LoggingTest {
     @Test
     public void shouldHandleNonExistingFiles() throws Exception {
 
-        File source = getTestResourcesAsSourceFolder();
+        File source = TestUtils.getTestResourcesAsSourceFolder();
         File expectedTemplateFolder = new File(source,"templates");
         File expectedAssetFolder = new File(source,"assets");
         File expectedContentFolder = new File(source,"content");
@@ -290,7 +291,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldHandleCustomTemplateFolder() throws Exception {
-        File source = getTestResourcesAsSourceFolder();
+        File source = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
 
         config.setTemplateFolder(sourceFolder.newFolder("my_custom_templates"));
@@ -300,7 +301,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldHandleCustomContentFolder() throws Exception {
-        File source = getTestResourcesAsSourceFolder();
+        File source = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
 
         config.setContentFolder(sourceFolder.newFolder("my_custom_content"));
@@ -310,7 +311,7 @@ public class ConfigUtilTest extends LoggingTest {
 
     @Test
     public void shouldHandleCustomAssetFolder() throws Exception {
-        File source = getTestResourcesAsSourceFolder();
+        File source = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
 
         config.setAssetFolder(sourceFolder.newFolder("my_custom_asset"));
@@ -329,28 +330,4 @@ public class ConfigUtilTest extends LoggingTest {
         }
     }
 
-    //TODO: move to test util. use in all tests...
-    private File getTestResourcesAsSourceFolder() {
-        return new File(this.getClass().getResource("/fixture").getFile());
-    }
-
-    @Test
-    public void testGetContentRoothPath() throws Exception {
-        File source = getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
-
-        String path = ConfigUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "index.html"));
-
-        assertThat(path).isEqualTo("");
-        
-        path = ConfigUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "/blog/index.html"));
-
-        assertThat(path).isEqualTo("../");
-
-        path = ConfigUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "/blog/level2/index.html"));
-
-        assertThat(path).isEqualTo("../../");
-
-       
-    }
 }

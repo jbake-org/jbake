@@ -21,7 +21,7 @@ public class AssetTest {
 
 	@Before
     public void setup() throws Exception {
-		config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
+		config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
 		config.setDestinationFolder(folder.getRoot());
         Assert.assertEquals(".html", config.getOutputExtension());
 	}
