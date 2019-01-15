@@ -29,13 +29,13 @@ public class FileUtilTest {
         ConfigUtil util = new ConfigUtil();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
 
-        String path = FileUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "index.html"));
+        String path = FileUtil.getUriPathToContentRoot(config, new File(config.getContentFolder(), "index.html"));
         assertThat(path).isEqualTo("");
 
-        path = FileUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "/blog/index.html"));
+        path = FileUtil.getUriPathToContentRoot(config, new File(config.getContentFolder(), "/blog/index.html"));
         assertThat(path).isEqualTo("../");
 
-        path = FileUtil.getPathToContentRoot(config, new File(config.getContentFolder(), "/blog/level2/index.html"));
+        path = FileUtil.getUriPathToContentRoot(config, new File(config.getContentFolder(), "/blog/level2/index.html"));
         assertThat(path).isEqualTo("../../");
     }
 

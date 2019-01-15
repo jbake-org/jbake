@@ -227,7 +227,7 @@ public class Crawler {
     }
 
     private String getPathToRoot(File sourceFile) {
-        return FileUtil.getPathToContentRoot(config, sourceFile);
+        return FileUtil.getUriPathToContentRoot(config, sourceFile);
     }
 
     private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {

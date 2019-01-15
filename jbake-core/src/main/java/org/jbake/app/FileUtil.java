@@ -223,11 +223,11 @@ public class FileUtil {
         return sb.toString();
     }
 
-    static public String getPathtoDestinationRoot(JBakeConfiguration config, File sourceFile) {
+    static public String getUriPathToDestinationRoot(JBakeConfiguration config, File sourceFile) {
         return getPathToRoot(config, config.getDestinationFolder(), sourceFile);
     }
 
-    static public String getPathToContentRoot(JBakeConfiguration config, File sourceFile) {
+    static public String getUriPathToContentRoot(JBakeConfiguration config, File sourceFile) {
         return getPathToRoot(config, config.getContentFolder(), sourceFile);
     }
 }
