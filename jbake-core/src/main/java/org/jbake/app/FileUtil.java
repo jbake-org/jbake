@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.parser.Engines;
 
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 
 /**
@@ -17,6 +20,8 @@ import java.security.MessageDigest;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class FileUtil {
+
+    public static final String URI_SEPARATOR_CHAR = "/";
 
     /**
      * Filters files based on their file extension.
@@ -30,8 +35,8 @@ public class FileUtil {
             public boolean accept(File pathname) {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
-                return   !pathname.isHidden() && (pathname.isFile()
-                        && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
+                return !pathname.isHidden() && (pathname.isFile()
+                    && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
             }
         };
     }
@@ -48,20 +53,21 @@ public class FileUtil {
             public boolean accept(File pathname) {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
-                return  !pathname.isHidden() && (pathname.isFile()
-                        //extension should not be from registered content extensions
-                        && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
-                            || (directoryOnlyIfNotIgnored(pathname));
+                return !pathname.isHidden() && (pathname.isFile()
+                    //extension should not be from registered content extensions
+                    && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
+                    || (directoryOnlyIfNotIgnored(pathname));
             }
         };
     }
 
     /**
      * Ignores directory (and children) if it contains a file named ".jbakeignore".
+     *
      * @param file {@link File}
      * @return {@link Boolean} true/false
      */
-    public static boolean directoryOnlyIfNotIgnored(File file){
+    public static boolean directoryOnlyIfNotIgnored(File file) {
         boolean accept = false;
 
         FilenameFilter ignoreFile = new FilenameFilter() {
@@ -84,7 +90,7 @@ public class FileUtil {
      * Works out the folder where JBake is running from.
      *
      * @return File referencing folder JBake is running from
-     * @throws Exception    when application is not able to work out where is JBake running from
+     * @throws Exception when application is not able to work out where is JBake running from
      */
     public static File getRunningLocation() throws Exception {
         String codePath = FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -147,7 +153,7 @@ public class FileUtil {
             }
         } else if (sourceFile.isDirectory()) {
             File[] files = sourceFile.listFiles();
-            if (files!=null) {
+            if (files != null) {
                 for (File file : files) {
                     updateDigest(digest, file, buffer);
                 }
@@ -160,10 +166,10 @@ public class FileUtil {
      *
      * @param file the file to transform, or {@code null}
      * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null}
-     *         Needed to transform Windows path separators into slashes.
+     * Needed to transform Windows path separators into slashes.
      */
     public static String asPath(File file) {
-        if(file == null) {
+        if (file == null) {
             return null;
         }
         return asPath(file.getPath());
@@ -176,9 +182,51 @@ public class FileUtil {
      * @return The result will have alle platform path separators replaced by "/".
      */
     public static String asPath(String path) {
-        if(path == null) {
+        if (path == null) {
             return null;
         }
-        return path.replace(File.separator, "/");
+
+        // On windows we have to replace the backslash
+        if (!File.separator.equals(FileUtil.URI_SEPARATOR_CHAR)) {
+            return path.replace(File.separator, FileUtil.URI_SEPARATOR_CHAR);
+        } else {
+            return path;
+        }
+    }
+
+    /**
+     * Given a file inside content it return
+     * the relative path to get to the root.
+     * <p>
+     * Example: /content and /content/tags/blog will return '../..'
+     *
+     * @param sourceFile the file to calculate relative path for
+     * @return
+     */
+    static public String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
+
+        Path r = Paths.get(rootPath.toURI());
+        Path s = Paths.get(sourceFile.getParentFile().toURI());
+        Path relativePath = s.relativize(r);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(asPath(relativePath.toString()));
+
+        if (config.getUriWithoutExtension()) {
+            sb.append("/..");
+        }
+        if (sb.length() > 0) {  // added as calling logic assumes / at end.
+            sb.append("/");
+        }
+        return sb.toString();
+    }
+
+    static public String getUriPathToDestinationRoot(JBakeConfiguration config, File sourceFile) {
+        return getPathToRoot(config, config.getDestinationFolder(), sourceFile);
+    }
+
+    static public String getUriPathToContentRoot(JBakeConfiguration config, File sourceFile) {
+        return getPathToRoot(config, config.getContentFolder(), sourceFile);
     }
 }

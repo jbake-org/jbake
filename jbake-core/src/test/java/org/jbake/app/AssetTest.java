@@ -17,17 +17,16 @@ import java.net.URL;
 
 public class AssetTest {
 
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
     private DefaultJBakeConfiguration config;
 
     @Before
     public void setup() throws Exception {
-        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         config.setDestinationFolder(folder.getRoot());
         Assert.assertEquals(".html", config.getOutputExtension());
     }
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void copy() throws Exception {
@@ -46,7 +45,7 @@ public class AssetTest {
 
     @Test
     public void copyCustomFolder() throws Exception {
-        config.setAssetFolder(new File(config.getSourceFolder(),"/media"));
+        config.setAssetFolder(new File(config.getSourceFolder(), "/media"));
         Asset asset = new Asset(config);
         asset.copy();
 
@@ -75,7 +74,6 @@ public class AssetTest {
     }
 
 
-
     /**
      * Primary intention is to extend test cases to increase coverage.
      *
@@ -83,7 +81,7 @@ public class AssetTest {
      */
     @Test
     public void testWriteProtected() throws Exception {
-        File assets = new File(config.getSourceFolder(),"assets");
+        File assets = new File(config.getSourceFolder(), "assets");
         final File cssFile = new File(folder.newFolder("css"), "bootstrap.min.css");
         FileUtils.touch(cssFile);
         cssFile.setReadOnly();
@@ -109,7 +107,7 @@ public class AssetTest {
     }
 
     @Test
-    public void testJBakeIgnoredFolder(){
+    public void testJBakeIgnoredFolder() {
         URL assetsUrl = this.getClass().getResource("/fixture/assets");
         File assets = new File(assetsUrl.getFile());
         Asset asset = new Asset(config);
@@ -129,7 +127,7 @@ public class AssetTest {
 
 
     @Test
-    public void testCopyAssetsFromContent(){
+    public void testCopyAssetsFromContent() {
         URL contentUrl = this.getClass().getResource("/fixture/content");
         File contents = new File(contentUrl.getFile());
         Asset asset = new Asset(config);
@@ -152,14 +150,14 @@ public class AssetTest {
         Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
     }
 
-    private Integer countFiles(File path){
+    private Integer countFiles(File path) {
         int total = 0;
         FileFilter filesOnly = FileFilterUtils.fileFileFilter();
         FileFilter dirsOnly = FileFilterUtils.directoryFileFilter();
         File[] files = path.listFiles(filesOnly);
         System.out.println(files);
         total += files.length;
-        for (File file : path.listFiles(dirsOnly)){
+        for (File file : path.listFiles(dirsOnly)) {
             total += countFiles(file);
         }
         return total;

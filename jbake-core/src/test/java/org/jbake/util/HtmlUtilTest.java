@@ -1,5 +1,6 @@
 package org.jbake.util;
 
+import org.jbake.TestUtils;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -19,7 +20,7 @@ public class HtmlUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(new File(this.getClass().getResource("/fixture").getFile()));
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
     }
 
     @Test

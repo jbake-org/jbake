@@ -39,8 +39,8 @@ public class RendererTest {
 
     @Before
     public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/fixture");
-        File sourcePath = new File(sourceUrl.getFile());
+
+        File sourcePath = TestUtils.getTestResourcesAsSourceFolder();
         if (!sourcePath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }

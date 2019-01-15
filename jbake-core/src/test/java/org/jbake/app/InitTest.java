@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.launcher.Init;
@@ -10,7 +11,6 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -25,8 +25,8 @@ public class InitTest {
 
     @Before
     public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/fixture");
-        rootPath = new File(sourceUrl.getFile());
+
+        rootPath = TestUtils.getTestResourcesAsSourceFolder();
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
@@ -45,7 +45,7 @@ public class InitTest {
     }
 
     @Test
-    public void initFailDestinationContainsContent() throws IOException{
+    public void initFailDestinationContainsContent() throws IOException {
         Init init = new Init(config);
         File initPath = folder.newFolder("init");
         File contentFolder = new File(initPath.getPath(), config.getContentFolderName());
@@ -61,7 +61,7 @@ public class InitTest {
     }
 
     @Test
-    public void initFailInvalidTemplateType() throws IOException{
+    public void initFailInvalidTemplateType() throws IOException {
         Init init = new Init(config);
         File initPath = folder.newFolder("init");
         try {

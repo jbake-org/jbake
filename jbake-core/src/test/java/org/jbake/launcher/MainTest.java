@@ -1,6 +1,7 @@
 package org.jbake.launcher;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -153,7 +154,7 @@ public class MainTest {
     }
 
     private DefaultJBakeConfiguration stubConfig() throws ConfigurationException {
-        File sourceFolder = new File(this.getClass().getResource("/fixture").getFile());
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig( sourceFolder );
         configuration.setServerPort(8820);
         return configuration;
