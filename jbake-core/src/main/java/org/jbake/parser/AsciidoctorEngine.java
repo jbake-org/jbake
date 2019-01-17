@@ -99,7 +99,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             if (hasJBakePrefix(key)) {
                 String pKey = key.substring(6);
                 if(value instanceof String) {
-                    processHeader(pKey, (String) value, documentModel);
+                    storeHeaderValue(pKey, (String) value, documentModel);
                 } else {
                     documentModel.put(pKey, value);
                 }

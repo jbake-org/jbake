@@ -260,11 +260,11 @@ public abstract class MarkupEngine implements ParserEngine {
     private void processHeaderLine(String line, Map<String, Object> content) {
         String[] parts = line.split("=", 2);
         if (!line.isEmpty() && parts.length == 2) {
-            processHeader(parts[0], parts[1], content);
+            storeHeaderValue(parts[0], parts[1], content);
         }
     }
 
-    void processHeader(String inputKey, String inputValue, Map<String, Object> content) {
+    void storeHeaderValue(String inputKey, String inputValue, Map<String, Object> content) {
         String key = sanitizeKey(inputKey);
         String value = sanitizeValue(inputValue);
 
