@@ -98,7 +98,7 @@ public class AsciidoctorEngine extends MarkupEngine {
 
             if (hasJBakePrefix(key)) {
                 String pKey = key.substring(6);
-                if(value instanceof String) {
+                if(canCastToString(value)) {
                     storeHeaderValue(pKey, (String) value, documentModel);
                 } else {
                     documentModel.put(pKey, value);
@@ -128,7 +128,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     }
 
     private boolean canCastToString(Object value) {
-        return value != null && value instanceof String;
+        return value instanceof String;
     }
 
     private String getValueClassName(Object value) {
