@@ -188,19 +188,6 @@ public class AssetTest {
         Assert.assertFalse(asset.isAssetFile(contentFile));
     }
 
-    /*
-    @Test
-    public void testAssetTargetFolder() throws Exception {
-        Asset asset = new Asset(config);
-
-        File cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
-        Assert.assertEquals("css", asset.assetTargetFolder(cssAsset));
-
-        cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "foobar" + File.separatorChar + "bootstrap.min.css");
-        Assert.assertEquals("css/foobar", asset.assetTargetFolder(cssAsset));
-    }
-    */
-
     private Integer countFiles(File path){
         int total = 0;
         FileFilter filesOnly = FileFilterUtils.fileFileFilter();
