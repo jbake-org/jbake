@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import ch.qos.logback.classic.spi.LoggingEvent;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.TestUtils;
@@ -13,9 +14,14 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.net.URL;
 
-public class AssetTest {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+public class AssetTest extends LoggingTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -66,6 +72,36 @@ public class AssetTest {
         asset.copySingleFile(imgFile);
         Assert.assertTrue("Content img file did not copy", expected.exists());
     }
+
+    @Test
+    public void shouldSkipCopyingSingleFileIfDirectory() throws IOException {
+
+        Asset asset = new Asset(config);
+
+        File emptyDir = folder.newFolder("emptyDir");
+        File expectedDir = new File(fixtureDir.getCanonicalPath(), "emptyDir");
+
+        asset.copySingleFile(emptyDir);
+
+        Assert.assertFalse("Directory should be skipped", expectedDir.exists());
+    }
+
+    @Test
+    public void shouldLogSkipCopyingSingleFileIfDirectory() throws IOException {
+
+        Asset asset = new Asset(config);
+        File emptyDir = folder.newFolder("emptyDir");
+
+        asset.copySingleFile(emptyDir);
+
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+
+        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+        assertThat(loggingEvent.getMessage()).isEqualTo("Skip copying single asset file [{}]. Is a directory.");
+
+    }
+
+
 
     @Test
     public void testCopyCustomFolder() throws Exception {

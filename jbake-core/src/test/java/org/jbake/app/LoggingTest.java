@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,7 +26,7 @@ public abstract class LoggingTest {
     protected Logger root;
 
     @Before
-    public void setup() {
+    public void setupBase() {
         root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
         root.addAppender(mockAppender);
@@ -34,7 +34,7 @@ public abstract class LoggingTest {
     }
 
     @After
-    public void teardown() {
+    public void teardownBase() {
         root.detachAppender(mockAppender);
     }
 
