@@ -20,7 +20,7 @@ public class MockCompositeConfiguration extends CompositeConfiguration {
     @Override
     public boolean getBoolean(String key) {
 
-        if ( super.containsKey(key) ) {
+        if (super.containsKey(key)) {
             return super.getBoolean(key);
         }
         return _bool;

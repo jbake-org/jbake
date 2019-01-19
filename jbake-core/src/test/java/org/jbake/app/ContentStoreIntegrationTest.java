@@ -13,16 +13,14 @@ import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.net.URL;
 
 public abstract class ContentStoreIntegrationTest {
 
+    @ClassRule
+    public static TemporaryFolder folder = new TemporaryFolder();
     protected static ContentStore db;
     protected static DefaultJBakeConfiguration config;
     protected static StorageType storageType = StorageType.MEMORY;
-
-    @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
     protected static File sourceFolder;
 
     @BeforeClass

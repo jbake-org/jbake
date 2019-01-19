@@ -19,23 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(Parameterized.class)
 public class BuiltInProjectsTest {
 
-    @Parameters(name = " {0} ")
-    public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                { "thymeleaf",  "thyme" },
-                { "freemarker", "ftl" },
-                { "jade",       "jade" },
-                { "groovy",     "gsp" },
-                { "groovy-mte", "tpl" }
-        });
-    }
-
     @Parameter
     public String projectName;
-
     @Parameter(1)
     public String extension;
-
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     private File projectFolder;
@@ -44,9 +31,20 @@ public class BuiltInProjectsTest {
     private String jbakeExecutable;
     private BinaryRunner runner;
 
+    @Parameters(name = " {0} ")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            {"thymeleaf", "thyme"},
+            {"freemarker", "ftl"},
+            {"jade", "jade"},
+            {"groovy", "gsp"},
+            {"groovy-mte", "tpl"}
+        });
+    }
+
     @Before
     public void setup() throws IOException {
-        if ( Os.isFamily(Os.OS_FAMILY_WINDOWS) ) {
+        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
             jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
         } else {
             jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
@@ -64,15 +62,15 @@ public class BuiltInProjectsTest {
     }
 
     private void shouldInitProject(String projectName, String extension) throws IOException, InterruptedException {
-        Process process = runner.runWithArguments(jbakeExecutable,"-i", "-t", projectName);
+        Process process = runner.runWithArguments(jbakeExecutable, "-i", "-t", projectName);
         assertThat(process.exitValue()).isEqualTo(0);
-        assertThat(new File(projectFolder,"jbake.properties")).exists();
+        assertThat(new File(projectFolder, "jbake.properties")).exists();
         assertThat(new File(templateFolder, String.format("index.%s", extension))).exists();
         process.destroy();
     }
 
     private void shouldBakeProject() throws IOException, InterruptedException {
-        Process process = runner.runWithArguments(jbakeExecutable,"-b");
+        Process process = runner.runWithArguments(jbakeExecutable, "-b");
         assertThat(process.exitValue()).isEqualTo(0);
         assertThat(new File(outputFolder, "index.html")).exists();
         process.destroy();

@@ -189,6 +189,7 @@ public class ContentStore {
 
     /**
      * Get a document by sourceUri and update it from the given map.
+     *
      * @param incomingDocMap The document's db columns.
      * @return The saved document.
      * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.

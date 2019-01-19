@@ -30,7 +30,7 @@ public class PagingHelper {
         if (isFirstPage(currentPageNumber)) {
             return null;
         } else {
-            if ( currentPageNumber == 2 ) {
+            if (currentPageNumber == 2) {
                 // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
                 return "";
             } else {
@@ -44,7 +44,7 @@ public class PagingHelper {
     }
 
     public String getCurrentFileName(int page, String fileName) throws URISyntaxException {
-        if ( isFirstPage(page) ) {
+        if (isFirstPage(page)) {
             return fileName;
         } else {
             return new URI(page + URI_SEPARATOR + fileName).toString();
