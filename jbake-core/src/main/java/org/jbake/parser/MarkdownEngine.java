@@ -1,10 +1,10 @@
 package org.jbake.parser;
 
-import com.vladsch.flexmark.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.options.DataHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class MarkdownEngine extends MarkupEngine {
         Parser parser = Parser.builder(options).build();
         HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 
-        Node document = parser.parse(context.getBody());
+        Document document = parser.parse(context.getBody());
         context.setBody(renderer.render(document));
     }
 

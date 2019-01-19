@@ -35,7 +35,7 @@ dependencies {
     if ( JavaVersion.current().isJava7() ) {
         smokeTestCompile'org.eclipse.jgit:org.eclipse.jgit:4.5.3.201708160445-r'
     } else {
-        smokeTestCompile'org.eclipse.jgit:org.eclipse.jgit:5.1.2.201810061102-r'
+        smokeTestCompile'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
     }
     smokeTestCompile configurations.testCompile
     smokeTestCompile sourceSets.test.output
