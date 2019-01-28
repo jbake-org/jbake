@@ -6,49 +6,54 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
+import org.junitpioneer.jupiter.TempDirectory.TempDir;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+
+@ExtendWith(TempDirectory.class)
 public class AssetTest extends LoggingTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    public Path folder;
     private DefaultJBakeConfiguration config;
     private File fixtureDir;
 
-    @Before
-    public void setup() throws Exception {
+
+    @BeforeEach
+    public void setup(@TempDir Path folder) throws Exception {
         fixtureDir = new File(this.getClass().getResource("/fixture").getFile());
+        this.folder = folder;
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(fixtureDir);
-        config.setDestinationFolder(folder.getRoot());
-        Assert.assertEquals(".html", config.getOutputExtension());
+        config.setDestinationFolder(folder.toFile());
+        Assertions.assertEquals(".html", config.getOutputExtension());
     }
+
 
     @Test
     public void testCopy() throws Exception {
         Asset asset = new Asset(config);
         asset.copy();
+        File cssFile = new File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
+        Assertions.assertTrue(cssFile.exists(), () -> "File " + cssFile.getAbsolutePath() + " does not exist");
+        File imgFile = new File(folder.toString() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
+        Assertions.assertTrue(imgFile.exists(), () -> "File " + imgFile.getAbsolutePath() + " does not exist");
+        File jsFile = new File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
+        Assertions.assertTrue(jsFile.exists(), () -> "File " + jsFile.getAbsolutePath() + " does not exist");
 
-        File cssFile = new File(folder.getRoot().getPath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
-        Assert.assertTrue("File " + cssFile.getAbsolutePath() + " does not exist", cssFile.exists());
-        File imgFile = new File(folder.getRoot().getPath() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
-        Assert.assertTrue("File " + imgFile.getAbsolutePath() + " does not exist", imgFile.exists());
-        File jsFile = new File(folder.getRoot().getPath() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
-        Assert.assertTrue("File " + jsFile.getAbsolutePath() + " does not exist", jsFile.exists());
-
-        Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
     }
 
     @Test
@@ -59,18 +64,18 @@ public class AssetTest extends LoggingTest {
             + "images" + File.separatorChar + "custom-image.jpg";
 
         // Copy single Asset File
-        File expected = new File(folder.getRoot().getPath() + cssSubPath);
-        Assert.assertFalse("cssFile should not exist before running the test; avoids false positives", expected.exists());
+        File expected = new File(folder.toString() + cssSubPath);
+        Assertions.assertFalse(expected.exists(), "cssFile should not exist before running the test; avoids false positives");
         File cssFile = new File(fixtureDir.getPath() + File.separatorChar + "assets" + cssSubPath);
         asset.copySingleFile(cssFile);
-        Assert.assertTrue("Css asset file did not copy", expected.exists());
+        Assertions.assertTrue(expected.exists(), "Css asset file did not copy");
 
         // Copy single Content file
-        expected = new File(folder.getRoot().getPath() + contentImgPath);
-        Assert.assertFalse("content image file should not exist before running the test", expected.exists());
+        expected = new File(folder.toString() + contentImgPath);
+        Assertions.assertFalse(expected.exists(), "content image file should not exist before running the test");
         File imgFile = new File(fixtureDir.getPath() + File.separatorChar + "content" + contentImgPath);
         asset.copySingleFile(imgFile);
-        Assert.assertTrue("Content img file did not copy", expected.exists());
+        Assertions.assertTrue(expected.exists(), "Content img file did not copy");
     }
 
     @Test
@@ -78,19 +83,21 @@ public class AssetTest extends LoggingTest {
 
         Asset asset = new Asset(config);
 
-        File emptyDir = folder.newFolder("emptyDir");
+        File emptyDir = new File(folder.toFile(),"emptyDir");
+        emptyDir.mkdir();
         File expectedDir = new File(fixtureDir.getCanonicalPath(), "emptyDir");
 
         asset.copySingleFile(emptyDir);
 
-        Assert.assertFalse("Directory should be skipped", expectedDir.exists());
+        Assertions.assertFalse(expectedDir.exists(), "Directory should be skipped");
     }
 
     @Test
     public void shouldLogSkipCopyingSingleFileIfDirectory() throws IOException {
 
         Asset asset = new Asset(config);
-        File emptyDir = folder.newFolder("emptyDir");
+        File emptyDir = new File(folder.toFile(),"emptyDir");
+        emptyDir.mkdir();
 
         asset.copySingleFile(emptyDir);
 
@@ -101,23 +108,22 @@ public class AssetTest extends LoggingTest {
 
     }
 
-
-
     @Test
     public void testCopyCustomFolder() throws Exception {
-        config.setAssetFolder(new File(config.getSourceFolder(),"/media"));
+        config.setAssetFolder(new File(config.getSourceFolder(), "/media"));
         Asset asset = new Asset(config);
         asset.copy();
 
-        File favFile = new File(folder.getRoot().getPath() + File.separatorChar + "favicon.ico");
-        Assert.assertTrue("File " + favFile.getAbsolutePath() + " does not exist", favFile.exists());
+        File favFile = new File(folder.toString() + File.separatorChar + "favicon.ico");
+        Assertions.assertTrue(favFile.exists(), () -> "File " + favFile.getAbsolutePath() + " does not exist");
 
-        Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
     }
 
     @Test
     public void testCopyIgnore() throws Exception {
-        File assetFolder = folder.newFolder("ignoredAssets");
+        File assetFolder = new File(folder.toFile(), "ignoredAssets");
+        assetFolder.mkdirs();
         FileUtils.copyDirectory(new File(this.getClass().getResource("/fixture/ignorables").getFile()), assetFolder);
         config.setAssetFolder(assetFolder);
         config.setAssetIgnoreHidden(true);
@@ -125,12 +131,12 @@ public class AssetTest extends LoggingTest {
         Asset asset = new Asset(config);
         asset.copy(assetFolder);
 
-        File testFile = new File(folder.getRoot(), "test.txt");
-        Assert.assertTrue("File " + testFile.getAbsolutePath() + " does not exist", testFile.exists());
-        File testIgnoreFile = new File(folder.getRoot(), ".test.txt");
-        Assert.assertFalse("File " + testIgnoreFile.getAbsolutePath() + " does exist", testIgnoreFile.exists());
+        File testFile = new File(folder.toFile(), "test.txt");
+        Assertions.assertTrue(testFile.exists(), () -> "File " + testFile.getAbsolutePath() + " does not exist");
+        File testIgnoreFile = new File(folder.toFile(), ".test.txt");
+        Assertions.assertFalse(testIgnoreFile.exists(), () -> "File " + testIgnoreFile.getAbsolutePath() + " does exist");
 
-        Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
     }
 
 
@@ -142,16 +148,19 @@ public class AssetTest extends LoggingTest {
     @Test
     public void testWriteProtected() throws Exception {
         File assets = new File(config.getSourceFolder(), "assets");
-        final File cssFile = new File(folder.newFolder("css"), "bootstrap.min.css");
+        File css = new File(folder.toFile(),"css");
+        css.mkdir();
+        final File cssFile = new File(css, "bootstrap.min.css");
         FileUtils.touch(cssFile);
         cssFile.setReadOnly();
 
         config.setAssetFolder(assets);
-        config.setDestinationFolder(folder.getRoot());
+        config.setDestinationFolder(folder.toFile());
         Asset asset = new Asset(config);
         asset.copy();
 
-        Assert.assertFalse("At least one error during copy expected", asset.getErrors().isEmpty());
+        cssFile.setWritable(true);
+        Assertions.assertFalse(asset.getErrors().isEmpty(), "At least one error during copy expected");
     }
 
     /**
@@ -173,16 +182,16 @@ public class AssetTest extends LoggingTest {
         Asset asset = new Asset(config);
         asset.copy(assets);
 
-        File cssFile = new File(folder.getRoot().getPath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
-        Assert.assertTrue("File " + cssFile.getAbsolutePath() + " does not exist", cssFile.exists());
-        File imgFile = new File(folder.getRoot().getPath() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
-        Assert.assertTrue("File " + imgFile.getAbsolutePath() + " does not exist", imgFile.exists());
-        File jsFile = new File(folder.getRoot().getPath() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
-        Assert.assertTrue("File " + jsFile.getAbsolutePath() + " does not exist", jsFile.exists());
-        File ignorableFolder = new File(folder.getRoot().getPath() + File.separatorChar + "ignorablefolder");
-        Assert.assertFalse("Folder " + ignorableFolder.getAbsolutePath() + " must not exist", ignorableFolder.exists());
+        File cssFile = new File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
+        Assertions.assertTrue(cssFile.exists(), () -> "File " + cssFile.getAbsolutePath() + " does not exist");
+        File imgFile = new File(folder.toString() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
+        Assertions.assertTrue(imgFile.exists(), () -> "File " + imgFile.getAbsolutePath() + " does not exist");
+        File jsFile = new File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
+        Assertions.assertTrue(jsFile.exists(), () -> "File " + jsFile.getAbsolutePath() + " does not exist");
+        File ignorableFolder = new File(folder.toString() + File.separatorChar + "ignorablefolder");
+        Assertions.assertFalse(ignorableFolder.exists(), () -> "Folder " + ignorableFolder.getAbsolutePath() + " must not exist");
 
-        Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
     }
 
 
@@ -193,36 +202,37 @@ public class AssetTest extends LoggingTest {
         Asset asset = new Asset(config);
         asset.copyAssetsFromContent(contents);
 
-        int totalFiles = countFiles(folder.getRoot());
+        int totalFiles = countFiles(folder.toFile());
         int expected = 3;
 
-        Assert.assertTrue(String.format("Number of files copied must be %d but are %d", expected, totalFiles), totalFiles == expected);
+        Assertions.assertTrue(totalFiles == expected, () -> String.format("Number of files copied must be %d but are %d", expected, totalFiles));
 
-        File pngFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2012/images/custom-image.png");
-        Assert.assertTrue("File " + pngFile.getAbsolutePath() + " does not exist", pngFile.exists());
+        File pngFile = new File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2012/images/custom-image.png");
+        Assertions.assertTrue(pngFile.exists(), () -> "File " + pngFile.getAbsolutePath() + " does not exist");
 
-        File jpgFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2013/images/custom-image.jpg");
-        Assert.assertTrue("File " + jpgFile.getAbsolutePath() + " does not exist", jpgFile.exists());
+        File jpgFile = new File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2013/images/custom-image.jpg");
+        Assertions.assertTrue(jpgFile.exists(), () -> "File " + jpgFile.getAbsolutePath() + " does not exist");
 
-        File jsonFile = new File(folder.getRoot().getPath() + File.separatorChar + "blog" + File.separatorChar + "2012/sample.json");
-        Assert.assertTrue("File " + jsonFile.getAbsolutePath() + " does not exist", jsonFile.exists());
+        File jsonFile = new File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2012/sample.json");
+        Assertions.assertTrue(jsonFile.exists(), () -> "File " + jsonFile.getAbsolutePath() + " does not exist");
 
-        Assert.assertTrue("Errors during asset copying", asset.getErrors().isEmpty());
+        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
     }
 
     @Test
     public void testIsFileAsset() {
         File cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
-        Assert.assertTrue(cssAsset.exists());
+        Assertions.assertTrue(cssAsset.exists());
         File contentFile = new File(config.getContentFolder().getAbsolutePath() + File.separatorChar + "about.html");
-        Assert.assertTrue(contentFile.exists());
+        Assertions.assertTrue(contentFile.exists());
         Asset asset = new Asset(config);
 
-        Assert.assertTrue(asset.isAssetFile(cssAsset));
-        Assert.assertFalse(asset.isAssetFile(contentFile));
+        Assertions.assertTrue(asset.isAssetFile(cssAsset));
+        Assertions.assertFalse(asset.isAssetFile(contentFile));
     }
 
-    private Integer countFiles(File path){
+
+    private Integer countFiles(File path) {
         int total = 0;
         FileFilter filesOnly = FileFilterUtils.fileFileFilter();
         FileFilter dirsOnly = FileFilterUtils.directoryFileFilter();

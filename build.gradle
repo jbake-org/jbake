@@ -20,8 +20,10 @@ ext {
     args4jVersion = '2.33'
     freemarkerVersion = '2.3.28'
     junit4Version = '4.12'
+    junit5Version = '5.3.1'
+    junitPioneer = '0.2.2'
     flexmarkVersion = '0.40.8'
-    jettyServerVersion = '9.2.26.v20180806'
+    jettyServerVersion = '9.4.12.v20180830'
     orientDbVersion = '2.2.37'
     groovyVersion = '2.5.5'
     slf4jVersion = '1.7.25'
@@ -87,18 +89,16 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'nebula.optional-base'
 
-    if( JavaVersion.current().java7Compatible ) {
-        apply from: "$rootDir/gradle/signing.gradle"
-        // We do not publish any jars from the jbake-dist project
-        if ( project.name != "jbake-dist" ) {
-            apply from: "$rootDir/gradle/maven-publishing.gradle"
-        }
+    apply from: "$rootDir/gradle/signing.gradle"
+    // We do not publish any jars from the jbake-dist project
+    if ( project.name != "jbake-dist" ) {
+      apply from: "$rootDir/gradle/maven-publishing.gradle"
     }
 
     // add source and target compatibility for all JavaCompile tasks
     tasks.withType(JavaCompile) {
-        sourceCompatibility = 1.7
-        targetCompatibility = 1.7
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
 
         /**
          *  Fix for warning: [options] bootstrap class path not set in conjunction with -source
@@ -110,14 +110,26 @@ subprojects {
         }
     }
 
+    test {
+        useJUnitPlatform()
+    }
+
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
         compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
         compile "ch.qos.logback:logback-classic:$logbackVersion", optional
         compile "ch.qos.logback:logback-core:$logbackVersion", optional
+        
+        testCompile("org.junit.jupiter:junit-jupiter-api:$junit5Version")
+        testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
+        testCompile("org.junit-pioneer:junit-pioneer:$junitPioneer")
+        // compatibility for Junit 4 test
         testCompile "junit:junit:$junit4Version"
+        testRuntime("org.junit.vintage:junit-vintage-engine:$junit5Version")
+
         testCompile "org.assertj:assertj-core:$assertjCoreVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
+        testCompile "org.mockito:mockito-junit-jupiter:$mockitoVersion"
     }
 
     dependencyUpdates.resolutionStrategy = {
@@ -175,9 +187,9 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     description = 'Generates an aggregate report from all subprojects'
     dependsOn jacocoMerge
 
-    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(subprojects.sourceSets.main.output)
-    executionData = jacocoMerge.executionData
+    sourceDirectories.from files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.from files(subprojects.sourceSets.main.output)
+    executionData.from jacocoMerge.executionData
 
     reports {
         html.enabled = true

@@ -5,16 +5,16 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Appender;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public abstract class LoggingTest {
 
     @Mock
@@ -25,7 +25,7 @@ public abstract class LoggingTest {
 
     protected Logger root;
 
-    @Before
+    @BeforeEach
     public void setupBase() {
         root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
@@ -33,7 +33,7 @@ public abstract class LoggingTest {
         root.setLevel(Level.INFO);
     }
 
-    @After
+    @AfterEach
     public void teardownBase() {
         root.detachAppender(mockAppender);
     }

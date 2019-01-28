@@ -34,4 +34,11 @@ public class TestUtils {
         return new File(TestUtils.class.getResource("/fixture").getFile());
     }
 
+    public static File newFolder(File base, String folderName) {
+        File templateFolder = new File(base,folderName);
+        templateFolder.mkdir();
+        return templateFolder;
+    }
+
+
 }
