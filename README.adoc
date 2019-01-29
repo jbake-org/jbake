@@ -1,6 +1,6 @@
 = JBake plugin for Gradle
 :jbake-version: 2.6.4
-:plugin-version: 5.0.0-SNAPSHOT
+:plugin-version: 5.0.0
 :linkattrs:
 :project-name: jbake-gradle-plugin
 
