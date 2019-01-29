@@ -91,12 +91,14 @@ config {
     }
 
     bintray {
+        enabled       = true
+        userOrg       = project.bintray_org
+        name          = project.name
+        skipMavenSync = true
         credentials {
             username = project.bintrayUsername
             password = project.bintrayApiKey
         }
-        userOrg = project.bintray_org
-        name    = project.name
     }
 }
 
