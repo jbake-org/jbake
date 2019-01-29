@@ -30,8 +30,8 @@ buildScan {
     termsOfServiceAgree = 'yes'
 }
 
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
-if (!project.hasProperty('bintrayApiKey'))   ext.bintrayApiKey = ''
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = '**undefined**'
+if (!project.hasProperty('bintrayApiKey'))   ext.bintrayApiKey   = '**undefined**'
 
 config {
     release = (project.findProperty('release') ?: false).toBoolean()
