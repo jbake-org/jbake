@@ -63,13 +63,13 @@ class JBakePluginSpec extends Specification {
 
         where:
         group                   | name                          | version
-        'org.jbake'             | 'jbake-core'                  | '2.6.3'
+        'org.jbake'             | 'jbake-core'                  | '2.6.4'
         'org.freemarker'        | 'freemarker'                  | '2.3.28'
-        'com.vladsch.flexmark'  | 'flexmark'                    | '0.34.48'
-        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.34.48'
-        'org.asciidoctor'       | 'asciidoctorj'                | '1.5.7'
-        'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.3'
-        'org.thymeleaf'         | 'thymeleaf'                   | '3.0.9.RELEASE'
+        'com.vladsch.flexmark'  | 'flexmark'                    | '0.40.8'
+        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.40.8'
+        'org.asciidoctor'       | 'asciidoctorj'                | '1.5.8.1'
+        'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.5'
+        'org.thymeleaf'         | 'thymeleaf'                   | '3.0.11.RELEASE'
         'de.neuland-bfi'        | 'jade4j'                      | '1.2.7'
     }
 
