@@ -26,7 +26,7 @@ plugins {
 }
 
 buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceUrl   = 'https://gradle.com/terms-of-service'
     termsOfServiceAgree = 'yes'
 }
 
@@ -44,9 +44,9 @@ config {
         tags          = ['jbake', 'site-generator']
 
         links {
-            website      = 'https://github.com/jbake-org/jbake-gradle-plugin'
-            issueTracker = 'https://github.com/jbake-org/jbake-gradle-plugin/issues'
-            scm          = 'https://github.com/jbake-org/jbake-gradle-plugin.git'
+            website      = project.project_url
+            issueTracker = "${project.project_url}/issues"
+            scm          = "${project.project_url}.git"
         }
 
         specification {
@@ -199,29 +199,29 @@ bintray {
 gradlePlugin {
     plugins {
         jbakePlugin {
-            id = 'org.jbake.site'
-            implementationClass = 'org.jbake.gradle.JBakePlugin'
+            id                  = project.pluginId
+            implementationClass = project.pluginImplementationClass
         }
     }
 }
 
 pluginBundle {
-    website = 'https://github.com/jbake-org/jbake-gradle-plugin'
-    vcsUrl = 'https://github.com/jbake-org/jbake-gradle-plugin.git'
+    website     = project.project_url
+    vcsUrl      = "${project.project_url}.git"
     description = project.project_description
-    tags = ['jbake', 'site-generator']
+    tags        = ['jbake', 'site-generator']
 
     plugins {
         jbakePlugin {
-            id = project.pluginId
+            id          = project.pluginId
             displayName = project.displayName
         }
     }
 
     mavenCoordinates {
-        groupId = project.group
+        groupId    = project.group
         artifactId = project.name
-        version = project.version
+        version    = project.version
     }
 }
 
