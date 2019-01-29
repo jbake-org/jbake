@@ -15,34 +15,92 @@
  */
 
 plugins {
-    id 'groovy'
+    id 'com.gradle.build-scan'      version '2.1'
     id 'idea'
-    id 'maven-publish'
-    id 'jacoco'
+    id 'groovy'
     id 'java-gradle-plugin'
-    id 'com.jfrog.bintray'             version '1.8.4'
-    id 'net.nemerosa.versioning'       version '2.7.1'
-    id 'com.github.ben-manes.versions' version '0.20.0'
-    id 'com.gradle.plugin-publish'     version '0.10.0'
-    id 'com.github.hierynomus.license' version '0.14.0'
-    id 'com.github.kt3k.coveralls'     version '2.8.2'
+    id 'org.kordamp.gradle.project' version '0.12.0'
+    id 'org.kordamp.gradle.bintray' version '0.12.0'
+    id 'com.gradle.plugin-publish'  version '0.10.0'
+    id 'com.github.kt3k.coveralls'  version '2.8.2'
 }
 
-apply from: 'gradle/credentials.gradle'
-apply from: 'gradle/publishing.gradle'
-apply from: 'gradle/code-quality.gradle'
+buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
+}
 
-gradlePlugin {
-    plugins {
-        jbakePlugin {
-            id = project_pluginId
-            implementationClass = 'org.jbake.gradle.JBakePlugin'
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
+if (!project.hasProperty('bintrayApiKey'))   ext.bintrayApiKey = ''
+
+config {
+    release = (project.findProperty('release') ?: false).toBoolean()
+
+    info {
+        name          = project.name
+        vendor        = 'JBake'
+        description   = project.project_description
+        inceptionYear = '2014'
+        tags          = ['jbake', 'site-generator']
+
+        links {
+            website      = 'https://github.com/jbake-org/jbake-gradle-plugin'
+            issueTracker = 'https://github.com/jbake-org/jbake-gradle-plugin/issues'
+            scm          = 'https://github.com/jbake-org/jbake-gradle-plugin.git'
         }
+
+        specification {
+            enabled = false
+        }
+
+        implementation {
+            enabled = false
+        }
+
+        people {
+            person {
+                id    = 'melix'
+                name  = 'Cedric Champeau'
+                roles = ['developer']
+            }
+            person {
+                id    = 'aalmiray'
+                name  = 'Andres Almiray'
+                roles = ['developer']
+            }
+        }
+    }
+
+    javadoc {
+        enabled = false
+    }
+
+    groovydoc {
+        replaceJavadoc = true
+        options {
+            link 'https://docs.gradle.org/4.0/javadoc/', 'org.gradle.'
+        }
+    }
+
+    license {
+        licenses {
+            license {
+                id = 'Apache-2.0'
+            }
+        }
+    }
+
+    bintray {
+        credentials {
+            username = project.bintrayUsername
+            password = project.bintrayApiKey
+        }
+        userOrg = project.bintray_org
+        name    = project.name
     }
 }
 
 repositories {
-    mavenLocal()
     jcenter()
 }
 
@@ -75,43 +133,6 @@ compileGroovy {
     targetCompatibility = project.targetCompatibility
 }
 
-groovydoc {
-    use             = true
-    source          = project.sourceSets.main.allSource
-    classpath       = javadoc.classpath
-    ext.windowtitle = "$project.name $project.version API"
-    ext.doctitle    = "$project.name $project.version API"
-    header          = "$project.name $project.version API"
-    footer          = "Copyright &copy; ${copyrightYear} the original author or authors. All rights reserved."
-    includePrivate  = false
-    link 'https://docs.gradle.org/3.5/javadoc/', 'org.gradle.'
-    link 'http://docs.oracle.com/javase/7/docs/api/', 'java.', 'org.xml.', 'javax.', 'org.w3c.'
-}
-
-task sourcesJar(type: Jar) {
-    group 'Build'
-    description 'An archive of the source code'
-    classifier 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: groovydoc) {
-    group 'Build'
-    description 'An archive of the javadoc'
-    classifier 'javadoc'
-    from groovydoc.destinationDir
-}
-
-jar.finalizedBy sourcesJar
-jar.finalizedBy javadocJar
-
-artifacts {
-    sourcesJar
-    javadocJar
-}
-
-task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
-
 project.tasks.withType(Test) {
     beforeTest { descriptor ->
         logger.lifecycle("Running test: " + descriptor)
@@ -135,7 +156,7 @@ project.tasks.withType(Test) {
     /**
      * AppVeyor breaks with mockito throwing a java.lang.OutOfMemoryError: PermGen space
      */
-    if ( JavaVersion.current().java7 ) {
+    if (JavaVersion.current().java7) {
         args << '-XX:MaxPermSize=2g'
     }
 
@@ -143,20 +164,65 @@ project.tasks.withType(Test) {
      * jdk9 build is unable to determine the amount of MaxDirectMemorySize
      * See https://pastebin.com/ECvQeHx0
      */
-    if ( JavaVersion.current().java9Compatible ) {
+    if (JavaVersion.current().java9Compatible) {
         args << '-XX:MaxDirectMemorySize=2g'
     }
     jvmArgs args
-
 }
 
 jacoco {
     toolVersion = jacocoVersion
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
+license {
+    exclude '**/*.woff'
+    exclude '**/*.eot'
+    exclude '**/*.ttf'
+    exclude '**/*.md'
+    exclude '**/*.adoc'
+    exclude '**/*.svg'
+    exclude '**/*.ico'
+}
+
+licenseTest {
+    source -= sourceSets.test.resources
+}
+
+bintray {
+    pkg {
+        version {
+            attributes = ['gradle-plugin': "${project.pluginId}:${project.group}:${project.name}"]
+        }
     }
 }
+
+gradlePlugin {
+    plugins {
+        jbakePlugin {
+            id = 'org.jbake.site'
+            implementationClass = 'org.jbake.gradle.JBakePlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/jbake-org/jbake-gradle-plugin'
+    vcsUrl = 'https://github.com/jbake-org/jbake-gradle-plugin.git'
+    description = project.project_description
+    tags = ['jbake', 'site-generator']
+
+    plugins {
+        jbakePlugin {
+            id = project.pluginId
+            displayName = project.displayName
+        }
+    }
+
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
+        version = project.version
+    }
+}
+
+task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}

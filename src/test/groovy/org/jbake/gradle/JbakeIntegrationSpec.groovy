@@ -1,5 +1,7 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +30,10 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
     @Shared
-    def latestGradleVersion = '4.10'
+    String latestGradleVersion = '5.1'
 
     @Shared
-    def latestJbakeVersion = '2.6.2'
+    String latestJbakeVersion = '2.6.4'
 
     @Unroll
     def 'Setup and bake with gradle #version'() {
@@ -39,7 +41,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         given:
 
         if (Jvm.current.java9Compatible) {
-            Assume.assumeTrue("Skip. Not jdk9 compatible",jdk9Compatible)
+            Assume.assumeTrue("Skip. Not jdk9 compatible", jdk9Compatible)
         }
 
         gradleVersion = version
@@ -70,13 +72,9 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         blogTagFile.size() > 0
 
         where:
-        version                 | jdk9Compatible
-          '2.8'                 | false     // lower limit of Tooling API compatibility for TestKit
-          '2.12'                | false     // introduces changes such as compileOnly
-          '2.14.1'              | false     // latest release in 2.x line
-          '3.0'                 | false     // first release in 3.x line, compatibility changes
-           latestGradleVersion  | true      // latest release, deprecations & warnings
-
+        version             | jdk9Compatible
+        '5.0'               | true      // base version
+        latestGradleVersion | true      // latest release, deprecations & warnings
     }
 
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
