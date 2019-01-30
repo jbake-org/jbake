@@ -4,15 +4,15 @@ plugins {
     id "io.sdkman.vendors"              version "1.1.1"     apply false
     id "com.jfrog.bintray"              version "1.8.4"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
-    id "org.sonarqube"                  version "2.6.2"     apply false
+    id "org.sonarqube"                  version "2.7"     apply false
     id 'com.github.ben-manes.versions'  version '0.20.0'
-    id "nebula.optional-base"           version "4.0.1"     apply false
+    id "nebula.optional-base"           version "5.0.0"     apply false
 }
 
 // common variables
 ext {
     asciidoctorjVersion = '1.5.8.1'
-    asciidoctorjDiagramVersion = '1.5.10'
+    asciidoctorjDiagramVersion = '1.5.11'
     commonsIoVersion = '2.6'
     commonsConfigurationVersion = '1.10'
     commonsLangVersion = '3.8.1'
@@ -20,17 +20,19 @@ ext {
     args4jVersion = '2.33'
     freemarkerVersion = '2.3.28'
     junit4Version = '4.12'
-    flexmarkVersion = '0.34.48'
-    jettyServerVersion = '9.2.24.v20180105'
-    orientDbVersion = '3.0.10'
-    groovyVersion = '2.5.3'
+    junit5Version = '5.3.1'
+    junitPioneer = '0.2.2'
+    flexmarkVersion = '0.40.8'
+    jettyServerVersion = '9.4.12.v20180830'
+    orientDbVersion = '3.0.13'
+    groovyVersion = '2.5.5'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
     assertjCoreVersion = '2.9.1'
-    thymeleafVersion = '3.0.9.RELEASE'
+    thymeleafVersion = '3.0.11.RELEASE'
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.7'
-    mockitoVersion = '2.23.0'
+    mockitoVersion = '2.23.4'
     jsoupVersion = '1.11.3'
 
     isTravis = (System.getenv("TRAVIS") == "true")
@@ -56,6 +58,19 @@ apply plugin: 'com.github.kt3k.coveralls'
 allprojects {
     apply plugin: 'jacoco'
 
+    if ( JavaVersion.current().isJava8Compatible() ) {
+
+        apply plugin: 'checkstyle'
+
+        tasks.withType(Checkstyle) {
+            reports {
+                xml.enabled false
+                html.enabled true
+            }
+        }
+
+    }
+
     repositories {
         jcenter()
     }
@@ -74,12 +89,10 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'nebula.optional-base'
 
-    if( JavaVersion.current().java7Compatible ) {
-        apply from: "$rootDir/gradle/signing.gradle"
-        // We do not publish any jars from the jbake-dist project
-        if ( project.name != "jbake-dist" ) {
-            apply from: "$rootDir/gradle/maven-publishing.gradle"
-        }
+    apply from: "$rootDir/gradle/signing.gradle"
+    // We do not publish any jars from the jbake-dist project
+    if ( project.name != "jbake-dist" ) {
+      apply from: "$rootDir/gradle/maven-publishing.gradle"
     }
 
     // add source and target compatibility for all JavaCompile tasks
@@ -97,14 +110,26 @@ subprojects {
         }
     }
 
+    test {
+        useJUnitPlatform()
+    }
+
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
         compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
         compile "ch.qos.logback:logback-classic:$logbackVersion", optional
         compile "ch.qos.logback:logback-core:$logbackVersion", optional
+        
+        testCompile("org.junit.jupiter:junit-jupiter-api:$junit5Version")
+        testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
+        testCompile("org.junit-pioneer:junit-pioneer:$junitPioneer")
+        // compatibility for Junit 4 test
         testCompile "junit:junit:$junit4Version"
+        testRuntime("org.junit.vintage:junit-vintage-engine:$junit5Version")
+
         testCompile "org.assertj:assertj-core:$assertjCoreVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
+        testCompile "org.mockito:mockito-junit-jupiter:$mockitoVersion"
     }
 
     dependencyUpdates.resolutionStrategy = {
@@ -162,9 +187,9 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     description = 'Generates an aggregate report from all subprojects'
     dependsOn jacocoMerge
 
-    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(subprojects.sourceSets.main.output)
-    executionData = jacocoMerge.executionData
+    sourceDirectories.from files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.from files(subprojects.sourceSets.main.output)
+    executionData.from jacocoMerge.executionData
 
     reports {
         html.enabled = true

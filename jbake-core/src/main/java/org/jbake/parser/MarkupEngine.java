@@ -253,33 +253,35 @@ public abstract class MarkupEngine implements ParserEngine {
             if (hasHeaderSeparator(line)) {
                 break;
             }
-            processLine(line, context.getDocumentModel());
+            processHeaderLine(line, context.getDocumentModel());
         }
     }
 
-    private void processLine(String line, Map<String, Object> content) {
+    private void processHeaderLine(String line, Map<String, Object> content) {
         String[] parts = line.split("=", 2);
         if (!line.isEmpty() && parts.length == 2) {
+            storeHeaderValue(parts[0], parts[1], content);
+        }
+    }
 
+    void storeHeaderValue(String inputKey, String inputValue, Map<String, Object> content) {
+        String key = sanitizeKey(inputKey);
+        String value = sanitizeValue(inputValue);
 
-            String key = sanitizeKey(parts[0]);
-            String value = sanitizeValue(parts[1]);
-
-            if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
-                DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
-                try {
-                    Date date = df.parse(value);
-                    content.put(key, date);
-                } catch (ParseException e) {
-                    LOGGER.error("unable to parse date {}", value);
-                }
-            } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
-                content.put(key, getTags(value));
-            } else if (isJson(value)) {
-                content.put(key, JSONValue.parse(value));
-            } else {
-                content.put(key, value);
+        if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
+            DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
+            try {
+                Date date = df.parse(value);
+                content.put(key, date);
+            } catch (ParseException e) {
+                LOGGER.error("unable to parse date {}", value);
             }
+        } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
+            content.put(key, getTags(value));
+        } else if (isJson(value)) {
+            content.put(key, JSONValue.parse(value));
+        } else {
+            content.put(key, value);
         }
     }
 

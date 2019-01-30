@@ -24,17 +24,11 @@ after_success:
 
 jdk:
   - openjdk11
-  - openjdk10
-  - oraclejdk9
   - oraclejdk8
   - openjdk8
 
 jobs:
   include:
-
-  - script: "./gradlew check"
-    jdk: openjdk7
-    dist: precise
 
   - script: "./gradlew check"
     jdk:

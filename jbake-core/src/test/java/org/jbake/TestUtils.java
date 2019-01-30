@@ -29,4 +29,16 @@ public class TestUtils {
     public static boolean isWindows() {
         return Os.isFamily(Os.OS_FAMILY_WINDOWS);
     }
+
+    public static File getTestResourcesAsSourceFolder() {
+        return new File(TestUtils.class.getResource("/fixture").getFile());
+    }
+
+    public static File newFolder(File base, String folderName) {
+        File templateFolder = new File(base,folderName);
+        templateFolder.mkdir();
+        return templateFolder;
+    }
+
+
 }

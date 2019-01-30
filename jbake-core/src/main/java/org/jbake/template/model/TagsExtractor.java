@@ -1,8 +1,8 @@
 package org.jbake.template.model;
 
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
 import org.jbake.app.DocumentList;
+import org.jbake.app.FileUtil;
 import org.jbake.template.ModelExtractor;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class TagsExtractor implements ModelExtractor<DocumentList> {
             String tagName = tag;
             newTag.put("name", tagName);
 
-            String uri = tagPath + Crawler.URI_SEPARATOR_CHAR + tag + config.get(OUTPUT_EXTENSION.replace(".", "_")).toString();
+            String uri = tagPath + FileUtil.URI_SEPARATOR_CHAR + tag + config.get(OUTPUT_EXTENSION.replace(".", "_")).toString();
 
             newTag.put("uri", uri);
             newTag.put("tagged_posts", db.getPublishedPostsByTag(tagName));

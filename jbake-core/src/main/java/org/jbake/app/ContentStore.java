@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * @author jdlee
  */
@@ -180,6 +181,37 @@ public class ContentStore {
             System.out.println("db is null on activate");
     }
 
+
+    /**
+     * Get a document by sourceUri and update it from the given map.
+     * @param incomingDocMap The document's db columns.
+     * @return The saved document.
+     * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.
+     */
+    public ODocument mergeDocument(Map<String, ? extends Object> incomingDocMap)
+    {
+        String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
+        if (null == sourceUri)
+            throw new IllegalArgumentException("Document sourceUri is null.");
+        String docType = (String) incomingDocMap.get(Crawler.Attributes.TYPE);
+        if (null == docType)
+            throw new IllegalArgumentException("Document docType is null.");
+
+        // Get a document by sourceUri
+        String sql = "SELECT * FROM " + docType + " WHERE sourceuri=?";
+        activateOnCurrentThread();
+        List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
+        if (results.size() == 0)
+            throw new JBakeException("No document with sourceUri '"+sourceUri+"'.");
+
+        // Update it from the given map.
+        ODocument incomingDoc = new ODocument(docType);
+        incomingDoc.fromMap(incomingDocMap);
+        ODocument merged = results.get(0).merge(incomingDoc, true, false);
+        return merged;
+    }
+
+
     public long getDocumentCount(String docType) {
         activateOnCurrentThread();
         return db.countClass(docType);
@@ -188,6 +220,13 @@ public class ContentStore {
     public long getPublishedCount(String docType) {
         String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType);
         return (Long) query(statement).get(0).get("count");
+    }
+
+    /*
+     * In fact, the URI should be the only input as there can only be one document at given URI; but the DB is split per document type for some reason.
+     */
+    public DocumentList getDocumentByUri(String docType, String uri) {
+        return query("select * from " + docType + " where sourceuri=?", uri);
     }
 
     public DocumentList getDocumentStatus(String docType, String uri) {
@@ -329,17 +368,29 @@ public class ContentStore {
     private void createDocType(final OSchema schema, final String docType) {
         logger.debug("Create document class '{}'", docType);
 
+
         OClass page = schema.createClass(docType);
-        page.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.SHA1.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.SOURCE_URI), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SOURCE_URI.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.CACHED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.CACHED.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.RENDERED), OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.RENDERED.toString());
-        page.createProperty(String.valueOf(DocumentAttributes.STATUS), OType.STRING).setNotNull(true);
-        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, DocumentAttributes.STATUS.toString());
+
+        // Primary key
+        String attribName = DocumentAttributes.SOURCE_URI.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, attribName);
+
+        attribName = DocumentAttributes.SHA1.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.CACHED.toString();
+        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.RENDERED.toString();
+        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
+
+        attribName = DocumentAttributes.STATUS.toString();
+        page.createProperty(attribName, OType.STRING).setNotNull(true);
+        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
     }
 
     private void createSignatureType(OSchema schema) {

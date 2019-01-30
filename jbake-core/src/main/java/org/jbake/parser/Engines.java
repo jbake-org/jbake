@@ -68,7 +68,7 @@ public class Engines {
     }
 
     private void registerEngine(String fileExtension, ParserEngine markupEngine) {
-    	ParserEngine old = parsers.put(fileExtension, markupEngine);
+        ParserEngine old = parsers.put(fileExtension, markupEngine);
         if (old != null) {
             LOGGER.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
         }
@@ -122,7 +122,7 @@ public class Engines {
     }
 
     private static void registerEngine(String className, String... extensions) {
-    	ParserEngine engine = tryLoadEngine(className);
+        ParserEngine engine = tryLoadEngine(className);
         if (engine != null) {
             for (String extension : extensions) {
                 register(extension, engine);

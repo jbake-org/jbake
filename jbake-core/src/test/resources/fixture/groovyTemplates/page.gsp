@@ -9,10 +9,10 @@
       </div>
 
       <hr>
-      
+
       <h5>Published Pages</h5>
       <%published_pages.each {page -> %>
-      	<a href="${config.site_host}${page.uri}">${page.title}</a>
+          <a href="${config.site_host}${page.uri}">${page.title}</a>
       <%}%>
 
 <%include "footer.gsp"%>

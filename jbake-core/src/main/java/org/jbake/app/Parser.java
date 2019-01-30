@@ -32,15 +32,15 @@ public class Parser {
      * Process the file by parsing the contents.
      *
      * @param    file File input for parsing
-     * @return				The contents of the file
+     * @return                The contents of the file
      */
     public Map<String, Object> processFile(File file) {
-    	ParserEngine engine = Engines.get(FileUtil.fileExt(file));
-    	if (engine==null) {
-    		LOGGER.error("Unable to find suitable markup engine for {}",file);
-    		return null;
-    	}
-    	
-    	return engine.parse(config, file);
+        ParserEngine engine = Engines.get(FileUtil.fileExt(file));
+        if (engine==null) {
+            LOGGER.error("Unable to find suitable markup engine for {}",file);
+            return null;
+        }
+
+        return engine.parse(config, file);
     }
 }
