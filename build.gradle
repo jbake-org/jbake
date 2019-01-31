@@ -24,7 +24,7 @@ ext {
     junitPioneer = '0.2.2'
     flexmarkVersion = '0.40.8'
     jettyServerVersion = '9.4.12.v20180830'
-    orientDbVersion = '3.0.13'
+    orientDbVersion = '3.0.14'
     groovyVersion = '2.5.5'
     slf4jVersion = '1.7.25'
     logbackVersion = '1.2.3'
@@ -119,7 +119,7 @@ subprojects {
         compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
         compile "ch.qos.logback:logback-classic:$logbackVersion", optional
         compile "ch.qos.logback:logback-core:$logbackVersion", optional
-        
+
         testCompile("org.junit.jupiter:junit-jupiter-api:$junit5Version")
         testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
         testCompile("org.junit-pioneer:junit-pioneer:$junitPioneer")
