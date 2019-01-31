@@ -82,7 +82,7 @@ distributions {
 }
 
 startScripts {
-    defaultJvmOpts = ['-XX:MaxDirectMemorySize=512m']
+    defaultJvmOpts = ['-XX:MaxDirectMemorySize=512m','-Djna.nosys=true']
     classpath = files("lib","logging")
 
     /**

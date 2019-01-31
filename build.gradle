@@ -148,7 +148,7 @@ subprojects {
     //set jvm for all Test tasks (like test and smokeTest)
     tasks.withType(Test) {
 
-        def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']
+        def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false','-Djna.nosys=true']
 
         /**
          * AppVeyor breaks with mockito throwing a java.lang.OutOfMemoryError: PermGen space
