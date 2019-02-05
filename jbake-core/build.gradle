@@ -23,6 +23,7 @@ dependencies {
     compile "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
     compile "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     compile "org.jsoup:jsoup:$jsoupVersion"
+    compile "io.pebbletemplates:pebble:$pebbleVersion", optional
 
     // cli specific dependencies
     compile "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional

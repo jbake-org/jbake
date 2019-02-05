@@ -34,6 +34,7 @@ ext {
     jade4jVersion = '1.2.7'
     mockitoVersion = '2.23.4'
     jsoupVersion = '1.11.3'
+    pebbleVersion = '3.0.7'
 
     isTravis = (System.getenv("TRAVIS") == "true")
     isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
@@ -119,7 +120,7 @@ subprojects {
         compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
         compile "ch.qos.logback:logback-classic:$logbackVersion", optional
         compile "ch.qos.logback:logback-core:$logbackVersion", optional
-        
+
         testCompile("org.junit.jupiter:junit-jupiter-api:$junit5Version")
         testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
         testCompile("org.junit-pioneer:junit-pioneer:$junitPioneer")
