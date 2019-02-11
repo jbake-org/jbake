@@ -102,5 +102,5 @@ startScripts {
 }
 
 distZip {
-    classifier = "bin"
+    archiveClassifier.set("bin")
 }
