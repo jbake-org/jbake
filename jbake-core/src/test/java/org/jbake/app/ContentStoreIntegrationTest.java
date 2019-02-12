@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import org.apache.commons.vfs2.util.Os;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -36,6 +37,12 @@ public abstract class ContentStoreIntegrationTest {
         Assert.assertEquals(".html", config.getOutputExtension());
         config.setDatabaseStore(storageType.toString());
         String dbPath = folder.newFolder("documents" + System.currentTimeMillis()).getAbsolutePath();
+
+        // setting the database path with a colon creates an invalid url for OrientDB.
+        // only one colon is expected. there is no documentation about proper url path for windows available :(
+        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
+            dbPath = dbPath.replace(":","");
+        }
         config.setDatabasePath(dbPath);
         db = DBUtil.createDataStore(config);
     }
