@@ -11,7 +11,8 @@ import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Renders pages using the <a href="https://pebbletemplates.io/">Pebble</a> template engine.
