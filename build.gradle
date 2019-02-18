@@ -34,6 +34,7 @@ ext {
     jade4jVersion = '1.2.7'
     mockitoVersion = '2.23.4'
     jsoupVersion = '1.11.3'
+    pebbleVersion = '3.0.7'
 
     isTravis = (System.getenv("TRAVIS") == "true")
     isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"

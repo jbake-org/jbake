@@ -1,0 +1,15 @@
+{% extends 'base.pebble' %}
+
+ {% block header %}<h1>Tags</h1>{% endblock %}
+
+ {% block primary %}
+
+    <div id="main">
+        	<ul class="posts">
+                    {% for tag in tags %}
+                        <h2><a href="{{ content.rootpath }}{{ tag.uri }}">{{ tag.name }}</a> {{tag.tagged_posts.size}}</h2>
+                    {% endfor %}
+            </ul>
+    </div>
+
+ {% endblock %}

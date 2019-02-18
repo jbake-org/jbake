@@ -1,0 +1,18 @@
+{% extends 'base.pebble' %}
+
+ {% block title %}{{ content.title }}{% endblock %}
+{% block header %}<h4>{{ content.title }}</h4>{% endblock %}
+
+ {% block primary %}
+
+     <p><em>{{ content.date | date("dd MMMM yyyy") }}</em></p>
+
+     <p>{{ content.body }}</p>
+
+     <hr />
+
+     <h5>Published Pages</h5>
+    {% for page in published_pages %}
+    	<a href="{{ config.site_host }}/{{ page.uri }}">{{ page.title }}</a>
+    {% endfor %}
+{% endblock %}
