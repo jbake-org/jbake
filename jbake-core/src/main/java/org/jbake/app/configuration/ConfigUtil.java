@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -44,7 +45,8 @@ public class ConfigUtil {
         if (customConfigFile.exists()) {
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
         }
-        config.addConfiguration(new PropertiesConfiguration(DEFAULT_CONFIG_FILE));
+        URL defaultPropertiesLocation = this.getClass().getClassLoader().getResource(DEFAULT_CONFIG_FILE);
+        config.addConfiguration(new PropertiesConfiguration(defaultPropertiesLocation));
         config.addConfiguration(new SystemConfiguration());
         return config;
     }
