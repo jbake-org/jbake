@@ -150,7 +150,7 @@ public class Main {
         parser.printUsage(System.out);
     }
 
-    private void runServer(File path, int port) {
+    protected void runServer(File path, int port) {
         jettyServer.run(path.getPath(), String.valueOf(port));
     }
 

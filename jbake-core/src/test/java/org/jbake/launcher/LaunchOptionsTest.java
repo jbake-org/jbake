@@ -1,13 +1,25 @@
 package org.jbake.launcher;
 
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.File;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
 public class LaunchOptionsTest {
+
+    @Spy
+    Main main;
 
     @Test
     public void showHelp() throws Exception {
@@ -31,13 +43,22 @@ public class LaunchOptionsTest {
 
     @Test
     public void runServerWithFolder() throws Exception {
-        String[] args = {"-s", "/tmp"};
+        String path = "/tmp";
+        String[] args = {"-s", path};
         LaunchOptions res = new LaunchOptions();
         CmdLineParser parser = new CmdLineParser(res);
         parser.parseArgument(args);
 
         assertThat(res.isRunServer()).isTrue();
-        assertThat(res.getSource()).isEqualTo(new File("/tmp"));
+        assertThat(res.getSource()).isEqualTo(new File(path));
+
+        // ensures path supplied is actually used when running server
+        JBakeConfiguration config = new JBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+        // to stop server actually running when method is called
+        doNothing().when(main).runServer(any(File.class), any(Integer.class));
+        main.run(res, config);
+        // verify method was called with correct path
+        verify(main).runServer(new File(path), config.getServerPort());
     }
 
     @Test
