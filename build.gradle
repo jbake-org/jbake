@@ -117,6 +117,7 @@ subprojects {
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
         compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
+        compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
         compile "ch.qos.logback:logback-classic:$logbackVersion", optional
         compile "ch.qos.logback:logback-core:$logbackVersion", optional
 
