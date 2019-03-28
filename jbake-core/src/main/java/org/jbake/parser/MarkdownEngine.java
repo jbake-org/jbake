@@ -2,7 +2,7 @@ package org.jbake.parser;
 
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.profiles.pegdown.Extensions;
+import com.vladsch.flexmark.parser.PegdownExtensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.options.DataHolder;
@@ -25,7 +25,7 @@ public class MarkdownEngine extends MarkupEngine {
     public void processBody(final ParserContext context) {
         List<String> mdExts = context.getConfig().getMarkdownExtensions();
 
-        int extensions = Extensions.NONE;
+        int extensions = PegdownExtensions.NONE;
 
         for (String ext : mdExts) {
             if (ext.startsWith("-")) {
@@ -49,10 +49,10 @@ public class MarkdownEngine extends MarkupEngine {
     }
 
     private int extensionFor(String name) {
-        int extension = Extensions.NONE;
+        int extension = PegdownExtensions.NONE;
 
         try {
-            Field extField = Extensions.class.getDeclaredField(name);
+            Field extField = PegdownExtensions.class.getDeclaredField(name);
             extension = extField.getInt(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             logger.debug("Undeclared extension field '{}', fallback to NONE", name);

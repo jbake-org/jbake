@@ -28,7 +28,7 @@ dependencies {
         exclude group: 'org.asciidoctor', module: 'asciidoctorj'
     }
 
-    smokeTestCompile 'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
+    smokeTestCompile "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
     smokeTestCompile configurations.testCompile
     smokeTestCompile sourceSets.test.output
     smokeTestRuntime configurations.testRuntime
