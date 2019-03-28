@@ -1,40 +1,41 @@
 plugins {
     id "eclipse"
     id "idea"
-    id "io.sdkman.vendors"              version "1.1.1"     apply false
+    id "io.sdkman.vendors"              version "1.2.1"     apply false
     id "com.jfrog.bintray"              version "1.8.4"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
-    id "org.sonarqube"                  version "2.7"     apply false
-    id 'com.github.ben-manes.versions'  version '0.20.0'
-    id "nebula.optional-base"           version "5.0.0"     apply false
+    id "org.sonarqube"                  version "2.7"       apply false
+    id 'com.github.ben-manes.versions'  version '0.21.0'
+    id "nebula.optional-base"           version "5.0.2"     apply false
 }
 
 // common variables
 ext {
-    asciidoctorjVersion = '1.5.8.1'
-    asciidoctorjDiagramVersion = '1.5.11'
+    asciidoctorjVersion = '1.6.2'
+    asciidoctorjDiagramVersion = '1.5.16'
     commonsIoVersion = '2.6'
     commonsConfigurationVersion = '1.10'
     commonsLangVersion = '3.8.1'
-    commonsVfs2Version = '2.2'
+    commonsVfs2Version = '2.3'
     args4jVersion = '2.33'
     freemarkerVersion = '2.3.28'
     junit4Version = '4.12'
-    junit5Version = '5.3.1'
-    junitPioneer = '0.2.2'
-    flexmarkVersion = '0.40.8'
-    jettyServerVersion = '9.4.12.v20180830'
-    orientDbVersion = '3.0.14'
-    groovyVersion = '2.5.5'
-    slf4jVersion = '1.7.25'
+    junit5Version = '5.4.1'
+    junitPioneer = '0.3.0'
+    jgitVersion = '5.3.0.201903130848-r'
+    flexmarkVersion = '0.40.34'
+    jettyServerVersion = '9.4.15.v20190215'
+    orientDbVersion = '3.0.18'
+    groovyVersion = '2.5.6'
+    slf4jVersion = '1.7.26'
     logbackVersion = '1.2.3'
-    assertjCoreVersion = '2.9.1'
+    assertjCoreVersion = '3.12.2'
     thymeleafVersion = '3.0.11.RELEASE'
     jsonSimpleVersion = '1.1.1'
     jade4jVersion = '1.2.7'
-    mockitoVersion = '2.23.4'
+    mockitoVersion = '2.26.0'
     jsoupVersion = '1.11.3'
-    pebbleVersion = '3.0.7'
+    pebbleVersion = '3.0.8'
 
     isTravis = (System.getenv("TRAVIS") == "true")
     isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
@@ -152,13 +153,6 @@ subprojects {
     tasks.withType(Test) {
 
         def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false','-Djna.nosys=true']
-
-        /**
-         * AppVeyor breaks with mockito throwing a java.lang.OutOfMemoryError: PermGen space
-         */
-        if ( JavaVersion.current().java7 ) {
-            args << '-XX:MaxPermSize=2g'
-        }
 
         /**
          * jdk9 build is unable to determine the amount of MaxDirectMemorySize
