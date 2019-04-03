@@ -34,10 +34,6 @@ dependencies {
     smokeTestRuntime configurations.testRuntime
 }
 
-artifacts {
-    archives distZip
-}
-
 task smokeTest(type: Test, dependsOn: installDist) {
     group 'Verification'
     description 'Runs the integration tests.'
