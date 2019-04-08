@@ -11,32 +11,6 @@ plugins {
 
 // common variables
 ext {
-    asciidoctorjVersion = '1.6.2'
-    asciidoctorjDiagramVersion = '1.5.16'
-    commonsIoVersion = '2.6'
-    commonsConfigurationVersion = '1.10'
-    commonsLangVersion = '3.8.1'
-    commonsVfs2Version = '2.3'
-    args4jVersion = '2.33'
-    freemarkerVersion = '2.3.28'
-    junit4Version = '4.12'
-    junit5Version = '5.4.1'
-    junitPioneer = '0.3.0'
-    jgitVersion = '5.3.0.201903130848-r'
-    flexmarkVersion = '0.40.34'
-    jettyServerVersion = '9.4.15.v20190215'
-    orientDbVersion = '3.0.18'
-    groovyVersion = '2.5.6'
-    slf4jVersion = '1.7.26'
-    logbackVersion = '1.2.3'
-    assertjCoreVersion = '3.12.2'
-    thymeleafVersion = '3.0.11.RELEASE'
-    jsonSimpleVersion = '1.1.1'
-    jade4jVersion = '1.2.7'
-    mockitoVersion = '2.26.0'
-    jsoupVersion = '1.11.3'
-    pebbleVersion = '3.0.8'
-
     isTravis = (System.getenv("TRAVIS") == "true")
     isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
     pullRequestId = System.getenv("TRAVIS_PULL_REQUEST")
@@ -118,22 +92,22 @@ subprojects {
     }
 
     dependencies {
-        compile "org.slf4j:slf4j-api:$slf4jVersion"
-        compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
-        compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
-        compile "ch.qos.logback:logback-classic:$logbackVersion", optional
-        compile "ch.qos.logback:logback-core:$logbackVersion", optional
+        implementation "org.slf4j:slf4j-api:$slf4jVersion"
+        implementation "org.slf4j:jul-to-slf4j:$slf4jVersion"
+        implementation "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+        implementation "ch.qos.logback:logback-classic:$logbackVersion", optional
+        implementation "ch.qos.logback:logback-core:$logbackVersion", optional
 
-        testCompile("org.junit.jupiter:junit-jupiter-api:$junit5Version")
-        testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
-        testCompile("org.junit-pioneer:junit-pioneer:$junitPioneer")
+        testImplementation "org.junit-pioneer:junit-pioneer:$junitPioneer"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
         // compatibility for Junit 4 test
-        testCompile "junit:junit:$junit4Version"
-        testRuntime("org.junit.vintage:junit-vintage-engine:$junit5Version")
+        testCompileOnly "junit:junit:$junit4Version"
+        testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
 
-        testCompile "org.assertj:assertj-core:$assertjCoreVersion"
-        testCompile "org.mockito:mockito-core:$mockitoVersion"
-        testCompile "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+        testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
+        testImplementation "org.mockito:mockito-core:$mockitoVersion"
+        testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
     }
 
     dependencyUpdates.resolutionStrategy = {
