@@ -23,7 +23,6 @@ public class ProjectWebsiteTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     private File projectFolder;
-    private File templateFolder;
     private File outputFolder;
     private String jbakeExecutable;
     private BinaryRunner runner;
@@ -33,12 +32,11 @@ public class ProjectWebsiteTest {
         Assume.assumeTrue("JDK 7 is not supported for this test", !isJava7());
         if ( Os.isFamily(Os.OS_FAMILY_WINDOWS) ) {
             jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
-        }
-        else {
+        } else {
             jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
         }
         projectFolder = folder.newFolder("project");
-        templateFolder = new File(projectFolder, "templates");
+        new File(projectFolder, "templates");
         outputFolder = new File(projectFolder, "output");
 
         runner = new BinaryRunner(projectFolder);
@@ -58,7 +56,7 @@ public class ProjectWebsiteTest {
         cmd.setURI(WEBSITE_REPO_URL);
         cmd.setDirectory(projectFolder);
 
-        Git git = cmd.call();
+        cmd.call();
 
         assertThat(new File(projectFolder,"README.md").exists()).isTrue();
     }
