@@ -194,7 +194,7 @@ public class MdParserTest {
         out.println("");
         out.println("    Item 1 paragraph 1");
         out.println("Item 1 paragraph 1 lazy continuation");
-            out.println("    Item 1 paragraph 1 continuation");
+        out.println("    Item 1 paragraph 1 continuation");
         out.close();
 
         mdFileRelaxedhrules = folder.newFile("releaxedhrules.md");

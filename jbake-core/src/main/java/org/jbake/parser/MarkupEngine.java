@@ -301,8 +301,9 @@ public abstract class MarkupEngine implements ParserEngine {
 
     private String[] getTags(String tagsPart) {
         String[] tags = tagsPart.split(",");
-        for (int i = 0; i < tags.length; i++)
+        for (int i = 0; i < tags.length; i++) {
             tags[i] = sanitizeValue(tags[i]);
+        }
         return tags;
     }
 

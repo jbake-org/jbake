@@ -201,7 +201,9 @@ public class FileUtil {
      * Example: /content and /content/tags/blog will return '../..'
      *
      * @param sourceFile the file to calculate relative path for
-     * @return
+     * @param rootPath the root path
+     * @param config the jbake configuration
+     * @return the relative path to get to the root
      */
     static public String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
 

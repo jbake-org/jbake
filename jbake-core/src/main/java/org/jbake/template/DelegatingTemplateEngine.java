@@ -27,6 +27,11 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
 
     /**
      * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
+     *
+     * @param config the {@link CompositeConfiguration} of jbake
+     * @param db the {@link ContentStore}
+     * @param destination the destination path
+     * @param templatesPath the templates path
      */
     @Deprecated
     public DelegatingTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
@@ -52,8 +57,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
 
             if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
                 valueObject = config.getPaginateIndex();
-            }
-            else {
+            } else {
                 valueObject = config.get(key);
             }
             //replace "." in key so you can use dot notation in templates
