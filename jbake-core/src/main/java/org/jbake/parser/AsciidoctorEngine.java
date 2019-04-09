@@ -165,7 +165,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         JBakeConfiguration config = context.getConfig();
         List<String> asciidoctorAttributes = config.getAsciidoctorAttributes();
-        final AttributesBuilder attributes = attributes(asciidoctorAttributes.toArray(new String[asciidoctorAttributes.size()]));
+        final AttributesBuilder attributes = attributes(asciidoctorAttributes.toArray(new String[0]));
         if (config.getExportAsciidoctorAttributes()) {
             final String prefix = config.getAttributesExportPrefixForAsciidoctor();
 
@@ -197,6 +197,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         return options;
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> getAsList(Object asciidoctorOption) {
         List<String> values = new ArrayList<>();
 

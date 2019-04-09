@@ -10,12 +10,10 @@ import org.jbake.util.DebugUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DebugUtilTest
-{
+public class DebugUtilTest {
 
     @Test
-    public void printMap() throws UnsupportedEncodingException
-    {
+    public void printMap() throws UnsupportedEncodingException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream ps = new PrintStream(baos, true, "UTF-8")) {
             HashMap<String, Object> map = new HashMap<String, Object>();

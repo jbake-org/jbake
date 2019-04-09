@@ -24,7 +24,9 @@ public class DocumentsRenderer implements RenderingTool {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList documentList = db.getUnrenderedContent(docType);
 
-            if (documentList == null) continue;
+            if (documentList == null) {
+                continue;
+            }
 
             int index = 0;
 

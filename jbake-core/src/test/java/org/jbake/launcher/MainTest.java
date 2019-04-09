@@ -164,8 +164,7 @@ public class MainTest {
         File mockedSourceFolder = folder.newFolder(sourcePath.split("/"));
         if ( withJetty ) {
             mockJettyConfiguration(mockedSourceFolder, mockedSourceFolder);
-        }
-        else {
+        } else {
             mockDefaultJbakeConfiguration(mockedSourceFolder);
         }
         return mockedSourceFolder;

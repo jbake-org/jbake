@@ -42,6 +42,11 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
     /**
      * @deprecated Use {@link #ThymeleafTemplateEngine(JBakeConfiguration, ContentStore)} instead
+     *
+     * @param config the {@link CompositeConfiguration} of jbake
+     * @param db the {@link ContentStore}
+     * @param destination the destination path
+     * @param templatesPath the templates path
      */
     @Deprecated
     public ThymeleafTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
