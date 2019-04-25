@@ -2,11 +2,11 @@ plugins {
     id "eclipse"
     id "idea"
     id "io.sdkman.vendors"              version "1.2.1"     apply false
-    id "com.jfrog.bintray"              version "1.8.4"     apply false
-    id "com.github.kt3k.coveralls"      version "2.8.2"     apply false
-    id "org.sonarqube"                  version "2.7"       apply false
-    id 'com.github.ben-manes.versions'  version '0.21.0'
-    id "nebula.optional-base"           version "5.0.2"     apply false
+    id "com.jfrog.bintray"              version "1.8.5"     apply false
+    id "com.github.kt3k.coveralls"      version "2.10.1"     apply false
+    id "org.sonarqube"                  version "2.8"       apply false
+    id 'com.github.ben-manes.versions'  version '0.28.0'
+    id "nebula.optional-base"           version "5.0.3"     apply false
 }
 
 // common variables
@@ -66,10 +66,11 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'nebula.optional-base'
 
-    apply from: "$rootDir/gradle/signing.gradle"
     // We do not publish any jars from the jbake-dist project
     if ( project.name != "jbake-dist" ) {
       apply from: "$rootDir/gradle/maven-publishing.gradle"
+      apply from: "$rootDir/gradle/signing.gradle"
+      apply from: "$rootDir/gradle/publishing.gradle"
     }
 
     // add source and target compatibility for all JavaCompile tasks
@@ -110,7 +111,7 @@ subprojects {
         testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
     }
 
-    dependencyUpdates.resolutionStrategy = {
+    dependencyUpdates.resolutionStrategy {
         componentSelection { rules ->
             rules.all { ComponentSelection selection ->
                 boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->

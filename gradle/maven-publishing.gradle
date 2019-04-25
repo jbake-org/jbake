@@ -1,6 +1,6 @@
 import java.text.SimpleDateFormat
 
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 Date buildTimeAndDate = new Date()
 ext {
@@ -9,65 +9,84 @@ ext {
     isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 
-def jbakePom = pom {
-    project {
-        name "jbake"
-        description project.description
-        url project.website
-        developers {
-            developer {
-                id 'jonbullock'
-                name 'Jonathan Bullock'
-                email 'jonbullock@gmail.com'
-                url 'http://jonathanbullock.com'
-                timezone 'Europe/London'
-            }
-            developer {
-                id 'ancho'
-                name 'Frank Becker'
-                email 'frank@calmdevelopment.de'
-                timezone 'Europe/Berlin'
-            }
-            developer {
-                id 'manikmagar'
-                name 'Manik Magar'
-                url 'https://manik.magar.me/'
-                timezone 'America/New_York'
-            }
-        }
-        scm {
-            url project.vcs
-            connection 'scm:git:git@github.com:jbake-org/jbake.git'
-            developerConnection 'scm:git:https://github.com/jbake-org/jbake.git'
-        }
-        issueManagement {
-            system 'GitHub Issues'
-            url project.issues
-        }
-        mailingLists {
+task javadocJar(type: Jar) {
+    archiveClassifier.set('javadoc')
+    from javadoc
+}
 
-            mailingList {
-                name 'jbake-dev'
-                subscribe 'jbake-dev@googlegroups.com'
-                unsubscribe 'jbake-dev+unsubscribe@googlegroups.com'
-                archive 'http://groups.google.com/group/jbake-dev'
-            }
-            mailingList {
-                name 'jbake-user'
-                subscribe 'jbake-user@googlegroups.com'
-                unsubscribe 'jbake-user+unsubscribe@googlegroups.com'
-                archive 'http://groups.google.com/group/jbake-user'
-            }
-        }
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
+}
 
-        licenses {
-            license {
-                name 'The MIT License (MIT)'
-                url 'http://opensource.org/licenses/MIT'
+publishing {
+    publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                artifact javadocJar
+                artifact sourcesJar
+
+                pom {
+                    name = "jbake"
+                    description = project.description
+                    url = project.website
+                    developers {
+                        developer {
+                            id = 'jonbullock'
+                            name = 'Jonathan Bullock'
+                            email = 'jonbullock@gmail.com'
+                            url = 'http://jonathanbullock.com'
+                            timezone = 'Europe/London'
+                        }
+                        developer {
+                            id = 'ancho'
+                            name = 'Frank Becker'
+                            email = 'frank@calmdevelopment.de'
+                            timezone = 'Europe/Berlin'
+                        }
+                        developer {
+                            id = 'manikmagar'
+                            name = 'Manik Magar'
+                            url = 'https://manik.magar.me/'
+                            timezone = 'America/New_York'
+                        }
+                    }
+                    scm {
+                        url = project.vcs
+                        connection = 'scm:git:git@github.com:jbake-org/jbake.git'
+                        developerConnection = 'scm:git:https://github.com/jbake-org/jbake.git'
+                    }
+                    issueManagement {
+                        system = 'GitHub Issues'
+                        url = project.issues
+                    }
+                    mailingLists {
+
+                        mailingList {
+                            name = 'jbake-dev'
+                            subscribe = 'jbake-dev@googlegroups.com'
+                            unsubscribe = 'jbake-dev+unsubscribe@googlegroups.com'
+                            archive = 'http://groups.google.com/group/jbake-dev'
+                        }
+                        mailingList {
+                            name = 'jbake-user'
+                            subscribe = 'jbake-user@googlegroups.com'
+                            unsubscribe = 'jbake-user+unsubscribe@googlegroups.com'
+                            archive = 'http://groups.google.com/group/jbake-user'
+                        }
+                    }
+
+                    licenses {
+                        license {
+                            name = 'The MIT License (MIT)'
+                            url = 'http://opensource.org/licenses/MIT'
+                        }
+                    }
+                }
             }
         }
     }
-}
 
 jar {
     manifest {
@@ -86,22 +105,4 @@ jar {
     }
 }
 
-task javadocJar(type: Jar) {
-    archiveClassifier.set('javadoc')
-    from javadoc
-}
 
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-install {
-    repositories.mavenInstaller {
-        setPom jbakePom
-    }
-}

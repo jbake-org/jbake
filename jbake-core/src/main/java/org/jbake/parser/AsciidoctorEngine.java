@@ -4,6 +4,7 @@ import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.Options;
 import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.jruby.AsciidoctorJRuby;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                     if (engine == null) {
                         LOGGER.info("Initializing Asciidoctor engine...");
                         if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = Asciidoctor.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
+                            engine = AsciidoctorJRuby.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
                         } else {
                             engine = Asciidoctor.Factory.create();
                         }
@@ -159,7 +160,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     private void processAsciiDoc(ParserContext context) {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
-        context.setBody(asciidoctor.render(context.getBody(), options));
+        context.setBody(asciidoctor.convert(context.getBody(), options));
     }
 
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {

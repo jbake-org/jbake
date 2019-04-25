@@ -1,7 +1,6 @@
 import java.text.SimpleDateFormat
 
 apply from: "$rootDir/gradle/sonarqube.gradle"
-apply from: "$rootDir/gradle/publishing.gradle"
 apply plugin: 'java-library'
 
 
@@ -17,6 +16,7 @@ dependencies {
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
     implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
+    implementation "org.codehaus.groovy:groovy:$groovyVersion", optional
     implementation "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
     implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
     implementation "org.freemarker:freemarker:$freemarkerVersion", optional

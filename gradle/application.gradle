@@ -57,8 +57,8 @@ exampleRepositories.each { name, repository ->
         group "distribution"
         description "Zip $name repository"
 
-        baseName = name
-        archiveName = "${baseName}.zip"
+        archiveBaseName = name
+        archiveFileName = "${archiveBaseName.get()}.zip"
 
         from project.tasks.getByName("clone_${name}Repository").outputs
         exclude 'README.md'

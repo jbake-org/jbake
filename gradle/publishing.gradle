@@ -69,16 +69,19 @@ if (project.name == "jbake-dist") {
     bintray {
         user = bintrayUsername
         key = bintrayKey
-        configurations = ['archives']
+        publications = ['mavenJava']
 
         if (!project.hasProperty('skipSigning')) {
-            // Copy the signed pom to bintrayDestination
             filesSpec {
-                from signPom
-                into signPom.bintrayDestination
+                from("${buildDir}/libs") {
+                    include '*.jar.asc'
+                }
+                from("${buildDir}/publications/mavenJava") {
+                    include 'pom-default.xml.asc'
+                    rename 'pom-default.xml.asc', "${project.name}-${project.version}.pom.asc"
+                }
+                into "."
             }
-            signPom.dependsOn install
-            bintrayUpload.dependsOn signPom
         }
 
         dryRun = bintrayDryRun.toBoolean()
