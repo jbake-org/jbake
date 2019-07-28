@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.Writer;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -98,7 +97,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    private void initializeContext(Locale locale, Map<String, Object> model) {
+    private void initializeContext(Locale locale, TemplateModel model) {
         context.clearVariables();
         context.setLocale(locale);
         context.setVariables(model);
@@ -115,9 +114,9 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
 
         private ContentStore db;
         private String key;
-        private Map<String, Object> model;
+        private TemplateModel model;
 
-        public ContextVariable(ContentStore db, String key, Map<String, Object> model) {
+        public ContextVariable(ContentStore db, String key, TemplateModel model) {
             this.db = db;
             this.key = key;
             this.model = model;

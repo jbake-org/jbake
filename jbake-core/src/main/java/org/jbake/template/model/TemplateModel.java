@@ -11,6 +11,13 @@ import java.util.Map;
 
 public class TemplateModel extends BaseModel {
 
+    public TemplateModel() {
+    }
+
+    public TemplateModel(TemplateModel model) {
+        putAll(model);
+    }
+
     public Map<String, Object> getConfig() {
         return (Map<String, Object>) get(ModelAttributes.CONFIG);
     }

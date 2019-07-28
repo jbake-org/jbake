@@ -1,7 +1,6 @@
 package org.jbake.template;
 
 
-import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
@@ -15,7 +14,12 @@ import org.jbake.template.model.TemplateModel;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,32 +73,25 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
         return template;
     }
 
-    private Map<String, Object> wrap(final Map<String, Object> model) {
-        return new HashMap<String, Object>(model) {
+    private TemplateModel wrap(final TemplateModel model) {
+        return new TemplateModel(model) {
             @Override
-            public Object get(final Object property) {
-                if (property instanceof String || property instanceof GString) {
-                    String key = property.toString();
-                    if ("include".equals(key)) {
-                        return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
-                    }
-                    try {
-                        return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
-                    } catch (NoModelExtractorException e) {
-                        // fallback to parent model
-                    }
+            public Object get(Object key) {
+                if ("include".equals(key)) {
+                    return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
                 }
-
-                return super.get(property);
+                try {
+                    return extractors.extractAndTransform(db, (String) key, model, new TemplateEngineAdapter.NoopAdapter());
+                } catch (NoModelExtractorException e) {
+                    return super.get(key);
+                }
             }
         };
     }
 
-    private void doInclude(Map<String, Object> model, String templateName) throws Exception {
-        TemplateModel templateModel = new TemplateModel();
-        templateModel.putAll(model);
-        AbstractTemplateEngine engine = templateModel.getRenderer();
-        Writer out = templateModel.getWriter();
-        engine.renderDocument(templateModel, templateName, out);
+    private void doInclude(TemplateModel model, String templateName) throws Exception {
+        AbstractTemplateEngine engine = model.getRenderer();
+        Writer out = model.getWriter();
+        engine.renderDocument(model, templateName, out);
     }
 }

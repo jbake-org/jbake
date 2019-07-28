@@ -1,6 +1,5 @@
 package org.jbake.template;
 
-import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.Template;
 import groovy.text.markup.MarkupTemplateEngine;
@@ -12,7 +11,6 @@ import org.jbake.template.model.TemplateModel;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -71,20 +69,15 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    private Map<String, Object> wrap(final TemplateModel model) {
-        return new HashMap<String, Object>(model) {
+    private TemplateModel wrap(final TemplateModel model) {
+        return new TemplateModel(model) {
             @Override
-            public Object get(final Object property) {
-                if (property instanceof String || property instanceof GString) {
-                    String key = property.toString();
-                    try {
-                        put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
-                    } catch (NoModelExtractorException e) {
-                        // should never happen, as we iterate over existing extractors
-                    }
+            public Object get(Object key) {
+                try {
+                    return extractors.extractAndTransform(db, (String) key, model, new TemplateEngineAdapter.NoopAdapter());
+                } catch (NoModelExtractorException e) {
+                    return super.get(key);
                 }
-
-                return super.get(property);
             }
         };
     }

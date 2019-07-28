@@ -1,7 +1,6 @@
 package org.jbake.model;
 
 import org.jbake.app.DBUtil;
-import org.jbake.app.DocumentList;
 
 import java.util.Date;
 

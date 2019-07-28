@@ -12,7 +12,6 @@ import org.jbake.template.model.TemplateModel;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,32 +49,26 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
         try {
             template = engine.getTemplate(templateName);
             template.evaluate(writer, wrap(model));
-        } catch (PebbleException e) {
-            throw new RenderingException(e);
-        } catch (IOException e) {
+        } catch (PebbleException | IOException e) {
             throw new RenderingException(e);
         }
 
     }
 
-    private Map<String, Object> wrap(final Map<String, Object> model) {
-        Map<String, Object> result = new HashMap<String, Object>(model) {
+    private TemplateModel wrap(final TemplateModel model) {
+        return new TemplateModel(model) {
 
             private static final long serialVersionUID = -5489285491728950547L;
 
             @Override
             public Object get(final Object property) {
-                String key = property.toString();
                 try {
-                    return extractors.extractAndTransform(db, key, this, new TemplateEngineAdapter.NoopAdapter());
+                    return extractors.extractAndTransform(db, (String) property, this, new TemplateEngineAdapter.NoopAdapter());
                 } catch(NoModelExtractorException e) {
-                    // fallback to parent model
+                    return super.get(property);
                 }
-
-                return super.get(property);
             }
         };
 
-        return result;
     }
 }
