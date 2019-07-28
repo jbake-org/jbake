@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -75,7 +74,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         private final SimpleHash eagerModel;
         private final ContentStore db;
 
-        public LazyLoadingModel(ObjectWrapper wrapper, Map<String, Object> eagerModel, final ContentStore db) {
+        public LazyLoadingModel(ObjectWrapper wrapper, TemplateModel eagerModel, final ContentStore db) {
             this.eagerModel = new SimpleHash(eagerModel, wrapper);
             this.db = db;
             this.wrapper = wrapper;
