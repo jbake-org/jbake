@@ -47,7 +47,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         this.compositeConfiguration = configuration;
         setSourceFolder(sourceFolder);
         setupDefaultDestination();
-        setupPathsRelativeToSourceFile();
     }
 
     @Override
