@@ -54,7 +54,7 @@ public class LaunchOptions {
         if (destination != null) {
             return new File(destination);
         } else {
-            return new File(getSource(), "output");
+            return null;
         }
     }
 
