@@ -5,7 +5,7 @@ plugins {
     id "com.jfrog.bintray"              version "1.8.4"     apply false
     id "com.github.kt3k.coveralls"      version "2.8.4"     apply false
     id "org.sonarqube"                  version "2.7.1"     apply false
-    id 'com.github.ben-manes.versions'  version '0.21.0'
+    id 'com.github.ben-manes.versions'  version '0.23.0'
     id "nebula.optional-base"           version "5.0.3"     apply false
 }
 
@@ -109,7 +109,7 @@ subprojects {
         testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
     }
 
-    dependencyUpdates.resolutionStrategy = {
+    dependencyUpdates.resolutionStrategy {
         componentSelection { rules ->
             rules.all { ComponentSelection selection ->
                 boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
