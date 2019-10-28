@@ -11,6 +11,7 @@
     <p>${post.date?string("dd MMMM yyyy")}</p>
     <p>${post.body}</p>
     </#if>
+    <span>Post Url: ${post.uri?url}</span>
 </#list>
 <span>${db.getPublishedPages().size()}</span>
 <hr/>
