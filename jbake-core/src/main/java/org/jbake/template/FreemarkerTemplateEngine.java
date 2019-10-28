@@ -50,6 +50,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     private void createTemplateConfiguration() {
         templateCfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         templateCfg.setDefaultEncoding(config.getRenderEncoding());
+        templateCfg.setOutputEncoding(config.getOutputEncoding());
         try {
             templateCfg.setDirectoryForTemplateLoading(config.getTemplateFolder());
         } catch (IOException e) {
