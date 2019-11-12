@@ -3,6 +3,19 @@ apply plugin: 'com.jfrog.bintray'
 ext.bintrayUsername = project.hasProperty('bintrayUsername') ? bintrayUsername : ''
 ext.bintrayKey = project.hasProperty('bintrayKey') ? bintrayKey : ''
 
+/*
+   UGLY HACK to workaround gradle-bintray-plugin compatibility with Gradle 5+
+   https://github.com/asciidoctor/asciidoctorj/issues/861
+   https://github.com/bintray/gradle-bintray-plugin/issues/300
+   WARNING: since the Groovy Gradle API is modified, this breaks build isolation when sharing a common Gradle daemon instance
+   This works because gradle-bintray-plugin is using Groovy dynamic compilation hence it is affected by Groovy runtime meta-programming
+   Tested with: Gradle 5.6.3 / gradle-bintray-plugin 1.8.4
+   TODO: remove as soon as bintray/gradle-bintray-plugin#300 is fixed and integrated
+*/
+Signature.metaClass.getToSignArtifact = { ->
+      return (delegate as Signature).source
+}
+
 if (project.name == "jbake-dist") {
 
     /**
