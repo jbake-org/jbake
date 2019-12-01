@@ -34,6 +34,18 @@ config {
 
         specification { enabled = false }
 
+        links {
+            website      = "https://github.com/jbake-org/${project.rootProject.name}"
+            issueTracker = "https://github.com/jbake-org/${project.rootProject.name}/issues"
+            scm          = "https://github.com/jbake-org/${project.rootProject.name}.git"
+        }
+
+        scm {
+            url                 = "https://github.com/jbake-org/${project.rootProject.name}"
+            connection          = "scm:git:https://github.com/jbake-org/${project.rootProject.name}.git"
+            developerConnection = "scm:git:git@github.com:jbake-org/${project.rootProject.name}.git"
+        }
+
         people {
             person {
                 id    = 'melix'
