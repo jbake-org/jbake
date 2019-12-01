@@ -1,11 +1,13 @@
 /*
- * Copyright 2014-2018 the original author or authors.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2014-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,49 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 plugins {
-    id 'com.gradle.build-scan'      version '2.1'
-    id 'idea'
+    id 'java-library'
     id 'groovy'
-    id 'java-gradle-plugin'
-    id 'org.kordamp.gradle.project' version '0.12.0'
-    id 'org.kordamp.gradle.bintray' version '0.12.0'
-    id 'com.gradle.plugin-publish'  version '0.10.0'
-    id 'com.github.kt3k.coveralls'  version '2.8.2'
+    id 'org.kordamp.gradle.kordamp-parentpom'
+    id 'org.kordamp.gradle.groovy-project'
+    id 'org.kordamp.gradle.bintray'
+    id 'org.kordamp.gradle.plugin'
 }
-
-buildScan {
-    termsOfServiceUrl   = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
-}
-
-if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = '**undefined**'
-if (!project.hasProperty('bintrayApiKey'))   ext.bintrayApiKey   = '**undefined**'
 
 config {
-    release = (project.findProperty('release') ?: false).toBoolean()
-
     info {
-        name          = project.name
+        name          = rootProject.name
         vendor        = 'JBake'
-        description   = project.project_description
+        description   = 'Run JBake inside a Gradle build'
         inceptionYear = '2014'
         tags          = ['jbake', 'site-generator']
 
-        links {
-            website      = project.project_url
-            issueTracker = "${project.project_url}/issues"
-            scm          = "${project.project_url}.git"
-        }
-
-        specification {
-            enabled = false
-        }
-
-        implementation {
-            enabled = false
-        }
+        specification { enabled = false }
 
         people {
             person {
@@ -63,64 +40,31 @@ config {
                 name  = 'Cedric Champeau'
                 roles = ['developer']
             }
-            person {
-                id    = 'aalmiray'
-                name  = 'Andres Almiray'
-                roles = ['developer']
-            }
         }
-    }
-
-    javadoc {
-        enabled = false
     }
 
     groovydoc {
         replaceJavadoc = true
         options {
-            link 'https://docs.gradle.org/4.0/javadoc/', 'org.gradle.'
+            link 'https://docs.gradle.org/5.0/javadoc/', 'org.gradle.'
         }
     }
 
-    license {
-        licenses {
-            license {
-                id = 'Apache-2.0'
-            }
-        }
+    plugin {
+        enabled             = true
+        id                  = 'org.jbake.site'
+        implementationClass = 'org.jbake.gradle.JBakePlugin'
     }
 
     bintray {
-        enabled       = true
-        userOrg       = project.bintray_org
-        name          = project.name
         skipMavenSync = true
-        credentials {
-            username = project.bintrayUsername
-            password = project.bintrayApiKey
-        }
-    }
-}
-
-repositories {
-    jcenter()
-}
-
-dependencyUpdates.resolutionStrategy = {
-    componentSelection { rules ->
-        rules.all { selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
+        userOrg       = 'jbake'
+        repo          = 'maven'
     }
 }
 
 dependencies {
-    compile gradleApi()
+    compileOnly gradleApi()
     compile "com.github.zafarkhaja:java-semver:$semverVersion"
     compileOnly "org.eclipse.jetty:jetty-server:$jettyVersion"
     compileOnly "org.jbake:jbake-core:$jbakeVersion"
@@ -130,29 +74,9 @@ dependencies {
     testCompile "commons-io:commons-io:$commonsIoVersion"
 }
 
-compileGroovy {
-    sourceCompatibility = project.sourceCompatibility
-    targetCompatibility = project.targetCompatibility
-}
+task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
 
 project.tasks.withType(Test) {
-    beforeTest { descriptor ->
-        logger.lifecycle("Running test: " + descriptor)
-    }
-
-    onOutput { descriptor, event ->
-        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
-    }
-
-    testLogging {
-        showStandardStreams = true
-        afterSuite { desc, result ->
-            if (!desc.parent) {
-                println "Test results ${project.name}: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-            }
-        }
-    }
-
     def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']
 
     /**
@@ -172,10 +96,6 @@ project.tasks.withType(Test) {
     jvmArgs args
 }
 
-jacoco {
-    toolVersion = jacocoVersion
-}
-
 license {
     exclude '**/*.woff'
     exclude '**/*.eot'
@@ -189,42 +109,3 @@ license {
 licenseTest {
     source -= sourceSets.test.resources
 }
-
-bintray {
-    pkg {
-        version {
-            attributes = ['gradle-plugin': "${project.pluginId}:${project.group}:${project.name}"]
-        }
-    }
-}
-
-gradlePlugin {
-    plugins {
-        jbakePlugin {
-            id                  = project.pluginId
-            implementationClass = project.pluginImplementationClass
-        }
-    }
-}
-
-pluginBundle {
-    website     = project.project_url
-    vcsUrl      = "${project.project_url}.git"
-    description = project.project_description
-    tags        = ['jbake', 'site-generator']
-
-    plugins {
-        jbakePlugin {
-            id          = project.pluginId
-            displayName = project.displayName
-        }
-    }
-
-    mavenCoordinates {
-        groupId    = project.group
-        artifactId = project.name
-        version    = project.version
-    }
-}
-
-task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}

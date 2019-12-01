@@ -33,7 +33,7 @@ class JBakeTask extends DefaultTask {
     @InputDirectory File input
     @OutputDirectory File output
     @Input Map<String, Object> configuration = [:]
-    @Input @Optional
+    @Input
     boolean clearCache
 
     @Input @Optional
