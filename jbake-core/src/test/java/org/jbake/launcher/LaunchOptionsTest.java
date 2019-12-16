@@ -10,6 +10,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LaunchOptionsTest {
 
     @Test
+    public void showHelpIfNoArguments() throws Exception {
+        String[] args = {};
+        LaunchOptions res = new LaunchOptions();
+        CmdLineParser parser = new CmdLineParser(res);
+        parser.parseArgument(args);
+
+        assertThat(res.isHelpNeeded()).isTrue();
+    }
+
+    @Test
     public void showHelp() throws Exception {
         String[] args = {"-h"};
         LaunchOptions res = new LaunchOptions();
