@@ -7,6 +7,8 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
@@ -18,6 +20,8 @@ import java.io.StringWriter;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class Main {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private final String USAGE_PREFIX = "Usage: jbake";
     private final String ALT_USAGE_PREFIX = "   or  jbake";
@@ -84,14 +88,18 @@ public class Main {
     }
 
     protected void run(LaunchOptions res, JBakeConfiguration config) {
-        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]");
-        System.out.println();
-
         if (res.isHelpNeeded()) {
             printUsage(res);
             // Help was requested, so we are done here
             return;
         }
+
+        if (res.isVersionNeeded()) {
+            System.out.println(getVersionString(config));
+            return;
+        }
+
+        LOGGER.info(getVersionString(config));
 
         if (res.isBake()) {
             baker.bake(config);
@@ -122,6 +130,10 @@ public class Main {
             }
         }
 
+    }
+
+    private String getVersionString(JBakeConfiguration config) {
+        return "JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]";
     }
 
     private LaunchOptions parseArguments(String[] args) {
