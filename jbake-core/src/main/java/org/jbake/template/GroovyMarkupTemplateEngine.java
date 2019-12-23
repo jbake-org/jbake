@@ -7,6 +7,7 @@ import groovy.text.markup.MarkupTemplateEngine;
 import groovy.text.markup.TemplateConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
+import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.io.File;
 import java.io.Writer;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.
- *
+ * <p>
  * The file extension to activate this Engine is .tpl
  *
  * @see <a href="http://groovy-lang.org/templating.html#_the_markuptemplateengine">Groovy MarkupTemplateEngine Documentation</a>
@@ -24,8 +25,18 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     private TemplateConfiguration templateConfiguration;
     private MarkupTemplateEngine templateEngine;
 
+    /**
+     * @deprecated Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead
+     */
+    @Deprecated
     public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
+        setupTemplateConfiguration();
+        initializeTemplateEngine();
+    }
+
+    public GroovyMarkupTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
+        super(config, db);
         setupTemplateConfiguration();
         initializeTemplateEngine();
     }
@@ -39,7 +50,7 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     }
 
     private void initializeTemplateEngine() {
-        templateEngine = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(),templatesPath,templateConfiguration);
+        templateEngine = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(), config.getTemplateFolder(), templateConfiguration);
     }
 
     @Override
@@ -58,14 +69,14 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
         return new HashMap<String, Object>(model) {
             @Override
             public Object get(final Object property) {
-            	if (property instanceof String || property instanceof GString) {
-            		String key = property.toString();
-					try {
-						put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
-					} catch (NoModelExtractorException e) {
-						// should never happen, as we iterate over existing extractors
-					}
-            	}
+                if (property instanceof String || property instanceof GString) {
+                    String key = property.toString();
+                    try {
+                        put(key, extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter()));
+                    } catch (NoModelExtractorException e) {
+                        // should never happen, as we iterate over existing extractors
+                    }
+                }
 
                 return super.get(property);
             }

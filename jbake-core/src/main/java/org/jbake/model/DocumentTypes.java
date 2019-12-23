@@ -16,21 +16,21 @@ import java.util.Set;
  */
 public class DocumentTypes {
 
-	private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<>();
+    private static final Set<String> DEFAULT_DOC_TYPES = new LinkedHashSet<>();
     private static final Set<DocumentTypeListener> LISTENERS = new HashSet<>();
 
     static {
-    	resetDocumentTypes();
+        resetDocumentTypes();
     }
 
     private DocumentTypes() {}
 
     public static void resetDocumentTypes() {
-    	DEFAULT_DOC_TYPES.clear();
-    	DEFAULT_DOC_TYPES.addAll(Arrays.asList("page", "post", "masterindex", "archive", "feed"));
+        DEFAULT_DOC_TYPES.clear();
+        DEFAULT_DOC_TYPES.addAll(Arrays.asList("page", "post", "masterindex", "archive", "feed"));
     }
-    
-    
+
+
     public static void addDocumentType(String docType) {
         DEFAULT_DOC_TYPES.add(docType);
         notifyListener(docType);
@@ -51,7 +51,7 @@ public class DocumentTypes {
      * @return all supported document types
      */
     public static String[] getDocumentTypes() {
-    	// TODO: is this needed?
+        // TODO: is this needed?
         // make sure engines are loaded before to get document types
         Engines.getRecognizedExtensions();
         return DEFAULT_DOC_TYPES.toArray(new String[DEFAULT_DOC_TYPES.size()]);

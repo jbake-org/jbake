@@ -41,11 +41,11 @@ public class FakeDocumentBuilder {
     }
 
     public FakeDocumentBuilder withDate(Date date) {
-    	fileModel.put(Crawler.Attributes.DATE, date);
-    	hasDate = true;
-    	return this;
+        fileModel.put(Crawler.Attributes.DATE, date);
+        hasDate = true;
+        return this;
     }
-    
+
     private FakeDocumentBuilder withCurrentDate() {
         fileModel.put(Crawler.Attributes.DATE, new Date() );
         return this;

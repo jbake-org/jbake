@@ -7,6 +7,7 @@ import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,6 +18,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
+
+    @BeforeClass
+    public static void setUpTest() {
+        //switch to PLOCAL mode for this test class as Travis sometimes runs out of memory
+        db.close();
+        config.setDatabaseStore(StorageType.PLOCAL.toString());
+        db = DBUtil.createDataStore(config);
+    }
 
     public GroovyMarkupTemplateEngineRenderingTest() {
         super("groovyMarkupTemplates", "tpl");
@@ -55,14 +64,14 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     @Test
     public void renderCustomTypePaper() throws Exception {
         // setup
-        config.setProperty("template.paper.file", "paper." + templateExtension);
+        config.setTemplateFileNameForDocType("paper", "paper." + templateExtension);
         DocumentTypes.addDocumentType("paper");
-        DBUtil.updateSchema(db);
+        db.updateSchema();
 
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + "content"));
-        Parser parser = new Parser(config, sourceFolder.getPath());
-        Renderer renderer = new Renderer(db, destinationFolder, templateFolder, config);
+        Crawler crawler = new Crawler(db, config);
+        crawler.crawl();
+        Parser parser = new Parser(config);
+        Renderer renderer = new Renderer(db, config);
         String filename = "published-paper.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "papers" + File.separator + filename);

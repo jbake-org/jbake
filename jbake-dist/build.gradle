@@ -1,5 +1,6 @@
 apply from: "$rootDir/gradle/application.gradle"
 apply from: "$rootDir/gradle/sdkman.gradle"
+apply from: "$rootDir/gradle/publishing.gradle"
 
 description = "The binary distribution package that bundles JBake cli"
 
@@ -23,7 +24,11 @@ configurations {
 
 dependencies {
     compile project(':jbake-core')
-    dist group: 'org.asciidoctor', name: 'asciidoctorj-diagram', version: asciidoctorjDiagramVersion
+    compile("org.asciidoctor:asciidoctorj-diagram:$asciidoctorjDiagramVersion") {
+        exclude group: 'org.asciidoctor', module: 'asciidoctorj'
+    }
+
+    smokeTestCompile 'org.eclipse.jgit:org.eclipse.jgit:5.2.1.201812262042-r'
     smokeTestCompile configurations.testCompile
     smokeTestCompile sourceSets.test.output
     smokeTestRuntime configurations.testRuntime

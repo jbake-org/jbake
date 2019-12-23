@@ -106,8 +106,8 @@ public class LaunchOptionsTest {
         assertThat(res.isRunServer()).isFalse();
         assertThat(res.isInit()).isFalse();
         assertThat(res.isBake()).isFalse();
-        assertThat(res.getSource().getPath()).isEqualTo(".");
-        assertThat(res.getDestination()).isNull();
+        assertThat(res.getSource().getPath()).isEqualTo(System.getProperty("user.dir"));
+        assertThat(res.getDestination().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + "output");
     }
 
     @Test

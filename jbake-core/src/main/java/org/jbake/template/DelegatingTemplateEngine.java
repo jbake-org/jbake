@@ -1,9 +1,10 @@
 package org.jbake.template;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.app.configuration.JBakeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,34 +21,54 @@ import java.util.Map;
  * @author Cédric Champeau
  */
 public class DelegatingTemplateEngine extends AbstractTemplateEngine {
-    private final static Logger LOGGER = LoggerFactory.getLogger(DelegatingTemplateEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingTemplateEngine.class);
 
     private final TemplateEngines renderers;
 
+    /**
+     * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
+     */
+    @Deprecated
     public DelegatingTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
-        this.renderers = new TemplateEngines(config, db, destination, templatesPath);
+        this.renderers = new TemplateEngines(this.config, db);
+    }
+
+    public DelegatingTemplateEngine(final ContentStore db, final JBakeConfiguration config) {
+        super(config, db);
+        this.renderers = new TemplateEngines(config, db);
     }
 
     @Override
     public void renderDocument(final Map<String, Object> model, String templateName, final Writer writer) throws RenderingException {
-        model.put("version", config.getString(Keys.VERSION));
-        Map<String, Object> configModel = new HashMap<String, Object>();
+        model.put("version", config.getVersion());
+
+        // TODO: create config model from configuration
+        Map<String, Object> configModel = new HashMap<>();
         Iterator<String> configKeys = config.getKeys();
         while (configKeys.hasNext()) {
             String key = configKeys.next();
+            Object valueObject;
+
+            if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
+                valueObject = config.getPaginateIndex();
+            }
+            else {
+                valueObject = config.get(key);
+            }
             //replace "." in key so you can use dot notation in templates
-            configModel.put(key.replace(".", "_"), config.getProperty(key));
+            configModel.put(key.replace(".", "_"), valueObject);
         }
         model.put("config", configModel);
         // if default template exists we will use it
-        File templateFile = new File(templatesPath, templateName);
+        File templateFolder = config.getTemplateFolder();
+        File templateFile = new File(templateFolder, templateName);
         if (!templateFile.exists()) {
             LOGGER.info("Default template: {} was not found, searching for others...", templateName);
             // if default template does not exist then check if any alternative engine templates exist
             String templateNameWithoutExt = templateName.substring(0, templateName.length() - 4);
             for (String extension : renderers.getRecognizedExtensions()) {
-                templateFile = new File(templatesPath, templateNameWithoutExt + "." + extension);
+                templateFile = new File(templateFolder, templateNameWithoutExt + "." + extension);
                 if (templateFile.exists()) {
                     LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName());
                     templateName = templateFile.getName();

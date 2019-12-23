@@ -1,6 +1,7 @@
 import java.text.SimpleDateFormat
 
 apply from: "$rootDir/gradle/sonarqube.gradle"
+apply from: "$rootDir/gradle/publishing.gradle"
 
 description = "The core library of JBake"
 
@@ -15,12 +16,14 @@ dependencies {
     compile "com.orientechnologies:orientdb-core:$orientDbVersion"
     compile "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
     compile "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
+    compile "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
     compile "org.freemarker:freemarker:$freemarkerVersion", optional
     compile "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
     compile "de.neuland-bfi:jade4j:$jade4jVersion", optional
     compile "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
     compile "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     compile "org.jsoup:jsoup:$jsoupVersion"
+    compile "io.pebbletemplates:pebble:$pebbleVersion", optional
 
     // cli specific dependencies
     compile "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional

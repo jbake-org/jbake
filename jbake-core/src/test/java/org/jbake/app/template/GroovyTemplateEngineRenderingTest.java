@@ -23,13 +23,18 @@
  */
 package org.jbake.app.template;
 
-import java.util.Arrays;
+import org.junit.BeforeClass;
 
 /**
  *
  * @author jdlee
  */
-public class GroovyTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest{
+public class GroovyTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
+
+    @BeforeClass
+    public static void setUpClass() {
+        //setUpDatabase(StorageType.PLOCAL);
+    }
 
     public GroovyTemplateEngineRenderingTest() {
         super("groovyTemplates", "gsp");

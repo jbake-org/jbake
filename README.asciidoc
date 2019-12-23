@@ -57,7 +57,8 @@ Talk to other users of JBake on the forum:
 
 == Build System
 
-The project uses http://gradle.org[Gradle] as the build system. To build the JBake distribution ZIP file execute the following command from the root of the repo:
+The project uses http://gradle.org[Gradle] 4.9+ as the build system.
+To build the JBake distribution ZIP file execute the following command from the root of the repo:
 
 ----
 $ ./gradlew distZip
@@ -66,6 +67,39 @@ $ ./gradlew distZip
 This will build a ZIP file in the `/build/distributions` folder.
 
 For more information see link:BUILD.adoc[Test, Build and Deploy]
+
+== Coding conventions
+
+The project uses a basic set of http://checkstyle.sourceforge.net/[checkstyle] rules to keep the Code in shape.
+
+We configured the gradle checkstyle Plugin to run with the `check` task.
+It does not break the build if convention violations are found. But prints a warning and generates a report.
+
+For more information see link:BUILD.adoc[Test, Build and Deploy]
+
+=== Setup Intellij
+
+* Install https://github.com/jshiell/checkstyle-idea[checkstyle-idea plugin]
++
+Settings -> Plugins -> CheckStyle-IDEA
+
+* Configure
++
+Settings -> Other Settings -> Checksytle
++
+Add a new _Configuration File_.
+Enter a Description like "jbake Checkstyle" and choose "Use a local Checkstyle file".
+The checkstyle File is located at the project root path `config/checkstyle/checkstyle.xml`
+
+* Add to Editor Code Style Scheme
++
+Settings -> Editor -> Code Style
++
+Click the gear Symbol besides the "Scheme:" drop-down.
++
+Import Scheme -> Checkstyle Configuration
++
+Pick the project checkstyle file `config/checkstyle/checkstyle.xml`
 
 == Tools & Libraries Used
 
@@ -76,7 +110,7 @@ For more information see link:BUILD.adoc[Test, Build and Deploy]
 * http://gradle.org[Gradle]
 * http://groovy-lang.org/[Groovy]
 * http://junit.org/[JUnit]
-* http://pegdown.org/[Pegdown]
+* https://github.com/vsch/flexmark-java[Flexmark]
 * http://www.eclipse.org/jetty/[Jetty Server]
 * http://www.orientdb.org/[OrientDB]
 

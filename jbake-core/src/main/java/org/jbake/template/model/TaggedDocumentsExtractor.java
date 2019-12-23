@@ -1,11 +1,11 @@
 package org.jbake.template.model;
 
-import java.util.Map;
-
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
 import org.jbake.app.DocumentList;
 import org.jbake.template.ModelExtractor;
+
+import java.util.Map;
 
 public class TaggedDocumentsExtractor implements ModelExtractor<DocumentList> {
 

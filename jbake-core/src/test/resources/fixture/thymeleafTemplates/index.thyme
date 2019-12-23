@@ -26,7 +26,7 @@
 
     <span th:text='${db.getPublishedPages().size()}'>count of published pages</span>
 
-	<hr/>
+    <hr/>
 
 
     <div th:replace="footer.thyme::footer"></div>

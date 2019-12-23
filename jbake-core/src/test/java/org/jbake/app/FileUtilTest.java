@@ -1,13 +1,16 @@
 package org.jbake.app;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.jbake.TestUtils;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+
+import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Created by frank on 28.03.16.
@@ -18,36 +21,36 @@ public class FileUtilTest {
     public void testGetRunningLocation() throws Exception {
 
         File path = FileUtil.getRunningLocation();
-        assertThat(new File("build/classes").getAbsolutePath()).isEqualTo(path.getPath());
+        assertEquals(new File("build/classes").getAbsolutePath(), path.getPath());
     }
-    
+
     @Test
-    public void testFileIgnore() throws IOException, InterruptedException {
-    	URL sourceUrl = this.getClass().getResource("/fixture");
-    	File contentFolder = new File(sourceUrl.getFile(), "content");
-    	
-    	//Without filter, make sure ignorable file is selected
-    	File files1[] = contentFolder.listFiles();
-    	assertThat(files1).contains(new File(contentFolder, ".ignorablefile.html"));
-    	
-    	TestUtils.hideAssets(contentFolder);
-    	
-    	//When using filter, ignorable file should not be selected
-    	File files2[] = contentFolder.listFiles(FileUtil.getFileFilter());
-    	assertThat(files2).doesNotContain(new File(contentFolder, ".ignorablefile.html"));
+    public void testIsFileInDirectory() throws Exception {
+        File fixtureDir = new File(this.getClass().getResource("/fixture").getFile());
+        File jbakeFile = new File(fixtureDir.getCanonicalPath() + File.separatorChar + "jbake.properties");
+        assertTrue("jbake.properties expected to be in /fixture directory", FileUtil.isFileInDirectory(jbakeFile, fixtureDir));
+
+        File contentFile = new File(fixtureDir.getCanonicalPath() + File.separatorChar + "content" + File.separatorChar + "projects.html");
+        assertTrue("projects.html expected to be nested in the /fixture directory", FileUtil.isFileInDirectory(contentFile, fixtureDir));
+
+        File contentDir = contentFile.getParentFile();
+        assertFalse("jbake.properties file should not be in the /fixture/content directory", FileUtil.isFileInDirectory(jbakeFile, contentDir));
     }
-    
-    @Test
-    public void testFolderIgnore(){
-    	URL sourceUrl = this.getClass().getResource("/fixture");
-    	File contentFolder = new File(sourceUrl.getFile());
-    	
-    	//Without filter, make sure ignorable folder is selected
-    	File files1[] = contentFolder.listFiles();
-    	assertThat(files1).contains(new File(contentFolder, "ignorablefolder"));
-    	
-    	//When using filter, ignorable folder should not be selected
-    	File files2[] = contentFolder.listFiles(FileUtil.getFileFilter());
-    	assertThat(files2).doesNotContain(new File(contentFolder, "ignorablefolder"));
+
+    @Test  
+    public void testGetContentRoothPath() throws Exception {
+
+        File source = TestUtils.getTestResourcesAsSourceFolder();
+        ConfigUtil util = new ConfigUtil();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        String path = FileUtil.getUriPathToContentRoot(config, new File(config.getContentFolder(), "index.html"));
+        assertThat(path).isEqualTo("");
+
+        path = FileUtil.getUriPathToContentRoot(config, new File(config.getContentFolder(), "/blog/index.html"));
+        assertThat(path).isEqualTo("../");
+
+        path = FileUtil.getUriPathToContentRoot(config, new File(config.getContentFolder(), "/blog/level2/index.html"));
+        assertThat(path).isEqualTo("../../");
     }
 }

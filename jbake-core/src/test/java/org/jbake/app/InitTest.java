@@ -1,7 +1,8 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.jbake.app.ConfigUtil.Keys;
+import org.jbake.TestUtils;
+import org.jbake.app.configuration.ConfigUtil;
+import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.launcher.Init;
 import org.junit.Before;
 import org.junit.Rule;
@@ -10,7 +11,6 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -20,19 +20,19 @@ public class InitTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    public CompositeConfiguration config;
+    public DefaultJBakeConfiguration config;
     private File rootPath;
 
     @Before
     public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/fixture");
-        rootPath = new File(sourceUrl.getFile());
+
+        rootPath = TestUtils.getTestResourcesAsSourceFolder();
         if (!rootPath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
-        config = ConfigUtil.load(rootPath);
+        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(rootPath);
         // override base template config option
-        config.setProperty("example.project.freemarker", "test.zip");
+        config.setExampleProject("freemarker", "test.zip");
     }
 
     @Test
@@ -48,7 +48,7 @@ public class InitTest {
     public void initFailDestinationContainsContent() throws IOException {
         Init init = new Init(config);
         File initPath = folder.newFolder("init");
-        File contentFolder = new File(initPath.getPath() + File.separatorChar + config.getString(Keys.CONTENT_FOLDER));
+        File contentFolder = new File(initPath.getPath(), config.getContentFolderName());
         contentFolder.mkdir();
         try {
             init.run(initPath, rootPath, "freemarker");

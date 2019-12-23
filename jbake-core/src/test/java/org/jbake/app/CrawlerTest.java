@@ -1,44 +1,23 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.jbake.app.ConfigUtil.Keys;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CrawlerTest extends ContentStoreIntegrationTest {
-    private CompositeConfiguration config;
-    private File sourceFolder;
-
-
-    @Before
-    public void setup() throws Exception {
-        URL sourceUrl = this.getClass().getResource("/fixture");
-
-        sourceFolder = new File(sourceUrl.getFile());
-        if (!sourceFolder.exists()) {
-            throw new Exception("Cannot find sample data structure!");
-        }
-
-        config = ConfigUtil.load(sourceFolder);
-        Assert.assertEquals(".html", config.getString(Keys.OUTPUT_EXTENSION));
-    }
 
     @Test
     public void crawl() {
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
+        Crawler crawler = new Crawler(db, config);
+        crawler.crawl();
 
         Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
@@ -50,7 +29,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         for (Map<String, Object> content : results) {
             assertThat(content)
                     .containsKey(Crawler.Attributes.ROOTPATH)
-                    .containsValue("../../");
+                    .containsValue("../../../");
         }
 
         DocumentList allPosts = db.getAllContent("post");
@@ -70,16 +49,12 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
     @Test
     public void renderWithPrettyUrls() throws Exception {
-        Map<String, Object> testProperties = new HashMap<>();
-        testProperties.put(Keys.URI_NO_EXTENSION, true);
-        testProperties.put(Keys.URI_NO_EXTENSION_PREFIX, "/blog");
 
-        CompositeConfiguration config = new CompositeConfiguration();
-        config.addConfiguration(new MapConfiguration(testProperties));
-        config.addConfiguration(ConfigUtil.load(sourceFolder));
+        config.setUriWithoutExtension(true);
+        config.setPrefixForUriWithoutExtension("/blog");
 
-        Crawler crawler = new Crawler(db, sourceFolder, config);
-        crawler.crawl(new File(sourceFolder.getPath() + File.separator + config.getString(Keys.CONTENT_FOLDER)));
+        Crawler crawler = new Crawler(db, config);
+        crawler.crawl();
 
         Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));

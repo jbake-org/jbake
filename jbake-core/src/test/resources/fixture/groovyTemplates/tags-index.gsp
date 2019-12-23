@@ -15,7 +15,7 @@
             <%tags.each {tag ->%>
 				
 				
-				<h2><a href="${tag.uri}">${tag.name}</a></h2>
+				<h2><a href="${content.rootpath}${tag.uri}">${tag.name}</a> ${tag.tagged_posts.size()}</h2>
 				
 			<%}%>
 		</div>

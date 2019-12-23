@@ -9,6 +9,5 @@ package org.jbake.model;
 public enum DocumentStatus {
     NEW,
     UPDATED,
-    REMOVED,
     IDENTICAL
 }

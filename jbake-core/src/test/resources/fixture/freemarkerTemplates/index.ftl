@@ -15,7 +15,7 @@
 <span>${db.getPublishedPages().size()}</span>
 <hr/>
 
-<#if (config.index_paginate!false) >
+<#if config.index_paginate >
 <span> <#if (previousFileName??) > <a href="${previousFileName}">Previous</a> </#if> - <#if (nextFileName??) > <a href="${nextFileName}">Next</a> </#if></span>
 <span> ${currentPageNumber} of ${numberOfPages} </span>
 <hr/>
