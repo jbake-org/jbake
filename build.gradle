@@ -22,6 +22,7 @@ plugins {
     id 'org.kordamp.gradle.groovy-project'
     id 'org.kordamp.gradle.bintray'
     id 'org.kordamp.gradle.plugin'
+    id 'org.kordamp.gradle.coveralls'
 }
 
 config {
@@ -55,10 +56,12 @@ config {
         }
     }
 
-    groovydoc {
-        replaceJavadoc = true
-        options {
-            link 'https://docs.gradle.org/5.0/javadoc/', 'org.gradle.'
+    docs {
+        groovydoc {
+            replaceJavadoc = true
+            options {
+                link 'https://docs.gradle.org/5.0/javadoc/', 'org.gradle.'
+            }
         }
     }
 
@@ -77,16 +80,14 @@ config {
 
 dependencies {
     compileOnly gradleApi()
-    compile "com.github.zafarkhaja:java-semver:$semverVersion"
+    api "com.github.zafarkhaja:java-semver:$semverVersion"
     compileOnly "org.eclipse.jetty:jetty-server:$jettyVersion"
     compileOnly "org.jbake:jbake-core:$jbakeVersion"
-    testCompile("org.spockframework:spock-core:$spockVersion") {
+    testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude group: 'org.codehaus.groovy'
     }
-    testCompile "commons-io:commons-io:$commonsIoVersion"
+    testImplementation "commons-io:commons-io:$commonsIoVersion"
 }
-
-task publishRelease(dependsOn: [bintrayUpload, publishPlugins]) {}
 
 project.tasks.withType(Test) {
     def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']

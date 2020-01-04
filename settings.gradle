@@ -19,12 +19,13 @@ pluginManagement {
     repositories {
         jcenter()
         gradlePluginPortal()
+        mavenLocal()
     }
     plugins {
-        id 'org.kordamp.gradle.kordamp-parentpom' version '1.9.1'
-        id 'org.kordamp.gradle.groovy-project'    version kordampVersion
-        id 'org.kordamp.gradle.bintray'           version kordampVersion
-        id 'org.kordamp.gradle.plugin'            version kordampVersion
-        id 'com.github.kt3k.coveralls'            version '2.8.2'
+        id 'org.kordamp.gradle.kordamp-parentpom' version kordampPomVersion
+        id 'org.kordamp.gradle.groovy-project'    version kordampPluginVersion
+        id 'org.kordamp.gradle.bintray'           version kordampPluginVersion
+        id 'org.kordamp.gradle.plugin'            version kordampPluginVersion
+        id 'org.kordamp.gradle.coveralls'         version kordampPluginVersion
     }
 }

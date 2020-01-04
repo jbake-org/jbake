@@ -23,7 +23,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
-class PluginIntegrationSpec extends Specification {
+abstract class PluginIntegrationSpec extends Specification {
     private final TemporaryFolder folder = new TemporaryFolder()
 
     File buildFile
