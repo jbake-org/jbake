@@ -20,6 +20,7 @@ package org.jbake.gradle
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
@@ -31,7 +32,7 @@ class JBakeServeTask extends DefaultTask {
     @Input Map<String, Object> configuration = [:]
     @Input String port = '8080'
 
-    @Input @Optional
+    @Classpath @Optional
     Configuration classpath
     private static ClassLoader cl
 

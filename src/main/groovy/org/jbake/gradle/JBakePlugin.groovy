@@ -18,89 +18,106 @@
 package org.jbake.gradle
 
 import com.github.zafarkhaja.semver.Version
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.plugins.BasePlugin
 
+@CompileStatic
 class JBakePlugin implements Plugin<Project> {
     static final String JBAKE = 'jbake'
 
     Project project
-    JBakeExtension extension
 
     void apply(Project project) {
         this.project = project
-        project.apply(plugin: 'base')
+        project.pluginManager.apply(BasePlugin)
 
         Configuration configuration = project.configurations.maybeCreate(JBAKE)
-        extension = project.extensions.create(JBAKE, JBakeExtension)
+        JBakeExtension jbakeExtension = project.extensions.create(JBAKE, JBakeExtension)
 
         addDependenciesAfterEvaluate()
 
-        project.task('bake', type: JBakeTask, group: 'Documentation', description: 'Bake a jbake project') {
-            classpath = configuration
-            conventionMapping.input = { project.file("$project.projectDir/$project.jbake.srcDirName") }
-            conventionMapping.output = { project.file("$project.buildDir/$project.jbake.destDirName") }
-            conventionMapping.clearCache = { project.jbake.clearCache }
-            conventionMapping.configuration = { project.jbake.configuration }
-        }
+        project.tasks.register('bake', JBakeTask, new Action<JBakeTask>() {
+            @Override
+            void execute(JBakeTask t) {
+                t.group = 'Documentation'
+                t.description = 'Bake a jbake project'
+                t.classpath = configuration
+                t.input = project.layout.projectDirectory.file(jbakeExtension.srcDirName).asFile
+                t.output = project.layout.buildDirectory.dir(jbakeExtension.destDirName).get().asFile
+                t.clearCache = jbakeExtension.clearCache
+                t.configuration = jbakeExtension.configuration
+            }
+        })
 
-        project.task('bakePreview', type: JBakeServeTask, description: 'Preview a jbake project') {
-            classpath = configuration
-            conventionMapping.input = { project.file("$project.buildDir/$project.jbake.destDirName") }
-            conventionMapping.configuration = { project.jbake.configuration }
-        }
+        project.tasks.register('bakePreview', JBakeServeTask, new Action<JBakeServeTask>() {
+            @Override
+            void execute(JBakeServeTask t) {
+                t.group = 'Documentation'
+                t.description = 'Preview a jbake project'
+                t.classpath = configuration
+                t.input = project.layout.buildDirectory.file(jbakeExtension.destDirName).get().asFile
+                t.configuration = jbakeExtension.configuration
+            }
+        })
 
-        project.task('bakeInit', type: JBakeInitTask, description: 'Setup a jbake project') {
-            classpath = configuration
-            conventionMapping.template = { project.jbake.template }
-            conventionMapping.templateUrl = { project.jbake.templateUrl }
-            conventionMapping.outputDir = { project.file("${project.jbake.srcDirName}") }
-            conventionMapping.configuration = { project.jbake.configuration }
-        }
+        project.tasks.register('bakeInit', JBakeInitTask, new Action<JBakeInitTask>() {
+            @Override
+            void execute(JBakeInitTask t) {
+                t.group = 'Documentation'
+                t.description = 'Setup a jbake project'
+                t.template = jbakeExtension.template
+                t.templateUrl = jbakeExtension.templateUrl
+                t.outputDir = project.layout.projectDirectory.file(jbakeExtension.srcDirName).asFile
+                t.configuration = jbakeExtension.configuration
+            }
+        })
     }
 
     private void addDependenciesAfterEvaluate() {
         project.afterEvaluate {
-            JBakeExtension extension = project.extensions.findByName(JBAKE)
-            if (extension.includeDefaultRepositories) {
-                project.repositories {
-                    jcenter()
-                }
+            JBakeExtension jbakeExtension = project.extensions.findByType(JBakeExtension)
+            if (jbakeExtension.includeDefaultRepositories) {
+                project.repositories.jcenter()
             }
 
             addDependencies()
         }
     }
 
+    @CompileDynamic
     private void addDependencies() {
+        JBakeExtension jbakeExtension = project.extensions.findByType(JBakeExtension)
         project.dependencies {
-            jbake("org.jbake:jbake-core:${extension.version}")
+            jbake("org.jbake:jbake-core:${jbakeExtension.version}")
 
-            Version currentVersion = Version.valueOf(extension.version)
+            Version currentVersion = Version.valueOf(jbakeExtension.version)
             Version jbake2_3_0 = Version.valueOf('2.3.0')
             Version jbake2_6_0 = Version.valueOf('2.6.0')
 
             if (currentVersion.greaterThan(jbake2_3_0)) {
-                jbake("org.asciidoctor:asciidoctorj:${extension.asciidoctorjVersion}")
+                jbake("org.asciidoctor:asciidoctorj:${jbakeExtension.asciidoctorjVersion}")
             } else {
-                jbake("org.asciidoctor:asciidoctor-java-integration:${extension.asciidoctorJavaIntegrationVersion}")
+                jbake("org.asciidoctor:asciidoctor-java-integration:${jbakeExtension.asciidoctorJavaIntegrationVersion}")
             }
 
             if (currentVersion.greaterThanOrEqualTo(jbake2_6_0)) {
-                jbake("com.vladsch.flexmark:flexmark:${extension.flexmarkVersion}")
-                jbake("com.vladsch.flexmark:flexmark-profile-pegdown:${extension.flexmarkVersion}")
-            }
-            else {
-                jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
+                jbake("com.vladsch.flexmark:flexmark:${jbakeExtension.flexmarkVersion}")
+                jbake("com.vladsch.flexmark:flexmark-profile-pegdown:${jbakeExtension.flexmarkVersion}")
+            } else {
+                jbake("org.pegdown:pegdown:${jbakeExtension.pegdownVersion}")
             }
 
-            jbake("org.freemarker:freemarker:${extension.freemarkerVersion}")
-            jbake("org.codehaus.groovy:groovy-templates:${extension.groovyTemplatesVersion}")
-            jbake("de.neuland-bfi:jade4j:${extension.jade4jVersion}")
-            jbake("org.thymeleaf:thymeleaf:${extension.thymeleafVersion}")
-            jbake("org.pegdown:pegdown:${extension.pegdownVersion}")
-            jbake("org.eclipse.jetty:jetty-server:${extension.jettyVersion}")
+            jbake("org.freemarker:freemarker:${jbakeExtension.freemarkerVersion}")
+            jbake("org.codehaus.groovy:groovy-templates:${jbakeExtension.groovyTemplatesVersion}")
+            jbake("de.neuland-bfi:jade4j:${jbakeExtension.jade4jVersion}")
+            jbake("org.thymeleaf:thymeleaf:${jbakeExtension.thymeleafVersion}")
+            jbake("org.pegdown:pegdown:${jbakeExtension.pegdownVersion}")
+            jbake("org.eclipse.jetty:jetty-server:${jbakeExtension.jettyVersion}")
         }
     }
 }

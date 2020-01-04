@@ -36,19 +36,16 @@ class JBakePluginSpec extends Specification {
     }
 
     def "should add a JBakeTask"() {
-
         expect:
         project.tasks.bake instanceof JBakeTask
     }
 
     def "should add jbake configuration"() {
-
         expect:
         project.configurations.jbake
     }
 
     def "should define default jbake version"() {
-
         expect:
         project.jbake.version != null
     }
@@ -66,11 +63,11 @@ class JBakePluginSpec extends Specification {
         where:
         group                   | name                          | version
         'org.jbake'             | 'jbake-core'                  | '2.6.4'
-        'org.freemarker'        | 'freemarker'                  | '2.3.28'
+        'org.freemarker'        | 'freemarker'                  | '2.3.29'
         'com.vladsch.flexmark'  | 'flexmark'                    | '0.40.8'
         'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.40.8'
         'org.asciidoctor'       | 'asciidoctorj'                | '1.5.8.1'
-        'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.5'
+        'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.8'
         'org.thymeleaf'         | 'thymeleaf'                   | '3.0.11.RELEASE'
         'de.neuland-bfi'        | 'jade4j'                      | '1.2.7'
     }
@@ -86,7 +83,6 @@ class JBakePluginSpec extends Specification {
         project.configurations.jbake.dependencies.find {
             it.name == 'jbake-core' && it.version == '2.3.0'
         }
-
     }
 
     def "switch to asciidoctorj if version > 2.3.0"() {
@@ -115,7 +111,6 @@ class JBakePluginSpec extends Specification {
                 it.name == 'asciidoctor-java-integration' &&
                 it.version == '0.1.4'
         }
-
     }
 
     def "switch to flexmark if version >= 2.6.0"() {
@@ -129,7 +124,6 @@ class JBakePluginSpec extends Specification {
         project.configurations.jbake.dependencies.find {
             it.group == 'com.vladsch.flexmark' && it.name == 'flexmark'
         }
-
     }
 
     def "use pegdown if version is < 2.6.0"() {
@@ -143,7 +137,6 @@ class JBakePluginSpec extends Specification {
         project.configurations.jbake.dependencies.find {
             it.group == 'org.pegdown' && it.name == 'pegdown'
         }
-
     }
 
     def "input dir should be configured by extension"() {

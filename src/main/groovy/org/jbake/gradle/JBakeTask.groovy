@@ -19,6 +19,7 @@ package org.jbake.gradle
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Optional
@@ -36,7 +37,7 @@ class JBakeTask extends DefaultTask {
     @Input
     boolean clearCache
 
-    @Input @Optional
+    @Classpath @Optional
     Configuration classpath
     private static ClassLoader cl
 
