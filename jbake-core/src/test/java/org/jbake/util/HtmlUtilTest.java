@@ -7,7 +7,6 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +45,7 @@ public class HtmlUtilTest {
         fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
         fileContent.put(Attributes.BODY, "<div> Test <img src='./first.jpg' /></div>");
         config.setImgPathPrependHost(false);
+        config.setRelativePathPrependHost(false);
 
         HtmlUtil.fixImageSourceUrls(fileContent, config);
 
@@ -62,6 +62,7 @@ public class HtmlUtilTest {
         fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
         fileContent.put(Attributes.BODY, "<div> Test <img src='img/deeper/underground.jpg' /></div>");
         config.setImgPathPrependHost(true);
+        config.setRelativePathPrependHost(true);
 
         HtmlUtil.fixImageSourceUrls(fileContent, config);
 
