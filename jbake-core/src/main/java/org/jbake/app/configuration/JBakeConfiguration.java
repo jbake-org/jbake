@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
- *
+ * <p>
  * Use one of {@link JBakeConfigurationFactory} methods to create an instance.
  */
 public interface JBakeConfiguration {
@@ -293,6 +293,18 @@ public interface JBakeConfiguration {
      * see {@link #getImgPathUpdate()} which allows you to control the absolute path used
      */
     boolean getImgPathUpdate();
+
+    /**
+     * @return Flag indicating if relative paths like image or a link in content should be updated with absolute path (using URI value of content file),
+     * see {@link #getRelativePathUpdate()} which allows you to control the absolute path used
+     */
+    boolean getRelativePathUpdate();
+
+    /**
+     * @return Flag indicating if relative paths should be prepended with {@link #getSiteHost()} value - only has an effect if
+     * {@link #getRelativePathUpdate()} is set to true
+     */
+    boolean getRelativePathPrependHost();
 
     /**
      * @return Version of JBake

@@ -7,12 +7,23 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Manik Magar
  */
 public class HtmlUtil {
+
+    private static final Map<String, String> TAG_ATTR;
+
+    static {
+        Map<String, String> map = new HashMap<>();
+        map.put("a", "href");
+        map.put("img", "src");
+        TAG_ATTR = Collections.unmodifiableMap(map);
+    }
 
     private HtmlUtil() {
     }
@@ -25,18 +36,26 @@ public class HtmlUtil {
      *
      * @param fileContents  Map representing file contents
      * @param configuration Configuration object
+     * @see #fixRelativeSourceUrls(Map, JBakeConfiguration)
      */
     public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
+        fixRelativeSourceUrls(fileContents, configuration);
+    }
+
+    public static void fixRelativeSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
         String htmlContent = fileContents.get(Attributes.BODY).toString();
-        boolean prependSiteHost = configuration.getImgPathPrependHost();
+        boolean prependSiteHost = configuration.getImgPathPrependHost() || configuration.getRelativePathPrependHost();
         String siteHost = configuration.getSiteHost();
         String uri = getDocumentUri(fileContents);
 
         Document document = Jsoup.parseBodyFragment(htmlContent);
-        Elements allImgs = document.getElementsByTag("img");
-
-        for (Element img : allImgs) {
-            transformImageSource(img, uri, siteHost, prependSiteHost);
+        for (Map.Entry<String, String> entry : TAG_ATTR.entrySet()) {
+            String tagName = entry.getKey();
+            String attrKey = entry.getValue();
+            Elements tags = document.getElementsByTag(tagName);
+            for (Element tag : tags) {
+                transformRelativeSource(tag, attrKey, uri, siteHost, prependSiteHost);
+            }
         }
 
         //Use body().html() to prevent adding <body></body> from parsed fragment.
@@ -57,8 +76,8 @@ public class HtmlUtil {
         return uri;
     }
 
-    private static void transformImageSource(Element img, String uri, String siteHost, boolean prependSiteHost) {
-        String source = img.attr("src");
+    private static void transformRelativeSource(Element element, String attributeKey, String uri, String siteHost, boolean prependSiteHost) {
+        String source = element.attr(attributeKey);
 
         // Now add the root path
         if (!source.startsWith("http://") && !source.startsWith("https://")) {
@@ -73,10 +92,10 @@ public class HtmlUtil {
                 }
                 source = siteHost + source;
             }
-
-            img.attr("src", source);
+            element.attr(attributeKey, source);
         }
     }
+
 
     private static String removeFilename(String uri) {
         uri = uri.substring(0, uri.lastIndexOf('/') + 1);

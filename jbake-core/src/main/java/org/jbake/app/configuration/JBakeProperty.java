@@ -45,8 +45,11 @@ public class JBakeProperty {
     public static final String URI_NO_EXTENSION_PREFIX = "uri.noExtension.prefix";
     public static final String IMG_PATH_UPDATE = "img.path.update";
     public static final String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
+    public static final String RELATIVE_PATH_UPDATE = "relative.path.update";
+    public static final String RELATIVE_PATH_PREPEND_HOST = "relative.path.prepend.host";
     public static final String VERSION = "version";
 
-    private JBakeProperty() {}
+    private JBakeProperty() {
+    }
 
 }

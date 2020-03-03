@@ -541,6 +541,24 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsBoolean(JBakeProperty.IMG_PATH_UPDATE);
     }
 
+    @Override
+    public boolean getRelativePathUpdate() {
+        return getAsBoolean(JBakeProperty.RELATIVE_PATH_UPDATE);
+    }
+
+    public void setRelativePathUpdate(boolean relativePathUpdate) {
+        setProperty(JBakeProperty.RELATIVE_PATH_UPDATE, relativePathUpdate);
+    }
+
+    @Override
+    public boolean getRelativePathPrependHost() {
+        return getAsBoolean(JBakeProperty.RELATIVE_PATH_PREPEND_HOST);
+    }
+
+    public void setRelativePathPrependHost(boolean relativePathPrependHost) {
+        setProperty(JBakeProperty.RELATIVE_PATH_PREPEND_HOST, relativePathPrependHost);
+    }
+
     public void setImgPathUPdate(boolean imgPathUpdate) {
         setProperty(JBakeProperty.IMG_PATH_UPDATE, imgPathUpdate);
     }
