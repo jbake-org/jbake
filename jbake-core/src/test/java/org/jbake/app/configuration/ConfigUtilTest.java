@@ -15,15 +15,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(TempDirectory.class)
 public class ConfigUtilTest extends LoggingTest {
@@ -328,4 +326,18 @@ public class ConfigUtilTest extends LoggingTest {
         }
     }
 
+    @Test
+    public void loadPropertiesUtf8Encoding() throws Exception {
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+        boolean yes = false;
+        Iterator<String> it = config.getKeys();
+        while (it.hasNext()) {
+            String key = it.next();
+            if ((yes = "site.about".equals(key))) {
+                break;
+            }
+        }
+        assertThat(yes).isTrue();
+    }
 }

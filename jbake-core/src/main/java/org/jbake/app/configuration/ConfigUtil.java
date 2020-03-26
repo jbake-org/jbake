@@ -2,7 +2,6 @@ package org.jbake.app.configuration;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.jbake.app.JBakeException;
 import org.slf4j.Logger;
@@ -10,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Provides Configuration related functions.
@@ -39,14 +36,14 @@ public class ConfigUtil {
         File customConfigFile = new File(source, LEGACY_CONFIG_FILE);
         if (customConfigFile.exists()) {
             displayLegacyConfigFileWarningIfRequired();
-            config.addConfiguration(new PropertiesConfiguration(customConfigFile));
+            config.addConfiguration(new Utf8PropertiesConfiguration(customConfigFile));
         }
         customConfigFile = new File(source, CONFIG_FILE);
         if (customConfigFile.exists()) {
-            config.addConfiguration(new PropertiesConfiguration(customConfigFile));
+            config.addConfiguration(new Utf8PropertiesConfiguration(customConfigFile));
         }
         URL defaultPropertiesLocation = this.getClass().getClassLoader().getResource(DEFAULT_CONFIG_FILE);
-        config.addConfiguration(new PropertiesConfiguration(defaultPropertiesLocation));
+        config.addConfiguration(new Utf8PropertiesConfiguration(defaultPropertiesLocation));
         config.addConfiguration(new SystemConfiguration());
         return config;
     }

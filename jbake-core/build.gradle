@@ -7,8 +7,12 @@ description = "The core library of JBake"
 
 dependencies {
     compile "commons-io:commons-io:$commonsIoVersion"
-    compile "commons-configuration:commons-configuration:$commonsConfigurationVersion"
-    compile "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
+    compile("commons-configuration:commons-configuration:$commonsConfigurationVersion") {
+        exclude group: "commons-logging", module: "commons-logging"
+    }
+    compile("org.apache.commons:commons-vfs2:$commonsVfs2Version") {
+        exclude group: "commons-logging", module: "commons-logging"
+    }
     compile "org.apache.commons:commons-lang3:$commonsLangVersion"
     compile("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {
         exclude group: "junit", module: "junit"
@@ -19,7 +23,9 @@ dependencies {
     compile "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
     compile "org.freemarker:freemarker:$freemarkerVersion", optional
     compile "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
-    compile "de.neuland-bfi:jade4j:$jade4jVersion", optional
+    compile("de.neuland-bfi:jade4j:$jade4jVersion") {
+        exclude group: "commons-logging", module: "commons-logging"
+    }
     compile "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
     compile "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     compile "org.jsoup:jsoup:$jsoupVersion"
@@ -34,7 +40,7 @@ processResources {
     from("src/main/resources") {
         include 'default.properties'
         expand jbakeVersion: project.version,
-                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format(new Date())
+            timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format(new Date())
     }
 }
 
