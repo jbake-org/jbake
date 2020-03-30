@@ -129,7 +129,7 @@ public abstract class MarkupEngine implements ParserEngine {
         if (context.getTags() != null) {
             String[] tags = (String[]) context.getTags();
             for (int i = 0; i < tags.length; i++) {
-                tags[i] = sanitizeValue(tags[i]);
+                tags[i] = sanitize(tags[i]);
                 if (context.getConfig().getSanitizeTag()) {
                     tags[i] = tags[i].replace(" ", "-");
                 }
@@ -231,15 +231,15 @@ public abstract class MarkupEngine implements ParserEngine {
     }
 
     private boolean hasHeaderSeparator(String line) {
-        return line.equals(configuration.getHeaderSeparator());
+        return sanitize(line).equals(configuration.getHeaderSeparator());
     }
 
     private boolean isStatusProperty(String line) {
-        return line.startsWith("status=");
+        return sanitize(line).startsWith("status=");
     }
 
     private boolean isTypeProperty(String line) {
-        return line.startsWith("type=");
+        return sanitize(line).startsWith("type=");
     }
 
     /**
@@ -265,8 +265,8 @@ public abstract class MarkupEngine implements ParserEngine {
     }
 
     void storeHeaderValue(String inputKey, String inputValue, Map<String, Object> content) {
-        String key = sanitizeKey(inputKey);
-        String value = sanitizeValue(inputValue);
+        String key = sanitize(inputKey);
+        String value = sanitize(inputValue);
 
         if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
             DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
@@ -285,24 +285,19 @@ public abstract class MarkupEngine implements ParserEngine {
         }
     }
 
-    private String sanitizeValue(String part) {
-        return part.trim();
-    }
-
-    private String sanitizeKey(String part) {
-        String key;
+    private String sanitize(String part) {
         if (part.contains(UTF_8_BOM)) {
-            key = part.trim().replace(UTF_8_BOM, "");
+            return part.replace(UTF_8_BOM, "").trim();
         } else {
-            key = part.trim();
+            return part.trim();
         }
-        return key;
     }
 
     private String[] getTags(String tagsPart) {
         String[] tags = tagsPart.split(",");
-        for (int i = 0; i < tags.length; i++)
-            tags[i] = sanitizeValue(tags[i]);
+        for (int i = 0; i < tags.length; i++) {
+            tags[i] = sanitize(tags[i]);
+        }
         return tags;
     }
 

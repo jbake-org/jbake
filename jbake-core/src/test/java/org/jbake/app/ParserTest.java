@@ -3,14 +3,13 @@ package org.jbake.app;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -32,12 +31,6 @@ public class ParserTest {
 
     private File validHTMLFile;
     private File invalidHTMLFile;
-    private File validAsciiDocFile;
-    private File invalidAsciiDocFile;
-    private File validAsciiDocFileWithoutHeader;
-    private File invalidAsciiDocFileWithoutHeader;
-    private File validAsciiDocFileWithHeaderInContent;
-    private File validAsciiDocFileWithoutJBakeMetaData;
     private File validMarkdownFileWithCustomHeader;
     private File validMarkdownFileWithDefaultStatus;
     private File validMarkdownFileWithDefaultTypeAndStatus;
@@ -47,10 +40,14 @@ public class ParserTest {
     private File validHTMLWithJSONFile;
     private File validAsciiDocWithJSONFile;
     private File validAsciiDocWithADHeaderJSONFile;
+    private File validaAsciidocWithUnsanitizedHeader;
 
     private String validHeader = "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~";
     private String invalidHeader = "title=This is a Title\n~~~~~~";
     private String sampleJsonData = "{\"numberValue\": 42, \"stringValue\": \"Answer to live, the universe and everything\", \"nullValue\": null, \"arrayValue\": [1, 2], \"objectValue\": {\"val1\": 1, \"val2\": 2}}";
+
+    private String unsanitizedKeys = " title= Title \n status= draft \n   type= post   \ndate=2020-02-30\ncustom=custom without bom's\n~~~~~~";
+
     private String customHeaderSeparator;
 
 
@@ -69,74 +66,6 @@ public class ParserTest {
         invalidHTMLFile = folder.newFile("invalid.html");
         out = new PrintWriter(invalidHTMLFile);
         out.println(invalidHeader);
-        out.close();
-
-        validAsciiDocFile = folder.newFile("valid.ad");
-        out = new PrintWriter(validAsciiDocFile);
-        out.println(validHeader);
-        out.println("= Hello, AsciiDoc!");
-        out.println("Test User <user@test.org>");
-        out.println("");
-        out.println("JBake now supports AsciiDoc.");
-        out.close();
-
-        invalidAsciiDocFile = folder.newFile("invalid.ad");
-        out = new PrintWriter(invalidAsciiDocFile);
-        out.println(invalidHeader);
-        out.println("= Hello, AsciiDoc!");
-        out.println("Test User <user@test.org>");
-        out.println("");
-        out.println("JBake now supports AsciiDoc.");
-        out.close();
-
-        validAsciiDocFileWithoutHeader = folder.newFile("validwoheader.ad");
-        out = new PrintWriter(validAsciiDocFileWithoutHeader);
-        out.println("= Hello: AsciiDoc!");
-        out.println("Test User <user@test.org>");
-        out.println("2013-09-02");
-        out.println(":jbake-status: published");
-        out.println(":jbake-type: page");
-        out.println("");
-        out.println("JBake now supports AsciiDoc.");
-        out.close();
-
-        invalidAsciiDocFileWithoutHeader = folder.newFile("invalidwoheader.ad");
-        out = new PrintWriter(invalidAsciiDocFileWithoutHeader);
-        out.println("= Hello, AsciiDoc!");
-        out.println("Test User <user@test.org>");
-        out.println("2013-09-02");
-        out.println(":jbake-status: published");
-        out.println("");
-        out.println("JBake now supports AsciiDoc.");
-        out.close();
-
-        validAsciiDocFileWithHeaderInContent = folder.newFile("validheaderincontent.ad");
-        out = new PrintWriter(validAsciiDocFileWithHeaderInContent);
-        out.println("= Hello, AsciiDoc!");
-        out.println("Test User <user@test.org>");
-        out.println("2013-09-02");
-        out.println(":jbake-status: published");
-        out.println(":jbake-type: page");
-        out.println("");
-        out.println("JBake now supports AsciiDoc.");
-        out.println("");
-        out.println("----");
-        out.println("title=Example Header");
-        out.println("date=2013-02-01");
-        out.println("type=post");
-        out.println("tags=tag1, tag2");
-        out.println("status=published");
-        out.println("~~~~~~");
-        out.println("----");
-        out.close();
-
-        validAsciiDocFileWithoutJBakeMetaData = folder.newFile("validwojbakemetadata.ad");
-        out = new PrintWriter(validAsciiDocFileWithoutJBakeMetaData);
-        out.println("= Hello: AsciiDoc!");
-        out.println("Test User <user@test.org>");
-        out.println("2013-09-02");
-        out.println("");
-        out.println("JBake now supports AsciiDoc documents without JBake meta data.");
         out.close();
 
         validMarkdownFileWithCustomHeader = folder.newFile("validMdCustomHeader.md");
@@ -257,7 +186,23 @@ public class ParserTest {
         out.println("");
         out.println("JBake now supports AsciiDoc.");
         out.close();
+
+        validaAsciidocWithUnsanitizedHeader = folder.newFile("validAsciidocWithUnsanitizedHeader.adoc");
+        out = new PrintWriter(validaAsciidocWithUnsanitizedHeader, "UTF-8");
+        // Simulating a \uFEFF Byte order Marker in utf-8
+        out.print("\uFEFF");
+        out.println(unsanitizedKeys);
+        out.println("= Hello: AsciiDoc!");
+        out.println("Test User <user@test.org>");
+        out.println("2013-09-02");
+        out.println(":jbake-status: published");
+        out.println(":jbake-type: page");
+        out.print(":jbake-jsondata: ");
+        out.println(sampleJsonData);
+        out.println("");
+        out.println("JBake now supports AsciiDoc.");
         out.close();
+
     }
 
     @Test
@@ -283,78 +228,11 @@ public class ParserTest {
     }
 
     @Test
-    public void parseValidAsciiDocFile() {
-        Map<String, Object> map = parser.processFile(validAsciiDocFile);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("draft", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
-        assertThat(map.get("body").toString())
-                .contains("class=\"paragraph\"")
-                .contains("<p>JBake now supports AsciiDoc.</p>");
-//        Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
-    }
-
-    @Test
-    public void parseInvalidAsciiDocFile() {
-        Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
-        Assert.assertNull(map);
-    }
-
-    @Test
     public void parseInvalidExtension(){
         Map<String, Object> map = parser.processFile(invalidExtensionFile);
         Assert.assertNull(map);
     }
 
-    @Test
-    public void parseValidAsciiDocFileWithoutHeader() {
-        Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutHeader);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("Hello: AsciiDoc!", map.get("title"));
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
-        assertThat(map.get("body").toString())
-                .contains("class=\"paragraph\"")
-                .contains("<p>JBake now supports AsciiDoc.</p>");
-//        Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n</div>\n</div>", map.get("body"));
-    }
-
-    @Test
-    public void parseInvalidAsciiDocFileWithoutHeader() {
-        Map<String, Object> map = parser.processFile(invalidAsciiDocFileWithoutHeader);
-        Assert.assertNull(map);
-    }
-
-    @Test
-    public void parseValidAsciiDocFileWithExampleHeaderInContent() {
-        Map<String, Object> map = parser.processFile(validAsciiDocFileWithHeaderInContent);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
-        assertThat(map.get("body").toString())
-                .contains("class=\"paragraph\"")
-                .contains("<p>JBake now supports AsciiDoc.</p>")
-                .contains("class=\"listingblock\"")
-                .contains("class=\"content\"")
-                .contains("<pre>")
-                .contains("title=Example Header")
-                .contains("date=2013-02-01")
-                .contains("tags=tag1, tag2");
-//        Assert.assertEquals("<div id=\"preamble\">\n<div class=\"sectionbody\">\n<div class=\"paragraph\">\n<p>JBake now supports AsciiDoc.</p>\n</div>\n<div class=\"listingblock\">\n<div class=\"content\">\n<pre>title=Example Header\ndate=2013-02-01\ntype=post\ntags=tag1, tag2\nstatus=published\n~~~~~~</pre>\n</div>\n</div>\n</div>\n</div>", map.get("body"));
-    }
-
-    @Test
-    public void parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() {
-        config.setDefaultStatus("published");
-        config.setDefaultType("page");
-        Parser parser = new Parser(config);
-        Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData);
-        Assert.assertNotNull(map);
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
-        assertThat(map.get("body").toString())
-                .contains("<p>JBake now supports AsciiDoc documents without JBake meta data.</p>");
-    }
 
     @Test
     public void parseMarkdownFileWithCustomHeaderSeparator() {
@@ -403,6 +281,16 @@ public class ParserTest {
     public void parseInvalidMarkdownFile() {
         Map<String, Object> map = parser.processFile(invalidMDFile);
         Assert.assertNull(map);
+    }
+
+    @Test
+    public void sanitizeKeysAndValues() {
+        Map<String, Object> map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
+
+        assertThat(map.get("status")).isEqualTo("draft");
+        assertThat(map.get("title")).isEqualTo("Title");
+        assertThat(map.get("type")).isEqualTo("post");
+        assertThat(map.get("custom")).isEqualTo("custom without bom's");
     }
 
     @Test
