@@ -3,6 +3,7 @@ package org.jbake.app;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeProperty;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
@@ -14,6 +15,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -46,7 +48,7 @@ public class ParserTest {
     private String invalidHeader = "title=This is a Title\n~~~~~~";
     private String sampleJsonData = "{\"numberValue\": 42, \"stringValue\": \"Answer to live, the universe and everything\", \"nullValue\": null, \"arrayValue\": [1, 2], \"objectValue\": {\"val1\": 1, \"val2\": 2}}";
 
-    private String unsanitizedKeys = " title= Title \n status= draft \n   type= post   \ndate=2020-02-30\ncustom=custom without bom's\n~~~~~~";
+    private String unsanitizedKeys = " title= Title \n status= draft \n   type= post   \ndate=2020-02-30\ncustom=custom without bom's\ntags= jbake, java    , tag with space   \n~~~~~~";
 
     private String customHeaderSeparator;
 
@@ -291,7 +293,17 @@ public class ParserTest {
         assertThat(map.get("title")).isEqualTo("Title");
         assertThat(map.get("type")).isEqualTo("post");
         assertThat(map.get("custom")).isEqualTo("custom without bom's");
+        assertThat(map.get("tags")).isEqualTo(Arrays.asList("jbake", "java", "tag with space").toArray());
     }
+
+    @Test
+    public void sanitizeTags() {
+        config.setProperty(JBakeProperty.TAG_SANITIZE, true);
+        Map<String, Object> map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
+
+        assertThat(map.get("tags")).isEqualTo(Arrays.asList("jbake", "java", "tag-with-space").toArray());
+    }
+
 
     @Test
     public void parseValidHTMLWithJSONFile() {

@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -76,28 +77,17 @@ public abstract class MarkupEngine implements ParserEngine {
      */
     public Map<String, Object> parse(JBakeConfiguration config, File file) {
         this.configuration = config;
-        List<String> fileContents;
-        try (InputStream is = new FileInputStream(file)) {
+        List<String> fileContent = getFileContent(file, config.getRenderEncoding());
 
-            fileContents = IOUtils.readLines(is, config.getRenderEncoding());
-        } catch (IOException e) {
-            LOGGER.error("Error while opening file {}", file, e);
-
+        if (fileContent.isEmpty()) {
             return null;
         }
 
-        boolean hasHeader = hasHeader(fileContents);
-        ParserContext context = new ParserContext(
-                file,
-                fileContents,
-                config,
-                hasHeader
-        );
+        boolean hasHeader = hasHeader(fileContent);
+        ParserContext context = new ParserContext(file, fileContent, config, hasHeader);
 
-        if (hasHeader) {
-            // read header from file
-            processDefaultHeader(context);
-        }
+        // read header from file
+        processDefaultHeader(context);
         // then read engine specific headers
         processHeader(context);
 
@@ -123,6 +113,26 @@ public abstract class MarkupEngine implements ParserEngine {
         // TODO: post parsing plugins to hook in here?
 
         return context.getDocumentModel();
+    }
+
+    private List<String> getFileContent(File file, String encoding) {
+
+        try (InputStream is = new FileInputStream(file)) {
+            LOGGER.debug("read file '{}' with encoding '{}'", file, encoding);
+            List<String> lines = IOUtils.readLines(is, encoding);
+            if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines.get(0))) {
+                LOGGER.warn("remove BOM from file '{}' read with encoding '{}'", file, encoding);
+                lines.set(0, lines.get(0).replace(UTF_8_BOM, ""));
+            }
+            return lines;
+        } catch (IOException e) {
+            LOGGER.error("Error while opening file {}", file, e);
+            return Collections.emptyList();
+        }
+    }
+
+    private boolean isUtf8WithBOM(String encoding, String line) {
+        return encoding.equals("UTF-8") && line.startsWith(UTF_8_BOM);
     }
 
     private void sanitizeTags(ParserContext context) {
@@ -201,10 +211,6 @@ public abstract class MarkupEngine implements ParserEngine {
         return !configuration.getDefaultStatus().isEmpty();
     }
 
-    private boolean hasHeaderSeparatorInContent(List<String> contents) {
-        return contents.indexOf(configuration.getHeaderSeparator()) != -1;
-    }
-
     /**
      * Checks if header separator demarcates end of metadata header
      *
@@ -220,7 +226,7 @@ public abstract class MarkupEngine implements ParserEngine {
 
             for (String line : subContents) {
                 // header should only contain empty lines or lines with '=' in
-                if (!line.contains("=") && !line.isEmpty())  {
+                if (!line.contains("=") && !line.isEmpty()) {
                     return false;
                 }
             }
@@ -248,12 +254,14 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param context the parser context
      */
     private void processDefaultHeader(ParserContext context) {
-        for (String line : context.getFileLines()) {
+        if (context.hasHeader()) {
+            for (String line : context.getFileLines()) {
 
-            if (hasHeaderSeparator(line)) {
-                break;
+                if (hasHeaderSeparator(line)) {
+                    break;
+                }
+                processHeaderLine(line, context.getDocumentModel());
             }
-            processHeaderLine(line, context.getDocumentModel());
         }
     }
 
@@ -286,19 +294,11 @@ public abstract class MarkupEngine implements ParserEngine {
     }
 
     private String sanitize(String part) {
-        if (part.contains(UTF_8_BOM)) {
-            return part.replace(UTF_8_BOM, "").trim();
-        } else {
-            return part.trim();
-        }
+        return part.trim();
     }
 
     private String[] getTags(String tagsPart) {
-        String[] tags = tagsPart.split(",");
-        for (int i = 0; i < tags.length; i++) {
-            tags[i] = sanitize(tags[i]);
-        }
-        return tags;
+        return tagsPart.split(",");
     }
 
     private boolean isJson(String part) {
