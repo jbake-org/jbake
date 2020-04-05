@@ -39,6 +39,7 @@ ext {
     isTravis = (System.getenv("TRAVIS") == "true")
     isTravisPullRequest = (System.getenv("TRAVIS_PULL_REQUEST")) != "false"
     pullRequestId = System.getenv("TRAVIS_PULL_REQUEST")
+    pullRequestBranch = System.getenv("TRAVIS_PULL_REQUEST_BRANCH")
     hasGithub = System.getenv("GITHUBTOKEN") && System.getenv("GITHUBREPO")
     hasSonar = System.getenv("SONARORG") && System.getenv("SONARLOGIN")
     sonarDefaultURL = "https://sonarcloud.io"
