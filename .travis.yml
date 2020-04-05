@@ -37,9 +37,7 @@ jobs:
   - stage: Quality Check
     jdk: oraclejdk8
     script:
-    - "./gradlew jacocoRootReport"
-    after_success:
-    - "./gradlew sonarqube -i --stacktrace"
+    - "./gradlew jacocoRootReport sonarqube -i --stacktrace"
 
 notifications:
   irc: "irc.freenode.org#jbake"
@@ -61,3 +59,4 @@ cache:
      - "$HOME/.gradle/wrapper/"
      - "$HOME/.sonar/cache"
      - ".gradle"
+     - "build"

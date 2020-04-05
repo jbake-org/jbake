@@ -15,7 +15,7 @@ if ( JavaVersion.current().isJava8Compatible() ) {
             property "sonar.organization", System.getenv('SONARORG')
             property "sonar.login", System.getenv('SONARLOGIN')
             property "sonar.projectKey", sonarProjectKey
-
+            property "sonar.coverage.jacoco.xmlReportPaths", "${rootDir}/build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 
             if (isTravis && isTravisPullRequest) {
 
