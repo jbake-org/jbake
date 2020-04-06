@@ -178,10 +178,11 @@ public class ContentStore {
     }
 
     private void activateOnCurrentThread() {
-        if (db != null)
+        if (db != null) {
             db.activateOnCurrentThread();
-        else
+        } else {
             System.out.println("db is null on activate");
+        }
     }
 
 
@@ -191,21 +192,26 @@ public class ContentStore {
      * @return The saved document.
      * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.
      */
-    public ODocument mergeDocument(Map<String, ? extends Object> incomingDocMap)
-    {
+    public ODocument mergeDocument(Map<String, ? extends Object> incomingDocMap) {
         String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
-        if (null == sourceUri)
+
+        if (null == sourceUri) {
             throw new IllegalArgumentException("Document sourceUri is null.");
+        }
+
         String docType = (String) incomingDocMap.get(Crawler.Attributes.TYPE);
-        if (null == docType)
+
+        if (null == docType) {
             throw new IllegalArgumentException("Document docType is null.");
+        }
 
         // Get a document by sourceUri
         String sql = "SELECT * FROM " + docType + " WHERE sourceuri=?";
         activateOnCurrentThread();
         List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
-        if (results.size() == 0)
-            throw new JBakeException("No document with sourceUri '"+sourceUri+"'.");
+        if (results.isEmpty()) {
+            throw new JBakeException("No document with sourceUri '" + sourceUri + "'.");
+        }
 
         // Update it from the given map.
         ODocument incomingDoc = new ODocument(docType);

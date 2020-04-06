@@ -33,8 +33,7 @@ public class PagingHelper {
             if ( currentPageNumber == 2 ) {
                 // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
                 return "";
-            }
-            else {
+            } else {
                 return new URI((currentPageNumber - 1) + URI_SEPARATOR).toString();
             }
         }
@@ -47,8 +46,7 @@ public class PagingHelper {
     public String getCurrentFileName(int page, String fileName) throws URISyntaxException {
         if ( isFirstPage(page) ) {
             return fileName;
-        }
-        else {
+        } else {
             return new URI(page + URI_SEPARATOR + fileName).toString();
         }
     }

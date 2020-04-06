@@ -23,21 +23,21 @@ public class ModelExtractorsTest {
 
         ModelExtractors.getInstance();
         String[] expectedKeys = new String[]{
-                "pages",
-                "posts",
-                "indexs",
-                "archives",
-                "feeds",
-                "published_posts",
-                "published_pages",
-                "published_content",
-                "published_date",
-                "all_content",
-                "alltags",
-                "db",
-                "tag_posts",
-                "tags",
-                "tagged_documents",
+            "pages",
+            "posts",
+            "indexs",
+            "archives",
+            "feeds",
+            "published_posts",
+            "published_pages",
+            "published_content",
+            "published_date",
+            "all_content",
+            "alltags",
+            "db",
+            "tag_posts",
+            "tags",
+            "tagged_documents",
         };
 
         for (String aKey : expectedKeys) {

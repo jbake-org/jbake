@@ -10,7 +10,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,8 +48,7 @@ public class BuiltInProjectsTest {
     public void setup() throws IOException {
         if ( Os.isFamily(Os.OS_FAMILY_WINDOWS) ) {
             jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
-        }
-        else {
+        } else {
             jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
         }
         projectFolder = folder.newFolder("project");
@@ -58,7 +58,7 @@ public class BuiltInProjectsTest {
     }
 
     @Test
-    public void should_bake_with_project() throws Exception {
+    public void shouldBakeWithProject() throws Exception {
         shouldInitProject(projectName, extension);
         shouldBakeProject();
     }

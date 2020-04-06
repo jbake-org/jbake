@@ -67,8 +67,7 @@ public abstract class ContentStoreIntegrationTest {
         MEMORY, PLOCAL;
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return this.name().toLowerCase();
         }
     }

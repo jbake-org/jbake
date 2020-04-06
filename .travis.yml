@@ -14,7 +14,7 @@ before_install:
 install: true
 
 script:
-- "./gradlew check -i"
+- "./gradlew check"
 
 after_failure:
 - "./gradlew clean check -debug --stacktrace"

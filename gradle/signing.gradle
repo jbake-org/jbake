@@ -6,35 +6,14 @@ if ( !project.hasProperty('skipSigning') ) {
         ext.skipSigning = true
     }
     else {
-        signing {
-            sign configurations.archives
+        if ( project.name != "jbake-dist" ) {
+            signing {
+                sign publishing.publications.mavenJava
+            }
         }
-    }
-
-    task signPom(type: Sign) {
-        group "publishing"
-        description "Sign the projects pom file"
-
-        ext.pom = file("$buildDir/poms/pom-default.xml")
-        ext.signedPom = file("$buildDir/poms/${project.name}-${project.version}.pom.asc")
-        ext.bintrayDestination = "${project.group.replace(".", "/")}/${project.name}/${project.version}"
-
-        inputs.file pom
-        outputs.file signedPom
-
-        doLast {
-
-            def input = pom.newInputStream()
-            def output = signedPom.newOutputStream()
-            try {
-                signatory.sign(input, output)
-            }
-            catch (Exception e) {
-                logger.error e.message
-            }
-            finally {
-                input.close()
-                output.close()
+        else {
+            signing {
+                sign configurations.archives
             }
         }
     }

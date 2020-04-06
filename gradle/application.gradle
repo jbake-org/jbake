@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.ajoberstar:grgit:1.6.0'
+        classpath "org.ajoberstar:grgit:$grgitVersion"
     }
 }
 
@@ -16,17 +16,16 @@ apply plugin: 'application'
 mainClassName = "org.jbake.launcher.Main"
 applicationName = "jbake"
 
-ext {
-    examplesBase = "$project.buildDir/examples"
 
-    exampleRepositories = [
-            "example_project_freemarker": "git://github.com/jbake-org/jbake-example-project-freemarker.git",
-            "example_project_groovy"    : "git://github.com/jbake-org/jbake-example-project-groovy.git",
-            "example_project_thymeleaf" : "git://github.com/jbake-org/jbake-example-project-thymeleaf.git",
-            "example_project_groovy-mte": "git://github.com/jbake-org/jbake-example-project-groovy-mte.git",
-            "example_project_jade"      : "git://github.com/jbake-org/jbake-example-project-jade.git"
-    ]
-}
+def examplesBase = "$project.buildDir/examples"
+
+def exampleRepositories = [
+    "example_project_freemarker": "git://github.com/jbake-org/jbake-example-project-freemarker.git",
+    "example_project_groovy"    : "git://github.com/jbake-org/jbake-example-project-groovy.git",
+    "example_project_thymeleaf" : "git://github.com/jbake-org/jbake-example-project-thymeleaf.git",
+    "example_project_groovy-mte": "git://github.com/jbake-org/jbake-example-project-groovy-mte.git",
+    "example_project_jade"      : "git://github.com/jbake-org/jbake-example-project-jade.git"
+]
 
 processResources {
     from("src/main/resources"){
@@ -58,8 +57,8 @@ exampleRepositories.each { name, repository ->
         group "distribution"
         description "Zip $name repository"
 
-        baseName = name
-        archiveName = "${baseName}.zip"
+        archiveBaseName = name
+        archiveFileName = "${archiveBaseName.get()}.zip"
 
         from project.tasks.getByName("clone_${name}Repository").outputs
         exclude 'README.md'
