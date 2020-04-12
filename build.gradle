@@ -90,6 +90,11 @@ subprojects {
 
     test {
         useJUnitPlatform()
+
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
+        }
     }
 
     dependencies {
@@ -180,6 +185,8 @@ task testReport(type: TestReport) {
 coveralls {
     sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    saveAsFile = true
+    sendToCoveralls = false
 }
 
 tasks.coveralls {
