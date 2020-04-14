@@ -18,7 +18,6 @@ package org.jbake.maven;
 
 import com.orientechnologies.orient.core.Orient;
 
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.MapConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
@@ -29,9 +28,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.jbake.app.Oven;
+import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 import java.io.File;
 
@@ -98,8 +97,6 @@ public class GenerateMojo extends AbstractMojo {
       // TODO: At some point, reuse Oven
       Oven oven = new Oven(createConfiguration());
 
-      oven.setupPaths();
-
       oven.bake();
       if (failOnError && !oven.getErrors().isEmpty()) {
           throw new MojoFailureException("Baked with " + oven.getErrors().size() + " errors. Check output above for details!");
@@ -112,18 +109,11 @@ public class GenerateMojo extends AbstractMojo {
   }
 
   protected JBakeConfiguration createConfiguration() throws ConfigurationException {
-    JBakeConfigurationFactory jbakeConfigurationFactory = new JBakeConfigurationFactory();
-      
-    // load base config (cast to DefaultJBakeConfig)
-    DefaultJBakeConfiguration baseConfiguration = (DefaultJBakeConfiguration)jbakeConfigurationFactory.getConfigUtil().loadConfig(inputDirectory);
-    
-    final CompositeConfiguration config = new CompositeConfiguration();
-
-    config.addConfiguration(baseConfiguration.getCompositeConfiguration());
-
-    config.addConfiguration(new MapConfiguration(this.project.getProperties()));
-
-    return jbakeConfigurationFactory.createDefaultJbakeConfiguration(inputDirectory, outputDirectory, config, isClearCache);
+	  DefaultJBakeConfiguration jBakeConfiguration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(inputDirectory);
+    jBakeConfiguration.getCompositeConfiguration().addConfiguration(new MapConfiguration(this.project.getProperties()));
+    jBakeConfiguration.setDestinationFolder(outputDirectory);
+    jBakeConfiguration.setClearCache(isClearCache);
+    return jBakeConfiguration;
   }
 
 }
