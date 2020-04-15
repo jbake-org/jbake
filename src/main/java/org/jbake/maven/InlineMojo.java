@@ -48,7 +48,7 @@ public class InlineMojo extends WatchMojo {
   /**
    * Listen Port
    */
-  @Parameter(property = "jbake.port", defaultValue = "8080")
+  @Parameter(property = "jbake.port", defaultValue = "8820")
   private Integer port;
 
   protected void stopServer() throws MojoExecutionException {
