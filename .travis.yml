@@ -1,7 +1,7 @@
 language: java
 
 os: linux
-dist: trusty
+dist: bionic
 
 addons:
   hosts:
@@ -14,30 +14,34 @@ before_install:
 install: true
 
 script:
-- "./gradlew check"
-
-after_failure:
-- "./gradlew clean check -debug --stacktrace"
-
-after_success:
-- "./gradlew -PskipSigning jacocoRootReport coveralls || ./gradlew clean"
+- "./gradlew check --stacktrace"
 
 jdk:
+  - openjdk14
   - openjdk11
-  - oraclejdk8
   - openjdk8
 
 jobs:
   include:
 
-  - script: "./gradlew check"
-    jdk:
+  - jdk: openjdk14
+    os: osx
+
+  - jdk: openjdk11
     os: osx
 
   - stage: Quality Check
-    jdk: oraclejdk8
+    name: sonarqube
+    jdk: openjdk11
     script:
     - "./gradlew jacocoRootReport sonarqube -i --stacktrace"
+
+  - stage: Quality Check
+    name: coveralls
+    jdk: openjdk11
+    script:
+    - "./gradlew -PskipSigning jacocoRootReport coveralls -i --stacktrace"
+    - curl -F 'json_file=@build/coveralls/report.json' 'https://coveralls.io/api/v1/jobs'
 
 notifications:
   irc: "irc.freenode.org#jbake"

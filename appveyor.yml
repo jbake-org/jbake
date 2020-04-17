@@ -1,3 +1,5 @@
+image:
+    - Visual Studio 2019
 version: '{build}'
 skip_tags: true
 skip_commits:
@@ -8,6 +10,7 @@ environment:
   matrix:
     - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
     - JAVA_HOME: C:\Program Files\Java\jdk11
+    - JAVA_HOME: C:\Program Files\Java\jdk14
 
 install:
   - SET PATH=%JAVA_HOME%\bin;%PATH%

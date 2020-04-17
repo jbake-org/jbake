@@ -44,4 +44,11 @@ task smokeTest(type: Test, dependsOn: installDist) {
     shouldRunAfter test
 }
 
+smokeTest {
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
 check.dependsOn smokeTest
