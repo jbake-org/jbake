@@ -1,5 +1,7 @@
 package org.jbake.maven;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 /*
  * Copyright 2013 ingenieux Labs
  *
@@ -48,8 +50,21 @@ public class InlineMojo extends WatchMojo {
   /**
    * Listen Port
    */
-  @Parameter(property = "jbake.port", defaultValue = "8820")
+  @Parameter(property = "jbake.port")
   private Integer port;
+
+  private int getPort() {
+    if (this.port == null) {
+      try {
+        return createConfiguration().getServerPort();
+      } catch (ConfigurationException e) {
+        // ignore since default will be returned
+      }
+    } else {
+      return this.port;
+    }
+    return 8820;
+  }
 
   protected void stopServer() throws MojoExecutionException {
     stop();
@@ -59,7 +74,7 @@ public class InlineMojo extends WatchMojo {
     externalStaticFileLocation(outputDirectory.getPath());
 
     ipAddress(listenAddress);
-    port(this.port);
+    port(getPort());
 
     init();
 
