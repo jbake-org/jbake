@@ -3,6 +3,8 @@ Jonathan Bullock
 2018-04-23
 :idprefix:
 
+image:https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin"]
+
 JBake Maven Plugin is a Maven plugin allowing you to integrate http://jbake.org[JBake] into your projects build. This is the official version published at 
 the following Maven coordinates:
 
@@ -10,7 +12,7 @@ the following Maven coordinates:
 <dependency>
     <groupId>org.jbake</groupId>
     <artifactId>jbake-maven-plugin</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
 </dependency>
 ----
 
