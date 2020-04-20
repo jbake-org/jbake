@@ -113,6 +113,7 @@ class JBakePlugin implements Plugin<Project> {
             }
 
             jbake("org.freemarker:freemarker:${jbakeExtension.freemarkerVersion}")
+            jbake("org.codehaus.groovy:groovy:${jbakeExtension.groovyTemplatesVersion}")
             jbake("org.codehaus.groovy:groovy-templates:${jbakeExtension.groovyTemplatesVersion}")
             jbake("de.neuland-bfi:jade4j:${jbakeExtension.jade4jVersion}")
             jbake("org.thymeleaf:thymeleaf:${jbakeExtension.thymeleafVersion}")
