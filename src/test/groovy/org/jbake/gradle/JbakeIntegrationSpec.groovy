@@ -29,10 +29,10 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 @Unroll
 class JbakeIntegrationSpec extends PluginIntegrationSpec {
     @Shared
-    String latestGradleVersion = '6.0'
+    String latestGradleVersion = '6.3'
 
     @Shared
-    String latestJbakeVersion = '2.6.4'
+    String latestJbakeVersion = '2.6.5'
 
     @Unroll
     def 'Setup and bake with gradle #version'() {
@@ -40,6 +40,9 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         if (Jvm.current.java9Compatible) {
             Assume.assumeTrue("Skip. Not jdk9 compatible", jdk9Compatible)
+        }
+        if ((Jvm.current.javaSpecificationVersion as float) >= 14f) {
+            Assume.assumeTrue("Skip. $gradleVersion is not jdk14 compatible", jdk14Compatible)
         }
 
         gradleVersion = version
@@ -70,9 +73,10 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         blogTagFile.size() > 0
 
         where:
-        version             | jdk9Compatible
-        '5.0'               | true      // base version
-        latestGradleVersion | true      // latest release, deprecations & warnings
+        version             | jdk9Compatible | jdk14Compatible
+        '5.0'               | true           | false            // base version
+        '5.6.4'             | true           | false            // latest 5.x version
+        latestGradleVersion | true           | true             // latest release, deprecations & warnings
     }
 
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {

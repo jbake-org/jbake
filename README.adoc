@@ -1,5 +1,5 @@
 = JBake plugin for Gradle
-:jbake-version: 2.6.4
+:jbake-version: 2.6.5
 :plugin-version: 5.0.0
 :linkattrs:
 :project-name: jbake-gradle-plugin
@@ -15,7 +15,7 @@ This plugin allows rendering a site using http://www.jbake.org[JBake] directly f
 
 == Requirements
 
- * Java 7
+ * Java 8
  * Gradle 5+
 
 == Examples
@@ -124,13 +124,14 @@ Jbake uses several engines. The library versions could be changed too:
 ----
 jbake {
     pegdownVersion = '1.6.0'
-    flexmarkVersion = '0.40.8'
-    freemarkerVersion = '2.3.28'
-    groovyTemplatesVersion = '2.5.5'
+    flexmarkVersion = '0.61.0'
+    freemarkerVersion = '2.3.30'
+    groovyTemplatesVersion = '3.0.2'
     jade4jVersion = '1.2.7'
     thymeleafVersion = '3.0.11.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'
-    asciidoctorjVersion = '1.5.8.1'
+    asciidoctorjVersion = '2.2.0'
+    jettyVersion = '9.4.27.v20200227'
 }
 ----
 

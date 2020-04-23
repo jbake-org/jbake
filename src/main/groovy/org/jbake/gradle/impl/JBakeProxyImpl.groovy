@@ -21,9 +21,6 @@ import org.jbake.gradle.JBakeProxy
 
 import java.lang.reflect.Constructor
 
-/**
- * Created by frank on 12.10.14.
- */
 class JBakeProxyImpl implements JBakeProxy {
     Class delegate
     def input

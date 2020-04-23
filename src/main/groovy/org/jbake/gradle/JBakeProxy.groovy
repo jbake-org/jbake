@@ -17,9 +17,6 @@
  */
 package org.jbake.gradle
 
-/**
- * Created by frank on 12.10.14.
- */
 interface JBakeProxy {
     def jbake()
 

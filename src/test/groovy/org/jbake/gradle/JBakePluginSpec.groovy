@@ -22,9 +22,6 @@ import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
 import spock.lang.Unroll
 
-/**
- * Created by frank on 03.10.14.
- */
 class JBakePluginSpec extends Specification {
     public static final String PLUGIN_ID = 'org.jbake.site'
 
@@ -62,12 +59,12 @@ class JBakePluginSpec extends Specification {
 
         where:
         group                   | name                          | version
-        'org.jbake'             | 'jbake-core'                  | '2.6.4'
-        'org.freemarker'        | 'freemarker'                  | '2.3.29'
-        'com.vladsch.flexmark'  | 'flexmark'                    | '0.40.8'
-        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.40.8'
-        'org.asciidoctor'       | 'asciidoctorj'                | '1.5.8.1'
-        'org.codehaus.groovy'   | 'groovy-templates'            | '2.5.8'
+        'org.jbake'             | 'jbake-core'                  | '2.6.5'
+        'org.freemarker'        | 'freemarker'                  | '2.3.30'
+        'com.vladsch.flexmark'  | 'flexmark'                    | '0.61.0'
+        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.61.0'
+        'org.asciidoctor'       | 'asciidoctorj'                | '2.2.0'
+        'org.codehaus.groovy'   | 'groovy-templates'            | '3.0.2'
         'org.thymeleaf'         | 'thymeleaf'                   | '3.0.11.RELEASE'
         'de.neuland-bfi'        | 'jade4j'                      | '1.2.7'
     }
