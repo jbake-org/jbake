@@ -18,7 +18,6 @@
 plugins {
     id 'java-library'
     id 'groovy'
-    id 'org.kordamp.gradle.kordamp-parentpom'
     id 'org.kordamp.gradle.groovy-project'
     id 'org.kordamp.gradle.bintray'
     id 'org.kordamp.gradle.plugin'
@@ -82,7 +81,9 @@ dependencies {
     compileOnly gradleApi()
     api "com.github.zafarkhaja:java-semver:$semverVersion"
     compileOnly "org.eclipse.jetty:jetty-server:$jettyVersion"
-    compileOnly "org.jbake:jbake-core:$jbakeVersion"
+    compileOnly("org.jbake:jbake-core:$jbakeVersion") {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude group: 'org.codehaus.groovy'
     }

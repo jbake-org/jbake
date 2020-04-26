@@ -27,7 +27,7 @@ class JBakeExtension {
     String groovyTemplatesVersion = '3.0.2'
     String jade4jVersion = '1.2.7'
     String thymeleafVersion = '3.0.11.RELEASE'
-    String jettyVersion = '9.4.27.v20200227'
+    String jettyVersion = '9.4.28.v20200408'
     String srcDirName = 'src/jbake'
     String destDirName = 'jbake'
     String template = 'groovy'
