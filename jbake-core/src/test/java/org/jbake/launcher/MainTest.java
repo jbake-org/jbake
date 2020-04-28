@@ -1,7 +1,7 @@
 package org.jbake.launcher;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.itsallcode.junit.sysextensions.ExitGuard;
 import org.jbake.TestUtils;
 import org.jbake.app.LoggingTest;

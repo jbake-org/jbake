@@ -23,6 +23,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -214,9 +215,9 @@ public class ConfigUtilTest extends LoggingTest {
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
 
-        Object option = config.getAsciidoctorOption("requires");
+        List<String> option = config.getAsciidoctorOption("requires");
 
-        assertThat(String.valueOf(option)).contains("asciidoctor-diagram");
+        assertThat(option).contains("asciidoctor-diagram");
     }
 
     @Test
@@ -226,20 +227,19 @@ public class ConfigUtilTest extends LoggingTest {
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
 
-        Object option = config.getAsciidoctorOption("template_dirs");
+        List<String> option = config.getAsciidoctorOption("template_dirs");
 
-        assertTrue(option instanceof List);
-        assertThat((List<String>) option).contains("src/template1", "src/template2");
+        assertThat(option).contains("src/template1", "src/template2");
     }
 
     @Test
-    public void shouldReturnEmptyStringIfOptionNotAvailable() throws Exception {
+    public void shouldReturnEmptyListIfOptionNotAvailable() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
-        Object option = config.getAsciidoctorOption("template_dirs");
+        List<String> options = config.getAsciidoctorOption("template_dirs");
 
-        assertThat(String.valueOf(option)).isEmpty();
+        assertThat(options).isEmpty();
     }
 
     @Test
@@ -327,6 +327,14 @@ public class ConfigUtilTest extends LoggingTest {
 
         assertThat(destinationFolder).isEqualTo(expectedDestination.toFile());
         assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile());
+    }
+
+    @Test
+    void shouldLoadPropertiesWithUtf8Encoding() throws Exception {
+        File source = TestUtils.getTestResourcesAsSourceFolder();
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+
+        assertThat((String)config.get("site.about")).contains("中文属性使用默认Properties编码");
     }
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
