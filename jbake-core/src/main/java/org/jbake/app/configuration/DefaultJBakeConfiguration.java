@@ -1,16 +1,14 @@
 package org.jbake.app.configuration;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -75,7 +73,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     private List<String> getAsList(String key) {
-        return Arrays.asList(compositeConfiguration.getStringArray(key));
+        return compositeConfiguration.getList(String.class, key);
     }
 
     private String getAsString(String key) {
@@ -91,15 +89,15 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsList(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES);
     }
 
-    public Object getAsciidoctorOption(String optionKey) {
+    public List<String> getAsciidoctorOption(String optionKey) {
         Configuration subConfig = compositeConfiguration.subset(JBakeProperty.ASCIIDOCTOR_OPTION);
-        Object value = subConfig.getProperty(optionKey);
 
-        if (value == null) {
+        if (subConfig.containsKey(optionKey)) {
+            return subConfig.getList(String.class, optionKey);
+        } else {
             logger.warn("Cannot find asciidoctor option '{}.{}'", JBakeProperty.ASCIIDOCTOR_OPTION, optionKey);
-            return "";
+            return Collections.emptyList();
         }
-        return value;
     }
 
     @Override
@@ -515,6 +513,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public void setProperty(String key, Object value) {
+
         compositeConfiguration.setProperty(key, value);
     }
 

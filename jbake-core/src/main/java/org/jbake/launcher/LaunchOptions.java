@@ -8,9 +8,9 @@ import picocli.CommandLine.Parameters;
 import java.io.File;
 
 @Command(
-        description = "JBake is a Java based, open source, static site/blog generator for developers & designers",
-        name = "jbake",
-        usageHelpAutoWidth = true
+    description = "JBake is a Java based, open source, static site/blog generator for developers & designers",
+    name = "jbake",
+    usageHelpAutoWidth = true
 )
 public class LaunchOptions {
     @Parameters(index = "0", description = "source folder of site content (with templates and assets), if not supplied will default to current directory", arity = "0..1")
@@ -24,24 +24,15 @@ public class LaunchOptions {
 
     @ArgGroup(exclusive = false, heading = "%n%nJBake initialization%n%n")
     private InitOptions initGroup;
-
-    static class InitOptions {
-
-        @Option(names = {"-i", "--init"}, paramLabel = "<target>", description = "initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)", required = true)
-        private boolean init;
-
-        @Option(names = {"-t", "--template"}, defaultValue = "freemarker", fallbackValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <template> is not supplied) ", arity = "0..1")
-        private String template;
-    }
-
     @Option(names = {"-s", "--server"}, description = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
     private boolean runServer;
-
     @Option(names = {"-h", "--help"}, description = "prints this message", usageHelp = true)
     private boolean helpRequested;
-
     @Option(names = {"--reset"}, description = "clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
+    @Option(names = {"--prop-encoding"}, description = "use given encoding to load properties file. default: utf-8")
+
+    private String propertiesEncoding = "utf-8";
 
     public String getTemplate() {
         return initGroup.template;
@@ -80,7 +71,7 @@ public class LaunchOptions {
     }
 
     public boolean isInit() {
-        return (initGroup !=null && initGroup.init);
+        return (initGroup != null && initGroup.init);
     }
 
     public boolean isClearCache() {
@@ -89,5 +80,18 @@ public class LaunchOptions {
 
     public boolean isBake() {
         return bake || (source != null && destination != null);
+    }
+
+    public String getPropertiesEncoding() {
+        return propertiesEncoding;
+    }
+
+    static class InitOptions {
+
+        @Option(names = {"-i", "--init"}, paramLabel = "<target>", description = "initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)", required = true)
+        private boolean init;
+
+        @Option(names = {"-t", "--template"}, defaultValue = "freemarker", fallbackValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <template> is not supplied) ", arity = "0..1")
+        private String template;
     }
 }

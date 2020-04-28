@@ -90,6 +90,22 @@ public class LaunchOptionsTest {
     }
 
     @Test
+    public void customPropertiesEncoding() throws Exception {
+        String[] args = {"--prop-encoding", "utf-16"};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.getPropertiesEncoding()).isEqualTo("utf-16");
+    }
+
+    @Test
+    public void defaultEncodingIsUtf8() throws Exception {
+        String[] args = {};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.getPropertiesEncoding()).isEqualTo("utf-8");
+    }
+
+    @Test
     public void bakeNoArgs() {
         String[] args = {};
         LaunchOptions res = parseArgs(args);

@@ -1,6 +1,6 @@
 package org.jbake.render;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.DocumentList;
