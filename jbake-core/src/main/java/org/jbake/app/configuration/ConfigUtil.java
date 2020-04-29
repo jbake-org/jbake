@@ -22,7 +22,7 @@ import java.net.URL;
 public class ConfigUtil {
 
     public static final char LIST_DELIMITER = ',';
-    public static final String DEFAULT_ENCODING = "UTF-8";
+    public static final String DEFAULT_ENCODING = "UTF8";
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
     private static final String LEGACY_CONFIG_FILE = "custom.properties";
     private static final String CONFIG_FILE = "jbake.properties";
