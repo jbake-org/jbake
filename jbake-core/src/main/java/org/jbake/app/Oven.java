@@ -176,13 +176,15 @@ public class Oven {
             asset.copyAssetsFromContent(config.getContentFolder());
 
             errors.addAll(asset.getErrors());
-
+            utensils.getRenderer().shutdown();
             LOGGER.info("Baking finished!");
             long end = new Date().getTime();
-            LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
+            LOGGER.info("Baked {} items in {}ms", utensils.getRenderer().getRenderCount(), end - start);
             if (!errors.isEmpty()) {
                 LOGGER.error("Failed to bake {} item(s)!", errors.size());
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             contentStore.close();
             contentStore.shutdown();
@@ -216,7 +218,7 @@ public class Oven {
     /**
      * Load {@link RenderingTool} instances and delegate rendering of documents to them
      */
-    private void renderContent() {
+    private void renderContent() throws InterruptedException {
         JBakeConfiguration config = utensils.getConfiguration();
         Renderer renderer = utensils.getRenderer();
         ContentStore contentStore = utensils.getContentStore();

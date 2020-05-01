@@ -9,18 +9,15 @@ import org.jbake.model.ModelAttributes;
 import org.jbake.template.DelegatingTemplateEngine;
 import org.jbake.template.model.TemplateModel;
 import org.jbake.util.PagingHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Render output to a file.
@@ -34,10 +31,12 @@ public class Renderer {
     private static final String ARCHIVE_TEMPLATE_NAME = "archive";
     private static final String ERROR404_TEMPLATE_NAME = "error404";
 
-    private final Logger logger = LoggerFactory.getLogger(Renderer.class);
+    private final ThreadPoolExecutor excutor;
     private final JBakeConfiguration config;
     private final DelegatingTemplateEngine renderingEngine;
     private final ContentStore db;
+    private final CopyOnWriteArrayList<Throwable> errors;
+    private final AtomicInteger renderCount = new AtomicInteger(0);
 
     /**
      * @param db            The database holding the content
@@ -84,6 +83,8 @@ public class Renderer {
         this.config = config;
         this.renderingEngine = new DelegatingTemplateEngine(db, config);
         this.db = db;
+        this.excutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(200);
+        errors = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -97,6 +98,8 @@ public class Renderer {
         this.config = config;
         this.renderingEngine = renderingEngine;
         this.db = db;
+        this.excutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(200);
+        errors = new CopyOnWriteArrayList<>();
     }
 
     private String findTemplateName(String docType) {
@@ -110,64 +113,11 @@ public class Renderer {
      * @throws Exception if IOException or SecurityException are raised
      */
     public void render(DocumentModel content) throws Exception {
-        String docType = content.getType();
-        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + content.getUri();
-        if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
-            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'));
-        }
-
-        // delete existing versions if they exist in case status has changed either way
-        String outputExtension = config.getOutputExtensionByDocType(docType);
-        File draftFile = new File(outputFilename, config.getDraftSuffix() + outputExtension);
-        if (draftFile.exists()) {
-            Files.delete(draftFile.toPath());
-        }
-
-        File publishedFile = new File(outputFilename + outputExtension);
-        if (publishedFile.exists()) {
-            Files.delete(publishedFile.toPath());
-        }
-
-        if (content.getStatus().equals(ModelAttributes.Status.DRAFT)) {
-            outputFilename = outputFilename + config.getDraftSuffix();
-        }
-
-        File outputFile = new File(outputFilename + outputExtension);
-        TemplateModel model = new TemplateModel();
-        model.setContent(content);
-        model.setRenderer(renderingEngine);
-
-        try {
-            try (Writer out = createWriter(outputFile)) {
-                renderingEngine.renderDocument(model, findTemplateName(docType), out);
-            }
-            logger.info("Rendering [{}]... done!", outputFile);
-        } catch (Exception e) {
-            logger.error("Rendering [{}]... failed!", outputFile, e);
-            throw new Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.getMessage(), e);
-        }
+        excutor.execute(new DocumentRenderAgent(config,content,renderingEngine, this));
     }
 
-    private Writer createWriter(File file) throws IOException {
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
-
-        return new OutputStreamWriter(new FileOutputStream(file), config.getRenderEncoding());
-    }
-
-    private void render(RenderingConfig renderConfig) throws Exception {
-        File outputFile = renderConfig.getPath();
-        try {
-            try (Writer out = createWriter(outputFile)) {
-                renderingEngine.renderDocument(renderConfig.getModel(), renderConfig.getTemplate(), out);
-            }
-            logger.info("Rendering {} [{}]... done!", renderConfig.getName(), outputFile);
-        } catch (Exception e) {
-            logger.error("Rendering {} [{}]... failed!", renderConfig.getName(), outputFile, e);
-            throw new Exception("Failed to render " + renderConfig.getName(), e);
-        }
+    private void render(RenderingConfig renderConfig) {
+        excutor.execute(new DocumentRenderconfigAgent(config, renderConfig, renderingEngine, this));
     }
 
     /**
@@ -176,7 +126,7 @@ public class Renderer {
      * @param indexFile The name of the output file
      * @throws Exception if IOException or SecurityException are raised
      */
-    public void renderIndex(String indexFile) throws Exception {
+    public void renderIndex(String indexFile) {
         render(new DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME));
     }
 
@@ -190,16 +140,15 @@ public class Renderer {
         } else {
             PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
 
-            TemplateModel model = new TemplateModel();
-            model.setRenderer(renderingEngine);
-            model.setNumberOfPages(pagingHelper.getNumberOfPages());
-
             try {
                 db.setLimit(postsPerPage);
                 for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
                     String fileName = indexFile;
 
                     db.setStart(pageStart);
+                    TemplateModel model = new TemplateModel();
+                    model.setRenderer(renderingEngine);
+                    model.setNumberOfPages(pagingHelper.getNumberOfPages());
                     model.setCurrentPageNuber(page);
                     String previous = pagingHelper.getPreviousFileName(page);
                     model.setPreviousFilename(previous);
@@ -233,7 +182,7 @@ public class Renderer {
      * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
      * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
      */
-    public void renderSitemap(String sitemapFile) throws Exception {
+    public void renderSitemap(String sitemapFile) throws Exception{
         render(new DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME));
     }
 
@@ -243,7 +192,7 @@ public class Renderer {
      * @param feedFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    public void renderFeed(String feedFile) throws Exception {
+    public void renderFeed(String feedFile) {
         render(new DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME));
     }
 
@@ -283,13 +232,13 @@ public class Renderer {
                 TemplateModel model = new TemplateModel();
                 model.setRenderer(renderingEngine);
                 model.setTag(tag);
-                DocumentModel map = buildSimpleModel(ModelAttributes.TAG.toString());
+                DocumentModel map = buildSimpleModel(ModelAttributes.TAG);
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
 
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
                 model.setContent(map);
 
-                render(new ModelRenderingConfig(path, ModelAttributes.TAG.toString(), model, findTemplateName(ModelAttributes.TAG.toString())));
+                render(new ModelRenderingConfig(path, ModelAttributes.TAG, model, findTemplateName(ModelAttributes.TAG)));
 
                 renderedCount++;
             } catch (Exception e) {
@@ -304,7 +253,7 @@ public class Renderer {
                 // display all tags page.
                 TemplateModel model = new TemplateModel();
                 model.setRenderer(renderingEngine);
-                DocumentModel map = buildSimpleModel(ModelAttributes.TAGS.toString());
+                DocumentModel map = buildSimpleModel(ModelAttributes.TAGS);
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
 
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
@@ -344,7 +293,40 @@ public class Renderer {
         return content;
     }
 
-    private interface RenderingConfig {
+    public void addError(Exception e) {
+        errors.add(e);
+    }
+
+    public List<Throwable> getErrors() {
+        return errors;
+    }
+
+    public void shutdown() throws InterruptedException {
+        this.excutor.shutdown();
+        this.excutor.awaitTermination(10, TimeUnit.MINUTES);
+    }
+
+    public int getRenderCount() {
+        return renderCount.get();
+    }
+
+    public void incrementCount() {
+        renderCount.incrementAndGet();
+    }
+
+    public int getActiveAgentCount() {
+        return excutor.getActiveCount();
+    }
+
+    public long getCompletedAgentCount() {
+        return excutor.getCompletedTaskCount();
+    }
+
+    public long getTaskCount() {
+        return excutor.getTaskCount();
+    }
+
+    public interface RenderingConfig {
 
         File getPath();
 

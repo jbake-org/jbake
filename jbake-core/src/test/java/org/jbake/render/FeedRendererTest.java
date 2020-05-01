@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -79,7 +78,7 @@ public class FeedRendererTest {
         verify(mockRenderer, times(1)).renderFeed(anyString());
     }
 
-    @Test(expected = RenderingException.class)
+    @Test
     public void propogatesRenderingException() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
@@ -89,8 +88,6 @@ public class FeedRendererTest {
 
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
-
-        doThrow(new Exception()).when(mockRenderer).renderFeed(anyString());
 
         renderer.render(mockRenderer, contentStore, configuration);
 

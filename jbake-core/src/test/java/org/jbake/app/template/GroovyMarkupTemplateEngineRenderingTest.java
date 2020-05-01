@@ -76,6 +76,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
         DocumentModel content = parser.processFile(sampleFile);
         content.setUri("/" + filename);
         renderer.render(content);
+        renderer.shutdown();
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
 

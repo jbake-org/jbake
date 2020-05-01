@@ -7,12 +7,8 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
-import org.jbake.template.RenderingException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -43,7 +39,7 @@ public class DocumentsRendererTest {
     @Before
     public void setUp() {
 
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         documentsRenderer = new DocumentsRenderer();
 
@@ -85,34 +81,27 @@ public class DocumentsRendererTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionWithCollectedErrorMessages() {
+    public void shouldThrowAnExceptionWithCollectedErrorMessages() throws Exception {
+        // given
         String fakeExceptionMessage = "fake exception";
+        DocumentTypes.addDocumentType("customType");
 
-        // expect
-        Assertions.assertThrows(
-            RenderingException.class, () -> {
+        DocumentList<DocumentModel> templateModelList = new DocumentList<>();
+        DocumentModel document = emptyDocument();
+        DocumentModel document2 = emptyDocument();
+        templateModelList.add(document);
+        templateModelList.add(document2);
 
-                // given
-                DocumentTypes.addDocumentType("customType");
+        // throw an exception for every call of renderer's render method
+        doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(any(DocumentModel.class));
+        when(db.getUnrenderedContent()).thenReturn(templateModelList);
 
-                DocumentList<DocumentModel> templateModelList = new DocumentList<>();
-                DocumentModel document = emptyDocument();
-                DocumentModel document2 = emptyDocument();
-                templateModelList.add(document);
-                templateModelList.add(document2);
-
-                // throw an exception for every call of renderer's render method
-                doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(any(DocumentModel.class));
-                when(db.getUnrenderedContent()).thenReturn(templateModelList);
-
-                // when
-                int renderResponse = documentsRenderer.render(renderer, db, configuration);
-
-                // then
-                assertThat(renderResponse).isEqualTo(2);
-            },
-            fakeExceptionMessage + "\n" + fakeExceptionMessage
-        );
+        // when
+        documentsRenderer.render(renderer, db, configuration);
+        renderer.shutdown();
+        // then
+        assertThat(renderer.getRenderCount()).isEqualTo(0);
+        verify(renderer, times(2)).addError(any());
     }
 
     @Test

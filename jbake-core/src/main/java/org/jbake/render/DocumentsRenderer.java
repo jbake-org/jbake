@@ -10,15 +10,12 @@ import org.jbake.model.ModelAttributes;
 import org.jbake.template.RenderingException;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
 public class DocumentsRenderer implements RenderingTool {
 
     @Override
     public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
         int renderedCount = 0;
-        final List<String> errors = new LinkedList<>();
 
         DocumentList<DocumentModel> documentList = db.getUnrenderedContent();
         for (DocumentModel document : documentList) {
@@ -34,20 +31,13 @@ public class DocumentsRenderer implements RenderingTool {
                 renderedCount++;
 
             } catch (Exception e) {
-                errors.add(e.getMessage());
+                renderer.addError(e);
             }
         }
 
-        if (!errors.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Failed to render documents. Cause(s):");
-            for (String error : errors) {
-                sb.append("\n").append(error);
-            }
-            throw new RenderingException(sb.toString());
-        } else {
-            return renderedCount;
-        }
+
+        return renderedCount;
+
     }
 
     private DocumentModel getNextDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {

@@ -65,7 +65,7 @@ public class IndexRendererTest {
     }
 
 
-    @Test(expected = RenderingException.class)
+    @Test
     public void propagatesRenderingException() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
@@ -76,11 +76,11 @@ public class IndexRendererTest {
         ContentStore contentStore = mock(ContentStore.class);
         Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderIndex(anyString());
+        doThrow(new Exception()).when(mockRenderer).renderIndexPaging(anyString());
 
         renderer.render(mockRenderer, contentStore, configuration);
 
-        verify(mockRenderer, never()).renderIndex(anyString());
+        verify(mockRenderer, never()).renderIndexPaging(anyString());
     }
 
 

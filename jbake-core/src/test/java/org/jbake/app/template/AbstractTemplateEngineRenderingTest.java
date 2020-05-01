@@ -35,13 +35,15 @@ import org.jbake.template.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -167,6 +169,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         DocumentModel content = parser.processFile(sampleFile);
         content.setUri("/" + filename);
         renderer.render(content);
+        renderer.shutdown();
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
 
@@ -186,6 +189,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         DocumentModel content = parser.processFile(sampleFile);
         content.setUri("/" + filename);
         renderer.render(content);
+        renderer.shutdown();
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());
 
@@ -200,7 +204,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     public void renderIndex() throws Exception {
         //exec
         renderer.renderIndex("index.html");
-
+        renderer.shutdown();
         //validate
         File outputFile = new File(destinationFolder, "index.html");
         Assert.assertTrue(outputFile.exists());
@@ -215,7 +219,9 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     @Test
     public void renderFeed() throws Exception {
         renderer.renderFeed("feed.xml");
+        renderer.shutdown();
         File outputFile = new File(destinationFolder, "feed.xml");
+
         Assert.assertTrue(outputFile.exists());
 
         // verify
@@ -228,7 +234,9 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     @Test
     public void renderArchive() throws Exception {
         renderer.renderArchive("archive.html");
+        renderer.shutdown();
         File outputFile = new File(destinationFolder, "archive.html");
+
         Assert.assertTrue(outputFile.exists());
 
         // verify
@@ -241,6 +249,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     @Test
     public void renderTags() throws Exception {
         renderer.renderTags("tags");
+        renderer.shutdown();
 
         // verify
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "blog.html");
@@ -256,6 +265,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         config.setRenderTagsIndex(true);
 
         renderer.renderTags("tags");
+        renderer.shutdown();
         File outputFile = new File(destinationFolder + File.separator + "tags" + File.separator + "index.html");
         Assert.assertTrue(outputFile.exists());
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
@@ -271,6 +281,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         db.updateSchema();
 
         renderer.renderSitemap("sitemap.xml");
+        renderer.shutdown();
         File outputFile = new File(destinationFolder, "sitemap.xml");
         Assert.assertTrue(outputFile.exists());
 
@@ -298,6 +309,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
         db.deleteAllByDocType("post");
 
         renderer.renderIndexPaging("index.html");
+        renderer.shutdown();
 
         File outputFile = new File(destinationFolder, "index.html");
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
