@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  * Provides Configuration related functions.
@@ -22,11 +23,12 @@ import java.net.URL;
 public class ConfigUtil {
 
     public static final char LIST_DELIMITER = ',';
-    public static final String DEFAULT_ENCODING = "UTF8";
+    public static final String DEFAULT_ENCODING = "UTF-8";
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
     private static final String LEGACY_CONFIG_FILE = "custom.properties";
     private static final String CONFIG_FILE = "jbake.properties";
     private static final String DEFAULT_CONFIG_FILE = "default.properties";
+    private String encoding = DEFAULT_ENCODING;
 
     private CompositeConfiguration load(File source) throws ConfigurationException {
 
@@ -64,7 +66,7 @@ public class ConfigUtil {
             new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
                 .configure(new Parameters().properties()
                     .setFile(propertiesFile)
-                    .setEncoding(DEFAULT_ENCODING)
+                    .setEncoding(encoding)
                     .setThrowExceptionOnMissing(true)
                     .setListDelimiterHandler(new DefaultListDelimiterHandler(LIST_DELIMITER))
                     .setIncludesAllowed(false));
@@ -76,7 +78,7 @@ public class ConfigUtil {
             new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
                 .configure(new Parameters().properties()
                     .setURL(propertiesFile)
-                    .setEncoding(DEFAULT_ENCODING)
+                    .setEncoding(encoding)
                     .setThrowExceptionOnMissing(true)
                     .setListDelimiterHandler(new DefaultListDelimiterHandler(LIST_DELIMITER))
                     .setIncludesAllowed(false));
@@ -93,4 +95,17 @@ public class ConfigUtil {
         return new DefaultJBakeConfiguration(source, configuration);
     }
 
+    public String getEncoding() {
+        return this.encoding;
+    }
+
+    public ConfigUtil setEncoding(String encoding) {
+        if (Charset.isSupported(encoding)) {
+            this.encoding = encoding;
+        } else {
+            this.encoding = DEFAULT_ENCODING;
+            LOGGER.warn("Unsupported encoding '{}'. Using default encoding '{}'", encoding, this.encoding);
+        }
+        return this;
+    }
 }

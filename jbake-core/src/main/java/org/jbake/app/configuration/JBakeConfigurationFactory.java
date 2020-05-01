@@ -106,4 +106,9 @@ public class JBakeConfigurationFactory {
     public void setConfigUtil(ConfigUtil configUtil) {
         this.configUtil = configUtil;
     }
+
+    public JBakeConfigurationFactory setEncoding(String charset) {
+        this.configUtil.setEncoding(charset);
+        return this;
+    }
 }
