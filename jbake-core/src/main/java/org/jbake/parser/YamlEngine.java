@@ -35,6 +35,7 @@ public class YamlEngine extends MarkupEngine {
         Yaml yaml = new Yaml();
         try (InputStream is = new FileInputStream(file)) {
             Object result = yaml.load(is);
+            model.setType("data");
             if (result instanceof List) {
                 model.put("data", result);
             } else if (result instanceof Map) {

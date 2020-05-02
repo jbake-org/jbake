@@ -154,32 +154,35 @@ public class Oven {
         setLocale();
 
         try {
-
-            final long start = new Date().getTime();
-            LOGGER.info("Baking has started...");
             contentStore.startup();
             updateDocTypesFromConfiguration();
             contentStore.updateSchema();
             contentStore.updateAndClearCacheIfNeeded(config.getClearCache(), config.getTemplateFolder());
 
+            LOGGER.info("Baking has started...");
+            final long bakeStart = new Date().getTime();
             // process source content
+            LOGGER.info("Crawling content...");
             crawler.crawl();
 
             // process data files
             crawler.crawlDataFiles();
 
             // render content
+            LOGGER.info("Rendering content...");
             renderContent();
 
             // copy assets
+            LOGGER.info("Copy assets...");
             asset.copy();
             asset.copyAssetsFromContent(config.getContentFolder());
 
-            errors.addAll(asset.getErrors());
             utensils.getRenderer().shutdown();
+            errors.addAll(asset.getErrors());
+            errors.addAll(utensils.getRenderer().getErrors());
             LOGGER.info("Baking finished!");
-            long end = new Date().getTime();
-            LOGGER.info("Baked {} items in {}ms", utensils.getRenderer().getRenderCount(), end - start);
+            long bakeEnd = new Date().getTime();
+            LOGGER.info("Baked {} items in {}ms", utensils.getRenderer().getRenderCount(), bakeEnd - bakeStart);
             if (!errors.isEmpty()) {
                 LOGGER.error("Failed to bake {} item(s)!", errors.size());
             }

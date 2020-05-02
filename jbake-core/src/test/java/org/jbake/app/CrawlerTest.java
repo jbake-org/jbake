@@ -8,8 +8,6 @@ import org.jbake.model.ModelAttributes;
 import org.jbake.model.DocumentTypes;
 import org.jbake.util.DataFileUtil;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -20,7 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 public class CrawlerTest extends ContentStoreIntegrationTest {
 
     @Test
-    public void crawl() {
+    public void crawl() throws InterruptedException {
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
 
@@ -53,12 +51,13 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
     }
 
     @Test
-    public void crawlDataFiles() {
+    public void crawlDataFiles() throws InterruptedException {
         Crawler crawler = new Crawler(db, config);
         // manually register data doctype
         DocumentTypes.addDocumentType(config.getDataFileDocType());
         db.updateSchema();
         crawler.crawlDataFiles();
+        crawler.shutdown();
         Assert.assertEquals(1, db.getDocumentCount("data"));
 
         DataFileUtil util = new DataFileUtil(db, "data");
@@ -68,7 +67,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
     }
 
     @Test
-    public void renderWithPrettyUrls() {
+    public void renderWithPrettyUrls() throws InterruptedException {
 
         config.setUriWithoutExtension(true);
         config.setPrefixForUriWithoutExtension("/blog");

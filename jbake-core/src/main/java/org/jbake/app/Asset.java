@@ -10,6 +10,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -53,7 +58,9 @@ public class Asset {
      * read from configuration
      */
     public void copy() {
-        copy(config.getAssetFolder());
+        if (config.getAssetFolder() != null) {
+            copy(config.getAssetFolder());
+        }
     }
 
     /**
@@ -62,12 +69,7 @@ public class Asset {
      * @param path The starting path
      */
     public void copy(File path) {
-        FileFilter filter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config));
-            }
-        };
+        FileFilter filter = file -> (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config));
         copy(path, config.getDestinationFolder(), filter);
     }
 
@@ -78,7 +80,7 @@ public class Asset {
      */
     public void copySingleFile(File asset) {
         try {
-            if ( !asset.isDirectory() ) {
+            if (!asset.isDirectory()) {
                 String targetPath = config.getDestinationFolder().getCanonicalPath() + File.separatorChar + assetSubPath(asset);
                 LOGGER.info("Copying single asset file to [{}]", targetPath);
                 copyFile(asset, new File(targetPath));
@@ -92,6 +94,7 @@ public class Asset {
 
     /**
      * Determine if a given file is an asset file.
+     *
      * @param path to the file to validate.
      * @return true if the path provided points to a file in the asset folder.
      */
@@ -99,7 +102,7 @@ public class Asset {
         boolean isAsset = false;
 
         try {
-            if(FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
+            if (FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
                 if (FileUtil.isFileInDirectory(path, config.getAssetFolder())) {
                     isAsset = true;
                 } else if (FileUtil.isFileInDirectory(path, config.getContentFolder())
@@ -142,15 +145,14 @@ public class Asset {
     private void copy(File sourceFolder, File targetFolder, final FileFilter filter) {
         final File[] assets = sourceFolder.listFiles(filter);
         if (assets != null) {
-            Arrays.sort(assets);
-            for (File asset : assets) {
+            Arrays.stream(assets).parallel().forEach( asset ->{
                 final File target = new File(targetFolder, asset.getName());
                 if (asset.isFile()) {
                     copyFile(asset, target);
                 } else if (asset.isDirectory()) {
                     copy(asset, target, filter);
                 }
-            }
+            });
         }
     }
 

@@ -302,9 +302,11 @@ public class ContentStore {
         return DocumentList.wrap(results);
     }
 
-    private void executeCommand(String query, Object... args) {
+    private synchronized void executeCommand(String query, Object... args) {
         activateOnCurrentThread();
+        db.getTransaction().begin();
         db.command(query, args);
+        db.getTransaction().commit();
     }
 
     public Set<String> getTags() {
@@ -407,10 +409,12 @@ public class ContentStore {
         return db.isActiveOnCurrentThread();
     }
 
-    public void addDocument(DocumentModel document) {
+    public synchronized void addDocument(DocumentModel document) {
+        db.getTransaction().begin();
         ODocument doc = new ODocument(Schema.DOCUMENTS);
         doc.fromMap(document);
         doc.save();
+        db.getTransaction().commit();
     }
 
     protected abstract class Schema {

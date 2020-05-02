@@ -26,7 +26,6 @@ public abstract class RenderAgent implements Runnable {
     @Override
     public void run() {
         try {
-            logger.info("Start render document. Current agent count: {} completed: {} tasks: {}", renderer.getActiveAgentCount(), renderer.getCompletedAgentCount(), renderer.getTaskCount());
             renderDocument();
         } catch (Exception e) {
             renderer.addError(e);
