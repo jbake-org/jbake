@@ -10,6 +10,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -96,7 +97,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
             return subConfig.getList(String.class, optionKey);
         } else {
             logger.warn("Cannot find asciidoctor option '{}.{}'", JBakeProperty.ASCIIDOCTOR_OPTION, optionKey);
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
