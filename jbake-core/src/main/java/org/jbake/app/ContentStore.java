@@ -169,8 +169,6 @@ public class ContentStore {
 
     public void drop() {
         activateOnCurrentThread();
-//        db.drop();
-
         orient.drop(name);
     }
 
@@ -290,13 +288,13 @@ public class ContentStore {
         executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
     }
 
-    private DocumentList<DocumentModel> query(String sql) {
+    private synchronized DocumentList<DocumentModel> query(String sql) {
         activateOnCurrentThread();
         OResultSet results = db.query(sql);
         return DocumentList.wrap(results);
     }
 
-    private DocumentList<DocumentModel> query(String sql, Object... args) {
+    private synchronized DocumentList<DocumentModel> query(String sql, Object... args) {
         activateOnCurrentThread();
         OResultSet results = db.command(sql, args);
         return DocumentList.wrap(results);
@@ -355,6 +353,9 @@ public class ContentStore {
         OClass signatures = schema.createClass(Schema.SIGNATURES);
         signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
+
+        signatures.createProperty("key", OType.STRING);
+        signatures.createIndex("kexIdx", OClass.INDEX_TYPE.UNIQUE, "key");
     }
 
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {

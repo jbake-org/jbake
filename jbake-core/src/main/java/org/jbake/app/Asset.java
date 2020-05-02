@@ -143,9 +143,9 @@ public class Asset {
     }
 
     private void copy(File sourceFolder, File targetFolder, final FileFilter filter) {
-        final File[] assets = sourceFolder.listFiles(filter);
-        if (assets != null) {
-            Arrays.stream(assets).parallel().forEach( asset ->{
+        File[] array = sourceFolder.listFiles(filter);
+        if ( array != null ) {
+            Arrays.stream(array).parallel().forEach(asset -> {
                 final File target = new File(targetFolder, asset.getName());
                 if (asset.isFile()) {
                     copyFile(asset, target);

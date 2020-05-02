@@ -162,17 +162,13 @@ public class Crawler {
      * @param path Folder to start from
      */
     private void crawl(File path) {
-        File[] contents = path.listFiles(FileUtil.getFileFilter(config));
-        if (contents != null) {
-            Arrays.sort(contents);
-            for (File sourceFile : contents) {
-                if (sourceFile.isFile()) {
-                    crawlFile(sourceFile);
-                } else if (sourceFile.isDirectory()) {
-                    crawl(sourceFile);
-                }
+        Arrays.stream(path.listFiles(FileUtil.getFileFilter(config))).parallel().forEach( source -> {
+            if (source.isFile()) {
+                crawlFile(source);
+            } else if (source.isDirectory()) {
+                crawl(source);
             }
-        }
+        });
     }
 
 
