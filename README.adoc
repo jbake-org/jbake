@@ -1,7 +1,7 @@
 = JBake plugin for Gradle
-:jbake-version: 2.6.5
-:plugin-version: 5.1.0
 :linkattrs:
+:jbake-version: 2.6.5
+:plugin-version: 5.2.0
 :project-name: jbake-gradle-plugin
 
 image:http://img.shields.io/travis/jbake-org/{project-name}/master.svg["Build Status", link="https://travis-ci.org/jbake-org/{project-name}"]
