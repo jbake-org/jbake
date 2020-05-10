@@ -60,7 +60,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     protected File templateFolder;
     protected Renderer renderer;
     protected Locale currentLocale;
-    private Parser parser;
+    protected Parser parser;
 
     public AbstractTemplateEngineRenderingTest(String templateDir, String templateExtension) {
         this.templateDir = templateDir;
