@@ -33,10 +33,10 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 @Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 public class WatchMojo extends GenerateMojo {
 
-  public void executeInternal() throws MojoExecutionException, MojoFailureException {
+  public void executeInternal() throws MojoExecutionException {
     reRender();
 
-    Long lastProcessed = Long.valueOf(System.currentTimeMillis());
+    Long lastProcessed = System.currentTimeMillis();
 
     getLog().info(
         "Now listening for changes on path " + inputDirectory.getPath());
