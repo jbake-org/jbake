@@ -2,10 +2,12 @@ package org.jbake.launcher;
 
 import org.junit.Test;
 import picocli.CommandLine;
+import picocli.CommandLine.MissingParameterException;
 
 import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class LaunchOptionsTest {
 
@@ -68,6 +70,15 @@ public class LaunchOptionsTest {
         assertThat(res.isInit()).isTrue();
         assertThat(res.getTemplate()).isEqualTo("foo");
         assertThat(res.getSourceValue()).isEqualTo("/tmp");
+    }
+
+    @Test
+    public void shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
+        String[] args = {"-t", "groovy-mte"};
+
+        assertThatExceptionOfType(MissingParameterException.class).isThrownBy(()-> {
+            LaunchOptions res = parseArgs(args);
+        }).withMessage("Error: Missing required argument(s): --init");
     }
 
     @Test

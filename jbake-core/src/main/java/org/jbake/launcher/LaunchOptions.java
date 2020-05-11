@@ -1,44 +1,49 @@
 package org.jbake.launcher;
 
-import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 import java.io.File;
 
-@CommandLine.Command(
+@Command(
         description = "JBake is a Java based, open source, static site/blog generator for developers & designers",
         name = "jbake"
 )
 public class LaunchOptions {
-    @CommandLine.Parameters(index = "0", description = "source folder of site content (with templates and assets), if not supplied will default to current directory", arity = "0..1")
+    @Parameters(index = "0", description = "source folder of site content (with templates and assets), if not supplied will default to current directory", arity = "0..1")
     private String source;
 
-    @CommandLine.Parameters(index = "1", description = "destination folder for output, if not supplied will default to a folder called \"output\" in the current directory", arity = "0..1")
+    @Parameters(index = "1", description = "destination folder for output, if not supplied will default to a folder called \"output\" in the current directory", arity = "0..1")
     private String destination;
 
-    @CommandLine.Option(names = {"-b", "--bake"}, description = "performs a bake")
+    @Option(names = {"-b", "--bake"}, description = "performs a bake")
     private boolean bake;
 
-    @CommandLine.Option(names = {"-i", "--init"}, description = "initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)", arity = "0..1")
-    private boolean init;
+    @ArgGroup(exclusive = false, heading = "JBake initialization%n")
+    private InitOptions initGroup;
 
-    @CommandLine.Option(names = {"-t", "--template"}, description = "use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", arity = "1")
-    private String template;
+    static class InitOptions {
 
-    @CommandLine.Option(names = {"-s", "--server"}, description = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
+        @Option(names = {"-i", "--init"}, paramLabel = "-i", description = "initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)", required = true, arity = "0..1")
+        private boolean init;
+
+        @Option(names = {"-t", "--template"}, defaultValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", arity = "1")
+        private String template;
+    }
+
+    @Option(names = {"-s", "--server"}, description = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
     private boolean runServer;
 
-    @CommandLine.Option(names = {"-h", "--help"}, description = "prints this message", usageHelp = true)
+    @Option(names = {"-h", "--help"}, description = "prints this message", usageHelp = true)
     private boolean helpRequested;
 
-    @CommandLine.Option(names = {"--reset"}, description = "clears the local cache, enforcing rendering from scratch")
+    @Option(names = {"--reset"}, description = "clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
 
     public String getTemplate() {
-        if (template != null) {
-            return template;
-        } else {
-            return "freemarker";
-        }
+        return initGroup.template;
     }
 
     public File getSource() {
@@ -74,7 +79,7 @@ public class LaunchOptions {
     }
 
     public boolean isInit() {
-        return init;
+        return (initGroup !=null && initGroup.init);
     }
 
     public boolean isClearCache() {

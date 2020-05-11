@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import picocli.CommandLine;
+import picocli.CommandLine.MissingParameterException;
 
 import java.io.File;
 
@@ -59,6 +60,11 @@ public class Main {
         } catch (final JBakeException e) {
             logger.error(e.getMessage());
             logger.trace(e.getMessage(), e);
+
+            if (e.getCause() instanceof MissingParameterException) {
+                Main.printUsage();
+            }
+
             System.exit(1);
         } catch (final Throwable e) {
             logger.error("An unexpected error occurred: " + e.getMessage());
@@ -82,6 +88,8 @@ public class Main {
             run(res, config);
         } catch (final ConfigurationException e) {
             throw new JBakeException("Configuration error: " + e.getMessage(), e);
+        } catch (MissingParameterException mex) {
+            throw new JBakeException(mex.getMessage(), mex);
         }
     }
 
@@ -131,6 +139,10 @@ public class Main {
 
     private void printUsage(Object options) {
         CommandLine.usage(options, System.out);
+    }
+
+    public static void printUsage() {
+        CommandLine.usage(new LaunchOptions(), System.out);
     }
 
     private void runServer(File path, JBakeConfiguration configuration) {

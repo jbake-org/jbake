@@ -167,7 +167,7 @@ public class MainTest extends LoggingTest {
         verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
 
         LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-        assertThat(loggingEvent.getMessage()).isEqualTo("Invalid commandline arguments: option \"-t (--template)\" requires the option(s) [-i]");
+        assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init");
     }
 
     private LaunchOptions stubOptions(String[] args) {
