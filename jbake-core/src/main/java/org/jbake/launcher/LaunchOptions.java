@@ -26,7 +26,7 @@ public class LaunchOptions {
 
     static class InitOptions {
 
-        @Option(names = {"-i", "--init"}, paramLabel = "-i", description = "initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)", required = true, arity = "0..1")
+        @Option(names = {"-i", "--init"}, paramLabel = "<target>", description = "initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)", required = true)
         private boolean init;
 
         @Option(names = {"-t", "--template"}, defaultValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", arity = "1")
