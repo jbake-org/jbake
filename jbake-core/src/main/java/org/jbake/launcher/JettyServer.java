@@ -27,7 +27,7 @@ public class JettyServer implements Closeable {
 
     @Deprecated
     public void run(String resourceBase, String port) {
-        LOGGER.warn("DEPRECATED. Will be removed in the future. Use run(String resourceBase, JBakeConfiguration config) instead");
+        LOGGER.warn("DEPRECATED. This method will be removed in the next major release. Use run(String resourceBase, JBakeConfiguration config) instead.");
         run(resourceBase, "/", "localhost", Integer.parseInt(port));
     }
 
