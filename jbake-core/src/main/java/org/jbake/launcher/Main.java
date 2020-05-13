@@ -3,6 +3,7 @@ package org.jbake.launcher;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
+import org.jbake.app.JBakeException.SystemExit;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.slf4j.Logger;
@@ -60,25 +61,20 @@ public class Main {
         } catch (final JBakeException e) {
             logger.error(e.getMessage());
             logger.trace(e.getMessage(), e);
-
             if (e.getCause() instanceof MissingParameterException) {
                 Main.printUsage();
             }
-
-            System.exit(1);
-        } catch (final Throwable e) {
-            logger.error("An unexpected error occurred: " + e.getMessage());
-            logger.trace(e.getMessage(), e);
-            System.exit(2);
+            System.exit(e.getExit());
         }
     }
 
-    protected void run(String[] args) {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-
-        final JBakeConfiguration config;
+    public void run(String[] args) throws JBakeException {
         try {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+
+            final JBakeConfiguration config;
+
             LaunchOptions res = parseArguments(args);
             if (res.isRunServer()) {
                 config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
@@ -87,9 +83,11 @@ public class Main {
             }
             run(res, config);
         } catch (final ConfigurationException e) {
-            throw new JBakeException("Configuration error: " + e.getMessage(), e);
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "Configuration error: " + e.getMessage(), e);
         } catch (MissingParameterException mex) {
-            throw new JBakeException(mex.getMessage(), mex);
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, mex.getMessage(), mex);
+        } catch (final Throwable e) {
+            throw new JBakeException(SystemExit.ERROR, "An unexpected error occurred: " + e.getMessage(), e);
         }
     }
 
@@ -163,7 +161,7 @@ public class Main {
             System.out.println("Base folder structure successfully created.");
         } catch (final Exception e) {
             final String msg = "Failed to initialise structure: " + e.getMessage();
-            throw new JBakeException(msg, e);
+            throw new JBakeException(SystemExit.INIT_ERROR, msg, e);
         }
     }
 

@@ -5,14 +5,12 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.jbake.app.JBakeException;
+import org.jbake.app.JBakeException.SystemExit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.charset.Charset;
 
 /**
  * Provides Configuration related functions.
@@ -29,10 +27,10 @@ public class ConfigUtil {
     private CompositeConfiguration load(File source) throws ConfigurationException {
 
         if (!source.exists()) {
-            throw new JBakeException("The given source folder '" + source.getAbsolutePath() + "' does not exist.");
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "The given source folder '" + source.getAbsolutePath() + "' does not exist.");
         }
         if (!source.isDirectory()) {
-            throw new JBakeException("The given source folder is not a directory.");
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR,"The given source folder is not a directory.");
         }
         CompositeConfiguration config = new CompositeConfiguration();
         config.setListDelimiter(',');

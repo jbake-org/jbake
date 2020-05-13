@@ -36,6 +36,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import org.jbake.app.JBakeException.SystemExit;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
@@ -211,7 +212,7 @@ public class ContentStore {
         activateOnCurrentThread();
         List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
         if (results.isEmpty()) {
-            throw new JBakeException("No document with sourceUri '" + sourceUri + "'.");
+            throw new JBakeException(SystemExit.ERROR, "No document with sourceUri '" + sourceUri + "'.");
         }
 
         // Update it from the given map.
