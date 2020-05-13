@@ -29,7 +29,7 @@ public class LaunchOptions {
         @Option(names = {"-i", "--init"}, paramLabel = "<target>", description = "initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)", required = true)
         private boolean init;
 
-        @Option(names = {"-t", "--template"}, defaultValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", arity = "1")
+        @Option(names = {"-t", "--template"}, defaultValue = "freemarker", fallbackValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <template> is not supplied) ", arity = "0..1")
         private String template;
     }
 
