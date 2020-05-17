@@ -3,7 +3,6 @@ package org.jbake.launcher;
 import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
-import org.jbake.app.JBakeException.SystemExit;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.slf4j.Logger;

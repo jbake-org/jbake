@@ -36,7 +36,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.app.JBakeException.SystemExit;
+import org.jbake.launcher.SystemExit;
 import org.jbake.model.DocumentAttributes;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;

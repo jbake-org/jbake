@@ -1,5 +1,7 @@
 package org.jbake.app;
 
+import org.jbake.launcher.SystemExit;
+
 /**
  * This runtime exception is thrown by JBake API to indicate an processing
  * error.
@@ -9,23 +11,6 @@ package org.jbake.app;
 public class JBakeException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public enum SystemExit {
-        ERROR(1),
-        CONFIGURATION_ERROR(2),
-        INIT_ERROR(3),
-        SERVER_ERROR(4);
-
-        private final int status;
-
-        SystemExit(int status) {
-            this.status = status;
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-    }
     final private SystemExit exit;
 
     /**

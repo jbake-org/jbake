@@ -5,7 +5,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.itsallcode.junit.sysextensions.ExitGuard;
 import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
-import org.jbake.app.JBakeException.SystemExit;
 import org.jbake.app.LoggingTest;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;

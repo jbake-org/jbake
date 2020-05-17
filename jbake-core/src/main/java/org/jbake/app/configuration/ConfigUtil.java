@@ -5,7 +5,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.jbake.app.JBakeException;
-import org.jbake.app.JBakeException.SystemExit;
+import org.jbake.launcher.SystemExit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
