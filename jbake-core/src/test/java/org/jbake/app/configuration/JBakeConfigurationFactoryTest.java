@@ -64,6 +64,7 @@ public class JBakeConfigurationFactoryTest {
 
 
 
+
     @Test
     public void shouldReturnADefaultConfigurationWithSitehost() throws Exception {
         File sourceFolder = root;

@@ -5,6 +5,7 @@ import org.apache.commons.vfs2.util.Os;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class TestUtils {
 
@@ -44,5 +45,11 @@ public class TestUtils {
         return templateFolder;
     }
 
+    public static String getOsPath(Path path) {
 
+        if ( isWindows() ) {
+            return path.toString().replace("\\","\\\\");
+        }
+        return path.toString();
+    }
 }

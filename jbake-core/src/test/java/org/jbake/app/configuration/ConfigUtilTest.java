@@ -1,6 +1,7 @@
 package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
+import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
@@ -14,12 +15,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -70,7 +74,7 @@ public class ConfigUtilTest extends LoggingTest {
         when(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent");
         when(nonExistentSourceFolder.exists()).thenReturn(false);
 
-        JBakeException e = assertThrows(JBakeException.class, ()->util.loadConfig(nonExistentSourceFolder));
+        JBakeException e = assertThrows(JBakeException.class, () -> util.loadConfig(nonExistentSourceFolder));
         assertThat(e.getMessage()).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.");
     }
 
@@ -276,6 +280,53 @@ public class ConfigUtilTest extends LoggingTest {
         assertThat(assetFolder).isEqualTo(expectedAssetFolder);
         assertThat(contentFolder).isEqualTo(expectedContentFolder);
         assertThat(destinationFolder).isEqualTo(expectedDestinationFolder);
+    }
+
+    @Test
+    void shouldSetCustomFoldersWithAbsolutePaths() throws Exception {
+        // given
+        Path source = sourceFolder.resolve("source");
+        Path theme = sourceFolder.resolve("theme");
+        Path destination = sourceFolder.resolve("destination");
+
+        File originalSource = TestUtils.getTestResourcesAsSourceFolder();
+        FileUtils.copyDirectory(originalSource, source.toFile());
+        File originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme");
+        FileUtils.copyDirectory(originalTheme, theme.toFile());
+
+        Path expectedTemplateFolder = theme.resolve("templates");
+        Path expectedAssetFolder = theme.resolve("assets");
+        Path expectedContentFolder = source.resolve("content");
+        Path expectedDestination = destination.resolve("output");
+
+        File properties = source.resolve("jbake.properties").toFile();
+        BufferedWriter fw = Files.newBufferedWriter(properties.toPath());
+
+        fw.write(JBakeProperty.ASSET_FOLDER + "=" + TestUtils.getOsPath(expectedAssetFolder));
+        fw.newLine();
+        fw.write(JBakeProperty.TEMPLATE_FOLDER + "=" + TestUtils.getOsPath(expectedTemplateFolder));
+        fw.newLine();
+        fw.write(JBakeProperty.DESTINATION_FOLDER + "=" + TestUtils.getOsPath(expectedDestination));
+        fw.close();
+
+        // when
+
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source.toFile());
+
+        File templateFolder = config.getTemplateFolder();
+        File assetFolder = config.getAssetFolder();
+        File contentFolder = config.getContentFolder();
+        File destinationFolder = config.getDestinationFolder();
+
+        // then
+        assertThat(config.getTemplateFolderName()).isEqualTo(expectedTemplateFolder.toString());
+        assertThat(templateFolder).isEqualTo(expectedTemplateFolder.toFile());
+
+        assertThat(config.getAssetFolderName()).isEqualTo(expectedAssetFolder.toString());
+        assertThat(assetFolder).isEqualTo(expectedAssetFolder.toFile());
+
+        assertThat(destinationFolder).isEqualTo(expectedDestination.toFile());
+        assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile());
     }
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {

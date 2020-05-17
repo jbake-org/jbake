@@ -1,15 +1,23 @@
 package org.jbake.app;
 
+import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.JBakeProperty;
 import org.jbake.model.DocumentTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.nio.Buffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,7 +31,7 @@ import static org.mockito.Mockito.verify;
 public class OvenTest {
 
     @TempDir
-    File root;
+    Path root;
 
     private DefaultJBakeConfiguration configuration;
     private File sourceFolder;
@@ -33,7 +41,7 @@ public class OvenTest {
     public void setUp() throws Exception {
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         DocumentTypes.resetDocumentTypes();
-        File output = new File(root, "output");
+        File output = root.resolve("output").toFile();
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(output);
@@ -81,8 +89,55 @@ public class OvenTest {
     }
 
     @Test
+    public void shouldBakeWithAbsoluteCustomPaths() throws Exception {
+
+        // given
+        Path source = root.resolve("source");
+        Path theme = root.resolve("theme");
+        Path destination = root.resolve("destination");
+
+        File originalSource = TestUtils.getTestResourcesAsSourceFolder();
+        FileUtils.copyDirectory(originalSource, source.toFile());
+        File originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme");
+        FileUtils.copyDirectory(originalTheme, theme.toFile());
+
+        Path expectedTemplateFolder = theme.resolve("templates");
+        Path expectedAssetFolder = theme.resolve("assets");
+        Path expectedDestination = destination.resolve("output");
+
+        Path properties = source.resolve("jbake.properties");
+
+
+        BufferedWriter fw = Files.newBufferedWriter(properties);
+
+        fw.write(JBakeProperty.ASSET_FOLDER + "=" + TestUtils.getOsPath(expectedAssetFolder));
+        fw.newLine();
+        fw.write(JBakeProperty.TEMPLATE_FOLDER + "=" + TestUtils.getOsPath(expectedTemplateFolder));
+        fw.newLine();
+        fw.write(JBakeProperty.DESTINATION_FOLDER + "=" + TestUtils.getOsPath(expectedDestination));
+        fw.close();
+
+        configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(source.toFile());
+        File assetFolder = new File(configuration.getDestinationFolder(), "css");
+        File aboutFile = new File(configuration.getDestinationFolder(), "about.html");
+        File blogSubFolder = new File(configuration.getDestinationFolder(), "blog");
+
+
+        final Oven oven = new Oven(configuration);
+        oven.bake();
+
+        assertThat(oven.getErrors()).isEmpty();
+        assertThat(configuration.getDestinationFolder()).isNotEmptyDirectory();
+        assertThat(assetFolder).isNotEmptyDirectory();
+        assertThat(aboutFile).isFile();
+        assertThat(aboutFile).isNotEmpty();
+        assertThat(blogSubFolder).isNotEmptyDirectory();
+    }
+
+
+    @Test
     public void shouldThrowExceptionIfSourceFolderDoesNotExist() {
-        configuration.setSourceFolder(new File(root, "none"));
+        configuration.setSourceFolder(root.resolve("none").toFile());
 
         assertThrows(JBakeException.class, () -> new Oven(configuration));
     }
@@ -90,9 +145,9 @@ public class OvenTest {
     @Test
     public void shouldInstantiateNeededUtensils() throws Exception {
 
-        File template = TestUtils.newFolder(root, "template");
-        File content = TestUtils.newFolder(root, "content");
-        File assets = TestUtils.newFolder(root, "assets");
+        File template = TestUtils.newFolder(root.toFile(), "template");
+        File content = TestUtils.newFolder(root.toFile(), "content");
+        File assets = TestUtils.newFolder(root.toFile(), "assets");
 
         configuration.setTemplateFolder(template);
         configuration.setContentFolder(content);
@@ -109,7 +164,7 @@ public class OvenTest {
 
     @Test()
     public void shouldInspectConfigurationDuringInstantiationFromUtils() {
-        configuration.setSourceFolder(new File(root, "none"));
+        configuration.setSourceFolder(root.resolve("none").toFile());
 
         Utensils utensils = new Utensils();
         utensils.setConfiguration(configuration);
@@ -119,9 +174,9 @@ public class OvenTest {
 
     @Test
     public void shouldCrawlRenderAndCopyAssets() throws Exception {
-        File template = TestUtils.newFolder(root, "template");
-        File content = TestUtils.newFolder(root, "content");
-        File assets = TestUtils.newFolder(root, "assets");
+        File template = TestUtils.newFolder(root.toFile(), "template");
+        File content = TestUtils.newFolder(root.toFile(), "content");
+        File assets = TestUtils.newFolder(root.toFile(), "assets");
 
         configuration.setTemplateFolder(template);
         configuration.setContentFolder(content);
