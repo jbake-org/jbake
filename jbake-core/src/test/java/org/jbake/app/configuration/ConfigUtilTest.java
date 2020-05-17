@@ -20,6 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,13 +70,8 @@ public class ConfigUtilTest extends LoggingTest {
         when(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent");
         when(nonExistentSourceFolder.exists()).thenReturn(false);
 
-        try {
-            util.loadConfig(nonExistentSourceFolder);
-            fail("Exception should be thrown, as source folder does not exist");
-        } catch (JBakeException e) {
-
-            assertThat(e.getMessage()).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.");
-        }
+        JBakeException e = assertThrows(JBakeException.class, ()->util.loadConfig(nonExistentSourceFolder));
+        assertThat(e.getMessage()).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.");
     }
 
     @Test
@@ -85,7 +81,6 @@ public class ConfigUtilTest extends LoggingTest {
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         assertThat(config.getSourceFolder()).isEqualTo(sourceFolder);
-
     }
 
     @Test
@@ -95,13 +90,8 @@ public class ConfigUtilTest extends LoggingTest {
         when(sourceFolder.exists()).thenReturn(true);
         when(sourceFolder.isDirectory()).thenReturn(false);
 
-        try {
-            util.loadConfig(sourceFolder);
-            fail("Exception should be thrown if given source folder is not a directory.");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).isEqualTo("The given source folder is not a directory.");
-        }
-
+        JBakeException e = assertThrows(JBakeException.class, () -> util.loadConfig(sourceFolder));
+        assertThat(e.getMessage()).isEqualTo("The given source folder is not a directory.");
     }
 
     @Test
@@ -286,35 +276,6 @@ public class ConfigUtilTest extends LoggingTest {
         assertThat(assetFolder).isEqualTo(expectedAssetFolder);
         assertThat(contentFolder).isEqualTo(expectedContentFolder);
         assertThat(destinationFolder).isEqualTo(expectedDestinationFolder);
-    }
-
-    @Test
-    public void shouldHandleCustomTemplateFolder() throws Exception {
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
-
-        config.setTemplateFolder(TestUtils.newFolder(sourceFolder.toFile(), "my_custom_templates"));
-        assertThat(config.getTemplateFolderName()).isEqualTo("my_custom_templates");
-    }
-
-    @Test
-    public void shouldHandleCustomContentFolder() throws Exception {
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
-
-        config.setContentFolder(TestUtils.newFolder(sourceFolder.toFile(), "my_custom_content"));
-
-        assertThat(config.getContentFolderName()).isEqualTo("my_custom_content");
-    }
-
-    @Test
-    public void shouldHandleCustomAssetFolder() throws Exception {
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
-
-        config.setAssetFolder(TestUtils.newFolder(sourceFolder.toFile(), "my_custom_asset"));
-
-        assertThat(config.getAssetFolderName()).isEqualTo("my_custom_asset");
     }
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {

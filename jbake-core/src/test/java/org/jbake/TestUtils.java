@@ -31,7 +31,11 @@ public class TestUtils {
     }
 
     public static File getTestResourcesAsSourceFolder() {
-        return new File(TestUtils.class.getResource("/fixture").getFile());
+        return getTestResourcesAsSourceFolder("/fixture");
+    }
+
+    public static File getTestResourcesAsSourceFolder(String name) {
+        return new File(TestUtils.class.getResource(name).getFile());
     }
 
     public static File newFolder(File base, String folderName) {

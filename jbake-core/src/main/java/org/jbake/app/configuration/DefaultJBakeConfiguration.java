@@ -122,7 +122,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setAssetFolder(File assetFolder) {
         if (assetFolder != null) {
             setProperty(ASSET_FOLDER_KEY, assetFolder);
-            setProperty(JBakeProperty.ASSET_FOLDER, assetFolder.getName());
         }
     }
 
@@ -175,7 +174,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setContentFolder(File contentFolder) {
         if (contentFolder != null) {
             setProperty(CONTENT_FOLDER_KEY, contentFolder);
-            setProperty(JBakeProperty.CONTENT_FOLDER, contentFolder.getName());
         }
     }
 
@@ -233,7 +231,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setDestinationFolder(File destinationFolder) {
         if (destinationFolder != null) {
             setProperty(DESTINATION_FOLDER_KEY, destinationFolder);
-            setProperty(JBakeProperty.DESTINATION_FOLDER, destinationFolder.getName());
         }
     }
 
@@ -440,7 +437,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setTemplateFolder(File templateFolder) {
         if (templateFolder != null) {
             setProperty(TEMPLATE_FOLDER_KEY, templateFolder);
-            setProperty(JBakeProperty.TEMPLATE_FOLDER, templateFolder.getName());
         }
     }
 
