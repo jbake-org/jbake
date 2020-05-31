@@ -146,7 +146,7 @@ public class Main {
         sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
         sw.append("Options:");
         System.out.println(sw.toString());
-        parser.getProperties().withUsageWidth(100);
+        parser.getProperties().withUsageWidth(80);
         parser.printUsage(System.out);
     }
 
