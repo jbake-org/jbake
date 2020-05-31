@@ -317,6 +317,14 @@ public class ConfigUtilTest extends LoggingTest {
         assertThat(config.getAssetFolderName()).isEqualTo("my_custom_asset");
     }
 
+    @Test
+    public void shouldReturnIgnoreFileFromConfiguration() throws Exception {
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
+        JBakeConfiguration config = util.loadConfig(sourceFolder);
+
+        assertThat(config.getIgnoreFileName()).isEqualTo(".jbakeignore");
+    }
+
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
         for (Field field : JBakeConfiguration.class.getFields()) {
 
