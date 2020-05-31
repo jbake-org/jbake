@@ -46,6 +46,7 @@ public class FileUtil {
      * Filters files based on their file extension.
      *
      * @return Object for filtering files
+     * @deprecated use {@link #getFileFilter(JBakeConfiguration)} instead
      */
     @Deprecated
     public static FileFilter getFileFilter() {
@@ -247,7 +248,7 @@ public class FileUtil {
      * platform independent file.getPath()
      *
      * @param path the path to transform, or {@code null}
-     * @return The result will have alle platform path separators replaced by "/".
+     * @return The result will have all platform path separators replaced by "/".
      */
     public static String asPath(String path) {
         if (path == null) {

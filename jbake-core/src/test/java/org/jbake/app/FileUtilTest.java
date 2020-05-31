@@ -37,7 +37,7 @@ public class FileUtilTest {
         assertFalse("jbake.properties file should not be in the /fixture/content directory", FileUtil.isFileInDirectory(jbakeFile, contentDir));
     }
 
-    @Test  
+    @Test
     public void testGetContentRoothPath() throws Exception {
 
         File source = TestUtils.getTestResourcesAsSourceFolder();
