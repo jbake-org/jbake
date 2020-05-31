@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Provides Configuration related functions.
@@ -25,7 +23,7 @@ public class ConfigUtil {
     private static final String CONFIG_FILE = "jbake.properties";
     private static final String DEFAULT_CONFIG_FILE = "default.properties";
 
-    private CompositeConfiguration load(File source) throws ConfigurationException {
+    private CompositeConfiguration load(File source, File propertiesFile) throws ConfigurationException {
 
         if (!source.exists()) {
             throw new JBakeException("The given source folder '" + source.getAbsolutePath() + "' does not exist.");
@@ -41,7 +39,7 @@ public class ConfigUtil {
             displayLegacyConfigFileWarningIfRequired();
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
         }
-        customConfigFile = new File(source, CONFIG_FILE);
+        customConfigFile = propertiesFile != null ? propertiesFile : new File(source, CONFIG_FILE);
         if (customConfigFile.exists()) {
             config.addConfiguration(new PropertiesConfiguration(customConfigFile));
         }
@@ -56,9 +54,30 @@ public class ConfigUtil {
         LOGGER.warn("Usage of this file is being deprecated, please rename this file to: {} to remove this warning", CONFIG_FILE);
     }
 
-    public JBakeConfiguration loadConfig(File source) throws ConfigurationException {
-        CompositeConfiguration configuration = load(source);
+    /**
+     * Load a configuration.
+     *
+     * @param source the source directory of the project
+     * @param propertiesFile the properties file for the project
+     * @return the configuration
+     * @throws ConfigurationException if unable to configure
+     */
+    public JBakeConfiguration loadConfig(File source, File propertiesFile) throws ConfigurationException {
+        CompositeConfiguration configuration = load(source, propertiesFile);
         return new DefaultJBakeConfiguration(source, configuration);
+    }
+
+    /**
+     * Load a configuration.
+     *
+     * @param source the source directory of the project
+     * @return the configuration
+     * @throws ConfigurationException if unable to configure
+     * @deprecated use {@link #loadConfig(File, File)} instead
+     */
+    @Deprecated
+    public JBakeConfiguration loadConfig(File source) throws ConfigurationException {
+        return loadConfig(source, null);
     }
 
 }

@@ -24,6 +24,9 @@ public class LaunchOptions {
     @Option(name = "-s", aliases = {"--server"}, usage = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
     private boolean runServer;
 
+    @Option(name = "-c", aliases = {"--config"}, usage = "use specified file for configuration, (defaults to \"jbake.properties\" in the source folder if not supplied)")
+    private String properties;
+
     @Option(name = "-h", aliases = {"--help"}, usage = "prints this message")
     private boolean helpNeeded;
 
@@ -60,6 +63,18 @@ public class LaunchOptions {
 
     public String getDestinationValue() {
         return destination;
+    }
+
+    public File getProperties() {
+        if (properties != null) {
+            return new File(properties);
+        } else {
+            return new File(getSource(), "jbake.properties");
+        }
+    }
+
+    public String getPropertiesValue() {
+        return properties;
     }
 
     public boolean isHelpNeeded() {

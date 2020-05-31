@@ -23,10 +23,25 @@ public class JBakeConfigurationFactory {
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
+     * @deprecated use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead
      */
+    @Deprecated
     public DefaultJBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, boolean isClearCache) throws ConfigurationException {
+        return createDefaultJbakeConfiguration(sourceFolder, destination, (File) null, isClearCache);
+    }
 
-        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
+    /**
+     * Creates a {@link DefaultJBakeConfiguration}
+     * @param sourceFolder The source folder of the project
+     * @param destination The destination folder to render and copy files to
+     * @param propertiesFile The properties file for the project
+     * @param isClearCache Whether to clear database cache or not
+     * @return A configuration by given parameters
+     * @throws ConfigurationException if loading the configuration fails
+     */
+    public DefaultJBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, File propertiesFile, boolean isClearCache) throws ConfigurationException {
+
+        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder, propertiesFile);
         configuration.setDestinationFolder(destination);
         configuration.setClearCache(isClearCache);
 
@@ -89,9 +104,32 @@ public class JBakeConfigurationFactory {
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
+     * @deprecated use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead
      */
+    @Deprecated
     public DefaultJBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
+        configuration.setDestinationFolder(destinationFolder);
+        configuration.setClearCache(isClearCache);
+        configuration.setSiteHost("http://localhost:"+configuration.getServerPort());
+        return configuration;
+    }
+
+
+    /**
+     * Creates a {@link DefaultJBakeConfiguration} with value site.host replaced
+     * by http://localhost:[server.port].
+     * The server.port is read from the project properties file.
+     *
+     * @param sourceFolder The source folder of the project
+     * @param destinationFolder The destination folder to render and copy files to
+     * @param propertiesFile The properties file for the project
+     * @param isClearCache Whether to clear database cache or not
+     * @return A configuration by given parameters
+     * @throws ConfigurationException if loading the configuration fails
+     */
+    public DefaultJBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, File propertiesFile, boolean isClearCache) throws ConfigurationException {
+        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder, propertiesFile);
         configuration.setDestinationFolder(destinationFolder);
         configuration.setClearCache(isClearCache);
         configuration.setSiteHost("http://localhost:"+configuration.getServerPort());

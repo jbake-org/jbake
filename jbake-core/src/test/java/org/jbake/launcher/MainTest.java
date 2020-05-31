@@ -62,7 +62,7 @@ public class MainTest {
 
         verify(mockJetty).run(expectedOutput.getPath(),"8820");
     }
-    
+
     @Test
     public void launchBakeAndJetty() throws Exception {
         File sourceFolder = folder.newFolder("src", "jbake");
@@ -74,7 +74,7 @@ public class MainTest {
 
         verify(mockJetty).run(expectedOutput.getPath(),"8820");
     }
-    
+
     @Test
     public void launchBakeAndJettyWithCustomDirForJetty() throws ConfigurationException, IOException {
         mockValidSourceFolder("src/jbake", true);
@@ -171,16 +171,16 @@ public class MainTest {
     }
 
     private void mockDefaultJbakeConfiguration(File sourceFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,null,false);
+        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,null,null,false);
         System.setProperty("user.dir", sourceFolder.getPath());
 
-        when(factory.createJettyJbakeConfiguration(any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );
+        when(factory.createJettyJbakeConfiguration(any(File.class),any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );
     }
 
     private void mockJettyConfiguration(File sourceFolder, File destinationFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,destinationFolder,false);
+        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder,destinationFolder,null,false);
         System.setProperty("user.dir", sourceFolder.getPath());
 
-        when(factory.createJettyJbakeConfiguration(any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );
+        when(factory.createJettyJbakeConfiguration(any(File.class),any(File.class),any(File.class),anyBoolean())).thenReturn( configuration );
     }
 }

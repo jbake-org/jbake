@@ -108,6 +108,7 @@ public class LaunchOptionsTest {
         assertThat(res.isBake()).isFalse();
         assertThat(res.getSource().getPath()).isEqualTo(System.getProperty("user.dir"));
         assertThat(res.getDestination().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + "output");
+        assertThat(res.getProperties().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + "jbake.properties");
     }
 
     @Test
@@ -123,5 +124,16 @@ public class LaunchOptionsTest {
         assertThat(res.isBake()).isTrue();
         assertThat(res.getSource()).isEqualTo(new File("/tmp/source"));
         assertThat(res.getDestination()).isEqualTo(new File("/tmp/destination"));
+        assertThat(res.getProperties()).isEqualTo(new File("/tmp/source/jbake.properties"));
+    }
+
+    @Test
+    public void testConfigArgs() throws Exception {
+        String[] args = {"-c", "foo"};
+        LaunchOptions res = new LaunchOptions();
+        CmdLineParser parser = new CmdLineParser(res);
+        parser.parseArgument(args);
+
+        assertThat(res.getProperties().getAbsolutePath()).isEqualTo(System.getProperty("user.dir") + File.separator + "foo");
     }
 }
