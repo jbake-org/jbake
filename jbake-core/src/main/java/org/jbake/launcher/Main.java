@@ -135,7 +135,9 @@ public class Main {
     }
 
     private void printUsage(Object options) {
-        CommandLine.usage(options, System.out);
+        CommandLine cli = new CommandLine(options);
+        cli.setUsageHelpLongOptionsMaxWidth(28);
+        cli.usage(System.out);
     }
 
     public static void printUsage() {

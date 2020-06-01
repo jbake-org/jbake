@@ -9,7 +9,8 @@ import java.io.File;
 
 @Command(
         description = "JBake is a Java based, open source, static site/blog generator for developers & designers",
-        name = "jbake"
+        name = "jbake",
+        usageHelpAutoWidth = true
 )
 public class LaunchOptions {
     @Parameters(index = "0", description = "source folder of site content (with templates and assets), if not supplied will default to current directory", arity = "0..1")
@@ -21,7 +22,7 @@ public class LaunchOptions {
     @Option(names = {"-b", "--bake"}, description = "performs a bake")
     private boolean bake;
 
-    @ArgGroup(exclusive = false, heading = "JBake initialization%n")
+    @ArgGroup(exclusive = false, heading = "%n%nJBake initialization%n%n")
     private InitOptions initGroup;
 
     static class InitOptions {
