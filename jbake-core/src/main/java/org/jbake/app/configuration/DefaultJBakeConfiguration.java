@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -532,6 +529,15 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsBoolean(JBakeProperty.IMG_PATH_PREPEND_HOST);
     }
 
+    @Override
+    public boolean getRelativePathPrependHost() {
+        return getAsBoolean(JBakeProperty.RELATIVE_PATH_PREPEND_HOST);
+    }
+
+    public void setRelativePathPrependHost(boolean relativePathPrependHost) {
+        setProperty(JBakeProperty.RELATIVE_PATH_PREPEND_HOST, relativePathPrependHost);
+    }
+
     public void setImgPathPrependHost(boolean imgPathPrependHost) {
         setProperty(JBakeProperty.IMG_PATH_PREPEND_HOST, imgPathPrependHost);
     }
@@ -541,7 +547,36 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsBoolean(JBakeProperty.IMG_PATH_UPDATE);
     }
 
-    public void setImgPathUPdate(boolean imgPathUpdate) {
+    @Override
+    public boolean getRelativePathUpdate() {
+        return getAsBoolean(JBakeProperty.RELATIVE_PATH_UPDATE);
+    }
+
+    public void setRelativePathUpdate(String relativePathUpdate) {
+        setProperty(JBakeProperty.RELATIVE_PATH_UPDATE, relativePathUpdate);
+    }
+
+    @Override
+    public Map<String, String> getTagAttributes() {
+        List<String> pairs = getAsList(JBakeProperty.RELATIVE_TAG_ATTRIBUTE);
+        Map<String, String> tagAttribute = new HashMap<>();
+        char eq = '=';
+        for (String pair : pairs) {
+            int idx = pair.indexOf(eq);
+            if (idx > 0) {
+                String tag = pair.substring(0, idx);
+                String attr = pair.substring(idx + 1);
+                tagAttribute.put(tag, attr);
+            }
+        }
+        return tagAttribute;
+    }
+
+    public void setTagAttributes(String... tagAttributes) {
+        setProperty(JBakeProperty.RELATIVE_TAG_ATTRIBUTE, StringUtils.join(tagAttributes, ","));
+    }
+
+    public void setImgPathUpdate(boolean imgPathUpdate) {
         setProperty(JBakeProperty.IMG_PATH_UPDATE, imgPathUpdate);
     }
 }

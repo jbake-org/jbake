@@ -14,31 +14,41 @@ import java.util.Map;
  */
 public class HtmlUtil {
 
+    private static final char SLASH = '/';
+    private static final String SLASH_TEXT = String.valueOf(SLASH);
+    private static final String HTTP = "http://";
+    private static final String HTTPS = "https://";
+    private static final String WORKING_DIR = "\\./";
+    private static final String EMPTY = "";
+
     private HtmlUtil() {
     }
 
     /**
-     * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except
+     * Images or file paths are specified as w.r.t. assets folder. This function prefix site host to all path except
      * the ones that starts with http://, https://.
      * <p>
-     * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
+     * If path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
      *
      * @param fileContents  Map representing file contents
      * @param configuration Configuration object
      */
-    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
+    public static void fixUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
         String htmlContent = fileContents.get(Attributes.BODY).toString();
-        boolean prependSiteHost = configuration.getImgPathPrependHost();
+        boolean prependSiteHost = configuration.getImgPathPrependHost() && configuration.getRelativePathPrependHost();
         String siteHost = configuration.getSiteHost();
         String uri = getDocumentUri(fileContents);
 
         Document document = Jsoup.parseBodyFragment(htmlContent);
-        Elements allImgs = document.getElementsByTag("img");
-
-        for (Element img : allImgs) {
-            transformImageSource(img, uri, siteHost, prependSiteHost);
+        Map<String, String> pairs = configuration.getTagAttributes();
+        for (Map.Entry<String, String> entry : pairs.entrySet()) {
+            String tagName = entry.getKey();
+            String attKey = entry.getValue();
+            Elements allTags = document.getElementsByTag(tagName);
+            for (Element tag : allTags) {
+                transformPath(tag, attKey, uri, siteHost, prependSiteHost);
+            }
         }
-
         //Use body().html() to prevent adding <body></body> from parsed fragment.
         fileContents.put(Attributes.BODY, document.body().html());
     }
@@ -51,46 +61,47 @@ public class HtmlUtil {
             uri = removeTrailingSlash(uri);
         }
 
-        if (uri.contains("/")) {
+        if (uri.contains(SLASH_TEXT)) {
             uri = removeFilename(uri);
         }
         return uri;
     }
 
-    private static void transformImageSource(Element img, String uri, String siteHost, boolean prependSiteHost) {
-        String source = img.attr("src");
+    private static void transformPath(Element tag, String attrKey, String uri, String siteHost, boolean prependSiteHost) {
+        String path = tag.attr(attrKey);
 
         // Now add the root path
-        if (!source.startsWith("http://") && !source.startsWith("https://")) {
-
-            if (isRelative(source)) {
-                source = uri + source.replaceFirst("\\./", "");
+        if (!isUrl(path)) {
+            if (isRelative(path)) {
+                path = uri + path.replaceFirst(WORKING_DIR, EMPTY);
             }
-
             if (prependSiteHost) {
-                if (!siteHost.endsWith("/") && isRelative(source)) {
-                    siteHost = siteHost.concat("/");
+                if (!siteHost.endsWith(SLASH_TEXT) && isRelative(path)) {
+                    siteHost = siteHost.concat(SLASH_TEXT);
                 }
-                source = siteHost + source;
+                path = siteHost + path;
             }
-
-            img.attr("src", source);
+            tag.attr(attrKey, path);
         }
     }
 
     private static String removeFilename(String uri) {
-        uri = uri.substring(0, uri.lastIndexOf('/') + 1);
+        uri = uri.substring(0, uri.lastIndexOf(SLASH) + 1);
         return uri;
     }
 
     private static String removeTrailingSlash(String uri) {
-        if (uri.endsWith("/")) {
+        if (uri.endsWith(SLASH_TEXT)) {
             uri = uri.substring(0, uri.length() - 1);
         }
         return uri;
     }
 
+    private static boolean isUrl(String path) {
+        return path.startsWith(HTTP) || path.startsWith(HTTPS);
+    }
+
     private static boolean isRelative(String source) {
-        return !source.startsWith("/");
+        return !source.startsWith(SLASH_TEXT);
     }
 }
