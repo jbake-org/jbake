@@ -26,8 +26,12 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.util.GradleVersion
+import org.gradle.workers.WorkerExecutor
 import org.jbake.gradle.impl.JBakeProxyImpl
+import org.jbake.gradle.impl.JBakeWorkAction
 
+import javax.inject.Inject
 import java.lang.reflect.Constructor
 
 class JBakeTask extends DefaultTask {
@@ -43,21 +47,38 @@ class JBakeTask extends DefaultTask {
 
     private JBakeProxy jbake
 
-    JBakeTask() {
+    private final WorkerExecutor executor
+
+    @Inject
+    JBakeTask(WorkerExecutor executor) {
         group = 'jbake'
         description = 'Bakes your website with JBake'
+        this.executor = executor
     }
 
     @TaskAction
     void bake() {
-        createJbake()
-        jbake.prepare()
-        mergeConfiguration()
-        jbake.jbake()
-        List<String> errors = jbake.getErrors()
-        if (errors) {
-            errors.each { logger.error(it) }
-            throw new TaskExecutionException(this, new IllegalStateException(errors.join('\n')))
+        // Newer worker API was introduced in 5.6, older worker API doesn't properly forward the logging from Oven which would cause a regression.
+        // See https://github.com/gradle/gradle/issues/8318
+        if (GradleVersion.current().compareTo(GradleVersion.version("5.6")) >= 0) {
+            executor.classLoaderIsolation {
+                it.classpath.from(this.classpath)
+            }.submit(JBakeWorkAction) {
+                it.input = this.input
+                it.output = this.output
+                it.clearCache = this.clearCache
+                it.configuration.putAll(this.configuration)
+            }
+        } else {
+            createJbake()
+            jbake.prepare()
+            mergeConfiguration()
+            jbake.jbake()
+            List<String> errors = jbake.getErrors()
+            if (errors) {
+                errors.each { logger.error(it) }
+                throw new TaskExecutionException(this, new IllegalStateException(errors.join('\n')))
+            }
         }
     }
 

@@ -84,6 +84,7 @@ dependencies {
     compileOnly("org.jbake:jbake-core:$jbakeVersion") {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
+    compileOnly 'commons-configuration:commons-configuration:1.10'
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude group: 'org.codehaus.groovy'
     }
