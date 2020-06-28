@@ -22,9 +22,6 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property;
 import org.gradle.workers.WorkParameters;
 
-/**
- * @author Daniel Lacasse (@lacasseio)
- */
 interface JBakeWorkActionParameters extends WorkParameters {
     RegularFileProperty getInput()
     RegularFileProperty getOutput()

@@ -23,9 +23,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.workers.WorkAction
 import org.jbake.app.Oven
 
-/**
- * @author Daniel Lacasse (@lacasseio)
- */
 abstract class JBakeWorkAction implements WorkAction<JBakeWorkActionParameters> {
     private static final LOGGER = Logging.getLogger(JBakeWorkAction)
     private Oven jbake
