@@ -28,5 +28,5 @@ interface JBakeWorkActionParameters extends WorkParameters {
 
     Property<Boolean> getClearCache()
 
-    MapProperty<String, Object> getConfiguration();
+    MapProperty<String, Object> getConfiguration()
 }
