@@ -1,35 +1,21 @@
 language: java
 
-dist: trusty
-
-addons:
-  hosts:
-  - jbake-gradle-builder
-  hostname: jbake-gradle-builder
-
-notifications:
-  irc:
-    - "chat.freenode.net#jbake"
+jdk: openjdk8
 
 install: true
 
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
 cache:
-    directories:
-        - $HOME/.m2
-        - $HOME/.gradle
+  directories:
+  - $HOME/.m2/
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
 
 before_script:
-    - ./gradlew --version
+  - ./gradlew --version
 
-script:
-    - TERM=dumb ./gradlew build jacocoTestReport
+script: ./gradlew build -S
 
-matrix:
-  include:
-    - jdk: openjdk14
-    - jdk: openjdk11
-    - jdk: openjdk9
-    - jdk: openjdk8
-
-after_success:
-    - ./gradlew coveralls
+env: TERM=dumb

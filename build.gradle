@@ -64,10 +64,12 @@ config {
         }
     }
 
-    plugin {
-        enabled             = true
-        id                  = 'org.jbake.site'
-        implementationClass = 'org.jbake.gradle.JBakePlugin'
+    plugins {
+        plugin {
+            name                = 'jbake'
+            id                  = 'org.jbake.site'
+            implementationClass = 'org.jbake.gradle.JBakePlugin'
+        }
     }
 
     bintray {

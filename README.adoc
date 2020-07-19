@@ -1,7 +1,7 @@
 = JBake plugin for Gradle
 :linkattrs:
 :jbake-version: 2.6.5
-:plugin-version: 5.2.0
+:plugin-version: 5.3.0
 :project-name: jbake-gradle-plugin
 
 image:http://img.shields.io/travis/jbake-org/{project-name}/master.svg["Build Status", link="https://travis-ci.org/jbake-org/{project-name}"]
@@ -131,7 +131,7 @@ jbake {
     thymeleafVersion = '3.0.11.RELEASE'
     asciidoctorJavaIntegrationVersion = '0.1.4'
     asciidoctorjVersion = '2.2.0'
-    jettyVersion = '9.4.28.v20200408'
+    jettyVersion = '9.4.30.v20200611'
 }
 ----
 
