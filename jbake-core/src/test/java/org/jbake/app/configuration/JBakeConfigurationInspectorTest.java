@@ -6,22 +6,18 @@ import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
-import org.junitpioneer.jupiter.TempDirectory.TempDir;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 public class JBakeConfigurationInspectorTest extends LoggingTest {
 
     private Path folder;

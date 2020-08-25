@@ -1,11 +1,11 @@
 plugins {
     id "eclipse"
     id "idea"
-    id "io.sdkman.vendors"              version "1.2.1"     apply false
+    id "io.sdkman.vendors"              version "2.0.0"     apply false
     id "com.jfrog.bintray"              version "1.8.5"     apply false
-    id "com.github.kt3k.coveralls"      version "2.10.1"     apply false
-    id "org.sonarqube"                  version "2.8"       apply false
-    id 'com.github.ben-manes.versions'  version '0.28.0'
+    id "com.github.kt3k.coveralls"      version "2.10.2"     apply false
+    id "org.sonarqube"                  version "3.1.1"       apply false
+    id 'com.github.ben-manes.versions'  version '0.36.0'
     id "nebula.optional-base"           version "5.0.3"     apply false
 }
 
@@ -77,15 +77,6 @@ subprojects {
     tasks.withType(JavaCompile) {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
-
-        /**
-         *  Fix for warning: [options] bootstrap class path not set in conjunction with -source
-         *  See https://stackoverflow.com/questions/42599422/warning-options-bootstrap-class-path-not-set-in-conjunction-with-source-1-7
-         */
-        File file = file("${System.properties.getProperty("java.home")}/lib/rt.jar")
-        if ( file.exists() ) {
-            options.setBootstrapClasspath(files(file))
-        }
     }
 
     test {
@@ -183,10 +174,7 @@ task testReport(type: TestReport) {
 }
 
 coveralls {
-    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
-    saveAsFile = true
-    sendToCoveralls = false
 }
 
 tasks.coveralls {
