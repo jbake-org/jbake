@@ -104,7 +104,7 @@ public class JBakeConfigurationFactory {
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
-     * @deprecated use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead
+     * @deprecated use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead
      */
     @Deprecated
     public DefaultJBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {
