@@ -1,6 +1,7 @@
 package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
+import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
@@ -14,12 +15,16 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,13 +74,8 @@ public class ConfigUtilTest extends LoggingTest {
         when(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent");
         when(nonExistentSourceFolder.exists()).thenReturn(false);
 
-        try {
-            util.loadConfig(nonExistentSourceFolder);
-            fail("Exception should be thrown, as source folder does not exist");
-        } catch (JBakeException e) {
-
-            assertThat(e.getMessage()).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.");
-        }
+        JBakeException e = assertThrows(JBakeException.class, () -> util.loadConfig(nonExistentSourceFolder));
+        assertThat(e.getMessage()).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.");
     }
 
     @Test
@@ -85,7 +85,6 @@ public class ConfigUtilTest extends LoggingTest {
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         assertThat(config.getSourceFolder()).isEqualTo(sourceFolder);
-
     }
 
     @Test
@@ -95,13 +94,8 @@ public class ConfigUtilTest extends LoggingTest {
         when(sourceFolder.exists()).thenReturn(true);
         when(sourceFolder.isDirectory()).thenReturn(false);
 
-        try {
-            util.loadConfig(sourceFolder);
-            fail("Exception should be thrown if given source folder is not a directory.");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).isEqualTo("The given source folder is not a directory.");
-        }
-
+        JBakeException e = assertThrows(JBakeException.class, () -> util.loadConfig(sourceFolder));
+        assertThat(e.getMessage()).isEqualTo("The given source folder is not a directory.");
     }
 
     @Test
@@ -289,32 +283,50 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldHandleCustomTemplateFolder() throws Exception {
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+    void shouldSetCustomFoldersWithAbsolutePaths() throws Exception {
+        // given
+        Path source = sourceFolder.resolve("source");
+        Path theme = sourceFolder.resolve("theme");
+        Path destination = sourceFolder.resolve("destination");
 
-        config.setTemplateFolder(TestUtils.newFolder(sourceFolder.toFile(), "my_custom_templates"));
-        assertThat(config.getTemplateFolderName()).isEqualTo("my_custom_templates");
-    }
+        File originalSource = TestUtils.getTestResourcesAsSourceFolder();
+        FileUtils.copyDirectory(originalSource, source.toFile());
+        File originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme");
+        FileUtils.copyDirectory(originalTheme, theme.toFile());
 
-    @Test
-    public void shouldHandleCustomContentFolder() throws Exception {
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+        Path expectedTemplateFolder = theme.resolve("templates");
+        Path expectedAssetFolder = theme.resolve("assets");
+        Path expectedContentFolder = source.resolve("content");
+        Path expectedDestination = destination.resolve("output");
 
-        config.setContentFolder(TestUtils.newFolder(sourceFolder.toFile(), "my_custom_content"));
+        File properties = source.resolve("jbake.properties").toFile();
+        BufferedWriter fw = Files.newBufferedWriter(properties.toPath());
 
-        assertThat(config.getContentFolderName()).isEqualTo("my_custom_content");
-    }
+        fw.write(JBakeProperty.ASSET_FOLDER + "=" + TestUtils.getOsPath(expectedAssetFolder));
+        fw.newLine();
+        fw.write(JBakeProperty.TEMPLATE_FOLDER + "=" + TestUtils.getOsPath(expectedTemplateFolder));
+        fw.newLine();
+        fw.write(JBakeProperty.DESTINATION_FOLDER + "=" + TestUtils.getOsPath(expectedDestination));
+        fw.close();
 
-    @Test
-    public void shouldHandleCustomAssetFolder() throws Exception {
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+        // when
 
-        config.setAssetFolder(TestUtils.newFolder(sourceFolder.toFile(), "my_custom_asset"));
+        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source.toFile());
 
-        assertThat(config.getAssetFolderName()).isEqualTo("my_custom_asset");
+        File templateFolder = config.getTemplateFolder();
+        File assetFolder = config.getAssetFolder();
+        File contentFolder = config.getContentFolder();
+        File destinationFolder = config.getDestinationFolder();
+
+        // then
+        assertThat(config.getTemplateFolderName()).isEqualTo(expectedTemplateFolder.toString());
+        assertThat(templateFolder).isEqualTo(expectedTemplateFolder.toFile());
+
+        assertThat(config.getAssetFolderName()).isEqualTo(expectedAssetFolder.toString());
+        assertThat(assetFolder).isEqualTo(expectedAssetFolder.toFile());
+
+        assertThat(destinationFolder).isEqualTo(expectedDestination.toFile());
+        assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile());
     }
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
