@@ -14,7 +14,7 @@ image:https://img.shields.io/maven-central/v/org.jbake/jbake-core.svg["Maven Dow
 image:https://api.bintray.com/packages/jbake/maven/jbake-core/images/download.svg["Bintray Download", link="https://bintray.com/jbake/maven/jbake-core/_latestVersion"]
 image:https://img.shields.io/homebrew/v/jbake.svg["Homebrew Download", link="http://jbake.org/download.html#homebrew"]
 
-image:https://badges.gitter.im/jbake-org/jbake.png["Gitter Chat", link="https://gitter.im/jbake-org/jbake"]
+image:https://badges.gitter.im/jbake-org/jbake.svg["Gitter Chat", link="https://gitter.im/jbake-org/jbake"]
 
 == Documentation
 
