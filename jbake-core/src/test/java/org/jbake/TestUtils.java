@@ -5,6 +5,7 @@ import org.apache.commons.vfs2.util.Os;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class TestUtils {
 
@@ -31,7 +32,11 @@ public class TestUtils {
     }
 
     public static File getTestResourcesAsSourceFolder() {
-        return new File(TestUtils.class.getResource("/fixture").getFile());
+        return getTestResourcesAsSourceFolder("/fixture");
+    }
+
+    public static File getTestResourcesAsSourceFolder(String name) {
+        return new File(TestUtils.class.getResource(name).getFile());
     }
 
     public static File newFolder(File base, String folderName) {
@@ -40,5 +45,11 @@ public class TestUtils {
         return templateFolder;
     }
 
+    public static String getOsPath(Path path) {
 
+        if ( isWindows() ) {
+            return path.toString().replace("\\","\\\\");
+        }
+        return path.toString();
+    }
 }

@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -46,8 +48,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public DefaultJBakeConfiguration(File sourceFolder, CompositeConfiguration configuration) {
         this.compositeConfiguration = configuration;
         setSourceFolder(sourceFolder);
-        setupDefaultDestination();
-        setupPathsRelativeToSourceFile();
+        setupPaths();
     }
 
     @Override
@@ -122,7 +123,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setAssetFolder(File assetFolder) {
         if (assetFolder != null) {
             setProperty(ASSET_FOLDER_KEY, assetFolder);
-            setProperty(JBakeProperty.ASSET_FOLDER, assetFolder.getName());
         }
     }
 
@@ -175,7 +175,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setContentFolder(File contentFolder) {
         if (contentFolder != null) {
             setProperty(CONTENT_FOLDER_KEY, contentFolder);
-            setProperty(JBakeProperty.CONTENT_FOLDER, contentFolder.getName());
         }
     }
 
@@ -233,7 +232,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setDestinationFolder(File destinationFolder) {
         if (destinationFolder != null) {
             setProperty(DESTINATION_FOLDER_KEY, destinationFolder);
-            setProperty(JBakeProperty.DESTINATION_FOLDER, destinationFolder.getName());
         }
     }
 
@@ -408,7 +406,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     public void setSourceFolder(File sourceFolder) {
         setProperty(SOURCE_FOLDER_KEY, sourceFolder);
-        setupPathsRelativeToSourceFile();
+        setupPaths();
     }
 
     @Override
@@ -440,7 +438,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setTemplateFolder(File templateFolder) {
         if (templateFolder != null) {
             setProperty(TEMPLATE_FOLDER_KEY, templateFolder);
-            setProperty(JBakeProperty.TEMPLATE_FOLDER, templateFolder.getName());
         }
     }
 
@@ -493,29 +490,49 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setProperty(templateKey, fileName);
     }
 
-    private void setupDefaultAssetFolder() {
-        String assetFolder = getAsString(JBakeProperty.ASSET_FOLDER);
-        setAssetFolder(new File(getSourceFolder(), assetFolder));
-    }
-
-    private void setupDefaultContentFolder() {
-        setContentFolder(new File(getSourceFolder(), getContentFolderName()));
+    private void setupPaths() {
+        setupDefaultDestination();
+        setupDefaultAssetFolder();
+        setupDefaultTemplateFolder();
+        setupDefaultContentFolder();
     }
 
     private void setupDefaultDestination() {
         String destinationPath = getAsString(JBakeProperty.DESTINATION_FOLDER);
-        setDestinationFolder(new File(getSourceFolder(), destinationPath));
+
+        File destination = new File(destinationPath);
+        if ( destination.isAbsolute() ) {
+            setDestinationFolder(destination);
+        } else {
+            setDestinationFolder(new File(getSourceFolder(), destinationPath));
+        }
+    }
+
+    private void setupDefaultAssetFolder() {
+        String assetFolder = getAsString(JBakeProperty.ASSET_FOLDER);
+
+
+        File asset = new File(assetFolder);
+        if(asset.isAbsolute()) {
+            setAssetFolder(asset);
+        } else {
+            setAssetFolder(new File(getSourceFolder(), assetFolder));
+        }
     }
 
     private void setupDefaultTemplateFolder() {
-        String destinationPath = getAsString(JBakeProperty.TEMPLATE_FOLDER);
-        setTemplateFolder(new File(getSourceFolder(), destinationPath));
+        String templateFolder = getAsString(JBakeProperty.TEMPLATE_FOLDER);
+
+        File template = new File(templateFolder);
+        if(template.isAbsolute()) {
+            setTemplateFolder(template);
+        } else {
+            setTemplateFolder(new File(getSourceFolder(), templateFolder));
+        }
     }
 
-    private void setupPathsRelativeToSourceFile() {
-        setupDefaultAssetFolder();
-        setupDefaultTemplateFolder();
-        setupDefaultContentFolder();
+    private void setupDefaultContentFolder() {
+        setContentFolder(new File(getSourceFolder(), getContentFolderName()));
     }
 
     @Override
