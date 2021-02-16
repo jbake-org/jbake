@@ -6,8 +6,8 @@ Jonathan Bullock
 == JBake
 
 http://jbake.org[JBake] is a Java based open source static site/blog generator for developers.
-
-image:https://img.shields.io/travis/jbake-org/jbake/master.svg["Build Status", link="https://travis-ci.org/jbake-org/jbake"]
+https://img.shields.io/travis/com/jbake-org/jbake/master
+image:https://img.shields.io/travis/com/jbake-org/jbake/master.svg["Build Status", link="https://travis-ci.com/github/jbake-org/jbake"]
 image:https://ci.appveyor.com/api/projects/status/2q7hvg03wsjx953b?svg=true["Appveyor Status", link="https://ci.appveyor.com/project/jbake-org/jbake"]
 image:https://img.shields.io/coveralls/jbake-org/jbake/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/jbake"]
 image:https://img.shields.io/maven-central/v/org.jbake/jbake-core.svg["Maven Download", link="http://jbake.org/download.html#maven"]
@@ -22,15 +22,15 @@ Full documentation is available on http://jbake.org/docs/[jbake.org].
 
 == Contributing
 
-We welcome all contributions to the project both big and small. From new features, bug reports to even spelling mistake corrections in 
+We welcome all contributions to the project both big and small. From new features, bug reports to even spelling mistake corrections in
 the documentation. Please don't hesitate to submit an issue.
 
-The link:CONTRIBUTING.asciidoc[Contributing] guide provides information on how to submit an issue or create a pull request to fix a bug or 
+The link:CONTRIBUTING.asciidoc[Contributing] guide provides information on how to submit an issue or create a pull request to fix a bug or
 add a new feature to JBake.
 
 == Versioning
 
-The project has adopted the http://semver.org[Semantic Versioning] spec from v2.2.0 onwards to maintain an 
+The project has adopted the http://semver.org[Semantic Versioning] spec from v2.2.0 onwards to maintain an
 understandable backwards compatibility strategy.
 
 The version format is as follows:
