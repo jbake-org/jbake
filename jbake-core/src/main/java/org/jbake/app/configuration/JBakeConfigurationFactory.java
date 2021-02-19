@@ -92,7 +92,7 @@ public class JBakeConfigurationFactory {
      */
     public DefaultJBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
-        configuration.setDestinationFolder(destinationFolder);
+        configuration.setDestinationFolder(sourceFolder);
         configuration.setClearCache(isClearCache);
         configuration.setSiteHost("http://localhost:"+configuration.getServerPort());
         return configuration;
