@@ -1,11 +1,11 @@
 = JBake Maven Plugin
 Jonathan Bullock
-2020-09-12
+2021-03-03
 :idprefix:
 
 image:https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin"]
 
-JBake Maven Plugin is a Maven plugin allowing you to integrate http://jbake.org[JBake] into your projects build. This is the official version published at 
+JBake Maven Plugin is a Maven plugin allowing you to integrate http://jbake.org[JBake] into your projects build. This is the official version published at
 the following Maven coordinates:
 
 ----
@@ -17,6 +17,126 @@ the following Maven coordinates:
 ----
 
 Special thanks must go to the original author of this plugin - https://github.com/aldrinleal[Aldrin Leal].
+
+== Usage
+
+To use JBake Maven Plugin in your build add the plugin into your pom.xml as shown below:
+
+----
+<build>
+...
+    <plugins>
+    ...
+        <plugin>
+            <groupId>org.jbake</groupId>
+            <artifactId>jbake-maven-plugin</artifactId>
+            <version>0.3.2</version>
+            <configuration>
+                <!--
+                <inputDirectory>${project.basedir}/src/main/resources</inputDirectory>
+                <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                -->
+            </configuration>
+            <executions>
+                <execution>
+                    <id>default-generate</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <dependencies>
+                <!-- include required dependencies here, see below -->
+            </dependencies>
+        </plugin>
+       ...
+    </plugins>
+...
+</build>
+----
+
+=== Dependencies
+
+The plugin itself includes all required dependencies such as jbake-core, however you will need to explicitly declare dependencies for
+the content formats and template engines used in your project. As these dependencies are marked as optional to reduce bloat.
+
+If you have AsciiDoc content you'll need this dependency:
+
+----
+<dependency>
+    <groupId>org.asciidoctor</groupId>
+    <artifactId>asciidoctorj</artifactId>
+    <version>2.2.0</version>
+</dependency>
+----
+
+If you have Markdown content you'll need these dependencies:
+
+----
+<dependency>
+    <groupId>com.vladsch.flexmark</groupId>
+    <artifactId>flexmark</artifactId>
+    <version>0.61.0</version>
+</dependency>
+<dependency>
+    <groupId>com.vladsch.flexmark</groupId>
+    <artifactId>flexmark-profile-pegdown</artifactId>
+    <version>0.61.0</version>
+</dependency>
+----
+
+If you have Freemarker templates then you'll need this dependency:
+
+----
+<dependency>
+    <groupId>org.freemarker</groupId>
+    <artifactId>freemarker</artifactId>
+    <version>2.3.30</version>
+</dependency>
+----
+
+If you have Groovy templates then you'll need these dependencies:
+
+----
+<dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy</artifactId>
+    <version>3.0.2</version>
+</dependency>
+<dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-templates</artifactId>
+    <version>3.0.2</version>
+</dependency>
+<dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-dateutil</artifactId>
+    <version>3.0.2</version>
+</dependency>
+----
+
+If you have Thymeleaf templates then you'll need this dependency:
+
+----
+<dependency>
+    <groupId>org.thymeleaf</groupId>
+    <artifactId>thymeleaf</artifactId>
+    <version>3.0.11.RELEASE</version>
+</dependency>
+----
+
+If you have Jade4J templates then you'll need this dependency:
+
+----
+<dependency>
+    <groupId>de.neuland-bfi</groupId>
+    <artifactId>jade4j</artifactId>
+    <version>1.3.2</version>
+</dependency>
+----
+
+An example of the plugin being used can be found in this project: https://github.com/jonbullock/maven-jbake-site[https://github.com/jonbullock/maven-jbake-site]
 
 == Goals
 
