@@ -3,9 +3,9 @@ plugins {
     id "idea"
     id "io.sdkman.vendors"              version "2.0.0"     apply false
     id "com.jfrog.bintray"              version "1.8.5"     apply false
-    id "com.github.kt3k.coveralls"      version "2.10.2"     apply false
-    id "org.sonarqube"                  version "3.1.1"       apply false
-    id 'com.github.ben-manes.versions'  version '0.36.0'
+    id "com.github.kt3k.coveralls"      version "2.10.2"    apply false
+    id "org.sonarqube"                  version "3.1.1"     apply false
+    id 'com.github.ben-manes.versions'  version '0.38.0'
     id "nebula.optional-base"           version "5.0.3"     apply false
 }
 
