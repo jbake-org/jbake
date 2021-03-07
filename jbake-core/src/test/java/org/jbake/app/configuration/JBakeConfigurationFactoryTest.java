@@ -80,7 +80,7 @@ public class JBakeConfigurationFactoryTest {
     public void shouldReturnAJettyConfiguration() throws Exception {
         File sourceFolder = root;
         File destinationFolder = TestUtils.newFolder(root,"output");
-        String siteHost = "http://localhost:8820";
+        String siteHost = "http://localhost:8820/";
 
         JBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true);
 

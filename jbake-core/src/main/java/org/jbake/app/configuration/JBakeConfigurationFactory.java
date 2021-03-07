@@ -94,7 +94,7 @@ public class JBakeConfigurationFactory {
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(destinationFolder);
         configuration.setClearCache(isClearCache);
-        configuration.setSiteHost("http://localhost:"+configuration.getServerPort());
+        configuration.setSiteHost("http://" + configuration.getServerHostname() + ":" +configuration.getServerPort() + configuration.getServerContextPath());
         return configuration;
     }
 

@@ -31,7 +31,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     private static final String DOCTYPE_FILE_POSTFIX = ".file";
     private static final String DOCTYPE_EXTENSION_POSTFIX = ".extension";
     private static final String DOCTYPE_TEMPLATE_PREFIX = "template.";
-    private Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultJBakeConfiguration.class);
     private CompositeConfiguration compositeConfiguration;
 
     /**
@@ -478,6 +478,16 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public void setProperty(String key, Object value) {
         compositeConfiguration.setProperty(key, value);
+    }
+
+    @Override
+    public String getServerContextPath() {
+        return getAsString(JBakeProperty.SERVER_CONTEXT_PATH);
+    }
+
+    @Override
+    public String getServerHostname() {
+        return getAsString(JBakeProperty.SERVER_HOSTNAME);
     }
 
     public void setTemplateExtensionForDocType(String docType, String extension) {
