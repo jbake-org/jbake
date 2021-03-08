@@ -1,7 +1,8 @@
 package org.jbake.app.configuration;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
+
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 
 import java.io.File;
 
@@ -94,7 +95,7 @@ public class JBakeConfigurationFactory {
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(destinationFolder);
         configuration.setClearCache(isClearCache);
-        configuration.setSiteHost("http://localhost:"+configuration.getServerPort());
+        configuration.setSiteHost("http://" + configuration.getServerHostname() + ":" +configuration.getServerPort() + configuration.getServerContextPath());
         return configuration;
     }
 
@@ -104,5 +105,10 @@ public class JBakeConfigurationFactory {
 
     public void setConfigUtil(ConfigUtil configUtil) {
         this.configUtil = configUtil;
+    }
+
+    public JBakeConfigurationFactory setEncoding(String charset) {
+        this.configUtil.setEncoding(charset);
+        return this;
     }
 }

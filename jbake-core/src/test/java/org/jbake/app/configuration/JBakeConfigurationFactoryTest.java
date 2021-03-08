@@ -8,11 +8,14 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.FileWriter;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class JBakeConfigurationFactoryTest {
 
-    @TempDir File root;
+    @TempDir
+    File root;
 
     @Test
     public void shouldReturnDefaultConfigurationWithDefaultFolders() throws Exception {
@@ -33,7 +36,7 @@ public class JBakeConfigurationFactoryTest {
     @Test
     public void shouldReturnDefaultConfigurationWithCustomFolders() throws Exception {
         File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root,"output/custom");
+        File destinationFolder = TestUtils.newFolder(root, "output/custom");
         File templateFolder = TestUtils.newFolder(root, "templates/custom");
         File assetFolder = TestUtils.newFolder(root, "assets/custom");
         File contentFolder = TestUtils.newFolder(root, "content/custom");
@@ -63,12 +66,10 @@ public class JBakeConfigurationFactoryTest {
     }
 
 
-
-
     @Test
     public void shouldReturnADefaultConfigurationWithSitehost() throws Exception {
         File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root,"output");
+        File destinationFolder = TestUtils.newFolder(root, "output");
         String siteHost = "http://www.jbake.org";
 
         JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
@@ -79,12 +80,35 @@ public class JBakeConfigurationFactoryTest {
     @Test
     public void shouldReturnAJettyConfiguration() throws Exception {
         File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root,"output");
-        String siteHost = "http://localhost:8820";
+        File destinationFolder = TestUtils.newFolder(root, "output");
+        String siteHost = "http://localhost:8820/";
 
         JBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true);
 
         assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
     }
 
+    @Test
+    public void shouldUseDefaultEncodingUTF8() throws Exception {
+        File sourceFolder = root;
+        File destinationFolder = TestUtils.newFolder(root, "output");
+        JBakeConfigurationFactory factory = new JBakeConfigurationFactory();
+        JBakeConfiguration configuration = factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+
+        assertThat(factory.getConfigUtil().getEncoding()).isEqualTo("UTF-8");
+    }
+
+    @Test
+    public void shouldUseCustomEncoding() throws Exception {
+
+        ConfigUtil util = spy(ConfigUtil.class);
+        File sourceFolder = root;
+        File destinationFolder = TestUtils.newFolder(root, "output");
+        JBakeConfigurationFactory factory = new JBakeConfigurationFactory();
+        factory.setConfigUtil(util);
+        JBakeConfiguration configuration = factory.setEncoding("latin1").createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+
+        assertThat(factory.getConfigUtil().getEncoding()).isEqualTo("latin1");
+        verify(util).loadConfig(sourceFolder);
+    }
 }

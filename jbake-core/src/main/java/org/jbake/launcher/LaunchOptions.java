@@ -30,6 +30,9 @@ public class LaunchOptions {
     @Option(name = "--reset", usage = "clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
 
+    @Option(name = "--prop-encoding", usage = "use given encoding to load properties file. default: utf-8")
+    private String propertiesEncoding = "utf-8";
+
     public String getTemplate() {
         if (template != null) {
             return template;
@@ -80,5 +83,9 @@ public class LaunchOptions {
 
     public boolean isBake() {
         return bake || (source != null && destination != null);
+    }
+
+    public String getPropertiesEncoding() {
+        return propertiesEncoding;
     }
 }
