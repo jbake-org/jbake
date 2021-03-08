@@ -15,9 +15,11 @@ environment:
 install:
   - SET PATH=%JAVA_HOME%\bin;%PATH%
   - echo %PATH%
+  - systeminfo
   - java -version
   - gradlew.bat --version
+  - file C:\projects\jbake\jbake-core\src\test\resources\fixture\jbake.properties
 build_script:
-  - gradlew.bat -i assemble
+  - gradlew.bat -Dfile.encoding=UTF-8 -i assemble
 test_script:
-  - gradlew.bat -i -S check
+  - gradlew.bat -Dfile.encoding=UTF-8 -i -S check

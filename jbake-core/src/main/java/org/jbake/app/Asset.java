@@ -1,6 +1,6 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -24,7 +24,7 @@ public class Asset {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
     private final List<Throwable> errors = new LinkedList<>();
-    private JBakeConfiguration config;
+    private final JBakeConfiguration config;
 
     /**
      * @param source      Source file for the asset

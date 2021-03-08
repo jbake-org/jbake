@@ -1,6 +1,7 @@
 package org.jbake.render.support;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+
+import org.apache.commons.configuration2.CompositeConfiguration;
 
 public class MockCompositeConfiguration extends CompositeConfiguration {
 

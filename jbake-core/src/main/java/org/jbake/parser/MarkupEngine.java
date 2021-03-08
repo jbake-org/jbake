@@ -1,7 +1,7 @@
 package org.jbake.parser;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.jbake.app.Crawler;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
