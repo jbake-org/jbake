@@ -1,8 +1,7 @@
 package org.jbake.app.configuration;
 
-
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 
 import java.io.File;
 
@@ -105,10 +104,5 @@ public class JBakeConfigurationFactory {
 
     public void setConfigUtil(ConfigUtil configUtil) {
         this.configUtil = configUtil;
-    }
-
-    public JBakeConfigurationFactory setEncoding(String charset) {
-        this.configUtil.setEncoding(charset);
-        return this;
     }
 }

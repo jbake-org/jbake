@@ -1,6 +1,6 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler.Attributes;
@@ -37,7 +37,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private static final String DEFAULT_TEMPLATE_MODE = "HTML";
     private final ReentrantLock lock = new ReentrantLock();
     private TemplateEngine templateEngine;
-    private final Context context;
+    private Context context;
     private FileTemplateResolver templateResolver;
 
     /**
@@ -122,9 +122,9 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
      */
     private class ContextVariable extends LazyContextVariable {
 
-        private final ContentStore db;
-        private final String key;
-        private final Map<String,Object> model;
+        private ContentStore db;
+        private String key;
+        private Map<String,Object> model;
 
         public ContextVariable(ContentStore db, String key, Map<String, Object> model) {
             this.db = db;

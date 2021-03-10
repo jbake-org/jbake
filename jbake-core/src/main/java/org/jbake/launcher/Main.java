@@ -1,6 +1,6 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationException;
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -77,9 +77,9 @@ public class Main {
         try {
             LaunchOptions res = parseArguments(args);
             if (res.isRunServer()) {
-                config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+                config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
             } else {
-                config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+                config = getJBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
             }
             run(res, config);
         } catch (final ConfigurationException e) {

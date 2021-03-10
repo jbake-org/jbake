@@ -14,9 +14,6 @@
     <logger name="org.eclipse" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
     <logger name="org.jbake" level="INFO"/>
-    <!-- remove confusing log messages from apache configurations/beanutils -->
-    <logger name="org.apache.commons.beanutils.FluentPropertyBeanIntrospector" level="ERROR"/>
-
 
     <!-- Strictly speaking, the level attribute is not necessary since -->
     <!-- the level of the root logger is set to DEBUG by default.       -->
