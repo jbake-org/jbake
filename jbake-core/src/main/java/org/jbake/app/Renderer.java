@@ -1,6 +1,6 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;

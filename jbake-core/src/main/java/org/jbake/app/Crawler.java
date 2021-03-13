@@ -1,7 +1,7 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -30,8 +30,8 @@ public class Crawler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
     private final ContentStore db;
-    private final JBakeConfiguration config;
-    private final Parser parser;
+    private JBakeConfiguration config;
+    private Parser parser;
 
     /**
      * @param db     Database instance for content
@@ -142,7 +142,7 @@ public class Crawler {
 
         // strip off leading / to enable generating non-root based sites
         if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1);
+            uri = uri.substring(1, uri.length());
         }
 
         return uri;

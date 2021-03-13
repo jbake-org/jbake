@@ -1,6 +1,6 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BakeWatcher {
 
-    private final Logger logger = LoggerFactory.getLogger(BakeWatcher.class);
+    private Logger logger = LoggerFactory.getLogger(BakeWatcher.class);
 
     /**
      * Starts watching the file system for changes to trigger a bake.

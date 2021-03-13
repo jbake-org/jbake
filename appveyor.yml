@@ -20,6 +20,6 @@ install:
   - gradlew.bat --version
   - file C:\projects\jbake\jbake-core\src\test\resources\fixture\jbake.properties
 build_script:
-  - gradlew.bat -Dfile.encoding=UTF-8 -i assemble
+  - gradlew.bat -i assemble
 test_script:
-  - gradlew.bat -Dfile.encoding=UTF-8 -i -S check
+  - gradlew.bat -i -S check

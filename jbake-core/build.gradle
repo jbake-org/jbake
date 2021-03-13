@@ -8,8 +8,7 @@ description = "The core library of JBake"
 
 dependencies {
     implementation "commons-io:commons-io:$commonsIoVersion"
-    implementation "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
-    implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
+    implementation "commons-configuration:commons-configuration:$commonsConfigurationVersion"
     implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {

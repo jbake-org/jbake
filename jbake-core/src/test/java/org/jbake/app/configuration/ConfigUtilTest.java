@@ -14,11 +14,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import static ch.qos.logback.classic.Level.WARN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -208,9 +211,9 @@ public class ConfigUtilTest extends LoggingTest {
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
 
-        List<String> option = config.getAsciidoctorOption("requires");
+        Object option = config.getAsciidoctorOption("requires");
 
-        assertThat(option).contains("asciidoctor-diagram");
+        assertThat(String.valueOf(option)).contains("asciidoctor-diagram");
     }
 
     @Test
@@ -220,19 +223,20 @@ public class ConfigUtilTest extends LoggingTest {
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
 
-        List<String> option = config.getAsciidoctorOption("template_dirs");
+        Object option = config.getAsciidoctorOption("template_dirs");
 
-        assertThat(option).contains("src/template1", "src/template2");
+        assertTrue(option instanceof List);
+        assertThat((List<String>) option).contains("src/template1", "src/template2");
     }
 
     @Test
-    public void shouldReturnEmptyListIfOptionNotAvailable() throws Exception {
+    public void shouldReturnEmptyStringIfOptionNotAvailable() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
-        List<String> options = config.getAsciidoctorOption("template_dirs");
+        Object option = config.getAsciidoctorOption("template_dirs");
 
-        assertThat(options).isEmpty();
+        assertThat(String.valueOf(option)).isEmpty();
     }
 
     @Test
@@ -321,37 +325,6 @@ public class ConfigUtilTest extends LoggingTest {
         assertThat(destinationFolder).isEqualTo(expectedDestination.toFile());
         assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile());
     }
-
-    @Test
-    public void shouldUseUtf8EncodingAsDefault() throws Exception{
-        String unicodeString = "中文属性使用默认Properties编码";
-        JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
-
-        String siteAbout = (String) config.get("site.about");
-        assertThat(util.getEncoding()).isEqualTo("UTF-8");
-        assertThat(siteAbout).inUnicode().startsWith(unicodeString);
-    }
-
-    @Test
-    public void shouldBePossibleToSetCustomEncoding() throws Exception {
-        String expected = "Latin1 encoded file äöü";
-        JBakeConfiguration config = util.setEncoding("ISO8859_1").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"));
-
-        String siteAbout = (String) config.get("site.about");
-        assertThat(siteAbout).contains(expected);
-    }
-
-    @Test
-    public void shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() throws Exception {
-        JBakeConfiguration config = util.setEncoding("UNSUPPORTED_ENCODING").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"));
-        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
-
-        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-
-        assertThat(loggingEvent.getLevel()).isEqualTo(WARN);
-        assertThat(loggingEvent.getFormattedMessage()).isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'");
-    }
-
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
         for (Field field : JBakeConfiguration.class.getFields()) {
