@@ -161,36 +161,28 @@ plugin:: https://docs.gradle.org/current/userguide/application_plugin.html
 
 WARNING: Never add credentials to the repository
 
-=== publish to bintray
+=== publish to nexus sonatype
 
-You can publish to bintray with
-
-----
-./gradlew bintrayUpload
-----
-
-If you want to see what's going on without publishing
+You can publish to nexus with
 
 ----
-./gradlew -PbintrayDryRun=true bU --info
+./gradlew publishToSonatype
 ----
+
+The task will create a staging repository. You need to close and publish it manually.
+You can automate this process with the other tasks like `closeSonatypeStagingRepository` and `closeAndReleaseSonatypeStagingRepository`.
+
+For more information see:
+
+* https://github.com/gradle-nexus/publish-plugin
+* https://central.sonatype.org/pages/ossrh-guide.html
 
 You need to add two properties to your local gradle.properties file (_~/.gradle/gradle.properties_).
 
-    bintrayUsername=username
-    bintrayKey=secret
+    sonatypeUsername=username
+    sonatypePassword=secret
 
-It's possible to change the organization and repository too.
-The properties are called _bintrayOrg_ and _bintrayRepo_.
-To publish to your private repository in an example repository run
-
-----
-gradle -PbintrayOrg='' -PbintrayRepo=example bU
-----
-
-The default values can be found in the _gradle.properties_ file at the root of this repository.
-
-plugin:: https://plugins.gradle.org/plugin/com.jfrog.bintray
+plugin:: https://plugins.gradle.org/plugin/io.github.gradle-nexus.publish-plugin
 
 === publish to sdkman
 
