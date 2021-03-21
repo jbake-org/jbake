@@ -161,6 +161,40 @@ plugin:: https://docs.gradle.org/current/userguide/application_plugin.html
 
 WARNING: Never add credentials to the repository
 
+=== github release
+
+Bump desired project version in the projects `gradle.properties` file.
+
+Like
+
+----
+version = 2.7.0
+----
+
+Commit and push to origin at github.
+
+----
+./gradlew signArchives
+./gradlew githubRelease
+----
+
+The task will create a tag for you and create a release. Additionaly it uploads the binary distribution and the corresponding signature to the release.
+
+[NOTE]
+====
+You need to add some properties to your local gradle.properties file (_~/.gradle/gradle.properties_)
+
+----
+github.token=<access token>
+github.release.owner=jbake-org
+github.release.repo=jbake
+----
+
+It's also possible to dry-run this task. Execute `export GITHUB_RELEASE_DRY_RUN=true` in your terminal.
+====
+
+plugin:: https://github.com/BreadMoirai/github-release-gradle-plugin
+
 === publish to nexus sonatype
 
 You can publish to nexus with

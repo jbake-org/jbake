@@ -13,15 +13,7 @@ if ( !project.hasProperty('skipSigning') ) {
         }
         else {
             signing {
-                setRequired {
-                    gradle.taskGraph.allTasks.any {
-                        it.name.startsWith("publish")
-                    }
-                }
-                publishing.publications.configureEach {
-                    sign configurations.archives
-                }
-                useGpgCmd()
+                sign configurations.archives
             }
         }
     }
