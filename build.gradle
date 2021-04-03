@@ -7,6 +7,7 @@ plugins {
     id "org.sonarqube"                  version "3.1.1"     apply false
     id 'com.github.ben-manes.versions'  version '0.38.0'
     id "nebula.optional-base"           version "5.0.3"     apply false
+    id 'org.ajoberstar.grgit' version "$grgitVersion"
 }
 
 // common variables
@@ -56,6 +57,10 @@ allprojects {
         toolVersion = jacocoVersion
     }
 
+    tasks.withType(AbstractArchiveTask) {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
 }
 
 /**
