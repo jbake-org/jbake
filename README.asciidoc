@@ -30,7 +30,7 @@ To use JBake Maven Plugin in your build add the plugin into your pom.xml as show
         <plugin>
             <groupId>org.jbake</groupId>
             <artifactId>jbake-maven-plugin</artifactId>
-            <version>0.3.2</version>
+            <version>0.3.3</version>
             <configuration>
                 <!--
                 <inputDirectory>${project.basedir}/src/main/resources</inputDirectory>
