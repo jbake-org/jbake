@@ -1,7 +1,5 @@
 apply from: "$rootDir/gradle/application.gradle"
 apply from: "$rootDir/gradle/sdkman.gradle"
-apply from: "$rootDir/gradle/signing.gradle"
-apply from: "$rootDir/gradle/publishing.gradle"
 
 description = "The binary distribution package that bundles JBake cli"
 
