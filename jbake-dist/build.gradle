@@ -50,3 +50,5 @@ smokeTest {
 }
 
 check.dependsOn smokeTest
+
+jar.enabled=false

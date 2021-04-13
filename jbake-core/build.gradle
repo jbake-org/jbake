@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 apply from: "$rootDir/gradle/sonarqube.gradle"
 apply plugin: 'java-library'
@@ -36,7 +37,6 @@ processResources {
     from("src/main/resources") {
         include 'default.properties'
         expand jbakeVersion: project.version,
-                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format(new Date())
+               timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'"))
     }
 }
-
