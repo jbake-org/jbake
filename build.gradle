@@ -96,6 +96,10 @@ subprojects {
             events "passed", "skipped", "failed"
             exceptionFormat "full"
         }
+
+        jacoco {
+            excludes = ["**/*OrientSqlTokenManager*"]
+        }
     }
 
     dependencies {
