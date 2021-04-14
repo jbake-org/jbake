@@ -88,7 +88,7 @@ public class Main {
     }
 
     protected void run(LaunchOptions res, JBakeConfiguration config) {
-        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]");
+        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + " " + config.getAbbreviatedGitHash()  + "#) [http://jbake.org]");
         System.out.println();
 
         if (res.isHelpNeeded()) {

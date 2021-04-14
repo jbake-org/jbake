@@ -310,5 +310,10 @@ public interface JBakeConfiguration {
     String getServerContextPath();
 
     String getServerHostname();
+
+    /**
+     * @return Abbreviated hash of latest git commit
+     */
+    String getAbbreviatedGitHash();
 }
 
