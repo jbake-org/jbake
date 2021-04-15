@@ -82,7 +82,7 @@ class JBakePlugin implements Plugin<Project> {
         project.afterEvaluate {
             JBakeExtension jbakeExtension = project.extensions.findByType(JBakeExtension)
             if (jbakeExtension.includeDefaultRepositories) {
-                project.repositories.jcenter()
+                project.repositories.mavenCentral()
             }
 
             addDependencies()
@@ -98,6 +98,7 @@ class JBakePlugin implements Plugin<Project> {
             Version currentVersion = Version.valueOf(jbakeExtension.version)
             Version jbake2_3_0 = Version.valueOf('2.3.0')
             Version jbake2_6_0 = Version.valueOf('2.6.0')
+            Version jbake2_6_5 = Version.valueOf('2.6.5')
 
             if (currentVersion.greaterThan(jbake2_3_0)) {
                 jbake("org.asciidoctor:asciidoctorj:${jbakeExtension.asciidoctorjVersion}")
@@ -110,6 +111,10 @@ class JBakePlugin implements Plugin<Project> {
                 jbake("com.vladsch.flexmark:flexmark-profile-pegdown:${jbakeExtension.flexmarkVersion}")
             } else {
                 jbake("org.pegdown:pegdown:${jbakeExtension.pegdownVersion}")
+            }
+            
+            if (currentVersion.greaterThanOrEqualTo(jbake2_6_5)) {
+                jbake("io.pebbletemplates:pebble:${jbakeExtension.pebbleVersion}")
             }
 
             jbake("org.freemarker:freemarker:${jbakeExtension.freemarkerVersion}")

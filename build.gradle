@@ -79,12 +79,20 @@ config {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compileOnly gradleApi()
     api "com.github.zafarkhaja:java-semver:$semverVersion"
     compileOnly "org.eclipse.jetty:jetty-server:$jettyVersion"
     compileOnly("org.jbake:jbake-core:$jbakeVersion") {
         exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'commons-io', module: 'commons-io'
+        exclude group: 'org.apache.commons', module: 'commons-lang3'
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'com.vladsch.flexmark', module: 'flexmark'
     }
     compileOnly 'commons-configuration:commons-configuration:1.10'
     testImplementation("org.spockframework:spock-core:$spockVersion") {
