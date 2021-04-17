@@ -71,12 +71,6 @@ config {
             implementationClass = 'org.jbake.gradle.JBakePlugin'
         }
     }
-
-    bintray {
-        skipMavenSync = true
-        userOrg       = 'jbake'
-        repo          = 'maven'
-    }
 }
 
 repositories {
