@@ -1,13 +1,15 @@
 = JBake plugin for Gradle
 :linkattrs:
-:jbake-version: 2.6.6
-:plugin-version: 5.4.0
-:project-name: jbake-gradle-plugin
+:jbake-version:   2.6.6
+:plugin-version:  5.4.0
+:project-group:   org.jbake
+:plugin-id:       org.jbake.site
+:project-name:    jbake-gradle-plugin
 
 image:http://img.shields.io/travis/jbake-org/{project-name}/master.svg["Build Status", link="https://travis-ci.org/jbake-org/{project-name}"]
 image:http://img.shields.io/coveralls/jbake-org/{project-name}/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/{project-name}"]
 image:http://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="http://www.apache.org/licenses/LICENSE-2.0.txt"]
-image:https://api.bintray.com/packages/jbake/maven/{project-name}/images/download.svg[link="https://bintray.com/jbake/maven/{project-name}/_latestVersion"]
+image:https://img.shields.io/maven-metadata/v?label=Plugin%20Portal&metadataUrl=https://plugins.gradle.org/m2/org/jbake/site/{plugin-id}.gradle.plugin/maven-metadata.xml["Gradle Plugin Portal, link="https://plugins.gradle.org/plugin/{plugin-id}"]
 
 ---
 
