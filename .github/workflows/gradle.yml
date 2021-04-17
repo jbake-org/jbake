@@ -27,7 +27,6 @@ jobs:
     env:
       CI: true
     steps:
-    steps:
       - uses: actions/checkout@v2
 
       - name: Set up Java
