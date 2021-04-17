@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,14 +59,15 @@ class JBakePluginSpec extends Specification {
 
         where:
         group                   | name                          | version
-        'org.jbake'             | 'jbake-core'                  | '2.6.5'
-        'org.freemarker'        | 'freemarker'                  | '2.3.30'
-        'com.vladsch.flexmark'  | 'flexmark'                    | '0.61.0'
-        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | '0.61.0'
-        'org.asciidoctor'       | 'asciidoctorj'                | '2.2.0'
-        'org.codehaus.groovy'   | 'groovy-templates'            | '3.0.2'
-        'org.thymeleaf'         | 'thymeleaf'                   | '3.0.11.RELEASE'
-        'de.neuland-bfi'        | 'jade4j'                      | '1.2.7'
+        'org.jbake'             | 'jbake-core'                  | "${new JBakeExtension().version}"
+        'org.freemarker'        | 'freemarker'                  | "${new JBakeExtension().freemarkerVersion}"
+        'com.vladsch.flexmark'  | 'flexmark'                    | "${new JBakeExtension().flexmarkVersion}"
+        'com.vladsch.flexmark'  | 'flexmark-profile-pegdown'    | "${new JBakeExtension().flexmarkVersion}"
+        'org.asciidoctor'       | 'asciidoctorj'                | "${new JBakeExtension().asciidoctorjVersion}"
+        'org.codehaus.groovy'   | 'groovy-templates'            | "${new JBakeExtension().groovyTemplatesVersion}"
+        'org.thymeleaf'         | 'thymeleaf'                   | "${new JBakeExtension().thymeleafVersion}"
+        'de.neuland-bfi'        | 'jade4j'                      | "${new JBakeExtension().jade4jVersion}"
+        'io.pebbletemplates'    | 'pebble'                      | "${new JBakeExtension().pebbleVersion}"
     }
 
     def "set dependency version by extension"() {
