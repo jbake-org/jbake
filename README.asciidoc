@@ -1,6 +1,6 @@
 = JBake Maven Plugin
 Jonathan Bullock
-2021-03-03
+2021-04-20
 :idprefix:
 
 image:https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin"]
@@ -12,7 +12,7 @@ the following Maven coordinates:
 <dependency>
     <groupId>org.jbake</groupId>
     <artifactId>jbake-maven-plugin</artifactId>
-    <version>0.3.3</version>
+    <version>0.3.4</version>
 </dependency>
 ----
 
@@ -30,7 +30,7 @@ To use JBake Maven Plugin in your build add the plugin into your pom.xml as show
         <plugin>
             <groupId>org.jbake</groupId>
             <artifactId>jbake-maven-plugin</artifactId>
-            <version>0.3.3</version>
+            <version>0.3.4</version>
             <configuration>
                 <!--
                 <inputDirectory>${project.basedir}/src/main/resources</inputDirectory>
@@ -67,7 +67,7 @@ If you have AsciiDoc content you'll need this dependency:
 <dependency>
     <groupId>org.asciidoctor</groupId>
     <artifactId>asciidoctorj</artifactId>
-    <version>2.2.0</version>
+    <version>2.4.3</version>
 </dependency>
 ----
 
@@ -77,12 +77,12 @@ If you have Markdown content you'll need these dependencies:
 <dependency>
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>flexmark</artifactId>
-    <version>0.61.0</version>
+    <version>0.62.2</version>
 </dependency>
 <dependency>
     <groupId>com.vladsch.flexmark</groupId>
     <artifactId>flexmark-profile-pegdown</artifactId>
-    <version>0.61.0</version>
+    <version>0.62.2</version>
 </dependency>
 ----
 
@@ -92,7 +92,7 @@ If you have Freemarker templates then you'll need this dependency:
 <dependency>
     <groupId>org.freemarker</groupId>
     <artifactId>freemarker</artifactId>
-    <version>2.3.30</version>
+    <version>2.3.31</version>
 </dependency>
 ----
 
@@ -102,17 +102,17 @@ If you have Groovy templates then you'll need these dependencies:
 <dependency>
     <groupId>org.codehaus.groovy</groupId>
     <artifactId>groovy</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.7</version>
 </dependency>
 <dependency>
     <groupId>org.codehaus.groovy</groupId>
     <artifactId>groovy-templates</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.7</version>
 </dependency>
 <dependency>
     <groupId>org.codehaus.groovy</groupId>
     <artifactId>groovy-dateutil</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.7</version>
 </dependency>
 ----
 
@@ -122,7 +122,7 @@ If you have Thymeleaf templates then you'll need this dependency:
 <dependency>
     <groupId>org.thymeleaf</groupId>
     <artifactId>thymeleaf</artifactId>
-    <version>3.0.11.RELEASE</version>
+    <version>3.0.12.RELEASE</version>
 </dependency>
 ----
 
