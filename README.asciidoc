@@ -54,6 +54,30 @@ Talk to other users of JBake on the forum:
 
 * http://groups.google.com/group/jbake-user[Forum]
 
+== Docker Image
+
+The image uses the official openjdk:8-alpine image for building a distribution of JBake and openjdk:8-jre-alpine for runtime.
+
+=== Build
+
+To build the Docker image:
+
+----
+$ docker build -t jbake/jbake:latest .
+----
+
+=== Usage
+
+To execute JBake via Docker run this from project directory:
+
+----
+$ docker run --rm -u jbake -v "$PWD":/mnt/site -p 8820:8820 jbake/jbake:latest
+----
+
+This command will run using the jbake user to avoid running as root and will mount the current working directory as `/mnt/site`
+in the Docker container where JBake is expecting it to be. Port 8820 from the container will also be exposed as by default the
+Docker container will perform a bake and serve the content out.
+
 == Build System
 
 The project uses http://gradle.org[Gradle] 4.9+ as the build system.
