@@ -1,4 +1,4 @@
-FROM openjdk:8-alpine as builder
+FROM adoptopenjdk/openjdk11:alpine as builder
 
 LABEL maintainer="https://jbake.org/community/team.html"
 
@@ -14,7 +14,7 @@ RUN set -o errexit -o nounset \
     && cp -r jbake-dist/build/install/jbake/* $JBAKE_HOME \
     && rm -r ~/.gradle /usr/src/jbake
 
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 
 ENV JBAKE_USER=jbake
 ENV JBAKE_HOME=/opt/jbake
@@ -31,6 +31,6 @@ WORKDIR /mnt/site
 VOLUME ["/mnt/site"]
 
 ENTRYPOINT ["jbake"]
-CMD ["-b","-s"]
+CMD ["-b"]
 
 EXPOSE 8820
