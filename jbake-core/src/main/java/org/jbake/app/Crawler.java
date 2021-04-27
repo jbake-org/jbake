@@ -73,6 +73,12 @@ public class Crawler {
 
     }
 
+    public void crawlDataFiles() {
+        crawl(config.getDataFolder());
+
+
+    }
+
     /**
      * Crawl all files and folders looking for content.
      *

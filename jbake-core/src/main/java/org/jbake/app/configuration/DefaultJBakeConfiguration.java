@@ -27,6 +27,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     private static final String ASSET_FOLDER_KEY = "assetFolder";
     private static final String TEMPLATE_FOLDER_KEY = "templateFolder";
     private static final String CONTENT_FOLDER_KEY = "contentFolder";
+    private static final String DATA_FOLDER_KEY = "dataFolder";
     private static final Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
     private static final String DOCTYPE_FILE_POSTFIX = ".file";
     private static final String DOCTYPE_EXTENSION_POSTFIX = ".extension";
@@ -181,6 +182,22 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public String getContentFolderName() {
         return getAsString(JBakeProperty.CONTENT_FOLDER);
+    }
+
+    @Override
+    public File getDataFolder() {
+        return getAsFolder(DATA_FOLDER_KEY);
+    }
+
+    public void setDataFolder(File dataFolder) {
+        if (dataFolder != null) {
+            setProperty(DATA_FOLDER_KEY, dataFolder);
+        }
+    }
+
+    @Override
+    public String getDataFolderName() {
+        return getAsString(JBakeProperty.DATA_FOLDER);
     }
 
     @Override
