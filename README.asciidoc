@@ -56,7 +56,9 @@ Talk to other users of JBake on the forum:
 
 == Docker Image
 
-The image uses the official adoptopenjdk/openjdk11:alpine image for building a distribution of JBake and adoptopenjdk/openjdk11:alpine-jre for runtime.
+The image uses the official https://hub.docker.com/r/adoptopenjdk/openjdk11/[adoptopenjdk/openjdk11:alpine] image
+for building a distribution of JBake and
+https://hub.docker.com/r/adoptopenjdk/openjdk11/[adoptopenjdk/openjdk11:alpine-jre] for runtime.
 
 === Build
 
