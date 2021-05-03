@@ -18,6 +18,7 @@ import freemarker.template.TemplateModelException;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Crawler;
+import org.jbake.util.DataFileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
 
 import java.io.File;
@@ -61,7 +62,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateCfg.getTemplate(templateName);
-            template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db), writer);
+            template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db, config), writer);
         } catch (IOException e) {
             throw new RenderingException(e);
         } catch (TemplateException e) {
@@ -76,11 +77,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         private final ObjectWrapper wrapper;
         private final SimpleHash eagerModel;
         private final ContentStore db;
+        private final JBakeConfiguration config;
 
-        public LazyLoadingModel(ObjectWrapper wrapper, Map<String, Object> eagerModel, final ContentStore db) {
+        public LazyLoadingModel(ObjectWrapper wrapper, Map<String, Object> eagerModel, final ContentStore db, JBakeConfiguration config) {
             this.eagerModel = new SimpleHash(eagerModel, wrapper);
             this.db = db;
             this.wrapper = wrapper;
+            this.config = config;
         }
 
         @Override
@@ -95,7 +98,11 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                     BeansWrapper bw = bwb.build();
                     return bw.wrap(db);
                 }
-
+                if (key.equals(Crawler.Attributes.DATA)) {
+                    BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+                    BeansWrapper bw = bwb.build();
+                    return bw.wrap(new DataFileUtil(db, config.getDataFileDocType()));
+                }
 
                 return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
 

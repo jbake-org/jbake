@@ -201,6 +201,15 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getDataFileDocType() {
+        return getAsString(JBakeProperty.DATA_FILE_DOCTYPE);
+    }
+
+    public void setDataFileDocType(String dataFileDocType) {
+        setProperty(JBakeProperty.DATA_FILE_DOCTYPE, dataFileDocType);
+    }
+
+    @Override
     public String getDatabasePath() {
         return getAsString(JBakeProperty.DB_PATH);
     }
@@ -217,6 +226,8 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setDatabaseStore(String storeType) {
         setProperty(JBakeProperty.DB_STORE, storeType);
     }
+
+
 
     @Override
     public String getDateFormat() {
@@ -522,6 +533,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setupDefaultAssetFolder();
         setupDefaultTemplateFolder();
         setupDefaultContentFolder();
+        setupDefaultDataFolder();
     }
 
     private void setupDefaultDestination() {
@@ -555,6 +567,17 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
             setTemplateFolder(template);
         } else {
             setTemplateFolder(new File(getSourceFolder(), templateFolder));
+        }
+    }
+
+    private void setupDefaultDataFolder() {
+        String dataFolder = getAsString(JBakeProperty.DATA_FOLDER);
+
+        File data = new File(dataFolder);
+        if(data.isAbsolute()) {
+            setDataFolder(data);
+        } else {
+            setDataFolder(new File(getSourceFolder(), dataFolder));
         }
     }
 

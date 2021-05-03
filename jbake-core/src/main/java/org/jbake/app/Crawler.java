@@ -74,9 +74,14 @@ public class Crawler {
     }
 
     public void crawlDataFiles() {
-        crawl(config.getDataFolder());
+        crawlDataFiles(config.getDataFolder());
 
-
+        LOGGER.info("Data files detected:");
+        String docType = "data";
+        long count = db.getDocumentCount(docType);
+        if (count > 0) {
+            LOGGER.info("Parsed {} files", count);
+        }
     }
 
     /**
@@ -125,6 +130,50 @@ public class Crawler {
         }
     }
 
+    /**
+     * Crawl all files and folders looking for data files.
+     *
+     * @param path Folder to start from
+     */
+    private void crawlDataFiles(File path) {
+        File[] contents = path.listFiles(FileUtil.getDataFileFilter());
+        if (contents != null) {
+            Arrays.sort(contents);
+            for (File sourceFile : contents) {
+                if (sourceFile.isFile()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
+                    String sha1 = buildHash(sourceFile);
+                    String uri = buildDataFileURI(sourceFile);
+                    boolean process = true;
+                    DocumentStatus status = DocumentStatus.NEW;
+                    String docType = config.getDataFileDocType();
+                    status = findDocumentStatus(docType, uri, sha1);
+                    if (status == DocumentStatus.UPDATED) {
+                        sb.append(" : modified ");
+                        db.deleteContent(docType, uri);
+                    } else if (status == DocumentStatus.IDENTICAL) {
+                        sb.append(" : same ");
+                        process = false;
+                    }
+                    if (!process) {
+                        break;
+                    }
+                    if (DocumentStatus.NEW == status) {
+                        sb.append(" : new ");
+                    }
+                    if (process) { // new or updated
+                        crawlDataFile(sourceFile, sha1, uri, docType);
+                    }
+                    LOGGER.info("{}", sb);
+                }
+                if (sourceFile.isDirectory()) {
+                    crawlDataFiles(sourceFile);
+                }
+            }
+        }
+    }
+
     private String buildHash(final File sourceFile) {
         String sha1;
         try {
@@ -151,6 +200,15 @@ public class Crawler {
             uri = uri.substring(1, uri.length());
         }
 
+        return uri;
+    }
+
+    private String buildDataFileURI(final File sourceFile) {
+        String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getDataFolder()), "");
+        // strip off leading /
+        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
+            uri = uri.substring(1, uri.length());
+        }
         return uri;
     }
 
@@ -188,6 +246,28 @@ public class Crawler {
             && (noExtensionUriPrefix != null)
             && (noExtensionUriPrefix.length() > 0)
             && uri.startsWith(noExtensionUriPrefix);
+    }
+
+    private void crawlDataFile(final File sourceFile, final String sha1, final String uri, final String documentType) {
+        try {
+            Map<String, Object> fileContents = parser.processFile(sourceFile);
+            if (fileContents != null) {
+                fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
+                fileContents.put(String.valueOf(DocumentAttributes.RENDERED), true);
+                fileContents.put(Attributes.FILE, sourceFile.getPath());
+                fileContents.put(String.valueOf(DocumentAttributes.SOURCE_URI), uri);
+
+                ODocument doc = new ODocument(documentType);
+                doc.fromMap(fileContents);
+                boolean cached = fileContents.get(String.valueOf(DocumentAttributes.CACHED)) != null ? Boolean.valueOf((String) fileContents.get(String.valueOf(DocumentAttributes.CACHED))) : true;
+                doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
+                doc.save();
+            } else {
+                LOGGER.warn("{} couldn't be parsed so it has been ignored!", sourceFile);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
+        }
     }
 
     private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
@@ -273,6 +353,7 @@ public class Crawler {
         public static final String PUBLISHED_DATE = "published_date";
         public static final String BODY = "body";
         public static final String DB = "db";
+        public static final String DATA = "data";
 
         private Attributes() {
         }

@@ -45,13 +45,15 @@ public class BakeWatcher {
             FileObject listenPath = fsMan.resolveFile(config.getContentFolder().toURI());
             FileObject templateListenPath = fsMan.resolveFile(config.getTemplateFolder().toURI());
             FileObject assetPath = fsMan.resolveFile(config.getAssetFolder().toURI());
+            FileObject dataPath = fsMan.resolveFile(config.getDataFolder().toURI());
 
-            logger.info("Watching for (content, template, asset) changes in [{}]", config.getSourceFolder().getPath());
+            logger.info("Watching for (content, data, template, asset) changes in [{}]", config.getSourceFolder().getPath());
             DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(config));
             monitor.setRecursive(true);
             monitor.addFile(listenPath);
             monitor.addFile(templateListenPath);
             monitor.addFile(assetPath);
+            monitor.addFile(dataPath);
             monitor.start();
         } catch (FileSystemException e) {
             logger.error("Problems watching filesystem changes", e);
