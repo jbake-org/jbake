@@ -96,6 +96,26 @@ public class LaunchOptionsTest {
     }
 
     @Test
+    public void listConfig() throws Exception {
+        String[] args = {"-ls"};
+        LaunchOptions res = new LaunchOptions();
+        CmdLineParser parser = new CmdLineParser(res);
+        parser.parseArgument(args);
+
+        assertThat(res.isListConfig()).isTrue();
+    }
+
+    @Test
+    public void listConfigLongOption() throws Exception {
+        String[] args = {"--list-settings"};
+        LaunchOptions res = new LaunchOptions();
+        CmdLineParser parser = new CmdLineParser(res);
+        parser.parseArgument(args);
+
+        assertThat(res.isListConfig()).isTrue();
+    }
+
+    @Test
     public void bakeNoArgs() throws Exception {
         String[] args = {};
         LaunchOptions res = new LaunchOptions();

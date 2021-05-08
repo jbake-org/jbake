@@ -22,8 +22,8 @@ import java.io.StringWriter;
  */
 public class Main {
 
-    private final String USAGE_PREFIX = "Usage: jbake";
-    private final String ALT_USAGE_PREFIX = "   or  jbake";
+    private static final String USAGE_PREFIX = "Usage: jbake";
+    private static final String ALT_USAGE_PREFIX = "   or  jbake";
     private final Baker baker;
     private final JettyServer jettyServer;
     private final BakeWatcher watcher;
@@ -155,7 +155,7 @@ public class Main {
         sw.append(ALT_USAGE_PREFIX + " <source> <destination>\n");
         sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
         sw.append("Options:");
-        System.out.println(sw.toString());
+        System.out.println(sw);
         parser.getProperties().withUsageWidth(100);
         parser.printUsage(System.out);
     }

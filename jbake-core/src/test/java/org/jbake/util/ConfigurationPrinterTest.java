@@ -1,21 +1,19 @@
 package org.jbake.util;
 
-import org.hamcrest.CoreMatchers;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class ConfigurationPrinterTest {
+class ConfigurationPrinterTest {
 
     @Test
-    public void shouldPrintHeader() throws Exception {
-
+    void shouldPrintHeader() throws Exception {
         JBakeConfiguration configuration = new JBakeConfigurationFactory().getConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(data);
@@ -23,15 +21,15 @@ public class ConfigurationPrinterTest {
 
         printer.print();
 
-        assertThat(data.toString(), CoreMatchers.containsString("DEFAULT - Settings"));
-        assertThat(data.toString(), CoreMatchers.containsString("CUSTOM - Settings"));
-        assertThat(data.toString(), CoreMatchers.containsString("Key"));
-        assertThat(data.toString(), CoreMatchers.containsString("Value"));
+        assertThat(data.toString()).contains("DEFAULT - Settings");
+        assertThat(data.toString()).contains("CUSTOM - Settings");
+        assertThat(data.toString()).contains("Key");
+        assertThat(data.toString()).contains("Value");
     }
 
 
     @Test
-    public void shouldPrintKeyAndValue() throws Exception {
+    void shouldPrintKeyAndValue() throws Exception {
         JBakeConfiguration configuration = new JBakeConfigurationFactory().getConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(data);
@@ -39,7 +37,7 @@ public class ConfigurationPrinterTest {
 
         printer.print();
 
-        assertThat(data.toString(), CoreMatchers.containsString("site.host"));
-        assertThat(data.toString(), CoreMatchers.containsString("http://www.jbake.org"));
+        assertThat(data.toString()).contains("site.host");
+        assertThat(data.toString()).contains("http://www.jbake.org");
     }
 }
