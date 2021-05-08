@@ -21,8 +21,8 @@ import java.io.File;
  */
 public class Main {
 
-    private final String USAGE_PREFIX = "Usage: jbake";
-    private final String ALT_USAGE_PREFIX = "   or  jbake";
+    private static final String USAGE_PREFIX = "Usage: jbake";
+    private static final String ALT_USAGE_PREFIX = "   or  jbake";
     private final Baker baker;
     private final JettyServer jettyServer;
     private final BakeWatcher watcher;

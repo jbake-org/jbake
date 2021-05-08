@@ -2,7 +2,7 @@ package org.jbake.app.configuration;
 
 import java.util.Objects;
 
-public class Property implements Comparable {
+public class Property implements Comparable<Property> {
 
     private final String key;
     private final String description;
@@ -55,8 +55,7 @@ public class Property implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        Property other = (Property) o;
+    public int compareTo(Property other) {
         int result = this.getGroup().compareTo(other.getGroup());
 
         if (result == 0) {
@@ -68,7 +67,6 @@ public class Property implements Comparable {
     public enum Group {
         DEFAULT, CUSTOM
     }
-
 
 
 }

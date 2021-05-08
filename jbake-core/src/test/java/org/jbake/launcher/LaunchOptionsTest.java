@@ -90,6 +90,22 @@ public class LaunchOptionsTest {
     }
 
     @Test
+    public void listConfig() throws Exception {
+        String[] args = {"-ls"};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.isListConfig()).isTrue();
+    }
+
+    @Test
+    public void listConfigLongOption() throws Exception {
+        String[] args = {"--list-settings"};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.isListConfig()).isTrue();
+    }
+
+    @Test
     public void bakeNoArgs() {
         String[] args = {};
         LaunchOptions res = parseArgs(args);
