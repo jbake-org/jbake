@@ -49,7 +49,7 @@ public class JettyServer implements Closeable {
 
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(true);
-        resource_handler.setWelcomeFiles(new String[]{"index"});
+        resource_handler.setWelcomeFiles(new String[]{"index", "index.html"});
         resource_handler.setResourceBase(resourceBase);
 
         ContextHandler contextHandler = new ContextHandler();
