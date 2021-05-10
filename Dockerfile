@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine as builder
+FROM gradle:6.8-jdk11 as builder
 
 LABEL maintainer="https://jbake.org/community/team.html"
 
@@ -10,7 +10,7 @@ COPY . /usr/src/jbake
 RUN set -o errexit -o nounset \
     && echo "Building JBake" \
     && cd /usr/src/jbake \
-    && ./gradlew installDist \
+    && gradle --no-daemon installDist \
     && cp -r jbake-dist/build/install/jbake/* $JBAKE_HOME \
     && rm -r ~/.gradle /usr/src/jbake
 
