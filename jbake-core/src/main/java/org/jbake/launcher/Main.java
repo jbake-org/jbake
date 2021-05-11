@@ -5,14 +5,12 @@ import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import picocli.CommandLine;
 
 import java.io.File;
-import java.io.StringWriter;
 
 /**
  * Launcher for JBake.
@@ -128,29 +126,11 @@ public class Main {
     }
 
     private LaunchOptions parseArguments(String[] args) {
-        LaunchOptions res = new LaunchOptions();
-        CmdLineParser parser = new CmdLineParser(res);
-
-        try {
-            parser.parseArgument(args);
-        } catch (final CmdLineException e) {
-            printUsage(res);
-            throw new JBakeException("Invalid commandline arguments: " + e.getMessage(), e);
-        }
-
-        return res;
+        return CommandLine.populateCommand(new LaunchOptions(), args);
     }
 
     private void printUsage(Object options) {
-        CmdLineParser parser = new CmdLineParser(options);
-        StringWriter sw = new StringWriter();
-        sw.append(USAGE_PREFIX + "\n");
-        sw.append(ALT_USAGE_PREFIX + " <source> <destination>\n");
-        sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
-        sw.append("Options:");
-        System.out.println(sw.toString());
-        parser.getProperties().withUsageWidth(80);
-        parser.printUsage(System.out);
+        CommandLine.usage(options, System.out);
     }
 
     private void runServer(File path, JBakeConfiguration configuration) {

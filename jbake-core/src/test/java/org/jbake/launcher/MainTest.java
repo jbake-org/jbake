@@ -14,9 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.mockito.Mock;
+import picocli.CommandLine;
 
 import java.io.File;
 import java.io.IOException;
@@ -171,11 +170,8 @@ public class MainTest extends LoggingTest {
         assertThat(loggingEvent.getMessage()).isEqualTo("Invalid commandline arguments: option \"-t (--template)\" requires the option(s) [-i]");
     }
 
-    private LaunchOptions stubOptions(String[] args) throws CmdLineException {
-        LaunchOptions res = new LaunchOptions();
-        CmdLineParser parser = new CmdLineParser(res);
-        parser.parseArgument(args);
-        return res;
+    private LaunchOptions stubOptions(String[] args) {
+        return CommandLine.populateCommand(new LaunchOptions(), args);
     }
 
     private DefaultJBakeConfiguration stubConfig() throws ConfigurationException {

@@ -1,33 +1,36 @@
 package org.jbake.launcher;
 
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.Option;
+import picocli.CommandLine;
 
 import java.io.File;
 
+@CommandLine.Command(
+        description = "JBake is a Java based, open source, static site/blog generator for developers & designers",
+        name = "jbake"
+)
 public class LaunchOptions {
-    @Argument(index = 0, usage = "source folder of site content (with templates and assets), if not supplied will default to current directory", metaVar = "<source>")
+    @CommandLine.Parameters(index = "0", description = "source folder of site content (with templates and assets), if not supplied will default to current directory", arity = "0..1")
     private String source;
 
-    @Argument(index = 1, usage = "destination folder for output, if not supplied will default to a folder called \"output\" in the current directory", metaVar = "<destination>")
+    @CommandLine.Parameters(index = "1", description = "destination folder for output, if not supplied will default to a folder called \"output\" in the current directory", arity = "0..1")
     private String destination;
 
-    @Option(name = "-b", aliases = {"--bake"}, usage = "performs a bake")
+    @CommandLine.Option(names = {"-b", "--bake"}, description = "performs a bake")
     private boolean bake;
 
-    @Option(name = "-i", aliases = {"--init"}, usage = "initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)")
+    @CommandLine.Option(names = {"-i", "--init"}, description = "initialises required folder structure with default templates (defaults to current directory if <value> is not supplied)", arity = "0..1")
     private boolean init;
 
-    @Option(name = "-t", aliases = {"--template"}, usage = "use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", depends = ("-i"))
+    @CommandLine.Option(names = {"-t", "--template"}, description = "use specified template engine for default templates (uses Freemarker if <value> is not supplied) ", arity = "1")
     private String template;
 
-    @Option(name = "-s", aliases = {"--server"}, usage = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
+    @CommandLine.Option(names = {"-s", "--server"}, description = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
     private boolean runServer;
 
-    @Option(name = "-h", aliases = {"--help"}, usage = "prints this message")
-    private boolean helpNeeded;
+    @CommandLine.Option(names = {"-h", "--help"}, description = "prints this message", usageHelp = true)
+    private boolean helpRequested;
 
-    @Option(name = "--reset", usage = "clears the local cache, enforcing rendering from scratch")
+    @CommandLine.Option(names = {"--reset"}, description = "clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
 
     public String getTemplate() {
@@ -63,7 +66,7 @@ public class LaunchOptions {
     }
 
     public boolean isHelpNeeded() {
-        return helpNeeded || !(isBake() || isRunServer() || isInit() || source != null || destination != null);
+        return helpRequested || !(isBake() || isRunServer() || isInit() || source != null || destination != null);
     }
 
     public boolean isRunServer() {
