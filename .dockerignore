@@ -1,3 +1,3 @@
-/jbake-dist
-/dist
+/build
+/jbake-dist/build
 .gradle
