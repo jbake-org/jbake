@@ -24,8 +24,11 @@ public class LaunchOptions {
     @Option(name = "-s", aliases = {"--server"}, usage = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
     private boolean runServer;
 
-    @Option(name = "-h", aliases = {"--help"}, usage = "prints this message")
+    @Option(name = "-h", aliases = {"--help"}, usage = "prints this message and exits")
     private boolean helpNeeded;
+
+    @Option(name = "-V", aliases = {"--version"}, usage = "prints the version identifier and exits")
+    private boolean versionNeeded;
 
     @Option(name = "--reset", usage = "clears the local cache, enforcing rendering from scratch")
     private boolean clearCache;
@@ -64,6 +67,10 @@ public class LaunchOptions {
 
     public boolean isHelpNeeded() {
         return helpNeeded || !(isBake() || isRunServer() || isInit() || source != null || destination != null);
+    }
+
+    public boolean isVersionNeeded() {
+        return versionNeeded;
     }
 
     public boolean isRunServer() {

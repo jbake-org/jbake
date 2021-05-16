@@ -21,6 +21,8 @@ import java.io.StringWriter;
  */
 public class Main {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     private final String USAGE_PREFIX = "Usage: jbake";
     private final String ALT_USAGE_PREFIX = "   or  jbake";
     private final Baker baker;
@@ -88,14 +90,18 @@ public class Main {
     }
 
     protected void run(LaunchOptions res, JBakeConfiguration config) {
-        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]");
-        System.out.println();
-
         if (res.isHelpNeeded()) {
             printUsage(res);
             // Help was requested, so we are done here
             return;
         }
+
+        if (res.isVersionNeeded()) {
+            System.out.println(getVersionString(config));
+            return;
+        }
+
+        LOGGER.info(getVersionString(config));
 
         if (res.isBake()) {
             baker.bake(config);
@@ -125,6 +131,10 @@ public class Main {
                 runServer(config.getDestinationFolder(), config);
             }
         }
+    }
+
+    private String getVersionString(JBakeConfiguration config) {
+        return "JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]";
     }
 
     private LaunchOptions parseArguments(String[] args) {
