@@ -13,6 +13,11 @@ afterEvaluate {
         files << signatureFile
     }
 
+    // add checksum files
+    project(':jbake-dist').tasks.getByName("distZip").outputs.files.files.each {
+        files << new File(it.toString() + ".sha256")
+    }
+
     githubRelease {
         token "$rootProject.githubToken" // This is your personal access token with Repo permissions
         // You get this from your user settings > developer settings > Personal Access Tokens
@@ -27,3 +32,4 @@ afterEvaluate {
         // by default false; you can use this to see what actions would be taken without making a release
     }
 }
+

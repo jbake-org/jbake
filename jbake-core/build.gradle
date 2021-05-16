@@ -1,4 +1,3 @@
-import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 apply from: "$rootDir/gradle/sonarqube.gradle"
