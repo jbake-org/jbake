@@ -3,6 +3,8 @@ package org.jbake.app;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jbake.model.DocumentTypes;
+import org.jbake.util.DataFileUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,6 +47,21 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         // covers bug #213
         DocumentList publishedPostsByTag = db.getPublishedPostsByTag("blog");
         Assert.assertEquals(3, publishedPostsByTag.size());
+    }
+
+    @Test
+    public void crawlDataFiles() {
+        Crawler crawler = new Crawler(db, config);
+        // manually register data doctype
+        DocumentTypes.addDocumentType(config.getDataFileDocType());
+        db.updateSchema();
+        crawler.crawlDataFiles();
+        Assert.assertEquals(1, db.getDocumentCount("data"));
+
+        DataFileUtil util = new DataFileUtil(db, "data");
+        Map<String, Object> data = util.get("videos.yaml");
+        Assert.assertFalse(data.isEmpty());
+        Assert.assertNotNull(data.get("data"));
     }
 
     @Test
