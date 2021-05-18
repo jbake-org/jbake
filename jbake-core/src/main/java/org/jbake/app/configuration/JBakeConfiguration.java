@@ -324,5 +324,9 @@ public interface JBakeConfiguration {
      * @param value the value of the property
      */
     void setProperty(String key, Object value);
+
+    String getServerContextPath();
+
+    String getServerHostname();
 }
 

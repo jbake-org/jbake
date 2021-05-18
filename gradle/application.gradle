@@ -1,21 +1,7 @@
-import org.ajoberstar.grgit.Grgit
-
-import java.text.SimpleDateFormat
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.ajoberstar:grgit:$grgitVersion"
-    }
-}
-
 apply plugin: 'application'
 
 mainClassName = "org.jbake.launcher.Main"
 applicationName = "jbake"
-
 
 def examplesBase = "$project.buildDir/examples"
 
@@ -26,16 +12,6 @@ def exampleRepositories = [
     "example_project_groovy-mte": "git://github.com/jbake-org/jbake-example-project-groovy-mte.git",
     "example_project_jade"      : "git://github.com/jbake-org/jbake-example-project-jade.git"
 ]
-
-processResources {
-    from("src/main/resources"){
-        include 'default.properties'
-        expand  jbakeVersion: project.version,
-                timestamp: new SimpleDateFormat("yyyy-MM-dd HH:mm:ssa").format( new Date() )
-    }
-}
-
-
 
 //create clone and Zip Task for each repository
 exampleRepositories.each { name, repository ->
@@ -49,7 +25,7 @@ exampleRepositories.each { name, repository ->
         outputs.dir repositoryName
 
         doLast {
-            Grgit.clone(dir: repositoryName, uri: repository)
+            grgit.clone(dir: repositoryName, uri: repository)
         }
     }
 

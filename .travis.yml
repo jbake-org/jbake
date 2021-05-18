@@ -1,7 +1,7 @@
 language: java
 
 os: linux
-dist: bionic
+dist: focal
 
 addons:
   hosts:
@@ -17,14 +17,13 @@ script:
 - "./gradlew check --stacktrace"
 
 jdk:
-  - openjdk14
+  - openjdk15
   - openjdk11
-  - openjdk8
 
 jobs:
   include:
 
-  - jdk: openjdk14
+  - jdk: openjdk15
     os: osx
 
   - jdk: openjdk11
@@ -41,7 +40,6 @@ jobs:
     jdk: openjdk11
     script:
     - "./gradlew -PskipSigning jacocoRootReport coveralls -i --stacktrace"
-    - curl -F 'json_file=@build/coveralls/report.json' 'https://coveralls.io/api/v1/jobs'
 
 notifications:
   irc: "irc.freenode.org#jbake"

@@ -12,6 +12,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.charset.Charset;
 
 /**
  * Provides Configuration related functions.
@@ -33,7 +34,6 @@ public class ConfigUtil {
         if (!source.isDirectory()) {
             throw new JBakeException("The given source folder is not a directory.");
         }
-
         CompositeConfiguration config = new CompositeConfiguration();
         config.setListDelimiter(',');
         File customConfigFile = new File(source, LEGACY_CONFIG_FILE);
