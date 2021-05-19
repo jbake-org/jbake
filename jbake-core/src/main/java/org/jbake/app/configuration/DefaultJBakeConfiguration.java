@@ -271,6 +271,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getIgnoreFileName() {
+        return getAsString(JBakeProperty.IGNORE_FILE);
+    }
+
+    @Override
     public String getIndexFileName() {
         return getAsString(JBakeProperty.INDEX_FILE);
     }

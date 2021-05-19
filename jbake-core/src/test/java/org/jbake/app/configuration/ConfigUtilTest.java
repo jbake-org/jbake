@@ -326,6 +326,14 @@ public class ConfigUtilTest extends LoggingTest {
         assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile());
     }
 
+    @Test
+    public void shouldReturnIgnoreFileFromConfiguration() throws Exception {
+        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
+        JBakeConfiguration config = util.loadConfig(sourceFolder);
+
+        assertThat(config.getIgnoreFileName()).isEqualTo(".jbakeignore");
+    }
+
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
         for (Field field : JBakeConfiguration.class.getFields()) {
 

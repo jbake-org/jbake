@@ -21,6 +21,7 @@ public class JBakeProperty {
     public static final String DRAFT_SUFFIX = "draft.suffix";
     public static final String FEED_FILE = "feed.file";
     public static final String HEADER_SEPARATOR = "header.separator";
+    public static final String IGNORE_FILE = "ignore.file";
     public static final String INDEX_FILE = "index.file";
     public static final String MARKDOWN_EXTENSIONS = "markdown.extensions";
     public static final String OUTPUT_EXTENSION = "output.extension";

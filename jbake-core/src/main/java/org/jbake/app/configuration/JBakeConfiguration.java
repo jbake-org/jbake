@@ -148,6 +148,11 @@ public interface JBakeConfiguration {
     String getHeaderSeparator();
 
     /**
+     * @return Filename to use to ignore a directory in addition to ".jbakeignore"
+     */
+    String getIgnoreFileName();
+
+    /**
      * @return Output filename for index, is only used when {@link #getRenderIndex()} is true
      */
     String getIndexFileName();

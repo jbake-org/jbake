@@ -79,7 +79,7 @@ public class Crawler {
      * @param path Folder to start from
      */
     private void crawl(File path) {
-        File[] contents = path.listFiles(FileUtil.getFileFilter());
+        File[] contents = path.listFiles(FileUtil.getFileFilter(config));
         if (contents != null) {
             Arrays.sort(contents);
             for (File sourceFile : contents) {
