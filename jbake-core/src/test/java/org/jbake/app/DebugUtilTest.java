@@ -1,14 +1,14 @@
 package org.jbake.app;
 
+import org.jbake.util.DebugUtil;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-
-import org.jbake.util.DebugUtil;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class DebugUtilTest {
 

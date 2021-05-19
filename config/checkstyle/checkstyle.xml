@@ -20,7 +20,9 @@
     <module name="TreeWalker">
         <module name="Indentation"/>
         <module name="AvoidStarImport"/>
-        <module name="NeedBraces"/>
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true"/>
+        </module>
         <module name="LeftCurly">
             <property name="option" value="eol"/>
         </module>
