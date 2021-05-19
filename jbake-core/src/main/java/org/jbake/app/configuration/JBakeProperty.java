@@ -33,6 +33,7 @@ public class JBakeProperty {
     public static final String RENDER_TAGS = "render.tags";
     public static final String RENDER_TAGS_INDEX = "render.tagsindex";
     public static final String RENDER_ENCODING = "render.encoding";
+    public static final String OUTPUT_ENCODING = "freemarker.outputencoding";
     public static final String SERVER_PORT = "server.port";
     public static final String SERVER_HOSTNAME = "server.hostname";
     public static final String SERVER_CONTEXT_PATH = "server.contextPath";

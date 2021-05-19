@@ -343,6 +343,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getOutputEncoding() {
+        return getAsString(JBakeProperty.OUTPUT_ENCODING);
+    }
+
+    @Override
     public boolean getRenderFeed() {
         return getAsBoolean(JBakeProperty.RENDER_FEED);
     }

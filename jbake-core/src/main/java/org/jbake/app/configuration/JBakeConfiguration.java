@@ -201,6 +201,11 @@ public interface JBakeConfiguration {
     String getRenderEncoding();
 
     /**
+     * @return Output encoding for freemarker url escaping
+     */
+    String getOutputEncoding();
+
+    /**
      * @return Flag indicating if feed file should be generated
      */
     boolean getRenderFeed();
