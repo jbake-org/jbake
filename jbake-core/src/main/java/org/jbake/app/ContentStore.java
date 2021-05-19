@@ -55,6 +55,7 @@ import java.util.Set;
 public class ContentStore {
 
     private static final String STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "select * from %s where status='published' and ? in tags order by date desc";
+    private static final String STATEMENT_GET_POST_BY_TYPE_AND_URI = "select * from %s where sourceuri=?";
     private static final String STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "select sha1,rendered from %s where sourceuri=?";
     private static final String STATEMENT_GET_PUBLISHED_COUNT = "select count(*) as count from %s where status='published'";
     private static final String STATEMENT_MARK_CONTENT_AS_RENDERD = "update %s set rendered=true where rendered=false and cached=true";
@@ -188,6 +189,7 @@ public class ContentStore {
 
     /**
      * Get a document by sourceUri and update it from the given map.
+     *
      * @param incomingDocMap The document's db columns.
      * @return The saved document.
      * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.
@@ -206,7 +208,7 @@ public class ContentStore {
         }
 
         // Get a document by sourceUri
-        String sql = "SELECT * FROM " + docType + " WHERE sourceuri=?";
+        String sql = String.format(STATEMENT_GET_POST_BY_TYPE_AND_URI, quoteIdentifier(docType));
         activateOnCurrentThread();
         List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
         if (results.isEmpty()) {
@@ -227,7 +229,7 @@ public class ContentStore {
     }
 
     public long getPublishedCount(String docType) {
-        String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType);
+        String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, quoteIdentifier(docType));
         return (Long) query(statement).get(0).get("count");
     }
 
@@ -235,11 +237,11 @@ public class ContentStore {
      * In fact, the URI should be the only input as there can only be one document at given URI; but the DB is split per document type for some reason.
      */
     public DocumentList getDocumentByUri(String docType, String uri) {
-        return query("select * from " + docType + " where sourceuri=?", uri);
+        return query(String.format(STATEMENT_GET_POST_BY_TYPE_AND_URI, quoteIdentifier(docType)), uri);
     }
 
     public DocumentList getDocumentStatus(String docType, String uri) {
-        String statement = String.format(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, docType);
+        String statement = String.format(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, quoteIdentifier(docType));
         return query(statement, uri);
     }
 
@@ -259,7 +261,7 @@ public class ContentStore {
         final DocumentList documents = new DocumentList();
 
         for (final String docType : DocumentTypes.getDocumentTypes()) {
-            String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType);
+            String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, quoteIdentifier(docType));
             DocumentList documentsByTag = query(statement, tag);
             documents.addAll(documentsByTag);
         }
@@ -275,7 +277,7 @@ public class ContentStore {
     }
 
     private DocumentList getPublishedContent(String docType, boolean applyPaging) {
-        String query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType);
+        String query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, quoteIdentifier(docType));
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
@@ -287,7 +289,7 @@ public class ContentStore {
     }
 
     public DocumentList getAllContent(String docType, boolean applyPaging) {
-        String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType);
+        String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, quoteIdentifier(docType));
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
@@ -307,17 +309,17 @@ public class ContentStore {
     }
 
     public DocumentList getUnrenderedContent(String docType) {
-        String statement = String.format(STATEMENT_GET_UNDRENDERED_CONTENT, docType);
+        String statement = String.format(STATEMENT_GET_UNDRENDERED_CONTENT, quoteIdentifier(docType));
         return query(statement);
     }
 
     public void deleteContent(String docType, String uri) {
-        String statement = String.format(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, docType);
+        String statement = String.format(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, quoteIdentifier(docType));
         executeCommand(statement, uri);
     }
 
     public void markContentAsRendered(String docType) {
-        String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, docType);
+        String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, quoteIdentifier(docType));
         executeCommand(statement);
     }
 
@@ -326,7 +328,7 @@ public class ContentStore {
     }
 
     public void deleteAllByDocType(String docType) {
-        String statement = String.format(STATEMENT_DELETE_ALL, docType);
+        String statement = String.format(STATEMENT_DELETE_ALL, quoteIdentifier(docType));
         executeCommand(statement);
     }
 
@@ -364,7 +366,7 @@ public class ContentStore {
     public Set<String> getAllTags() {
         Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
-            String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType);
+            String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, quoteIdentifier(docType));
             DocumentList docs = query(statement);
             for (Map<String, Object> document : docs) {
                 String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
@@ -458,5 +460,13 @@ public class ContentStore {
 
     public boolean isActive() {
         return db.isActiveOnCurrentThread();
+    }
+
+    static String quoteIdentifier(String input) {
+        if(input == null) {
+            return input;
+        } else {
+            return "`" + input.replaceAll("([\\\\`])", "\\\\$1") + "`";
+        }
     }
 }

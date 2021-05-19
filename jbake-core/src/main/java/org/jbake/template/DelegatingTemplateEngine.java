@@ -55,7 +55,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
             String key = configKeys.next();
             Object valueObject;
 
-            if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
+            if (key.equals(JBakeProperty.PAGINATE_INDEX)) {
                 valueObject = config.getPaginateIndex();
             } else {
                 valueObject = config.get(key);

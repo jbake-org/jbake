@@ -37,12 +37,12 @@ public class JBakeConfigurationInspector {
 
     private void ensureTemplateFolder() {
         File path = configuration.getTemplateFolder();
-        checkRequiredFolderExists(configuration.getTemplateFolderName(), path);
+        checkRequiredFolderExists(JBakeProperty.TEMPLATE_FOLDER, path);
     }
 
     private void ensureContentFolder() {
         File path = configuration.getContentFolder();
-        checkRequiredFolderExists(configuration.getContentFolderName(), path);
+        checkRequiredFolderExists(JBakeProperty.CONTENT_FOLDER, path);
     }
 
     private void ensureDestination() {
@@ -62,9 +62,9 @@ public class JBakeConfigurationInspector {
         }
     }
 
-    private void checkRequiredFolderExists(String folderName, File path) {
+    private void checkRequiredFolderExists(String property, File path) {
         if (!FileUtil.isExistingFolder(path)) {
-            throw new JBakeException("Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.getAbsolutePath());
+            throw new JBakeException("Error: Required folder cannot be found! Expected to find [" + property + "] at: " + path.getAbsolutePath());
         }
     }
 

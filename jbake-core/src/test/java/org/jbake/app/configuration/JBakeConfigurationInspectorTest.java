@@ -6,21 +6,18 @@ import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
-import org.junitpioneer.jupiter.TempDirectory.TempDir;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(TempDirectory.class)
 public class JBakeConfigurationInspectorTest extends LoggingTest {
 
     private Path folder;
@@ -39,12 +36,9 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
 
         JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(configuration);
 
-        try {
-            inspector.inspect();
-            fail("should throw a JBakeException");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).isEqualTo("Error: Source folder must exist: " + nonExistentFile.getAbsolutePath());
-        }
+        JBakeException e = assertThrows(JBakeException.class, inspector::inspect);
+
+        assertThat(e.getMessage()).isEqualTo("Error: Source folder must exist: " + nonExistentFile.getAbsolutePath());
     }
 
     @Test
@@ -59,32 +53,24 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
 
         JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(configuration);
 
-        try {
-            inspector.inspect();
-            fail("should throw a JBakeException");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).isEqualTo("Error: Source folder is not readable: " + nonReadableFile.getAbsolutePath());
-        }
+        JBakeException e = assertThrows(JBakeException.class, inspector::inspect);
+
+        assertThat(e.getMessage()).isEqualTo("Error: Source folder is not readable: " + nonReadableFile.getAbsolutePath());
     }
 
     @Test
     public void shouldThrowExceptionIfTemplateFolderDoesNotExist() throws Exception {
-        String templateFolderName = "template";
+        String templateFolderName = "template/custom";
         File expectedFolder = new File(folder.toFile(), templateFolderName);
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(expectedFolder);
-        when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
 
         JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(configuration);
 
-        try {
-            inspector.inspect();
-            fail("should throw a JBakeException");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).isEqualTo("Error: Required folder cannot be found! Expected to find [" + templateFolderName + "] at: " + expectedFolder.getAbsolutePath());
-        }
+        JBakeException e = assertThrows(JBakeException.class, inspector::inspect);
 
+        assertThat(e.getMessage()).isEqualTo("Error: Required folder cannot be found! Expected to find [template.folder] at: " + expectedFolder.getAbsolutePath());
     }
 
     @Test
@@ -97,18 +83,14 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
-        when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
-        when(configuration.getContentFolderName()).thenReturn(contentFolderName);
 
         JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(configuration);
 
-        try {
-            inspector.inspect();
-            fail("should throw a JBakeException");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).isEqualTo("Error: Required folder cannot be found! Expected to find [" + contentFolderName + "] at: " + contentFolder.getAbsolutePath());
-        }
+
+        JBakeException e = assertThrows(JBakeException.class, inspector::inspect);
+
+        assertThat(e.getMessage()).isEqualTo("Error: Required folder cannot be found! Expected to find [content.folder] at: " + contentFolder.getAbsolutePath());
     }
 
     @Test
@@ -124,9 +106,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
-        when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
-        when(configuration.getContentFolderName()).thenReturn(contentFolderName);
         when(configuration.getDestinationFolder()).thenReturn(destinationFolder);
         when(configuration.getAssetFolder()).thenReturn(destinationFolder);
 
@@ -150,20 +130,14 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
-        when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
-        when(configuration.getContentFolderName()).thenReturn(contentFolderName);
         when(configuration.getDestinationFolder()).thenReturn(destinationFolder);
 
         JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(configuration);
 
-        try {
-            inspector.inspect();
-            fail("should throw JBakeException");
-        } catch (JBakeException e) {
-            assertThat(e.getMessage()).contains("Error: Destination folder is not writable:");
-        }
+        JBakeException e = assertThrows(JBakeException.class, inspector::inspect);
 
+        assertThat(e.getMessage()).contains("Error: Destination folder is not writable:");
     }
 
     @Test
@@ -181,9 +155,7 @@ public class JBakeConfigurationInspectorTest extends LoggingTest {
         JBakeConfiguration configuration = mock(JBakeConfiguration.class);
         when(configuration.getSourceFolder()).thenReturn(folder.toFile());
         when(configuration.getTemplateFolder()).thenReturn(templateFolder);
-        when(configuration.getTemplateFolderName()).thenReturn(templateFolderName);
         when(configuration.getContentFolder()).thenReturn(contentFolder);
-        when(configuration.getContentFolderName()).thenReturn(contentFolderName);
         when(configuration.getDestinationFolder()).thenReturn(destinationFolder);
         when(configuration.getAssetFolder()).thenReturn(assetFolder);
 

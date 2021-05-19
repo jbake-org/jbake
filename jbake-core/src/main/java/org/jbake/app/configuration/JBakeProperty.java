@@ -34,7 +34,10 @@ public class JBakeProperty {
     public static final String RENDER_TAGS = "render.tags";
     public static final String RENDER_TAGS_INDEX = "render.tagsindex";
     public static final String RENDER_ENCODING = "render.encoding";
+    public static final String OUTPUT_ENCODING = "freemarker.outputencoding";
     public static final String SERVER_PORT = "server.port";
+    public static final String SERVER_HOSTNAME = "server.hostname";
+    public static final String SERVER_CONTEXT_PATH = "server.contextPath";
     public static final String SITE_HOST = "site.host";
     public static final String SITEMAP_FILE = "sitemap.file";
     public static final String TAG_SANITIZE = "tag.sanitize";
@@ -47,6 +50,7 @@ public class JBakeProperty {
     public static final String IMG_PATH_UPDATE = "img.path.update";
     public static final String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
     public static final String VERSION = "version";
+    public static final String GIT_HASH = "git.hash";
 
     private JBakeProperty() {}
 

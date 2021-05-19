@@ -79,7 +79,7 @@ public class TemplateEngines {
             return ctor.newInstance(config, db);
         } catch (Throwable e) {
             // not all engines might be necessary, therefore only emit class loading issue with level warn
-            LOGGER.warn("Template engine not available: {}", engineClassName);
+            LOGGER.debug("Template engine not available: {}", engineClassName);
             return null;
         }
     }

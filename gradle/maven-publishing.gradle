@@ -1,11 +1,11 @@
-import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 apply plugin: 'maven-publish'
 
-Date buildTimeAndDate = new Date()
+def buildTimeAndDate = grgit.head().dateTime
 ext {
-    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
-    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+    buildDate = buildTimeAndDate.format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))
+    buildTime = buildTimeAndDate.format(DateTimeFormatter.ofPattern('HH:mm:ss.SSSZ'))
     isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 

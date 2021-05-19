@@ -7,6 +7,8 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
@@ -21,10 +23,12 @@ public class Main {
 
     private final String USAGE_PREFIX = "Usage: jbake";
     private final String ALT_USAGE_PREFIX = "   or  jbake";
-    private Baker baker;
-    private JettyServer jettyServer;
-    private BakeWatcher watcher;
+    private final Baker baker;
+    private final JettyServer jettyServer;
+    private final BakeWatcher watcher;
     private JBakeConfigurationFactory configurationFactory;
+    private static final Logger logger = LoggerFactory.getLogger("jbake");
+
     /**
      * Default constructor.
      */
@@ -55,12 +59,12 @@ public class Main {
         try {
             new Main().run(args);
         } catch (final JBakeException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            logger.trace(e.getMessage(), e);
             System.exit(1);
         } catch (final Throwable e) {
-            System.err.println("An unexpected error occurred: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("An unexpected error occurred: " + e.getMessage());
+            logger.trace(e.getMessage(), e);
             System.exit(2);
         }
     }
@@ -68,23 +72,23 @@ public class Main {
     protected void run(String[] args) {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
-        LaunchOptions res = parseArguments(args);
 
         final JBakeConfiguration config;
         try {
+            LaunchOptions res = parseArguments(args);
             if (res.isRunServer()) {
                 config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
             } else {
                 config = getJBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
             }
+            run(res, config);
         } catch (final ConfigurationException e) {
             throw new JBakeException("Configuration error: " + e.getMessage(), e);
         }
-        run(res, config);
     }
 
     protected void run(LaunchOptions res, JBakeConfiguration config) {
-        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + ") [http://jbake.org]");
+        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + " " + config.getAbbreviatedGitHash()  + "#) [http://jbake.org]");
         System.out.println();
 
         if (res.isHelpNeeded()) {
@@ -108,20 +112,19 @@ public class Main {
                 // bake and server commands have been run together
                 if (res.getDestination() != null) {
                     // use the destination provided via the commandline
-                    runServer(res.getDestination(), config.getServerPort());
+                    runServer(res.getDestination(), config);
                 } else if (!res.getSource().getPath().equals(".")) {
                     // use the source folder provided via the commandline
-                    runServer(res.getSource(), config.getServerPort());
+                    runServer(res.getSource(), config);
                 } else {
                     // use the default DESTINATION_FOLDER value
-                    runServer(config.getDestinationFolder(), config.getServerPort());
+                    runServer(config.getDestinationFolder(), config);
                 }
             } else {
                 // use the default destination folder
-                runServer(config.getDestinationFolder(), config.getServerPort());
+                runServer(config.getDestinationFolder(), config);
             }
         }
-
     }
 
     private LaunchOptions parseArguments(String[] args) {
@@ -146,12 +149,12 @@ public class Main {
         sw.append(ALT_USAGE_PREFIX + " [OPTION]... [<value>...]\n\n");
         sw.append("Options:");
         System.out.println(sw.toString());
-        parser.getProperties().withUsageWidth(100);
+        parser.getProperties().withUsageWidth(80);
         parser.printUsage(System.out);
     }
 
-    private void runServer(File path, int port) {
-        jettyServer.run(path.getPath(), String.valueOf(port));
+    private void runServer(File path, JBakeConfiguration configuration) {
+        jettyServer.run(path.getPath(), configuration);
     }
 
     private void initStructure(String type, JBakeConfiguration config) {

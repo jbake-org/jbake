@@ -276,7 +276,7 @@ public class Renderer {
 
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
                 map.put(Attributes.ROOTPATH, FileUtil.getUriPathToDestinationRoot(config, path));
-                
+
                 render(new ModelRenderingConfig(path, Attributes.TAG, model, findTemplateName(Attributes.TAG)));
 
                 renderedCount++;

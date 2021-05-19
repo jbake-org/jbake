@@ -62,6 +62,8 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         for (String string : getOutputStrings("index")) {
             assertThat(output).contains(string);
         }
+
+        assertThat(output).contains("Post Url: blog%2F2013%2Fsecond-post.html");
     }
 
     @Test

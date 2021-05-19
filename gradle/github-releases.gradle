@@ -1,0 +1,35 @@
+rootProject.ext {
+    githubToken = project.hasProperty("github.token") ? project.getProperty("github.token") : System.getenv("GITHUBTOKEN")
+    githubReleaseOwner = project.hasProperty("github.release.owner") ? getProperty("github.release.owner") : System.getenv("GITHUB_RELEASE_OWNER")
+    githubReleaseRepo = project.hasProperty("github.release.repo") ? getProperty("github.release.repo") : System.getenv("GITHUB_RELEASE_REPO")
+    githubReleaseDryRun = System.getenv("GITHUB_RELEASE_DRY_RUN") ?: false
+}
+
+afterEvaluate {
+    def name = project(':jbake-dist').tasks.getByName("distZip").archiveName
+    def files = project(':jbake-dist').tasks.getByName("distZip").outputs.files.files
+    if (!project.hasProperty('skipSigning')) {
+        def signatureFile = project(':jbake-dist').tasks.getByName("signArchives").outputs.files.files.find { it.name.contains(name) }
+        files << signatureFile
+    }
+
+    // add checksum files
+    project(':jbake-dist').tasks.getByName("distZip").outputs.files.files.each {
+        files << new File(it.toString() + ".sha256")
+    }
+
+    githubRelease {
+        token "$rootProject.githubToken" // This is your personal access token with Repo permissions
+        // You get this from your user settings > developer settings > Personal Access Tokens
+        owner "$rootProject.githubReleaseOwner"
+        // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
+        repo "$rootProject.githubReleaseRepo" // by default this is set to your project name
+        targetCommitish "master" // by default this is set to "master"
+        draft false // by default this is false
+        releaseAssets files
+        // this points to which files you want to upload as assets with your release
+        dryRun rootProject.githubReleaseDryRun as boolean
+        // by default false; you can use this to see what actions would be taken without making a release
+    }
+}
+

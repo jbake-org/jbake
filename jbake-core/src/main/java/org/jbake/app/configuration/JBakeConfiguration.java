@@ -206,6 +206,11 @@ public interface JBakeConfiguration {
     String getRenderEncoding();
 
     /**
+     * @return Output encoding for freemarker url escaping
+     */
+    String getOutputEncoding();
+
+    /**
      * @return Flag indicating if feed file should be generated
      */
     boolean getRenderFeed();
@@ -311,5 +316,14 @@ public interface JBakeConfiguration {
      * @param value the value of the property
      */
     void setProperty(String key, Object value);
+
+    String getServerContextPath();
+
+    String getServerHostname();
+
+    /**
+     * @return Abbreviated hash of latest git commit
+     */
+    String getAbbreviatedGitHash();
 }
 
