@@ -19,7 +19,6 @@ plugins {
     id 'java-library'
     id 'groovy'
     id 'org.kordamp.gradle.groovy-project'
-    id 'org.kordamp.gradle.bintray'
     id 'org.kordamp.gradle.plugin'
     id 'org.kordamp.gradle.coveralls'
 }

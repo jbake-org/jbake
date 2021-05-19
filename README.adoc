@@ -1,7 +1,7 @@
 = JBake plugin for Gradle
 :linkattrs:
 :jbake-version:   2.6.7
-:plugin-version:  5.4.0
+:plugin-version:  5.5.0
 :project-group:   org.jbake
 :plugin-id:       org.jbake.site
 :project-name:    jbake-gradle-plugin
@@ -18,7 +18,7 @@ This plugin allows rendering a site using http://www.jbake.org[JBake] directly f
 == Requirements
 
  * Java 8
- * Gradle 5+
+ * Gradle 6+
 
 == Examples
 
