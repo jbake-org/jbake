@@ -12,6 +12,8 @@ public class JBakeProperty {
     public static final String BUILD_TIMESTAMP = "build.timestamp";
     public static final String CLEAR_CACHE = "db.clear.cache";
     public static final String CONTENT_FOLDER = "content.folder";
+    public static final String DATA_FOLDER = "data.folder";
+    public static final String DATA_FILE_DOCTYPE = "data.file.docType";
     public static final String DATE_FORMAT = "date.format";
     public static final String DB_STORE = "db.store";
     public static final String DB_PATH = "db.path";

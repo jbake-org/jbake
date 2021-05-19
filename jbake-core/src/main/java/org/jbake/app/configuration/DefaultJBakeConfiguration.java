@@ -27,6 +27,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     private static final String ASSET_FOLDER_KEY = "assetFolder";
     private static final String TEMPLATE_FOLDER_KEY = "templateFolder";
     private static final String CONTENT_FOLDER_KEY = "contentFolder";
+    private static final String DATA_FOLDER_KEY = "dataFolder";
     private static final Pattern TEMPLATE_DOC_PATTERN = Pattern.compile("(?:template\\.)([a-zA-Z0-9-_]+)(?:\\.file)");
     private static final String DOCTYPE_FILE_POSTFIX = ".file";
     private static final String DOCTYPE_EXTENSION_POSTFIX = ".extension";
@@ -184,6 +185,31 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public File getDataFolder() {
+        return getAsFolder(DATA_FOLDER_KEY);
+    }
+
+    public void setDataFolder(File dataFolder) {
+        if (dataFolder != null) {
+            setProperty(DATA_FOLDER_KEY, dataFolder);
+        }
+    }
+
+    @Override
+    public String getDataFolderName() {
+        return getAsString(JBakeProperty.DATA_FOLDER);
+    }
+
+    @Override
+    public String getDataFileDocType() {
+        return getAsString(JBakeProperty.DATA_FILE_DOCTYPE);
+    }
+
+    public void setDataFileDocType(String dataFileDocType) {
+        setProperty(JBakeProperty.DATA_FILE_DOCTYPE, dataFileDocType);
+    }
+
+    @Override
     public String getDatabasePath() {
         return getAsString(JBakeProperty.DB_PATH);
     }
@@ -200,6 +226,8 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setDatabaseStore(String storeType) {
         setProperty(JBakeProperty.DB_STORE, storeType);
     }
+
+
 
     @Override
     public String getDateFormat() {
@@ -515,6 +543,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         setupDefaultAssetFolder();
         setupDefaultTemplateFolder();
         setupDefaultContentFolder();
+        setupDefaultDataFolder();
     }
 
     private void setupDefaultDestination() {
@@ -548,6 +577,17 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
             setTemplateFolder(template);
         } else {
             setTemplateFolder(new File(getSourceFolder(), templateFolder));
+        }
+    }
+
+    private void setupDefaultDataFolder() {
+        String dataFolder = getAsString(JBakeProperty.DATA_FOLDER);
+
+        File data = new File(dataFolder);
+        if(data.isAbsolute()) {
+            setDataFolder(data);
+        } else {
+            setDataFolder(new File(getSourceFolder(), dataFolder));
         }
     }
 

@@ -85,6 +85,21 @@ public interface JBakeConfiguration {
     String getContentFolderName();
 
     /**
+     * @return the data folder
+     */
+    File getDataFolder();
+
+    /**
+     * @return name of Folder where data files reside in
+     */
+    String getDataFolderName();
+
+    /**
+     * @return docType for data files
+     */
+    String getDataFileDocType();
+
+    /**
      * @return Folder to store database files in
      */
     String getDatabasePath();

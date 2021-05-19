@@ -152,6 +152,9 @@ public class Oven {
             // process source content
             crawler.crawl();
 
+            // process data files
+            crawler.crawlDataFiles();
+
             // render content
             renderContent();
 
@@ -187,6 +190,9 @@ public class Oven {
         for (String docType : config.getDocumentTypes()) {
             DocumentTypes.addDocumentType(docType);
         }
+
+        // needs manually setting as this isn't defined in same way as document types for content files
+        DocumentTypes.addDocumentType(config.getDataFileDocType());
     }
 
     private void resetDocumentTypesAndExtractors() {

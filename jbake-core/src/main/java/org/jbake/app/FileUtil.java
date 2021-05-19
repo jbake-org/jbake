@@ -63,6 +63,21 @@ public class FileUtil {
     }
 
     /**
+     * Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension)
+     *
+     * @return Object for filtering files
+     */
+    public static FileFilter getDataFileFilter() {
+        return new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                return "yaml".equalsIgnoreCase(fileExt(pathname)) || "yml".equalsIgnoreCase(fileExt(pathname));
+            }
+        };
+    }
+
+    /**
      * Gets the list of files that are not content files based on their extension.
      *
      * @param config the jbake configuration
