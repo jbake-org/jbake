@@ -22,7 +22,6 @@ pluginManagement {
     }
     plugins {
         id 'org.kordamp.gradle.groovy-project' version kordampPluginVersion
-        id 'org.kordamp.gradle.bintray'        version kordampPluginVersion
         id 'org.kordamp.gradle.plugin'         version kordampPluginVersion
         id 'org.kordamp.gradle.coveralls'      version kordampPluginVersion
     }
