@@ -37,6 +37,7 @@ processResources {
     from("src/main/resources") {
         include 'default.properties'
         expand jbakeVersion: project.version,
-               timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'"))
+               timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
+               gitHash: grgit.head().abbreviatedId
     }
 }

@@ -571,4 +571,9 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setImgPathUPdate(boolean imgPathUpdate) {
         setProperty(JBakeProperty.IMG_PATH_UPDATE, imgPathUpdate);
     }
+
+    @Override
+    public String getAbbreviatedGitHash() {
+        return getAsString(JBakeProperty.GIT_HASH);
+    }
 }
