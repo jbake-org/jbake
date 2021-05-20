@@ -284,6 +284,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getError404FileName() {
+        return getAsString(JBakeProperty.ERROR404_FILE);
+    }
+
+    @Override
     public String getExampleProjectByType(String templateType) {
         return getAsString("example.project." + templateType);
     }
@@ -378,6 +383,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public String getOutputEncoding() {
         return getAsString(JBakeProperty.OUTPUT_ENCODING);
+    }
+
+    @Override
+    public boolean getRenderError404() {
+        return getAsBoolean(JBakeProperty.RENDER_ERROR404);
     }
 
     @Override

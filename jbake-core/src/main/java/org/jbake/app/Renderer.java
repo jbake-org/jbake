@@ -30,6 +30,7 @@ public class Renderer {
     private static final String SITEMAP_TEMPLATE_NAME = "sitemap";
     private static final String FEED_TEMPLATE_NAME = "feed";
     private static final String ARCHIVE_TEMPLATE_NAME = "archive";
+    private static final String ERROR404_TEMPLATE_NAME = "error404";
 
     private final Logger LOGGER = LoggerFactory.getLogger(Renderer.class);
     private final JBakeConfiguration config;
@@ -174,7 +175,6 @@ public class Renderer {
      * @throws Exception if IOException or SecurityException are raised
      */
     public void renderIndex(String indexFile) throws Exception {
-
         render(new DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME));
     }
 
@@ -253,6 +253,16 @@ public class Renderer {
      */
     public void renderArchive(String archiveFile) throws Exception {
         render(new DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME));
+    }
+
+    /**
+     * Render an 404 file using the predefined template.
+     *
+     * @param errorFile      The name of the output file
+     * @throws Exception    if default rendering configuration is not loaded correctly
+     */
+    public void renderError404(String errorFile) throws Exception {
+        render(new DefaultRenderingConfig(errorFile, ERROR404_TEMPLATE_NAME));
     }
 
     /**

@@ -21,6 +21,7 @@ public class JBakeProperty {
     public static final String DEFAULT_TYPE = "default.type";
     public static final String DESTINATION_FOLDER = "destination.folder";
     public static final String DRAFT_SUFFIX = "draft.suffix";
+    public static final String ERROR404_FILE = "error404.file";
     public static final String FEED_FILE = "feed.file";
     public static final String HEADER_SEPARATOR = "header.separator";
     public static final String IGNORE_FILE = "ignore.file";
@@ -35,6 +36,7 @@ public class JBakeProperty {
     public static final String RENDER_SITEMAP = "render.sitemap";
     public static final String RENDER_TAGS = "render.tags";
     public static final String RENDER_TAGS_INDEX = "render.tagsindex";
+    public static final String RENDER_ERROR404 = "render.error404";
     public static final String RENDER_ENCODING = "render.encoding";
     public static final String OUTPUT_ENCODING = "freemarker.outputencoding";
     public static final String SERVER_PORT = "server.port";
