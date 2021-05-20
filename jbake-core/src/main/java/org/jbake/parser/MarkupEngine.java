@@ -3,9 +3,10 @@ package org.jbake.parser;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
-import org.jbake.app.Crawler;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
+import org.jbake.model.ModelAttributes;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public abstract class MarkupEngine implements ParserEngine {
      * @param file file to process
      * @return a map containing all infos. Returning null indicates an error, even if an exception would be better.
      */
-    public Map<String, Object> parse(JBakeConfiguration config, File file) {
+    public DocumentModel parse(JBakeConfiguration config, File file) {
         this.configuration = config;
         List<String> fileContent = getFileContent(file, config.getRenderEncoding());
 
@@ -265,32 +266,35 @@ public abstract class MarkupEngine implements ParserEngine {
         }
     }
 
-    private void processHeaderLine(String line, Map<String, Object> content) {
+    private void processHeaderLine(String line, DocumentModel content) {
         String[] parts = line.split("=", 2);
         if (!line.isEmpty() && parts.length == 2) {
             storeHeaderValue(parts[0], parts[1], content);
         }
     }
 
-    void storeHeaderValue(String inputKey, String inputValue, Map<String, Object> content) {
+    void storeHeaderValue(String inputKey, String inputValue, DocumentModel content) {
         String key = sanitize(inputKey);
         String value = sanitize(inputValue);
 
-        if (key.equalsIgnoreCase(Crawler.Attributes.DATE)) {
+        if (key.equalsIgnoreCase(ModelAttributes.DATE)) {
             DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
             try {
                 Date date = df.parse(value);
-                content.put(key, date);
+                content.setDate(date);
             } catch (ParseException e) {
                 LOGGER.error("unable to parse date {}", value);
             }
-        } else if (key.equalsIgnoreCase(Crawler.Attributes.TAGS)) {
-            content.put(key, getTags(value));
+        } else if (key.equalsIgnoreCase(ModelAttributes.TAGS)) {
+            content.setTags(getTags(value));
+        } else if (key.equalsIgnoreCase(ModelAttributes.CACHED)) {
+            content.setCached(Boolean.valueOf(value));
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value));
         } else {
             content.put(key, value);
         }
+
     }
 
     private String sanitize(String part) {

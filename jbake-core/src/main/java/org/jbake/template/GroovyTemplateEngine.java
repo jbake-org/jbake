@@ -1,7 +1,6 @@
 package org.jbake.template;
 
 
-import groovy.lang.GString;
 import groovy.lang.Writable;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
@@ -11,6 +10,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.template.model.TemplateModel;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -52,7 +52,7 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = findTemplate(templateName);
             Writable writable = template.make(wrap(model));
@@ -73,31 +73,25 @@ public class GroovyTemplateEngine extends AbstractTemplateEngine {
         return template;
     }
 
-    private Map<String, Object> wrap(final Map<String, Object> model) {
-        return new HashMap<String, Object>(model) {
+    private TemplateModel wrap(final TemplateModel model) {
+        return new TemplateModel(model) {
             @Override
-            public Object get(final Object property) {
-                if (property instanceof String || property instanceof GString) {
-                    String key = property.toString();
-                    if ("include".equals(key)) {
-                        return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
-                    }
-                    try {
-                        return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter.NoopAdapter());
-                    } catch (NoModelExtractorException e) {
-                        // fallback to parent model
-                    }
+            public Object get(Object key) {
+                if ("include".equals(key)) {
+                    return new MethodClosure(GroovyTemplateEngine.this, "doInclude").curry(this);
                 }
-
-                return super.get(property);
+                try {
+                    return extractors.extractAndTransform(db, (String) key, model, new TemplateEngineAdapter.NoopAdapter());
+                } catch (NoModelExtractorException e) {
+                    return super.get(key);
+                }
             }
         };
     }
 
-    private void doInclude(Map<String, Object> model, String templateName) throws Exception {
-        AbstractTemplateEngine engine = (AbstractTemplateEngine) model.get("renderer");
-        Writer out = (Writer) model.get("out");
+    private void doInclude(TemplateModel model, String templateName) throws Exception {
+        AbstractTemplateEngine engine = model.getRenderer();
+        Writer out = model.getWriter();
         engine.renderDocument(model, templateName, out);
-        model.put("out", out);
     }
 }

@@ -4,6 +4,7 @@ import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.model.DocumentModel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -134,76 +135,76 @@ public class AsciidocParserTest {
     public void parseAsciidocFileWithPrettifyAttribute() {
 
         config.setProperty(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES,"source-highlighter=prettify");
-        Map<String, Object> map = parser.processFile(asciidocWithSource);
+        DocumentModel map = parser.processFile(asciidocWithSource);
         Assert.assertNotNull(map);
-        Assert.assertEquals("draft", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
-        assertThat(map.get("body").toString())
+        Assert.assertEquals("draft", map.getStatus());
+        Assert.assertEquals("post", map.getType());
+        assertThat(map.getBody())
                 .contains("class=\"paragraph\"")
                 .contains("<p>JBake now supports AsciiDoc.</p>")
                 .contains("class=\"prettyprint highlight\"");
 
-        assertThat(map.get("body").toString()).doesNotContain("I Love Jbake");
-        System.out.println(map.get("body").toString());
+        assertThat(map.getBody()).doesNotContain("I Love Jbake");
+        System.out.println(map.getBody());
     }
 
     @Test
     public void parseAsciidocFileWithCustomAttribute() {
 
         config.setProperty(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES,"source-highlighter=prettify,testattribute=I Love Jbake");
-        Map<String, Object> map = parser.processFile(asciidocWithSource);
+        DocumentModel map = parser.processFile(asciidocWithSource);
         Assert.assertNotNull(map);
-        Assert.assertEquals("draft", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
-        assertThat(map.get("body").toString())
+        Assert.assertEquals("draft", map.getStatus());
+        Assert.assertEquals("post", map.getType());
+        assertThat(map.getBody())
                 .contains("I Love Jbake")
                 .contains("class=\"prettyprint highlight\"");
 
-        System.out.println(map.get("body").toString());
+        System.out.println(map.getBody());
     }
 
     @Test
     public void parseValidAsciiDocFile() {
-        Map<String, Object> map = parser.processFile(validAsciidocFile);
+        DocumentModel map = parser.processFile(validAsciidocFile);
         Assert.assertNotNull(map);
-        Assert.assertEquals("draft", map.get("status"));
-        Assert.assertEquals("post", map.get("type"));
-        assertThat(map.get("body").toString())
+        Assert.assertEquals("draft", map.getStatus());
+        Assert.assertEquals("post", map.getType());
+        assertThat(map.getBody())
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>");
     }
 
     @Test
     public void parseInvalidAsciiDocFile() {
-        Map<String, Object> map = parser.processFile(invalidAsciiDocFile);
+        DocumentModel map = parser.processFile(invalidAsciiDocFile);
         Assert.assertNull(map);
     }
 
     @Test
     public void parseValidAsciiDocFileWithoutHeader() {
-        Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutHeader);
+        DocumentModel map = parser.processFile(validAsciiDocFileWithoutHeader);
         Assert.assertNotNull(map);
         Assert.assertEquals("Hello: AsciiDoc!", map.get("title"));
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
-        assertThat(map.get("body").toString())
+        Assert.assertEquals("published", map.getStatus());
+        Assert.assertEquals("page", map.getType());
+        assertThat(map.getBody())
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>");
     }
 
     @Test
     public void parseInvalidAsciiDocFileWithoutHeader() {
-        Map<String, Object> map = parser.processFile(invalidAsciiDocFileWithoutHeader);
+        DocumentModel map = parser.processFile(invalidAsciiDocFileWithoutHeader);
         Assert.assertNull(map);
     }
 
     @Test
     public void parseValidAsciiDocFileWithExampleHeaderInContent() {
-        Map<String, Object> map = parser.processFile(validAsciiDocFileWithHeaderInContent);
+        DocumentModel map = parser.processFile(validAsciiDocFileWithHeaderInContent);
         Assert.assertNotNull(map);
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
-        assertThat(map.get("body").toString())
+        Assert.assertEquals("published", map.getStatus());
+        Assert.assertEquals("page", map.getType());
+        assertThat(map.getBody())
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>")
             .contains("class=\"listingblock\"")
@@ -219,11 +220,11 @@ public class AsciidocParserTest {
         config.setDefaultStatus("published");
         config.setDefaultType("page");
         Parser parser = new Parser(config);
-        Map<String, Object> map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData);
+        DocumentModel map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData);
         Assert.assertNotNull(map);
-        Assert.assertEquals("published", map.get("status"));
-        Assert.assertEquals("page", map.get("type"));
-        assertThat(map.get("body").toString())
+        Assert.assertEquals("published", map.getStatus());
+        Assert.assertEquals("page", map.getType());
+        assertThat(map.getBody())
             .contains("<p>JBake now supports AsciiDoc documents without JBake meta data.</p>");
     }
 

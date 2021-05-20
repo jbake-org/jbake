@@ -4,10 +4,7 @@ import com.orientechnologies.orient.core.db.record.OTrackedList;
 import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import org.jbake.app.configuration.JBakeConfiguration;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.jbake.model.DocumentModel;
 
 public class DBUtil {
     private static ContentStore contentStore;
@@ -37,12 +34,11 @@ public class DBUtil {
         contentStore = null;
     }
 
-    public static Map<String, Object> documentToModel(OResult doc) {
-        Map<String, Object> result = new HashMap<>();
-        Iterator<String> fieldIterator = doc.getPropertyNames().iterator();
-        while (fieldIterator.hasNext()) {
-            String entry = fieldIterator.next();
-            result.put(entry, doc.getProperty(entry));
+    public static DocumentModel documentToModel(OResult doc) {
+        DocumentModel result = new DocumentModel();
+
+        for (String key : doc.getPropertyNames()) {
+            result.put(key, doc.getProperty(key));
         }
         return result;
     }

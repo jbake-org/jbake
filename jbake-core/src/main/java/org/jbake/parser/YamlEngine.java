@@ -2,11 +2,13 @@ package org.jbake.parser;
 
 import org.apache.commons.io.IOUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.swing.text.Document;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,26 +30,26 @@ public class YamlEngine extends MarkupEngine {
      * @param file
      * @return
      */
-    private Map<String, Object> parseFile(File file) {
-        Map<String, Object> fileContents = new HashMap<>();
+    private DocumentModel parseFile(File file) {
+        DocumentModel model = new DocumentModel();
         Yaml yaml = new Yaml();
         try (InputStream is = new FileInputStream(file)) {
             Object result = yaml.load(is);
             if (result instanceof List) {
-                fileContents.put("data", result);
+                model.put("data", result);
             } else if (result instanceof Map) {
-                fileContents = (Map<String, Object>) result;
+                model = (DocumentModel) result;
             } else {
 
             }
         } catch (IOException e) {
             LOGGER.error("Error while parsing file {}", file, e);
         }
-        return fileContents;
+        return model;
     }
 
     @Override
-    public Map<String, Object> parse(JBakeConfiguration config, File file) {
+    public DocumentModel parse(JBakeConfiguration config, File file) {
         return parseFile(file);
     }
 
@@ -59,7 +61,7 @@ public class YamlEngine extends MarkupEngine {
     @Override
     public void processHeader(final ParserContext context) {
         Map<String, Object> fileContents = parseFile(context.getFile());
-        Map<String, Object> documentModel = context.getDocumentModel();
+        DocumentModel documentModel = context.getDocumentModel();
 
         for (String key : fileContents.keySet()) {
             if (hasJBakePrefix(key)) {

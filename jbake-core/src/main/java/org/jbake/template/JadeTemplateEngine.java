@@ -3,7 +3,6 @@ package org.jbake.template;
 
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
-import de.neuland.jade4j.exceptions.JadeCompilerException;
 import de.neuland.jade4j.filter.CDATAFilter;
 import de.neuland.jade4j.filter.CssFilter;
 import de.neuland.jade4j.filter.JsFilter;
@@ -15,6 +14,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.template.model.TemplateModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(Map<String, Object> model, String templateName, Writer writer) throws RenderingException {
+    public void renderDocument(TemplateModel model, String templateName, Writer writer) throws RenderingException {
         try {
             JadeTemplate template = jadeConfiguration.getTemplate(templateName);
 
@@ -66,37 +66,34 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
         }
     }
 
-    public void renderTemplate(JadeTemplate template, Map<String, Object> model, Writer writer) throws JadeCompilerException {
-        JadeModel jadeModel = wrap(jadeConfiguration.getSharedVariables());
-        jadeModel.putAll(model);
+    public void renderTemplate(JadeTemplate template, TemplateModel model, Writer writer) {
+        JadeModel jadeModel = wrap(model);
+        jadeModel.putAll(jadeConfiguration.getSharedVariables());
         template.process(jadeModel, writer);
     }
 
-    private JadeModel wrap(final Map<String, Object> model) {
+    private JadeModel wrap(final TemplateModel model) {
         return new JadeModel(model) {
 
             @Override
             public Object get(final Object property) {
-                String key = property.toString();
                 try {
-                    return extractors.extractAndTransform(db, key, this, new TemplateEngineAdapter.NoopAdapter());
-                } catch(NoModelExtractorException e) {
-                    // fallback to parent model
+                    return extractors.extractAndTransform(db, (String) property, this, new TemplateEngineAdapter.NoopAdapter());
+                } catch (NoModelExtractorException e) {
+                    return super.get(property);
                 }
-
-                return super.get(property);
             }
         };
     }
 
     public static class FormatHelper {
-        private Map<String, SimpleDateFormat> formatters = new HashMap<String, SimpleDateFormat>();
+        private Map<String, SimpleDateFormat> formatters = new HashMap<>();
 
         public String format(Date date, String pattern) {
-            if(date!=null && pattern!=null) {
+            if (date != null && pattern != null) {
                 SimpleDateFormat df = formatters.get(pattern);
 
-                if(df==null) {
+                if (df == null) {
                     df = new SimpleDateFormat(pattern);
                     formatters.put(pattern, df);
                 }

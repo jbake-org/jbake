@@ -13,20 +13,19 @@ import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.jbake.app.ContentStore;
-import org.jbake.app.Crawler;
-import org.jbake.util.DataFileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.ModelAttributes;
+import org.jbake.template.model.TemplateModel;
+import org.jbake.util.DataFileUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
@@ -60,13 +59,11 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, final String templateName, final Writer writer) throws RenderingException {
+    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateCfg.getTemplate(templateName);
             template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db, config), writer);
-        } catch (IOException e) {
-            throw new RenderingException(e);
-        } catch (TemplateException e) {
+        } catch (IOException | TemplateException e) {
             throw new RenderingException(e);
         }
     }
@@ -80,7 +77,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         private final ContentStore db;
         private final JBakeConfiguration config;
 
-        public LazyLoadingModel(ObjectWrapper wrapper, Map<String, Object> eagerModel, final ContentStore db, JBakeConfiguration config) {
+        public LazyLoadingModel(ObjectWrapper wrapper, TemplateModel eagerModel, final ContentStore db, JBakeConfiguration config) {
             this.eagerModel = new SimpleHash(eagerModel, wrapper);
             this.db = db;
             this.wrapper = wrapper;
@@ -88,30 +85,30 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         }
 
         @Override
-        public TemplateModel get(final String key) throws TemplateModelException {
+        public freemarker.template.TemplateModel get(final String key) throws TemplateModelException {
             try {
 
                 // GIT Issue#357: Accessing db in freemarker template throws exception
                 // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
                 // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
-                if(key.equals(Crawler.Attributes.DB)) {
+                if (key.equals(ModelAttributes.DB)) {
                     BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
                     BeansWrapper bw = bwb.build();
                     return bw.wrap(db);
                 }
-                if (key.equals(Crawler.Attributes.DATA)) {
+                if (key.equals(ModelAttributes.DATA)) {
                     BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
                     BeansWrapper bw = bwb.build();
                     return bw.wrap(new DataFileUtil(db, config.getDataFileDocType()));
                 }
 
-                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<TemplateModel>() {
+                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<freemarker.template.TemplateModel>() {
 
                     @Override
-                    public TemplateModel adapt(String key, Object extractedValue) {
-                        if(key.equals(Crawler.Attributes.ALLTAGS)) {
+                    public freemarker.template.TemplateModel adapt(String key, Object extractedValue) {
+                        if (key.equals(ModelAttributes.ALLTAGS)) {
                             return new SimpleCollection((Collection) extractedValue, wrapper);
-                        } else if(key.equals(Crawler.Attributes.PUBLISHED_DATE)) {
+                        } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
                             return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
                         } else {
                             // All other cases, as far as I know, are document collections
@@ -120,13 +117,13 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
                     }
                 });
-            } catch(NoModelExtractorException e) {
+            } catch (NoModelExtractorException e) {
                 return eagerModel.get(key);
             }
         }
 
         @Override
-        public boolean isEmpty() throws TemplateModelException {
+        public boolean isEmpty() {
             return false;
         }
 

@@ -24,6 +24,7 @@
 package org.jbake.app;
 
 import org.jbake.FakeDocumentBuilder;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +32,6 @@ import org.junit.Test;
 import org.junit.BeforeClass;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,8 +63,7 @@ public class PaginationTest extends ContentStoreIntegrationTest {
         for (int i = 1; i <= TOTAL_POSTS; i++) {
             cal.add(Calendar.SECOND, 5);
             FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
-            builder.withName("dummyfile" + i)
-                    .withCached(true)
+            builder.withCached(true)
                     .withStatus("published")
                     .withDate(cal.getTime())
                     .build();
@@ -81,7 +80,10 @@ public class PaginationTest extends ContentStoreIntegrationTest {
             assertThat(posts.size()).isLessThanOrEqualTo(2);
 
             if (posts.size() > 1) {
-                assertThat((Date) posts.get(0).get("date")).isAfter((Date) posts.get(1).get("date"));
+                DocumentModel post = (DocumentModel) posts.get(0);
+                DocumentModel nextPost = (DocumentModel) posts.get(1);
+
+                assertThat(post.getDate()).isAfter(nextPost.getDate());
             }
 
             pageCount++;

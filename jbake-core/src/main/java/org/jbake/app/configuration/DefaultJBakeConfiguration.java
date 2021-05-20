@@ -7,12 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
 
+    public static final String DEFAULT_TYHMELEAF_TEMPLATE_MODE = "HTML";
     private static final String SOURCE_FOLDER_KEY = "sourceFolder";
     private static final String DESTINATION_FOLDER_KEY = "destinationFolder";
     private static final String ASSET_FOLDER_KEY = "assetFolder";
@@ -529,6 +530,12 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
+    public String getThymeleafModeByType(String type) {
+        String key = "template_" + type + "_thymeleaf_mode";
+        return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE);
+    }
+
+    @Override
     public String getServerContextPath() {
         return getAsString(JBakeProperty.SERVER_CONTEXT_PATH);
     }
@@ -536,6 +543,25 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     @Override
     public String getServerHostname() {
         return getAsString(JBakeProperty.SERVER_HOSTNAME);
+    }
+
+    @Override
+    public Map<String, Object> asHashMap() {
+        HashMap<String, Object> configModel = new HashMap<>();
+        Iterator<String> configKeys = this.getKeys();
+        while (configKeys.hasNext()) {
+            String key = configKeys.next();
+            Object valueObject;
+
+            if (key.equals(JBakeProperty.PAGINATE_INDEX)) {
+                valueObject = this.getPaginateIndex();
+            } else {
+                valueObject = this.get(key);
+            }
+            //replace "." in key so you can use dot notation in templates
+            configModel.put(key.replace(".", "_"), valueObject);
+        }
+        return configModel;
     }
 
     public void setTemplateExtensionForDocType(String docType, String extension) {

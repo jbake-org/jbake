@@ -6,17 +6,14 @@ import org.asciidoctor.Options;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.jruby.AsciidoctorJRuby;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.asciidoctor.AttributesBuilder.attributes;
@@ -88,9 +85,9 @@ public class AsciidoctorEngine extends MarkupEngine {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
-        Map<String, Object> documentModel = context.getDocumentModel();
+        DocumentModel documentModel = context.getDocumentModel();
         if (header.getDocumentTitle() != null) {
-            documentModel.put("title", header.getDocumentTitle().getCombined());
+            documentModel.setTitle(header.getDocumentTitle().getCombined());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
