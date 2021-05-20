@@ -139,6 +139,11 @@ public interface JBakeConfiguration {
     String getDraftSuffix();
 
     /**
+     * @return Output filename for error404 file, is only used when {@link #getRenderError404()} is true
+     */
+    String getError404FileName();
+
+    /**
      * Get name for example project name by given template type
      *
      * @param templateType a template type
@@ -152,7 +157,7 @@ public interface JBakeConfiguration {
     boolean getExportAsciidoctorAttributes();
 
     /**
-     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} der} is true
+     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} is true
      */
     String getFeedFileName();
 
@@ -224,6 +229,11 @@ public interface JBakeConfiguration {
      * @return Output encoding for freemarker url escaping
      */
     String getOutputEncoding();
+
+    /**
+     * @return Flag indicating if error404 file should be generated
+     */
+    boolean getRenderError404();
 
     /**
      * @return Flag indicating if feed file should be generated
