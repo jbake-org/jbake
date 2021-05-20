@@ -4,6 +4,7 @@ import ch.qos.logback.classic.spi.LoggingEvent;
 import org.apache.commons.configuration.ConfigurationException;
 import org.itsallcode.junit.sysextensions.ExitGuard;
 import org.jbake.TestUtils;
+import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -14,9 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.mockito.Mock;
+import picocli.CommandLine;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +24,11 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.itsallcode.junit.sysextensions.AssertExit.assertExitWithStatus;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,7 +83,6 @@ public class MainTest extends LoggingTest {
 
         verify(mockJetty).run(expectedOutput.getPath(),configuration);
     }
-
 
     @Test
     public void launchBakeAndJettyWithCustomDirForJetty(@TempDir Path source) throws ConfigurationException, IOException {
@@ -163,19 +165,29 @@ public class MainTest extends LoggingTest {
 
         String[] args = {"-t", "groovy-mte"};
 
-        assertExitWithStatus(1, ()->Main.main(args));
+        assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.getStatus(), ()->Main.main(args));
 
         verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
 
         LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-        assertThat(loggingEvent.getMessage()).isEqualTo("Invalid commandline arguments: option \"-t (--template)\" requires the option(s) [-i]");
+        assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init");
     }
 
-    private LaunchOptions stubOptions(String[] args) throws CmdLineException {
-        LaunchOptions res = new LaunchOptions();
-        CmdLineParser parser = new CmdLineParser(res);
-        parser.parseArgument(args);
-        return res;
+    @Test
+    void shouldThrowJBakeExceptionWithSystemExitCodeOnUnexpectedError() {
+
+        Main other = spy(main);
+
+        doThrow(new RuntimeException("something went wrong")).when(other).run(any(LaunchOptions.class), any());
+
+        JBakeException e = assertThrows(JBakeException.class, () -> other.run(new String[]{}));
+
+        assertThat(e.getMessage()).isEqualTo("An unexpected error occurred: something went wrong");
+        assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.getStatus());
+    }
+
+    private LaunchOptions stubOptions(String[] args) {
+        return CommandLine.populateCommand(new LaunchOptions(), args);
     }
 
     private DefaultJBakeConfiguration stubConfig() throws ConfigurationException {
