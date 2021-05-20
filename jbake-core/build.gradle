@@ -30,7 +30,7 @@ dependencies {
 
     // cli specific dependencies
     implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
-    implementation "args4j:args4j:$args4jVersion", optional
+    implementation "info.picocli:picocli:$picocli", optional
 }
 
 processResources {

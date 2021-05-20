@@ -41,7 +41,7 @@ public class Baker {
                 msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.getMessage()));
                 ++errNr;
             }
-            throw new JBakeException(msg.toString(), errors.get(0));
+            throw new JBakeException(SystemExit.ERROR ,msg.toString(), errors.get(0));
         }
     }
 }
