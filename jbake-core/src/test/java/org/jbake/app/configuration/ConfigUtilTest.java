@@ -188,7 +188,7 @@ public class ConfigUtilTest extends LoggingTest {
 
         List<String> docTypes = config.getDocumentTypes();
 
-        assertThat(docTypes).containsExactly("allcontent", "masterindex", "feed", "archive", "tag", "tagsindex", "sitemap", "post", "page");
+        assertThat(docTypes).containsExactly("allcontent", "masterindex", "feed", "error404", "archive", "tag", "tagsindex", "sitemap", "post", "page");
 
     }
 
