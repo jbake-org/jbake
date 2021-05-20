@@ -1,13 +1,11 @@
 package org.jbake.util;
 
-import org.jbake.app.Crawler.Attributes;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import java.util.Map;
 
 /**
  * @author Manik Magar
@@ -26,8 +24,8 @@ public class HtmlUtil {
      * @param fileContents  Map representing file contents
      * @param configuration Configuration object
      */
-    public static void fixImageSourceUrls(Map<String, Object> fileContents, JBakeConfiguration configuration) {
-        String htmlContent = fileContents.get(Attributes.BODY).toString();
+    public static void fixImageSourceUrls(DocumentModel fileContents, JBakeConfiguration configuration) {
+        String htmlContent = fileContents.getBody();
         boolean prependSiteHost = configuration.getImgPathPrependHost();
         String siteHost = configuration.getSiteHost();
         String uri = getDocumentUri(fileContents);
@@ -40,14 +38,14 @@ public class HtmlUtil {
         }
 
         //Use body().html() to prevent adding <body></body> from parsed fragment.
-        fileContents.put(Attributes.BODY, document.body().html());
+        fileContents.setBody(document.body().html());
     }
 
-    private static String getDocumentUri(Map<String, Object> fileContents) {
-        String uri = fileContents.get(Attributes.URI).toString();
+    private static String getDocumentUri(DocumentModel fileContents) {
+        String uri = fileContents.getUri();
 
-        if (fileContents.get(Attributes.NO_EXTENSION_URI) != null) {
-            uri = fileContents.get(Attributes.NO_EXTENSION_URI).toString();
+        if (fileContents.getNoExtensionUri() != null) {
+            uri = fileContents.getNoExtensionUri();
             uri = removeTrailingSlash(uri);
         }
 

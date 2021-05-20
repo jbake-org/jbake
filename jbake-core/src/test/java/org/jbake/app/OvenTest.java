@@ -49,7 +49,8 @@ public class OvenTest {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(output);
-        configuration.setTemplateFolder(new File(sourceFolder, "freemarkerTemplates"));
+        configuration.setTemplateFolder(new File(sourceFolder, "groovyMarkupTemplates"));
+        configuration.setProperty("template.paper.file", "paper.tpl");
     }
 
     @AfterEach
@@ -62,7 +63,7 @@ public class OvenTest {
 
     @Test
     public void bakeWithAbsolutePaths() {
-        configuration.setTemplateFolder(new File(sourceFolder, "freemarkerTemplates"));
+        configuration.setTemplateFolder(new File(sourceFolder, "groovyMarkupTemplates"));
         configuration.setContentFolder(new File(sourceFolder, "content"));
         configuration.setAssetFolder(new File(sourceFolder, "assets"));
 

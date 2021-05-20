@@ -22,12 +22,12 @@ public class DataFileUtil {
 
     public Map<String, Object> get(String ref) {
         Map<String, Object> result = new HashMap<>();
-        DocumentList docs = db.getDocumentByUri(defaultDocType, ref);
+        DocumentList docs = db.getDocumentByUri(ref);
         if (docs.isEmpty()) {
             LOGGER.warn("Unable to locate content for ref: {}", ref);
         } else {
             if (docs.size() == 1) {
-                result = docs.get(0);
+                result = (Map<String, Object>) docs.get(0);
             } else {
                 LOGGER.warn("Located multiple hits for ref: {}", ref);
             }
