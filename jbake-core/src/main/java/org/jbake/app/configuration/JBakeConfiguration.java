@@ -340,5 +340,10 @@ public interface JBakeConfiguration {
      * @return Abbreviated hash of latest git commit
      */
     String getAbbreviatedGitHash();
+
+    /**
+     * @return Locale to set in the JVM
+     */
+    String getJvmLocale();
 }
 

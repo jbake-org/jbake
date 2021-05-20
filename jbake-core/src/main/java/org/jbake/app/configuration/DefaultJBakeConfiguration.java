@@ -626,4 +626,9 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public String getAbbreviatedGitHash() {
         return getAsString(JBakeProperty.GIT_HASH);
     }
+
+    @Override
+    public String getJvmLocale() {
+        return getAsString(JBakeProperty.JVM_LOCALE);
+    }
 }

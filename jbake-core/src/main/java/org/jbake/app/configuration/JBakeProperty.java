@@ -53,6 +53,7 @@ public class JBakeProperty {
     public static final String IMG_PATH_PREPEND_HOST = "img.path.prepend.host";
     public static final String VERSION = "version";
     public static final String GIT_HASH = "git.hash";
+    public static final String JVM_LOCALE = "jvm.locale";
 
     private JBakeProperty() {}
 

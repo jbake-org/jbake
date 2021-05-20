@@ -11,6 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,6 +21,7 @@ import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -203,5 +207,26 @@ public class OvenTest {
         verify(renderer, atLeastOnce()).renderIndex(anyString());
         verify(crawler, times(1)).crawl();
         verify(asset, times(1)).copy();
+    }
+
+    @Test
+    public void localeConfiguration() throws Exception {
+        String language = configuration.getJvmLocale();
+
+        final Oven oven = new Oven(configuration);
+        oven.bake();
+
+        assertThat(Locale.getDefault(), is(new Locale(language)));
+    }
+
+    @Test
+    public void noLocaleConfiguration() throws Exception {
+        configuration.setProperty(JBakeProperty.JVM_LOCALE, null);
+
+        String language = Locale.getDefault().getLanguage();
+        final Oven oven = new Oven(configuration);
+        oven.bake();
+
+        assertThat(Locale.getDefault(), is(new Locale(language)));
     }
 }

@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.lang3.LocaleUtils;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -14,11 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * All the baking happens in the Oven!
@@ -115,6 +112,16 @@ public class Oven {
     }
 
     /**
+     * Sets the Locale for the JVM
+     *
+     */
+    private void setLocale() {
+        String localeString = getUtensils().getConfiguration().getJvmLocale();
+        Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
+        Locale.setDefault(locale);
+    }
+
+    /**
      * Responsible for incremental baking, typically a single file at a time.
      *
      * @param fileToBake The file to bake
@@ -139,6 +146,7 @@ public class Oven {
         JBakeConfiguration config = utensils.getConfiguration();
         Crawler crawler = utensils.getCrawler();
         Asset asset = utensils.getAsset();
+        setLocale();
 
         try {
 
