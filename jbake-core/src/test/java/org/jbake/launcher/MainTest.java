@@ -198,17 +198,17 @@ public class MainTest extends LoggingTest {
     }
 
     private void mockDefaultJbakeConfiguration(File sourceFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, false);
+        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false);
         System.setProperty("user.dir", sourceFolder.getPath());
 
-        when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
+        when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
     }
 
     private JBakeConfiguration mockJettyConfiguration(File sourceFolder, File destinationFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, false);
+        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false);
         System.setProperty("user.dir", sourceFolder.getPath());
 
-        when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
+        when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class),  any(File.class), anyBoolean())).thenReturn(configuration);
         return configuration;
     }
 

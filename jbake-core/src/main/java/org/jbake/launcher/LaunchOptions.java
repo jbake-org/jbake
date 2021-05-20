@@ -1,5 +1,6 @@
 package org.jbake.launcher;
 
+import org.jbake.app.configuration.ConfigUtil;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -37,6 +38,9 @@ public class LaunchOptions {
     @Option(names = {"-s", "--server"}, description = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
     private boolean runServer;
 
+    @Option(names = {"-c", "--config"}, description = "use specified file for configuration (defaults to " + ConfigUtil.CONFIG_FILE +" in the source folder if not supplied)")
+    private String config;
+
     @Option(names = {"-h", "--help"}, description = "prints this message", usageHelp = true)
     private boolean helpRequested;
 
@@ -69,6 +73,18 @@ public class LaunchOptions {
 
     public String getDestinationValue() {
         return destination;
+    }
+
+    public File getConfig() {
+        if (config != null) {
+            return new File(config);
+        } else {
+            return new File(getSource(), "jbake.properties");
+        }
+    }
+
+    public String getConfigValue() {
+        return config;
     }
 
     public boolean isHelpNeeded() {

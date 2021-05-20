@@ -76,9 +76,9 @@ public class Main {
 
             LaunchOptions res = parseArguments(args);
             if (res.isRunServer()) {
-                config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+                config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
             } else {
-                config = getJBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+                config = getJBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
             }
             run(res, config);
         } catch (final ConfigurationException e) {

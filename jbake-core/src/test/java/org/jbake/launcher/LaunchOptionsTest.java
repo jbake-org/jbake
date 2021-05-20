@@ -1,5 +1,6 @@
 package org.jbake.launcher;
 
+import org.jbake.app.configuration.ConfigUtil;
 import org.junit.Test;
 import picocli.CommandLine;
 import picocli.CommandLine.MissingParameterException;
@@ -100,6 +101,7 @@ public class LaunchOptionsTest {
         assertThat(res.isBake()).isFalse();
         assertThat(res.getSource().getPath()).isEqualTo(System.getProperty("user.dir"));
         assertThat(res.getDestination().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + "output");
+        assertThat(res.getConfig().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + ConfigUtil.CONFIG_FILE);
     }
 
     @Test
@@ -113,6 +115,14 @@ public class LaunchOptionsTest {
         assertThat(res.isBake()).isTrue();
         assertThat(res.getSource()).isEqualTo(new File("/tmp/source"));
         assertThat(res.getDestination()).isEqualTo(new File("/tmp/destination"));
+    }
+
+    @Test
+    public void configArg() {
+        String[] args = {"-c", "foo"};
+        LaunchOptions res = parseArgs(args);
+        assertThat(res.getConfig().getAbsoluteFile().toString()).isEqualTo(System.getProperty("user.dir")+ File.separator + "foo");
+
     }
 
     private LaunchOptions parseArgs(String[] args) {
