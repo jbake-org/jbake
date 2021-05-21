@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+import static org.jbake.app.configuration.PropertyList.CONTENT_FOLDER;
+import static org.jbake.app.configuration.PropertyList.TEMPLATE_FOLDER;
+
 public class JBakeConfigurationInspector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JBakeConfigurationInspector.class);
@@ -38,12 +41,12 @@ public class JBakeConfigurationInspector {
 
     private void ensureTemplateFolder() {
         File path = configuration.getTemplateFolder();
-        checkRequiredFolderExists(JBakeProperty.TEMPLATE_FOLDER, path);
+        checkRequiredFolderExists(TEMPLATE_FOLDER.getKey(), path);
     }
 
     private void ensureContentFolder() {
         File path = configuration.getContentFolder();
-        checkRequiredFolderExists(JBakeProperty.CONTENT_FOLDER, path);
+        checkRequiredFolderExists(CONTENT_FOLDER.getKey(), path);
     }
 
     private void ensureDestination() {

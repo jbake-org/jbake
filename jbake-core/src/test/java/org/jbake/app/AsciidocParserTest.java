@@ -3,8 +3,8 @@ package org.jbake.app;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
 import org.jbake.model.DocumentModel;
+import org.jbake.app.configuration.PropertyList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.jbake.app.configuration.PropertyList.ASCIIDOCTOR_ATTRIBUTES;
 
 public class AsciidocParserTest {
 
@@ -134,7 +135,7 @@ public class AsciidocParserTest {
     @Test
     public void parseAsciidocFileWithPrettifyAttribute() {
 
-        config.setProperty(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES,"source-highlighter=prettify");
+        config.setProperty(ASCIIDOCTOR_ATTRIBUTES.getKey(),"source-highlighter=prettify");
         DocumentModel map = parser.processFile(asciidocWithSource);
         Assert.assertNotNull(map);
         Assert.assertEquals("draft", map.getStatus());
@@ -151,7 +152,7 @@ public class AsciidocParserTest {
     @Test
     public void parseAsciidocFileWithCustomAttribute() {
 
-        config.setProperty(JBakeProperty.ASCIIDOCTOR_ATTRIBUTES,"source-highlighter=prettify,testattribute=I Love Jbake");
+        config.setProperty(ASCIIDOCTOR_ATTRIBUTES.getKey(),"source-highlighter=prettify,testattribute=I Love Jbake");
         DocumentModel map = parser.processFile(asciidocWithSource);
         Assert.assertNotNull(map);
         Assert.assertEquals("draft", map.getStatus());

@@ -365,5 +365,7 @@ public interface JBakeConfiguration {
     String getJvmLocale();
 
     Map<String, Object> asHashMap();
+
+    List<Property> getJbakeProperties();
 }
 
