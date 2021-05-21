@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.app.configuration.PropertyList;
 import org.jbake.model.DocumentTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,6 @@ import static org.hamcrest.core.Is.is;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -115,11 +114,11 @@ public class OvenTest {
 
         BufferedWriter fw = Files.newBufferedWriter(properties);
 
-        fw.write(JBakeProperty.ASSET_FOLDER + "=" + TestUtils.getOsPath(expectedAssetFolder));
+        fw.write(PropertyList.ASSET_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedAssetFolder));
         fw.newLine();
-        fw.write(JBakeProperty.TEMPLATE_FOLDER + "=" + TestUtils.getOsPath(expectedTemplateFolder));
+        fw.write(PropertyList.TEMPLATE_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedTemplateFolder));
         fw.newLine();
-        fw.write(JBakeProperty.DESTINATION_FOLDER + "=" + TestUtils.getOsPath(expectedDestination));
+        fw.write(PropertyList.DESTINATION_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedDestination));
         fw.close();
 
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(source.toFile());
@@ -222,7 +221,7 @@ public class OvenTest {
 
     @Test
     public void noLocaleConfiguration() throws Exception {
-        configuration.setProperty(JBakeProperty.JVM_LOCALE, null);
+        configuration.setProperty(PropertyList.JVM_LOCALE.getKey(), null);
 
         String language = Locale.getDefault().getLanguage();
         final Oven oven = new Oven(configuration);

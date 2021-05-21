@@ -3,8 +3,8 @@ package org.jbake.app;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
 import org.jbake.model.DocumentModel;
+import org.jbake.app.configuration.PropertyList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.jbake.app.configuration.PropertyList.TAG_SANITIZE;
 
 public class ParserTest {
 
@@ -308,7 +309,7 @@ public class ParserTest {
 
     @Test
     public void sanitizeTags() {
-        config.setProperty(JBakeProperty.TAG_SANITIZE, true);
+        config.setProperty(TAG_SANITIZE.getKey(), true);
         DocumentModel map = parser.processFile(validaAsciidocWithUnsanitizedHeader);
 
         assertThat(map.getTags()).isEqualTo(Arrays.asList("jbake", "java", "tag-with-space").toArray());

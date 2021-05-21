@@ -18,8 +18,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import picocli.CommandLine;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,46 +36,53 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(ExitGuard.class)
-public class MainTest extends LoggingTest {
+class MainTest extends LoggingTest {
 
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     private Main main;
-
-    @Mock private Baker mockBaker;
-    @Mock private JettyServer mockJetty;
-    @Mock private BakeWatcher mockWatcher;
-    @Mock private ConfigUtil configUtil;
-    @Mock private JBakeConfigurationFactory factory;
+    @Mock
+    private Baker mockBaker;
+    @Mock
+    private JettyServer mockJetty;
+    @Mock
+    private BakeWatcher mockWatcher;
+    @Mock
+    private ConfigUtil configUtil;
+    @Mock
+    private JBakeConfigurationFactory factory;
 
     private String workingdir;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.main = new Main(mockBaker, mockJetty, mockWatcher);
         workingdir = System.getProperty("user.dir");
         factory.setConfigUtil(configUtil);
         main.setJBakeConfigurationFactory(factory);
+        System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         System.setProperty("user.dir", workingdir);
+        System.setOut(standardOut);
     }
 
     @Test
-    public void launchJetty(@TempDir Path source) throws Exception {
-
-        File currentWorkingdir = newFolder(source,"src/jbake");
-        File expectedOutput = new File(currentWorkingdir,"output");
-        JBakeConfiguration configuration = mockJettyConfiguration(currentWorkingdir,expectedOutput);
+    void launchJetty(@TempDir Path source) throws Exception {
+        File currentWorkingdir = newFolder(source, "src/jbake");
+        File expectedOutput = new File(currentWorkingdir, "output");
+        JBakeConfiguration configuration = mockJettyConfiguration(currentWorkingdir, expectedOutput);
 
         String[] args = {"-s"};
         main.run(args);
 
-        verify(mockJetty).run(expectedOutput.getPath(),configuration);
+        verify(mockJetty).run(expectedOutput.getPath(), configuration);
     }
 
     @Test
-    public void launchBakeAndJetty(@TempDir Path source) throws Exception {
+    void launchBakeAndJetty(@TempDir Path source) throws Exception {
         File sourceFolder = newFolder(source, "src/jbake");
         File expectedOutput = newFolder(sourceFolder.toPath(), "output");
         JBakeConfiguration configuration = mockJettyConfiguration(sourceFolder, expectedOutput);
@@ -81,15 +90,15 @@ public class MainTest extends LoggingTest {
         String[] args = {"-b", "-s"};
         main.run(args);
 
-        verify(mockJetty).run(expectedOutput.getPath(),configuration);
+        verify(mockJetty).run(expectedOutput.getPath(), configuration);
     }
 
     @Test
-    public void launchBakeAndJettyWithCustomDirForJetty(@TempDir Path source) throws ConfigurationException, IOException {
-        File sourceFolder = newFolder(source,"src/jbake");
+    void launchBakeAndJettyWithCustomDirForJetty(@TempDir Path source) throws ConfigurationException, IOException {
+        File sourceFolder = newFolder(source, "src/jbake");
         String expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output";
-        File output = newFolder(source,expectedRunPath);
-        JBakeConfiguration configuration = mockJettyConfiguration(sourceFolder,output);
+        File output = newFolder(source, expectedRunPath);
+        JBakeConfiguration configuration = mockJettyConfiguration(sourceFolder, output);
 
         String[] args = {"-b", "-s", "src/jbake"};
         main.run(args);
@@ -98,8 +107,8 @@ public class MainTest extends LoggingTest {
     }
 
     @Test
-    public void launchJettyWithCustomServerSourceDir(@TempDir Path output) throws Exception {
-        File build = newFolder(output,"build/jbake");
+    void launchJettyWithCustomServerSourceDir(@TempDir Path output) throws Exception {
+        File build = newFolder(output, "build/jbake");
         JBakeConfiguration configuration = mockJettyConfiguration(build, build);
 
         String[] args = {build.getPath(), "-s"};
@@ -112,9 +121,9 @@ public class MainTest extends LoggingTest {
     // ATTENTION
     // There ist no extra argument for -s option. you can call jbake -s /customsource or jbake /customsource -s
     @Test
-    public void launchJettyWithCustomDestinationDir(@TempDir Path source) throws Exception {
+    void launchJettyWithCustomDestinationDir(@TempDir Path source) throws Exception {
         File src = newFolder(source, "src/jbake");
-        JBakeConfiguration configuration = mockJettyConfiguration(src,src);
+        JBakeConfiguration configuration = mockJettyConfiguration(src, src);
 
         String[] args = {"-s", src.getPath()};
         main.run(args);
@@ -123,10 +132,10 @@ public class MainTest extends LoggingTest {
     }
 
     @Test
-    public void launchJettyWithCustomSrcAndDestDir(@TempDir Path source, @TempDir Path output) throws Exception {
+    void launchJettyWithCustomSrcAndDestDir(@TempDir Path source, @TempDir Path output) throws Exception {
         File src = newFolder(source, "src/jbake");
         File exampleOutput = output.resolve("build/jbake").toFile();
-        JBakeConfiguration configuration = mockJettyConfiguration(src,exampleOutput);
+        JBakeConfiguration configuration = mockJettyConfiguration(src, exampleOutput);
 
         String[] args = {src.getPath(), exampleOutput.getPath(), "-s"};
         main.run(args);
@@ -135,7 +144,7 @@ public class MainTest extends LoggingTest {
     }
 
     @Test
-    public void launchJettyWithCustomDestViaConfig(@TempDir Path output) throws Exception {
+    void launchJettyWithCustomDestViaConfig(@TempDir Path output) throws Exception {
         String[] args = {"-s"};
         final File exampleOutput = output.resolve("build/jbake").toFile();
         DefaultJBakeConfiguration configuration = stubConfig();
@@ -147,7 +156,7 @@ public class MainTest extends LoggingTest {
     }
 
     @Test
-    public void launchJettyWithCmdlineOverridingProperties(@TempDir Path source, @TempDir Path output, @TempDir Path target) throws Exception {
+    void launchJettyWithCmdlineOverridingProperties(@TempDir Path source, @TempDir Path output, @TempDir Path target) throws Exception {
         final File src = newFolder(source, "src/jbake");
         final File expectedOutput = newFolder(output, "build/jbake");
         final File configTarget = newFolder(target, "target/jbake");
@@ -161,7 +170,7 @@ public class MainTest extends LoggingTest {
     }
 
     @Test
-    public void shouldTellUserThatTemplateOptionRequiresInitOption() throws Exception {
+    void shouldTellUserThatTemplateOptionRequiresInitOption() throws Exception {
 
         String[] args = {"-t", "groovy-mte"};
 
@@ -186,6 +195,17 @@ public class MainTest extends LoggingTest {
         assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.getStatus());
     }
 
+    @Test
+    void shouldListCurrentSettings(@TempDir Path source) throws ConfigurationException {
+        File src = newFolder(source, "src/jbake");
+        mockDefaultJbakeConfiguration(src);
+
+        String[] args = {"-ls"};
+        main.run(args);
+
+        assertThat(outputStreamCaptor.toString()).contains("DEFAULT - Settings");
+    }
+
     private LaunchOptions stubOptions(String[] args) {
         return CommandLine.populateCommand(new LaunchOptions(), args);
     }
@@ -201,7 +221,7 @@ public class MainTest extends LoggingTest {
         DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false);
         System.setProperty("user.dir", sourceFolder.getPath());
 
-        when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
+        when(factory.createDefaultJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
     }
 
     private JBakeConfiguration mockJettyConfiguration(File sourceFolder, File destinationFolder) throws ConfigurationException {

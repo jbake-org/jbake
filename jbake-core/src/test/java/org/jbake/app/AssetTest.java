@@ -6,7 +6,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.app.configuration.PropertyList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -196,7 +196,7 @@ public class AssetTest extends LoggingTest {
 
     @Test
     public void testFooIgnoredFolder() {
-        config.setProperty(JBakeProperty.IGNORE_FILE, ".fooignore");
+        config.setProperty(PropertyList.IGNORE_FILE.getKey(), ".fooignore");
 
         URL assetsUrl = this.getClass().getResource("/fixture/assets");
         File assets = new File(assetsUrl.getFile());

@@ -12,9 +12,9 @@ import java.io.File;
 
 public class CustomFSChangeListener implements FileListener {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CustomFSChangeListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomFSChangeListener.class);
 
-    private JBakeConfiguration config;
+    private final JBakeConfiguration config;
 
     public CustomFSChangeListener(JBakeConfiguration config) {
         this.config = config;
@@ -22,20 +22,20 @@ public class CustomFSChangeListener implements FileListener {
 
     @Override
     public void fileCreated(FileChangeEvent event) throws Exception {
-        LOGGER.info("File created event detected: {}", event.getFile().getURL());
-        exec(event.getFile());
+        LOGGER.info("File created event detected: {}", event.getFileObject().getURL());
+        exec(event.getFileObject());
     }
 
     @Override
     public void fileDeleted(FileChangeEvent event) throws Exception {
-        LOGGER.info("File deleted event detected: {}", event.getFile().getURL());
-        exec(event.getFile());
+        LOGGER.info("File deleted event detected: {}", event.getFileObject().getURL());
+        exec(event.getFileObject());
     }
 
     @Override
     public void fileChanged(FileChangeEvent event) throws Exception {
-        LOGGER.info("File changed event detected: {}", event.getFile().getURL());
-        exec(event.getFile());
+        LOGGER.info("File changed event detected: {}", event.getFileObject().getURL());
+        exec(event.getFileObject());
     }
 
     private void exec(FileObject file) {
