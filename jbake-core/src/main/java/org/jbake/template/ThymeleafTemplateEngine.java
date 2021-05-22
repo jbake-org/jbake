@@ -1,6 +1,6 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -38,7 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     private final ReentrantLock lock = new ReentrantLock();
     private TemplateEngine templateEngine;
-    private Context context;
+    private final Context context;
     private FileTemplateResolver templateResolver;
 
     /**
@@ -112,9 +112,9 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
      */
     private class ContextVariable extends LazyContextVariable {
 
-        private ContentStore db;
-        private String key;
-        private TemplateModel model;
+        private final ContentStore db;
+        private final String key;
+        private final TemplateModel model;
 
         public ContextVariable(ContentStore db, String key, TemplateModel model) {
             this.db = db;

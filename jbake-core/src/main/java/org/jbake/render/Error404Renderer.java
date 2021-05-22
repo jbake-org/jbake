@@ -2,7 +2,7 @@ package org.jbake.render;
 
 import java.io.File;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;

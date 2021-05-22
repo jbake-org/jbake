@@ -1,7 +1,7 @@
 package org.jbake.launcher;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.itsallcode.junit.sysextensions.ExitGuard;
 import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
@@ -82,6 +82,28 @@ class MainTest extends LoggingTest {
     }
 
     @Test
+    public void launchBakeWithCustomPropertiesEncoding(@TempDir Path source) throws Exception {
+        File currentWorkingdir = newFolder(source, "jbake");
+        mockDefaultJbakeConfiguration(currentWorkingdir);
+
+        String[] args = {"-b", "--prop-encoding", "latin1"};
+        main.run(args);
+
+        verify(factory).setEncoding("latin1");
+    }
+
+    @Test
+    public void launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir Path source) throws Exception {
+        File currentWorkingdir = newFolder(source, "jbake");
+        mockDefaultJbakeConfiguration(currentWorkingdir);
+
+        String[] args = {"-b"};
+        main.run(args);
+
+        verify(factory).setEncoding("utf-8");
+    }
+
+    @Test
     void launchBakeAndJetty(@TempDir Path source) throws Exception {
         File sourceFolder = newFolder(source, "src/jbake");
         File expectedOutput = newFolder(sourceFolder.toPath(), "output");
@@ -94,7 +116,7 @@ class MainTest extends LoggingTest {
     }
 
     @Test
-    void launchBakeAndJettyWithCustomDirForJetty(@TempDir Path source) throws ConfigurationException, IOException {
+    void launchBakeAndJettyWithCustomDirForJetty(@TempDir Path source) throws ConfigurationException {
         File sourceFolder = newFolder(source, "src/jbake");
         String expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output";
         File output = newFolder(source, expectedRunPath);
@@ -170,7 +192,7 @@ class MainTest extends LoggingTest {
     }
 
     @Test
-    void shouldTellUserThatTemplateOptionRequiresInitOption() throws Exception {
+    void shouldTellUserThatTemplateOptionRequiresInitOption() {
 
         String[] args = {"-t", "groovy-mte"};
 
@@ -183,13 +205,15 @@ class MainTest extends LoggingTest {
     }
 
     @Test
-    void shouldThrowJBakeExceptionWithSystemExitCodeOnUnexpectedError() {
+    void shouldThrowJBakeExceptionWithSystemExitCodeOnUnexpectedError(@TempDir Path source) throws ConfigurationException {
 
         Main other = spy(main);
+        File currentWorkingdir = newFolder(source, "jbake");
+        mockDefaultJbakeConfiguration(currentWorkingdir);
 
         doThrow(new RuntimeException("something went wrong")).when(other).run(any(LaunchOptions.class), any());
 
-        JBakeException e = assertThrows(JBakeException.class, () -> other.run(new String[]{}));
+        JBakeException e = assertThrows(JBakeException.class, () -> other.run(new String[]{""}));
 
         assertThat(e.getMessage()).isEqualTo("An unexpected error occurred: something went wrong");
         assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.getStatus());
@@ -220,15 +244,15 @@ class MainTest extends LoggingTest {
     private void mockDefaultJbakeConfiguration(File sourceFolder) throws ConfigurationException {
         DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false);
         System.setProperty("user.dir", sourceFolder.getPath());
-
+        when(factory.setEncoding(any())).thenReturn(factory);
         when(factory.createDefaultJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
     }
 
     private JBakeConfiguration mockJettyConfiguration(File sourceFolder, File destinationFolder) throws ConfigurationException {
         DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false);
         System.setProperty("user.dir", sourceFolder.getPath());
-
         when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class),  any(File.class), anyBoolean())).thenReturn(configuration);
+        when(factory.setEncoding(any())).thenReturn(factory);
         return configuration;
     }
 
