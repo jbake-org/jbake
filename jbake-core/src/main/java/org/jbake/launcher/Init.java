@@ -1,6 +1,6 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ZipUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -16,7 +16,7 @@ import java.io.FileInputStream;
  */
 public class Init {
 
-    private JBakeConfiguration config;
+    private final JBakeConfiguration config;
 
     /**
      * @param config The project configuration

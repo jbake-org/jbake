@@ -1,6 +1,6 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.lang3.LocaleUtils;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -15,7 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ServiceLoader;
 
 /**
  * All the baking happens in the Oven!
@@ -26,8 +31,8 @@ public class Oven {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
-    private Utensils utensils;
-    private List<Throwable> errors = new LinkedList<>();
+    private final Utensils utensils;
+    private final List<Throwable> errors = new LinkedList<>();
     private int renderedCount = 0;
 
     /**

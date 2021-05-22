@@ -1,8 +1,8 @@
 package org.jbake.app.configuration;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.SystemConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.SystemConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     private List<String> getAsList(String key) {
-        return Arrays.asList(compositeConfiguration.getStringArray(key));
+        return compositeConfiguration.getList(String.class, key);
     }
 
     private String getAsString(String key) {
@@ -90,15 +90,15 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsList(ASCIIDOCTOR_ATTRIBUTES.getKey());
     }
 
-    public Object getAsciidoctorOption(String optionKey) {
+    public List<String> getAsciidoctorOption(String optionKey) {
         Configuration subConfig = compositeConfiguration.subset(ASCIIDOCTOR_OPTION.getKey());
-        Object value = subConfig.getProperty(optionKey);
 
-        if (value == null) {
+        if (subConfig.containsKey(optionKey)) {
+            return subConfig.getList(String.class, optionKey);
+        } else {
             logger.warn("Cannot find asciidoctor option '{}.{}'", ASCIIDOCTOR_OPTION.getKey(), optionKey);
-            return "";
+            return Collections.emptyList();
         }
-        return value;
     }
 
     @Override
@@ -524,6 +524,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public void setProperty(String key, Object value) {
+
         compositeConfiguration.setProperty(key, value);
     }
 

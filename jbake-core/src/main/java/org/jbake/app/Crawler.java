@@ -1,7 +1,7 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -30,8 +30,8 @@ public class Crawler {
 
     private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
     private final ContentStore db;
-    private JBakeConfiguration config;
-    private Parser parser;
+    private final JBakeConfiguration config;
+    private final Parser parser;
 
     /**
      * @param db     Database instance for content
