@@ -38,12 +38,12 @@ public class YamlEngine extends MarkupEngine {
             if (result instanceof List) {
                 model.put("data", result);
             } else if (result instanceof Map) {
-                model = (DocumentModel) result;
+                model.putAll((Map)result);
             } else {
-
+                LOGGER.warn("Unexpected result [{}] while parsing YAML file {}", result.getClass(), file);
             }
         } catch (IOException e) {
-            LOGGER.error("Error while parsing file {}", file, e);
+            LOGGER.error("Error while parsing YAML file {}", file, e);
         }
         return model;
     }
@@ -60,7 +60,7 @@ public class YamlEngine extends MarkupEngine {
      */
     @Override
     public void processHeader(final ParserContext context) {
-        Map<String, Object> fileContents = parseFile(context.getFile());
+        DocumentModel fileContents = parseFile(context.getFile());
         DocumentModel documentModel = context.getDocumentModel();
 
         for (String key : fileContents.keySet()) {
