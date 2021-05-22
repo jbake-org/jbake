@@ -3,6 +3,7 @@ package org.jbake.app.configuration;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
@@ -139,6 +140,11 @@ public interface JBakeConfiguration {
     String getDraftSuffix();
 
     /**
+     * @return Output filename for error404 file, is only used when {@link #getRenderError404()} is true
+     */
+    String getError404FileName();
+
+    /**
      * Get name for example project name by given template type
      *
      * @param templateType a template type
@@ -152,7 +158,7 @@ public interface JBakeConfiguration {
     boolean getExportAsciidoctorAttributes();
 
     /**
-     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} der} is true
+     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} is true
      */
     String getFeedFileName();
 
@@ -224,6 +230,11 @@ public interface JBakeConfiguration {
      * @return Output encoding for freemarker url escaping
      */
     String getOutputEncoding();
+
+    /**
+     * @return Flag indicating if error404 file should be generated
+     */
+    boolean getRenderError404();
 
     /**
      * @return Flag indicating if feed file should be generated
@@ -332,6 +343,13 @@ public interface JBakeConfiguration {
      */
     void setProperty(String key, Object value);
 
+    /**
+     *
+     * @param type the documents type
+     * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
+     */
+    String getThymeleafModeByType(String type);
+
     String getServerContextPath();
 
     String getServerHostname();
@@ -340,5 +358,14 @@ public interface JBakeConfiguration {
      * @return Abbreviated hash of latest git commit
      */
     String getAbbreviatedGitHash();
+
+    /**
+     * @return Locale to set in the JVM
+     */
+    String getJvmLocale();
+
+    Map<String, Object> asHashMap();
+
+    List<Property> getJbakeProperties();
 }
 

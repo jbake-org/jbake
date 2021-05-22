@@ -1,5 +1,6 @@
 package org.jbake.launcher;
 
+import org.jbake.app.configuration.ConfigUtil;
 import org.junit.Test;
 import picocli.CommandLine;
 import picocli.CommandLine.MissingParameterException;
@@ -90,6 +91,38 @@ public class LaunchOptionsTest {
     }
 
     @Test
+    public void listConfig() throws Exception {
+        String[] args = {"-ls"};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.isListConfig()).isTrue();
+    }
+
+    @Test
+    public void listConfigLongOption() throws Exception {
+        String[] args = {"--list-settings"};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.isListConfig()).isTrue();
+    }
+
+    @Test
+    public void customPropertiesEncoding() throws Exception {
+        String[] args = {"--prop-encoding", "utf-16"};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.getPropertiesEncoding()).isEqualTo("utf-16");
+    }
+
+    @Test
+    public void defaultEncodingIsUtf8() throws Exception {
+        String[] args = {};
+        LaunchOptions res = parseArgs(args);
+
+        assertThat(res.getPropertiesEncoding()).isEqualTo("utf-8");
+    }
+
+    @Test
     public void bakeNoArgs() {
         String[] args = {};
         LaunchOptions res = parseArgs(args);
@@ -100,6 +133,7 @@ public class LaunchOptionsTest {
         assertThat(res.isBake()).isFalse();
         assertThat(res.getSource().getPath()).isEqualTo(System.getProperty("user.dir"));
         assertThat(res.getDestination().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + "output");
+        assertThat(res.getConfig().getPath()).isEqualTo(System.getProperty("user.dir") + File.separator + ConfigUtil.CONFIG_FILE);
     }
 
     @Test
@@ -113,6 +147,14 @@ public class LaunchOptionsTest {
         assertThat(res.isBake()).isTrue();
         assertThat(res.getSource()).isEqualTo(new File("/tmp/source"));
         assertThat(res.getDestination()).isEqualTo(new File("/tmp/destination"));
+    }
+
+    @Test
+    public void configArg() {
+        String[] args = {"-c", "foo"};
+        LaunchOptions res = parseArgs(args);
+        assertThat(res.getConfig().getAbsoluteFile().toString()).isEqualTo(System.getProperty("user.dir")+ File.separator + "foo");
+
     }
 
     private LaunchOptions parseArgs(String[] args) {

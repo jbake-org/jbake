@@ -1,10 +1,11 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.util.ConfigurationPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -20,8 +21,8 @@ import java.io.File;
  */
 public class Main {
 
-    private final String USAGE_PREFIX = "Usage: jbake";
-    private final String ALT_USAGE_PREFIX = "   or  jbake";
+    private static final String USAGE_PREFIX = "Usage: jbake";
+    private static final String ALT_USAGE_PREFIX = "   or  jbake";
     private final Baker baker;
     private final JettyServer jettyServer;
     private final BakeWatcher watcher;
@@ -76,9 +77,9 @@ public class Main {
 
             LaunchOptions res = parseArguments(args);
             if (res.isRunServer()) {
-                config = getJBakeConfigurationFactory().createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+                config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
             } else {
-                config = getJBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.isClearCache());
+                config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
             }
             run(res, config);
         } catch (final ConfigurationException e) {
@@ -97,6 +98,12 @@ public class Main {
         if (res.isHelpNeeded()) {
             printUsage(res);
             // Help was requested, so we are done here
+            return;
+        }
+
+        if (res.isListConfig()) {
+            ConfigurationPrinter printer = new ConfigurationPrinter(config, System.out);
+            printer.print();
             return;
         }
 

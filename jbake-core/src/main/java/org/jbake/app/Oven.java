@@ -1,6 +1,7 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.lang3.LocaleUtils;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ServiceLoader;
 
 /**
@@ -29,8 +31,8 @@ public class Oven {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Oven.class);
 
-    private Utensils utensils;
-    private List<Throwable> errors = new LinkedList<>();
+    private final Utensils utensils;
+    private final List<Throwable> errors = new LinkedList<>();
     private int renderedCount = 0;
 
     /**
@@ -115,6 +117,16 @@ public class Oven {
     }
 
     /**
+     * Sets the Locale for the JVM
+     *
+     */
+    private void setLocale() {
+        String localeString = getUtensils().getConfiguration().getJvmLocale();
+        Locale locale = localeString != null ? LocaleUtils.toLocale(localeString) : Locale.getDefault();
+        Locale.setDefault(locale);
+    }
+
+    /**
      * Responsible for incremental baking, typically a single file at a time.
      *
      * @param fileToBake The file to bake
@@ -139,6 +151,7 @@ public class Oven {
         JBakeConfiguration config = utensils.getConfiguration();
         Crawler crawler = utensils.getCrawler();
         Asset asset = utensils.getAsset();
+        setLocale();
 
         try {
 
