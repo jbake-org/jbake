@@ -1,7 +1,6 @@
 package org.jbake.app;
 
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.model.DocumentModel;
@@ -13,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -65,9 +62,10 @@ public class Crawler {
     }
 
     public void crawl() throws InterruptedException {
-        crawl(config.getContentFolder());
+        crawlContentFiles();
+        crawlDataFiles();
         shutdown();
-        logger.info("Content detected:");
+
         for (String docType : DocumentTypes.getDocumentTypes()) {
             long count = db.getDocumentCount(docType);
             if (count > 0) {
@@ -76,101 +74,34 @@ public class Crawler {
         }
     }
 
-    public void crawlDataFiles() {
-        crawlDataFiles(config.getDataFolder());
+    private void crawlContentFiles() {
+        crawl(config.getContentFolder(), FileUtil.getFileFilter(config));
+    }
 
+    protected void crawlDataFiles() {
+        crawl(config.getDataFolder(), FileUtil.getDataFileFilter());
         logger.info("Data files detected:");
-        String docType = config.getDataFileDocType();
-        long count = db.getDocumentCount(docType);
-        if (count > 0) {
-            logger.info("Parsed {} files", count);
-        }
     }
-
-    /**
-     * Crawl all files and folders looking for data files.
-     *
-     * @param path Folder to start from
-     */
-    private void crawlDataFiles(File path) {
-
-        File[] contents = path.listFiles(FileUtil.getDataFileFilter());
-        if (contents != null) {
-            Arrays.sort(contents);
-            for (File sourceFile : contents) {
-                if (sourceFile.isFile()) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
-                    String sha1 = buildHash(sourceFile);
-                    String uri = buildDataFileURI(sourceFile);
-                    DocumentStatus status = findDocumentStatus(uri, sha1);
-                    if (status == DocumentStatus.UPDATED) {
-                        sb.append(" : modified ");
-                        db.deleteContent(uri);
-                    } else if (status == DocumentStatus.IDENTICAL) {
-                        sb.append(" : same ");
-                    } else if (DocumentStatus.NEW == status) {
-                        sb.append(" : new ");
-                    }
-
-                    if (status != DocumentStatus.IDENTICAL) {
-                        String docType = config.getDataFileDocType();
-                        crawlDataFile(sourceFile, sha1, uri, docType);
-                    }
-
-                    logger.info("{}", sb);
-                }
-                if (sourceFile.isDirectory()) {
-                    crawlDataFiles(sourceFile);
-                }
-            }
-        }
-    }
-    private String buildDataFileURI(final File sourceFile) {
-        String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getDataFolder()), "");
-        // strip off leading /
-        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1, uri.length());
-        }
-        return uri;
-    }
-
-    private void crawlDataFile(final File sourceFile, final String sha1, final String uri, final String documentType) {
-        try {
-            DocumentModel document = parser.processFile(sourceFile);
-            if (document != null) {
-                document.setSha1(sha1);
-                document.setRendered(true);
-                document.setFile(sourceFile.getPath());
-                document.setSourceUri(uri);
-                document.setType(documentType);
-
-                db.addDocument(document);
-            } else {
-                logger.warn("{} couldn't be parsed so it has been ignored!", sourceFile);
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
-        }
-    }
-
-
 
     /**
      * Crawl all files and folders looking for content.
      *
      * @param path Folder to start from
      */
-    private void crawl(File path) {
-        Arrays.stream(path.listFiles(FileUtil.getFileFilter(config))).parallel().forEach( source -> {
-            if (source.isFile()) {
-                crawlFile(source);
-            } else if (source.isDirectory()) {
-                crawl(source);
-            }
-        });
+    private void crawl(File path, FileFilter filter) {
+        File[] filteredFiles = path.listFiles(filter);
+        if (filteredFiles != null) {
+            Arrays.stream(filteredFiles).parallel().forEach(source -> {
+                if (source.isFile()) {
+                    crawlFile(source);
+                } else if (source.isDirectory()) {
+                    crawl(source, filter);
+                }
+            });
+        } else {
+            logger.debug("filter does not apply");
+        }
     }
-
 
 
     private void crawlFile(File sourceFile) {
@@ -198,8 +129,8 @@ public class Crawler {
             StringBuilder sb = new StringBuilder();
             try {
                 sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
-                String sha1 = buildHash(sourceFile);
-                String uri = buildURI(sourceFile);
+                String sha1 = parser.buildHash(sourceFile);
+                String uri = parser.buildURI(sourceFile);
                 DocumentStatus status = findDocumentStatus(uri, sha1);
                 if (status == DocumentStatus.UPDATED) {
                     sb.append(" : modified ");
@@ -220,60 +151,6 @@ public class Crawler {
                 long delta = end - start;
                 logger.info("{} ({} ms)", sb, delta);
             }
-        }
-
-        private String buildURI(final File sourceFile) {
-            String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getContentFolder()), "");
-
-            if (useNoExtensionUri(uri)) {
-                // convert URI from xxx.html to xxx/index.html
-                uri = createNoExtensionUri(uri);
-            } else {
-                uri = createUri(uri);
-            }
-
-            // strip off leading / to enable generating non-root based sites
-            if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-                uri = uri.substring(1);
-            }
-
-            return uri;
-        }
-
-        // TODO: Refactor - parametrize the following two methods into one.
-        // commons-codec's URLCodec could be used when we add that dependency.
-        private String createUri(String uri) {
-            try {
-                return FileUtil.URI_SEPARATOR_CHAR
-                    + FilenameUtils.getPath(uri)
-                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
-                    + config.getOutputExtension();
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
-            }
-        }
-
-        private String createNoExtensionUri(String uri) {
-            try {
-                return FileUtil.URI_SEPARATOR_CHAR
-                    + FilenameUtils.getPath(uri)
-                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
-                    + FileUtil.URI_SEPARATOR_CHAR
-                    + "index"
-                    + config.getOutputExtension();
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
-            }
-        }
-
-        private boolean useNoExtensionUri(String uri) {
-            boolean noExtensionUri = config.getUriWithoutExtension();
-            String noExtensionUriPrefix = config.getPrefixForUriWithoutExtension();
-
-            return noExtensionUri
-                && (noExtensionUriPrefix != null)
-                && (noExtensionUriPrefix.length() > 0)
-                && uri.startsWith(noExtensionUriPrefix);
         }
 
         private void processSourceFile(final File sourceFile, final String sha1, final String uri) {
@@ -298,22 +175,26 @@ public class Crawler {
         }
 
         private void addAdditionalDocumentAttributes(DocumentModel document, File sourceFile, String sha1, String uri) {
-            document.setRootPath(getPathToRoot(sourceFile));
             document.setSha1(sha1);
-            document.setRendered(false);
+            document.setRendered(true);
+            document.setCached(true);
             document.setFile(sourceFile.getPath());
             document.setSourceUri(uri);
-            document.setUri(uri);
-            document.setCached(true);
 
-            if (document.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
-                && (document.getDate() != null)
-                && new Date().after(document.getDate())) {
-                document.setStatus(ModelAttributes.Status.PUBLISHED);
-            }
+            if ( !document.getType().equals(config.getDataFileDocType())) {
+                document.setRootPath(getPathToRoot(sourceFile));
+                document.setUri(uri);
+                document.setRendered(false);
 
-            if (config.getUriWithoutExtension()) {
-                document.setNoExtensionUri(uri.replace("/index.html", "/"));
+                if (document.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
+                    && (document.getDate() != null)
+                    && new Date().after(document.getDate())) {
+                    document.setStatus(ModelAttributes.Status.PUBLISHED);
+                }
+
+                if (config.getUriWithoutExtension()) {
+                    document.setNoExtensionUri(uri.replace("/index.html", "/"));
+                }
             }
         }
 
@@ -321,35 +202,19 @@ public class Crawler {
             return FileUtil.getUriPathToContentRoot(config, sourceFile);
         }
 
-
-    }
-
-    private String buildHash(final File sourceFile) {
-        String sha1;
-        try {
-            sha1 = FileUtil.sha1(sourceFile);
-        } catch (Exception e) {
-            logger.error("unable to build sha1 hash for source file '{}'", sourceFile);
-            sha1 = "";
-        }
-        return sha1;
-    }
-
-
-    private DocumentStatus findDocumentStatus(String uri, String sha1) {
-        DocumentList<DocumentModel> match = db.getDocumentStatus(uri);
-        if (!match.isEmpty()) {
-            DocumentModel document = match.get(0);
-            String oldHash = document.getSha1();
-            if (!oldHash.equals(sha1) || !document.getRendered()) {
-                return DocumentStatus.UPDATED;
+        private DocumentStatus findDocumentStatus(String uri, String sha1) {
+            DocumentList<DocumentModel> match = db.getDocumentStatus(uri);
+            if (!match.isEmpty()) {
+                DocumentModel document = match.get(0);
+                String oldHash = document.getSha1();
+                if (!oldHash.equals(sha1) || !document.getRendered()) {
+                    return DocumentStatus.UPDATED;
+                } else {
+                    return DocumentStatus.IDENTICAL;
+                }
             } else {
-                return DocumentStatus.IDENTICAL;
+                return DocumentStatus.NEW;
             }
-        } else {
-            return DocumentStatus.NEW;
         }
     }
-
-
 }

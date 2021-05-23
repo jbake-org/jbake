@@ -57,7 +57,6 @@ public class OvenTest {
     public void tearDown() {
         if (contentStore != null && contentStore.isActive()) {
             contentStore.close();
-            contentStore.shutdown();
         }
     }
 

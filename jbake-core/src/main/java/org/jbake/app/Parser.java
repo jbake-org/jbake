@@ -15,7 +15,7 @@ import java.io.File;
  * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
  */
 public class Parser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Parser.class);
+    private static final Logger logger = LoggerFactory.getLogger(Parser.class);
 
     private JBakeConfiguration config;
 
@@ -37,10 +37,29 @@ public class Parser {
     public DocumentModel processFile(File file) {
         ParserEngine engine = Engines.get(FileUtil.fileExt(file));
         if (engine == null) {
-            LOGGER.error("Unable to find suitable markup engine for {}", file);
+            logger.error("Unable to find suitable markup engine for {}", file);
             return null;
         }
 
         return engine.parse(config, file);
+    }
+
+    public String buildHash(File file) {
+        try {
+            return FileUtil.sha1(file);
+        } catch (Exception e) {
+            logger.error("unable to build sha1 hash for source file '{}'", file);
+            return "";
+        }
+    }
+
+    public String buildURI(File file) {
+        ParserEngine engine = Engines.get(FileUtil.fileExt(file));
+        if (engine == null) {
+            logger.error("Unable to find suitable markup engine for {}", file);
+            return null;
+        }
+
+        return engine.buildURI(config, file);
     }
 }

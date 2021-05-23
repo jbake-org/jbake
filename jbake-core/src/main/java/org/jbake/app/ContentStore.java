@@ -148,11 +148,6 @@ public class ContentStore {
         DBUtil.closeDataStore();
     }
 
-    public void shutdown() {
-
-//        Orient.instance().shutdown();
-    }
-
     private void startupIfEnginesAreMissing() {
         // Using a jdk which doesn't bundle a javascript engine
         // throws a NoClassDefFoundError while logging the warning

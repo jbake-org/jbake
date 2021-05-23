@@ -29,4 +29,11 @@ public interface ParserEngine {
     @Deprecated
     Map<String, Object> parse(Configuration config, File file, String contentPath);
 
+    /**
+     * Build the engine specific URI for the given file
+     * @param config The project configuration
+     * @param file The file the URI should be build for
+     * @return The engine specific URI
+     */
+    String buildURI(JBakeConfiguration config, File file);
 }

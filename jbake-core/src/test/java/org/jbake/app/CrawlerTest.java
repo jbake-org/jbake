@@ -21,7 +21,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
     public void crawl() throws InterruptedException {
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
-
+        crawler.shutdown();
         Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));
 
@@ -74,6 +74,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
+        crawler.shutdown();
 
         Assert.assertEquals(4, db.getDocumentCount("post"));
         Assert.assertEquals(3, db.getDocumentCount("page"));

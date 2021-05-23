@@ -165,9 +165,6 @@ public class Oven {
             LOGGER.info("Crawling content...");
             crawler.crawl();
 
-            // process data files
-            crawler.crawlDataFiles();
-
             // render content
             LOGGER.info("Rendering content...");
             renderContent();
@@ -190,7 +187,6 @@ public class Oven {
             e.printStackTrace();
         } finally {
             contentStore.close();
-            contentStore.shutdown();
         }
     }
 
