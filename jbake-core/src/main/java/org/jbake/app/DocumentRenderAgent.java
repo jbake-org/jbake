@@ -20,6 +20,7 @@ public class DocumentRenderAgent extends RenderAgent {
     }
 
     public void renderDocument() throws Exception {
+        long start = System.currentTimeMillis();
         String docType = document.getType();
         String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + document.getUri();
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
@@ -51,10 +52,14 @@ public class DocumentRenderAgent extends RenderAgent {
             try (Writer out = createWriter(outputFile)) {
                 renderingEngine.renderDocument(model, findTemplateName(docType), out);
                 renderer.incrementCount();
-                logger.info("Rendering [{}]... done!", outputFile);
+                long end = System.currentTimeMillis();
+                long delta = end - start;
+                logger.info("Rendering [{}]... done! ({} ms)", outputFile, delta);
             }
         } catch (Exception e) {
-            logger.error("Rendering [{}]... failed!", outputFile, e);
+            long end = System.currentTimeMillis();
+            long delta = end - start;
+            logger.error("Rendering [{}]... failed! ({} ms)", outputFile, delta, e);
             throw new Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.getMessage(), e);
         }
     }

@@ -194,24 +194,31 @@ public class Crawler {
 
         @Override
         public void run() {
+            long start = System.currentTimeMillis();
             StringBuilder sb = new StringBuilder();
-            sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
-            String sha1 = buildHash(sourceFile);
-            String uri = buildURI(sourceFile);
-            DocumentStatus status = findDocumentStatus(uri, sha1);
-            if (status == DocumentStatus.UPDATED) {
-                sb.append(" : modified ");
-                db.deleteContent(uri);
-            } else if (status == DocumentStatus.IDENTICAL) {
-                sb.append(" : same ");
-            } else if (DocumentStatus.NEW == status) {
-                sb.append(" : new ");
-            }
+            try {
+                sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
+                String sha1 = buildHash(sourceFile);
+                String uri = buildURI(sourceFile);
+                DocumentStatus status = findDocumentStatus(uri, sha1);
+                if (status == DocumentStatus.UPDATED) {
+                    sb.append(" : modified ");
+                    db.deleteContent(uri);
+                } else if (status == DocumentStatus.IDENTICAL) {
+                    sb.append(" : same ");
+                } else if (DocumentStatus.NEW == status) {
+                    sb.append(" : new ");
+                }
 
-            logger.info("{}", sb);
-
-            if (status != DocumentStatus.IDENTICAL) {
-                processSourceFile(sourceFile, sha1, uri);
+                if (status != DocumentStatus.IDENTICAL) {
+                    processSourceFile(sourceFile, sha1, uri);
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            } finally {
+                long end = System.currentTimeMillis();
+                long delta = end - start;
+                logger.info("{} ({} ms)", sb, delta);
             }
         }
 

@@ -18,15 +18,20 @@ public class DocumentRenderconfigAgent extends RenderAgent {
 
     @Override
     protected void renderDocument() throws Exception {
+        long start = System.currentTimeMillis();
         File outputFile = renderingConfig.getPath();
         try {
             try (Writer out = createWriter(outputFile)) {
                 renderingEngine.renderDocument(renderingConfig.getModel(), renderingConfig.getTemplate(), out);
                 renderer.incrementCount();
             }
-            logger.info("Rendering {} [{}]... done!", renderingConfig.getName(), outputFile);
+            long end = System.currentTimeMillis();
+            long delta = end - start;
+            logger.info("Rendering {} [{}]... done! ({} ms)", renderingConfig.getName(), outputFile, delta);
         } catch (Exception e) {
-            logger.error("Rendering {} [{}]... failed!", renderingConfig.getName(), outputFile, e);
+            long end = System.currentTimeMillis();
+            long delta = end - start;
+            logger.error("Rendering {} [{}]... failed! ({} ms)", renderingConfig.getName(), outputFile, delta, e);
             throw new Exception("Failed to render " + renderingConfig.getName(), e);
         }
     }
