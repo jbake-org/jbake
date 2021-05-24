@@ -1,6 +1,6 @@
 package org.jbake.app;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
@@ -24,7 +24,7 @@ public class Asset {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
     private final List<Throwable> errors = new LinkedList<>();
-    private JBakeConfiguration config;
+    private final JBakeConfiguration config;
 
     /**
      * @param source      Source file for the asset
@@ -65,7 +65,7 @@ public class Asset {
         FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file));
+                return (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config));
             }
         };
         copy(path, config.getDestinationFolder(), filter);
@@ -99,11 +99,11 @@ public class Asset {
         boolean isAsset = false;
 
         try {
-            if(FileUtil.directoryOnlyIfNotIgnored(path.getParentFile())) {
+            if(FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
                 if (FileUtil.isFileInDirectory(path, config.getAssetFolder())) {
                     isAsset = true;
                 } else if (FileUtil.isFileInDirectory(path, config.getContentFolder())
-                    && FileUtil.getNotContentFileFilter().accept(path)) {
+                    && FileUtil.getNotContentFileFilter(config).accept(path)) {
                     isAsset = true;
                 }
             }
@@ -119,7 +119,7 @@ public class Asset {
      * @param path of the content directory
      */
     public void copyAssetsFromContent(File path) {
-        copy(path, config.getDestinationFolder(), FileUtil.getNotContentFileFilter());
+        copy(path, config.getDestinationFolder(), FileUtil.getNotContentFileFilter(config));
     }
 
     /**

@@ -5,6 +5,7 @@ import org.jbake.app.Crawler;
 import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -13,7 +14,6 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,9 +64,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     @Test
     public void renderCustomTypePaper() throws Exception {
         // setup
-        config.setTemplateFileNameForDocType("paper", "paper." + templateExtension);
-        DocumentTypes.addDocumentType("paper");
-        db.updateSchema();
+
 
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
@@ -75,8 +73,8 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
         String filename = "published-paper.html";
 
         File sampleFile = new File(sourceFolder.getPath() + File.separator + "content" + File.separator + "papers" + File.separator + filename);
-        Map<String, Object> content = parser.processFile(sampleFile);
-        content.put(Crawler.Attributes.URI, "/" + filename);
+        DocumentModel content = parser.processFile(sampleFile);
+        content.setUri("/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
         Assert.assertTrue(outputFile.exists());

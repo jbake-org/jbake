@@ -1,18 +1,17 @@
 package org.jbake.template;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.template.model.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
+import static org.jbake.app.configuration.PropertyList.PAGINATE_INDEX;
 
 /**
  * A template which is responsible for delegating to a supported template engine,
@@ -45,28 +44,14 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
     }
 
     @Override
-    public void renderDocument(final Map<String, Object> model, String templateName, final Writer writer) throws RenderingException {
-        model.put("version", config.getVersion());
+    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
+        model.setVersion(config.getVersion());
+        model.setConfig(config.asHashMap());
 
-        // TODO: create config model from configuration
-        Map<String, Object> configModel = new HashMap<>();
-        Iterator<String> configKeys = config.getKeys();
-        while (configKeys.hasNext()) {
-            String key = configKeys.next();
-            Object valueObject;
-
-            if ( key.equals(JBakeProperty.PAGINATE_INDEX) ){
-                valueObject = config.getPaginateIndex();
-            } else {
-                valueObject = config.get(key);
-            }
-            //replace "." in key so you can use dot notation in templates
-            configModel.put(key.replace(".", "_"), valueObject);
-        }
-        model.put("config", configModel);
         // if default template exists we will use it
         File templateFolder = config.getTemplateFolder();
         File templateFile = new File(templateFolder, templateName);
+        String theTemplateName = templateName;
         if (!templateFile.exists()) {
             LOGGER.info("Default template: {} was not found, searching for others...", templateName);
             // if default template does not exist then check if any alternative engine templates exist
@@ -75,17 +60,17 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
                 templateFile = new File(templateFolder, templateNameWithoutExt + "." + extension);
                 if (templateFile.exists()) {
                     LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName());
-                    templateName = templateFile.getName();
+                    theTemplateName = templateFile.getName();
                     break;
                 }
             }
         }
-        String ext = FileUtil.fileExt(templateName);
+        String ext = FileUtil.fileExt(theTemplateName);
         AbstractTemplateEngine engine = renderers.getEngine(ext);
         if (engine != null) {
-            engine.renderDocument(model, templateName, writer);
+            engine.renderDocument(model, theTemplateName, writer);
         } else {
-            LOGGER.error("Warning - No template engine found for template: {}", templateName);
+            LOGGER.error("Warning - No template engine found for template: {}", theTemplateName);
         }
     }
 }

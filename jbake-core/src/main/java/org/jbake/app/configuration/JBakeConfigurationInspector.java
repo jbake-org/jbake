@@ -2,10 +2,14 @@ package org.jbake.app.configuration;
 
 import org.jbake.app.FileUtil;
 import org.jbake.app.JBakeException;
+import org.jbake.launcher.SystemExit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+
+import static org.jbake.app.configuration.PropertyList.CONTENT_FOLDER;
+import static org.jbake.app.configuration.PropertyList.TEMPLATE_FOLDER;
 
 public class JBakeConfigurationInspector {
 
@@ -28,21 +32,21 @@ public class JBakeConfigurationInspector {
     private void ensureSource() throws JBakeException {
         File source = configuration.getSourceFolder();
         if (!FileUtil.isExistingFolder(source)) {
-            throw new JBakeException("Error: Source folder must exist: " + source.getAbsolutePath());
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.getAbsolutePath());
         }
         if (!configuration.getSourceFolder().canRead()) {
-            throw new JBakeException("Error: Source folder is not readable: " + source.getAbsolutePath());
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.getAbsolutePath());
         }
     }
 
     private void ensureTemplateFolder() {
         File path = configuration.getTemplateFolder();
-        checkRequiredFolderExists(JBakeProperty.TEMPLATE_FOLDER, path);
+        checkRequiredFolderExists(TEMPLATE_FOLDER.getKey(), path);
     }
 
     private void ensureContentFolder() {
         File path = configuration.getContentFolder();
-        checkRequiredFolderExists(JBakeProperty.CONTENT_FOLDER, path);
+        checkRequiredFolderExists(CONTENT_FOLDER.getKey(), path);
     }
 
     private void ensureDestination() {
@@ -51,7 +55,7 @@ public class JBakeConfigurationInspector {
             destination.mkdirs();
         }
         if (!destination.canWrite()) {
-            throw new JBakeException("Error: Destination folder is not writable: " + destination.getAbsolutePath());
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Destination folder is not writable: " + destination.getAbsolutePath());
         }
     }
 
@@ -62,9 +66,9 @@ public class JBakeConfigurationInspector {
         }
     }
 
-    private void checkRequiredFolderExists(String property, File path) {
+    private void checkRequiredFolderExists(String folderName, File path) {
         if (!FileUtil.isExistingFolder(path)) {
-            throw new JBakeException("Error: Required folder cannot be found! Expected to find [" + property + "] at: " + path.getAbsolutePath());
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.getAbsolutePath());
         }
     }
 

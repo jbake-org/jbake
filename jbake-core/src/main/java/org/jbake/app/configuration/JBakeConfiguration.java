@@ -86,6 +86,21 @@ public interface JBakeConfiguration {
     String getContentFolderName();
 
     /**
+     * @return the data folder
+     */
+    File getDataFolder();
+
+    /**
+     * @return name of Folder where data files reside in
+     */
+    String getDataFolderName();
+
+    /**
+     * @return docType for data files
+     */
+    String getDataFileDocType();
+
+    /**
      * @return Folder to store database files in
      */
     String getDatabasePath();
@@ -125,6 +140,11 @@ public interface JBakeConfiguration {
     String getDraftSuffix();
 
     /**
+     * @return Output filename for error404 file, is only used when {@link #getRenderError404()} is true
+     */
+    String getError404FileName();
+
+    /**
      * Get name for example project name by given template type
      *
      * @param templateType a template type
@@ -138,7 +158,7 @@ public interface JBakeConfiguration {
     boolean getExportAsciidoctorAttributes();
 
     /**
-     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} der} is true
+     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} is true
      */
     String getFeedFileName();
 
@@ -147,6 +167,11 @@ public interface JBakeConfiguration {
      * @return String used to separate the header from the body
      */
     String getHeaderSeparator();
+
+    /**
+     * @return Filename to use to ignore a directory in addition to ".jbakeignore"
+     */
+    String getIgnoreFileName();
 
     /**
      * @return Output filename for index, is only used when {@link #getRenderIndex()} is true
@@ -200,6 +225,16 @@ public interface JBakeConfiguration {
      * @return Encoding used when rendering files
      */
     String getRenderEncoding();
+
+    /**
+     * @return Output encoding for freemarker url escaping
+     */
+    String getOutputEncoding();
+
+    /**
+     * @return Flag indicating if error404 file should be generated
+     */
+    boolean getRenderError404();
 
     /**
      * @return Flag indicating if feed file should be generated
@@ -325,8 +360,29 @@ public interface JBakeConfiguration {
      */
     void setProperty(String key, Object value);
 
+    /**
+     *
+     * @param type the documents type
+     * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
+     */
+    String getThymeleafModeByType(String type);
+
     String getServerContextPath();
 
     String getServerHostname();
+
+    /**
+     * @return Abbreviated hash of latest git commit
+     */
+    String getAbbreviatedGitHash();
+
+    /**
+     * @return Locale to set in the JVM
+     */
+    String getJvmLocale();
+
+    Map<String, Object> asHashMap();
+
+    List<Property> getJbakeProperties();
 }
 

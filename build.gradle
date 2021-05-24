@@ -37,7 +37,7 @@ apply plugin: 'com.github.kt3k.coveralls'
 allprojects {
     apply plugin: 'jacoco'
 
-    if ( JavaVersion.current().isJava8Compatible() ) {
+    if (JavaVersion.current().isJava8Compatible()) {
 
         apply plugin: 'checkstyle'
 
@@ -51,7 +51,7 @@ allprojects {
     }
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     jacoco {
@@ -77,10 +77,6 @@ subprojects {
         apply from: "$rootDir/gradle/maven-publishing.gradle"
         apply from: "$rootDir/gradle/publishing.gradle"
         apply from: "$rootDir/gradle/signing.gradle"
-    }
-    else {
-        apply from: "$rootDir/gradle/signing.gradle"
-        apply from: "$rootDir/gradle/github-releases.gradle"
     }
 
     // add source and target compatibility for all JavaCompile tasks
@@ -198,5 +194,6 @@ tasks.coveralls {
 
     dependsOn jacocoRootReport
     // Skip Task if not run on CI Server
+
     onlyIf { System.env.'CI' }
 }

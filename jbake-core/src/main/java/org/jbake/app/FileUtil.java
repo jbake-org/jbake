@@ -26,8 +26,29 @@ public class FileUtil {
     /**
      * Filters files based on their file extension.
      *
+     * @param config the jbake configuration
      * @return Object for filtering files
      */
+    public static FileFilter getFileFilter(JBakeConfiguration config) {
+        return new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                //Accept if input  is a non-hidden file with registered extension
+                //or if a non-hidden and not-ignored directory
+                return !pathname.isHidden() && (pathname.isFile()
+                    && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config));
+            }
+        };
+    }
+
+    /**
+     * Filters files based on their file extension.
+     *
+     * @return Object for filtering files
+     * @deprecated use {@link #getFileFilter(JBakeConfiguration)} instead
+     */
+    @Deprecated
     public static FileFilter getFileFilter() {
         return new FileFilter() {
 
@@ -42,10 +63,48 @@ public class FileUtil {
     }
 
     /**
+     * Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension)
+     *
+     * @return Object for filtering files
+     */
+    public static FileFilter getDataFileFilter() {
+        return new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                return "yaml".equalsIgnoreCase(fileExt(pathname)) || "yml".equalsIgnoreCase(fileExt(pathname));
+            }
+        };
+    }
+
+    /**
+     * Gets the list of files that are not content files based on their extension.
+     *
+     * @param config the jbake configuration
+     * @return FileFilter object
+     */
+    public static FileFilter getNotContentFileFilter(JBakeConfiguration config) {
+        return new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                //Accept if input  is a non-hidden file with NOT-registered extension
+                //or if a non-hidden and not-ignored directory
+                return !pathname.isHidden() && (pathname.isFile()
+                    //extension should not be from registered content extensions
+                    && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
+                    || (directoryOnlyIfNotIgnored(pathname, config));
+            }
+        };
+    }
+
+    /**
      * Gets the list of files that are not content files based on their extension.
      *
      * @return FileFilter object
+     * @deprecated use {@link #getNotContentFileFilter(JBakeConfiguration)} instead
      */
+    @Deprecated
     public static FileFilter getNotContentFileFilter() {
         return new FileFilter() {
 
@@ -62,11 +121,36 @@ public class FileUtil {
     }
 
     /**
+     * Ignores directory (and children) if it contains a file named in the
+     * configuration as a marker to ignore the directory.
+     *
+     * @param file the file to test
+     * @param config the jbake configuration
+     * @return true if file is directory and not ignored
+     */
+    public static boolean directoryOnlyIfNotIgnored(File file, JBakeConfiguration config) {
+        boolean accept = false;
+
+        FilenameFilter ignoreFile = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.equalsIgnoreCase(config.getIgnoreFileName());
+            }
+        };
+
+        accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
+
+        return accept;
+    }
+
+    /**
      * Ignores directory (and children) if it contains a file named ".jbakeignore".
      *
-     * @param file {@link File}
-     * @return {@link Boolean} true/false
+     * @param file the file to test
+     * @return true if file is directory and not ignored
+     * @deprecated use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead
      */
+    @Deprecated
     public static boolean directoryOnlyIfNotIgnored(File file) {
         boolean accept = false;
 
@@ -179,7 +263,7 @@ public class FileUtil {
      * platform independent file.getPath()
      *
      * @param path the path to transform, or {@code null}
-     * @return The result will have alle platform path separators replaced by "/".
+     * @return The result will have all platform path separators replaced by "/".
      */
     public static String asPath(String path) {
         if (path == null) {

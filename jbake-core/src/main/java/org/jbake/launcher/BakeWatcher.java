@@ -1,6 +1,6 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BakeWatcher {
 
-    private Logger logger = LoggerFactory.getLogger(BakeWatcher.class);
+    private final Logger logger = LoggerFactory.getLogger(BakeWatcher.class);
 
     /**
      * Starts watching the file system for changes to trigger a bake.
@@ -45,13 +45,15 @@ public class BakeWatcher {
             FileObject listenPath = fsMan.resolveFile(config.getContentFolder().toURI());
             FileObject templateListenPath = fsMan.resolveFile(config.getTemplateFolder().toURI());
             FileObject assetPath = fsMan.resolveFile(config.getAssetFolder().toURI());
+            FileObject dataPath = fsMan.resolveFile(config.getDataFolder().toURI());
 
-            logger.info("Watching for (content, template, asset) changes in [{}]", config.getSourceFolder().getPath());
+            logger.info("Watching for (content, data, template, asset) changes in [{}]", config.getSourceFolder().getPath());
             DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(config));
             monitor.setRecursive(true);
             monitor.addFile(listenPath);
             monitor.addFile(templateListenPath);
             monitor.addFile(assetPath);
+            monitor.addFile(dataPath);
             monitor.start();
         } catch (FileSystemException e) {
             logger.error("Problems watching filesystem changes", e);

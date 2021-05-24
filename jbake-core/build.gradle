@@ -1,4 +1,3 @@
-import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 apply from: "$rootDir/gradle/sonarqube.gradle"
@@ -9,7 +8,8 @@ description = "The core library of JBake"
 
 dependencies {
     implementation "commons-io:commons-io:$commonsIoVersion"
-    implementation "commons-configuration:commons-configuration:$commonsConfigurationVersion"
+    implementation "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
+    implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
     implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {
@@ -27,16 +27,18 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     implementation "org.jsoup:jsoup:$jsoupVersion"
     implementation "io.pebbletemplates:pebble:$pebbleVersion", optional
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
 
     // cli specific dependencies
     implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
-    implementation "args4j:args4j:$args4jVersion", optional
+    implementation "info.picocli:picocli:$picocli", optional
 }
 
 processResources {
     from("src/main/resources") {
         include 'default.properties'
         expand jbakeVersion: project.version,
-               timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'"))
+               timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
+               gitHash: grgit.head().abbreviatedId
     }
 }

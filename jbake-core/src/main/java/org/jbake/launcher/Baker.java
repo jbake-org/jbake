@@ -1,6 +1,6 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -41,7 +41,7 @@ public class Baker {
                 msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.getMessage()));
                 ++errNr;
             }
-            throw new JBakeException(msg.toString(), errors.get(0));
+            throw new JBakeException(SystemExit.ERROR ,msg.toString(), errors.get(0));
         }
     }
 }

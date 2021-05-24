@@ -4,20 +4,23 @@ import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeProperty;
+import org.jbake.app.configuration.PropertyList;
 import org.jbake.model.DocumentTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +48,8 @@ public class OvenTest {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         configuration.setDestinationFolder(output);
-        configuration.setTemplateFolder(new File(sourceFolder, "freemarkerTemplates"));
+        configuration.setTemplateFolder(new File(sourceFolder, "groovyMarkupTemplates"));
+        configuration.setProperty("template.paper.file", "paper.tpl");
     }
 
     @AfterEach
@@ -58,7 +62,7 @@ public class OvenTest {
 
     @Test
     public void bakeWithAbsolutePaths() {
-        configuration.setTemplateFolder(new File(sourceFolder, "freemarkerTemplates"));
+        configuration.setTemplateFolder(new File(sourceFolder, "groovyMarkupTemplates"));
         configuration.setContentFolder(new File(sourceFolder, "content"));
         configuration.setAssetFolder(new File(sourceFolder, "assets"));
 
@@ -110,11 +114,11 @@ public class OvenTest {
 
         BufferedWriter fw = Files.newBufferedWriter(properties);
 
-        fw.write(JBakeProperty.ASSET_FOLDER + "=" + TestUtils.getOsPath(expectedAssetFolder));
+        fw.write(PropertyList.ASSET_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedAssetFolder));
         fw.newLine();
-        fw.write(JBakeProperty.TEMPLATE_FOLDER + "=" + TestUtils.getOsPath(expectedTemplateFolder));
+        fw.write(PropertyList.TEMPLATE_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedTemplateFolder));
         fw.newLine();
-        fw.write(JBakeProperty.DESTINATION_FOLDER + "=" + TestUtils.getOsPath(expectedDestination));
+        fw.write(PropertyList.DESTINATION_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedDestination));
         fw.close();
 
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(source.toFile());
@@ -203,5 +207,26 @@ public class OvenTest {
         verify(renderer, atLeastOnce()).renderIndex(anyString());
         verify(crawler, times(1)).crawl();
         verify(asset, times(1)).copy();
+    }
+
+    @Test
+    public void localeConfiguration() throws Exception {
+        String language = configuration.getJvmLocale();
+
+        final Oven oven = new Oven(configuration);
+        oven.bake();
+
+        assertThat(Locale.getDefault(), is(new Locale(language)));
+    }
+
+    @Test
+    public void noLocaleConfiguration() throws Exception {
+        configuration.setProperty(PropertyList.JVM_LOCALE.getKey(), null);
+
+        String language = Locale.getDefault().getLanguage();
+        final Oven oven = new Oven(configuration);
+        oven.bake();
+
+        assertThat(Locale.getDefault(), is(new Locale(language)));
     }
 }

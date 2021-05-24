@@ -33,43 +33,41 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.model.DocumentAttributes;
+import org.jbake.launcher.SystemExit;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
 
 /**
  * @author jdlee
  */
 public class ContentStore {
 
-    private static final String STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "select * from %s where status='published' and ? in tags order by date desc";
-    private static final String STATEMENT_GET_POST_BY_TYPE_AND_URI = "select * from %s where sourceuri=?";
-    private static final String STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "select sha1,rendered from %s where sourceuri=?";
-    private static final String STATEMENT_GET_PUBLISHED_COUNT = "select count(*) as count from %s where status='published'";
-    private static final String STATEMENT_MARK_CONTENT_AS_RENDERD = "update %s set rendered=true where rendered=false and cached=true";
-    private static final String STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from %s where sourceuri=?";
-    private static final String STATEMENT_GET_UNDRENDERED_CONTENT = "select * from %s where rendered=false order by date desc";
+    private static final String STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "select * from Documents where status='published' and type='%s' and ? in tags order by date desc";
+    private static final String STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "select sha1,rendered from Documents where sourceuri=?";
+    private static final String STATEMENT_GET_PUBLISHED_COUNT = "select count(*) as count from Documents where status='published' and type='%s'";
+    private static final String STATEMENT_MARK_CONTENT_AS_RENDERD = "update Documents set rendered=true where rendered=false and type='%s' and sourceuri='%s' and cached=true";
+    private static final String STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from Documents where sourceuri=?";
+    private static final String STATEMENT_GET_UNDRENDERED_CONTENT = "select * from Documents where rendered=false order by date desc";
     private static final String STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "select sha1 from Signatures where key='templates'";
-    private static final String STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "select tags from post where status='published'";
-    private static final String STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "select * from %s order by date desc";
-    private static final String STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "select * from %s where status='published' order by date desc";
-    private static final String STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "select * from post where status='published' and ? in tags order by date desc";
-    private static final String STATEMENT_GET_TAGS_BY_DOCTYPE = "select tags from %s where status='published'";
+    private static final String STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "select tags from Documents where status='published' and type='post'";
+    private static final String STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "select * from Documents where type='%s' order by date desc";
+    private static final String STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "select * from Documents where status='published' and type='%s' order by date desc";
+    private static final String STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "select * from Documents where status='published' and type='post' and ? in tags order by date desc";
+    private static final String STATEMENT_GET_TAGS_BY_DOCTYPE = "select tags from Documents where status='published' and type='%s'";
     private static final String STATEMENT_INSERT_TEMPLATES_SIGNATURE = "insert into Signatures(key,sha1) values('templates',?)";
-    private static final String STATEMENT_DELETE_ALL = "delete from %s";
+    private static final String STATEMENT_DELETE_ALL = "delete from Documents where type='%s'";
     private static final String STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "update Signatures set sha1=? where key='templates'";
+    private static final String STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "select count(*) as count from Documents where type='%s'";
 
     private final Logger logger = LoggerFactory.getLogger(ContentStore.class);
     private final String type;
@@ -130,12 +128,10 @@ public class ContentStore {
 
         OSchema schema = db.getMetadata().getSchema();
 
-        for (String docType : DocumentTypes.getDocumentTypes()) {
-            if (!schema.existsClass(docType)) {
-                createDocType(schema, docType);
-            }
+        if (!schema.existsClass(Schema.DOCUMENTS)) {
+            createDocType(schema);
         }
-        if (!schema.existsClass("Signatures")) {
+        if (!schema.existsClass(Schema.SIGNATURES)) {
             createSignatureType(schema);
         }
     }
@@ -186,109 +182,70 @@ public class ContentStore {
         }
     }
 
-
-    /**
-     * Get a document by sourceUri and update it from the given map.
-     * @param incomingDocMap The document's db columns.
-     * @return The saved document.
-     * @throws IllegalArgumentException if sourceUri or docType are null, or if the document doesn't exist.
-     */
-    public ODocument mergeDocument(Map<String, ? extends Object> incomingDocMap) {
-        String sourceUri = (String) incomingDocMap.get(DocumentAttributes.SOURCE_URI.toString());
-
-        if (null == sourceUri) {
-            throw new IllegalArgumentException("Document sourceUri is null.");
-        }
-
-        String docType = (String) incomingDocMap.get(Crawler.Attributes.TYPE);
-
-        if (null == docType) {
-            throw new IllegalArgumentException("Document docType is null.");
-        }
-
-        // Get a document by sourceUri
-        String sql = String.format(STATEMENT_GET_POST_BY_TYPE_AND_URI, quoteIdentifier(docType));
-        activateOnCurrentThread();
-        List<ODocument> results = db.command(new OSQLSynchQuery<ODocument>(sql)).execute(sourceUri);
-        if (results.isEmpty()) {
-            throw new JBakeException("No document with sourceUri '" + sourceUri + "'.");
-        }
-
-        // Update it from the given map.
-        ODocument incomingDoc = new ODocument(docType);
-        incomingDoc.fromMap(incomingDocMap);
-        ODocument merged = results.get(0).merge(incomingDoc, true, false);
-        return merged;
-    }
-
-
     public long getDocumentCount(String docType) {
         activateOnCurrentThread();
-        return db.countClass(docType);
+        String statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType);
+        return (long) query(statement).get(0).get("count");
     }
 
     public long getPublishedCount(String docType) {
-        String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, quoteIdentifier(docType));
-        return (Long) query(statement).get(0).get("count");
+        String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType);
+        return (long) query(statement).get(0).get("count");
     }
 
-    /*
-     * In fact, the URI should be the only input as there can only be one document at given URI; but the DB is split per document type for some reason.
-     */
-    public DocumentList getDocumentByUri(String docType, String uri) {
-        return query(String.format(STATEMENT_GET_POST_BY_TYPE_AND_URI, quoteIdentifier(docType)), uri);
+    public DocumentList<DocumentModel> getDocumentByUri(String uri) {
+        return query("select * from Documents where sourceuri=?", uri);
     }
 
-    public DocumentList getDocumentStatus(String docType, String uri) {
-        String statement = String.format(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, quoteIdentifier(docType));
-        return query(statement, uri);
+    public DocumentList<DocumentModel> getDocumentStatus(String uri) {
+        return query(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, uri);
     }
 
-    public DocumentList getPublishedPosts() {
+    public DocumentList<DocumentModel> getPublishedPosts() {
         return getPublishedContent("post");
     }
 
-    public DocumentList getPublishedPosts(boolean applyPaging) {
+    public DocumentList<DocumentModel> getPublishedPosts(boolean applyPaging) {
         return getPublishedContent("post", applyPaging);
     }
 
-    public DocumentList getPublishedPostsByTag(String tag) {
+    public DocumentList<DocumentModel> getPublishedPostsByTag(String tag) {
         return query(STATEMENT_GET_PUBLISHED_POSTS_BY_TAG, tag);
     }
 
-    public DocumentList getPublishedDocumentsByTag(String tag) {
-        final DocumentList documents = new DocumentList();
+    public DocumentList<DocumentModel> getPublishedDocumentsByTag(String tag) {
+        final DocumentList<DocumentModel> documents = new DocumentList<>();
 
         for (final String docType : DocumentTypes.getDocumentTypes()) {
-            String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, quoteIdentifier(docType));
-            DocumentList documentsByTag = query(statement, tag);
+            String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType);
+            DocumentList<DocumentModel> documentsByTag = query(statement, tag);
             documents.addAll(documentsByTag);
         }
         return documents;
     }
 
-    public DocumentList getPublishedPages() {
+    public DocumentList<DocumentModel> getPublishedPages() {
         return getPublishedContent("page");
     }
 
-    public DocumentList getPublishedContent(String docType) {
+    public DocumentList<DocumentModel> getPublishedContent(String docType) {
         return getPublishedContent(docType, false);
     }
 
-    private DocumentList getPublishedContent(String docType, boolean applyPaging) {
-        String query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, quoteIdentifier(docType));
+    private DocumentList<DocumentModel> getPublishedContent(String docType, boolean applyPaging) {
+        String query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType);
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
         return query(query);
     }
 
-    public DocumentList getAllContent(String docType) {
+    public DocumentList<DocumentModel> getAllContent(String docType) {
         return getAllContent(docType, false);
     }
 
-    public DocumentList getAllContent(String docType, boolean applyPaging) {
-        String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, quoteIdentifier(docType));
+    public DocumentList<DocumentModel> getAllContent(String docType, boolean applyPaging) {
+        String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType);
         if (applyPaging && hasStartAndLimitBoundary()) {
             query += " SKIP " + start + " LIMIT " + limit;
         }
@@ -299,26 +256,24 @@ public class ContentStore {
         return (start >= 0) && (limit > -1);
     }
 
-    private DocumentList getAllTagsFromPublishedPosts() {
+    private DocumentList<DocumentModel> getAllTagsFromPublishedPosts() {
         return query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS);
     }
 
-    private DocumentList getSignaturesForTemplates() {
+    private DocumentList<DocumentModel> getSignaturesForTemplates() {
         return query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES);
     }
 
-    public DocumentList getUnrenderedContent(String docType) {
-        String statement = String.format(STATEMENT_GET_UNDRENDERED_CONTENT, quoteIdentifier(docType));
-        return query(statement);
+    public DocumentList<DocumentModel> getUnrenderedContent() {
+        return query(STATEMENT_GET_UNDRENDERED_CONTENT);
     }
 
-    public void deleteContent(String docType, String uri) {
-        String statement = String.format(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, quoteIdentifier(docType));
-        executeCommand(statement, uri);
+    public void deleteContent(String uri) {
+        executeCommand(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, uri);
     }
 
-    public void markContentAsRendered(String docType) {
-        String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, quoteIdentifier(docType));
+    public void markContentAsRendered(DocumentModel document) {
+        String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.getType(), document.getSourceuri());
         executeCommand(statement);
     }
 
@@ -327,7 +282,7 @@ public class ContentStore {
     }
 
     public void deleteAllByDocType(String docType) {
-        String statement = String.format(STATEMENT_DELETE_ALL, quoteIdentifier(docType));
+        String statement = String.format(STATEMENT_DELETE_ALL, docType);
         executeCommand(statement);
     }
 
@@ -335,13 +290,13 @@ public class ContentStore {
         executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
     }
 
-    private DocumentList query(String sql) {
+    private DocumentList<DocumentModel> query(String sql) {
         activateOnCurrentThread();
         OResultSet results = db.query(sql);
         return DocumentList.wrap(results);
     }
 
-    private DocumentList query(String sql, Object... args) {
+    private DocumentList<DocumentModel> query(String sql, Object... args) {
         activateOnCurrentThread();
         OResultSet results = db.command(sql, args);
         return DocumentList.wrap(results);
@@ -349,14 +304,14 @@ public class ContentStore {
 
     private void executeCommand(String query, Object... args) {
         activateOnCurrentThread();
-        db.command(new OCommandSQL(query)).execute(args);
+        db.command(query, args);
     }
 
     public Set<String> getTags() {
-        DocumentList docs = this.getAllTagsFromPublishedPosts();
+        DocumentList<DocumentModel> docs = this.getAllTagsFromPublishedPosts();
         Set<String> result = new HashSet<>();
-        for (Map<String, Object> document : docs) {
-            String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
+        for (DocumentModel document : docs) {
+            String[] tags = document.getTags();
             Collections.addAll(result, tags);
         }
         return result;
@@ -365,48 +320,39 @@ public class ContentStore {
     public Set<String> getAllTags() {
         Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
-            String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, quoteIdentifier(docType));
-            DocumentList docs = query(statement);
-            for (Map<String, Object> document : docs) {
-                String[] tags = DBUtil.toStringArray(document.get(Crawler.Attributes.TAGS));
+            String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType);
+            DocumentList<DocumentModel> docs = query(statement);
+            for (DocumentModel document : docs) {
+                String[] tags = document.getTags();
                 Collections.addAll(result, tags);
             }
         }
         return result;
     }
 
-    private void createDocType(final OSchema schema, final String docType) {
-        logger.debug("Create document class '{}'", docType);
+    private void createDocType(final OSchema schema) {
+        logger.debug("Create document class");
 
+        OClass page = schema.createClass(Schema.DOCUMENTS);
+        page.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
+        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1);
+        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).setNotNull(true);
+        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI);
+        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED);
+        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).setNotNull(true);
+        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED);
+        page.createProperty(ModelAttributes.STATUS, OType.STRING).setNotNull(true);
+        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS);
+        page.createProperty(ModelAttributes.TYPE, OType.STRING).setNotNull(true);
+        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE);
 
-        OClass page = schema.createClass(docType);
-
-        // Primary key
-        String attribName = DocumentAttributes.SOURCE_URI.toString();
-        page.createProperty(attribName, OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, attribName);
-
-        attribName = DocumentAttributes.SHA1.toString();
-        page.createProperty(attribName, OType.STRING).setNotNull(true);
-        page.createIndex(docType + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
-
-        attribName = DocumentAttributes.CACHED.toString();
-        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
-
-        attribName = DocumentAttributes.RENDERED.toString();
-        page.createProperty(attribName, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(docType + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
-
-        attribName = DocumentAttributes.STATUS.toString();
-        page.createProperty(attribName, OType.STRING).setNotNull(true);
-        page.createIndex(docType + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, attribName);
     }
 
     private void createSignatureType(OSchema schema) {
-        OClass signatures = schema.createClass("Signatures");
-        signatures.createProperty(String.valueOf(DocumentAttributes.SHA1), OType.STRING).setNotNull(true);
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, DocumentAttributes.SHA1.toString());
+        OClass signatures = schema.createClass(Schema.SIGNATURES);
+        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
+        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
     }
 
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
@@ -426,7 +372,7 @@ public class ContentStore {
     private boolean updateTemplateSignatureIfChanged(File templateFolder) {
         boolean templateSignatureChanged = false;
 
-        DocumentList docs = this.getSignaturesForTemplates();
+        DocumentList<DocumentModel> docs = this.getSignaturesForTemplates();
         String currentTemplatesSignature;
         try {
             currentTemplatesSignature = FileUtil.sha1(templateFolder);
@@ -434,7 +380,7 @@ public class ContentStore {
             currentTemplatesSignature = "";
         }
         if (!docs.isEmpty()) {
-            String sha1 = (String) docs.get(0).get(String.valueOf(DocumentAttributes.SHA1));
+            String sha1 = docs.get(0).getSha1();
             if (!sha1.equals(currentTemplatesSignature)) {
                 this.updateSignatures(currentTemplatesSignature);
                 templateSignatureChanged = true;
@@ -461,11 +407,15 @@ public class ContentStore {
         return db.isActiveOnCurrentThread();
     }
 
-    static String quoteIdentifier(String input) {
-        if(input == null) {
-            return input;
-        } else {
-            return "`" + input.replaceAll("([\\\\`])", "\\\\$1") + "`";
-        }
+    public void addDocument(DocumentModel document) {
+        ODocument doc = new ODocument(Schema.DOCUMENTS);
+        doc.fromMap(document);
+        doc.save();
     }
+
+    protected abstract class Schema {
+        static final String DOCUMENTS = "Documents";
+        static final String SIGNATURES = "Signatures";
+    }
+
 }

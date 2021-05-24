@@ -1,6 +1,7 @@
 package org.jbake.render.support;
 
-import org.apache.commons.configuration.CompositeConfiguration;
+
+import org.apache.commons.configuration2.CompositeConfiguration;
 
 public class MockCompositeConfiguration extends CompositeConfiguration {
 
@@ -20,7 +21,7 @@ public class MockCompositeConfiguration extends CompositeConfiguration {
     @Override
     public boolean getBoolean(String key) {
 
-        if ( super.containsKey(key) ) {
+        if (super.containsKey(key)) {
             return super.getBoolean(key);
         }
         return _bool;

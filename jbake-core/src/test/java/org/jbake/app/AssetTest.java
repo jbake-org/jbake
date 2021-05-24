@@ -6,6 +6,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
+import org.jbake.app.configuration.PropertyList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -186,11 +187,35 @@ public class AssetTest extends LoggingTest {
         File jsFile = new File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
         Assertions.assertTrue(jsFile.exists(), () -> "File " + jsFile.getAbsolutePath() + " does not exist");
         File ignorableFolder = new File(folder.toString() + File.separatorChar + "ignorablefolder");
+        File fooIgnorableFolder = new File(folder.toString() + File.separatorChar + "fooignorablefolder");
         Assertions.assertFalse(ignorableFolder.exists(), () -> "Folder " + ignorableFolder.getAbsolutePath() + " must not exist");
+        Assertions.assertTrue(fooIgnorableFolder.exists(), () -> "Folder " + fooIgnorableFolder.getAbsolutePath() + " must exist");
 
         Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
     }
 
+    @Test
+    public void testFooIgnoredFolder() {
+        config.setProperty(PropertyList.IGNORE_FILE.getKey(), ".fooignore");
+
+        URL assetsUrl = this.getClass().getResource("/fixture/assets");
+        File assets = new File(assetsUrl.getFile());
+        Asset asset = new Asset(config);
+        asset.copy(assets);
+
+        File cssFile = new File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
+        Assertions.assertTrue(cssFile.exists(), () -> "File " + cssFile.getAbsolutePath() + " does not exist");
+        File imgFile = new File(folder.toString() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png");
+        Assertions.assertTrue(imgFile.exists(), () -> "File " + imgFile.getAbsolutePath() + " does not exist");
+        File jsFile = new File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js");
+        Assertions.assertTrue(jsFile.exists(), () -> "File " + jsFile.getAbsolutePath() + " does not exist");
+        File ignorableFolder = new File(folder.toString() + File.separatorChar + "ignorablefolder");
+        File fooIgnorableFolder = new File(folder.toString() + File.separatorChar + "fooignorablefolder");
+        Assertions.assertTrue(ignorableFolder.exists(), () -> "Folder " + ignorableFolder.getAbsolutePath() + " must exist");
+        Assertions.assertFalse(fooIgnorableFolder.exists(), () -> "Folder " + fooIgnorableFolder.getAbsolutePath() + " must not exist");
+
+        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying");
+    }
 
     @Test
     public void testCopyAssetsFromContent() {

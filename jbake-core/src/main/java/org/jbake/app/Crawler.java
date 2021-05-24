@@ -1,14 +1,14 @@
 package org.jbake.app;
 
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
-import org.jbake.app.Crawler.Attributes.Status;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.model.DocumentAttributes;
+import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +28,10 @@ import java.util.Map;
  */
 public class Crawler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
+    private static final Logger logger = LoggerFactory.getLogger(Crawler.class);
     private final ContentStore db;
-    private JBakeConfiguration config;
-    private Parser parser;
+    private final JBakeConfiguration config;
+    private final Parser parser;
 
     /**
      * @param db     Database instance for content
@@ -63,14 +63,24 @@ public class Crawler {
     public void crawl() {
         crawl(config.getContentFolder());
 
-        LOGGER.info("Content detected:");
+        logger.info("Content detected:");
         for (String docType : DocumentTypes.getDocumentTypes()) {
             long count = db.getDocumentCount(docType);
             if (count > 0) {
-                LOGGER.info("Parsed {} files of type: {}", count, docType);
+                logger.info("Parsed {} files of type: {}", count, docType);
             }
         }
+    }
 
+    public void crawlDataFiles() {
+        crawlDataFiles(config.getDataFolder());
+
+        logger.info("Data files detected:");
+        String docType = config.getDataFileDocType();
+        long count = db.getDocumentCount(docType);
+        if (count > 0) {
+            logger.info("Parsed {} files", count);
+        }
     }
 
     /**
@@ -79,7 +89,49 @@ public class Crawler {
      * @param path Folder to start from
      */
     private void crawl(File path) {
-        File[] contents = path.listFiles(FileUtil.getFileFilter());
+        File[] contents = path.listFiles(FileUtil.getFileFilter(config));
+        if (contents != null) {
+            Arrays.sort(contents);
+            for (File sourceFile : contents) {
+                if (sourceFile.isFile()) {
+                    crawlFile(sourceFile);
+                } else if (sourceFile.isDirectory()) {
+                    crawl(sourceFile);
+                }
+            }
+        }
+    }
+
+    private void crawlFile(File sourceFile) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
+        String sha1 = buildHash(sourceFile);
+        String uri = buildURI(sourceFile);
+        DocumentStatus status = findDocumentStatus(uri, sha1);
+        if (status == DocumentStatus.UPDATED) {
+            sb.append(" : modified ");
+            db.deleteContent(uri);
+        } else if (status == DocumentStatus.IDENTICAL) {
+            sb.append(" : same ");
+        } else if (DocumentStatus.NEW == status) {
+            sb.append(" : new ");
+        }
+
+        logger.info("{}", sb);
+
+        if (status != DocumentStatus.IDENTICAL) {
+            processSourceFile(sourceFile, sha1, uri);
+        }
+    }
+
+    /**
+     * Crawl all files and folders looking for data files.
+     *
+     * @param path Folder to start from
+     */
+    private void crawlDataFiles(File path) {
+        File[] contents = path.listFiles(FileUtil.getDataFileFilter());
         if (contents != null) {
             Arrays.sort(contents);
             for (File sourceFile : contents) {
@@ -87,33 +139,31 @@ public class Crawler {
                     StringBuilder sb = new StringBuilder();
                     sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
                     String sha1 = buildHash(sourceFile);
-                    String uri = buildURI(sourceFile);
+                    String uri = buildDataFileURI(sourceFile);
                     boolean process = true;
                     DocumentStatus status = DocumentStatus.NEW;
-                    for (String docType : DocumentTypes.getDocumentTypes()) {
-                        status = findDocumentStatus(docType, uri, sha1);
-                        if (status == DocumentStatus.UPDATED) {
-                            sb.append(" : modified ");
-                            db.deleteContent(docType, uri);
-
-                        } else if (status == DocumentStatus.IDENTICAL) {
-                            sb.append(" : same ");
-                            process = false;
-                        }
-                        if (!process) {
-                            break;
-                        }
+                    String docType = config.getDataFileDocType();
+                    status = findDocumentStatus(uri, sha1);
+                    if (status == DocumentStatus.UPDATED) {
+                        sb.append(" : modified ");
+                        db.deleteContent(uri);
+                    } else if (status == DocumentStatus.IDENTICAL) {
+                        sb.append(" : same ");
+                        process = false;
+                    }
+                    if (!process) {
+                        break;
                     }
                     if (DocumentStatus.NEW == status) {
                         sb.append(" : new ");
                     }
                     if (process) { // new or updated
-                        crawlSourceFile(sourceFile, sha1, uri);
+                        crawlDataFile(sourceFile, sha1, uri, docType);
                     }
-                    LOGGER.info("{}", sb);
+                    logger.info("{}", sb);
                 }
                 if (sourceFile.isDirectory()) {
-                    crawl(sourceFile);
+                    crawlDataFiles(sourceFile);
                 }
             }
         }
@@ -124,7 +174,7 @@ public class Crawler {
         try {
             sha1 = FileUtil.sha1(sourceFile);
         } catch (Exception e) {
-            LOGGER.error("unable to build sha1 hash for source file '{}'", sourceFile);
+            logger.error("unable to build sha1 hash for source file '{}'", sourceFile);
             sha1 = "";
         }
         return sha1;
@@ -142,9 +192,18 @@ public class Crawler {
 
         // strip off leading / to enable generating non-root based sites
         if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1, uri.length());
+            uri = uri.substring(1);
         }
 
+        return uri;
+    }
+
+    private String buildDataFileURI(final File sourceFile) {
+        String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getDataFolder()), "");
+        // strip off leading /
+        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
+            uri = uri.substring(1, uri.length());
+        }
         return uri;
     }
 
@@ -184,50 +243,63 @@ public class Crawler {
             && uri.startsWith(noExtensionUriPrefix);
     }
 
-    private void crawlSourceFile(final File sourceFile, final String sha1, final String uri) {
+    private void crawlDataFile(final File sourceFile, final String sha1, final String uri, final String documentType) {
         try {
-            Map<String, Object> fileContents = parser.processFile(sourceFile);
-            if (fileContents != null) {
-                fileContents.put(Attributes.ROOTPATH, getPathToRoot(sourceFile));
-                fileContents.put(String.valueOf(DocumentAttributes.SHA1), sha1);
-                fileContents.put(String.valueOf(DocumentAttributes.RENDERED), false);
-                if (fileContents.get(Attributes.TAGS) != null) {
-                    // store them as a String[]
-                    String[] tags = (String[]) fileContents.get(Attributes.TAGS);
-                    fileContents.put(Attributes.TAGS, tags);
-                }
-                fileContents.put(Attributes.FILE, sourceFile.getPath());
-                fileContents.put(String.valueOf(DocumentAttributes.SOURCE_URI), uri);
-                fileContents.put(Attributes.URI, uri);
+            DocumentModel document = parser.processFile(sourceFile);
+            if (document != null) {
+                document.setSha1(sha1);
+                document.setRendered(true);
+                document.setFile(sourceFile.getPath());
+                document.setSourceUri(uri);
+                document.setType(documentType);
 
-                String documentType = (String) fileContents.get(Attributes.TYPE);
-                if (fileContents.get(Attributes.STATUS).equals(Status.PUBLISHED_DATE)) {
-                    if (fileContents.get(Attributes.DATE) != null && (fileContents.get(Attributes.DATE) instanceof Date)) {
-                        if (new Date().after((Date) fileContents.get(Attributes.DATE))) {
-                            fileContents.put(Attributes.STATUS, Status.PUBLISHED);
-                        }
-                    }
-                }
+                db.addDocument(document);
+            } else {
+                logger.warn("{} couldn't be parsed so it has been ignored!", sourceFile);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
+        }
+    }
 
-                if (config.getUriWithoutExtension()) {
-                    fileContents.put(Attributes.NO_EXTENSION_URI, uri.replace("/index.html", "/"));
-                }
+    private void processSourceFile(final File sourceFile, final String sha1, final String uri) {
+        DocumentModel document = parser.processFile(sourceFile);
+
+        if (document != null) {
+            if (DocumentTypes.contains(document.getType())) {
+                addAdditionalDocumentAttributes(document, sourceFile, sha1, uri);
 
                 if (config.getImgPathUpdate() || config.getRelativePathUpdate()) {
                     // Prevent image or other tag's source url's from breaking
                     HtmlUtil.fixUrls(fileContents, config);
                 }
 
-                ODocument doc = new ODocument(documentType);
-                doc.fromMap(fileContents);
-                boolean cached = fileContents.get(String.valueOf(DocumentAttributes.CACHED)) != null ? Boolean.valueOf((String) fileContents.get(String.valueOf(DocumentAttributes.CACHED))) : true;
-                doc.field(String.valueOf(DocumentAttributes.CACHED), cached);
-                doc.save();
+                db.addDocument(document);
             } else {
-                LOGGER.warn("{} has an invalid header, it has been ignored!", sourceFile);
+                logger.warn("{} has an unknown document type '{}' and has been ignored!", sourceFile, document.getType());
             }
-        } catch (Exception ex) {
-            throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
+        } else {
+            logger.warn("{} has an invalid header, it has been ignored!", sourceFile);
+        }
+    }
+
+    private void addAdditionalDocumentAttributes(DocumentModel document, File sourceFile, String sha1, String uri) {
+        document.setRootPath(getPathToRoot(sourceFile));
+        document.setSha1(sha1);
+        document.setRendered(false);
+        document.setFile(sourceFile.getPath());
+        document.setSourceUri(uri);
+        document.setUri(uri);
+        document.setCached(true);
+
+        if (document.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
+                && (document.getDate() != null)
+                && new Date().after(document.getDate())) {
+            document.setStatus(ModelAttributes.Status.PUBLISHED);
+        }
+
+        if (config.getUriWithoutExtension()) {
+            document.setNoExtensionUri(uri.replace("/index.html", "/"));
         }
     }
 
@@ -235,12 +307,12 @@ public class Crawler {
         return FileUtil.getUriPathToContentRoot(config, sourceFile);
     }
 
-    private DocumentStatus findDocumentStatus(String docType, String uri, String sha1) {
-        DocumentList match = db.getDocumentStatus(docType, uri);
+    private DocumentStatus findDocumentStatus(String uri, String sha1) {
+        DocumentList<DocumentModel> match = db.getDocumentStatus(uri);
         if (!match.isEmpty()) {
-            Map entries = match.get(0);
-            String oldHash = (String) entries.get(String.valueOf(DocumentAttributes.SHA1));
-            if (!(oldHash.equals(sha1)) || Boolean.FALSE.equals(entries.get(String.valueOf(DocumentAttributes.RENDERED)))) {
+            DocumentModel document = match.get(0);
+            String oldHash = document.getSha1();
+            if (!oldHash.equals(sha1) || !document.getRendered()) {
                 return DocumentStatus.UPDATED;
             } else {
                 return DocumentStatus.IDENTICAL;
@@ -250,40 +322,4 @@ public class Crawler {
         }
     }
 
-    public abstract static class Attributes {
-
-        public static final String DATE = "date";
-        public static final String STATUS = "status";
-        public static final String TYPE = "type";
-        public static final String TITLE = "title";
-        public static final String URI = "uri";
-        public static final String FILE = "file";
-        public static final String TAGS = "tags";
-        public static final String TAG = "tag";
-        public static final String ROOTPATH = "rootpath";
-        public static final String ID = "id";
-        public static final String NO_EXTENSION_URI = "noExtensionUri";
-        public static final String ALLTAGS = "alltags";
-        public static final String PUBLISHED_DATE = "published_date";
-        public static final String BODY = "body";
-        public static final String DB = "db";
-
-        private Attributes() {
-        }
-
-        /**
-         * Possible values of the {@link Attributes#STATUS} property
-         *
-         * @author ndx
-         */
-        public abstract static class Status {
-            public static final String PUBLISHED_DATE = "published-date";
-            public static final String PUBLISHED = "published";
-            public static final String DRAFT = "draft";
-
-            private Status() {
-            }
-        }
-
-    }
 }
