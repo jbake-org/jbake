@@ -7,6 +7,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Properties;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.spy;
@@ -110,5 +111,20 @@ public class JBakeConfigurationFactoryTest {
 
         assertThat(factory.getConfigUtil().getEncoding()).isEqualTo("latin1");
         verify(util).loadConfig(sourceFolder, null);
+    }
+
+    @Test
+    void shouldBeAbleToAddCustomProperties() {
+        File sourceFolder = root;
+        File destinationFolder = TestUtils.newFolder(root, "output");
+        DefaultJBakeConfiguration config = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+        Properties properties = new Properties();
+        properties.setProperty("custom.key", "custom value");
+        properties.setProperty("custom.key2", "custom value 2");
+
+        config.addConfiguration(properties);
+
+        assertThat(config.get("custom.key")).isEqualTo("custom value");
+        assertThat(config.get("custom.key2")).isEqualTo("custom value 2");
     }
 }

@@ -97,11 +97,15 @@ public class ConfigUtil {
      * @param source the source directory of the project
      * @param propertiesFile the properties file for the project
      * @return the configuration
-     * @throws ConfigurationException if unable to configure
+     * @throws JBakeException if unable to configure
      */
-    public JBakeConfiguration loadConfig(File source, File propertiesFile) throws ConfigurationException {
-        CompositeConfiguration configuration = load(source, propertiesFile);
-        return new DefaultJBakeConfiguration(source, configuration);
+    public JBakeConfiguration loadConfig(File source, File propertiesFile) throws JBakeException {
+        try {
+            CompositeConfiguration configuration = load(source, propertiesFile);
+            return new DefaultJBakeConfiguration(source, configuration);
+        } catch (ConfigurationException e) {
+            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, e.getMessage(), e);
+        }
     }
 
     /**
