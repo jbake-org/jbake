@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.Map;
+
 /**
  * @author Manik Magar
  */
@@ -31,9 +33,9 @@ public class HtmlUtil {
      * @param fileContents  Map representing file contents
      * @param configuration Configuration object
      */
-    public static void fixImageSourceUrls(DocumentModel fileContents, JBakeConfiguration configuration) {
+    public static void fixUrls(DocumentModel fileContents, JBakeConfiguration configuration) {
         String htmlContent = fileContents.getBody();
-        boolean prependSiteHost = configuration.getImgPathPrependHost();
+        boolean prependSiteHost = configuration.getImgPathPrependHost() || configuration.getRelativePathPrependHost();
         String siteHost = configuration.getSiteHost();
         String uri = getDocumentUri(fileContents);
 

@@ -7,9 +7,6 @@ import org.jbake.model.DocumentModel;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -31,7 +28,7 @@ public class HtmlUtilTest {
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).doesNotContain("<body>");
         assertThat(body).doesNotContain("</body>");
@@ -40,10 +37,10 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldNotAddBodyHTMLElement0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='/blog/2017/05/second_post.html' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setBody("<div> Test <a href='/blog/2017/05/second_post.html' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
@@ -72,15 +69,15 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldNotAddSiteHost0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='./first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setBody("<div> Test <a href='./first.jpg' /></div>");
         config.setRelativePathPrependHost(false);
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"blog/2017/05/first.jpg\"");
 
@@ -103,15 +100,15 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldAddSiteHostWithRelativeImageToDocument0() {
-        Map<String, Object> fileContent = new HashMap<>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='img/deeper/underground.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setBody("<div> Test <a href='img/deeper/underground.jpg' /></div>");
         config.setRelativePathPrependHost(true);
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\"");
     }
@@ -134,14 +131,14 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldAddContentPath0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='./first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setBody("<div> Test <a href='./first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 
@@ -165,14 +162,14 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldAddContentPathForCurrentDirectory0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setBody("<div> Test <a href='first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 
@@ -195,14 +192,14 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldNotAddRootPath0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='/blog/2017/05/first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setBody("<div> Test <a href='/blog/2017/05/first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 
@@ -226,15 +223,15 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldNotAddRootPathForNoExtension0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.NO_EXTENSION_URI, "blog/2017/05/first_post/");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='/blog/2017/05/first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <a href='/blog/2017/05/first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
 
@@ -257,15 +254,15 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldAddContentPathForNoExtension0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.NO_EXTENSION_URI, "blog/2017/05/first_post/");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='./first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <a href='./first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
     }
@@ -288,15 +285,15 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldNotChangeForHTTP0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.NO_EXTENSION_URI, "blog/2017/05/first_post/");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='http://example.com/first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <a href='http://example.com/first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"http://example.com/first.jpg\"");
 
@@ -319,15 +316,15 @@ public class HtmlUtilTest {
 
     @Test
     public void shouldNotChangeForHTTPS0() {
-        Map<String, Object> fileContent = new HashMap<String, Object>();
-        fileContent.put(Attributes.ROOTPATH, "../../../");
-        fileContent.put(Attributes.URI, "blog/2017/05/first_post.html");
-        fileContent.put(Attributes.NO_EXTENSION_URI, "blog/2017/05/first_post/");
-        fileContent.put(Attributes.BODY, "<div> Test <a href='https://example.com/first.jpg' /></div>");
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <a href='https://example.com/first.jpg' /></div>");
 
         HtmlUtil.fixUrls(fileContent, config);
 
-        String body = fileContent.get(Attributes.BODY).toString();
+        String body = fileContent.getBody();
 
         assertThat(body).contains("href=\"https://example.com/first.jpg\"");
     }

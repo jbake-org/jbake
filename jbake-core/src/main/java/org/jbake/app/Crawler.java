@@ -1,6 +1,5 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -19,7 +18,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Crawls a file system looking for content.
@@ -271,7 +269,7 @@ public class Crawler {
 
                 if (config.getImgPathUpdate() || config.getRelativePathUpdate()) {
                     // Prevent image or other tag's source url's from breaking
-                    HtmlUtil.fixUrls(fileContents, config);
+                    HtmlUtil.fixUrls(document, config);
                 }
 
                 db.addDocument(document);
@@ -293,8 +291,8 @@ public class Crawler {
         document.setCached(true);
 
         if (document.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
-                && (document.getDate() != null)
-                && new Date().after(document.getDate())) {
+            && (document.getDate() != null)
+            && new Date().after(document.getDate())) {
             document.setStatus(ModelAttributes.Status.PUBLISHED);
         }
 

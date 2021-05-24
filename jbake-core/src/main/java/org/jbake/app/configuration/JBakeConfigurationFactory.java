@@ -20,7 +20,7 @@ public class JBakeConfigurationFactory {
     /**
      * Creates a {@link DefaultJBakeConfiguration}
      * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
+     * @param destination  The destination folder to render and copy files to
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
@@ -33,10 +33,10 @@ public class JBakeConfigurationFactory {
 
     /**
      * Creates a {@link DefaultJBakeConfiguration}
-     * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
+     * @param sourceFolder   The source folder of the project
+     * @param destination    The destination folder to render and copy files to
      * @param propertiesFile The properties file for the project
-     * @param isClearCache Whether to clear database cache or not
+     * @param isClearCache   Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
      */
@@ -49,13 +49,12 @@ public class JBakeConfigurationFactory {
 
     /**
      * Creates a {@link DefaultJBakeConfiguration}
-     *
      * This is a compatibility factory method
      *
-     * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
+     * @param sourceFolder           The source folder of the project
+     * @param destination            The destination folder to render and copy files to
      * @param compositeConfiguration A given {@link CompositeConfiguration}
-     * @param isClearCache Whether to clear database cache or not
+     * @param isClearCache           Whether to clear database cache or not
      * @return A configuration by given parameters
      */
     public DefaultJBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, File destination, CompositeConfiguration compositeConfiguration, boolean isClearCache) {
@@ -67,11 +66,10 @@ public class JBakeConfigurationFactory {
 
     /**
      * Creates a {@link DefaultJBakeConfiguration}
-     *
      * This is a compatibility factory method
      *
-     * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
+     * @param sourceFolder           The source folder of the project
+     * @param destination            The destination folder to render and copy files to
      * @param compositeConfiguration A given {@link CompositeConfiguration}
      * @return A configuration by given parameters
      */
@@ -84,13 +82,12 @@ public class JBakeConfigurationFactory {
     /**
      * Creates a {@link DefaultJBakeConfiguration}
      *
-     *
      * @param sourceFolder The source folder of the project
-     * @param config A {@link CompositeConfiguration}
+     * @param config       A {@link CompositeConfiguration}
      * @return A configuration by given parameters
      */
     public DefaultJBakeConfiguration createDefaultJbakeConfiguration(File sourceFolder, CompositeConfiguration config) {
-        return new DefaultJBakeConfiguration(sourceFolder,config);
+        return new DefaultJBakeConfiguration(sourceFolder, config);
     }
 
     /**
@@ -98,16 +95,16 @@ public class JBakeConfigurationFactory {
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param sourceFolder The source folder of the project
+     * @param sourceFolder      The source folder of the project
      * @param destinationFolder The destination folder to render and copy files to
-     * @param isClearCache Whether to clear database cache or not
+     * @param isClearCache      Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
      * @deprecated use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead
      */
     @Deprecated
     public DefaultJBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws ConfigurationException {
-        return createJettyJbakeConfiguration(sourceFolder, destinationFolder, (File)null, isClearCache);
+        return createJettyJbakeConfiguration(sourceFolder, destinationFolder, (File) null, isClearCache);
     }
 
     /**
@@ -115,10 +112,10 @@ public class JBakeConfigurationFactory {
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param sourceFolder The source folder of the project
+     * @param sourceFolder      The source folder of the project
      * @param destinationFolder The destination folder to render and copy files to
-     * @param propertiesFile The properties file for the project
-     * @param isClearCache Whether to clear database cache or not
+     * @param propertiesFile    The properties file for the project
+     * @param isClearCache      Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws ConfigurationException if loading the configuration fails
      */
@@ -126,7 +123,7 @@ public class JBakeConfigurationFactory {
         DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) getConfigUtil().loadConfig(sourceFolder, propertiesFile);
         configuration.setDestinationFolder(destinationFolder);
         configuration.setClearCache(isClearCache);
-        configuration.setSiteHost("http://" + configuration.getServerHostname() + ":" +configuration.getServerPort() + configuration.getServerContextPath());
+        configuration.setSiteHost("http://" + configuration.getServerHostname() + ":" + configuration.getServerPort() + configuration.getServerContextPath());
         return configuration;
     }
 
