@@ -220,6 +220,14 @@ class MainTest extends LoggingTest {
     }
 
     @Test
+    void shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
+        when(factory.setEncoding(any())).thenReturn(factory);
+        doThrow(new JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong")).when(factory).createDefaultJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean());
+        JBakeException e = assertThrows(JBakeException.class, () -> main.run(new String[]{"-b"}));
+        assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.getStatus());
+    }
+
+    @Test
     void shouldListCurrentSettings(@TempDir Path source) throws ConfigurationException {
         File src = newFolder(source, "src/jbake");
         mockDefaultJbakeConfiguration(src);
