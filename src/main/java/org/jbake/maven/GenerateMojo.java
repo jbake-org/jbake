@@ -16,8 +16,6 @@ package org.jbake.maven;
  * limitations under the License.
  */
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.MapConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -25,6 +23,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -90,9 +89,9 @@ public class GenerateMojo extends AbstractMojo {
         }
     }
 
-    protected JBakeConfiguration createConfiguration() throws ConfigurationException {
+    protected JBakeConfiguration createConfiguration() throws JBakeException {
         DefaultJBakeConfiguration jBakeConfiguration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(inputDirectory, outputDirectory, isClearCache);
-        jBakeConfiguration.getCompositeConfiguration().addConfiguration(new MapConfiguration(this.project.getProperties()));
+        jBakeConfiguration.addConfiguration(this.project.getProperties());
         return jBakeConfiguration;
     }
 
