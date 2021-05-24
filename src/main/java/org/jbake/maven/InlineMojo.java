@@ -1,7 +1,5 @@
 package org.jbake.maven;
 
-import org.apache.commons.configuration.ConfigurationException;
-
 /*
  * Copyright 2013 ingenieux Labs
  *
@@ -21,6 +19,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jbake.app.JBakeException;
 
 import static spark.Spark.awaitInitialization;
 import static spark.Spark.externalStaticFileLocation;
@@ -57,7 +56,7 @@ public class InlineMojo extends WatchMojo {
     if (this.port == null) {
       try {
         return createConfiguration().getServerPort();
-      } catch (ConfigurationException e) {
+      } catch (JBakeException e) {
         // ignore since default will be returned
       }
     } else {
