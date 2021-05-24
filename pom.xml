@@ -8,7 +8,7 @@
 
     <groupId>org.jbake</groupId>
     <artifactId>jbake-maven-plugin</artifactId>
-    <version>0.3.5-rc.2</version>
+    <version>0.3.6-rc.2</version>
     <packaging>maven-plugin</packaging>
 
     <prerequisites>
