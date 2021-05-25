@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
@@ -384,5 +385,7 @@ public interface JBakeConfiguration {
     Map<String, Object> asHashMap();
 
     List<Property> getJbakeProperties();
+
+    void addConfiguration(Properties properties);
 }
 

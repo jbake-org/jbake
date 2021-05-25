@@ -2,6 +2,7 @@ package org.jbake.app.configuration;
 
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -695,6 +696,11 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         }
         Collections.sort(jbakeKeys);
         return jbakeKeys;
+    }
+
+    @Override
+    public void addConfiguration(Properties properties) {
+        compositeConfiguration.addConfiguration(new MapConfiguration(properties));
     }
 
     @Override

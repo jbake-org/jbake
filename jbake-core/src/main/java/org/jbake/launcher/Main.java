@@ -82,8 +82,8 @@ public class Main {
                 config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
             }
             run(res, config);
-        } catch (final ConfigurationException e) {
-            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, "Configuration error: " + e.getMessage(), e);
+        } catch (final JBakeException e) {
+            throw e;
         } catch (MissingParameterException mex) {
             throw new JBakeException(SystemExit.CONFIGURATION_ERROR, mex.getMessage(), mex);
         } catch (final Throwable e) {
