@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 public class BinaryRunner {
 
-    private File folder;
+    private final File folder;
 
     public BinaryRunner(File folder) {
         this.folder = folder;
@@ -30,7 +30,7 @@ public class BinaryRunner {
         String line;
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
-        while ((line = reader.readLine()) != null ) {
+        while ((line = reader.readLine()) != null) {
             System.out.println(line);
         }
         reader.close();

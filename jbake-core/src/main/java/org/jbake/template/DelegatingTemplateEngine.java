@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.Writer;
 
-import static org.jbake.app.configuration.PropertyList.PAGINATE_INDEX;
-
 /**
  * A template which is responsible for delegating to a supported template engine,
  * based on the file extension.

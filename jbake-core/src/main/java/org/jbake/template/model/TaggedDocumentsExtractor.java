@@ -2,21 +2,17 @@ package org.jbake.template.model;
 
 import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
+import org.jbake.model.DocumentModel;
 import org.jbake.template.ModelExtractor;
 
-import java.util.Map;
-
-public class TaggedDocumentsExtractor implements ModelExtractor<DocumentList> {
+public class TaggedDocumentsExtractor implements ModelExtractor<DocumentList<DocumentModel>> {
 
     @Override
-    public DocumentList get(ContentStore db, Map model, String key) {
+    public DocumentList<DocumentModel> get(ContentStore db, TemplateModel model, String key) {
         String tag = null;
-        TemplateModel templateModel = new TemplateModel();
-        templateModel.putAll(model);
-        if (templateModel.getTag() != null) {
-            tag = templateModel.getTag();
+        if (model.getTag() != null) {
+            tag = model.getTag();
         }
-        // fetch the tagged documents from db
         return db.getPublishedDocumentsByTag(tag);
     }
 

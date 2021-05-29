@@ -1,6 +1,7 @@
 package org.jbake.app;
 
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.launcher.SystemExit;
 import org.jbake.parser.Engines;
 
 import java.io.File;
@@ -9,10 +10,12 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Provides File related functions
@@ -30,15 +33,11 @@ public class FileUtil {
      * @return Object for filtering files
      */
     public static FileFilter getFileFilter(JBakeConfiguration config) {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                //Accept if input  is a non-hidden file with registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                    && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config));
-            }
+        return pathname -> {
+            //Accept if input  is a non-hidden file with registered extension
+            //or if a non-hidden and not-ignored directory
+            return !pathname.isHidden() && (pathname.isFile()
+                && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config));
         };
     }
 
@@ -50,15 +49,11 @@ public class FileUtil {
      */
     @Deprecated
     public static FileFilter getFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                //Accept if input  is a non-hidden file with registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                    && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
-            }
+        return pathname -> {
+            //Accept if input  is a non-hidden file with registered extension
+            //or if a non-hidden and not-ignored directory
+            return !pathname.isHidden() && (pathname.isFile()
+                && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
         };
     }
 
@@ -68,13 +63,7 @@ public class FileUtil {
      * @return Object for filtering files
      */
     public static FileFilter getDataFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                return "yaml".equalsIgnoreCase(fileExt(pathname)) || "yml".equalsIgnoreCase(fileExt(pathname));
-            }
-        };
+        return pathname -> "yaml".equalsIgnoreCase(fileExt(pathname)) || "yml".equalsIgnoreCase(fileExt(pathname));
     }
 
     /**
@@ -84,17 +73,13 @@ public class FileUtil {
      * @return FileFilter object
      */
     public static FileFilter getNotContentFileFilter(JBakeConfiguration config) {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                //Accept if input  is a non-hidden file with NOT-registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                    //extension should not be from registered content extensions
-                    && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
-                    || (directoryOnlyIfNotIgnored(pathname, config));
-            }
+        return pathname -> {
+            //Accept if input  is a non-hidden file with NOT-registered extension
+            //or if a non-hidden and not-ignored directory
+            return !pathname.isHidden() && (pathname.isFile()
+                //extension should not be from registered content extensions
+                && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
+                || (directoryOnlyIfNotIgnored(pathname, config));
         };
     }
 
@@ -106,17 +91,13 @@ public class FileUtil {
      */
     @Deprecated
     public static FileFilter getNotContentFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                //Accept if input  is a non-hidden file with NOT-registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                    //extension should not be from registered content extensions
-                    && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
-                    || (directoryOnlyIfNotIgnored(pathname));
-            }
+        return pathname -> {
+            //Accept if input  is a non-hidden file with NOT-registered extension
+            //or if a non-hidden and not-ignored directory
+            return !pathname.isHidden() && (pathname.isFile()
+                //extension should not be from registered content extensions
+                && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
+                || (directoryOnlyIfNotIgnored(pathname));
         };
     }
 
@@ -129,18 +110,9 @@ public class FileUtil {
      * @return true if file is directory and not ignored
      */
     public static boolean directoryOnlyIfNotIgnored(File file, JBakeConfiguration config) {
-        boolean accept = false;
+        FilenameFilter ignoreFile = (dir, name) -> name.equalsIgnoreCase(config.getIgnoreFileName());
 
-        FilenameFilter ignoreFile = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.equalsIgnoreCase(config.getIgnoreFileName());
-            }
-        };
-
-        accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
-
-        return accept;
+        return file.isDirectory() &&  (file.listFiles(ignoreFile).length == 0);
     }
 
     /**
@@ -152,18 +124,9 @@ public class FileUtil {
      */
     @Deprecated
     public static boolean directoryOnlyIfNotIgnored(File file) {
-        boolean accept = false;
+        FilenameFilter ignoreFile = (dir, name) -> name.equalsIgnoreCase(".jbakeignore");
 
-        FilenameFilter ignoreFile = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.equalsIgnoreCase(".jbakeignore");
-            }
-        };
-
-        accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
-
-        return accept;
+        return file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
     }
 
     public static boolean isExistingFolder(File f) {
@@ -176,16 +139,16 @@ public class FileUtil {
      * @return File referencing folder JBake is running from
      * @throws Exception when application is not able to work out where is JBake running from
      */
-    public static File getRunningLocation() throws Exception {
+    public static File getRunningLocation() throws UnsupportedEncodingException {
         String codePath = FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String decodedPath = URLDecoder.decode(codePath, "UTF-8");
         File codeFile = new File(decodedPath);
         if (!codeFile.exists()) {
-            throw new Exception("Cannot locate running location of JBake!");
+            throw new JBakeException(SystemExit.ERROR, "Cannot locate running location of JBake!");
         }
         File codeFolder = codeFile.getParentFile().getParentFile();
         if (!codeFolder.exists()) {
-            throw new Exception("Cannot locate running location of JBake!");
+            throw new JBakeException(SystemExit.ERROR, "Cannot locate running location of JBake!");
         }
 
         return codeFolder;
@@ -212,7 +175,7 @@ public class FileUtil {
      * @return an hex string representing the SHA1 hash of the file or directory.
      * @throws Exception if any IOException of SecurityException occured
      */
-    public static String sha1(File sourceFile) throws Exception {
+    public static String sha1(File sourceFile) throws NoSuchAlgorithmException, IOException {
         byte[] buffer = new byte[1024];
         MessageDigest complete = MessageDigest.getInstance("SHA-1");
         updateDigest(complete, sourceFile, buffer);
@@ -308,11 +271,11 @@ public class FileUtil {
         return sb.toString();
     }
 
-    static public String getUriPathToDestinationRoot(JBakeConfiguration config, File sourceFile) {
+    public static String getUriPathToDestinationRoot(JBakeConfiguration config, File sourceFile) {
         return getPathToRoot(config, config.getDestinationFolder(), sourceFile);
     }
 
-    static public String getUriPathToContentRoot(JBakeConfiguration config, File sourceFile) {
+    public static String getUriPathToContentRoot(JBakeConfiguration config, File sourceFile) {
         return getPathToRoot(config, config.getContentFolder(), sourceFile);
     }
 

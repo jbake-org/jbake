@@ -14,7 +14,7 @@ public class ModelExtractorsTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         ModelExtractors.getInstance().reset();
     }
 

@@ -78,7 +78,7 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
             @Override
             public Object get(final Object property) {
                 try {
-                    return extractors.extractAndTransform(db, (String) property, this, new TemplateEngineAdapter.NoopAdapter());
+                    return extractors.extractAndTransform(db, (String) property, model, TemplateEngineAdapter.NO_ADAPTER);
                 } catch (NoModelExtractorException e) {
                     return super.get(property);
                 }

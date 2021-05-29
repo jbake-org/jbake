@@ -62,12 +62,7 @@ public class Asset {
      * @param path The starting path
      */
     public void copy(File path) {
-        FileFilter filter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config));
-            }
-        };
+        FileFilter filter = file -> (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config));
         copy(path, config.getDestinationFolder(), filter);
     }
 
@@ -96,21 +91,20 @@ public class Asset {
      * @return true if the path provided points to a file in the asset folder.
      */
     public boolean isAssetFile(File path) {
-        boolean isAsset = false;
-
         try {
-            if(FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
-                if (FileUtil.isFileInDirectory(path, config.getAssetFolder())) {
-                    isAsset = true;
-                } else if (FileUtil.isFileInDirectory(path, config.getContentFolder())
-                    && FileUtil.getNotContentFileFilter(config).accept(path)) {
-                    isAsset = true;
-                }
+            if (FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)
+                && (FileUtil.isFileInDirectory(path, config.getAssetFolder()) || assetsInContentFolder(path))) {
+                return true;
             }
         } catch (IOException ioe) {
             LOGGER.error("Unable to determine the path to asset file {}", path.getPath(), ioe);
         }
-        return isAsset;
+        return false;
+    }
+
+    private boolean assetsInContentFolder(File path) throws IOException {
+        return FileUtil.isFileInDirectory(path, config.getContentFolder())
+            && FileUtil.getNotContentFileFilter(config).accept(path);
     }
 
     /**

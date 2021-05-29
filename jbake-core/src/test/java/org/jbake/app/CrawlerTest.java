@@ -4,12 +4,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.jbake.util.DataFileUtil;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -61,7 +59,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         crawler.crawlDataFiles();
         Assert.assertEquals(1, db.getDocumentCount("data"));
 
-        DataFileUtil util = new DataFileUtil(db, "data");
+        DataFileUtil util = new DataFileUtil(db);
         Map<String, Object> data = util.get("videos.yaml");
         Assert.assertFalse(data.isEmpty());
         Assert.assertNotNull(data.get("data"));

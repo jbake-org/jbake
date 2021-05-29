@@ -1,8 +1,7 @@
 package org.jbake.template;
 
 import org.jbake.app.ContentStore;
-
-import java.util.Map;
+import org.jbake.template.model.TemplateModel;
 
 
 /**
@@ -11,6 +10,6 @@ import java.util.Map;
  */
 public interface ModelExtractor<T> {
 
-    T get(ContentStore db, Map model, String key);
+    T get(ContentStore db, TemplateModel model, String key);
 
 }

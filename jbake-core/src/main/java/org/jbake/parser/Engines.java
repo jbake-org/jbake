@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
@@ -31,17 +32,17 @@ import java.util.Set;
  * <p>Markup engines are singletons, so are typically used to initialize the underlying renderning engines. They
  * <b>must not</b> store specific information of a currently processed file (use {@link ParserContext the parser context}
  * for that).</p>
- *
+ * <p>
  * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
  * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better
  * fit for embedding.
  *
  * @author Cédric Champeau
- *
  */
 public class Engines {
     private static final Logger LOGGER = LoggerFactory.getLogger(Engines.class);
     private static final Engines INSTANCE;
+    public static final String PROPERTIES = "META-INF/org.jbake.parser.MarkupEngines.properties";
 
     private final Map<String, ParserEngine> parsers;
 
@@ -105,15 +106,17 @@ public class Engines {
     private static void loadEngines() {
         try {
             ClassLoader cl = Engines.class.getClassLoader();
-            Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.MarkupEngines.properties");
+            Enumeration<URL> resources = cl.getResources(PROPERTIES);
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
-                Properties props = new Properties();
-                props.load(url.openStream());
-                for (Map.Entry<Object, Object> entry : props.entrySet()) {
-                    String className = (String) entry.getKey();
-                    String[] extensions = ((String)entry.getValue()).split(",");
-                    registerEngine(className, extensions);
+                try (InputStream is = url.openStream()) {
+                    Properties props = new Properties();
+                    props.load(is);
+                    for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                        String className = (String) entry.getKey();
+                        String[] extensions = ((String) entry.getValue()).split(",");
+                        registerEngine(className, extensions);
+                    }
                 }
             }
         } catch (IOException e) {

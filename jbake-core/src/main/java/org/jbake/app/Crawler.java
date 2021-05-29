@@ -1,10 +1,10 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.launcher.SystemExit;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentStatus;
 import org.jbake.model.DocumentTypes;
@@ -19,7 +19,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Crawls a file system looking for content.
@@ -141,9 +140,8 @@ public class Crawler {
                     String sha1 = buildHash(sourceFile);
                     String uri = buildDataFileURI(sourceFile);
                     boolean process = true;
-                    DocumentStatus status = DocumentStatus.NEW;
                     String docType = config.getDataFileDocType();
-                    status = findDocumentStatus(uri, sha1);
+                    DocumentStatus status = findDocumentStatus(uri, sha1);
                     if (status == DocumentStatus.UPDATED) {
                         sb.append(" : modified ");
                         db.deleteContent(uri);
@@ -156,8 +154,6 @@ public class Crawler {
                     }
                     if (DocumentStatus.NEW == status) {
                         sb.append(" : new ");
-                    }
-                    if (process) { // new or updated
                         crawlDataFile(sourceFile, sha1, uri, docType);
                     }
                     logger.info("{}", sb);
@@ -202,7 +198,7 @@ public class Crawler {
         String uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.getDataFolder()), "");
         // strip off leading /
         if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1, uri.length());
+            uri = uri.substring(1);
         }
         return uri;
     }
@@ -216,7 +212,7 @@ public class Crawler {
                 + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
                 + config.getOutputExtension();
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+            throw new JBakeException(SystemExit.ERROR, "Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
         }
     }
 
@@ -229,7 +225,7 @@ public class Crawler {
                 + "index"
                 + config.getOutputExtension();
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+            throw new JBakeException(SystemExit.ERROR, "Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
         }
     }
 
@@ -258,7 +254,7 @@ public class Crawler {
                 logger.warn("{} couldn't be parsed so it has been ignored!", sourceFile);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
+            throw new JBakeException(SystemExit.ERROR, "Failed crawling file: " + sourceFile.getPath() + " " + ex.getMessage(), ex);
         }
     }
 
@@ -293,8 +289,8 @@ public class Crawler {
         document.setCached(true);
 
         if (document.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
-                && (document.getDate() != null)
-                && new Date().after(document.getDate())) {
+            && (document.getDate() != null)
+            && new Date().after(document.getDate())) {
             document.setStatus(ModelAttributes.Status.PUBLISHED);
         }
 

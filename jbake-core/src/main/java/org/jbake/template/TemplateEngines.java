@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import java.util.Set;
 public class TemplateEngines {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
+    public static final String PROPERTIES = "META-INF/org.jbake.parser.TemplateEngines.properties";
 
     private final Map<String, AbstractTemplateEngine> engines;
 
@@ -91,15 +93,17 @@ public class TemplateEngines {
     private void loadEngines(final JBakeConfiguration config, final ContentStore db) {
         try {
             ClassLoader cl = TemplateEngines.class.getClassLoader();
-            Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.TemplateEngines.properties");
+            Enumeration<URL> resources = cl.getResources(PROPERTIES);
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
-                Properties props = new Properties();
-                props.load(url.openStream());
-                for (Map.Entry<Object, Object> entry : props.entrySet()) {
-                    String className = (String) entry.getKey();
-                    String[] extensions = ((String) entry.getValue()).split(",");
-                    registerEngine(config, db, className, extensions);
+                try (InputStream is = url.openStream()) {
+                    Properties props = new Properties();
+                    props.load(is);
+                    for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                        String className = (String) entry.getKey();
+                        String[] extensions = ((String) entry.getValue()).split(",");
+                        registerEngine(config, db, className, extensions);
+                    }
                 }
             }
         } catch (IOException e) {

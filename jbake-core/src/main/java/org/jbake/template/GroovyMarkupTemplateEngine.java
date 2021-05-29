@@ -25,12 +25,11 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
     private MarkupTemplateEngine templateEngine;
 
     /**
-     * @deprecated Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead
-     *
-     * @param config the {@link CompositeConfiguration} of jbake
-     * @param db the {@link ContentStore}
-     * @param destination the destination path
+     * @param config        the {@link CompositeConfiguration} of jbake
+     * @param db            the {@link ContentStore}
+     * @param destination   the destination path
      * @param templatesPath the templates path
+     * @deprecated Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead
      */
     @Deprecated
     public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
@@ -74,7 +73,7 @@ public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
             @Override
             public Object get(Object key) {
                 try {
-                    return extractors.extractAndTransform(db, (String) key, model, new TemplateEngineAdapter.NoopAdapter());
+                    return extractors.extractAndTransform(db, (String) key, model, TemplateEngineAdapter.NO_ADAPTER);
                 } catch (NoModelExtractorException e) {
                     return super.get(key);
                 }

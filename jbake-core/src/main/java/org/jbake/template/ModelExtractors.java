@@ -3,11 +3,14 @@ package org.jbake.template;
 import org.jbake.app.ContentStore;
 import org.jbake.model.DocumentTypeUtils;
 import org.jbake.template.model.PublishedCustomExtractor;
+import org.jbake.template.model.TemplateModel;
 import org.jbake.template.model.TypedDocumentsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
@@ -37,9 +40,9 @@ import java.util.TreeMap;
 public class ModelExtractors {
     private static final String PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties";
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ModelExtractors.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelExtractors.class);
 
-    private final Map<String, ModelExtractor> extractors;
+    private final Map<String, ModelExtractor<?>> extractors;
 
     private static class Loader {
         private static final ModelExtractors INSTANCE = new ModelExtractors();
@@ -50,7 +53,7 @@ public class ModelExtractors {
     }
 
     private ModelExtractors() {
-        extractors = new TreeMap<String, ModelExtractor>();
+        extractors = new TreeMap<>();
         loadEngines();
     }
 
@@ -59,8 +62,8 @@ public class ModelExtractors {
         loadEngines();
     }
 
-    public void registerEngine(String key, ModelExtractor extractor) {
-        ModelExtractor old = extractors.put(key, extractor);
+    public void registerEngine(String key, ModelExtractor<?> extractor) {
+        ModelExtractor<?> old = extractors.put(key, extractor);
         if (old != null) {
             LOGGER.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old);
         }
@@ -72,21 +75,14 @@ public class ModelExtractors {
      *
      * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
      */
-    private static ModelExtractor tryLoadEngine(String engineClassName) {
+    private static ModelExtractor<?> tryLoadEngine(String engineClassName) {
         try {
-            @SuppressWarnings("unchecked")
-            Class<? extends ModelExtractor> engineClass = (Class<? extends ModelExtractor>) Class.forName(engineClassName, false, ModelExtractors.class.getClassLoader());
-            return engineClass.newInstance();
-        } catch (ClassNotFoundException e) {
+            @SuppressWarnings("unchecked") Class<? extends ModelExtractor> engineClass = (Class<? extends ModelExtractor>) Class.forName(engineClassName, false, ModelExtractors.class.getClassLoader());
+            return engineClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoClassDefFoundError | NoSuchMethodException | InvocationTargetException e) {
             return null;
-        } catch (InstantiationException e) {
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
-        } catch (NoClassDefFoundError e) {
-            // a dependency of the engine may not be found on classpath
-            return null;
-        }
+        } // a dependency of the engine may not be found on classpath
+
     }
 
     /**
@@ -99,12 +95,14 @@ public class ModelExtractors {
             Enumeration<URL> resources = cl.getResources(PROPERTIES);
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
-                Properties props = new Properties();
-                props.load(url.openStream());
-                for (Map.Entry<Object, Object> entry : props.entrySet()) {
-                    String className = (String) entry.getKey();
-                    String[] extensions = ((String) entry.getValue()).split(",");
-                    loadAndRegisterEngine(className, extensions);
+                try (InputStream is = url.openStream()) {
+                    Properties props = new Properties();
+                    props.load(is);
+                    for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                        String className = (String) entry.getKey();
+                        String[] extensions = ((String) entry.getValue()).split(",");
+                        loadAndRegisterEngine(className, extensions);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -113,7 +111,7 @@ public class ModelExtractors {
     }
 
     private void loadAndRegisterEngine(String className, String... extensions) {
-        ModelExtractor engine = tryLoadEngine(className);
+        ModelExtractor<?> engine = tryLoadEngine(className);
         if (engine != null) {
             for (String extension : extensions) {
                 registerEngine(extension, engine);
@@ -121,7 +119,7 @@ public class ModelExtractors {
         }
     }
 
-    public <Type> Type extractAndTransform(ContentStore db, String key, Map map, TemplateEngineAdapter<Type> adapter) throws NoModelExtractorException {
+    public <T> T extractAndTransform(ContentStore db, String key, TemplateModel map, TemplateEngineAdapter<T> adapter) throws NoModelExtractorException {
         if (extractors.containsKey(key)) {
             Object extractedValue = extractors.get(key).get(db, map, key);
             return adapter.adapt(key, extractedValue);
@@ -131,16 +129,16 @@ public class ModelExtractors {
     }
 
     /**
-     * @see java.util.Map#containsKey(java.lang.Object)
      * @param key A key a {@link ModelExtractor} is registered with
      * @return true if key is registered
+     * @see java.util.Map#containsKey(java.lang.Object)
      */
-    public boolean containsKey(Object key) {
+    public boolean containsKey(String key) {
         return extractors.containsKey(key);
     }
 
     /**
-     * @return  A @{@link Set} of all known keys a @{@link ModelExtractor} is registered with
+     * @return A @{@link Set} of all known keys a @{@link ModelExtractor} is registered with
      * @see java.util.Map#keySet()
      */
     public Set<String> keySet() {

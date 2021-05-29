@@ -5,15 +5,16 @@ import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.template.ModelExtractor;
-import static org.jbake.app.configuration.PropertyList.*;
 
 import java.util.Map;
 
-public class AllContentExtractor implements ModelExtractor<DocumentList> {
+import static org.jbake.app.configuration.PropertyList.DATA_FILE_DOCTYPE;
+
+public class AllContentExtractor implements ModelExtractor<DocumentList<DocumentModel>> {
 
     @Override
-    public DocumentList get(ContentStore db, Map model, String key) {
-        Map<String, Object> config = (Map<String, Object>) model.get("config");
+    public DocumentList<DocumentModel> get(ContentStore db, TemplateModel model, String key) {
+        Map<String, Object> config = model.getConfig();
         String dataFileDocType = config.get(DATA_FILE_DOCTYPE.getKey().replace(".", "_")).toString();
         DocumentList<DocumentModel> allContent = new DocumentList<>();
         String[] documentTypes = DocumentTypes.getDocumentTypes();
