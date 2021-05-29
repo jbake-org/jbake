@@ -1,10 +1,17 @@
-package org.jbake.template;
+package org.jbake.engine;
 
 import org.jbake.app.ContentStore;
+import org.jbake.exception.NoModelExtractorException;
 import org.jbake.model.DocumentTypeUtils;
+import org.jbake.model.TemplateModel;
+import org.jbake.template.TemplateEngineAdapter;
+import org.jbake.template.model.ModelExtractor;
 import org.jbake.template.model.PublishedCustomExtractor;
-import org.jbake.template.model.TemplateModel;
 import org.jbake.template.model.TypedDocumentsExtractor;
+import org.jbake.template.model.UnknownModelExtractor;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -12,7 +19,7 @@ import org.jbake.template.model.TypedDocumentsExtractor;
  * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath
  * (recommanded).</p>
  * <p>The descriptor file must be found in <i>META-INF</i> directory and named
- * <i>org.jbake.template.ModelExtractors.properties</i>. The format of the file is easy:</p>
+ * <i>org.jbake.engine.ModelExtractors.properties</i>. The format of the file is easy:</p>
  * <code>org.jbake.template.model.AllPosts=all_posts<br> org.jbake.template.model.AllContent=all_content<br> </code>
  * <p>where the key is the class of the extractor (must implement {@link ModelExtractor}  and the value is the key
  * by which values are to be accessed in model.</p>
@@ -27,7 +34,7 @@ import org.jbake.template.model.TypedDocumentsExtractor;
  */
 public class ModelExtractors extends DescriptorFileEngineLoader<ModelExtractor<?>> {
 
-    private static final String PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties";
+    private static final String PROPERTIES = "META-INF/org.jbake.engine.ModelExtractors.properties";
 
     private static class Loader {
         private static final ModelExtractors INSTANCE = new ModelExtractors();
@@ -43,8 +50,18 @@ public class ModelExtractors extends DescriptorFileEngineLoader<ModelExtractor<?
     }
 
     @Override
+    protected ModelExtractor<?> getErrorEngine(String engineClassName) {
+        return new UnknownModelExtractor(engineClassName);
+    }
+
+    @Override
     protected String descriptorFile() {
         return PROPERTIES;
+    }
+
+    @Override
+    protected @NotNull ModelExtractor<?> createInstance(Context context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return (ModelExtractor<?>) context.engineClass().getDeclaredConstructor().newInstance();
     }
 
     public <T> T extractAndTransform(ContentStore db, String key, TemplateModel map, TemplateEngineAdapter<T> adapter) throws NoModelExtractorException {
@@ -59,7 +76,7 @@ public class ModelExtractors extends DescriptorFileEngineLoader<ModelExtractor<?
     public void registerExtractorsForCustomTypes(String docType) {
         String pluralizedDoctype = DocumentTypeUtils.pluralize(docType);
         if (!supportsExtension(pluralizedDoctype)) {
-            LOGGER.info("register new extractors for document type: {}", docType);
+            logger.info("register new extractors for document type: {}", docType);
             registerEngine(pluralizedDoctype, new TypedDocumentsExtractor());
             registerEngine("published_" + pluralizedDoctype, new PublishedCustomExtractor(docType));
         }

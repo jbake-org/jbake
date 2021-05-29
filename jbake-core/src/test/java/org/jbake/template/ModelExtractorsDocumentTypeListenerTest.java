@@ -1,6 +1,8 @@
 package org.jbake.template;
 
+import org.jbake.engine.ModelExtractors;
 import org.jbake.model.DocumentTypes;
+import org.jbake.template.model.ModelExtractorsDocumentTypeListener;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -7,7 +7,9 @@ import com.mitchellbosecke.pebble.loader.FileLoader;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.exception.NoModelExtractorException;
+import org.jbake.exception.RenderingException;
+import org.jbake.model.TemplateModel;
 
 import java.io.IOException;
 import java.io.Writer;

@@ -3,7 +3,7 @@ package org.jbake.template.model;
 import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.app.FileUtil;
-import org.jbake.template.ModelExtractor;
+import org.jbake.model.TemplateModel;
 
 import static org.jbake.app.configuration.PropertyList.OUTPUT_EXTENSION;
 import static org.jbake.app.configuration.PropertyList.TAG_PATH;

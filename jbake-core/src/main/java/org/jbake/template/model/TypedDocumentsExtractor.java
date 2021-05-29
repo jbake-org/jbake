@@ -4,7 +4,7 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypeUtils;
-import org.jbake.template.ModelExtractor;
+import org.jbake.model.TemplateModel;
 
 public class TypedDocumentsExtractor implements ModelExtractor<DocumentList<DocumentModel>> {
 

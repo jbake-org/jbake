@@ -17,8 +17,10 @@ import freemarker.template.TemplateModelException;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.exception.NoModelExtractorException;
+import org.jbake.exception.RenderingException;
 import org.jbake.model.ModelAttributes;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.model.TemplateModel;
 import org.jbake.util.DataFileUtil;
 
 import java.io.File;

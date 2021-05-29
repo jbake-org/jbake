@@ -1,7 +1,7 @@
 package org.jbake.template.model;
 
 import org.jbake.app.ContentStore;
-import org.jbake.template.ModelExtractor;
+import org.jbake.model.TemplateModel;
 import org.jbake.util.DataFileUtil;
 
 public class DataExtractor implements ModelExtractor<DataFileUtil> {

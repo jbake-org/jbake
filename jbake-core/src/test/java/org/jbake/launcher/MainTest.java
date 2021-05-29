@@ -4,12 +4,12 @@ import ch.qos.logback.classic.spi.LoggingEvent;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.itsallcode.junit.sysextensions.ExitGuard;
 import org.jbake.TestUtils;
-import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.exception.JBakeException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,6 @@ import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 

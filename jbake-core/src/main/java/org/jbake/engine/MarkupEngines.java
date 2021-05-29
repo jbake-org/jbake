@@ -1,8 +1,11 @@
-package org.jbake.parser;
+package org.jbake.engine;
 
-import org.jbake.template.DescriptorFileEngineLoader;
+import org.jbake.parser.ErrorEngine;
+import org.jbake.parser.ParserContext;
+import org.jbake.parser.ParserEngine;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <p>A singleton class giving access to markup engines. Markup engines are loaded based on classpath.
@@ -10,7 +13,7 @@ import java.util.Set;
  * on classpath (recommanded).</p>
  *
  * <p>The descriptor file must be found in <i>META-INF</i> directory and named
- * <i>org.jbake.parser.MarkupEngines.properties</i>. The format of the file is easy:</p>
+ * <i>org.jbake.engine.MarkupEngines.properties</i>. The format of the file is easy:</p>
  * <code>
  * org.jbake.parser.RawMarkupEngine=html<br>
  * org.jbake.parser.AsciidoctorEngine=ad,adoc,asciidoc<br>
@@ -30,7 +33,7 @@ import java.util.Set;
  * @author Cédric Champeau
  */
 public class MarkupEngines extends DescriptorFileEngineLoader<ParserEngine> {
-    public static final String PROPERTIES = "META-INF/org.jbake.parser.MarkupEngines.properties";
+    public static final String PROPERTIES = "META-INF/org.jbake.engine.MarkupEngines.properties";
 
     private static class Loader {
 
@@ -45,8 +48,14 @@ public class MarkupEngines extends DescriptorFileEngineLoader<ParserEngine> {
         loadEngines();
     }
 
-    public static Set<String> recognizedExtensions() {
-        return getInstance().keySet();
+    @Override
+    protected @NotNull ParserEngine createInstance(Context context) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        return (ParserEngine) context.engineClass().getDeclaredConstructor().newInstance();
+    }
+
+    @Override
+    protected ParserEngine getErrorEngine(String engineClassName) {
+        return new ErrorEngine(engineClassName);
     }
 
     public static ParserEngine fromExtension(String fileExt) {
@@ -58,16 +67,4 @@ public class MarkupEngines extends DescriptorFileEngineLoader<ParserEngine> {
         return PROPERTIES;
     }
 
-    @Override
-    protected void loadAndRegisterEngine(String className, String... extensions) {
-        ParserEngine engine = tryLoadEngine(className);
-        if (engine != null) {
-            for (String extension : extensions) {
-                registerEngine(extension, engine);
-            }
-            if (engine instanceof ErrorEngine) {
-                LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", (Object) extensions);
-            }
-        }
-    }
 }

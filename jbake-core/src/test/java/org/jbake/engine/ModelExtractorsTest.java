@@ -1,4 +1,4 @@
-package org.jbake.template;
+package org.jbake.engine;
 
 import org.jbake.model.DocumentTypes;
 import org.junit.After;

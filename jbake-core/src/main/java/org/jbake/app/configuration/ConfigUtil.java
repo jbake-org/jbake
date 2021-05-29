@@ -7,7 +7,7 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.jbake.app.JBakeException;
+import org.jbake.exception.JBakeException;
 import org.jbake.launcher.SystemExit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

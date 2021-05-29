@@ -1,8 +1,8 @@
 package org.jbake.app;
 
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.engine.MarkupEngines;
 import org.jbake.model.DocumentModel;
-import org.jbake.parser.MarkupEngines;
 import org.jbake.parser.ParserEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

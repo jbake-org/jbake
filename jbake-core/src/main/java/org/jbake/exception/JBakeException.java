@@ -1,4 +1,4 @@
-package org.jbake.app;
+package org.jbake.exception;
 
 import org.jbake.launcher.SystemExit;
 

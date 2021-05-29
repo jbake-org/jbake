@@ -1,9 +1,6 @@
-package org.jbake.template.model;
+package org.jbake.model;
 
 import org.jbake.app.DocumentList;
-import org.jbake.model.BaseModel;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
 import org.jbake.template.DelegatingTemplateEngine;
 
 import java.io.Writer;

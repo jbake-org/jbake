@@ -2,8 +2,8 @@ package org.jbake.app.configuration;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import org.jbake.TestUtils;
-import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
+import org.jbake.exception.JBakeException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

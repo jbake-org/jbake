@@ -6,11 +6,12 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.app.configuration.JBakeConfigurationInspector;
+import org.jbake.engine.ModelExtractors;
+import org.jbake.exception.JBakeException;
+import org.jbake.exception.RenderingException;
 import org.jbake.model.DocumentTypes;
 import org.jbake.render.RenderingTool;
-import org.jbake.template.ModelExtractors;
-import org.jbake.template.ModelExtractorsDocumentTypeListener;
-import org.jbake.template.RenderingException;
+import org.jbake.template.model.ModelExtractorsDocumentTypeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

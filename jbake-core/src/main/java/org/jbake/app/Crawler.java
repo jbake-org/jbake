@@ -4,6 +4,7 @@ import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.exception.JBakeException;
 import org.jbake.launcher.SystemExit;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentStatus;

@@ -1,5 +1,6 @@
-package org.jbake.template;
+package org.jbake.template.model;
 
+import org.jbake.engine.ModelExtractors;
 import org.jbake.model.DocumentTypeListener;
 
 public class ModelExtractorsDocumentTypeListener implements DocumentTypeListener {

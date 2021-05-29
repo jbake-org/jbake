@@ -1,7 +1,7 @@
-package org.jbake.template;
+package org.jbake.template.model;
 
 import org.jbake.app.ContentStore;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.model.TemplateModel;
 
 
 /**
