@@ -50,14 +50,14 @@ public class JettyServer implements Closeable {
             connector.setPort(port);
             server.addConnector(connector);
 
-            ResourceHandler resource_handler = new ResourceHandler();
-            resource_handler.setDirectoriesListed(true);
-            resource_handler.setWelcomeFiles(new String[]{"index", "index.html"});
-            resource_handler.setResourceBase(resourceBase);
+            ResourceHandler resourceHandler = new ResourceHandler();
+            resourceHandler.setDirectoriesListed(true);
+            resourceHandler.setWelcomeFiles(new String[]{"index", "index.html"});
+            resourceHandler.setResourceBase(resourceBase);
 
             ContextHandler contextHandler = new ContextHandler();
             contextHandler.setContextPath(contextPath);
-            contextHandler.setHandler(resource_handler);
+            contextHandler.setHandler(resourceHandler);
 
             HandlerList handlers = new HandlerList();
 

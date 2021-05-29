@@ -58,7 +58,7 @@ public class DocumentsRendererTest {
 
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
-        assertThat(renderResponse).isEqualTo(0);
+        assertThat(renderResponse).isZero();
     }
 
     @Test

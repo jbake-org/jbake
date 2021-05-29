@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class UnknownModelExtractor implements ModelExtractor<DocumentList<DocumentModel>> {
 
-    private final  static Logger logger = LoggerFactory.getLogger(UnknownModelExtractor.class);
+    private final Logger logger = LoggerFactory.getLogger(UnknownModelExtractor.class);
     private final String className;
 
     public UnknownModelExtractor(String className) {

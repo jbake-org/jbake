@@ -30,7 +30,7 @@ public class FeedRendererTest {
         Renderer mockRenderer = mock(Renderer.class);
         int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
-        assertThat(renderResponse).isEqualTo(0);
+        assertThat(renderResponse).isZero();
     }
 
     @Test

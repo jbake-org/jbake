@@ -81,7 +81,7 @@ class MainTest extends LoggingTest {
     }
 
     @Test
-    public void launchBakeWithCustomPropertiesEncoding(@TempDir Path source) throws Exception {
+    void launchBakeWithCustomPropertiesEncoding(@TempDir Path source) throws Exception {
         File currentWorkingdir = newFolder(source, "jbake");
         mockDefaultJbakeConfiguration(currentWorkingdir);
 
@@ -92,7 +92,7 @@ class MainTest extends LoggingTest {
     }
 
     @Test
-    public void launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir Path source) throws Exception {
+    void launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir Path source) throws Exception {
         File currentWorkingdir = newFolder(source, "jbake");
         mockDefaultJbakeConfiguration(currentWorkingdir);
 
