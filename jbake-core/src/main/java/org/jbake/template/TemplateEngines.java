@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -23,7 +24,7 @@ import java.util.Set;
  * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath
  * (recommanded).</p>
  * <p>The descriptor file must be found in <i>META-INF</i> directory and named
- * <i>org.jbake.parser.TemplateEngines.properties</i>. The format of the file is easy:</p>
+ * <i>org.jbake.template.TemplateEngines.properties</i>. The format of the file is easy:</p>
  * <code>org.jbake.parser.FreeMarkerRenderer=ftl<br> org.jbake.parser.GroovyRenderer=groovy,gsp<br> </code>
  * <p>where the key is the class of the engine (must extend {@link AbstractTemplateEngine} and have
  * a 4-arg constructor and the value is a comma-separated list of file extensions that this engine is capable
@@ -40,7 +41,7 @@ import java.util.Set;
 public class TemplateEngines {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateEngines.class);
-    public static final String PROPERTIES = "META-INF/org.jbake.parser.TemplateEngines.properties";
+    public static final String PROPERTIES = "META-INF/org.jbake.template.TemplateEngines.properties";
 
     private final Map<String, AbstractTemplateEngine> engines;
 
@@ -79,7 +80,7 @@ public class TemplateEngines {
             Class<? extends AbstractTemplateEngine> engineClass = (Class<? extends AbstractTemplateEngine>) Class.forName(engineClassName, false, TemplateEngines.class.getClassLoader());
             Constructor<? extends AbstractTemplateEngine> ctor = engineClass.getConstructor(JBakeConfiguration.class, ContentStore.class);
             return ctor.newInstance(config, db);
-        } catch (Throwable e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoClassDefFoundError | NoSuchMethodException | InvocationTargetException e) {
             // not all engines might be necessary, therefore only emit class loading issue with level warn
             LOGGER.debug("Template engine not available: {}", engineClassName);
             return null;

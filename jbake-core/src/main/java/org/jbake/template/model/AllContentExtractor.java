@@ -17,8 +17,7 @@ public class AllContentExtractor implements ModelExtractor<DocumentList<Document
         Map<String, Object> config = model.getConfig();
         String dataFileDocType = config.get(DATA_FILE_DOCTYPE.getKey().replace(".", "_")).toString();
         DocumentList<DocumentModel> allContent = new DocumentList<>();
-        String[] documentTypes = DocumentTypes.getDocumentTypes();
-        for (String docType : documentTypes) {
+        for (String docType : DocumentTypes.getDocumentTypes()) {
             if (!docType.equals(dataFileDocType)) {
                 DocumentList<DocumentModel> query = db.getAllContent(docType);
                 allContent.addAll(query);

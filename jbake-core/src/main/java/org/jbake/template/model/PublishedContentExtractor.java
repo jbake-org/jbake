@@ -11,8 +11,7 @@ public class PublishedContentExtractor implements ModelExtractor<DocumentList<Do
     @Override
     public DocumentList<DocumentModel> get(ContentStore db, TemplateModel model, String key) {
         DocumentList<DocumentModel> publishedContent = new DocumentList<>();
-        String[] documentTypes = DocumentTypes.getDocumentTypes();
-        for (String docType : documentTypes) {
+        for (String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList<DocumentModel> query = db.getPublishedContent(docType);
             publishedContent.addAll(query);
         }

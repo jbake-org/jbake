@@ -41,7 +41,7 @@ public class ModelExtractorsTest {
         };
 
         for (String aKey : expectedKeys) {
-            assertThat(ModelExtractors.getInstance().containsKey(aKey)).isTrue();
+            assertThat(ModelExtractors.getInstance().supportsExtension(aKey)).isTrue();
         }
     }
 
@@ -52,7 +52,7 @@ public class ModelExtractorsTest {
 
         ModelExtractors.getInstance().registerExtractorsForCustomTypes(knownDocumentType);
 
-        assertThat(ModelExtractors.getInstance().containsKey("published_alltags")).isFalse();
+        assertThat(ModelExtractors.getInstance().supportsExtension("published_alltags")).isFalse();
     }
 
     @Test
@@ -65,10 +65,10 @@ public class ModelExtractorsTest {
         ModelExtractors.getInstance().registerExtractorsForCustomTypes(newDocumentType);
 
         // then an extractor is registered by pluralized type as key
-        assertThat(ModelExtractors.getInstance().containsKey("projects")).isTrue();
+        assertThat(ModelExtractors.getInstance().supportsExtension("projects")).isTrue();
 
         // and an extractor for published types is registered
-        assertThat(ModelExtractors.getInstance().containsKey("published_projects")).isTrue();
+        assertThat(ModelExtractors.getInstance().supportsExtension("published_projects")).isTrue();
     }
 
     @Test

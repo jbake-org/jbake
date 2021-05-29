@@ -2,7 +2,7 @@ package org.jbake.app;
 
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.launcher.SystemExit;
-import org.jbake.parser.Engines;
+import org.jbake.parser.MarkupEngines;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -26,6 +26,8 @@ public class FileUtil {
 
     public static final String URI_SEPARATOR_CHAR = "/";
 
+    private FileUtil() {}
+
     /**
      * Filters files based on their file extension.
      *
@@ -33,12 +35,10 @@ public class FileUtil {
      * @return Object for filtering files
      */
     public static FileFilter getFileFilter(JBakeConfiguration config) {
-        return pathname -> {
-            //Accept if input  is a non-hidden file with registered extension
-            //or if a non-hidden and not-ignored directory
-            return !pathname.isHidden() && (pathname.isFile()
-                && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config));
-        };
+        //Accept if input  is a non-hidden file with registered extension
+        //or if a non-hidden and not-ignored directory
+        return pathname -> !pathname.isHidden() && (pathname.isFile()
+                && MarkupEngines.getInstance().supportsExtension(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config));
     }
 
     /**
@@ -49,12 +49,8 @@ public class FileUtil {
      */
     @Deprecated
     public static FileFilter getFileFilter() {
-        return pathname -> {
-            //Accept if input  is a non-hidden file with registered extension
-            //or if a non-hidden and not-ignored directory
-            return !pathname.isHidden() && (pathname.isFile()
-                && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
-        };
+        return pathname -> !pathname.isHidden() && (pathname.isFile()
+            && MarkupEngines.getInstance().supportsExtension(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
     }
 
     /**
@@ -73,14 +69,10 @@ public class FileUtil {
      * @return FileFilter object
      */
     public static FileFilter getNotContentFileFilter(JBakeConfiguration config) {
-        return pathname -> {
-            //Accept if input  is a non-hidden file with NOT-registered extension
-            //or if a non-hidden and not-ignored directory
-            return !pathname.isHidden() && (pathname.isFile()
-                //extension should not be from registered content extensions
-                && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
-                || (directoryOnlyIfNotIgnored(pathname, config));
-        };
+        return pathname -> !pathname.isHidden() && (pathname.isFile()
+            //extension should not be from registered content extensions
+            && !MarkupEngines.getInstance().supportsExtension(fileExt(pathname)))
+            || (directoryOnlyIfNotIgnored(pathname, config));
     }
 
     /**
@@ -91,14 +83,10 @@ public class FileUtil {
      */
     @Deprecated
     public static FileFilter getNotContentFileFilter() {
-        return pathname -> {
-            //Accept if input  is a non-hidden file with NOT-registered extension
-            //or if a non-hidden and not-ignored directory
-            return !pathname.isHidden() && (pathname.isFile()
+        return pathname -> !pathname.isHidden() && (pathname.isFile()
                 //extension should not be from registered content extensions
-                && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
+                && !MarkupEngines.getInstance().supportsExtension(fileExt(pathname)))
                 || (directoryOnlyIfNotIgnored(pathname));
-        };
     }
 
     /**
@@ -252,7 +240,7 @@ public class FileUtil {
      * @param config the jbake configuration
      * @return the relative path to get to the root
      */
-    static public String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
+    public static String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
 
         Path r = Paths.get(rootPath.toURI());
         Path s = Paths.get(sourceFile.getParentFile().toURI());
