@@ -8,9 +8,8 @@ clone_depth: 10
 environment:
   TERM: dumb
   matrix:
-    - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
     - JAVA_HOME: C:\Program Files\Java\jdk11
-    - JAVA_HOME: C:\Program Files\Java\jdk15
+    - JAVA_HOME: C:\Program Files\Java\jdk16
 
 install:
   - SET PATH=%JAVA_HOME%\bin;%PATH%
