@@ -100,7 +100,7 @@ public class Renderer {
     }
 
     private String findTemplateName(String docType) {
-        return config.getTemplateFileByDocType(docType).getName();
+        return config.getTemplateByDocType(docType);
     }
 
     /**

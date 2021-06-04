@@ -468,13 +468,22 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     }
 
     @Override
-    public File getTemplateFileByDocType(String docType) {
+    public String getTemplateByDocType(String docType) {
         String templateKey = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_FILE_POSTFIX;
         String templateFileName = getAsString(templateKey);
         if (templateFileName != null) {
-            return new File(getTemplateFolder(), templateFileName);
+            return templateFileName;
         }
         logger.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, docType);
+        return null;
+    }
+
+    @Override
+    public File getTemplateFileByDocType(String docType) {
+        String templateFileName = getTemplateByDocType(docType);
+        if (templateFileName != null) {
+            return new File(getTemplateFolder(), templateFileName);
+        }
         return null;
     }
 

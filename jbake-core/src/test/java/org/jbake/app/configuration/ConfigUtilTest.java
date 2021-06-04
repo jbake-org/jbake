@@ -140,8 +140,10 @@ public class ConfigUtilTest extends LoggingTest {
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
         File templateFile = config.getTemplateFileByDocType("masterindex");
-
         assertThat(templateFile).isEqualTo(expectedTemplateFile);
+
+        String templateFile2 = config.getTemplateByDocType("team");
+        assertThat(templateFile2).isEqualTo("special/team.tpl");
     }
 
     @Test
@@ -190,7 +192,7 @@ public class ConfigUtilTest extends LoggingTest {
 
         List<String> docTypes = config.getDocumentTypes();
 
-        assertThat(docTypes).containsExactly("allcontent", "masterindex", "feed", "error404", "archive", "tag", "tagsindex", "sitemap", "post", "page");
+        assertThat(docTypes).containsExactly("allcontent", "team", "masterindex", "feed", "error404", "archive", "tag", "tagsindex", "sitemap", "post", "page");
 
     }
 
