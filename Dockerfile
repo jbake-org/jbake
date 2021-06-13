@@ -19,6 +19,14 @@ FROM adoptopenjdk/openjdk11:alpine-jre
 ENV JBAKE_USER=jbake
 ENV JBAKE_HOME=/opt/jbake
 ENV PATH ${JBAKE_HOME}/bin:$PATH
+ENV TZ=UTC
+
+RUN apk --no-cache update && \
+    apk --no-cache upgrade && \
+    apk add --update tzdata && \
+    rm -rf /var/cache/apk/*
+
+RUN echo ${TZ} > /etc/timezone
 
 RUN adduser -D -u 1000 -g "" ${JBAKE_USER} ${JBAKE_USER}
 
