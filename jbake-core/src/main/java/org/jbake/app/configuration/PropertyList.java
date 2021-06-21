@@ -129,6 +129,20 @@ public abstract class PropertyList {
         "img.path.update",
         "update image path?"
     );
+    public static final Property RELATIVE_PATH_UPDATE = new Property(
+        "relative.path.update",
+        "update relative path?"
+    );
+
+    public static final Property RELATIVE_PATH_PREPEND_HOST = new Property(
+        "relative.path.prepend.host",
+        "Prepend site.host to relative paths"
+    );
+
+    public static final Property RELATIVE_TAG_ATTRIBUTE = new Property(
+        "relative.tag.attribute",
+        "Define tag and it's attribute that may contains relative paths"
+    );
 
     public static final Property IMG_PATH_PREPEND_HOST = new Property(
         "img.path.prepend.host",
