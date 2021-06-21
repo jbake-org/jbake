@@ -1,8 +1,0 @@
-version: 1
-update_configs:
-  - package_manager: "java:gradle"
-    directory: "/jbake-core"
-    update_schedule: "daily"
-  - package_manager: "java:gradle"
-    directory: "/jbake-dist"
-    update_schedule: "daily"
