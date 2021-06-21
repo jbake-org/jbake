@@ -6,7 +6,6 @@ import org.jbake.app.DBUtil;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

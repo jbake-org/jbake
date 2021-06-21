@@ -5,9 +5,10 @@ import org.apache.commons.lang.LocaleUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.exception.NoModelExtractorException;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.ModelAttributes;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.model.TemplateModel;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.LazyContextVariable;
@@ -110,7 +111,7 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
     /**
      * Helper class to lazy load data form extractors by key
      */
-    private class ContextVariable extends LazyContextVariable {
+    private static class ContextVariable extends LazyContextVariable<Object> {
 
         private final ContentStore db;
         private final String key;
@@ -126,31 +127,28 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
         protected Object loadValue() {
 
             try {
-                return extractors.extractAndTransform(db, key, model, new TemplateEngineAdapter<LazyContextVariable>() {
-                    @Override
-                    public LazyContextVariable adapt(String key, final Object extractedValue) {
-                        if (key.equals(ModelAttributes.ALLTAGS)) {
-                            return new LazyContextVariable<Set<?>>() {
-                                @Override
-                                protected Set<?> loadValue() {
-                                    return (Set<?>) extractedValue;
-                                }
-                            };
-                        } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
-                            return new LazyContextVariable<Date>() {
-                                @Override
-                                protected Date loadValue() {
-                                    return (Date) extractedValue;
-                                }
-                            };
-                        } else {
-                            return new LazyContextVariable<Object>() {
-                                @Override
-                                protected Object loadValue() {
-                                    return extractedValue;
-                                }
-                            };
-                        }
+                return extractors.extractAndTransform(db, key, model, (k, v) -> {
+                    if (k.equals(ModelAttributes.ALLTAGS)) {
+                        return new LazyContextVariable<Set<?>>() {
+                            @Override
+                            protected Set<?> loadValue() {
+                                return (Set<?>) v;
+                            }
+                        };
+                    } else if (k.equals(ModelAttributes.PUBLISHED_DATE)) {
+                        return new LazyContextVariable<Date>() {
+                            @Override
+                            protected Date loadValue() {
+                                return (Date) v;
+                            }
+                        };
+                    } else {
+                        return new LazyContextVariable<Object>() {
+                            @Override
+                            protected Object loadValue() {
+                                return v;
+                            }
+                        };
                     }
                 }).getValue();
             } catch (NoModelExtractorException e) {

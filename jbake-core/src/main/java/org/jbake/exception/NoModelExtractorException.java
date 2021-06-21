@@ -1,4 +1,4 @@
-package org.jbake.template;
+package org.jbake.exception;
 
 public class NoModelExtractorException extends RenderingException {
 

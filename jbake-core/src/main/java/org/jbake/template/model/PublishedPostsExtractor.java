@@ -2,14 +2,13 @@ package org.jbake.template.model;
 
 import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
-import org.jbake.template.ModelExtractor;
+import org.jbake.model.DocumentModel;
+import org.jbake.model.TemplateModel;
 
-import java.util.Map;
-
-public class PublishedPostsExtractor implements ModelExtractor<DocumentList> {
+public class PublishedPostsExtractor implements ModelExtractor<DocumentList<DocumentModel>> {
 
     @Override
-    public DocumentList get(ContentStore db, Map model, String key) {
+    public DocumentList<DocumentModel> get(ContentStore db, TemplateModel model, String key) {
         if (model.containsKey("numberOfPages")) {
             return db.getPublishedPosts(true);
         } else {

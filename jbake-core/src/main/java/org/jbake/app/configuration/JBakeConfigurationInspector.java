@@ -1,7 +1,7 @@
 package org.jbake.app.configuration;
 
 import org.jbake.app.FileUtil;
-import org.jbake.app.JBakeException;
+import org.jbake.exception.JBakeException;
 import org.jbake.launcher.SystemExit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

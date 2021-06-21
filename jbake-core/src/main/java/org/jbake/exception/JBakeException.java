@@ -1,4 +1,4 @@
-package org.jbake.app;
+package org.jbake.exception;
 
 import org.jbake.launcher.SystemExit;
 
@@ -11,7 +11,7 @@ import org.jbake.launcher.SystemExit;
 public class JBakeException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    final private SystemExit exit;
+    private final SystemExit exit;
 
     /**
      *

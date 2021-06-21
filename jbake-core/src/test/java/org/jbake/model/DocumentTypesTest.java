@@ -2,6 +2,8 @@ package org.jbake.model;
 
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -9,9 +11,9 @@ import static org.mockito.Mockito.verify;
 public class DocumentTypesTest {
 
     @Test
-    public void shouldReturnDefaultDocumentTypes() throws Exception {
-        String[] knownDocumentTypes = DocumentTypes.getDocumentTypes();
-        String[] expectedDocumentType = new String[] {"page", "post", "masterindex", "archive", "feed" };
+    public void shouldReturnDefaultDocumentTypes() {
+        Set<String> knownDocumentTypes = DocumentTypes.getDocumentTypes();
+        String[] expectedDocumentType = new String[]{"page", "post", "masterindex", "archive", "feed"};
 
         assertThat(knownDocumentTypes).contains(expectedDocumentType);
     }

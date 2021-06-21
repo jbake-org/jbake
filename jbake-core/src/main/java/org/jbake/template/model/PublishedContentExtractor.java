@@ -4,17 +4,14 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
-import org.jbake.template.ModelExtractor;
+import org.jbake.model.TemplateModel;
 
-import java.util.Map;
-
-public class PublishedContentExtractor implements ModelExtractor<DocumentList> {
+public class PublishedContentExtractor implements ModelExtractor<DocumentList<DocumentModel>> {
 
     @Override
-    public DocumentList get(ContentStore db, Map model, String key) {
+    public DocumentList<DocumentModel> get(ContentStore db, TemplateModel model, String key) {
         DocumentList<DocumentModel> publishedContent = new DocumentList<>();
-        String[] documentTypes = DocumentTypes.getDocumentTypes();
-        for (String docType : documentTypes) {
+        for (String docType : DocumentTypes.getDocumentTypes()) {
             DocumentList<DocumentModel> query = db.getPublishedContent(docType);
             publishedContent.addAll(query);
         }

@@ -6,14 +6,17 @@ import org.asciidoctor.Options;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.jruby.AsciidoctorJRuby;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.asciidoctor.AttributesBuilder.attributes;
@@ -39,7 +42,7 @@ public class AsciidoctorEngine extends MarkupEngine {
     private static final String OPT_REQUIRES = "requires";
 
     public AsciidoctorEngine() {
-        Class engineClass = Asciidoctor.class;
+        Class<Asciidoctor> engineClass = Asciidoctor.class;
         assert engineClass != null;
     }
 
@@ -51,23 +54,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                 try {
                     lock.writeLock().lock();
                     if (engine == null) {
-                        LOGGER.info("Initializing Asciidoctor engine...");
-                        if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = AsciidoctorJRuby.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
-                        } else {
-                            engine = Asciidoctor.Factory.create();
-                        }
-
-                        if (options.map().containsKey(OPT_REQUIRES)) {
-                            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
-                            if (requires.length != 0) {
-                                for (String require : requires) {
-                                    engine.requireLibrary(require);
-                                }
-                            }
-                        }
-
-                        LOGGER.info("Asciidoctor engine initialized.");
+                        initialize(options);
                     }
                 } finally {
                     lock.readLock().lock();
@@ -80,48 +67,93 @@ public class AsciidoctorEngine extends MarkupEngine {
         return engine;
     }
 
+    private void initialize(Options options) {
+        LOGGER.info("Initializing Asciidoctor engine...");
+        if (options.map().containsKey(OPT_GEM_PATH)) {
+            engine = AsciidoctorJRuby.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
+        } else {
+            engine = Asciidoctor.Factory.create();
+        }
+
+        if (options.map().containsKey(OPT_REQUIRES)) {
+            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
+            if (requires.length != 0) {
+                for (String require : requires) {
+                    engine.requireLibrary(require);
+                }
+            }
+        }
+
+        LOGGER.info("Asciidoctor engine initialized.");
+    }
+
     @Override
     public void processHeader(final ParserContext context) {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
         DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
-        DocumentModel documentModel = context.getDocumentModel();
-        if (header.getDocumentTitle() != null) {
-            documentModel.setTitle(header.getDocumentTitle().getCombined());
-        }
+        setDocumentTitleIfNotPresentInHeader(context, header);
+        addAttributesToDocumentModel(context, header);
+    }
+
+    private void addAttributesToDocumentModel(ParserContext context, DocumentHeader header) {
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
-            String key = attribute.getKey();
-            Object value = attribute.getValue();
+            addIfKeyHasJbakePrefix(context, attribute);
+            convertAndSetIfDate(context, attribute);
+            addIfJbakeTagsOrDefault(context, attribute);
+        }
+    }
 
-            if (hasJBakePrefix(key)) {
-                String pKey = key.substring(6);
-                if(canCastToString(value)) {
-                    storeHeaderValue(pKey, (String) value, documentModel);
-                } else {
-                    documentModel.put(pKey, value);
-                }
-            }
-            if (hasRevdate(key) && canCastToString(value)) {
+    private void addIfJbakeTagsOrDefault(ParserContext context, Map.Entry<String, Object> attribute) {
+        String key = attribute.getKey();
+        Object value = attribute.getValue();
 
-                String dateFormat = context.getConfig().getDateFormat();
-                DateFormat df = new SimpleDateFormat(dateFormat);
-                try {
-                    Date date = df.parse((String) value);
-                    context.setDate(date);
-                } catch (ParseException e) {
-                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
-                }
-            }
-            if (key.equals("jbake-tags")) {
-                if (canCastToString(value)) {
-                    context.setTags(((String) value).split(","));
-                } else {
-                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
-                }
+        if (key.equals("jbake-tags")) {
+            if (canCastToString(value)) {
+                context.setTags(((String) value).split(","));
             } else {
-                documentModel.put(key, attributes.get(key));
+                LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
             }
+        } else {
+            context.getDocumentModel().put(key, value);
+        }
+    }
+
+    private void addIfKeyHasJbakePrefix(ParserContext context, Map.Entry<String, Object> attribute) {
+        String key = attribute.getKey();
+        Object value = attribute.getValue();
+
+        if (hasJBakePrefix(key)) {
+            String pKey = key.substring(6);
+            if(canCastToString(value)) {
+                storeHeaderValue(pKey, (String) value, context.getDocumentModel());
+            } else {
+                context.getDocumentModel().put(pKey, value);
+            }
+        }
+    }
+
+    private void convertAndSetIfDate(ParserContext context, Map.Entry<String, Object> attribute) {
+        String key = attribute.getKey();
+        Object value = attribute.getValue();
+
+        if (hasRevdate(key) && canCastToString(value)) {
+
+            String dateFormat = context.getConfig().getDateFormat();
+            DateFormat df = new SimpleDateFormat(dateFormat);
+            try {
+                Date date = df.parse((String) value);
+                context.setDate(date);
+            } catch (ParseException e) {
+                LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
+            }
+        }
+    }
+
+    private void setDocumentTitleIfNotPresentInHeader(ParserContext context, DocumentHeader header) {
+        if (header.getDocumentTitle() != null) {
+            context.getDocumentModel().setTitle(header.getDocumentTitle().getCombined());
         }
     }
 

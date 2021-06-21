@@ -10,7 +10,9 @@ import org.apache.commons.configuration2.CompositeConfiguration;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.exception.NoModelExtractorException;
+import org.jbake.exception.RenderingException;
+import org.jbake.model.TemplateModel;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

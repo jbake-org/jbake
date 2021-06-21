@@ -1,7 +1,5 @@
 package org.jbake.model;
 
-import org.jbake.parser.Engines;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -52,11 +50,8 @@ public class DocumentTypes {
      *
      * @return all supported document types
      */
-    public static String[] getDocumentTypes() {
-        // TODO: is this needed?
-        // make sure engines are loaded before to get document types
-        Engines.getRecognizedExtensions();
-        return DEFAULT_DOC_TYPES.toArray(new String[DEFAULT_DOC_TYPES.size()]);
+    public static Set<String> getDocumentTypes() {
+        return DEFAULT_DOC_TYPES;
     }
 
     public static boolean contains(String documentType) {

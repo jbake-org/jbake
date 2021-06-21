@@ -1,13 +1,13 @@
 package org.jbake.render;
 
-import java.io.File;
-
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.template.RenderingException;
+import org.jbake.exception.RenderingException;
+
+import java.io.File;
 
 
 public class Error404Renderer implements RenderingTool {

@@ -1,5 +1,7 @@
 package org.jbake.model;
 
+import java.util.Set;
+
 public class DocumentTypeUtils {
 
     private DocumentTypeUtils() {}
@@ -9,7 +11,7 @@ public class DocumentTypeUtils {
         if ((pluralized == null) || (pluralized.length() == 0)) {
             throw new IllegalArgumentException("pluralized string should not be null or length should be bigger than zero");
         }
-        String[] documentTypes = DocumentTypes.getDocumentTypes();
+        Set<String> documentTypes = DocumentTypes.getDocumentTypes();
 
         String unpluralizedDoctype = pluralized.substring(0, pluralized.length() - 1);
         if (DocumentTypes.contains(unpluralizedDoctype)) {
@@ -20,7 +22,7 @@ public class DocumentTypeUtils {
     }
 
     public static String pluralize(String documentType) {
-        String[] documentTypes = DocumentTypes.getDocumentTypes();
+        Set<String> documentTypes = DocumentTypes.getDocumentTypes();
 
         if (DocumentTypes.contains(documentType)) {
             return documentType + "s";

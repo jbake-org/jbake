@@ -1,4 +1,4 @@
-package org.jbake.template;
+package org.jbake.exception;
 
 /**
  * Thrown if rendering of a document failed.

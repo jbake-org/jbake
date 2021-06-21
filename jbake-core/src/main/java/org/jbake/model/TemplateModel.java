@@ -1,12 +1,10 @@
-package org.jbake.template.model;
+package org.jbake.model;
 
 import org.jbake.app.DocumentList;
-import org.jbake.model.BaseModel;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
 import org.jbake.template.DelegatingTemplateEngine;
 
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Map;
 
 public class TemplateModel extends BaseModel {
@@ -19,7 +17,9 @@ public class TemplateModel extends BaseModel {
     }
 
     public Map<String, Object> getConfig() {
-        return (Map<String, Object>) get(ModelAttributes.CONFIG);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> configMap = (Map<String, Object>) get(ModelAttributes.CONFIG);
+        return Collections.unmodifiableMap(configMap);
     }
 
     public void setConfig(Map<String, Object> configModel) {
@@ -66,11 +66,11 @@ public class TemplateModel extends BaseModel {
         put(ModelAttributes.TAG, tag);
     }
 
-    public void setTaggedPosts(DocumentList taggedPosts) {
+    public void setTaggedPosts(DocumentList<DocumentModel> taggedPosts) {
         put(ModelAttributes.TAGGED_POSTS, taggedPosts);
     }
 
-    public void setTaggedDocuments(DocumentList taggedDocuments) {
+    public void setTaggedDocuments(DocumentList<DocumentModel> taggedDocuments) {
         put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments);
     }
 

@@ -6,8 +6,8 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.ModelAttributes;
+import org.jbake.model.TemplateModel;
 import org.jbake.template.DelegatingTemplateEngine;
-import org.jbake.template.model.TemplateModel;
 import org.jbake.util.PagingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -283,13 +282,13 @@ public class Renderer {
                 TemplateModel model = new TemplateModel();
                 model.setRenderer(renderingEngine);
                 model.setTag(tag);
-                DocumentModel map = buildSimpleModel(ModelAttributes.TAG.toString());
+                DocumentModel map = buildSimpleModel(ModelAttributes.TAG);
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
 
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
                 model.setContent(map);
 
-                render(new ModelRenderingConfig(path, ModelAttributes.TAG.toString(), model, findTemplateName(ModelAttributes.TAG.toString())));
+                render(new ModelRenderingConfig(path, ModelAttributes.TAG, model, findTemplateName(ModelAttributes.TAG)));
 
                 renderedCount++;
             } catch (Exception e) {
@@ -304,7 +303,7 @@ public class Renderer {
                 // display all tags page.
                 TemplateModel model = new TemplateModel();
                 model.setRenderer(renderingEngine);
-                DocumentModel map = buildSimpleModel(ModelAttributes.TAGS.toString());
+                DocumentModel map = buildSimpleModel(ModelAttributes.TAGS);
                 File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
 
                 map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));

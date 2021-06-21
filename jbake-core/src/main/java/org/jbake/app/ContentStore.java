@@ -34,8 +34,6 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.launcher.SystemExit;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
@@ -149,8 +147,6 @@ public class ContentStore {
     }
 
     public void shutdown() {
-
-//        Orient.instance().shutdown();
     }
 
     private void startupIfEnginesAreMissing() {
@@ -169,8 +165,6 @@ public class ContentStore {
 
     public void drop() {
         activateOnCurrentThread();
-//        db.drop();
-
         orient.drop(name);
     }
 
@@ -178,7 +172,7 @@ public class ContentStore {
         if (db != null) {
             db.activateOnCurrentThread();
         } else {
-            System.out.println("db is null on activate");
+            logger.warn("db is null on activate");
         }
     }
 

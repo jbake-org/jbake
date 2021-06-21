@@ -2,7 +2,7 @@ package org.jbake.app.configuration;
 
 
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.JBakeException;
+import org.jbake.exception.JBakeException;
 
 import java.io.File;
 
@@ -111,7 +111,7 @@ public class JBakeConfigurationFactory {
      */
     @Deprecated
     public DefaultJBakeConfiguration createJettyJbakeConfiguration(File sourceFolder, File destinationFolder, boolean isClearCache) throws JBakeException {
-        return createJettyJbakeConfiguration(sourceFolder, destinationFolder, (File)null, isClearCache);
+        return createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, isClearCache);
     }
 
     /**

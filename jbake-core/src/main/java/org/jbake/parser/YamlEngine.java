@@ -1,20 +1,15 @@
 package org.jbake.parser;
 
-import org.apache.commons.io.IOUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.swing.text.Document;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +25,7 @@ public class YamlEngine extends MarkupEngine {
      * @param file
      * @return
      */
+    @SuppressWarnings("unchecked")
     private DocumentModel parseFile(File file) {
         DocumentModel model = new DocumentModel();
         Yaml yaml = new Yaml();
@@ -38,7 +34,7 @@ public class YamlEngine extends MarkupEngine {
             if (result instanceof List) {
                 model.put("data", result);
             } else if (result instanceof Map) {
-                model.putAll((Map)result);
+                model.putAll((Map<? extends String, ?>) result);
             } else {
                 LOGGER.warn("Unexpected result [{}] while parsing YAML file {}", result.getClass(), file);
             }
@@ -63,14 +59,14 @@ public class YamlEngine extends MarkupEngine {
         DocumentModel fileContents = parseFile(context.getFile());
         DocumentModel documentModel = context.getDocumentModel();
 
-        for (String key : fileContents.keySet()) {
+        fileContents.keySet().forEach(key -> {
             if (hasJBakePrefix(key)) {
                 String pKey = key.substring(6);
                 documentModel.put(pKey, fileContents.get(key));
             } else {
                 documentModel.put(key, fileContents.get(key));
             }
-        }
+        });
     }
 
     /**

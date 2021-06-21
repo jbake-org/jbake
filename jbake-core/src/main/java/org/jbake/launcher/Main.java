@@ -1,10 +1,9 @@
 package org.jbake.launcher;
 
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.jbake.app.FileUtil;
-import org.jbake.app.JBakeException;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.exception.JBakeException;
 import org.jbake.util.ConfigurationPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +20,6 @@ import java.io.File;
  */
 public class Main {
 
-    private static final String USAGE_PREFIX = "Usage: jbake";
-    private static final String ALT_USAGE_PREFIX = "   or  jbake";
     private final Baker baker;
     private final JettyServer jettyServer;
     private final BakeWatcher watcher;
