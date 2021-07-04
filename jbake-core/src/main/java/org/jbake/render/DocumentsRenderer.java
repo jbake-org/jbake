@@ -18,30 +18,14 @@ public class DocumentsRenderer implements RenderingTool {
     @Override
     public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
         int renderedCount = 0;
-        int index = 0;
         final List<String> errors = new LinkedList<>();
-        DocumentModel nextDocument = null;
 
         DocumentList<DocumentModel> documentList = db.getUnrenderedContent();
         for (DocumentModel document : documentList) {
             try {
-                document.setNextContent(null);
-                document.setPreviousContent(null);
-
-                if (nextDocument != null && index > 0) {
-                    document.setNextContent(getContentForNav(nextDocument));
-                }
-
-                if (index < documentList.size() - 1) {
-                    DocumentModel tempNext = findPrevPublishedDocument(documentList, index);
-                    if (tempNext != null) {
-                        document.setPreviousContent(getContentForNav(tempNext));
-                    }
-                }
-
-                if (isPublished(document)) {
-                    nextDocument = document;
-                }
+                DocumentList<DocumentModel> typedDocList = db.getAllContent(document.getType());
+                setPrevDoc(typedDocList, document);
+                setNextDoc(typedDocList, document);
 
                 renderer.render(document);
                 db.markContentAsRendered(document);
@@ -50,8 +34,6 @@ public class DocumentsRenderer implements RenderingTool {
             } catch (Exception e) {
                 errors.add(e.getMessage());
             }
-
-            index++;
         }
 
         if (!errors.isEmpty()) {
@@ -66,14 +48,50 @@ public class DocumentsRenderer implements RenderingTool {
         }
     }
 
-    private DocumentModel findPrevPublishedDocument(DocumentList<DocumentModel> documentList, int index) {
-        for ( int prevDocIndex = index+1; prevDocIndex < documentList.size(); ++prevDocIndex ) {
-            DocumentModel prevDocument = documentList.get(prevDocIndex);
-            if (isPublished(prevDocument)) {
-                return prevDocument;
+    private void setNextDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
+        int typedListIndex = typedList.indexOf(doc);
+        if (typedList.getFirst().equals(doc)) {
+            // initial doc in typed list so there is no next
+            doc.setNextContent(null);
+        } else {
+            boolean found = false;
+            while (!found) {
+                try {
+                    DocumentModel nextDoc = typedList.get(typedListIndex - 1);
+                    if (isPublished(nextDoc)) {
+                        doc.setNextContent(getContentForNav(nextDoc));
+                        found = true;
+                    } else {
+                        typedListIndex--;
+                    }
+                } catch (IndexOutOfBoundsException ex) {
+                    found = true;
+                }
             }
         }
-        return null;
+    }
+
+    private void setPrevDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
+        int typedListIndex = typedList.indexOf(doc);
+        if (typedList.getLast().equals(doc)) {
+            // last doc in typed list so there is no previous
+            doc.setPreviousContent(null);
+        } else {
+            boolean found = false;
+            while (!found) {
+                try {
+                    DocumentModel prevDoc = typedList.get(typedListIndex + 1);
+                    if (isPublished(prevDoc)) {
+                        doc.setPreviousContent(getContentForNav(prevDoc));
+                        found = true;
+                    } else {
+                        typedListIndex++;
+                    }
+                } catch (IndexOutOfBoundsException ex) {
+                    found = true;
+                }
+            }
+        }
     }
 
     private boolean isPublished(DocumentModel document) {

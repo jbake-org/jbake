@@ -91,6 +91,9 @@ This command will also expose port 8820 from the container, you'll also need to 
 server.hostname=0.0.0.0
 ----
 
+NOTE: Docker image timezone is _UTC_. This may affect the date and time expected in output content. To set different timezone, add `TZ` environment variable and set value to required https://en.wikipedia.org/wiki/List_of_tz_database_time_zones[timezone^]. Example - `docker run --rm -u jbake  -e TZ=America/New_York -v "$PWD":/mnt/site jbake/jbake:latest`
+
+
 == Build System
 
 The project uses http://gradle.org[Gradle] 4.9+ as the build system.

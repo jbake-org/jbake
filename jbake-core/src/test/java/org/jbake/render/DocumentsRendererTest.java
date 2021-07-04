@@ -75,6 +75,7 @@ public class DocumentsRendererTest {
 
         // return given DocumentList for DocumentType 'custom type'
         when(db.getUnrenderedContent()).thenReturn(templateModelList);
+        when(db.getAllContent(any())).thenReturn(templateModelList);
 
         // when:
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
@@ -120,32 +121,63 @@ public class DocumentsRendererTest {
         DocumentTypes.addDocumentType("customType");
 
         String firstTitle = "First Document";
-        String secondTitleIsDraft = "Second Document (draft)";
+        DocumentModel firstDoc = simpleDocument(firstTitle, ModelAttributes.Status.PUBLISHED, "page");
+        String secondTitle = "Second Document";
+        DocumentModel secondDoc = simpleDocument(secondTitle, ModelAttributes.Status.PUBLISHED, "post");
         String thirdTitle = "Third Document";
-        String fourthTitle = "Fourth Document";
+        DocumentModel thirdDoc = simpleDocument(thirdTitle, ModelAttributes.Status.PUBLISHED, "page");
+        String fourthTitle = "Fourth Document (draft)";
+        DocumentModel fourthDoc = simpleDocument(fourthTitle, ModelAttributes.Status.DRAFT, "post");
+        String fifthTitle = "Fifth Document";
+        DocumentModel fifthDoc = simpleDocument(fifthTitle, ModelAttributes.Status.PUBLISHED, "page");
+        String sixthTitle = "Sixth Document";
+        DocumentModel sixthDoc = simpleDocument(sixthTitle, ModelAttributes.Status.PUBLISHED, "post");
+        String seventhTitle = "Seventh Document";
+        DocumentModel seventhDoc = simpleDocument(seventhTitle, ModelAttributes.Status.PUBLISHED, "post");
 
-        DocumentList documents = new DocumentList();
-        // Attributes.Status.PUBLISHED_DATE cannot occur here
-        // because it's converted TO either PUBLISHED or DRAFT in the Crawler.
-        documents.add(simpleDocument(fourthTitle, ModelAttributes.Status.PUBLISHED));
-        documents.add(simpleDocument(thirdTitle, ModelAttributes.Status.PUBLISHED));
-        documents.add(simpleDocument(secondTitleIsDraft, ModelAttributes.Status.DRAFT));
-        documents.add(simpleDocument(firstTitle, ModelAttributes.Status.PUBLISHED));
+        DocumentList allDocs = new DocumentList();
+        allDocs.add(seventhDoc);
+        allDocs.add(sixthDoc);
+        allDocs.add(fifthDoc);
+        allDocs.add(fourthDoc);
+        allDocs.add(thirdDoc);
+        allDocs.add(secondDoc);
+        allDocs.add(firstDoc);
 
-        when(db.getUnrenderedContent()).thenReturn(documents);
+        DocumentList pageDocs = new DocumentList();
+        pageDocs.add(fifthDoc);
+        pageDocs.add(thirdDoc);
+        pageDocs.add(firstDoc);
+
+        DocumentList postDocs = new DocumentList();
+        postDocs.add(seventhDoc);
+        postDocs.add(sixthDoc);
+        postDocs.add(fourthDoc);
+        postDocs.add(secondDoc);
+
+        when(db.getUnrenderedContent()).thenReturn(allDocs);
+        when(db.getAllContent("page")).thenReturn(pageDocs);
+        when(db.getAllContent("post")).thenReturn(postDocs);
 
         // when
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
         // then
-        verify(renderer, times(4)).render(argument.capture());
-
+        verify(renderer, times(7)).render(argument.capture());
         final Map<String, Map<String, Object>> renderedDocs = asTitleToDocMap(argument.getAllValues());
+
+        // page checks
+        assertDocumentNavigation(renderedDocs.get(fifthTitle), thirdTitle, null);
+        assertDocumentNavigation(renderedDocs.get(thirdTitle), firstTitle, fifthTitle);
         assertDocumentNavigation(renderedDocs.get(firstTitle), null, thirdTitle);
-        assertDocumentNavigation(renderedDocs.get(secondTitleIsDraft), firstTitle, thirdTitle);
-        assertDocumentNavigation(renderedDocs.get(thirdTitle), firstTitle, fourthTitle);
-        assertDocumentNavigation(renderedDocs.get(fourthTitle), thirdTitle, null);
-        assertThat(renderResponse).isEqualTo(4);
+
+        // post checks
+        assertDocumentNavigation(renderedDocs.get(seventhTitle), sixthTitle, null);
+        assertDocumentNavigation(renderedDocs.get(sixthTitle), secondTitle, seventhTitle);
+        assertDocumentNavigation(renderedDocs.get(fourthTitle), secondTitle, sixthTitle);
+        assertDocumentNavigation(renderedDocs.get(secondTitle), null, sixthTitle);
+
+        assertThat(renderResponse).isEqualTo(7);
     }
 
     private void assertDocumentNavigation(
@@ -166,11 +198,12 @@ public class DocumentsRendererTest {
         return new DocumentModel();
     }
 
-    private DocumentModel simpleDocument(String title, String status) {
+    private DocumentModel simpleDocument(String title, String status, String docType) {
         DocumentModel simpleDoc = new DocumentModel();
         String uri = title.replace(" ", "_");
         simpleDoc.setNoExtensionUri(uri);
         simpleDoc.setUri(uri);
+        simpleDoc.setType(docType);
         simpleDoc.setTitle(title);
         simpleDoc.setStatus(status);
         return simpleDoc;

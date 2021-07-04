@@ -297,7 +297,9 @@ public interface JBakeConfiguration {
      */
     String getTemplateEncoding();
 
-    File getTemplateFileByDocType(String masterindex);
+    String getTemplateByDocType(String doctype);
+
+    File getTemplateFileByDocType(String doctype);
 
     /**
      * @return the template folder
