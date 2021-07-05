@@ -134,6 +134,11 @@ public abstract class PropertyList {
         "update relative path?"
     );
 
+    public static final Property ASSERT_REPLACE_DOMAINS = new Property(
+        "assert.replace.domains",
+        "replace these domains with local site?"
+    );
+
     public static final Property RELATIVE_PATH_PREPEND_HOST = new Property(
         "relative.path.prepend.host",
         "Prepend site.host to relative paths"

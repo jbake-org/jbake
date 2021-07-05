@@ -1,5 +1,6 @@
 package org.jbake.util;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
 import org.jsoup.Jsoup;
@@ -8,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Manik Magar
@@ -15,6 +17,7 @@ import java.util.Map;
 public class HtmlUtil {
 
     private static final char SLASH = '/';
+    private static final String DOUBLE_SLASH = "//";
     private static final String SLASH_TEXT = String.valueOf(SLASH);
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";
@@ -38,7 +41,7 @@ public class HtmlUtil {
         boolean prependSiteHost = configuration.getImgPathPrependHost() || configuration.getRelativePathPrependHost();
         String siteHost = configuration.getSiteHost();
         String uri = getDocumentUri(fileContents);
-
+        Set<String> domains = configuration.replaceDomains();
         Document document = Jsoup.parseBodyFragment(htmlContent);
         Map<String, String> pairs = configuration.getTagAttributes();
         for (Map.Entry<String, String> entry : pairs.entrySet()) {
@@ -46,7 +49,7 @@ public class HtmlUtil {
             String attKey = entry.getValue();
             Elements allTags = document.getElementsByTag(tagName);
             for (Element tag : allTags) {
-                transformPath(tag, attKey, uri, siteHost, prependSiteHost);
+                transformPath(tag, attKey, uri, siteHost, prependSiteHost, domains);
             }
         }
 
@@ -68,9 +71,9 @@ public class HtmlUtil {
         return uri;
     }
 
-    private static void transformPath(Element tag, String attrKey, String uri, String siteHost, boolean prependSiteHost) {
+    private static void transformPath(Element tag, String attrKey,
+                                      String uri, String siteHost, boolean prependSiteHost, Set<String> domains) {
         String path = tag.attr(attrKey);
-
         // Now add the root path
         if (!isUrl(path)) {
             if (isRelative(path)) {
@@ -83,6 +86,23 @@ public class HtmlUtil {
                 path = siteHost + path;
             }
             tag.attr(attrKey, path);
+        } else if (CollectionUtils.isNotEmpty(domains)) {
+            int start = path.indexOf(DOUBLE_SLASH);
+            if (start > 0) {
+                int fromIndex = start + DOUBLE_SLASH.length();
+                int end = path.indexOf(SLASH, fromIndex);
+                if (end < fromIndex) {
+                    end = path.length();
+                }
+                String host = path.substring(fromIndex, end);
+                if (domains.contains(host)) {
+                    String newPath = siteHost;
+                    if (end < path.length()) {
+                        newPath += path.substring(end);
+                    }
+                    tag.attr(attrKey, newPath);
+                }
+            }
         }
     }
 

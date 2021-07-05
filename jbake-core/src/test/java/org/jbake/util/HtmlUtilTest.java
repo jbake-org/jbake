@@ -328,4 +328,64 @@ public class HtmlUtilTest {
 
         assertThat(body).contains("href=\"https://example.com/first.jpg\"");
     }
+
+    @Test
+    public void replaceDomains() {
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <a href='https://cdnjs.cloudflare.com/first.jpg' /></div>");
+
+        HtmlUtil.fixUrls(fileContent, config);
+
+        String body = fileContent.getBody();
+
+        assertThat(body).contains("href=\"http://www.jbake.org/first.jpg\"");
+    }
+
+    @Test
+    public void replaceDomains2() {
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <a href='https://example.com/first.jpg' /></div>");
+
+        HtmlUtil.fixUrls(fileContent, config);
+
+        String body = fileContent.getBody();
+
+        assertThat(body).contains("href=\"https://example.com/first.jpg\"");
+    }
+
+    @Test
+    public void replaceDomains0() {
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <script src='https://cdnjs.cloudflare.com/' /></div>");
+
+        HtmlUtil.fixUrls(fileContent, config);
+
+        String body = fileContent.getBody();
+
+        assertThat(body).contains("src=\"http://www.jbake.org/");
+    }
+
+    @Test
+    public void replaceDomains1() {
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <script src='https://cdnjs.cloudflare.com' /></div>");
+
+        HtmlUtil.fixUrls(fileContent, config);
+
+        String body = fileContent.getBody();
+
+        assertThat(body).contains("src=\"http://www.jbake.org");
+    }
 }

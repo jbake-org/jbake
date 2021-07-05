@@ -1,10 +1,7 @@
 package org.jbake.app.configuration;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
@@ -346,6 +343,13 @@ public interface JBakeConfiguration {
     boolean getRelativePathUpdate();
 
     /**
+     * Asciidoc will introduce some third partes resources, we can replace it with local resource.
+     *
+     * @return candidate domains
+     */
+    Set<String> replaceDomains();
+
+    /**
      * @return Tag and it's attribute name which contains a path that maybe relative.
      */
     Map<String, String> getTagAttributes();
@@ -364,7 +368,6 @@ public interface JBakeConfiguration {
     void setProperty(String key, Object value);
 
     /**
-     *
      * @param type the documents type
      * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
      */

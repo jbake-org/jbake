@@ -727,6 +727,15 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
         return getAsBoolean(RELATIVE_PATH_UPDATE.getKey());
     }
 
+    @Override
+    public Set<String> replaceDomains() {
+        List<String> domains = getAsList(ASSERT_REPLACE_DOMAINS.getKey());
+        if (null == domains) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(domains);
+    }
+
     public void setRelativePathUpdate(boolean relativePathUpdate) {
         setBothPathUpdate(relativePathUpdate);
     }
