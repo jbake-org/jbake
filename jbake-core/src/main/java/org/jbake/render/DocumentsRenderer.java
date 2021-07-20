@@ -24,8 +24,10 @@ public class DocumentsRenderer implements RenderingTool {
         for (DocumentModel document : documentList) {
             try {
                 DocumentList<DocumentModel> typedDocList = db.getAllContent(document.getType());
-                setPrevDoc(typedDocList, document);
-                setNextDoc(typedDocList, document);
+                DocumentModel prev = getPrevDoc(typedDocList, document);
+                DocumentModel next = getNextDoc(typedDocList, document);
+                document.setPreviousContent(prev);
+                document.setNextContent(next);
 
                 renderer.render(document);
                 db.markContentAsRendered(document);
@@ -48,47 +50,43 @@ public class DocumentsRenderer implements RenderingTool {
         }
     }
 
-    private void setNextDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
+    private DocumentModel getNextDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
         int typedListIndex = typedList.indexOf(doc);
         if (typedList.getFirst().equals(doc)) {
             // initial doc in typed list so there is no next
-            doc.setNextContent(null);
+            return null;
         } else {
-            boolean found = false;
-            while (!found) {
+            while (true) {
                 try {
                     DocumentModel nextDoc = typedList.get(typedListIndex - 1);
                     if (isPublished(nextDoc)) {
-                        doc.setNextContent(getContentForNav(nextDoc));
-                        found = true;
+                        return getContentForNav(nextDoc);
                     } else {
                         typedListIndex--;
                     }
                 } catch (IndexOutOfBoundsException ex) {
-                    found = true;
+                    return null;
                 }
             }
         }
     }
 
-    private void setPrevDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
+    private DocumentModel getPrevDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
         int typedListIndex = typedList.indexOf(doc);
         if (typedList.getLast().equals(doc)) {
             // last doc in typed list so there is no previous
-            doc.setPreviousContent(null);
+            return null;
         } else {
-            boolean found = false;
-            while (!found) {
+            while (true) {
                 try {
                     DocumentModel prevDoc = typedList.get(typedListIndex + 1);
                     if (isPublished(prevDoc)) {
-                        doc.setPreviousContent(getContentForNav(prevDoc));
-                        found = true;
+                        return getContentForNav(prevDoc);
                     } else {
                         typedListIndex++;
                     }
                 } catch (IndexOutOfBoundsException ex) {
-                    found = true;
+                    return null;
                 }
             }
         }
