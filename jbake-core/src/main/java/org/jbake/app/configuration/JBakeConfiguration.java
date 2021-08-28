@@ -343,7 +343,7 @@ public interface JBakeConfiguration {
     boolean getRelativePathUpdate();
 
     /**
-     * Asciidoc will introduce some third partes resources, we can replace it with local resource.
+     * Asciidoc will introduce some third-party resources, we can replace it with local resource.
      *
      * @return candidate domains
      */

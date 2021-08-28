@@ -8,6 +8,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +21,7 @@ public class HtmlUtil {
     private static final char SLASH = '/';
     private static final String DOUBLE_SLASH = "//";
     private static final String SLASH_TEXT = String.valueOf(SLASH);
+    private static final Path ROOT = Paths.get(SLASH_TEXT);
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";
     private static final String WORKING_DIR = "\\./";
@@ -71,34 +74,43 @@ public class HtmlUtil {
         return uri;
     }
 
+    /**
+     * Site host, document uri, and links in this document. Normally the full path of links should be site host+document uri+ link
+     * <p>
+     * But, link itself may also be an url. We resolve link uri here.
+     *
+     * @param docUri doc uri, a path
+     */
     private static void transformPath(Element tag, String attrKey,
-                                      String uri, String siteHost, boolean prependSiteHost, Set<String> domains) {
-        String path = tag.attr(attrKey);
-        // Now add the root path
-        if (!isUrl(path)) {
-            if (isRelative(path)) {
-                path = uri + path.replaceFirst(WORKING_DIR, EMPTY);
+                                      String docUri, String siteHost, boolean prependSiteHost, Set<String> domains) {
+        String linkUri = tag.attr(attrKey);
+        if (!isUrl(linkUri)) {
+            Path linkPath = Paths.get(linkUri);
+            if (!linkPath.isAbsolute()) {
+                linkPath = Paths.get(docUri).resolve(linkPath);
             }
             if (prependSiteHost) {
-                if (!siteHost.endsWith(SLASH_TEXT) && isRelative(path)) {
-                    siteHost = siteHost.concat(SLASH_TEXT);
+                if (siteHost.endsWith(SLASH_TEXT)) {
+                    siteHost = siteHost.substring(0, siteHost.length() - SLASH_TEXT.length());
                 }
-                path = siteHost + path;
+                linkUri = siteHost + ROOT.resolve(linkPath).normalize();
+            } else {
+                linkUri = linkPath.normalize().toString();
             }
-            tag.attr(attrKey, path);
+            tag.attr(attrKey, linkUri);
         } else if (CollectionUtils.isNotEmpty(domains)) {
-            int start = path.indexOf(DOUBLE_SLASH);
+            int start = linkUri.indexOf(DOUBLE_SLASH);
             if (start > 0) {
                 int fromIndex = start + DOUBLE_SLASH.length();
-                int end = path.indexOf(SLASH, fromIndex);
+                int end = linkUri.indexOf(SLASH, fromIndex);
                 if (end < fromIndex) {
-                    end = path.length();
+                    end = linkUri.length();
                 }
-                String host = path.substring(fromIndex, end);
+                String host = linkUri.substring(fromIndex, end);
                 if (domains.contains(host)) {
                     String newPath = siteHost;
-                    if (end < path.length()) {
-                        newPath += path.substring(end);
+                    if (end < linkUri.length()) {
+                        newPath += linkUri.substring(end);
                     }
                     tag.attr(attrKey, newPath);
                 }

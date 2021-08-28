@@ -222,6 +222,36 @@ public class HtmlUtilTest {
     }
 
     @Test
+    public void resolvePath0() {
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <img src='/blog/2017/05/../../2019/01/first.jpg' /></div>");
+
+        HtmlUtil.fixUrls(fileContent, config);
+
+        String body = fileContent.getBody();
+
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2019/01/first.jpg\"");
+
+    }
+
+    @Test
+    public void resolvePath1() {
+        DocumentModel fileContent = new DocumentModel();
+        fileContent.setRootPath("../../../");
+        fileContent.setUri("blog/2017/05/first_post.html");
+        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
+        fileContent.setBody("<div> Test <img src='/blog/2017/05/../../2019/01/first.jpg' /></div>");
+        config.setRelativePathPrependHost(false);
+        HtmlUtil.fixUrls(fileContent, config);
+
+        String body = fileContent.getBody();
+        assertThat(body).contains("src=\"/blog/2019/01/first.jpg\"");
+    }
+
+    @Test
     public void shouldNotAddRootPathForNoExtension0() {
         DocumentModel fileContent = new DocumentModel();
         fileContent.setRootPath("../../../");
