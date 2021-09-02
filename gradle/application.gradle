@@ -6,11 +6,11 @@ applicationName = "jbake"
 def examplesBase = "$project.buildDir/examples"
 
 def exampleRepositories = [
-    "example_project_freemarker": "git://github.com/jbake-org/jbake-example-project-freemarker.git",
-    "example_project_groovy"    : "git://github.com/jbake-org/jbake-example-project-groovy.git",
-    "example_project_thymeleaf" : "git://github.com/jbake-org/jbake-example-project-thymeleaf.git",
-    "example_project_groovy-mte": "git://github.com/jbake-org/jbake-example-project-groovy-mte.git",
-    "example_project_jade"      : "git://github.com/jbake-org/jbake-example-project-jade.git"
+    "example_project_freemarker": "https://github.com/jbake-org/jbake-example-project-freemarker.git",
+    "example_project_groovy"    : "https://github.com/jbake-org/jbake-example-project-groovy.git",
+    "example_project_thymeleaf" : "https://github.com/jbake-org/jbake-example-project-thymeleaf.git",
+    "example_project_groovy-mte": "https://github.com/jbake-org/jbake-example-project-groovy-mte.git",
+    "example_project_jade"      : "https://github.com/jbake-org/jbake-example-project-jade.git"
 ]
 
 //create clone and Zip Task for each repository
