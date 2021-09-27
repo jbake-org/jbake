@@ -44,6 +44,6 @@ public abstract class RenderAgent implements Runnable {
     }
 
     protected String findTemplateName(String docType) {
-        return config.getTemplateFileByDocType(docType).getName();
+        return config.getTemplateByDocType(docType);
     }
 }
