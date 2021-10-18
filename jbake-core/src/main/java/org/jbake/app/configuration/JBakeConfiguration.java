@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
@@ -366,6 +367,12 @@ public interface JBakeConfiguration {
      * @return Locale to set in the JVM
      */
     String getJvmLocale();
+
+    /**
+     *
+     * @return TimeZone to use within Freemarker
+     */
+    TimeZone getFreemarkerTimeZone();
 
     Map<String, Object> asHashMap();
 
