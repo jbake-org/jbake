@@ -702,4 +702,13 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public String getJvmLocale() {
         return getAsString(JVM_LOCALE.getKey());
     }
+
+    @Override
+    public TimeZone getFreemarkerTimeZone() {
+        String timezone = getAsString(FREEMARKER_TIMEZONE.getKey());
+        if (StringUtils.isNotEmpty(timezone)) {
+            return TimeZone.getTimeZone(timezone);
+        }
+        return null;
+    }
 }

@@ -110,6 +110,11 @@ public abstract class PropertyList {
         "filename to use for feed"
     );
 
+    public static final Property FREEMARKER_TIMEZONE = new Property(
+        "freemarker.timezone",
+        "TimeZone to use within Freemarker"
+    );
+
     public static final Property GIT_HASH = new Property(
         "git.hash",
         "abbreviated git hash"

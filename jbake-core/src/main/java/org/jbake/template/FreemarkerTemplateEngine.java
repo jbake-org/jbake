@@ -51,6 +51,10 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         templateCfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
         templateCfg.setDefaultEncoding(config.getRenderEncoding());
         templateCfg.setOutputEncoding(config.getOutputEncoding());
+        if (config.getFreemarkerTimeZone() != null) {
+            templateCfg.setTimeZone(config.getFreemarkerTimeZone());
+            templateCfg.setSQLDateAndTimeTimeZone(config.getFreemarkerTimeZone());
+        }
         try {
             templateCfg.setDirectoryForTemplateLoading(config.getTemplateFolder());
         } catch (IOException e) {
