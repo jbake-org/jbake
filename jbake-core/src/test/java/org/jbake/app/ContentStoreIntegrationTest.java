@@ -48,7 +48,6 @@ public abstract class ContentStoreIntegrationTest {
     @AfterClass
     public static void cleanUpClass() {
         db.close();
-        db.shutdown();
     }
 
     @Before

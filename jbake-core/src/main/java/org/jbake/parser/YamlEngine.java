@@ -1,6 +1,7 @@
 package org.jbake.parser;
 
 import org.apache.commons.io.IOUtils;
+import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
@@ -35,6 +36,7 @@ public class YamlEngine extends MarkupEngine {
         Yaml yaml = new Yaml();
         try (InputStream is = new FileInputStream(file)) {
             Object result = yaml.load(is);
+            model.setType("data");
             if (result instanceof List) {
                 model.put("data", result);
             } else if (result instanceof Map) {
@@ -86,5 +88,15 @@ public class YamlEngine extends MarkupEngine {
 
     private boolean hasJBakePrefix(String key) {
         return key.startsWith(JBAKE_PREFIX);
+    }
+
+    @Override
+    public String buildURI(JBakeConfiguration config, File file) {
+        String uri = FileUtil.asPath(file).replace(FileUtil.asPath(config.getDataFolder()), "");
+        // strip off leading /
+        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
+            uri = uri.substring(1, uri.length());
+        }
+        return uri;
     }
 }

@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
-import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,6 +68,7 @@ public class RendererTest {
         content.setStatus("published");
 
         renderer.render(content);
+        renderer.shutdown();
 
         File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
         assertThat(outputFile).isFile();

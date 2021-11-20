@@ -148,11 +148,6 @@ public class ContentStore {
         DBUtil.closeDataStore();
     }
 
-    public void shutdown() {
-
-//        Orient.instance().shutdown();
-    }
-
     private void startupIfEnginesAreMissing() {
         // Using a jdk which doesn't bundle a javascript engine
         // throws a NoClassDefFoundError while logging the warning
@@ -169,8 +164,6 @@ public class ContentStore {
 
     public void drop() {
         activateOnCurrentThread();
-//        db.drop();
-
         orient.drop(name);
     }
 
@@ -290,21 +283,23 @@ public class ContentStore {
         executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
     }
 
-    private DocumentList<DocumentModel> query(String sql) {
+    private synchronized DocumentList<DocumentModel> query(String sql) {
         activateOnCurrentThread();
         OResultSet results = db.query(sql);
         return DocumentList.wrap(results);
     }
 
-    private DocumentList<DocumentModel> query(String sql, Object... args) {
+    private synchronized DocumentList<DocumentModel> query(String sql, Object... args) {
         activateOnCurrentThread();
         OResultSet results = db.command(sql, args);
         return DocumentList.wrap(results);
     }
 
-    private void executeCommand(String query, Object... args) {
+    private synchronized void executeCommand(String query, Object... args) {
         activateOnCurrentThread();
+        db.getTransaction().begin();
         db.command(query, args);
+        db.getTransaction().commit();
     }
 
     public Set<String> getTags() {
@@ -353,6 +348,9 @@ public class ContentStore {
         OClass signatures = schema.createClass(Schema.SIGNATURES);
         signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
+
+        signatures.createProperty("key", OType.STRING);
+        signatures.createIndex("kexIdx", OClass.INDEX_TYPE.UNIQUE, "key");
     }
 
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
@@ -407,10 +405,12 @@ public class ContentStore {
         return db.isActiveOnCurrentThread();
     }
 
-    public void addDocument(DocumentModel document) {
+    public synchronized void addDocument(DocumentModel document) {
+        db.getTransaction().begin();
         ODocument doc = new ODocument(Schema.DOCUMENTS);
         doc.fromMap(document);
         doc.save();
+        db.getTransaction().commit();
     }
 
     protected abstract class Schema {

@@ -50,13 +50,13 @@ public class OvenTest {
         configuration.setDestinationFolder(output);
         configuration.setTemplateFolder(new File(sourceFolder, "groovyMarkupTemplates"));
         configuration.setProperty("template.paper.file", "paper.tpl");
+        TestUtils.hideAssets(new File(sourceFolder,"content"));
     }
 
     @AfterEach
     public void tearDown() {
         if (contentStore != null && contentStore.isActive()) {
             contentStore.close();
-            contentStore.shutdown();
         }
     }
 

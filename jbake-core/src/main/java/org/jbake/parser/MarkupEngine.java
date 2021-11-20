@@ -2,7 +2,9 @@ package org.jbake.parser;
 
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
@@ -15,6 +17,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -333,4 +338,60 @@ public abstract class MarkupEngine implements ParserEngine {
         }
         context.setBody(body.toString());
     }
+
+    @Override
+    public String buildURI(JBakeConfiguration config, File file) {
+        String uri = FileUtil.asPath(file).replace(FileUtil.asPath(config.getContentFolder()), "");
+
+        if (useNoExtensionUri(config, uri)) {
+            // convert URI from xxx.html to xxx/index.html
+            uri = createNoExtensionUri(config, uri);
+        } else {
+            uri = createUri(config, uri);
+        }
+
+        // strip off leading / to enable generating non-root based sites
+        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
+            uri = uri.substring(1);
+        }
+
+        return uri;
+    }
+
+    // TODO: Refactor - parametrize the following two methods into one.
+    // commons-codec's URLCodec could be used when we add that dependency.
+    private String createUri(JBakeConfiguration config, String uri) {
+        try {
+            return FileUtil.URI_SEPARATOR_CHAR
+                + FilenameUtils.getPath(uri)
+                + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                + config.getOutputExtension();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+        }
+    }
+
+    private String createNoExtensionUri(JBakeConfiguration config, String uri) {
+        try {
+            return FileUtil.URI_SEPARATOR_CHAR
+                + FilenameUtils.getPath(uri)
+                + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                + FileUtil.URI_SEPARATOR_CHAR
+                + "index"
+                + config.getOutputExtension();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Missing UTF-8 encoding??", e); // Won't happen unless JDK is broken.
+        }
+    }
+
+    private boolean useNoExtensionUri(JBakeConfiguration config, String uri) {
+        boolean noExtensionUri = config.getUriWithoutExtension();
+        String noExtensionUriPrefix = config.getPrefixForUriWithoutExtension();
+
+        return noExtensionUri
+            && (noExtensionUriPrefix != null)
+            && (noExtensionUriPrefix.length() > 0)
+            && uri.startsWith(noExtensionUriPrefix);
+    }
+
 }

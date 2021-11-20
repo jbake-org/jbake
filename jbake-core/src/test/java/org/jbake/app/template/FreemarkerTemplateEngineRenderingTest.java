@@ -55,6 +55,7 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         ));
 
         renderer.renderIndexPaging("index.html");
+        renderer.shutdown();
 
         File outputFile = new File(destinationFolder, 2 + File.separator + "index.html");
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
