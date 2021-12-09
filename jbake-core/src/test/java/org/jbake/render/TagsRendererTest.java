@@ -4,7 +4,7 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.RenderingException;
+import org.jbake.exception.RenderingException;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class TagsRendererTest {
         Renderer mockRenderer = mock(Renderer.class);
         int renderResponse = renderer.render(mockRenderer, contentStore, configuration);
 
-        assertThat(renderResponse).isEqualTo(0);
+        assertThat(renderResponse).isZero();
     }
 
     @Test

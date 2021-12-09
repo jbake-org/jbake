@@ -4,14 +4,14 @@ import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.FileUtil;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.engine.TemplateEngines;
+import org.jbake.exception.RenderingException;
+import org.jbake.model.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Writer;
-
-import static org.jbake.app.configuration.PropertyList.PAGINATE_INDEX;
 
 /**
  * A template which is responsible for delegating to a supported template engine,
@@ -66,7 +66,7 @@ public class DelegatingTemplateEngine extends AbstractTemplateEngine {
             }
         }
         String ext = FileUtil.fileExt(theTemplateName);
-        AbstractTemplateEngine engine = renderers.getEngine(ext);
+        TemplateEngine engine = renderers.getEngine(ext);
         if (engine != null) {
             engine.renderDocument(model, theTemplateName, writer);
         } else {

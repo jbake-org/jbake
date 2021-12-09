@@ -4,15 +4,15 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.extension.escaper.EscaperExtension;
 import com.mitchellbosecke.pebble.loader.FileLoader;
-import com.mitchellbosecke.pebble.loader.Loader;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.exception.NoModelExtractorException;
+import org.jbake.exception.RenderingException;
+import org.jbake.model.TemplateModel;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
 
 /**
  * Renders pages using the <a href="https://pebbletemplates.io/">Pebble</a> template engine.
@@ -28,7 +28,7 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
     }
 
     private void initializeTemplateEngine() {
-        Loader loader = new FileLoader();
+        FileLoader loader = new FileLoader();
         loader.setPrefix(config.getTemplateFolder().getAbsolutePath());
 
         /*
@@ -57,13 +57,10 @@ public class PebbleTemplateEngine extends AbstractTemplateEngine {
 
     private TemplateModel wrap(final TemplateModel model) {
         return new TemplateModel(model) {
-
-            private static final long serialVersionUID = -5489285491728950547L;
-
             @Override
             public Object get(final Object property) {
                 try {
-                    return extractors.extractAndTransform(db, (String) property, this, new TemplateEngineAdapter.NoopAdapter());
+                    return extractors.extractAndTransform(db, (String) property, this, TemplateEngineAdapter.NO_ADAPTER);
                 } catch(NoModelExtractorException e) {
                     return super.get(property);
                 }

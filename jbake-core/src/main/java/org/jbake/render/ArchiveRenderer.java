@@ -5,7 +5,7 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.template.RenderingException;
+import org.jbake.exception.RenderingException;
 
 import java.io.File;
 
@@ -28,7 +28,6 @@ public class ArchiveRenderer implements RenderingTool {
 
     @Override
     public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
-
         JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config);
         return render(renderer, db, configuration);
     }

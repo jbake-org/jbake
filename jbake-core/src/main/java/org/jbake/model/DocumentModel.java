@@ -84,8 +84,8 @@ public class DocumentModel extends BaseModel {
         put(ModelAttributes.ROOTPATH, pathToRoot);
     }
 
-    public Boolean getRendered() {
-        return (Boolean) getOrDefault(ModelAttributes.RENDERED, false);
+    public boolean getRendered() {
+        return (boolean) getOrDefault(ModelAttributes.RENDERED, false);
     }
 
     public void setRendered(boolean rendered) {

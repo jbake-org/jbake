@@ -17,8 +17,10 @@ import freemarker.template.TemplateModelException;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.exception.NoModelExtractorException;
+import org.jbake.exception.RenderingException;
 import org.jbake.model.ModelAttributes;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.model.TemplateModel;
 import org.jbake.util.DataFileUtil;
 
 import java.io.File;
@@ -36,6 +38,9 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
 
     private Configuration templateCfg;
 
+    /**
+     * @deprecated use {@link FreemarkerTemplateEngine(JBakeConfiguration, ContentStore)}
+     */
     @Deprecated
     public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
         super(config, db, destination, templatesPath);
@@ -66,7 +71,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
     public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
         try {
             Template template = templateCfg.getTemplate(templateName);
-            template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db, config), writer);
+            template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db), writer);
         } catch (IOException | TemplateException e) {
             throw new RenderingException(e);
         }
@@ -79,22 +84,22 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         private final ObjectWrapper wrapper;
         private final SimpleHash eagerModel;
         private final ContentStore db;
-        private final JBakeConfiguration config;
 
-        public LazyLoadingModel(ObjectWrapper wrapper, TemplateModel eagerModel, final ContentStore db, JBakeConfiguration config) {
+        public LazyLoadingModel(ObjectWrapper wrapper, TemplateModel eagerModel, final ContentStore db) {
             this.eagerModel = new SimpleHash(eagerModel, wrapper);
             this.db = db;
             this.wrapper = wrapper;
-            this.config = config;
         }
 
         @Override
         public freemarker.template.TemplateModel get(final String key) throws TemplateModelException {
             try {
 
-                // GIT Issue#357: Accessing db in freemarker template throws exception
-                // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
-                // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
+                /*
+                 * GIT Issue#357: Accessing db in freemarker template throws exception
+                 * When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
+                 * All methods on db are then accessible in template. Eg: <code>${db.getPublishedPostsByTag(tagName).size()}</code>
+                 */
                 if (key.equals(ModelAttributes.DB)) {
                     BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
                     BeansWrapper bw = bwb.build();
@@ -103,22 +108,17 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                 if (key.equals(ModelAttributes.DATA)) {
                     BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
                     BeansWrapper bw = bwb.build();
-                    return bw.wrap(new DataFileUtil(db, config.getDataFileDocType()));
+                    return bw.wrap(new DataFileUtil(db));
                 }
 
-                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<freemarker.template.TemplateModel>() {
-
-                    @Override
-                    public freemarker.template.TemplateModel adapt(String key, Object extractedValue) {
-                        if (key.equals(ModelAttributes.ALLTAGS)) {
-                            return new SimpleCollection((Collection) extractedValue, wrapper);
-                        } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
-                            return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
-                        } else {
-                            // All other cases, as far as I know, are document collections
-                            return new SimpleSequence((Collection) extractedValue, wrapper);
-                        }
-
+                return extractors.extractAndTransform(db, key, (TemplateModel) eagerModel.toMap(), (key1, extractedValue) -> {
+                    if (key1.equals(ModelAttributes.ALLTAGS)) {
+                        return new SimpleCollection((Collection) extractedValue, wrapper);
+                    } else if (key1.equals(ModelAttributes.PUBLISHED_DATE)) {
+                        return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
+                    } else {
+                        // All other cases, as far as I know, are document collections
+                        return new SimpleSequence((Collection) extractedValue, wrapper);
                     }
                 });
             } catch (NoModelExtractorException e) {

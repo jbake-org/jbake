@@ -8,6 +8,8 @@ package org.jbake.template;
  */
 public interface TemplateEngineAdapter<Type> {
 
+    TemplateEngineAdapter<Object> NO_ADAPTER = new NoopAdapter();
+
     class NoopAdapter implements TemplateEngineAdapter<Object> {
 
         @Override

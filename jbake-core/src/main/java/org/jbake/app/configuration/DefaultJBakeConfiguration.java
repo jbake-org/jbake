@@ -9,7 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -534,7 +540,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public void setProperty(String key, Object value) {
-
         compositeConfiguration.setProperty(key, value);
     }
 
@@ -604,7 +609,6 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     private void setupDefaultAssetFolder() {
         String assetFolder = getAsString(ASSET_FOLDER.getKey());
-
 
         File asset = new File(assetFolder);
         if(asset.isAbsolute()) {

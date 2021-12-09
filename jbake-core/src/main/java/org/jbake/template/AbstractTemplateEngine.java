@@ -5,7 +5,8 @@ import org.apache.commons.configuration2.Configuration;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.template.model.TemplateModel;
+import org.jbake.engine.ModelExtractors;
+import org.jbake.model.TemplateModel;
 
 import java.io.File;
 import java.io.Writer;
@@ -27,7 +28,7 @@ import java.io.Writer;
  *
  * @author Cédric Champeau
  */
-public abstract class AbstractTemplateEngine {
+public abstract class AbstractTemplateEngine implements TemplateEngine {
 
     protected static ModelExtractors extractors = ModelExtractors.getInstance();
     protected final JBakeConfiguration config;
@@ -46,5 +47,4 @@ public abstract class AbstractTemplateEngine {
         this.db = db;
     }
 
-    public abstract void renderDocument(TemplateModel model, String templateName, Writer writer) throws RenderingException;
 }

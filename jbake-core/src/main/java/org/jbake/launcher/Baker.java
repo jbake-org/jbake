@@ -1,10 +1,10 @@
 package org.jbake.launcher;
 
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.JBakeException;
 import org.jbake.app.Oven;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
+import org.jbake.exception.JBakeException;
 
 import java.text.MessageFormat;
 import java.util.List;

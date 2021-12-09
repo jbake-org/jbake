@@ -4,15 +4,13 @@ import org.jbake.app.ContentStore;
 import org.jbake.app.DocumentList;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.exception.RenderingException;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
-import org.jbake.template.RenderingException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -60,7 +58,7 @@ public class DocumentsRendererTest {
 
         int renderResponse = documentsRenderer.render(renderer, db, configuration);
 
-        assertThat(renderResponse).isEqualTo(0);
+        assertThat(renderResponse).isZero();
     }
 
     @Test

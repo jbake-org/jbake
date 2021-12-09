@@ -28,20 +28,22 @@ import org.jbake.app.ContentStoreIntegrationTest;
 import org.jbake.app.Crawler;
 import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
+import org.jbake.engine.ModelExtractors;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
-import org.jbake.template.ModelExtractors;
-import org.jbake.template.ModelExtractorsDocumentTypeListener;
+import org.jbake.template.model.ModelExtractorsDocumentTypeListener;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
