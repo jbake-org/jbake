@@ -1,0 +1,57 @@
+apply plugin: 'org.jreleaser'
+
+// cannot reference project. properties inside jreleaser config block
+// as that collides with the "project" DSL element of the config extension
+ext.releaseIsDryrun = (project.rootProject.findProperty('dryrun') ?: false).toBoolean()
+ext.projectWebsite = project.website
+
+jreleaser {
+    dryrun = releaseIsDryrun
+    gitRootSearch = true
+
+    project {
+        website = projectWebsite
+        authors = ['Jonathan Bullock']
+        license = 'MIT'
+        extraProperties.put('inceptionYear', '2012')
+    }
+
+    release {
+        github {
+            overwrite = true
+            changelog {
+                formatted = 'always'
+                format = '- {{commitShortHash}} {{commitTitle}}'
+                contributors {
+                    format = '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+                }
+                hide {
+                    contributors = ['GitHub']
+                }
+            }
+        }
+    }
+
+    signing {
+        active = 'always'
+        armored = true
+    }
+
+    checksum {
+        individual = true
+    }
+
+    distributions {
+        jbake {
+            sdkman {
+                active = 'always'
+            }
+            artifact {
+                path = 'build/distributions/{{distributionName}}-{{projectVersion}}-bin.zip'
+            }
+            artifact {
+                path = 'build/distributions/{{distributionName}}-{{projectVersion}}.tar'
+            }
+        }
+    }
+}
