@@ -7,7 +7,7 @@ plugins {
     id "nebula.optional-base"                   version "5.0.3"     apply false
     id 'org.ajoberstar.grgit'                   version "$grgitVersion"
     id "io.github.gradle-nexus.publish-plugin"  version "1.0.0"
-    id 'org.jreleaser'                          version "0.9.1"     apply false
+    id 'org.jreleaser'                          version "0.10.0"    apply false
 }
 
 // common variables

@@ -19,6 +19,7 @@ jreleaser {
     release {
         github {
             overwrite = true
+            branch = 'master'
             changelog {
                 formatted = 'always'
                 format = '- {{commitShortHash}} {{commitTitle}}'
@@ -44,7 +45,7 @@ jreleaser {
     distributions {
         jbake {
             sdkman {
-                active = 'always'
+                active = 'release'
             }
             artifact {
                 path = 'build/distributions/{{distributionName}}-{{projectVersion}}-bin.zip'
