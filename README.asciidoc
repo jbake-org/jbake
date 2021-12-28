@@ -145,7 +145,7 @@ There are 4 goals provided by this plugin:
 * `jbake:seed` - seeds your project/site with example content and templates
 * `jbake:generate` - bakes your project/site
 * `jbake:watch` - watches to changes and bakes your site whenever a change is detected
-* `jbake:inline` - bakes, watches and serves out content on http://localhost:8080[http://localhost:8080]
+* `jbake:inline` - bakes, watches and serves out content on http://localhost:8820[http://localhost:8820]
 
 You can also more details on each goal by running the help goal:
 
