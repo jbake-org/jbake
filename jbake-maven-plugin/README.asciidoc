@@ -1,0 +1,173 @@
+= JBake Maven Plugin
+Jonathan Bullock
+2021-04-20
+:idprefix:
+
+image:https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.jbake/jbake-maven-plugin"]
+
+JBake Maven Plugin is a Maven plugin allowing you to integrate http://jbake.org[JBake] into your projects build. This is the official version published at
+the following Maven coordinates:
+
+----
+<dependency>
+    <groupId>org.jbake</groupId>
+    <artifactId>jbake-maven-plugin</artifactId>
+    <version>0.3.4</version>
+</dependency>
+----
+
+Special thanks must go to the original author of this plugin - https://github.com/aldrinleal[Aldrin Leal].
+
+== Usage
+
+To use JBake Maven Plugin in your build add the plugin into your pom.xml as shown below:
+
+----
+<build>
+...
+    <plugins>
+    ...
+        <plugin>
+            <groupId>org.jbake</groupId>
+            <artifactId>jbake-maven-plugin</artifactId>
+            <version>0.3.4</version>
+            <configuration>
+                <!--
+                <inputDirectory>${project.basedir}/src/main/resources</inputDirectory>
+                <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                -->
+            </configuration>
+            <executions>
+                <execution>
+                    <id>default-generate</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <dependencies>
+                <!-- include required dependencies here, see below -->
+            </dependencies>
+        </plugin>
+       ...
+    </plugins>
+...
+</build>
+----
+
+=== Dependencies
+
+The plugin itself includes all required dependencies such as jbake-core, however you will need to explicitly declare dependencies for
+the content formats and template engines used in your project. As these dependencies are marked as optional to reduce bloat.
+
+If you have AsciiDoc content you'll need this dependency:
+
+----
+<dependency>
+    <groupId>org.asciidoctor</groupId>
+    <artifactId>asciidoctorj</artifactId>
+    <version>2.4.3</version>
+</dependency>
+----
+
+If you have Markdown content you'll need these dependencies:
+
+----
+<dependency>
+    <groupId>com.vladsch.flexmark</groupId>
+    <artifactId>flexmark</artifactId>
+    <version>0.62.2</version>
+</dependency>
+<dependency>
+    <groupId>com.vladsch.flexmark</groupId>
+    <artifactId>flexmark-profile-pegdown</artifactId>
+    <version>0.62.2</version>
+</dependency>
+----
+
+If you have Freemarker templates then you'll need this dependency:
+
+----
+<dependency>
+    <groupId>org.freemarker</groupId>
+    <artifactId>freemarker</artifactId>
+    <version>2.3.31</version>
+</dependency>
+----
+
+If you have Groovy templates then you'll need these dependencies:
+
+----
+<dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy</artifactId>
+    <version>3.0.7</version>
+</dependency>
+<dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-templates</artifactId>
+    <version>3.0.7</version>
+</dependency>
+<dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-dateutil</artifactId>
+    <version>3.0.7</version>
+</dependency>
+----
+
+If you have Thymeleaf templates then you'll need this dependency:
+
+----
+<dependency>
+    <groupId>org.thymeleaf</groupId>
+    <artifactId>thymeleaf</artifactId>
+    <version>3.0.12.RELEASE</version>
+</dependency>
+----
+
+If you have Jade4J templates then you'll need this dependency:
+
+----
+<dependency>
+    <groupId>de.neuland-bfi</groupId>
+    <artifactId>jade4j</artifactId>
+    <version>1.3.2</version>
+</dependency>
+----
+
+An example of the plugin being used can be found in this project: https://github.com/jonbullock/maven-jbake-site[https://github.com/jonbullock/maven-jbake-site]
+
+== Goals
+
+There are 4 goals provided by this plugin:
+
+* `jbake:seed` - seeds your project/site with example content and templates
+* `jbake:generate` - bakes your project/site
+* `jbake:watch` - watches to changes and bakes your site whenever a change is detected
+* `jbake:inline` - bakes, watches and serves out content on http://localhost:8820[http://localhost:8820]
+
+You can also more details on each goal by running the help goal:
+
+----
+$ mvn jbake:help -Ddetail # -DgoalName=[seed|generate|watch|inline]
+----
+
+== Versioning
+
+The project adopts the http://semver.org[Semantic Versioning] spec to maintain an understandable backwards compatibility strategy.
+
+The version format is as follows:
+
+----
+<major>.<minor>.<patch>-<label>
+----
+
+* An increment of the major version represents incompatible API changes.
+* An increment of the minor version represents additional functionality in a backwards-compatible manner.
+* An increment of the patch version represents backwards-compatible bug fixes.
+* Existence of a label represents a pre-release or build metadata.
+
+== Copyright & License
+
+This plugin is licensed under the Apache 2.0 License.
