@@ -51,6 +51,11 @@ publishing {
                             url = 'https://manik.magar.me/'
                             timezone = 'America/New_York'
                         }
+                        developer {
+                            id = 'aldrinleal'
+                            name = 'Aldrin Leal'
+                            timezone = 'America/Bogota'
+                        }
                     }
                     scm {
                         url = project.vcs

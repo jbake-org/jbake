@@ -1,0 +1,55 @@
+plugins {
+    id 'de.benediktritter.maven-plugin-development' version '0.3.1'
+}
+
+//config {
+//    licensing {
+//        exclude 'build/mavenPlugin/**'
+//    }
+//}
+
+//mavenPlugin {
+//    helpMojoPackage = 'org.jbake.maven.plugin.help'
+//}
+
+dependencies {
+    implementation project(':jbake-core')
+
+    implementation "org.apache.maven:maven-plugin-api:$mavenVersion"
+    compileOnly "org.apache.maven:maven-core:$mavenVersion"
+    compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:$mavenAnnotationsVersion"
+//    implementation "org.sonatype.plexus:plexus-build-api:0.0.7"
+//    implementation "org.codehaus.plexus:plexus-utils:3.0.22"
+
+    implementation "org.apache.commons:commons-configuration2:2.7"
+    implementation "com.sparkjava:spark-core:2.9.3"
+
+    // Include all optional dependencies by default
+//    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+//    implementation "org.codehaus.groovy:groovy:$groovyVersion"
+//    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
+//    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+//    implementation "org.freemarker:freemarker:$freemarkerVersion"
+//    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+//    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+//    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+//    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+//    implementation "io.pebbletemplates:pebble:$pebbleVersion"
+//    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+}
+
+
+//license {
+//    exclude '**/build/**/pom.xml'
+//}
+
+processResources {
+    inputs.property('version', project.version)
+    filesMatching(['**/*.properties']) {
+        expand(
+            'version': project.version,
+            'id': 'jbake',
+            'name': project.pluginDisplayName
+        )
+    }
+}

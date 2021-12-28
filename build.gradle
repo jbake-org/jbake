@@ -64,6 +64,9 @@ allprojects {
     }
 }
 
+// TODO Inline this file. Note that it can't be called multiple times in the same build
+apply from: "$rootDir/gradle/publishing.gradle"
+
 /**
  * Common setup for all subprojects
  */
@@ -75,7 +78,6 @@ subprojects {
     // We do not publish any jars from the jbake-dist project
     if ( project.name != "jbake-dist" ) {
         apply from: "$rootDir/gradle/maven-publishing.gradle"
-        apply from: "$rootDir/gradle/publishing.gradle"
         apply from: "$rootDir/gradle/signing.gradle"
     }
 
