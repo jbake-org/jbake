@@ -73,10 +73,10 @@ apply from: "$rootDir/gradle/publishing.gradle"
 subprojects {
 
     apply plugin: 'java'
-    apply plugin: 'nebula.optional-base'
 
     // We do not publish any jars from the jbake-dist project
-    if ( project.name != "jbake-dist" ) {
+    if ( project.name != "jbake-dist" && project.name != "jbake-maven-plugin" ) {
+
         apply from: "$rootDir/gradle/maven-publishing.gradle"
         apply from: "$rootDir/gradle/signing.gradle"
     }
@@ -104,8 +104,8 @@ subprojects {
         implementation "org.slf4j:slf4j-api:$slf4jVersion"
         implementation "org.slf4j:jul-to-slf4j:$slf4jVersion"
         implementation "org.slf4j:jcl-over-slf4j:$slf4jVersion"
-        implementation "ch.qos.logback:logback-classic:$logbackVersion", optional
-        implementation "ch.qos.logback:logback-core:$logbackVersion", optional
+        implementation "ch.qos.logback:logback-classic:$logbackVersion"
+        implementation "ch.qos.logback:logback-core:$logbackVersion"
 
         testImplementation "org.junit-pioneer:junit-pioneer:$junitPioneer"
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"

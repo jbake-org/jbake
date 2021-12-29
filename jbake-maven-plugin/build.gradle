@@ -1,26 +1,21 @@
 plugins {
-    id 'de.benediktritter.maven-plugin-development' version '0.3.1'
+    id "io.freefair.maven-plugin" version "6.3.0"
 }
 
-//config {
-//    licensing {
-//        exclude 'build/mavenPlugin/**'
-//    }
-//}
+group = "org.jbake.maven"
+version = "2.7.0"
 
-//mavenPlugin {
-//    helpMojoPackage = 'org.jbake.maven.plugin.help'
-//}
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-    implementation project(':jbake-core')
+    implementation 'org.jbake:jbake-core:2.7.0-rc.5'
 
-    implementation "org.apache.maven:maven-plugin-api:$mavenVersion"
-    compileOnly "org.apache.maven:maven-core:$mavenVersion"
-    compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:$mavenAnnotationsVersion"
-//    implementation "org.sonatype.plexus:plexus-build-api:0.0.7"
-//    implementation "org.codehaus.plexus:plexus-utils:3.0.22"
+    compileOnly "org.apache.maven:maven-core:3.8.1"
+    compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.2"
 
+    implementation 'commons-io:commons-io:2.6'
     implementation "org.apache.commons:commons-configuration2:2.7"
     implementation "com.sparkjava:spark-core:2.9.3"
 
@@ -36,20 +31,4 @@ dependencies {
 //    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
 //    implementation "io.pebbletemplates:pebble:$pebbleVersion"
 //    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
-}
-
-
-//license {
-//    exclude '**/build/**/pom.xml'
-//}
-
-processResources {
-    inputs.property('version', project.version)
-    filesMatching(['**/*.properties']) {
-        expand(
-            'version': project.version,
-            'id': 'jbake',
-            'name': project.pluginDisplayName
-        )
-    }
 }

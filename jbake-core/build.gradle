@@ -10,32 +10,33 @@ dependencies {
     implementation "commons-io:commons-io:$commonsIoVersion"
     implementation "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
     implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
-    implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
+    implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
-    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
-    implementation "org.codehaus.groovy:groovy:$groovyVersion", optional
-    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
-    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
-    implementation "org.freemarker:freemarker:$freemarkerVersion", optional
-    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
-    implementation "de.neuland-bfi:jade4j:$jade4jVersion", optional
-    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
-    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
+    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    implementation "org.codehaus.groovy:groovy:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+    implementation "org.freemarker:freemarker:$freemarkerVersion"
+    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
     implementation "org.jsoup:jsoup:$jsoupVersion"
-    implementation "io.pebbletemplates:pebble:$pebbleVersion", optional
-    implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
+    implementation "io.pebbletemplates:pebble:$pebbleVersion"
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
 
     // cli specific dependencies
-    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
-    implementation "info.picocli:picocli:$picocli", optional
+    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+    implementation "info.picocli:picocli:$picocli"
 }
 
 processResources {
     from("src/main/resources") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         include 'default.properties'
         expand jbakeVersion: project.version,
                timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
