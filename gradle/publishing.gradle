@@ -1,8 +1,0 @@
-apply plugin: 'io.github.gradle-nexus.publish-plugin'
-
-nexusPublishing {
-    repositories {
-        sonatype()
-    }
-}
-

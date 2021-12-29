@@ -1,4 +1,6 @@
 plugins {
+    id "io.github.gradle-nexus.publish-plugin"  version "1.0.0"
+    id 'com.github.ben-manes.versions'          version '0.38.0'
     id "eclipse"
     id "idea"
 }
@@ -17,50 +19,21 @@ ext {
     sonarProjectKey = System.getenv("SONARPROJECTKEY") ?: sonarDefaultProjectKey
 }
 
-allprojects {
+nexusPublishing {
     repositories {
-        mavenCentral()
+        sonatype()
     }
 }
 
-task jacocoMerge(type: JacocoMerge) {
-    description 'Merge all testreport execution data from subprojects excluding jbake-dist'
-    dependsOn subprojects.test
-    executionData subprojects.findAll{it.name!="jbake-dist"}.jacocoTestReport.executionData
-}
-
-task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
-    description = 'Generates an aggregate report from all subprojects'
-    dependsOn jacocoMerge
-
-    sourceDirectories.from files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories.from files(subprojects.sourceSets.main.output)
-    executionData.from jacocoMerge.executionData
-
-    reports {
-        html.enabled = true
-        xml.enabled = true
+dependencyUpdates.resolutionStrategy {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
     }
-}
-
-task testReport(type: TestReport) {
-    description "Generate an aggregated Testreport for all projects"
-
-    destinationDir = file("$buildDir/reports/allTests")
-    // Include the results from the `test` task in all subprojects
-    reportOn subprojects*.test
-}
-
-coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
-}
-
-tasks.coveralls {
-    group = 'Coverage reports'
-    description = 'Uploads the aggregated coverage report to Coveralls'
-
-    dependsOn jacocoRootReport
-    // Skip Task if not run on CI Server
-
-    onlyIf { System.env.'CI' }
 }

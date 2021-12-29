@@ -1,23 +1,17 @@
 plugins {
     id "io.freefair.maven-plugin" version "6.3.0"
+    id "org.jbake.convention.java-common"
 }
 
-group = "org.jbake.maven"
+group = "org.jbake"
 version = "2.7.0"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    //implementation 'org.jbake:jbake-core:2.7.0-rc.5'
     implementation project(":jbake-core")
 
     compileOnly "org.apache.maven:maven-core:3.8.1"
     compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.2"
 
-    implementation 'commons-io:commons-io:2.6'
-    implementation "org.apache.commons:commons-configuration2:2.7"
     implementation "com.sparkjava:spark-core:2.9.3"
 
     // Include all optional dependencies by default
