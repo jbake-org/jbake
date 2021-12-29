@@ -1,10 +1,44 @@
 import java.time.format.DateTimeFormatter
 
-apply from: "$rootDir/gradle/sonarqube.gradle"
-apply plugin: 'java-library'
-
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'org.ajoberstar.grgit' version "$grgitVersion"
+    id 'checkstyle'
+}
 
 description = "The core library of JBake"
+
+// add source and target compatibility for all JavaCompile tasks
+tasks.withType(JavaCompile) {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+//set jvm for all Test tasks (like test and smokeTest)
+tasks.withType(Test) {
+
+    def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false', '-Djna.nosys=true']
+
+    /**
+     * jdk9 build is unable to determine the amount of MaxDirectMemorySize
+     * See https://pastebin.com/ECvQeHx0
+     */
+    if (JavaVersion.current().java9Compatible) {
+        args << '-XX:MaxDirectMemorySize=2g'
+    }
+    jvmArgs args
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
+
+jacocoTestReport.dependsOn test
+
 
 dependencies {
     implementation "commons-io:commons-io:$commonsIoVersion"
@@ -32,6 +66,26 @@ dependencies {
     // cli specific dependencies
     implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
     implementation "info.picocli:picocli:$picocli"
+
+
+    /// ----- TESTING DEPS ----- TODO: candidate for convention plugin
+    implementation "org.slf4j:slf4j-api:$slf4jVersion"
+    implementation "org.slf4j:jul-to-slf4j:$slf4jVersion"
+    implementation "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+    implementation "ch.qos.logback:logback-core:$logbackVersion"
+
+    testImplementation "org.junit-pioneer:junit-pioneer:$junitPioneer"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
+    // compatibility for Junit 4 test
+    testCompileOnly "junit:junit:$junit4Version"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
+
+    testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
+    testImplementation 'org.itsallcode:junit5-system-extensions:1.1.0'
 }
 
 processResources {
@@ -42,4 +96,33 @@ processResources {
                timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
                gitHash: grgit.head().abbreviatedId
     }
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+
+    jacoco {
+        excludes = ["**/*OrientSqlTokenManager*"]
+    }
+}
+
+jacoco {
+    toolVersion = jacocoVersion
 }

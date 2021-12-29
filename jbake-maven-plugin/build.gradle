@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jbake:jbake-core:2.7.0-rc.5'
+    //implementation 'org.jbake:jbake-core:2.7.0-rc.5'
+    implementation project(":jbake-core")
 
     compileOnly "org.apache.maven:maven-core:3.8.1"
     compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.2"

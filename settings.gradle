@@ -1,3 +1,4 @@
 rootProject.name = 'jbake-base'
 include 'jbake-core'
 include 'jbake-dist'
+include 'jbake-maven-plugin'

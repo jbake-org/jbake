@@ -1,14 +1,6 @@
 plugins {
     id "eclipse"
     id "idea"
-    id "io.sdkman.vendors"                      version "2.0.0"     apply false
-    id "com.github.kt3k.coveralls"              version "2.10.2"    apply false
-    id "org.sonarqube"                          version "3.1.1"     apply false
-    id 'com.github.ben-manes.versions'          version '0.38.0'
-    id "nebula.optional-base"                   version "5.0.3"     apply false
-    id 'org.ajoberstar.grgit'                   version "$grgitVersion"
-    id "io.github.gradle-nexus.publish-plugin"  version "1.0.0"
-    id "com.github.breadmoirai.github-release"  version "2.2.12"
 }
 
 // common variables
@@ -25,137 +17,10 @@ ext {
     sonarProjectKey = System.getenv("SONARPROJECTKEY") ?: sonarDefaultProjectKey
 }
 
-/**
- * Apply coveralls to the root project as we just need it here to send the
- * aggregated coverage execution data from the jacocoRootReport task
- */
-apply plugin: 'com.github.kt3k.coveralls'
-
-/**
- * Apply jacoco plugin to all projects and add jcenter as default repository
- */
 allprojects {
-    apply plugin: 'jacoco'
-
-    if (JavaVersion.current().isJava8Compatible()) {
-
-        apply plugin: 'checkstyle'
-
-        tasks.withType(Checkstyle) {
-            reports {
-                xml.enabled false
-                html.enabled true
-            }
-        }
-
-    }
-
     repositories {
         mavenCentral()
     }
-
-    jacoco {
-        toolVersion = jacocoVersion
-    }
-
-    tasks.withType(AbstractArchiveTask) {
-        preserveFileTimestamps = false
-        reproducibleFileOrder = true
-    }
-}
-
-// TODO Inline this file. Note that it can't be called multiple times in the same build
-apply from: "$rootDir/gradle/publishing.gradle"
-
-/**
- * Common setup for all subprojects
- */
-subprojects {
-
-    apply plugin: 'java'
-
-    // We do not publish any jars from the jbake-dist project
-    if ( project.name != "jbake-dist" && project.name != "jbake-maven-plugin" ) {
-
-        apply from: "$rootDir/gradle/maven-publishing.gradle"
-        apply from: "$rootDir/gradle/signing.gradle"
-    }
-
-    // add source and target compatibility for all JavaCompile tasks
-    tasks.withType(JavaCompile) {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
-
-    test {
-        useJUnitPlatform()
-
-        testLogging {
-            events "passed", "skipped", "failed"
-            exceptionFormat "full"
-        }
-
-        jacoco {
-            excludes = ["**/*OrientSqlTokenManager*"]
-        }
-    }
-
-    dependencies {
-        implementation "org.slf4j:slf4j-api:$slf4jVersion"
-        implementation "org.slf4j:jul-to-slf4j:$slf4jVersion"
-        implementation "org.slf4j:jcl-over-slf4j:$slf4jVersion"
-        implementation "ch.qos.logback:logback-classic:$logbackVersion"
-        implementation "ch.qos.logback:logback-core:$logbackVersion"
-
-        testImplementation "org.junit-pioneer:junit-pioneer:$junitPioneer"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
-        // compatibility for Junit 4 test
-        testCompileOnly "junit:junit:$junit4Version"
-        testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
-
-        testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
-        testImplementation "org.mockito:mockito-core:$mockitoVersion"
-        testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
-        testImplementation 'org.itsallcode:junit5-system-extensions:1.1.0'
-    }
-
-    dependencyUpdates.resolutionStrategy {
-        componentSelection { rules ->
-            rules.all { ComponentSelection selection ->
-                boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                    selection.candidate.version ==~ /(?i).*[.-]?${qualifier}[.\d-]*/
-                }
-                if (rejected) {
-                    selection.reject('Release candidate')
-                }
-            }
-        }
-    }
-
-    //set jvm for all Test tasks (like test and smokeTest)
-    tasks.withType(Test) {
-
-        def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false','-Djna.nosys=true']
-
-        /**
-         * jdk9 build is unable to determine the amount of MaxDirectMemorySize
-         * See https://pastebin.com/ECvQeHx0
-         */
-        if ( JavaVersion.current().java9Compatible ) {
-            args << '-XX:MaxDirectMemorySize=2g'
-        }
-        jvmArgs args
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.enabled = true // coveralls plugin depends on xml format report
-            html.enabled = true
-        }
-    }
-
-    jacocoTestReport.dependsOn test
 }
 
 task jacocoMerge(type: JacocoMerge) {
