@@ -4,6 +4,7 @@ plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
     id 'org.ajoberstar.grgit' version "$grgitVersion"
+    id 'nebula.optional-base' version '3.0.3'
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
@@ -21,22 +22,22 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
-    api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
-    api "org.codehaus.groovy:groovy:$groovyVersion"
-    api "org.codehaus.groovy:groovy-templates:$groovyVersion"
-    api "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
-    api "org.freemarker:freemarker:$freemarkerVersion"
-    api "org.thymeleaf:thymeleaf:$thymeleafVersion"
-    api "de.neuland-bfi:jade4j:$jade4jVersion"
-    api "com.vladsch.flexmark:flexmark:$flexmarkVersion"
-    api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
-    api "io.pebbletemplates:pebble:$pebbleVersion"
+    api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
+    api "org.codehaus.groovy:groovy:$groovyVersion", optional
+    api "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
+    api "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
+    api "org.freemarker:freemarker:$freemarkerVersion", optional
+    api "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
+    api "de.neuland-bfi:jade4j:$jade4jVersion", optional
+    api "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
+    api "io.pebbletemplates:pebble:$pebbleVersion", optional
     implementation "org.jsoup:jsoup:$jsoupVersion"
-    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
 
     // cli specific dependencies
-    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
-    implementation "info.picocli:picocli:$picocli"
+    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
+    implementation "info.picocli:picocli:$picocli", optional
 }
 
 processResources {
