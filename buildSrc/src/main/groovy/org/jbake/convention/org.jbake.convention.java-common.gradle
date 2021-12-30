@@ -25,7 +25,7 @@ dependencies {
     testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
-    testImplementation 'org.itsallcode:junit5-system-extensions:1.1.0'
+    testImplementation "org.itsallcode:junit5-system-extensions:$junit5SystemExtVersion"
 }
 
 tasks.withType(JavaCompile) {
@@ -91,7 +91,7 @@ jacocoTestReport.dependsOn test
 
 tasks.withType(Checkstyle) {
     reports {
-        xml.enabled false
-        html.enabled true
+        xml.required.set false
+        html.required.set true
     }
 }
