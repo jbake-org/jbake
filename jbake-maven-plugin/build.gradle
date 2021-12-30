@@ -4,26 +4,25 @@ plugins {
 }
 
 group = "org.jbake"
-version = "2.7.0"
 
 dependencies {
     implementation project(":jbake-core")
 
-    compileOnly "org.apache.maven:maven-core:3.8.1"
-    compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.2"
+    compileOnly "org.apache.maven:maven-core:$mavenVersion"
+    compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:$mavenAnnotationsVersion"
 
-    implementation "com.sparkjava:spark-core:2.9.3"
+    implementation "com.sparkjava:spark-core:$sparkVersion"
 
     // Include all optional dependencies by default
-//    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
-//    implementation "org.codehaus.groovy:groovy:$groovyVersion"
-//    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
-//    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
-//    implementation "org.freemarker:freemarker:$freemarkerVersion"
-//    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
-//    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
-//    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
-//    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
-//    implementation "io.pebbletemplates:pebble:$pebbleVersion"
-//    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    implementation "org.codehaus.groovy:groovy:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+    implementation "org.freemarker:freemarker:$freemarkerVersion"
+    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    implementation "io.pebbletemplates:pebble:$pebbleVersion"
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
 }
