@@ -1,9 +1,14 @@
+import java.time.format.DateTimeFormatter
+
 plugins {
     id "io.github.gradle-nexus.publish-plugin"  version "1.0.0"
     id 'com.github.ben-manes.versions'          version '0.38.0'
+    id 'org.ajoberstar.grgit'                   version "$grgitVersion"
     id "eclipse"
     id "idea"
 }
+
+def buildTimeAndDate = grgit.head().dateTime
 
 // common variables
 ext {
@@ -17,6 +22,9 @@ ext {
     sonarDefaultProjectKey = "org.jbake:jbake-base:jbake-core"
     sonarURL = System.getenv("SONARHOST") ?: sonarDefaultURL
     sonarProjectKey = System.getenv("SONARPROJECTKEY") ?: sonarDefaultProjectKey
+    buildDate = buildTimeAndDate.format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))
+    buildTime = buildTimeAndDate.format(DateTimeFormatter.ofPattern('HH:mm:ss.SSSZ'))
+    isReleaseVersion = !version.endsWith("SNAPSHOT")
 }
 
 nexusPublishing {

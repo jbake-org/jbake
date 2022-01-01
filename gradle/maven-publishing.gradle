@@ -1,111 +1,85 @@
-import java.time.format.DateTimeFormatter
-
 apply plugin: 'maven-publish'
-
-def buildTimeAndDate = grgit.head().dateTime
-ext {
-    buildDate = buildTimeAndDate.format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))
-    buildTime = buildTimeAndDate.format(DateTimeFormatter.ofPattern('HH:mm:ss.SSSZ'))
-    isReleaseVersion = !version.endsWith("SNAPSHOT")
-}
-
-task javadocJar(type: Jar) {
-    archiveClassifier.set('javadoc')
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
 
 publishing {
     publications {
-            mavenJava(MavenPublication) {
-                from components.java
+        mavenJava(MavenPublication) {
+            from components.java
 
-                artifact javadocJar
-                artifact sourcesJar
+            artifact javadocJar
+            artifact sourcesJar
 
-                pom {
-                    name = "jbake"
-                    description = project.description
-                    url = project.website
-                    developers {
-                        developer {
-                            id = 'jonbullock'
-                            name = 'Jonathan Bullock'
-                            email = 'jonbullock@gmail.com'
-                            url = 'http://jonathanbullock.com'
-                            timezone = 'Europe/London'
-                        }
-                        developer {
-                            id = 'ancho'
-                            name = 'Frank Becker'
-                            email = 'frank@calmdevelopment.de'
-                            timezone = 'Europe/Berlin'
-                        }
-                        developer {
-                            id = 'manikmagar'
-                            name = 'Manik Magar'
-                            url = 'https://manik.magar.me/'
-                            timezone = 'America/New_York'
-                        }
-                        developer {
-                            id = 'aldrinleal'
-                            name = 'Aldrin Leal'
-                            timezone = 'America/Bogota'
-                        }
+            pom {
+                name = "jbake"
+                description = project.description
+                url = project.website
+                developers {
+                    developer {
+                        id = 'jonbullock'
+                        name = 'Jonathan Bullock'
+                        email = 'jonbullock@gmail.com'
+                        url = 'http://jonathanbullock.com'
+                        timezone = 'Europe/London'
                     }
-                    scm {
-                        url = project.vcs
-                        connection = 'scm:git:git@github.com:jbake-org/jbake.git'
-                        developerConnection = 'scm:git:https://github.com/jbake-org/jbake.git'
+                    developer {
+                        id = 'ancho'
+                        name = 'Frank Becker'
+                        email = 'frank@calmdevelopment.de'
+                        timezone = 'Europe/Berlin'
                     }
-                    issueManagement {
-                        system = 'GitHub Issues'
-                        url = project.issues
+                    developer {
+                        id = 'manikmagar'
+                        name = 'Manik Magar'
+                        url = 'https://manik.magar.me/'
+                        timezone = 'America/New_York'
                     }
-                    mailingLists {
+                    developer {
+                        id = 'aldrinleal'
+                        name = 'Aldrin Leal'
+                        timezone = 'America/Bogota'
+                    }
+                }
+                scm {
+                    url = project.vcs
+                    connection = 'scm:git:git@github.com:jbake-org/jbake.git'
+                    developerConnection = 'scm:git:https://github.com/jbake-org/jbake.git'
+                }
+                issueManagement {
+                    system = 'GitHub Issues'
+                    url = project.issues
+                }
+                mailingLists {
 
-                        mailingList {
-                            name = 'jbake-dev'
-                            subscribe = 'jbake-dev@googlegroups.com'
-                            unsubscribe = 'jbake-dev+unsubscribe@googlegroups.com'
-                            archive = 'http://groups.google.com/group/jbake-dev'
-                        }
-                        mailingList {
-                            name = 'jbake-user'
-                            subscribe = 'jbake-user@googlegroups.com'
-                            unsubscribe = 'jbake-user+unsubscribe@googlegroups.com'
-                            archive = 'http://groups.google.com/group/jbake-user'
-                        }
+                    mailingList {
+                        name = 'jbake-dev'
+                        subscribe = 'jbake-dev@googlegroups.com'
+                        unsubscribe = 'jbake-dev+unsubscribe@googlegroups.com'
+                        archive = 'http://groups.google.com/group/jbake-dev'
                     }
-
-                    licenses {
-                        license {
-                            name = 'The MIT License (MIT)'
-                            url = 'http://opensource.org/licenses/MIT'
-                        }
+                    mailingList {
+                        name = 'jbake-user'
+                        subscribe = 'jbake-user@googlegroups.com'
+                        unsubscribe = 'jbake-user+unsubscribe@googlegroups.com'
+                        archive = 'http://groups.google.com/group/jbake-user'
                     }
                 }
             }
         }
     }
+}
 
 jar {
     manifest {
         attributes(
-                'Built-By': System.properties['user.name'],
-                'Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString(),
-                'Build-Date': buildDate,
-                'Build-Time': buildTime,
-                'Specification-Title': project.name,
-                'Specification-Version': project.version,
-                'Specification-Vendor': project.name,
-                'Implementation-Title': project.name,
-                'Implementation-Version': project.version,
-                'Implementation-Vendor': project.name
+            'Built-By': System.properties['user.name'],
+            'Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString(),
+            'Build-Date': buildDate,
+            'Build-Time': buildTime,
+            'Specification-Title': project.name,
+            'Specification-Version': project.version,
+            'Specification-Vendor': project.name,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': project.name
         )
     }
 }

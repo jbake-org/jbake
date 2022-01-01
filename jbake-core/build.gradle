@@ -3,7 +3,6 @@ import java.time.format.DateTimeFormatter
 plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
-    id 'org.ajoberstar.grgit' version "$grgitVersion"
     id 'nebula.optional-base' version '3.0.3'
 }
 
@@ -11,6 +10,24 @@ apply from: "$rootDir/gradle/maven-publishing.gradle"
 apply from: "$rootDir/gradle/signing.gradle"
 
 description = "The core library of JBake"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = "jbake-core"
+
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = 'http://opensource.org/licenses/MIT'
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 dependencies {
     api "commons-io:commons-io:$commonsIoVersion"

@@ -1,9 +1,29 @@
 plugins {
-    id "io.freefair.maven-plugin" version "6.3.0"
+    id 'de.benediktritter.maven-plugin-development' version '0.3.1'
     id "org.jbake.convention.java-common"
 }
 
 group = "org.jbake"
+
+apply from: "$rootDir/gradle/maven-publishing.gradle"
+apply from: "$rootDir/gradle/signing.gradle"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = "jbake-maven-plugin"
+
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0'
+                        url  = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}
 
 dependencies {
     implementation project(":jbake-core")
