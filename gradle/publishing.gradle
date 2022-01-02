@@ -1,6 +1,0 @@
-nexusPublishing {
-    repositories {
-        sonatype()
-    }
-}
-

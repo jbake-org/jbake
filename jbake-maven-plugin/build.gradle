@@ -1,0 +1,48 @@
+plugins {
+    id 'de.benediktritter.maven-plugin-development' version '0.3.1'
+    id "org.jbake.convention.java-common"
+}
+
+group = "org.jbake"
+
+apply from: "$rootDir/gradle/maven-publishing.gradle"
+apply from: "$rootDir/gradle/signing.gradle"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = "jbake-maven-plugin"
+
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0'
+                        url  = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation project(":jbake-core")
+
+    compileOnly "org.apache.maven:maven-core:$mavenVersion"
+    compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:$mavenAnnotationsVersion"
+
+    implementation "com.sparkjava:spark-core:$sparkVersion"
+
+    // Include all optional dependencies by default
+    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    implementation "org.codehaus.groovy:groovy:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+    implementation "org.freemarker:freemarker:$freemarkerVersion"
+    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    implementation "io.pebbletemplates:pebble:$pebbleVersion"
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+}

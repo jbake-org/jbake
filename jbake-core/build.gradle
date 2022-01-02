@@ -1,14 +1,37 @@
 import java.time.format.DateTimeFormatter
 
-apply from: "$rootDir/gradle/sonarqube.gradle"
-apply plugin: 'java-library'
+plugins {
+    id "org.jbake.convention.java-common"
+    id 'java-library'
+    id 'nebula.optional-base' version '3.0.3'
+}
 
+apply from: "$rootDir/gradle/maven-publishing.gradle"
+apply from: "$rootDir/gradle/signing.gradle"
 
 description = "The core library of JBake"
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = "jbake-core"
+
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = 'http://opensource.org/licenses/MIT'
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 dependencies {
-    implementation "commons-io:commons-io:$commonsIoVersion"
-    implementation "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
+    api "commons-io:commons-io:$commonsIoVersion"
+    api "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
     implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
     implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
@@ -16,17 +39,17 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
-    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
-    implementation "org.codehaus.groovy:groovy:$groovyVersion", optional
-    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
-    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
-    implementation "org.freemarker:freemarker:$freemarkerVersion", optional
-    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
-    implementation "de.neuland-bfi:jade4j:$jade4jVersion", optional
-    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
-    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
+    api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
+    api "org.codehaus.groovy:groovy:$groovyVersion", optional
+    api "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
+    api "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
+    api "org.freemarker:freemarker:$freemarkerVersion", optional
+    api "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
+    api "de.neuland-bfi:jade4j:$jade4jVersion", optional
+    api "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
+    api "io.pebbletemplates:pebble:$pebbleVersion", optional
     implementation "org.jsoup:jsoup:$jsoupVersion"
-    implementation "io.pebbletemplates:pebble:$pebbleVersion", optional
     implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
 
     // cli specific dependencies
@@ -36,6 +59,7 @@ dependencies {
 
 processResources {
     from("src/main/resources") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         include 'default.properties'
         expand jbakeVersion: project.version,
                timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),

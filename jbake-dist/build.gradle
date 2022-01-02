@@ -1,3 +1,10 @@
+plugins {
+    id "io.sdkman.vendors"  version "2.0.0"
+    id "com.github.breadmoirai.github-release" version "2.2.12"
+    id "org.jbake.convention.java-common"
+    id 'application'
+}
+
 apply from: "$rootDir/gradle/application.gradle"
 apply from: "$rootDir/gradle/sdkman.gradle"
 apply from: "$rootDir/gradle/signing.gradle"
@@ -33,7 +40,7 @@ dependencies {
     }
 
     smokeTestImplementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
-    smokeTestImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
+    smokeTestImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
 }
 
 task smokeTest(type: Test, dependsOn: installDist) {

@@ -1,5 +1,3 @@
-apply plugin: 'application'
-
 mainClassName = "org.jbake.launcher.Main"
 applicationName = "jbake"
 
