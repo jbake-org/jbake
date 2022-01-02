@@ -158,7 +158,7 @@ public class Asset {
         try {
             FileUtils.copyFile(asset, targetFolder);
             LOGGER.info("Copying [{}]... done!", asset.getPath());
-        } catch (IOException e) {
+        } catch (IOException|IllegalArgumentException e) {
             LOGGER.error("Copying [{}]... failed!", asset.getPath(), e);
             errors.add(e);
         }

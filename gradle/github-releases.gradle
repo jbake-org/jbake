@@ -6,7 +6,7 @@ rootProject.ext {
 }
 
 afterEvaluate {
-    def name = project(':jbake-dist').tasks.getByName("distZip").archiveName
+    def name = project(':jbake-dist').tasks.getByName("distZip").archiveFileName.getOrNull()
     def files = project(':jbake-dist').tasks.getByName("distZip").outputs.files.files
     if (!project.hasProperty('skipSigning')) {
         def signatureFile = project(':jbake-dist').tasks.getByName("signArchives").outputs.files.files.find { it.name.contains(name) }
