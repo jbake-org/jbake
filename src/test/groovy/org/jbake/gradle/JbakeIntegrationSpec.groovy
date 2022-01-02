@@ -17,8 +17,8 @@
  */
 package org.jbake.gradle
 
+import org.assertj.core.api.Assumptions
 import org.gradle.testkit.runner.BuildResult
-import org.junit.Assume
 import spock.lang.Shared
 import spock.lang.Unroll
 import spock.util.environment.Jvm
@@ -39,14 +39,14 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         given:
 
         if (Jvm.current.java9Compatible) {
-            Assume.assumeTrue("Skip. Not jdk9 compatible", jdk9Compatible)
+            Assumptions.assumeThat(jdk9Compatible).isTrue()
         }
         if ((Jvm.current.javaSpecificationVersion as float) >= 14f) {
-            Assume.assumeTrue("Skip. $gradleVersion is not jdk14 compatible", jdk14Compatible)
+            Assumptions.assumeThat(jdk14Compatible).isTrue()
         }
 
         gradleVersion = version
-        File jbakeSourceDir = newFolder('src', 'jbake')
+        File jbakeSourceDir = newFolder('src/jbake')
         File jbakeDestinationDir = new File(projectDir, 'build/jbake')
         File blogTagFile = new File(jbakeDestinationDir, 'tags/blog.html')
 
@@ -64,7 +64,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         """
 
         when:
-        BuildResult result = runTasksWithSucess('bake', '--info')
+        BuildResult result = runTasksWithSuccess('bake', '--info')
 
         then:
         result.task(':bake').outcome == SUCCESS
@@ -74,7 +74,6 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
 
         where:
         version             | jdk9Compatible | jdk14Compatible
-        '5.0'               | true           | false            // base version
         '5.6.4'             | true           | false            // latest 5.x version
         '6.8.3'             | true           | true             // latest 6.x version
         latestGradleVersion | true           | true             // latest release, deprecations & warnings
@@ -83,7 +82,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
     def 'Bake with default repositories set to #includeDefaultRepositories results in #status'() {
         given:
         gradleVersion = latestGradleVersion
-        File jbakeSourceDir = newFolder('src', 'jbake')
+        File jbakeSourceDir = newFolder('src/jbake')
 
         copyResources('example-project', jbakeSourceDir.path)
 
@@ -114,7 +113,7 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
     def 'Bake with default repositories set to false and repositories block defined results in SUCCESS'() {
         given:
         gradleVersion = latestGradleVersion
-        File jbakeSourceDir = newFolder('src', 'jbake')
+        File jbakeSourceDir = newFolder('src/jbake')
 
         copyResources('example-project', jbakeSourceDir.path)
 
@@ -135,9 +134,74 @@ class JbakeIntegrationSpec extends PluginIntegrationSpec {
         """
 
         when:
-        BuildResult result = runTasksWithSucess('bake', '--info')
+        BuildResult result = runTasksWithSuccess('bake', '--info')
 
         then:
         result.task(':bake').outcome == SUCCESS
+    }
+
+    def "should show an error message using gradle <= 5.6"() {
+        given:
+        gradleVersion = "5.0"
+
+        buildFile << """
+            plugins {
+                id 'org.jbake.site'
+            }
+        """
+
+        when:
+        BuildResult result = runTasksWithFailure('bake', '--info')
+
+        then:
+        result.output.contains("This plugin does not support gradle versions <= 5.6")
+    }
+
+    def "should initialize with example project"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'org.jbake.site'
+            }
+        """
+        !new File(tempDir, "src/jbake/templates").exists()
+        !new File(tempDir, "src/jbake/assets").exists()
+        !new File(tempDir, "src/jbake/content").exists()
+
+
+        when:
+        BuildResult result = runTasksWithSuccess('bakeInit')
+
+        then:
+        result.output.contains("Base folder structure successfully created.")
+        new File(tempDir, "src/jbake/templates").exists()
+        new File(tempDir, "src/jbake/assets").exists()
+        new File(tempDir, "src/jbake/content").exists()
+    }
+
+    def "should initialize with from given zip url"() {
+        given:
+        buildFile << """
+            plugins {
+                id 'org.jbake.site'
+            }
+            
+            jbake {
+                templateUrl = 'https://github.com/jbake-org/jbake-example-project-groovy-mte/archive/master.zip'
+            }
+        """
+        !new File(tempDir, "src/jbake/templates").exists()
+        !new File(tempDir, "src/jbake/assets").exists()
+        !new File(tempDir, "src/jbake/content").exists()
+
+
+        when:
+        BuildResult result = runTasksWithSuccess('bakeInit')
+
+        then:
+        result.output.contains("Base folder structure successfully created.")
+        new File(tempDir, "src/jbake/templates/page.tpl").exists()
+        new File(tempDir, "src/jbake/assets").exists()
+        new File(tempDir, "src/jbake/content").exists()
     }
 }

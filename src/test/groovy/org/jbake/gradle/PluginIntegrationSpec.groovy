@@ -20,28 +20,27 @@ package org.jbake.gradle
 import org.apache.commons.io.FileUtils
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+import spock.lang.TempDir
 
 abstract class PluginIntegrationSpec extends Specification {
-    private final TemporaryFolder folder = new TemporaryFolder()
 
+    @TempDir
+    File tempDir
+    
     File buildFile
+
     boolean debug = false
     String gradleVersion
 
     void setup() {
-        folder.create()
-        buildFile = folder.newFile('build.gradle')
-        File gradleProperties = folder.newFile('gradle.properties')
+
+        buildFile = new File(tempDir,'build.gradle')
+        File gradleProperties = new File(tempDir, 'gradle.properties')
 
         gradleProperties.withWriter {
             it.append("org.gradle.jvmargs=-XX:MaxDirectMemorySize=1g")
         }
-    }
-
-    void cleanup() {
-        folder.delete()
     }
 
     protected void copyResources(String srcDir, String destination) {
@@ -61,12 +60,14 @@ abstract class PluginIntegrationSpec extends Specification {
         }
     }
 
-    File newFolder(String... s) {
-        folder.newFolder(s)
+    File newFolder(String s) {
+        def dir = new File(tempDir, s)
+        dir.mkdir()
+        dir
     }
 
     File getProjectDir() {
-        folder.root
+        tempDir
     }
 
     protected GradleRunner getGradleRunner(String... arguments) {
@@ -82,7 +83,7 @@ abstract class PluginIntegrationSpec extends Specification {
         runner
     }
 
-    protected BuildResult runTasksWithSucess(String... arguments) {
+    protected BuildResult runTasksWithSuccess(String... arguments) {
         getGradleRunner(arguments).build()
     }
 
@@ -91,6 +92,6 @@ abstract class PluginIntegrationSpec extends Specification {
     }
 
     protected BuildResult runTasks(boolean success, String... arguments) {
-        success ? runTasksWithSucess(arguments) : runTasksWithFailure(arguments)
+        success ? runTasksWithSuccess(arguments) : runTasksWithFailure(arguments)
     }
 }

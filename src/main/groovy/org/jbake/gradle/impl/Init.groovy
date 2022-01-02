@@ -17,6 +17,8 @@
  */
 package org.jbake.gradle.impl
 
+import org.jbake.app.configuration.JBakeConfiguration
+
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -25,7 +27,7 @@ import java.util.zip.ZipInputStream
  * Modified from {@code org.jbake.launcher.Init} original by Jonathan Bullock
  */
 class Init {
-    def config
+    JBakeConfiguration config
 
     /**
      * Performs checks on output folder before extracting template file
@@ -55,13 +57,13 @@ class Init {
         if (contents != null) {
             for (File content : contents) {
                 if (content.isDirectory()) {
-                    if (content.getName().equalsIgnoreCase(config.getString("template.folder"))) {
+                    if (content.getName().equalsIgnoreCase(config.getTemplateFolderName())) {
                         safe = false
                     }
-                    if (content.getName().equalsIgnoreCase(config.getString("content.folder"))) {
+                    if (content.getName().equalsIgnoreCase(config.getContentFolderName())) {
                         safe = false
                     }
-                    if (content.getName().equalsIgnoreCase(config.getString("asset.folder"))) {
+                    if (content.getName().equalsIgnoreCase(config.getAssetFolderName())) {
                         safe = false
                     }
                 }

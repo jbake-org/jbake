@@ -15,16 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jbake.gradle
+package org.jbake.gradle.impl
 
-interface JBakeProxy {
-    def jbake()
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
+import org.gradle.workers.WorkParameters
 
-    def prepare()
-
-    def getConfig()
-
-    def setConfig(Object config)
-
-    List<String> getErrors()
+interface JBakeInitActionParameters extends WorkParameters {
+    Property<String> getTemplate()
+    Property<String> getTemplateUrl()
+    RegularFileProperty getOutput()
+    MapProperty<String, Object> getConfiguration()
 }

@@ -37,6 +37,16 @@ class JBakePluginSpec extends Specification {
         project.tasks.bake instanceof JBakeTask
     }
 
+    def "should add a JBakeInitTask"() {
+        expect:
+        project.tasks.bakeInit instanceof JBakeInitTask
+    }
+
+    def "should add a JBakeServeTask"() {
+        expect:
+        project.tasks.bakePreview instanceof JBakeServeTask
+    }
+
     def "should add jbake configuration"() {
         expect:
         project.configurations.jbake

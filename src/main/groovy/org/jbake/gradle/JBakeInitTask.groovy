@@ -24,9 +24,10 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.jbake.gradle.impl.JBakeInitProxyImpl
+import org.gradle.workers.WorkerExecutor
+import org.jbake.gradle.impl.JBakeInitAction
 
-import java.lang.reflect.Constructor
+import javax.inject.Inject
 
 class JBakeInitTask extends DefaultTask {
     @Input @Optional String template
@@ -36,67 +37,30 @@ class JBakeInitTask extends DefaultTask {
 
     @Classpath @Optional
     Configuration classpath
-    private static ClassLoader cl
 
-    private JBakeInitProxy init
+    private final WorkerExecutor executor
 
-    JBakeInitTask() {
+    @Inject
+    JBakeInitTask(WorkerExecutor executor) {
         group = 'Documentation'
         description = 'Initializes the directory structure for a new JBake site'
+        this.executor = executor
     }
 
     @TaskAction
     void init() {
-        String _template = getTemplate()
-        String _templateUrl = getTemplateUrl()
-
-        if(!_template && _templateUrl) {
+        if(!getTemplate() && getTemplateUrl()) {
             throw new IllegalStateException("You must define a value for either 'template' or 'templateUrl")
         }
 
-        createJBakeInit()
-        init.prepare()
-        mergeConfiguration()
-
-        _templateUrl ? init.initFromTemplateUrl(_templateUrl, getOutputDir()) :
-            init.initFromTemplate(_template, getOutputDir())
-    }
-
-    private JBakeInitProxy createJBakeInit() {
-        if (!init) {
-            loadInitDynamic().newInstance()
-            init = new JBakeInitProxyImpl(delegate: loadInitDynamic())
+        executor.classLoaderIsolation {
+            it.classpath.from(this.classpath)
+        }.submit(JBakeInitAction) {
+            it.template = this.template
+            it.templateUrl = this.templateUrl
+            it.output = this.outputDir
+            it.configuration.putAll(this.configuration)
         }
     }
 
-    private mergeConfiguration() {
-        def delegate = loadClass('org.apache.commons.configuration.CompositeConfiguration')
-        Constructor constructor = delegate.getConstructor(loadClass('org.apache.commons.configuration.Configuration'))
-        init.config = constructor.newInstance(createMapConfiguration())
-    }
-
-    private createMapConfiguration() {
-        def delegate = loadClass('org.apache.commons.configuration.MapConfiguration')
-        Constructor constructor = delegate.getConstructor(Map)
-        constructor.newInstance(getConfiguration())
-    }
-
-    private loadInitDynamic() {
-        setupClassLoader()
-        loadClass('org.jbake.gradle.impl.Init')
-    }
-
-    private static Class loadClass(String className) {
-        cl.loadClass(className)
-    }
-
-    private setupClassLoader() {
-        if (classpath?.files) {
-            def urls = classpath.files.collect { it.toURI().toURL() }
-            cl = new URLClassLoader(urls as URL[], Thread.currentThread().contextClassLoader)
-            Thread.currentThread().contextClassLoader = cl
-        } else {
-            cl = Thread.currentThread().contextClassLoader
-        }
-    }
 }

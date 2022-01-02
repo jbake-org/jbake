@@ -17,11 +17,10 @@
  */
 package org.jbake.gradle.impl
 
-import org.apache.commons.configuration.CompositeConfiguration
-import org.apache.commons.configuration.MapConfiguration
 import org.gradle.api.logging.Logging
 import org.gradle.workers.WorkAction
 import org.jbake.app.Oven
+import org.jbake.app.configuration.JBakeConfigurationFactory
 
 abstract class JBakeWorkAction implements WorkAction<JBakeWorkActionParameters> {
     private static final LOGGER = Logging.getLogger(JBakeWorkAction)
@@ -29,23 +28,16 @@ abstract class JBakeWorkAction implements WorkAction<JBakeWorkActionParameters> 
 
     @Override
     void execute() {
-        jbake = new Oven(parameters.input.get().asFile, parameters.output.get().asFile, parameters.clearCache.get())
-        jbake.setupPaths()
-        mergeConfiguration()
+        def configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(parameters.input.get().asFile, parameters.output.get().asFile, parameters.clearCache.get())
+        parameters.configuration.get().each {
+            configuration.setProperty(it.key, it.value)
+        }
+        jbake = new Oven(configuration)
         jbake.bake()
-        List<String> errors = jbake.getErrors()
+        List<Throwable> errors = jbake.getErrors()
         if (errors) {
-            errors.each { LOGGER.error(it) }
+            errors.each { LOGGER.error(it.message) }
             throw new IllegalStateException(errors.join('\n'))
         }
-    }
-
-    private void mergeConfiguration() {
-        def config = new CompositeConfiguration([createMapConfiguration(), jbake.getConfig()])
-        jbake.setConfig(config)
-    }
-
-    private MapConfiguration createMapConfiguration() {
-        return new MapConfiguration(parameters.configuration.get())
     }
 }

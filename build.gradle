@@ -87,7 +87,6 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-api'
         exclude group: 'com.vladsch.flexmark', module: 'flexmark'
     }
-    compileOnly 'commons-configuration:commons-configuration:1.10'
     testImplementation("org.spockframework:spock-core:$spockVersion") {
         exclude group: 'org.codehaus.groovy'
     }
@@ -126,4 +125,8 @@ license {
 
 licenseTest {
     source -= sourceSets.test.resources
+}
+
+test {
+    useJUnitPlatform()
 }

@@ -21,10 +21,14 @@ import com.github.zafarkhaja.semver.Version
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.internal.plugins.PluginApplicationException
 import org.gradle.api.plugins.BasePlugin
+import org.gradle.api.tasks.TaskExecutionException
+import org.gradle.util.GradleVersion
 
 @CompileStatic
 class JBakePlugin implements Plugin<Project> {
@@ -33,6 +37,9 @@ class JBakePlugin implements Plugin<Project> {
     Project project
 
     void apply(Project project) {
+
+        checkGradleVersion()
+
         this.project = project
         project.pluginManager.apply(BasePlugin)
 
@@ -70,12 +77,25 @@ class JBakePlugin implements Plugin<Project> {
             void execute(JBakeInitTask t) {
                 t.group = 'Documentation'
                 t.description = 'Setup a jbake project'
+                t.classpath = configuration
                 t.template = jbakeExtension.template
                 t.templateUrl = jbakeExtension.templateUrl
                 t.outputDir = project.layout.projectDirectory.file(jbakeExtension.srcDirName).asFile
                 t.configuration = jbakeExtension.configuration
             }
         })
+    }
+
+    private static void checkGradleVersion() {
+        if (GradleVersion.current().compareTo(GradleVersion.version("5.6")) < 0) {
+            def message = """
+This plugin does not support gradle versions <= 5.6
+
+Newer worker API was introduced in 5.6, older worker API doesn't properly forward the logging from Oven which would cause a regression.
+See https://github.com/gradle/gradle/issues/8318
+"""
+            throw new GradleException(message)
+        }
     }
 
     private void addDependenciesAfterEvaluate() {
