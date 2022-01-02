@@ -23,8 +23,8 @@ jdk:
 jobs:
   include:
 
-  - jdk: openjdk17
-    os: osx
+  - os: osx
+    osx_image: xcode13.2
 
   - jdk: openjdk11
     os: osx
