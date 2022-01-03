@@ -16,15 +16,15 @@ install: true
 script:
 - "./gradlew check --stacktrace"
 
-jdk:
-  - openjdk15
-  - openjdk11
-
 jobs:
   include:
 
-  - jdk: openjdk15
-    os: osx
+  - jdk: openjdk17
+
+  - jdk: openjdk11
+
+  - os: osx
+    osx_image: xcode13.2
 
   - jdk: openjdk11
     os: osx
@@ -42,7 +42,6 @@ jobs:
 #    - "./gradlew -PskipSigning jacocoRootReport coveralls -i --stacktrace"
 
 notifications:
-  irc: "irc.freenode.org#jbake"
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/2d332fabb02dba68a36b
