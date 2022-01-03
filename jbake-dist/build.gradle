@@ -1,15 +1,11 @@
 plugins {
-    id "io.sdkman.vendors"  version "2.0.0"
     id "com.github.breadmoirai.github-release" version "2.2.12"
     id "org.jbake.convention.java-common"
     id 'application'
 }
 
 apply from: "$rootDir/gradle/application.gradle"
-apply from: "$rootDir/gradle/sdkman.gradle"
-apply from: "$rootDir/gradle/signing.gradle"
-apply from: "$rootDir/gradle/github-releases.gradle"
-
+apply from: "$rootDir/gradle/release.gradle"
 description = "The binary distribution package that bundles JBake cli"
 
 sourceSets {
@@ -58,17 +54,6 @@ smokeTest {
     }
 }
 
-task buildChecksum(dependsOn: distZip, group: "distribution") {
-    description "creates a sha256 checksum file for the distribution"
-    doLast {
-        distZip.outputs.files.files.each {
-            ant.checksum(file: it, fileext: ".sha256", algorithm: "SHA-256", pattern: "{0} {1}")
-        }
-    }
-}
-
 check.dependsOn smokeTest
-
-distZip.finalizedBy buildChecksum
 
 jar.enabled=false
