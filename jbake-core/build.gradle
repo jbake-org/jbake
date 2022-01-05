@@ -7,7 +7,6 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
-apply from: "$rootDir/gradle/signing.gradle"
 
 description = "The core library of JBake"
 

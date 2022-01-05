@@ -4,6 +4,7 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin"  version "$nexusPublishPluginVersion"
     id 'com.github.ben-manes.versions'          version "$versionsPluginVersion"
     id 'org.ajoberstar.grgit'                   version "$grgitVersion"
+    id 'org.jreleaser'                          version "$jreleaserVersion" apply false
     id "eclipse"
     id "idea"
 }
