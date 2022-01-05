@@ -1,5 +1,4 @@
 plugins {
-    id "com.github.breadmoirai.github-release" version "2.2.12"
     id "org.jbake.convention.java-common"
     id 'application'
 }
