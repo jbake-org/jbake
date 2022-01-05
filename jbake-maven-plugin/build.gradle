@@ -1,5 +1,5 @@
 plugins {
-    id 'de.benediktritter.maven-plugin-development' version '0.3.1'
+    id 'de.benediktritter.maven-plugin-development' version "$mavenPluginDevVersion"
     id "org.jbake.convention.java-common"
 }
 
