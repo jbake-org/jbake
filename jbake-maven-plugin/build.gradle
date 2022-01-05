@@ -5,6 +5,10 @@ plugins {
 
 group = "org.jbake"
 
+mavenPlugin {
+    helpMojoPackage = 'org.jbake.maven'
+}
+
 apply from: "$rootDir/gradle/maven-publishing.gradle"
 
 publishing {
