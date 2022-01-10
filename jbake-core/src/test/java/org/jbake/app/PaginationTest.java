@@ -29,7 +29,6 @@ import org.jbake.model.DocumentTypes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.BeforeClass;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -66,7 +65,7 @@ public class PaginationTest extends ContentStoreIntegrationTest {
             builder.withCached(true)
                     .withStatus("published")
                     .withDate(cal.getTime())
-                    .build();
+                    .build(db);
         }
 
         int pageCount = 1;

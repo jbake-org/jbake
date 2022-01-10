@@ -1,6 +1,5 @@
 package org.jbake.template;
 
-
 import de.neuland.jade4j.Jade4J;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.filter.CDATAFilter;
@@ -11,18 +10,14 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.model.TemplateModel;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
 /**
  * Renders pages using the <a href="http://jade.org/">Jade</a> template language.
@@ -105,7 +100,7 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
         }
 
         public String escape(String s) {
-            return StringEscapeUtils.escapeHtml(s);
+            return StringEscapeUtils.escapeHtml4(s);
         }
     }
 }

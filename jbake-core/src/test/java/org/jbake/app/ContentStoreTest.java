@@ -24,13 +24,13 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
             FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
             builder.withStatus("published")
                     .withRandomSha1()
-                    .build();
+                    .build(db);
         }
 
         FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
         builder.withStatus("draft")
                 .withRandomSha1()
-                .build();
+                .build(db);
 
         assertEquals(6, db.getDocumentCount(DOC_TYPE_POST));
         assertEquals(5, db.getPublishedCount(DOC_TYPE_POST));

@@ -12,3 +12,4 @@
 build/
 .gradle
 .gradletasknamecache
+.DS_Store

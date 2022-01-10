@@ -1,6 +1,5 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.jbake.app.configuration.JBakeConfiguration;
@@ -13,13 +12,10 @@ import org.jbake.util.HtmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
+import java.util.*;
 
 /**
  * Crawls a file system looking for content.

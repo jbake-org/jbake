@@ -1,10 +1,10 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.record.OTrackedList;
-import com.orientechnologies.orient.core.record.OElement;
-import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.arcadedb.query.sql.executor.Result;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
+
+import java.util.*;
 
 public class DBUtil {
     private static ContentStore contentStore;
@@ -34,7 +34,7 @@ public class DBUtil {
         contentStore = null;
     }
 
-    public static DocumentModel documentToModel(OResult doc) {
+    public static DocumentModel documentToModel(Result doc) {
         DocumentModel result = new DocumentModel();
 
         for (String key : doc.getPropertyNames()) {
@@ -53,8 +53,8 @@ public class DBUtil {
     public static String[] toStringArray(Object entry) {
         if (entry instanceof String[]) {
             return (String[]) entry;
-        } else if (entry instanceof OTrackedList) {
-            OTrackedList<String> list = (OTrackedList<String>) entry;
+        } else if (entry instanceof List) {
+            List<String> list = (List<String>) entry;
             return list.toArray(new String[list.size()]);
         }
         return new String[0];
