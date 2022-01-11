@@ -23,9 +23,11 @@
  */
 package org.jbake.app;
 
+import com.arcadedb.GlobalConfiguration;
 import com.arcadedb.database.Database;
 import com.arcadedb.database.DatabaseFactory;
 import com.arcadedb.database.MutableDocument;
+import com.arcadedb.engine.Bucket;
 import com.arcadedb.query.sql.executor.ResultSet;
 import com.arcadedb.schema.DocumentType;
 import com.arcadedb.schema.Type;
@@ -73,8 +75,10 @@ public class ContentStore {
     public ContentStore(final String type, String name) {
         this.type = type;
         this.name = name;
-    }
 
+        // USE A 4X BIGGER PAGE THAN THE DEFAULT
+        GlobalConfiguration.BUCKET_DEFAULT_PAGE_SIZE.setValue(Bucket.DEF_PAGE_SIZE * 4);
+    }
 
     public void startup() {
         factory = new DatabaseFactory(name);
@@ -110,7 +114,6 @@ public class ContentStore {
     }
 
     public final void updateSchema() {
-
         com.arcadedb.schema.Schema schema = db.getSchema();
 
         if (!schema.existsType(Schema.DOCUMENTS)) {
@@ -362,8 +365,8 @@ public class ContentStore {
         return true;
     }
 
-    public void addDocument(DocumentModel document) {
-        MutableDocument doc = db.newDocument(Schema.DOCUMENTS);
+    public void addDocument(final DocumentModel document) {
+        final MutableDocument doc = db.newDocument(Schema.DOCUMENTS);
         doc.fromMap(document);
         doc.save();
     }
