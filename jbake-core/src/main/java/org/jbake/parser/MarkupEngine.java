@@ -18,10 +18,14 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
+import java.util.*;
+
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering
@@ -36,6 +40,7 @@ public abstract class MarkupEngine implements ParserEngine {
     private static final String UTF_8_BOM = "\uFEFF";
 
     private JBakeConfiguration configuration;
+    private List<DateTimeFormatter> dateTimeFormatters;
 
     /**
      * Tests if this markup engine can process the document.
@@ -151,7 +156,7 @@ public abstract class MarkupEngine implements ParserEngine {
 
     private void setModelDefaultsIfNotSetInHeader(ParserContext context) {
         if (context.getDate() == null) {
-            context.setDate(new Date(context.getFile().lastModified()));
+            context.setDate( Instant.ofEpochMilli(context.getFile().lastModified()));
         }
 
         // default status has been set
@@ -278,11 +283,30 @@ public abstract class MarkupEngine implements ParserEngine {
         String value = sanitize(inputValue);
 
         if (key.equalsIgnoreCase(ModelAttributes.DATE)) {
-            DateFormat df = new SimpleDateFormat(configuration.getDateFormat());
-            try {
-                Date date = df.parse(value);
-                content.setDate(date);
-            } catch (ParseException e) {
+            boolean dateIsSet = false;
+
+            for (DateTimeFormatter formatter : getFormatters()) {
+                try {
+                    final TemporalAccessor parse = formatter.parse(value);
+                    if (parse instanceof Instant) {
+                        content.setDate((Instant) parse);
+                    } else if (parse instanceof LocalDateTime) {
+                        final LocalDateTime localDateTime = (LocalDateTime) parse;
+                        content.setDate(localDateTime.toInstant(ZoneOffset.UTC));
+                    } else if (parse instanceof LocalDate) {
+                        final LocalDate localDate = (LocalDate) parse;
+                        final Instant instant = localDate.atStartOfDay(ZoneId.of("UTF")).toInstant();
+                        content.setDate(instant);
+                    }
+
+                    dateIsSet = true;
+                    break;
+                } catch (DateTimeParseException dateTimeParseException) {
+                    // try next
+                }
+            }
+
+            if (!dateIsSet) {
                 LOGGER.error("unable to parse date {}", value);
             }
         } else if (key.equalsIgnoreCase(ModelAttributes.TAGS)) {
@@ -295,6 +319,21 @@ public abstract class MarkupEngine implements ParserEngine {
             content.put(key, value);
         }
 
+    }
+
+    private List<DateTimeFormatter> getFormatters() {
+        if (this.dateTimeFormatters == null) {
+            List<DateTimeFormatter> formatters = new ArrayList<>();
+            formatters.add(DateTimeFormatter.ofPattern(configuration.getDateFormat()));
+            formatters.add(DateTimeFormatter.ISO_DATE_TIME);
+            formatters.add(DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.of("UTC")));
+            formatters.add(DateTimeFormatter.ISO_DATE);
+            formatters.add(DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.of("UTC")));
+
+            this.dateTimeFormatters = unmodifiableList(formatters);
+        }
+
+        return this.dateTimeFormatters;
     }
 
     private String sanitize(String part) {

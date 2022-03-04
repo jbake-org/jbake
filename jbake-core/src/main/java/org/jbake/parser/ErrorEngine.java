@@ -2,7 +2,7 @@ package org.jbake.parser;
 
 import org.jbake.model.DocumentModel;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * An internal rendering engine used to notify the user that the markup format he used requires an engine that couldn't
@@ -27,7 +27,7 @@ public class ErrorEngine extends MarkupEngine {
         documentModel.setType("post");
         documentModel.setStatus("published");
         documentModel.setTitle("Rendering engine missing");
-        documentModel.setDate(new Date());
+        documentModel.setDate(Instant.now());
         documentModel.setTags(new String[0]);
     }
 

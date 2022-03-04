@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.BeforeClass;
 
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -59,13 +60,13 @@ public class PaginationTest extends ContentStoreIntegrationTest {
     public void testPagination() {
         final int TOTAL_POSTS = 5;
         final int PER_PAGE = 2;
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        Instant instant = Instant.now();
         for (int i = 1; i <= TOTAL_POSTS; i++) {
-            cal.add(Calendar.SECOND, 5);
+            instant = instant.plusSeconds(5L);
             FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
             builder.withCached(true)
                     .withStatus("published")
-                    .withDate(cal.getTime())
+                    .withDate(instant)
                     .build();
         }
 

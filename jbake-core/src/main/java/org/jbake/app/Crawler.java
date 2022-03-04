@@ -17,9 +17,8 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * Crawls a file system looking for content.
@@ -294,7 +293,7 @@ public class Crawler {
 
         if (document.getStatus().equals(ModelAttributes.Status.PUBLISHED_DATE)
                 && (document.getDate() != null)
-                && new Date().after(document.getDate())) {
+                && Instant.now().isAfter(document.getDate())) {
             document.setStatus(ModelAttributes.Status.PUBLISHED);
         }
 

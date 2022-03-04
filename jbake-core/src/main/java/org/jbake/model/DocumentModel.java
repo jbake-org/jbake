@@ -2,7 +2,7 @@ package org.jbake.model;
 
 import org.jbake.app.DBUtil;
 
-import java.util.Date;
+import java.time.Instant;
 
 public class DocumentModel extends BaseModel {
 
@@ -21,11 +21,11 @@ public class DocumentModel extends BaseModel {
         put(ModelAttributes.BODY, body);
     }
 
-    public Date getDate() {
-        return (Date) get(ModelAttributes.DATE);
+    public Instant getDate() {
+        return (Instant) get(ModelAttributes.DATE);
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         put(ModelAttributes.DATE, date);
     }
 

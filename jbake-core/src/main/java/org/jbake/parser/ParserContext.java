@@ -4,7 +4,7 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
 
 import java.io.File;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 public class ParserContext {
@@ -55,11 +55,11 @@ public class ParserContext {
         documentModel.setBody(str);
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return getDocumentModel().getDate();
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         getDocumentModel().setDate(date);
     }
 

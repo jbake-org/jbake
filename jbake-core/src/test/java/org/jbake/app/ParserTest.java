@@ -15,6 +15,10 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -216,11 +220,10 @@ public class ParserTest {
         Assert.assertEquals("post", documentModel.getType());
         Assert.assertEquals("This is a Title = This is a valid Title", documentModel.getTitle());
         Assert.assertNotNull(documentModel.getDate());
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(documentModel.getDate());
-        Assert.assertEquals(8, cal.get(Calendar.MONTH));
-        Assert.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH));
-        Assert.assertEquals(2013, cal.get(Calendar.YEAR));
+        final ZonedDateTime dateTime = documentModel.getDate().atZone(ZoneId.of("UTC"));
+        Assert.assertEquals(2013, dateTime.get(ChronoField.YEAR));
+        Assert.assertEquals(2, dateTime.get(ChronoField.DAY_OF_MONTH));
+        Assert.assertEquals(8, dateTime.get(ChronoField.MONTH_OF_YEAR));
 
     }
 

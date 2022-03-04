@@ -19,8 +19,8 @@ import org.jbake.template.model.TemplateModel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,14 +87,14 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
     }
 
     public static class FormatHelper {
-        private final Map<String, SimpleDateFormat> formatters = new HashMap<>();
+        private final Map<String, DateTimeFormatter> formatters = new HashMap<>();
 
-        public String format(Date date, String pattern) {
+        public String format(Instant date, String pattern) {
             if (date != null && pattern != null) {
-                SimpleDateFormat df = formatters.get(pattern);
+                DateTimeFormatter df = formatters.get(pattern);
 
                 if (df == null) {
-                    df = new SimpleDateFormat(pattern);
+                    df = DateTimeFormatter.ofPattern(pattern);
                     formatters.put(pattern, df);
                 }
 

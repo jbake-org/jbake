@@ -6,7 +6,7 @@ import org.jbake.model.DocumentModel;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Random;
 
 public class FakeDocumentBuilder {
@@ -33,14 +33,14 @@ public class FakeDocumentBuilder {
         return this;
     }
 
-    public FakeDocumentBuilder withDate(Date date) {
+    public FakeDocumentBuilder withDate(Instant date) {
         fileModel.setDate(date);
         hasDate = true;
         return this;
     }
 
     private FakeDocumentBuilder withCurrentDate() {
-        fileModel.setDate(new Date());
+        fileModel.setDate(Instant.now());
         return this;
     }
 

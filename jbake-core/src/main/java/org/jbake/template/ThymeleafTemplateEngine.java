@@ -15,7 +15,7 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 
 import java.io.File;
 import java.io.Writer;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -137,10 +137,10 @@ public class ThymeleafTemplateEngine extends AbstractTemplateEngine {
                                 }
                             };
                         } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
-                            return new LazyContextVariable<Date>() {
+                            return new LazyContextVariable<Instant>() {
                                 @Override
-                                protected Date loadValue() {
-                                    return (Date) extractedValue;
+                                protected Instant loadValue() {
+                                    return (Instant) extractedValue;
                                 }
                             };
                         } else {
