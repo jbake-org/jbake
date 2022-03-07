@@ -44,6 +44,8 @@ jobs:
                   JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
                   JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
                   JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+                  JRELEASER_SDKMAN_CONSUMER_KEY: ${{ secrets.SDKMAN_CONSUMER_KEY }}
+                  JRELEASER_SDKMAN_CONSUMER_TOKEN: ${{ secrets.SDKMAN_CONSUMER_TOKEN }}
 
             - name: JReleaser output
               if: always()
