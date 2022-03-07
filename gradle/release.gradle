@@ -49,9 +49,11 @@ jreleaser {
             }
             artifact {
                 path = 'build/distributions/{{distributionName}}-{{projectVersion}}-bin.zip'
+                transform = '{{distributionName}}/{{distributionName}}-{{projectEffectiveVersion}}-bin.zip'
             }
             artifact {
                 path = 'build/distributions/{{distributionName}}-{{projectVersion}}.tar'
+                transform = '{{distributionName}}/{{distributionName}}-{{projectEffectiveVersion}}.tar'
             }
         }
     }
