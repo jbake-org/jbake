@@ -54,7 +54,11 @@ public class DirWatcher {
   }
 
   private void onUpdated() {
-    changeQueue.add(Long.valueOf(System.currentTimeMillis()));
+    try {
+      changeQueue.put(Long.valueOf(System.currentTimeMillis()));
+    } catch (InterruptedException iex) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**
