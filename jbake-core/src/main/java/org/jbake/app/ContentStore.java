@@ -32,10 +32,8 @@ import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.launcher.SystemExit;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
@@ -408,9 +406,9 @@ public class ContentStore {
     }
 
     public void addDocument(DocumentModel document) {
-        ODocument doc = new ODocument(Schema.DOCUMENTS);
-        doc.fromMap(document);
-        doc.save();
+        OElement element = db.newElement(Schema.DOCUMENTS);
+        document.forEach((k, v) -> element.setProperty(k, v, OType.ANY));
+        element.save();
     }
 
     protected abstract class Schema {
