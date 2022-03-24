@@ -14,7 +14,7 @@ RUN set -o errexit -o nounset \
     && cp -r jbake-dist/build/install/jbake/* $JBAKE_HOME \
     && rm -r ~/.gradle /usr/src/jbake
 
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM eclipse-temurin:11-jre-alpine
 
 ENV JBAKE_USER=jbake
 ENV JBAKE_HOME=/opt/jbake
