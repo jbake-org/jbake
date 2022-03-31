@@ -57,11 +57,9 @@ dependencies {
 }
 
 processResources {
-    from("src/main/resources") {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        include 'default.properties'
+    filesMatching("default.properties") {
         expand jbakeVersion: project.version,
-               timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
-               gitHash: grgit.head().abbreviatedId
+            timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
+            gitHash: grgit.head().abbreviatedId
     }
 }
