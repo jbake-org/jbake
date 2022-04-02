@@ -1,10 +1,10 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.sql.executor.OResult;
-import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import com.arcadedb.query.sql.executor.Result;
+import com.arcadedb.query.sql.executor.ResultSet;
 import org.jbake.model.DocumentModel;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Wraps an OrientDB document iterator into a model usable by
@@ -14,10 +14,10 @@ import java.util.LinkedList;
  */
 public class DocumentList<T> extends LinkedList<T> {
 
-    public static DocumentList<DocumentModel> wrap(OResultSet docs) {
+    public static DocumentList<DocumentModel> wrap(ResultSet docs) {
         DocumentList<DocumentModel> list = new DocumentList<>();
         while (docs.hasNext()) {
-            OResult next = docs.next();
+            Result next = docs.next();
             list.add(DBUtil.documentToModel(next));
         }
         docs.close();

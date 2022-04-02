@@ -23,29 +23,22 @@
  */
 package org.jbake.app;
 
-import com.orientechnologies.common.log.OLogManager;
-import com.orientechnologies.orient.core.Orient;
-import com.orientechnologies.orient.core.db.ODatabaseSession;
-import com.orientechnologies.orient.core.db.ODatabaseType;
-import com.orientechnologies.orient.core.db.OrientDB;
-import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import org.jbake.launcher.SystemExit;
+import com.arcadedb.GlobalConfiguration;
+import com.arcadedb.database.Database;
+import com.arcadedb.database.DatabaseFactory;
+import com.arcadedb.database.MutableDocument;
+import com.arcadedb.engine.Bucket;
+import com.arcadedb.query.sql.executor.ResultSet;
+import com.arcadedb.schema.DocumentType;
+import com.arcadedb.schema.Type;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author jdlee
@@ -73,33 +66,29 @@ public class ContentStore {
     private final String type;
     private final String name;
 
-    private ODatabaseSession db;
+    private Database db;
 
-    private long start = -1;
-    private long limit = -1;
-    private OrientDB orient;
+    private long            start = -1;
+    private long            limit = -1;
+    private DatabaseFactory factory;
 
     public ContentStore(final String type, String name) {
         this.type = type;
         this.name = name;
+
+        // USE A 4X BIGGER PAGE THAN THE DEFAULT
+        GlobalConfiguration.BUCKET_DEFAULT_PAGE_SIZE.setValue(Bucket.DEF_PAGE_SIZE * 4);
     }
 
-
     public void startup() {
-        startupIfEnginesAreMissing();
+        factory = new DatabaseFactory(name);
 
-        if (type.equalsIgnoreCase(ODatabaseType.PLOCAL.name())) {
-            orient = new OrientDB(type + ":" + name, OrientDBConfig.defaultConfig());
-        } else {
-            orient = new OrientDB(type + ":", OrientDBConfig.defaultConfig());
-        }
+        if( !factory.exists() )
+            db = factory.create();
+        else
+            db = factory.open();
 
-        orient.createIfNotExists(name, ODatabaseType.valueOf(type.toUpperCase()));
-
-        db = orient.open(name, "admin", "admin");
-
-        activateOnCurrentThread();
-
+        db.setAutoTransaction(true);
         updateSchema();
     }
 
@@ -125,65 +114,37 @@ public class ContentStore {
     }
 
     public final void updateSchema() {
+        com.arcadedb.schema.Schema schema = db.getSchema();
 
-        OSchema schema = db.getMetadata().getSchema();
-
-        if (!schema.existsClass(Schema.DOCUMENTS)) {
+        if (!schema.existsType(Schema.DOCUMENTS)) {
             createDocType(schema);
         }
-        if (!schema.existsClass(Schema.SIGNATURES)) {
+        if (!schema.existsType(Schema.SIGNATURES)) {
             createSignatureType(schema);
         }
     }
 
     public void close() {
         if (db != null) {
-            activateOnCurrentThread();
             db.close();
         }
 
-        if (orient != null) {
-            orient.close();
+        if (factory != null) {
+            factory.close();
         }
         DBUtil.closeDataStore();
     }
 
     public void shutdown() {
-
-//        Orient.instance().shutdown();
-    }
-
-    private void startupIfEnginesAreMissing() {
-        // Using a jdk which doesn't bundle a javascript engine
-        // throws a NoClassDefFoundError while logging the warning
-        // see https://github.com/orientechnologies/orientdb/issues/5855
-        OLogManager.instance().setWarnEnabled(false);
-
-        // If an instance of Orient was previously shutdown all engines are removed.
-        // We need to startup Orient again.
-        if (Orient.instance().getEngines().isEmpty()) {
-            Orient.instance().startup();
-        }
-        OLogManager.instance().setWarnEnabled(true);
+        close();
     }
 
     public void drop() {
-        activateOnCurrentThread();
-//        db.drop();
-
-        orient.drop(name);
-    }
-
-    private void activateOnCurrentThread() {
-        if (db != null) {
-            db.activateOnCurrentThread();
-        } else {
-            System.out.println("db is null on activate");
-        }
+        if( db != null)
+            db.drop();
     }
 
     public long getDocumentCount(String docType) {
-        activateOnCurrentThread();
         String statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType);
         return (long) query(statement).get(0).get("count");
     }
@@ -291,20 +252,17 @@ public class ContentStore {
     }
 
     private DocumentList<DocumentModel> query(String sql) {
-        activateOnCurrentThread();
-        OResultSet results = db.query(sql);
+        ResultSet results = db.query("sql", sql);
         return DocumentList.wrap(results);
     }
 
     private DocumentList<DocumentModel> query(String sql, Object... args) {
-        activateOnCurrentThread();
-        OResultSet results = db.command(sql, args);
+        ResultSet results = db.command("sql", sql, args);
         return DocumentList.wrap(results);
     }
 
     private void executeCommand(String query, Object... args) {
-        activateOnCurrentThread();
-        db.command(query, args);
+        db.command("sql", query, args);
     }
 
     public Set<String> getTags() {
@@ -330,29 +288,29 @@ public class ContentStore {
         return result;
     }
 
-    private void createDocType(final OSchema schema) {
+    private void createDocType(final com.arcadedb.schema.Schema schema) {
         logger.debug("Create document class");
 
-        OClass page = schema.createClass(Schema.DOCUMENTS);
-        page.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1);
-        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI);
-        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED);
-        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED);
-        page.createProperty(ModelAttributes.STATUS, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS);
-        page.createProperty(ModelAttributes.TYPE, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE);
+        DocumentType page = schema.createDocumentType(Schema.DOCUMENTS);
+        page.createProperty(ModelAttributes.SHA1, Type.STRING);
+        page.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE,false, ModelAttributes.SHA1);
+        page.createProperty(ModelAttributes.SOURCE_URI, Type.STRING);
+        page.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE, true,  ModelAttributes.SOURCE_URI);
+        page.createProperty(ModelAttributes.CACHED, Type.BOOLEAN);
+        page.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE, false, ModelAttributes.CACHED);
+        page.createProperty(ModelAttributes.RENDERED, Type.BOOLEAN);
+        page.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE, false, ModelAttributes.RENDERED);
+        page.createProperty(ModelAttributes.STATUS, Type.STRING);
+        page.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE, false, ModelAttributes.STATUS);
+        page.createProperty(ModelAttributes.TYPE, Type.STRING);
+        page.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE, false, ModelAttributes.TYPE);
 
     }
 
-    private void createSignatureType(OSchema schema) {
-        OClass signatures = schema.createClass(Schema.SIGNATURES);
-        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
+    private void createSignatureType(com.arcadedb.schema.Schema schema) {
+        DocumentType signatures = schema.createDocumentType(Schema.SIGNATURES);
+        signatures.createProperty(ModelAttributes.SHA1, Type.STRING);
+        signatures.createTypeIndex(com.arcadedb.schema.Schema.INDEX_TYPE.LSM_TREE, true, ModelAttributes.SHA1);
     }
 
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
@@ -404,11 +362,11 @@ public class ContentStore {
     }
 
     public boolean isActive() {
-        return db.isActiveOnCurrentThread();
+        return true;
     }
 
-    public void addDocument(DocumentModel document) {
-        ODocument doc = new ODocument(Schema.DOCUMENTS);
+    public void addDocument(final DocumentModel document) {
+        final MutableDocument doc = db.newDocument(Schema.DOCUMENTS);
         doc.fromMap(document);
         doc.save();
     }
