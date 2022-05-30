@@ -1,0 +1,23 @@
+authors:
+
+    John Smith:
+        first_name: John
+        last_name: Smith
+        twitter: "@jsmith"
+        facebook: "https://www.facebook.com/jsmith"
+
+    Jane Smith:
+        first_name: Jane
+        last_name: Smith
+        twitter: "@janesmith"
+
+    Joe Bloggs:
+        first_name: Joe
+        last_name: Bloggs
+        twitter: "@jblogs"
+
+    Tom Harry:
+        first_name: Tom
+        last_name: Harry
+        twitter: "@tharry"
+        facebook: "https://www.facebook.com/tharry"

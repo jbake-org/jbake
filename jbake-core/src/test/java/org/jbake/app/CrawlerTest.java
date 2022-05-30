@@ -1,5 +1,6 @@
 package org.jbake.app;
 
+import com.orientechnologies.orient.core.db.record.OTrackedMap;
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -12,6 +13,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,12 +62,21 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         DocumentTypes.addDocumentType(config.getDataFileDocType());
         db.updateSchema();
         crawler.crawlDataFiles();
-        Assert.assertEquals(1, db.getDocumentCount("data"));
+        Assert.assertEquals(2, db.getDocumentCount("data"));
 
-        DataFileUtil util = new DataFileUtil(db, "data");
-        Map<String, Object> data = util.get("videos.yaml");
-        Assert.assertFalse(data.isEmpty());
-        Assert.assertNotNull(data.get("data"));
+        DataFileUtil dataFileUtil = new DataFileUtil(db, "data");
+        Map<String, Object> videos = dataFileUtil.get("videos.yaml");
+        Assert.assertFalse(videos.isEmpty());
+        Assert.assertNotNull(videos.get("data"));
+
+        // regression test for issue 747
+        Map<String, Object> authorsFileContents = dataFileUtil.get("authors.yaml");
+        Assert.assertFalse(authorsFileContents.isEmpty());
+        Object authorsList = authorsFileContents.get("authors");
+        assertThat(authorsList).isNotInstanceOf(OTrackedMap.class);
+        assertThat(authorsList).isInstanceOf(LinkedHashMap.class);
+        LinkedHashMap<String, Map<String, Object>> authors = (LinkedHashMap<String, Map<String, Object>>) authorsList;
+        assertThat(authors.get("Joe Bloggs").get("last_name")).isEqualTo("Bloggs");
     }
 
     @Test
