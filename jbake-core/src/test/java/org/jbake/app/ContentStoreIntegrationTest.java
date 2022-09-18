@@ -34,7 +34,8 @@ public abstract class ContentStoreIntegrationTest {
 
         Assert.assertEquals(".html", config.getOutputExtension());
         config.setDatabaseStore(storageType.toString());
-        String dbPath = folder.newFolder("documents" + System.currentTimeMillis()).getAbsolutePath();
+        // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
+        String dbPath = folder.newFolder("documents" + System.currentTimeMillis()).getName();
 
         // setting the database path with a colon creates an invalid url for OrientDB.
         // only one colon is expected. there is no documentation about proper url path for windows available :(

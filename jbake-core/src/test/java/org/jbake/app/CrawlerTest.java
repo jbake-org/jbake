@@ -74,8 +74,8 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Assert.assertFalse(authorsFileContents.isEmpty());
         Object authorsList = authorsFileContents.get("authors");
         assertThat(authorsList).isNotInstanceOf(OTrackedMap.class);
-        assertThat(authorsList).isInstanceOf(LinkedHashMap.class);
-        LinkedHashMap<String, Map<String, Object>> authors = (LinkedHashMap<String, Map<String, Object>>) authorsList;
+        assertThat(authorsList).isInstanceOf(HashMap.class);
+        HashMap<String, Map<String, Object>> authors = (HashMap<String, Map<String, Object>>) authorsList;
         assertThat(authors.get("Joe Bloggs").get("last_name")).isEqualTo("Bloggs");
     }
 
