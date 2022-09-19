@@ -34,7 +34,7 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-gradlew-
             - name: Build
-              run: ./gradlew build -S
+              run: ./gradlew -Dfile.encoding=UTF-8 build -S
 
             - name: Upload Reports
               uses: actions/upload-artifact@v1
