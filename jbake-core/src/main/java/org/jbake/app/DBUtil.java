@@ -6,6 +6,8 @@ import com.orientechnologies.orient.core.sql.executor.OResult;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
 
+import java.util.ArrayList;
+
 public class DBUtil {
     private static ContentStore contentStore;
 
@@ -55,6 +57,9 @@ public class DBUtil {
             return (String[]) entry;
         } else if (entry instanceof OTrackedList) {
             OTrackedList<String> list = (OTrackedList<String>) entry;
+            return list.toArray(new String[list.size()]);
+        } else if (entry instanceof ArrayList) {
+            ArrayList<String> list = (ArrayList<String>) entry;
             return list.toArray(new String[list.size()]);
         }
         return new String[0];

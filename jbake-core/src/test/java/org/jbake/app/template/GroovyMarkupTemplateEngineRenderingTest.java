@@ -19,14 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
 
-    @BeforeClass
-    public static void setUpTest() {
-        //switch to PLOCAL mode for this test class as Travis sometimes runs out of memory
-        db.close();
-        config.setDatabaseStore(StorageType.PLOCAL.toString());
-        db = DBUtil.createDataStore(config);
-    }
-
     public GroovyMarkupTemplateEngineRenderingTest() {
         super("groovyMarkupTemplates", "tpl");
 

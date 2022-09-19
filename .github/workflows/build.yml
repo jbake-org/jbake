@@ -33,7 +33,12 @@ jobs:
                   key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
                   restore-keys: |
                       ${{ runner.os }}-gradlew-
-            - name: Build
+            - name: Build-win
+              if: runner.os == 'Windows'
+              shell: cmd
+              run: gradlew.bat -Dfile.encoding=UTF-8 build -S
+            - name: Build-nix
+              if: runner.os != 'Windows'
               run: ./gradlew build -S
 
             - name: Upload Reports
