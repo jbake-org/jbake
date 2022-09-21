@@ -10,6 +10,7 @@ mavenPlugin {
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
+apply from: "$rootDir/gradle/signing.gradle"
 
 publishing {
     publications {

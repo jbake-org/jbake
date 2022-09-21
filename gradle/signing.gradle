@@ -1,0 +1,15 @@
+if ( !project.hasProperty('skipSigning') ) {
+    apply plugin: 'signing'
+
+    if (!signing.signatory) {
+        logger.warn "No Signatory configured for project $project.name. Skip signing! See https://docs.gradle.org/current/userguide/signing_plugin.html"
+        ext.skipSigning = true
+    }
+    else {
+        if ( project.name != "jbake-dist" ) {
+            signing {
+                sign publishing.publications.mavenJava
+            }
+        }
+    }
+}
