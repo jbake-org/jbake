@@ -73,7 +73,7 @@ public interface JBakeConfiguration {
     String getBuildTimeStamp();
 
     /**
-     * @return Flag indicating to flash the database cache
+     * @return Flag indicating to flush the database cache
      */
     boolean getClearCache();
 
@@ -274,7 +274,7 @@ public interface JBakeConfiguration {
     int getServerPort();
 
     /**
-     * @return the host url of the site e.g. http://jbake.org
+     * @return the host url of the site e.g. https://jbake.org
      */
     String getSiteHost();
 
