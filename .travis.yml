@@ -26,9 +26,10 @@ jobs:
   - os: osx
     osx_image: xcode13.2 # defaults to openjdk17
 
-  - os: osx
-    osx_image: xcode9.4
-    jdk: openjdk11
+# below config fails
+#  - os: osx
+#    osx_image: xcode9.4
+#    jdk: openjdk11
 
 #  - stage: Quality Check
 #    name: sonarqube
