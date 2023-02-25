@@ -28,9 +28,7 @@ jobs:
 
   - os: osx
     osx_image: xcode9.4
-    script:
-        - jdk_switcher use openjdk11
-        - "./gradlew check --stacktrace"
+    jdk: openjdk11
 
 #  - stage: Quality Check
 #    name: sonarqube
