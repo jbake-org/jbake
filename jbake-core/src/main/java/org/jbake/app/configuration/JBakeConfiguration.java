@@ -340,7 +340,7 @@ public interface JBakeConfiguration {
     String getVersion();
 
     /**
-     * Set a property value for the given key
+     * Set a property value for the given key.
      *
      * @param key   the key for the property
      * @param value the value of the property
@@ -378,6 +378,10 @@ public interface JBakeConfiguration {
 
     List<Property> getJbakeProperties();
 
+    /**
+     * Adds another configuration whose properties take precedence over the ones already set.
+     * @param properties
+     */
     void addConfiguration(Properties properties);
 }
 
