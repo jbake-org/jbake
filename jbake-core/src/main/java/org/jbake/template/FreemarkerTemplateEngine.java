@@ -24,6 +24,7 @@ import org.jbake.util.DataFileUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 
@@ -60,6 +61,7 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        templateCfg.setObjectWrapper(new FreemarkerJava8ObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS));
     }
 
     @Override
@@ -113,7 +115,11 @@ public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
                         if (key.equals(ModelAttributes.ALLTAGS)) {
                             return new SimpleCollection((Collection) extractedValue, wrapper);
                         } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
-                            return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
+                            final Instant publishedDate = (Instant) extractedValue;
+                            return new SimpleDate(Date.from(publishedDate), TemplateDateModel.DATETIME);
+                        } else if (key.equals(ModelAttributes.DATE)) {
+                            final Instant date = (Instant) extractedValue;
+                            return new SimpleDate(Date.from(date), TemplateDateModel.DATETIME);
                         } else {
                             // All other cases, as far as I know, are document collections
                             return new SimpleSequence((Collection) extractedValue, wrapper);

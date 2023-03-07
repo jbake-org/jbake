@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -155,7 +155,7 @@ public class Oven {
 
         try {
 
-            final long start = new Date().getTime();
+            final Instant start = Instant.now();
             LOGGER.info("Baking has started...");
             contentStore.startup();
             updateDocTypesFromConfiguration();
@@ -178,8 +178,8 @@ public class Oven {
             errors.addAll(asset.getErrors());
 
             LOGGER.info("Baking finished!");
-            long end = new Date().getTime();
-            LOGGER.info("Baked {} items in {}ms", renderedCount, end - start);
+            Instant end = Instant.now();
+            LOGGER.info("Baked {} items in {}ms", renderedCount, end.toEpochMilli() - start.toEpochMilli());
             if (!errors.isEmpty()) {
                 LOGGER.error("Failed to bake {} item(s)!", errors.size());
             }

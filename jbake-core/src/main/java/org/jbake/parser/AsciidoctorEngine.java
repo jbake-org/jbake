@@ -108,7 +108,8 @@ public class AsciidoctorEngine extends MarkupEngine {
                 DateFormat df = new SimpleDateFormat(dateFormat);
                 try {
                     Date date = df.parse((String) value);
-                    context.setDate(date);
+                    // TODO: COPY FROM MARKUPENGINE
+                    context.setDate(date.toInstant());
                 } catch (ParseException e) {
                     LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
                 }

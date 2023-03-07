@@ -6,8 +6,8 @@ import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes.Status;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +48,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         DocumentModel model = DocumentModel.createDefaultDocumentModel();
         model.setType(typeWithHyphen);
         model.setTags(new String[]{tagWithHyphenBackslashAndBacktick});
-        model.setDate(new Date());
+        model.setDate(Instant.now());
         model.setSourceUri(uri);
         model.put("foo", "originalValue");
 
