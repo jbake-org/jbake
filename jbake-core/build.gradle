@@ -39,6 +39,7 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
+    implementation "org.reflections:reflections:$reflectionsVersion"
     api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
     api "org.codehaus.groovy:groovy:$groovyVersion", optional
     api "org.codehaus.groovy:groovy-templates:$groovyVersion", optional

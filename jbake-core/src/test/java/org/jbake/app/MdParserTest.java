@@ -68,6 +68,8 @@ public class MdParserTest {
     private File mdTasklistitems;
 
     private File mdExtanchorlinks;
+    
+    private File mdFootnote;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -228,6 +230,16 @@ public class MdParserTest {
         out.println(validHeader);
         out.println("# header & some *formatting* ~~chars~~");
         out.close();
+        
+        mdFootnote = folder.newFile("mdFootnote.md");
+        out = new PrintWriter(mdFootnote);
+        out.println(validHeader);
+        out.println("Paragraph with a footnote reference[^1]");
+        out.println("");
+        out.println("[^1]: Footnote text added at the bottom of the document");
+        out.close();
+        
+        
     }
 
     @Test
@@ -665,6 +677,37 @@ public class MdParserTest {
         documentModel = parser.processFile(mdExtanchorlinks);
         Assert.assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>");
+    }
+    
+    @Test
+    public void parseValidMdFileFootnoteExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Footnote");
+
+        // Test with Footnote
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdFootnote);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<sup id=\"fnref-1\"><a class=\"footnote-ref\" href=\"#fn-1\">1</a>");
+        
+        assertThat(documentModel.getBody()).contains(
+        		"<div class=\"footnotes\">\n" + 
+        		"<hr />\n" +
+                "<ol>\n" + 
+                "<li id=\"fn-1\">\n" + 
+                "<p>Footnote text added at the bottom of the document</p>\n" +
+                "<a href=\"#fnref-1\" class=\"footnote-backref\">&#8617;</a>\n" +
+                "</li>\n" +
+                "</ol>\n" + 
+                "</div>"
+        );
+
+        // Test without Footnote
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdFootnote);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("Paragraph with a footnote reference[^1]");
     }
 
 
