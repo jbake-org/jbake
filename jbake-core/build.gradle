@@ -48,6 +48,7 @@ dependencies {
     api "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
     api "de.neuland-bfi:jade4j:$jade4jVersion", optional
     api "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion", optional
     api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     api "io.pebbletemplates:pebble:$pebbleVersion", optional
     implementation "org.jsoup:jsoup:$jsoupVersion"

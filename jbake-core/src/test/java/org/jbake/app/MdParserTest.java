@@ -71,6 +71,8 @@ public class MdParserTest {
     
     private File mdFootnote;
 
+    private File mdAttributes;
+
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
     private String invalidHeader = "title=Title\n~~~~~~";
@@ -239,6 +241,12 @@ public class MdParserTest {
         out.println("[^1]: Footnote text added at the bottom of the document");
         out.close();
         
+        mdAttributes = folder.newFile("mdAttributes.md");
+        out = new PrintWriter(mdAttributes);
+        out.println(validHeader);
+        out.println("Paragraph with a **bold**{#IdForThisBold} reference{.test}");
+        out.println("![an image](images/nothing.jpg){width='250px' height='100px'}");
+        out.close();
         
     }
 
@@ -711,4 +719,26 @@ public class MdParserTest {
     }
 
 
+    @Test
+    public void parseValidMdFileAttributesExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+
+        // Test with attributes
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+
+        // Test without attributes
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>Paragraph with a <strong>bold</strong>{#IdForThisBold} reference{.test}");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" />{width='250px' height='100px'}");
+    }
+    
 }
