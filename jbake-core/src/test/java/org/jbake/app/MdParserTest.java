@@ -72,6 +72,8 @@ public class MdParserTest {
     private File mdFootnote;
 
     private File mdAttributes;
+    
+    private File mdAdmonition;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -246,6 +248,17 @@ public class MdParserTest {
         out.println(validHeader);
         out.println("Paragraph with a **bold**{#IdForThisBold} reference{.test}");
         out.println("![an image](images/nothing.jpg){width='250px' height='100px'}");
+        out.close();
+        
+        mdAdmonition = folder.newFile("mdAdmonition.md");
+        out = new PrintWriter(mdAdmonition);
+        out.println(validHeader);
+        out.println("!!! caution \"Optional Title\"\n" +
+        		"    block content sideBar with header\n");
+        out.println("??? example \"Optional Title\"\n" + 
+        		"    collapsible block content close by default\n");
+        out.println(" !!! danger \"\"\n" + 
+        		"        **danger** block content (without title)\n");
         out.close();
         
     }
@@ -718,7 +731,6 @@ public class MdParserTest {
         assertThat(documentModel.getBody()).contains("Paragraph with a footnote reference[^1]");
     }
 
-
     @Test
     public void parseValidMdFileAttributesExtension() {
         config.setMarkdownExtensions("");
@@ -741,4 +753,40 @@ public class MdParserTest {
         assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" />{width='250px' height='100px'}");
     }
     
+    @Test
+    public void parseValidMdFileAdmonitionExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+
+        // Test with admonition
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+        assertThat(documentModel.getBody()).contains("<div class=\"adm-block adm-warning\">\n" +
+        		 "<div class=\"adm-heading\">\n" +
+        		 "<svg class=\"adm-icon\"><use xlink:href=\"#adm-warning\" /></svg><span>Optional Title</span>\n" +
+        		 "</div>\n" +
+        		 "<div class=\"adm-body\">\n" +
+        		 "<p>block content sideBar with header</p>");
+        assertThat(documentModel.getBody()).contains("<div class=\"adm-block adm-example adm-collapsed\">\n" +
+        		 "<div class=\"adm-heading\">\n" +
+        		 "<svg class=\"adm-icon\"><use xlink:href=\"#adm-example\" /></svg><span>Optional Title</span>\n" +
+        		 "</div>\n" + 
+        		 "<div class=\"adm-body\">\n" +
+        		 "<p>collapsible block content close by default</p>");
+        assertThat(documentModel.getBody()).contains("<div class=\"adm-block adm-danger\">\n" +
+        		 "<div class=\"adm-body\">\n" +
+        		 "<p><strong>danger</strong> block content (without title)</p>\n" +
+        		 "</div>");
+
+        // Test without admonition
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("!!! caution &quot;Optional Title&quot; block content sideBar with header");
+        assertThat(documentModel.getBody()).contains("??? example &quot;Optional Title&quot; collapsible block content close by default");
+        assertThat(documentModel.getBody()).contains("!!! danger &quot;&quot; <strong>danger</strong> block content (without title)");
+    }
 }
