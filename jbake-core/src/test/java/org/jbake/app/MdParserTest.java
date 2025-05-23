@@ -74,6 +74,8 @@ public class MdParserTest {
     private File mdAttributes;
     
     private File mdAdmonition;
+    
+    private File mdAsside;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -259,6 +261,14 @@ public class MdParserTest {
         		"    collapsible block content close by default\n");
         out.println(" !!! danger \"\"\n" + 
         		"        **danger** block content (without title)\n");
+        out.close();
+        
+        mdAsside = folder.newFile("mdAsside.md");
+        out = new PrintWriter(mdAsside);
+        out.println(validHeader);
+        out.println("Paragraph as intro\n");
+        out.println("| an asside block\n"+
+        			"| on multiple lines\n");
         out.close();
         
     }
@@ -789,4 +799,26 @@ public class MdParserTest {
         assertThat(documentModel.getBody()).contains("??? example &quot;Optional Title&quot; collapsible block content close by default");
         assertThat(documentModel.getBody()).contains("!!! danger &quot;&quot; <strong>danger</strong> block content (without title)");
     }
+    
+    @Test
+    public void parseValidMdFileAssideExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("aside");
+
+        // Test with Asside
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAsside);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<aside>\n"+ 
+        		"<p>an asside block on multiple lines</p>\n"+
+        		"</aside>\n");
+
+        // Test without Asside
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAsside);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("| an asside block | on multiple lines");
+    }
+    
 }
