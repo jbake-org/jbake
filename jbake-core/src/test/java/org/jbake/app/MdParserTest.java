@@ -78,6 +78,8 @@ public class MdParserTest {
     private File mdAsside;
     
     private File mdEmoji;
+    
+    private File mdEnumeratedReference;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -280,8 +282,31 @@ public class MdParserTest {
         		+ "and not mapped due to missing last space :mango:");
         out.close();
         
-        
-        
+        mdEnumeratedReference = folder.newFile("mdEnumeratedReference.md");
+        out = new PrintWriter(mdEnumeratedReference);
+        out.println(validHeader);
+        out.println("![Flexmark Icon Logo](https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png){#fig:test}\n"
+        		+ "[#fig:test]\n"
+        		+ "\n"
+        		+ "![Flexmark Icon Logo](https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png){#fig:test2}\n"
+        		+ "[#fig:test2]\n"
+        		+ "\n"
+        		+ "| heading | heading | heading |\n"
+        		+ "|---------|---------|---------|\n"
+        		+ "| data    | data    |         |\n"
+        		+ "[[#tbl:test] caption]\n"
+        		+ "{#tbl:test}\n"
+        		+ "\n"
+        		+ "See [@fig:test2]\n"
+        		+ "\n"
+        		+ "See [@fig:test]\n"
+        		+ "\n"
+        		+ "See [@tbl:test]\n"
+        		+ "\n"
+        		+ "[@tbl]: Table [#].\n"
+        		+ "\n"
+        		+ "[@fig]: Figure [#].");
+        out.close();
     }
 
     @Test
@@ -814,7 +839,7 @@ public class MdParserTest {
     @Test
     public void parseValidMdFileAssideExtension() {
         config.setMarkdownExtensions("");
-        config.setMarkdownExtensions("aside");
+        config.setMarkdownExtensions("Aside");
 
         // Test with Asside
         Parser parser = new Parser(config);
@@ -835,7 +860,7 @@ public class MdParserTest {
     @Test
     public void parseValidMdFileEmojiExtension() {
         config.setMarkdownExtensions("");
-        config.setMarkdownExtensions("emoji");
+        config.setMarkdownExtensions("Emoji");
 
         // Test with Asside
         Parser parser = new Parser(config);
@@ -852,4 +877,53 @@ public class MdParserTest {
         assertThat(documentModel.getBody()).contains("");
         
     }
+    
+    @Test
+    public void parseValidMdFilemdEnumeratedReferenceExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("EnumeratedReference,Attributes,TABLES");
+
+        // Test with EnumeratedReference
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEnumeratedReference);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test\" /> Figure 1.</p>\n"
+        		+ "<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test2\" /> Figure 2.</p>\n"
+        		+ "<table id=\"tbl:test\">\n"
+        		+ "<thead>\n"
+        		+ "<tr><th> heading </th><th> heading </th><th> heading </th></tr>\n"
+        		+ "</thead>\n"
+        		+ "<tbody>\n"
+        		+ "<tr><td> data    </td><td> data    </td><td>         </td></tr>\n"
+        		+ "</tbody>\n"
+        		+ "<caption>Table 1. caption</caption>\n"
+        		+ "</table>\n"
+        		+ "<p>See <a href=\"#fig:test2\" title=\"Figure 2.\">Figure 2.</a></p>\n"
+        		+ "<p>See <a href=\"#fig:test\" title=\"Figure 1.\">Figure 1.</a></p>\n"
+        		+ "<p>See <a href=\"#tbl:test\" title=\"Table 1.\">Table 1.</a></p>\n"
+        		);
+
+        // Test without EnumeratedReference
+        config.setMarkdownExtensions("Attributes,TABLES");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdEnumeratedReference);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test\" /> [#fig:test]</p>\n"
+        		+ "<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test2\" /> [#fig:test2]</p>\n"
+        		+ "<table id=\"tbl:test\">\n"
+        		+ "<thead>\n"
+        		+ "<tr><th> heading </th><th> heading </th><th> heading </th></tr>\n"
+        		+ "</thead>\n"
+        		+ "<tbody>\n"
+        		+ "<tr><td> data    </td><td> data    </td><td>         </td></tr>\n"
+        		+ "</tbody>\n"
+        		+ "<caption>[#tbl:test] caption</caption>\n"
+        		+ "</table>\n"
+        		+ "<p>See [@fig:test2]</p>\n"
+        		+ "<p>See [@fig:test]</p>\n"
+        		+ "<p>See [@tbl:test]</p>\n"
+        		+ "<p>[@tbl]: Table [#].</p>\n"
+        		+ "<p>[@fig]: Figure [#].</p>\n");
+    }
+    
 }
