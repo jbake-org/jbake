@@ -53,6 +53,7 @@ dependencies {
     api "com.vladsch.flexmark:flexmark-ext-aside:$flexmarkVersion", optional
     api "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion", optional
     api "com.vladsch.flexmark:flexmark-ext-enumerated-reference:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-gfm-issues:$flexmarkVersion", optional
     api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     api "io.pebbletemplates:pebble:$pebbleVersion", optional
     implementation "org.jsoup:jsoup:$jsoupVersion"

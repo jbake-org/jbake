@@ -80,6 +80,8 @@ public class MdParserTest {
     private File mdEmoji;
     
     private File mdEnumeratedReference;
+    
+    private File mdGfmIssues;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -235,13 +237,13 @@ public class MdParserTest {
         out.println("* [x] closed task item");
         out.close();
 
-        mdExtanchorlinks = folder.newFile("mdExtanchorlinks.md");
+        mdExtanchorlinks = folder.newFile("extanchorlinks.md");
         out = new PrintWriter(mdExtanchorlinks);
         out.println(validHeader);
         out.println("# header & some *formatting* ~~chars~~");
         out.close();
         
-        mdFootnote = folder.newFile("mdFootnote.md");
+        mdFootnote = folder.newFile("footnote.md");
         out = new PrintWriter(mdFootnote);
         out.println(validHeader);
         out.println("Paragraph with a footnote reference[^1]");
@@ -249,14 +251,14 @@ public class MdParserTest {
         out.println("[^1]: Footnote text added at the bottom of the document");
         out.close();
         
-        mdAttributes = folder.newFile("mdAttributes.md");
+        mdAttributes = folder.newFile("attributes.md");
         out = new PrintWriter(mdAttributes);
         out.println(validHeader);
         out.println("Paragraph with a **bold**{#IdForThisBold} reference{.test}");
         out.println("![an image](images/nothing.jpg){width='250px' height='100px'}");
         out.close();
         
-        mdAdmonition = folder.newFile("mdAdmonition.md");
+        mdAdmonition = folder.newFile("admonition.md");
         out = new PrintWriter(mdAdmonition);
         out.println(validHeader);
         out.println("!!! caution \"Optional Title\"\n" +
@@ -267,7 +269,7 @@ public class MdParserTest {
         		"        **danger** block content (without title)\n");
         out.close();
         
-        mdAsside = folder.newFile("mdAsside.md");
+        mdAsside = folder.newFile("aside.md");
         out = new PrintWriter(mdAsside);
         out.println(validHeader);
         out.println("Paragraph as intro\n");
@@ -275,14 +277,14 @@ public class MdParserTest {
         			"| on multiple lines\n");
         out.close();
         
-        mdEmoji = folder.newFile("mdEmoji.md");
+        mdEmoji = folder.newFile("emoji.md");
         out = new PrintWriter(mdEmoji);
         out.println(validHeader);
         out.println("a bug :bug: and a pencil :pencil:\n"
         		+ "and not mapped due to missing last space :mango:");
         out.close();
         
-        mdEnumeratedReference = folder.newFile("mdEnumeratedReference.md");
+        mdEnumeratedReference = folder.newFile("enumeratedReference.md");
         out = new PrintWriter(mdEnumeratedReference);
         out.println(validHeader);
         out.println("![Flexmark Icon Logo](https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png){#fig:test}\n"
@@ -307,6 +309,14 @@ public class MdParserTest {
         		+ "\n"
         		+ "[@fig]: Figure [#].");
         out.close();
+        
+        mdGfmIssues = folder.newFile("gfmIssues.md");
+        out = new PrintWriter(mdGfmIssues);
+        out.println(validHeader);
+        out.println("An issue #759");
+        out.close();
+        
+        
     }
 
     @Test
@@ -874,8 +884,6 @@ public class MdParserTest {
         documentModel = parser.processFile(mdEmoji);
         Assert.assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>a bug :bug: and a pencil :pencil: and not mapped due to missing last space :mango:</p>");
-        assertThat(documentModel.getBody()).contains("");
-        
     }
     
     @Test
@@ -925,5 +933,29 @@ public class MdParserTest {
         		+ "<p>[@tbl]: Table [#].</p>\n"
         		+ "<p>[@fig]: Figure [#].</p>\n");
     }
+    
+    @Test
+    public void parseValidMdFileGfmIssues() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("gfmIssues");
+
+        // Test with gfmIssues
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmIssues);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>An issue <a href=\"issues/759\">#759</a></p>");
+
+        // Test without gfmIssues
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmIssues);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("An issue #759");
+        
+    }
+    
+    
+    
+    
     
 }
