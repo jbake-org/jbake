@@ -86,6 +86,8 @@ public class MdParserTest {
     private File mdGfmStrikeThroughtAndSubscript;
     
     private File mdGfmTasklist;
+    
+    private File mdGfmUsers;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -332,6 +334,12 @@ public class MdParserTest {
         out.println("- [ ] an unchecked box\n"
         		+ "- [x] a checked box\n"
         		+ "- [X] an other checked box\n");
+        out.close();
+        
+        mdGfmUsers = folder.newFile("gfmUsers.md");
+        out = new PrintWriter(mdGfmUsers);
+        out.println(validHeader);
+        out.println("A GitHub User @jderuette");
         out.close();
         
     }
@@ -968,7 +976,6 @@ public class MdParserTest {
         documentModel = parser.processFile(mdGfmIssues);
         Assert.assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("An issue #759");
-        
     }
     
     @Test
@@ -995,7 +1002,6 @@ public class MdParserTest {
         documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
         Assert.assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("A normal Text and a ~~strike texte~~ and a ~sbuscript~");
-        
     }
     
     @Test
@@ -1023,6 +1029,25 @@ public class MdParserTest {
         		+ "<li>[x] a checked box</li>\n"
         		+ "<li>[X] an other checked box</li>\n"
         		+ "</ul>");
-        
     }
+    
+    @Test
+    public void parseValidMdFileGfmUsers() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("GfmUsers");
+
+        // Test with gfmIssues
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmUsers);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>A GitHub User <a href=\"https://github.com/jderuette\"><strong>@jderuette</strong></a></p>");
+
+        // Test without gfmIssues
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmUsers);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("A GitHub User @jderuette");
+    }
+    
 }
