@@ -84,6 +84,8 @@ public class MdParserTest {
     private File mdGfmIssues;
     
     private File mdGfmStrikeThroughtAndSubscript;
+    
+    private File mdGfmTasklist;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -322,6 +324,14 @@ public class MdParserTest {
         out = new PrintWriter(mdGfmStrikeThroughtAndSubscript);
         out.println(validHeader);
         out.println("A normal Text and a ~~strike texte~~ and a ~sbuscript~");
+        out.close();
+        
+        mdGfmTasklist = folder.newFile("gfmTasklist.md");
+        out = new PrintWriter(mdGfmTasklist);
+        out.println(validHeader);
+        out.println("- [ ] an unchecked box\n"
+        		+ "- [x] a checked box\n"
+        		+ "- [X] an other checked box\n");
         out.close();
         
     }
@@ -988,4 +998,31 @@ public class MdParserTest {
         
     }
     
+    @Test
+    public void parseValidMdFileGfmTaskList() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("TaskList");
+
+        // Test with gfm-strikethrough only
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmTasklist);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<ul>\n"
+        		+ "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;an unchecked box</li>\n"
+        		+ "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"checked\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;a checked box</li>\n"
+        		+ "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"checked\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;an other checked box</li>\n"
+        		+ "</ul>");
+
+        // Test without extnesions
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmTasklist);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<ul>\n"
+        		+ "<li>[ ] an unchecked box</li>\n"
+        		+ "<li>[x] a checked box</li>\n"
+        		+ "<li>[X] an other checked box</li>\n"
+        		+ "</ul>");
+        
+    }
 }
