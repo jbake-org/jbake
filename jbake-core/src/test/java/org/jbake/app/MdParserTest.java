@@ -82,6 +82,8 @@ public class MdParserTest {
     private File mdEnumeratedReference;
     
     private File mdGfmIssues;
+    
+    private File mdGfmStrikeThroughtAndSubscript;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -316,6 +318,11 @@ public class MdParserTest {
         out.println("An issue #759");
         out.close();
         
+        mdGfmStrikeThroughtAndSubscript = folder.newFile("gfmStrikeThroughtAndSubscript.md");
+        out = new PrintWriter(mdGfmStrikeThroughtAndSubscript);
+        out.println(validHeader);
+        out.println("A normal Text and a ~~strike texte~~ and a ~sbuscript~");
+        out.close();
         
     }
 
@@ -954,8 +961,31 @@ public class MdParserTest {
         
     }
     
-    
-    
-    
+    @Test
+    public void parseValidMdFileGfmStrikeThroughtAndSubscript() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Strikethrough");
+
+        // Test with gfm-strikethrough only
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>A normal Text and a <del>strike texte</del> and a ~sbuscript~</p>");
+
+        // Test with both Strike and subscript
+        config.setMarkdownExtensions("StrikethroughSubscript");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>A normal Text and a <del>strike texte</del> and a <sub>sbuscript</sub></p>");
+        
+        // Test without extnesions
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("A normal Text and a ~~strike texte~~ and a ~sbuscript~");
+        
+    }
     
 }
