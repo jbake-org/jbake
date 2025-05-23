@@ -76,6 +76,8 @@ public class MdParserTest {
     private File mdAdmonition;
     
     private File mdAsside;
+    
+    private File mdEmoji;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -270,6 +272,15 @@ public class MdParserTest {
         out.println("| an asside block\n"+
         			"| on multiple lines\n");
         out.close();
+        
+        mdEmoji = folder.newFile("mdEmoji.md");
+        out = new PrintWriter(mdEmoji);
+        out.println(validHeader);
+        out.println("a bug :bug: and a pencil :pencil:\n"
+        		+ "and not mapped due to missing last space :mango:");
+        out.close();
+        
+        
         
     }
 
@@ -821,4 +832,24 @@ public class MdParserTest {
         assertThat(documentModel.getBody()).contains("| an asside block | on multiple lines");
     }
     
+    @Test
+    public void parseValidMdFileEmojiExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("emoji");
+
+        // Test with Asside
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/img/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/img/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+
+        // Test without Asside
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug :bug: and a pencil :pencil: and not mapped due to missing last space :mango:</p>");
+        assertThat(documentModel.getBody()).contains("");
+        
+    }
 }
