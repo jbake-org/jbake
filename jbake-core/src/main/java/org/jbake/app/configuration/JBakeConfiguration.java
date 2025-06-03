@@ -186,15 +186,24 @@ public interface JBakeConfiguration {
      * @return an iterator of configuration keys
      */
     Iterator<String> getKeys();
-
+    
     /**
-     * A list of markdown extensions
+     * A list of markdown options for extension or Parser
      * <p>
      * <code>markdown.extension=HARDWRAPS,AUTOLINKS,FENCED_CODE_BLOCKS,DEFINITIONS</code>
      *
-     * @return list of markdown extensions as string
+     * @return list of markdown options as string
      */
     List<String> getMarkdownExtensions();
+    
+    /**
+     * A list of markdown extensions
+     * <p>
+     * <code>markdown.options=ROOT_IMAGE_PATH=/images/emoji,AN_OTHER_OPTION=true</code>
+     *
+     * @return list of markdown extensions as key => value
+     */
+    Map<String, String> getMarkdownOptions();
 
     /**
      * @return file extension to be used for all output files

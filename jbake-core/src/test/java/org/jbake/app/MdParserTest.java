@@ -1,5 +1,10 @@
 package org.jbake.app;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.PrintWriter;
+
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -9,11 +14,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.PrintWriter;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests basic Markdown syntax and the extensions supported by the Markdown
@@ -88,6 +88,8 @@ public class MdParserTest {
     private File mdGfmTasklist;
     
     private File mdGfmUsers;
+    
+    private File mdGitLab;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -342,6 +344,16 @@ public class MdParserTest {
         out.println("A GitHub User @jderuette");
         out.close();
         
+        mdGitLab = folder.newFile("mdGitLab.md");
+        out = new PrintWriter(mdGitLab);
+        out.println(validHeader);
+        out.println(">>> a multiline block quote \n" + 
+        			"    and a seconde line \n" +
+        			"    and a third and last\n" +
+        			"\n" +
+        			"[- deleted marker-]" +
+        			"[+added marker+]");
+        out.close();
     }
 
     @Test
@@ -1036,13 +1048,13 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("GfmUsers");
 
-        // Test with gfmIssues
+        // Test with gfmUsers
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdGfmUsers);
         Assert.assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>A GitHub User <a href=\"https://github.com/jderuette\"><strong>@jderuette</strong></a></p>");
 
-        // Test without gfmIssues
+        // Test without gfmUsers
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdGfmUsers);
@@ -1050,4 +1062,220 @@ public class MdParserTest {
         assertThat(documentModel.getBody()).contains("A GitHub User @jderuette");
     }
     
+    @Test
+    public void parseValidMdFileGitLab() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("gitLab");
+
+        // Test with gitLab
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGitLab);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<blockquote>\n" + 
+        		"<p>a multiline block quote and a seconde line and a third and last</p>\n" + 
+        		"</blockquote>");
+        assertThat(documentModel.getBody()).contains("<del> deleted marker</del>");
+        assertThat(documentModel.getBody()).contains("<ins>added marker</ins>");
+
+        // Test without gitLab
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGitLab);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<blockquote>\n" + 
+        		"<p>a multiline block quote and a seconde line and a third and last</p>\n" +
+        		"</blockquote>");
+        		assertThat(documentModel.getBody()).contains("<p>[- deleted marker-][+added marker+]</p>");
+    }
+    
+    @Test
+    public void parseValidStringOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("EmojiExtension.ROOT_IMAGE_PATH=/images/emoji/");
+
+        // Test with Emojii custom image folder
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/images/emoji/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/images/emoji/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidUnreconizedOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("EmojiExtension.AN_OTHER_OPTION=true");
+
+        // Test with Emojii custom image folder
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/img/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/img/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidUnreconizedOwnerOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("unknowOwner.AN_OTHER_OPTION=true");
+
+        // Test with Emojii custom image folder
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/img/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/img/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidBooleanOption() {
+    	//Test with Attributes enabled (default behavior) ASSIGN_TEXT_ATTRIBUTES
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ASSIGN_TEXT_ATTRIBUTES=true");
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+        
+        // Test with Attributes disabled ASSIGN_TEXT_ATTRIBUTES
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ASSIGN_TEXT_ATTRIBUTES=false");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<p class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    }
+    
+    @Test
+    public void parseValidIntegerOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.CONTENT_INDENT=2");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+    
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.CONTENT_INDENT=three");
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+    }
+    
+    @Test
+    public void parseValidCharSequenceOption() {
+    	config.setMarkdownExtensions("");
+    	config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("Formatter.DOCUMENT_FIRST_PREFIX=        ");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+    }
+    
+    @Test
+    public void parseValidMapOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.QUALIFIER_TYPE_MAP=\"abstract=bob warning=info\"");
+
+        // Test with Attributes custom type mapping
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).doesNotContain("<symbol id=\"adm-warning\">");
+    
+        //test with invalid list (only 1 invalid and invalid)
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.QUALIFIER_TYPE_MAP=INVALID");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+        
+      //test with invalid list (valid and invalid values)
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.QUALIFIER_TYPE_MAP=\"abstract=bob warning=info noValid notValid:to\"");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).doesNotContain("<symbol id=\"adm-warning\">");
+    }
+    
+    @Test
+    public void parseValidKeepTypeEnumOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ATTRIBUTES_KEEP=FAIL");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ATTRIBUTES_KEEP=NOT_A_VALID_ATTRIBUTE");
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    }
+    
+    @Test
+    public void parseValidFencedCodeEnumOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.FENCED_CODE_ADD_ATTRIBUTES=ADD_TO_PRE_CODE");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.FENCED_CODE_ADD_ATTRIBUTES=NOT_A_VALID_ATTRIBUTE");
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    }
 }
