@@ -154,6 +154,11 @@ public abstract class PropertyList {
         "markdown.extensions",
         "comma delimited default markdown extensions; for available extensions: http://www.decodified.com/pegdown/api/org/pegdown/Extensions.html"
     );
+    
+    public static final Property MARKDOWN_OPTIONS = new Property(
+        "markdown.options",
+        "comma delimited markdown options; for information for options : https://github.com/vsch/flexmark-java/wiki/Extensions"
+    );
 
     public static final Property OUTPUT_ENCODING = new Property(
         "freemarker.outputencoding",

@@ -1,5 +1,10 @@
 package org.jbake.app;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.PrintWriter;
+
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -9,11 +14,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.PrintWriter;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests basic Markdown syntax and the extensions supported by the Markdown
@@ -68,6 +68,28 @@ public class MdParserTest {
     private File mdTasklistitems;
 
     private File mdExtanchorlinks;
+    
+    private File mdFootnote;
+
+    private File mdAttributes;
+    
+    private File mdAdmonition;
+    
+    private File mdAsside;
+    
+    private File mdEmoji;
+    
+    private File mdEnumeratedReference;
+    
+    private File mdGfmIssues;
+    
+    private File mdGfmStrikeThroughtAndSubscript;
+    
+    private File mdGfmTasklist;
+    
+    private File mdGfmUsers;
+    
+    private File mdGitLab;
 
     private String validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~";
 
@@ -223,10 +245,114 @@ public class MdParserTest {
         out.println("* [x] closed task item");
         out.close();
 
-        mdExtanchorlinks = folder.newFile("mdExtanchorlinks.md");
+        mdExtanchorlinks = folder.newFile("extanchorlinks.md");
         out = new PrintWriter(mdExtanchorlinks);
         out.println(validHeader);
         out.println("# header & some *formatting* ~~chars~~");
+        out.close();
+        
+        mdFootnote = folder.newFile("footnote.md");
+        out = new PrintWriter(mdFootnote);
+        out.println(validHeader);
+        out.println("Paragraph with a footnote reference[^1]");
+        out.println("");
+        out.println("[^1]: Footnote text added at the bottom of the document");
+        out.close();
+        
+        mdAttributes = folder.newFile("attributes.md");
+        out = new PrintWriter(mdAttributes);
+        out.println(validHeader);
+        out.println("Paragraph with a **bold**{#IdForThisBold} reference{.test}");
+        out.println("![an image](images/nothing.jpg){width='250px' height='100px'}");
+        out.close();
+        
+        mdAdmonition = folder.newFile("admonition.md");
+        out = new PrintWriter(mdAdmonition);
+        out.println(validHeader);
+        out.println("!!! caution \"Optional Title\"\n" +
+        		"    block content sideBar with header\n");
+        out.println("??? example \"Optional Title\"\n" + 
+        		"    collapsible block content close by default\n");
+        out.println(" !!! danger \"\"\n" + 
+        		"        **danger** block content (without title)\n");
+        out.close();
+        
+        mdAsside = folder.newFile("aside.md");
+        out = new PrintWriter(mdAsside);
+        out.println(validHeader);
+        out.println("Paragraph as intro\n");
+        out.println("| an asside block\n"+
+        			"| on multiple lines\n");
+        out.close();
+        
+        mdEmoji = folder.newFile("emoji.md");
+        out = new PrintWriter(mdEmoji);
+        out.println(validHeader);
+        out.println("a bug :bug: and a pencil :pencil:\n"
+        		+ "and not mapped due to missing last space :mango:");
+        out.close();
+        
+        mdEnumeratedReference = folder.newFile("enumeratedReference.md");
+        out = new PrintWriter(mdEnumeratedReference);
+        out.println(validHeader);
+        out.println("![Flexmark Icon Logo](https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png){#fig:test}\n"
+        		+ "[#fig:test]\n"
+        		+ "\n"
+        		+ "![Flexmark Icon Logo](https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png){#fig:test2}\n"
+        		+ "[#fig:test2]\n"
+        		+ "\n"
+        		+ "| heading | heading | heading |\n"
+        		+ "|---------|---------|---------|\n"
+        		+ "| data    | data    |         |\n"
+        		+ "[[#tbl:test] caption]\n"
+        		+ "{#tbl:test}\n"
+        		+ "\n"
+        		+ "See [@fig:test2]\n"
+        		+ "\n"
+        		+ "See [@fig:test]\n"
+        		+ "\n"
+        		+ "See [@tbl:test]\n"
+        		+ "\n"
+        		+ "[@tbl]: Table [#].\n"
+        		+ "\n"
+        		+ "[@fig]: Figure [#].");
+        out.close();
+        
+        mdGfmIssues = folder.newFile("gfmIssues.md");
+        out = new PrintWriter(mdGfmIssues);
+        out.println(validHeader);
+        out.println("An issue #759");
+        out.close();
+        
+        mdGfmStrikeThroughtAndSubscript = folder.newFile("gfmStrikeThroughtAndSubscript.md");
+        out = new PrintWriter(mdGfmStrikeThroughtAndSubscript);
+        out.println(validHeader);
+        out.println("A normal Text and a ~~strike texte~~ and a ~sbuscript~");
+        out.close();
+        
+        mdGfmTasklist = folder.newFile("gfmTasklist.md");
+        out = new PrintWriter(mdGfmTasklist);
+        out.println(validHeader);
+        out.println("- [ ] an unchecked box\n"
+        		+ "- [x] a checked box\n"
+        		+ "- [X] an other checked box\n");
+        out.close();
+        
+        mdGfmUsers = folder.newFile("gfmUsers.md");
+        out = new PrintWriter(mdGfmUsers);
+        out.println(validHeader);
+        out.println("A GitHub User @jderuette");
+        out.close();
+        
+        mdGitLab = folder.newFile("mdGitLab.md");
+        out = new PrintWriter(mdGitLab);
+        out.println(validHeader);
+        out.println(">>> a multiline block quote \n" + 
+        			"    and a seconde line \n" +
+        			"    and a third and last\n" +
+        			"\n" +
+        			"[- deleted marker-]" +
+        			"[+added marker+]");
         out.close();
     }
 
@@ -666,6 +792,490 @@ public class MdParserTest {
         Assert.assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>");
     }
+    
+    @Test
+    public void parseValidMdFileFootnoteExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Footnote");
 
+        // Test with Footnote
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdFootnote);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<sup id=\"fnref-1\"><a class=\"footnote-ref\" href=\"#fn-1\">1</a>");
+        
+        assertThat(documentModel.getBody()).contains(
+        		"<div class=\"footnotes\">\n" + 
+        		"<hr />\n" +
+                "<ol>\n" + 
+                "<li id=\"fn-1\">\n" + 
+                "<p>Footnote text added at the bottom of the document</p>\n" +
+                "<a href=\"#fnref-1\" class=\"footnote-backref\">&#8617;</a>\n" +
+                "</li>\n" +
+                "</ol>\n" + 
+                "</div>"
+        );
 
+        // Test without Footnote
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdFootnote);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("Paragraph with a footnote reference[^1]");
+    }
+
+    @Test
+    public void parseValidMdFileAttributesExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+
+        // Test with attributes
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+
+        // Test without attributes
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>Paragraph with a <strong>bold</strong>{#IdForThisBold} reference{.test}");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" />{width='250px' height='100px'}");
+    }
+    
+    @Test
+    public void parseValidMdFileAdmonitionExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+
+        // Test with admonition
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+        assertThat(documentModel.getBody()).contains("<div class=\"adm-block adm-warning\">\n" +
+        		 "<div class=\"adm-heading\">\n" +
+        		 "<svg class=\"adm-icon\"><use xlink:href=\"#adm-warning\" /></svg><span>Optional Title</span>\n" +
+        		 "</div>\n" +
+        		 "<div class=\"adm-body\">\n" +
+        		 "<p>block content sideBar with header</p>");
+        assertThat(documentModel.getBody()).contains("<div class=\"adm-block adm-example adm-collapsed\">\n" +
+        		 "<div class=\"adm-heading\">\n" +
+        		 "<svg class=\"adm-icon\"><use xlink:href=\"#adm-example\" /></svg><span>Optional Title</span>\n" +
+        		 "</div>\n" + 
+        		 "<div class=\"adm-body\">\n" +
+        		 "<p>collapsible block content close by default</p>");
+        assertThat(documentModel.getBody()).contains("<div class=\"adm-block adm-danger\">\n" +
+        		 "<div class=\"adm-body\">\n" +
+        		 "<p><strong>danger</strong> block content (without title)</p>\n" +
+        		 "</div>");
+
+        // Test without admonition
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("!!! caution &quot;Optional Title&quot; block content sideBar with header");
+        assertThat(documentModel.getBody()).contains("??? example &quot;Optional Title&quot; collapsible block content close by default");
+        assertThat(documentModel.getBody()).contains("!!! danger &quot;&quot; <strong>danger</strong> block content (without title)");
+    }
+    
+    @Test
+    public void parseValidMdFileAssideExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Aside");
+
+        // Test with Asside
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAsside);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<aside>\n"+ 
+        		"<p>an asside block on multiple lines</p>\n"+
+        		"</aside>\n");
+
+        // Test without Asside
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAsside);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("| an asside block | on multiple lines");
+    }
+    
+    @Test
+    public void parseValidMdFileEmojiExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+
+        // Test with Asside
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/img/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/img/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+
+        // Test without Asside
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug :bug: and a pencil :pencil: and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidMdFilemdEnumeratedReferenceExtension() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("EnumeratedReference,Attributes,TABLES");
+
+        // Test with EnumeratedReference
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEnumeratedReference);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test\" /> Figure 1.</p>\n"
+        		+ "<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test2\" /> Figure 2.</p>\n"
+        		+ "<table id=\"tbl:test\">\n"
+        		+ "<thead>\n"
+        		+ "<tr><th> heading </th><th> heading </th><th> heading </th></tr>\n"
+        		+ "</thead>\n"
+        		+ "<tbody>\n"
+        		+ "<tr><td> data    </td><td> data    </td><td>         </td></tr>\n"
+        		+ "</tbody>\n"
+        		+ "<caption>Table 1. caption</caption>\n"
+        		+ "</table>\n"
+        		+ "<p>See <a href=\"#fig:test2\" title=\"Figure 2.\">Figure 2.</a></p>\n"
+        		+ "<p>See <a href=\"#fig:test\" title=\"Figure 1.\">Figure 1.</a></p>\n"
+        		+ "<p>See <a href=\"#tbl:test\" title=\"Table 1.\">Table 1.</a></p>\n"
+        		);
+
+        // Test without EnumeratedReference
+        config.setMarkdownExtensions("Attributes,TABLES");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdEnumeratedReference);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test\" /> [#fig:test]</p>\n"
+        		+ "<p><img src=\"https://github.com/vsch/flexmark-java/raw/master/assets/images/flexmark-icon-logo%402x.png\" alt=\"Flexmark Icon Logo\" id=\"fig:test2\" /> [#fig:test2]</p>\n"
+        		+ "<table id=\"tbl:test\">\n"
+        		+ "<thead>\n"
+        		+ "<tr><th> heading </th><th> heading </th><th> heading </th></tr>\n"
+        		+ "</thead>\n"
+        		+ "<tbody>\n"
+        		+ "<tr><td> data    </td><td> data    </td><td>         </td></tr>\n"
+        		+ "</tbody>\n"
+        		+ "<caption>[#tbl:test] caption</caption>\n"
+        		+ "</table>\n"
+        		+ "<p>See [@fig:test2]</p>\n"
+        		+ "<p>See [@fig:test]</p>\n"
+        		+ "<p>See [@tbl:test]</p>\n"
+        		+ "<p>[@tbl]: Table [#].</p>\n"
+        		+ "<p>[@fig]: Figure [#].</p>\n");
+    }
+    
+    @Test
+    public void parseValidMdFileGfmIssues() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("gfmIssues");
+
+        // Test with gfmIssues
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmIssues);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>An issue <a href=\"issues/759\">#759</a></p>");
+
+        // Test without gfmIssues
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmIssues);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("An issue #759");
+    }
+    
+    @Test
+    public void parseValidMdFileGfmStrikeThroughtAndSubscript() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Strikethrough");
+
+        // Test with gfm-strikethrough only
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>A normal Text and a <del>strike texte</del> and a ~sbuscript~</p>");
+
+        // Test with both Strike and subscript
+        config.setMarkdownExtensions("StrikethroughSubscript");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>A normal Text and a <del>strike texte</del> and a <sub>sbuscript</sub></p>");
+        
+        // Test without extnesions
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmStrikeThroughtAndSubscript);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("A normal Text and a ~~strike texte~~ and a ~sbuscript~");
+    }
+    
+    @Test
+    public void parseValidMdFileGfmTaskList() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("TaskList");
+
+        // Test with gfm-strikethrough only
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmTasklist);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<ul>\n"
+        		+ "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;an unchecked box</li>\n"
+        		+ "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"checked\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;a checked box</li>\n"
+        		+ "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"checked\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;an other checked box</li>\n"
+        		+ "</ul>");
+
+        // Test without extnesions
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmTasklist);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<ul>\n"
+        		+ "<li>[ ] an unchecked box</li>\n"
+        		+ "<li>[x] a checked box</li>\n"
+        		+ "<li>[X] an other checked box</li>\n"
+        		+ "</ul>");
+    }
+    
+    @Test
+    public void parseValidMdFileGfmUsers() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("GfmUsers");
+
+        // Test with gfmUsers
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGfmUsers);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>A GitHub User <a href=\"https://github.com/jderuette\"><strong>@jderuette</strong></a></p>");
+
+        // Test without gfmUsers
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGfmUsers);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("A GitHub User @jderuette");
+    }
+    
+    @Test
+    public void parseValidMdFileGitLab() {
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("gitLab");
+
+        // Test with gitLab
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdGitLab);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<blockquote>\n" + 
+        		"<p>a multiline block quote and a seconde line and a third and last</p>\n" + 
+        		"</blockquote>");
+        assertThat(documentModel.getBody()).contains("<del> deleted marker</del>");
+        assertThat(documentModel.getBody()).contains("<ins>added marker</ins>");
+
+        // Test without gitLab
+        config.setMarkdownExtensions("");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdGitLab);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<blockquote>\n" + 
+        		"<p>a multiline block quote and a seconde line and a third and last</p>\n" +
+        		"</blockquote>");
+        		assertThat(documentModel.getBody()).contains("<p>[- deleted marker-][+added marker+]</p>");
+    }
+    
+    @Test
+    public void parseValidStringOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("EmojiExtension.ROOT_IMAGE_PATH=/images/emoji/");
+
+        // Test with Emojii custom image folder
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/images/emoji/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/images/emoji/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidUnreconizedOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("EmojiExtension.AN_OTHER_OPTION=true");
+
+        // Test with Emojii custom image folder
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/img/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/img/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidUnreconizedOwnerOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Emoji");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("unknowOwner.AN_OTHER_OPTION=true");
+
+        // Test with Emojii custom image folder
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdEmoji);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<p>a bug <img src=\"/img/bug.png\" alt=\"emoji nature:bug\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and a pencil <img src=\"/img/pencil.png\" alt=\"emoji objects:pencil\" height=\"20\" width=\"20\" align=\"absmiddle\" /> and not mapped due to missing last space :mango:</p>");
+    }
+    
+    @Test
+    public void parseValidBooleanOption() {
+    	//Test with Attributes enabled (default behavior) ASSIGN_TEXT_ATTRIBUTES
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ASSIGN_TEXT_ATTRIBUTES=true");
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+        
+        // Test with Attributes disabled ASSIGN_TEXT_ATTRIBUTES
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ASSIGN_TEXT_ATTRIBUTES=false");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<p class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    }
+    
+    @Test
+    public void parseValidIntegerOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.CONTENT_INDENT=2");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+    
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.CONTENT_INDENT=three");
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+    }
+    
+    @Test
+    public void parseValidCharSequenceOption() {
+    	config.setMarkdownExtensions("");
+    	config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("Formatter.DOCUMENT_FIRST_PREFIX=        ");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+    }
+    
+    @Test
+    public void parseValidMapOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.QUALIFIER_TYPE_MAP=\"abstract=bob warning=info\"");
+
+        // Test with Attributes custom type mapping
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).doesNotContain("<symbol id=\"adm-warning\">");
+    
+        //test with invalid list (only 1 invalid and invalid)
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.QUALIFIER_TYPE_MAP=INVALID");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<symbol id=\"adm-warning\">");
+        
+      //test with invalid list (valid and invalid values)
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Admonition");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AdmonitionExtension.QUALIFIER_TYPE_MAP=\"abstract=bob warning=info noValid notValid:to\"");
+        parser = new Parser(config);
+        documentModel = parser.processFile(mdAdmonition);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).doesNotContain("<symbol id=\"adm-warning\">");
+    }
+    
+    @Test
+    public void parseValidKeepTypeEnumOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ATTRIBUTES_KEEP=FAIL");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.ATTRIBUTES_KEEP=NOT_A_VALID_ATTRIBUTE");
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    }
+    
+    @Test
+    public void parseValidFencedCodeEnumOption() {
+    	config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.FENCED_CODE_ADD_ATTRIBUTES=ADD_TO_PRE_CODE");
+
+        // Test with Attributes custom duplicate handling
+        Parser parser = new Parser(config);
+        DocumentModel documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    
+        config.setMarkdownExtensions("");
+        config.setMarkdownExtensions("Attributes");
+        config.setMarkdownOptions("");
+        config.setMarkdownOptions("AttributesExtension.FENCED_CODE_ADD_ATTRIBUTES=NOT_A_VALID_ATTRIBUTE");
+        documentModel = parser.processFile(mdAttributes);
+        Assert.assertNotNull(documentModel);
+        assertThat(documentModel.getBody()).contains("<strong id=\"IdForThisBold\">bold</strong>");
+        assertThat(documentModel.getBody()).contains("<span class=\"test\">");
+        assertThat(documentModel.getBody()).contains("<img src=\"images/nothing.jpg\" alt=\"an image\" width=\"250px\" height=\"100px\" />");
+    }
 }
