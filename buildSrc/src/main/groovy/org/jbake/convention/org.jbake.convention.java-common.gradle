@@ -29,8 +29,8 @@ dependencies {
 }
 
 tasks.withType(JavaCompile) {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 //set jvm for all Test tasks (like test and smokeTest)

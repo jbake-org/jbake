@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -150,7 +152,7 @@ public class AssetTest extends LoggingTest {
         css.mkdir();
         final File cssFile = new File(css, "bootstrap.min.css");
         FileUtils.touch(cssFile);
-        cssFile.setReadOnly();
+        css.setReadOnly();
 
         config.setAssetFolder(assets);
         config.setDestinationFolder(folder.toFile());
