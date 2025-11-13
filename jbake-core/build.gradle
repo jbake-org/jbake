@@ -58,8 +58,9 @@ dependencies {
 }
 
 processResources {
+    inputs.property("jbake.version", project.version)
     filesMatching("default.properties") {
-        expand jbakeVersion: project.version,
+        expand jbakeVersion: inputs.properties.get("jbake.version"),
             timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
             gitHash: grgit.head().abbreviatedId
     }

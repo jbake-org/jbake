@@ -44,7 +44,7 @@ tasks.withType(Test) {
     if (JavaVersion.current().java9Compatible) {
         args << '-XX:MaxDirectMemorySize=2g'
     }
-    jvmArgs args
+    jvmArgs = args
 }
 
 task javadocJar(type: Jar) {
@@ -67,7 +67,7 @@ test {
 
     testLogging {
         events "passed", "skipped", "failed"
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     jacoco {

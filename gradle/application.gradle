@@ -1,5 +1,7 @@
-mainClassName = "org.jbake.launcher.Main"
-applicationName = "jbake"
+application {
+    mainClass = "org.jbake.launcher.Main"
+    applicationName = "jbake"
+}
 
 def examplesBase = "$project.buildDir/examples"
 
@@ -16,7 +18,7 @@ exampleRepositories.each { name, repository ->
 
     task "clone_${name}Repository"() {
         group = "distribution"
-        description "Clone jbake ${name} example project repository"
+        description = "Clone jbake ${name} example project repository"
 
         def repositoryName = "$examplesBase/$name"
 
@@ -28,8 +30,8 @@ exampleRepositories.each { name, repository ->
     }
 
     task "${name}Zip"(type: Zip) {
-        group "distribution"
-        description "Zip $name repository"
+        group = "distribution"
+        description = "Zip $name repository"
 
         archiveBaseName = name
         archiveFileName = "${archiveBaseName.get()}.zip"
