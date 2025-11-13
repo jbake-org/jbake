@@ -3,7 +3,7 @@ import java.time.format.DateTimeFormatter
 plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
-    id 'nebula.optional-base' version "$optionalBaseVersion"
+    id 'com.netflix.nebula.optional-base' version "9.0.0"
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
