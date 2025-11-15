@@ -49,16 +49,16 @@ object DBUtil {
      * @param entry Entry input to be converted
      * @return input entry as String[]
      */
-    fun toStringArray(entry: Any): Array<String?> {
-        if (entry is Array<String>) {
-            return entry as Array<String?>
+    fun toStringArray(entry: Any): Array<String> {
+        if (entry is Array<*>) {
+            return entry as Array<String>
         } else if (entry is OTrackedList<*>) {
-            val list = entry as OTrackedList<String?>
-            return list.toTypedArray<String?>()
+            val list = entry as OTrackedList<String>
+            return list.toTypedArray<String>()
         } else if (entry is ArrayList<*>) {
-            val list = entry as ArrayList<String?>
-            return list.toTypedArray<String?>()
+            val list = entry as ArrayList<String>
+            return list.toTypedArray<String>()
         }
-        return arrayOfNulls<String>(0)
+        return arrayOf()
     }
 }

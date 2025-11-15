@@ -27,10 +27,10 @@ class DocumentModel : BaseModel() {
             put(ModelAttributes.STATUS, status)
         }
 
-    var type: String?
+    var type: String
         get() {
             if (containsKey(ModelAttributes.TYPE)) {
-                return get(ModelAttributes.TYPE) as String?
+                return get(ModelAttributes.TYPE) as String
             }
             return ""
         }
@@ -38,7 +38,7 @@ class DocumentModel : BaseModel() {
             put(ModelAttributes.TYPE, type)
         }
 
-    var tags: Array<String?>?
+    var tags: Array<String>
         get() = DBUtil.toStringArray(get(ModelAttributes.TAGS))
         set(tags) {
             put(ModelAttributes.TAGS, tags)

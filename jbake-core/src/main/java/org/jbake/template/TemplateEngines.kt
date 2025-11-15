@@ -33,18 +33,18 @@ import java.util.*
  *
  * @author Cédric Champeau
  */
-class TemplateEngines(config: JBakeConfiguration?, db: ContentStore?) {
-    private val engines: MutableMap<String?, AbstractTemplateEngine?>
+class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
+    private val engines: MutableMap<String, AbstractTemplateEngine>
 
-    val recognizedExtensions: MutableSet<String?>
+    val recognizedExtensions: MutableSet<String>
         get() = Collections.unmodifiableSet<String?>(engines.keys)
 
     init {
-        engines = HashMap<String?, AbstractTemplateEngine?>()
+        engines = HashMap<String, AbstractTemplateEngine>()
         loadEngines(config, db)
     }
 
-    private fun registerEngine(fileExtension: String?, templateEngine: AbstractTemplateEngine?) {
+    private fun registerEngine(fileExtension: String, templateEngine: AbstractTemplateEngine) {
         val old = engines.put(fileExtension, templateEngine)
         if (old != null) {
             LOGGER.warn(
@@ -55,7 +55,7 @@ class TemplateEngines(config: JBakeConfiguration?, db: ContentStore?) {
         }
     }
 
-    fun getEngine(fileExtension: String?): AbstractTemplateEngine? {
+    fun getEngine(fileExtension: String): AbstractTemplateEngine? {
         return engines.get(fileExtension)
     }
 
@@ -63,7 +63,7 @@ class TemplateEngines(config: JBakeConfiguration?, db: ContentStore?) {
      * This method is used internally to load markup engines. Markup engines are found using descriptor files on
      * classpath, so adding an engine is as easy as adding a jar on classpath with the descriptor file included.
      */
-    private fun loadEngines(config: JBakeConfiguration?, db: ContentStore?) {
+    private fun loadEngines(config: JBakeConfiguration, db: ContentStore) {
         try {
             val cl = TemplateEngines::class.java.getClassLoader()
             val resources = cl.getResources("META-INF/org.jbake.parser.TemplateEngines.properties")
@@ -72,8 +72,8 @@ class TemplateEngines(config: JBakeConfiguration?, db: ContentStore?) {
                 val props = Properties()
                 props.load(url.openStream())
                 for (entry in props.entries) {
-                    val className = entry.key as String?
-                    val extensions: Array<String?> =
+                    val className = entry.key as String
+                    val extensions: Array<String> =
                         (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     registerEngine(config, db, className, *extensions)
                 }
@@ -84,10 +84,10 @@ class TemplateEngines(config: JBakeConfiguration?, db: ContentStore?) {
     }
 
     private fun registerEngine(
-        config: JBakeConfiguration?,
-        db: ContentStore?,
-        className: String?,
-        vararg extensions: String?
+        config: JBakeConfiguration,
+        db: ContentStore,
+        className: String,
+        vararg extensions: String
     ) {
         val engine: AbstractTemplateEngine? = tryLoadEngine(config, db, className)
         if (engine != null) {
@@ -110,17 +110,17 @@ class TemplateEngines(config: JBakeConfiguration?, db: ContentStore?) {
          * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
          */
         private fun tryLoadEngine(
-            config: JBakeConfiguration?,
+            config: JBakeConfiguration,
             db: ContentStore?,
-            engineClassName: String?
+            engineClassName: String
         ): AbstractTemplateEngine? {
             try {
                 val engineClass = Class.forName(
                     engineClassName,
                     false,
                     TemplateEngines::class.java.getClassLoader()
-                ) as Class<out AbstractTemplateEngine?>
-                val ctor: Constructor<out AbstractTemplateEngine?> =
+                ) as Class<out AbstractTemplateEngine>
+                val ctor: Constructor<out AbstractTemplateEngine> =
                     engineClass.getConstructor(JBakeConfiguration::class.java, ContentStore::class.java)
                 return ctor.newInstance(config, db)
             } catch (e: Throwable) {

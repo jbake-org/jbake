@@ -13,8 +13,8 @@ import org.jbake.parser.Engines
  */
 object DocumentTypes {
 
-    private val DEFAULT_DOC_TYPES: MutableSet<String?> = LinkedHashSet<String?>()
-    private val LISTENERS: MutableSet<DocumentTypeListener> = HashSet<DocumentTypeListener>()
+    private val DEFAULT_DOC_TYPES: MutableSet<String> = LinkedHashSet()
+    private val LISTENERS: MutableSet<DocumentTypeListener> = HashSet()
 
     init {
         resetDocumentTypes()
@@ -23,17 +23,17 @@ object DocumentTypes {
     @JvmStatic
     fun resetDocumentTypes() {
         DEFAULT_DOC_TYPES.clear()
-        DEFAULT_DOC_TYPES.addAll(mutableListOf<String?>("page", "post", "masterindex", "archive", "feed"))
+        DEFAULT_DOC_TYPES.addAll(mutableListOf("page", "post", "masterindex", "archive", "feed"))
     }
 
 
     @JvmStatic
-    fun addDocumentType(docType: String?) {
+    fun addDocumentType(docType: String) {
         DEFAULT_DOC_TYPES.add(docType)
         notifyListener(docType)
     }
 
-    private fun notifyListener(docType: String?) {
+    private fun notifyListener(docType: String) {
         for (listener in LISTENERS) {
             listener.added(docType)
         }
@@ -45,7 +45,7 @@ object DocumentTypes {
     }
 
     @JvmStatic
-    val documentTypes: Array<String?>
+    val documentTypes: Array<String>
         /**
          * Notice additional document types are added automagically before returning them
          *
@@ -54,8 +54,8 @@ object DocumentTypes {
         get() {
             // TODO: is this needed?
             // make sure engines are loaded before to get document types
-            Engines.Companion.getRecognizedExtensions()
-            return DEFAULT_DOC_TYPES.toTypedArray<String?>()
+            Engines.recognizedExtensions
+            return DEFAULT_DOC_TYPES.toTypedArray()
         }
 
     @JvmStatic

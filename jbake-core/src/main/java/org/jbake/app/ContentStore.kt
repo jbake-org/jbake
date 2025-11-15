@@ -176,7 +176,7 @@ class ContentStore(private val type: String, private val name: String?) {
     fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
         val documents = DocumentList<DocumentModel>()
 
-        for (docType in DocumentTypes.getDocumentTypes()) {
+        for (docType in DocumentTypes.documentTypes) {
             val statement: String = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType)
             val documentsByTag = query(statement, tag)
             documents.addAll(documentsByTag)
@@ -230,7 +230,7 @@ class ContentStore(private val type: String, private val name: String?) {
 
     fun markContentAsRendered(document: DocumentModel) {
         val statement: String =
-            String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.getType(), document.getSourceuri())
+            String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.type, document.getSourceuri())
         executeCommand(statement)
     }
 
