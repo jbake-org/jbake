@@ -3,7 +3,6 @@ import java.time.format.DateTimeFormatter
 plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
-    id 'com.netflix.nebula.optional-base' version "9.0.0"
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
@@ -33,28 +32,28 @@ dependencies {
     api "commons-io:commons-io:$commonsIoVersion"
     api "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
     implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
-    implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
+    implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
-    api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
-    api "org.codehaus.groovy:groovy:$groovyVersion", optional
-    api "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
-    api "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
-    api "org.freemarker:freemarker:$freemarkerVersion", optional
-    api "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
-    api "de.neuland-bfi:jade4j:$jade4jVersion", optional
-    api "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
-    api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
-    api "io.pebbletemplates:pebble:$pebbleVersion", optional
+    api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    api "org.codehaus.groovy:groovy:$groovyVersion"
+    api "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    api "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+    api "org.freemarker:freemarker:$freemarkerVersion"
+    api "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    api "de.neuland-bfi:jade4j:$jade4jVersion"
+    api "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    api "io.pebbletemplates:pebble:$pebbleVersion"
     implementation "org.jsoup:jsoup:$jsoupVersion"
-    implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
 
     // cli specific dependencies
-    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
-    implementation "info.picocli:picocli:$picocli", optional
+    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+    implementation "info.picocli:picocli:$picocli"
 }
 
 processResources {

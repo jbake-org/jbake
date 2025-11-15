@@ -16,7 +16,7 @@ def exampleRepositories = [
 //create clone and Zip Task for each repository
 exampleRepositories.each { name, repository ->
 
-    task "clone_${name}Repository"() {
+    tasks.register("clone_${name}Repository") {
         group = "distribution"
         description = "Clone jbake ${name} example project repository"
 
@@ -29,14 +29,14 @@ exampleRepositories.each { name, repository ->
         }
     }
 
-    task "${name}Zip"(type: Zip) {
+    tasks.register("${name}Zip", Zip) {
         group = "distribution"
         description = "Zip $name repository"
 
         archiveBaseName = name
-        archiveFileName = "${archiveBaseName.get()}.zip"
+        archiveFileName = "${archiveBaseName}.zip"
 
-        from project.tasks.getByName("clone_${name}Repository").outputs
+        from project.tasks.named("clone_${name}Repository").get().outputs
         exclude 'README.md'
         exclude 'LICENSE'
         exclude '.git'

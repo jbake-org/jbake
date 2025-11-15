@@ -27,13 +27,13 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
 
 //set jvm for all Test tasks (like test and smokeTest)
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
 
     def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false', '-Djna.nosys=true']
 
@@ -47,17 +47,18 @@ tasks.withType(Test) {
     jvmArgs = args
 }
 
-task javadocJar(type: Jar) {
+tasks.register("javadocJar", Jar) {
     archiveClassifier.set('javadoc')
     from javadoc
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
+tasks.register("sourcesJar", Jar) {
+
+    it.archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
 
-tasks.withType(AbstractArchiveTask) {
+tasks.withType(AbstractArchiveTask).configureEach {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
@@ -88,7 +89,7 @@ jacocoTestReport {
 
 jacocoTestReport.dependsOn test
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     reports {
         xml.required.set false
         html.required.set true
