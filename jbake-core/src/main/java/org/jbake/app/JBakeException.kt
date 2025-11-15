@@ -1,36 +1,29 @@
-package org.jbake.app;
+package org.jbake.app
 
-import org.jbake.launcher.SystemExit;
+import org.jbake.launcher.SystemExit
 
 /**
  * This runtime exception is thrown by JBake API to indicate an processing
  * error.
- * <p>
+ *
+ *
  * It always contains an error message and if available the cause.
  */
-public class JBakeException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
-
-    final private SystemExit exit;
-
-    /**
-     *
-     * @param message
-     *            The error message.
-     * @param cause
-     *            The causing exception or <code>null</code> if no cause
-     *            available.
-     */
-    public JBakeException(final SystemExit exit, final String message, final Throwable cause) {
-        super(message, cause);
-        this.exit = exit;
+class JBakeException
+/**
+ *
+ * @param message
+ * The error message.
+ * @param cause
+ * The causing exception or `null` if no cause
+ * available.
+ */ @JvmOverloads constructor(private val exit: SystemExit, message: String?, cause: Throwable? = null) :
+    RuntimeException(message, cause) {
+    fun getExit(): Int {
+        return exit.getStatus()
     }
 
-    public JBakeException(final SystemExit exit, final String message) {
-        this(exit, message, null);
-    }
-
-    public int getExit() {
-        return exit.getStatus();
+    companion object {
+        private const val serialVersionUID = 1L
     }
 }

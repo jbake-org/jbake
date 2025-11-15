@@ -1,20 +1,15 @@
-package org.jbake.template.model;
+package org.jbake.template.model
 
-import org.jbake.app.ContentStore;
-import org.jbake.app.DocumentList;
-import org.jbake.template.ModelExtractor;
+import org.jbake.app.ContentStore
+import org.jbake.app.DocumentList
+import org.jbake.template.ModelExtractor
 
-import java.util.Map;
-
-public class PublishedPostsExtractor implements ModelExtractor<DocumentList> {
-
-    @Override
-    public DocumentList get(ContentStore db, Map model, String key) {
+class PublishedPostsExtractor : ModelExtractor<DocumentList<*>?> {
+    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String?): DocumentList<*>? {
         if (model.containsKey("numberOfPages")) {
-            return db.getPublishedPosts(true);
+            return db.getPublishedPosts(true)
         } else {
-            return db.getPublishedPosts();
+            return db.getPublishedPosts()
         }
     }
-
 }

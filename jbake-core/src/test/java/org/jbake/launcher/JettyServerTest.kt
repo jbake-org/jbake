@@ -1,66 +1,62 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.jbake.TestUtils;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.assertj.core.api.Assertions
+import org.jbake.TestUtils
+import org.jbake.app.configuration.JBakeConfiguration
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.ServerSocket
+import java.net.URL
+import java.nio.file.Path
+import java.util.concurrent.Executors
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
-class JettyServerTest {
-
+@ExtendWith(MockitoExtension::class)
+internal class JettyServerTest {
     @Mock
-    JBakeConfiguration jBakeConfiguration;
+    var jBakeConfiguration: JBakeConfiguration? = null
 
     @Test
-    void shouldRunWithCustomPortAndContext(@TempDir Path output) throws Exception {
-        File out = output.resolve("build/jbake").toFile();
-        out.mkdirs();
+    @Throws(Exception::class)
+    fun shouldRunWithCustomPortAndContext(@TempDir output: Path) {
+        val out = output.resolve("build/jbake").toFile()
+        out.mkdirs()
 
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        int port = getRandoport();
-        when(jBakeConfiguration.getServerPort()).thenReturn(port);
-        when(jBakeConfiguration.getServerHostname()).thenReturn("localhost");
-        when(jBakeConfiguration.getServerContextPath()).thenReturn("/foo");
+        val source = TestUtils.getTestResourcesAsSourceFolder()
+        val port = this.randoport
+        Mockito.`when`<Any?>(jBakeConfiguration!!.serverPort).thenReturn(port)
+        Mockito.`when`<Any?>(jBakeConfiguration!!.serverHostname).thenReturn("localhost")
+        Mockito.`when`<Any?>(jBakeConfiguration!!.serverContextPath).thenReturn("/foo")
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        val executorService = Executors.newSingleThreadExecutor()
 
-        try(JettyServer server = new JettyServer()) {
-
-            executorService.execute(()->server.run(source.getAbsolutePath(), jBakeConfiguration));
-
-            while (!server.isStarted()) {
-                System.out.println("waiting until jetty is running");
-                Thread.sleep(100);
+        JettyServer().use { server ->
+            executorService.execute(Runnable { server.run(source.getAbsolutePath(), jBakeConfiguration!!) })
+            while (!server.isStarted) {
+                println("waiting until jetty is running")
+                Thread.sleep(100)
             }
 
-            URL url = new URL("http://localhost:"+port+"/foo/content/about.html");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+            val url = URL("http://localhost:" + port + "/foo/content/about.html")
+            val con = url.openConnection() as HttpURLConnection
+            con.setRequestMethod("GET")
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            assertThat(in.readLine()).isEqualTo("title=About");
+            val `in` = BufferedReader(InputStreamReader(con.getInputStream()))
+            Assertions.assertThat(`in`.readLine()).isEqualTo("title=About")
         }
     }
 
-    private int getRandoport() throws Exception {
-        try (ServerSocket socket = new ServerSocket(0)){
-            return socket.getLocalPort();
+    @get:Throws(Exception::class)
+    private val randoport: Int
+        get() {
+            ServerSocket(0).use { socket ->
+                return socket.getLocalPort()
+            }
         }
-    }
 }

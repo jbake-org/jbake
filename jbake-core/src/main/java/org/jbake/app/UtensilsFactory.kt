@@ -1,31 +1,29 @@
-package org.jbake.app;
+package org.jbake.app
 
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationInspector;
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationInspector
 
 /**
- * A factory to create a {@link Utensils} object
+ * A factory to create a [Utensils] object
  */
-public class UtensilsFactory {
-
+object UtensilsFactory {
     /**
-     * Create default {@link Utensils} by a given {@link JBakeConfiguration}
-     * @param config a {@link JBakeConfiguration}
-     * @return a default {@link Utensils} instance
+     * Create default [Utensils] by a given [JBakeConfiguration]
+     * @param config a [JBakeConfiguration]
+     * @return a default [Utensils] instance
      */
-    public static Utensils createDefaultUtensils(JBakeConfiguration config) {
+    fun createDefaultUtensils(config: JBakeConfiguration): Utensils {
+        val inspector = JBakeConfigurationInspector(config)
+        inspector.inspect()
 
-        JBakeConfigurationInspector inspector = new JBakeConfigurationInspector(config);
-        inspector.inspect();
+        val utensils = Utensils()
+        utensils.setConfiguration(config)
+        val contentStore = DBUtil.createDataStore(config)
+        utensils.setContentStore(contentStore)
+        utensils.setCrawler(Crawler(contentStore, config))
+        utensils.setRenderer(Renderer(contentStore, config))
+        utensils.setAsset(Asset(config))
 
-        Utensils utensils = new Utensils();
-        utensils.setConfiguration(config);
-        ContentStore contentStore = DBUtil.createDataStore(config);
-        utensils.setContentStore(contentStore);
-        utensils.setCrawler(new Crawler(contentStore, config));
-        utensils.setRenderer(new Renderer(contentStore, config));
-        utensils.setAsset(new Asset(config));
-
-        return utensils;
+        return utensils
     }
 }

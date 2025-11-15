@@ -1,127 +1,112 @@
-package org.jbake.app;
+package org.jbake.app
 
-import com.orientechnologies.orient.core.db.record.OTrackedMap;
-import org.apache.commons.io.FilenameUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
-import org.jbake.model.DocumentTypes;
-import org.jbake.util.DataFileUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import com.orientechnologies.orient.core.db.record.OTrackedMap
+import org.apache.commons.io.FilenameUtils
+import org.assertj.core.api.Assertions
+import org.hamcrest.BaseMatcher
+import org.hamcrest.CoreMatchers
+import org.hamcrest.Description
+import org.jbake.model.DocumentModel
+import org.jbake.model.DocumentTypes.addDocumentType
+import org.jbake.model.ModelAttributes
+import org.jbake.util.DataFileUtil
+import org.junit.Assert
+import org.junit.Test
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-
-public class CrawlerTest extends ContentStoreIntegrationTest {
-
+class CrawlerTest : ContentStoreIntegrationTest() {
     @Test
-    public void crawl() {
-        Crawler crawler = new Crawler(db, config);
-        crawler.crawl();
+    fun crawl() {
+        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        crawler.crawl()
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
-        Assert.assertEquals(3, db.getDocumentCount("page"));
+        Assert.assertEquals(4, ContentStoreIntegrationTest.Companion.db.getDocumentCount("post"))
+        Assert.assertEquals(3, ContentStoreIntegrationTest.Companion.db.getDocumentCount("page"))
 
-        DocumentList<DocumentModel> results = db.getPublishedPosts();
+        val results: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.publishedPosts
 
-        assertThat(results.size()).isEqualTo(3);
+        Assertions.assertThat(results.size).isEqualTo(3)
 
-        for (Map<String, Object> content : results) {
-            assertThat(content)
-                    .containsKey(ModelAttributes.ROOTPATH)
-                    .containsValue("../../../");
+        for (content in results) {
+            Assertions.assertThat<String?, Any?>(content)
+                .containsKey(ModelAttributes.ROOTPATH)
+                .containsValue("../../../")
         }
 
-        DocumentList<DocumentModel> allPosts = db.getAllContent("post");
+        val allPosts: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.getAllContent("post")
 
-        assertThat(allPosts.size()).isEqualTo(4);
+        Assertions.assertThat(allPosts.size).isEqualTo(4)
 
-        for (DocumentModel content : allPosts) {
-            if (content.getTitle().equals("Draft Post")) {
-                assertThat(content).containsKey(ModelAttributes.DATE);
+        for (content in allPosts) {
+            if (content!!.title == "Draft Post") {
+                Assertions.assertThat<String?, Any?>(content).containsKey(ModelAttributes.DATE)
             }
         }
 
         // covers bug #213
-        DocumentList<DocumentModel> publishedPostsByTag = db.getPublishedPostsByTag("blog");
-        Assert.assertEquals(3, publishedPostsByTag.size());
+        val publishedPostsByTag: DocumentList<DocumentModel> =
+            ContentStoreIntegrationTest.Companion.db.getPublishedPostsByTag("blog")
+        Assert.assertEquals(3, publishedPostsByTag.size.toLong())
     }
 
     @Test
-    public void crawlDataFiles() {
-        Crawler crawler = new Crawler(db, config);
+    fun crawlDataFiles() {
+        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
         // manually register data doctype
-        DocumentTypes.addDocumentType(config.getDataFileDocType());
-        db.updateSchema();
-        crawler.crawlDataFiles();
-        Assert.assertEquals(2, db.getDocumentCount("data"));
+        addDocumentType(ContentStoreIntegrationTest.Companion.config.getDataFileDocType())
+        ContentStoreIntegrationTest.Companion.db.updateSchema()
+        crawler.crawlDataFiles()
+        Assert.assertEquals(2, ContentStoreIntegrationTest.Companion.db.getDocumentCount("data"))
 
-        DataFileUtil dataFileUtil = new DataFileUtil(db, "data");
-        Map<String, Object> videos = dataFileUtil.get("videos.yaml");
-        Assert.assertFalse(videos.isEmpty());
-        Assert.assertNotNull(videos.get("data"));
+        val dataFileUtil = DataFileUtil(ContentStoreIntegrationTest.Companion.db, "data")
+        val videos = dataFileUtil.get("videos.yaml")
+        Assert.assertFalse(videos!!.isEmpty())
+        Assert.assertNotNull(videos.get("data"))
 
         // regression test for issue 747
-        Map<String, Object> authorsFileContents = dataFileUtil.get("authors.yaml");
-        Assert.assertFalse(authorsFileContents.isEmpty());
-        Object authorsList = authorsFileContents.get("authors");
-        assertThat(authorsList).isNotInstanceOf(OTrackedMap.class);
-        assertThat(authorsList).isInstanceOf(HashMap.class);
-        HashMap<String, Map<String, Object>> authors = (HashMap<String, Map<String, Object>>) authorsList;
-        assertThat(authors.get("Joe Bloggs").get("last_name")).isEqualTo("Bloggs");
+        val authorsFileContents = dataFileUtil.get("authors.yaml")
+        Assert.assertFalse(authorsFileContents!!.isEmpty())
+        val authorsList = authorsFileContents.get("authors")
+        Assertions.assertThat<Any?>(authorsList).isNotInstanceOf(OTrackedMap::class.java)
+        Assertions.assertThat<Any?>(authorsList).isInstanceOf(HashMap::class.java)
+        val authors = authorsList as HashMap<String?, MutableMap<String?, Any?>?>
+        Assertions.assertThat<Any?>(authors.get("Joe Bloggs")!!.get("last_name")).isEqualTo("Bloggs")
     }
 
     @Test
-    public void renderWithPrettyUrls() {
+    fun renderWithPrettyUrls() {
+        ContentStoreIntegrationTest.Companion.config.setUriWithoutExtension(true)
+        ContentStoreIntegrationTest.Companion.config.setPrefixForUriWithoutExtension("/blog")
 
-        config.setUriWithoutExtension(true);
-        config.setPrefixForUriWithoutExtension("/blog");
+        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        crawler.crawl()
 
-        Crawler crawler = new Crawler(db, config);
-        crawler.crawl();
+        Assert.assertEquals(4, ContentStoreIntegrationTest.Companion.db.getDocumentCount("post"))
+        Assert.assertEquals(3, ContentStoreIntegrationTest.Companion.db.getDocumentCount("page"))
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
-        Assert.assertEquals(3, db.getDocumentCount("page"));
+        val documents: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.publishedPosts
 
-        DocumentList<DocumentModel> documents = db.getPublishedPosts();
+        for (model in documents) {
+            val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model!!.file) + "/"
 
-        for (DocumentModel model : documents) {
-            String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.getFile()) + "/";
-
-            Assert.assertThat(model.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
-            Assert.assertThat(model.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-            Assert.assertThat(model.getRootPath(), is("../../../"));
+            Assert.assertThat<String?>(model.noExtensionUri, RegexMatcher.Companion.matches(noExtensionUri))
+            Assert.assertThat<String?>(model.uri, RegexMatcher.Companion.matches(noExtensionUri + "index\\.html"))
+            Assert.assertThat<String?>(model.rootPath, CoreMatchers.`is`<String?>("../../../"))
         }
     }
 
-    private static class RegexMatcher extends BaseMatcher<Object> {
-        private final String regex;
-
-        public RegexMatcher(String regex) {
-            this.regex = regex;
+    private class RegexMatcher(private val regex: String) : BaseMatcher<Any?>() {
+        override fun matches(o: Any): Boolean {
+            return (o as String).matches(regex.toRegex())
         }
 
-        public static RegexMatcher matches(String regex) {
-            return new RegexMatcher(regex);
+        override fun describeTo(description: Description) {
+            description.appendText("matches regex: " + regex)
         }
 
-        @Override
-        public boolean matches(Object o) {
-            return ((String) o).matches(regex);
-
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("matches regex: " + regex);
+        companion object {
+            fun matches(regex: String): RegexMatcher {
+                return RegexMatcher(regex)
+            }
         }
     }
 }

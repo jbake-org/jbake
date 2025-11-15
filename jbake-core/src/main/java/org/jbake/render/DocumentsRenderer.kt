@@ -1,101 +1,97 @@
-package org.jbake.render;
+package org.jbake.render
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.ContentStore;
-import org.jbake.app.DocumentList;
-import org.jbake.app.Renderer;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
-import org.jbake.template.RenderingException;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.ContentStore
+import org.jbake.app.DocumentList
+import org.jbake.app.Renderer
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.DocumentModel
+import org.jbake.model.ModelAttributes
+import org.jbake.template.RenderingException
+import java.io.File
+import java.util.*
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
+class DocumentsRenderer : RenderingTool {
+    @Throws(RenderingException::class)
+    override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration?): Int {
+        var renderedCount = 0
+        val errors: MutableList<String?> = LinkedList<String?>()
 
-public class DocumentsRenderer implements RenderingTool {
-
-    @Override
-    public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException {
-        int renderedCount = 0;
-        final List<String> errors = new LinkedList<>();
-
-        DocumentList<DocumentModel> documentList = db.getUnrenderedContent();
-        for (DocumentModel document : documentList) {
+        val documentList = db.getUnrenderedContent()
+        for (document in documentList) {
             try {
-                DocumentList<DocumentModel> typedDocList = db.getAllContent(document.getType());
-                DocumentModel prev = getPrevDoc(typedDocList, document);
-                DocumentModel next = getNextDoc(typedDocList, document);
-                document.setPreviousContent(prev);
-                document.setNextContent(next);
+                val typedDocList = db.getAllContent(document.getType())
+                val prev = getPrevDoc(typedDocList, document)
+                val next = getNextDoc(typedDocList, document)
+                document.setPreviousContent(prev)
+                document.setNextContent(next)
 
-                renderer.render(document);
-                db.markContentAsRendered(document);
-                renderedCount++;
-
-            } catch (Exception e) {
-                errors.add(e.getMessage());
+                renderer.render(document)
+                db.markContentAsRendered(document)
+                renderedCount++
+            } catch (e: Exception) {
+                errors.add(e.message)
             }
         }
 
         if (!errors.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Failed to render documents. Cause(s):");
-            for (String error : errors) {
-                sb.append("\n").append(error);
+            val sb = StringBuilder()
+            sb.append("Failed to render documents. Cause(s):")
+            for (error in errors) {
+                sb.append("\n").append(error)
             }
-            throw new RenderingException(sb.toString());
+            throw RenderingException(sb.toString())
         } else {
-            return renderedCount;
+            return renderedCount
         }
     }
 
-    private DocumentModel getNextDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
-        int typedListIndex = typedList.indexOf(doc);
-        if (typedList.getFirst().equals(doc)) {
+    private fun getNextDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
+        var typedListIndex = typedList.indexOf(doc)
+        if (typedList.getFirst() == doc) {
             // initial doc in typed list so there is no next
-            return null;
+            return null
         } else {
             while (true) {
                 try {
-                    DocumentModel nextDoc = typedList.get(typedListIndex - 1);
+                    val nextDoc = typedList.get(typedListIndex - 1)
                     if (isPublished(nextDoc)) {
-                        return getContentForNav(nextDoc);
+                        return getContentForNav(nextDoc)
                     } else {
-                        typedListIndex--;
+                        typedListIndex--
                     }
-                } catch (IndexOutOfBoundsException ex) {
-                    return null;
+                } catch (ex: IndexOutOfBoundsException) {
+                    return null
                 }
             }
         }
     }
 
-    private DocumentModel getPrevDoc(DocumentList<DocumentModel> typedList, DocumentModel doc) {
-        int typedListIndex = typedList.indexOf(doc);
-        if (typedList.getLast().equals(doc)) {
+    private fun getPrevDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
+        var typedListIndex = typedList.indexOf(doc)
+        if (typedList.getLast() == doc) {
             // last doc in typed list so there is no previous
-            return null;
+            return null
         } else {
             while (true) {
                 try {
-                    DocumentModel prevDoc = typedList.get(typedListIndex + 1);
+                    val prevDoc = typedList.get(typedListIndex + 1)
                     if (isPublished(prevDoc)) {
-                        return getContentForNav(prevDoc);
+                        return getContentForNav(prevDoc)
                     } else {
-                        typedListIndex++;
+                        typedListIndex++
                     }
-                } catch (IndexOutOfBoundsException ex) {
-                    return null;
+                } catch (ex: IndexOutOfBoundsException) {
+                    return null
                 }
             }
         }
     }
 
-    private boolean isPublished(DocumentModel document) {
+    private fun isPublished(document: DocumentModel): Boolean {
         // Attributes.Status.PUBLISHED_DATE cannot occur here
         // because it's converted TO either PUBLISHED or DRAFT in the Crawler.
-        return ModelAttributes.Status.PUBLISHED.equals(document.getStatus());
+        return ModelAttributes.Status.PUBLISHED == document.getStatus()
     }
 
     /**
@@ -104,16 +100,22 @@ public class DocumentsRenderer implements RenderingTool {
      * @param document original
      * @return navigation model for the 'document'
      */
-    private DocumentModel getContentForNav(DocumentModel document) {
-        DocumentModel navDocument = new DocumentModel();
-        navDocument.setNoExtensionUri(document.getNoExtensionUri());
-        navDocument.setUri(document.getUri());
-        navDocument.setTitle(document.getTitle());
-        return navDocument;
+    private fun getContentForNav(document: DocumentModel): DocumentModel {
+        val navDocument = DocumentModel()
+        navDocument.setNoExtensionUri(document.getNoExtensionUri())
+        navDocument.setUri(document.getUri())
+        navDocument.setTitle(document.getTitle())
+        return navDocument
     }
 
-    @Override
-    public int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException {
-        return render(renderer, db, null);
+    @Throws(RenderingException::class)
+    override fun render(
+        renderer: Renderer,
+        db: ContentStore,
+        destination: File?,
+        templatesPath: File?,
+        config: CompositeConfiguration?
+    ): Int {
+        return render(renderer, db, null)
     }
 }

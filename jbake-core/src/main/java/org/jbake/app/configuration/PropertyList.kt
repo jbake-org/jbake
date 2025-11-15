@@ -1,371 +1,376 @@
-package org.jbake.app.configuration;
+package org.jbake.app.configuration
 
-import java.lang.reflect.Field;
-
-import static org.jbake.app.configuration.Property.Group.CUSTOM;
-
-public abstract class PropertyList {
-
-    public static final Property ARCHIVE_FILE = new Property(
+object PropertyList {
+    @JvmField
+    val ARCHIVE_FILE: Property = Property(
         "archive.file",
         "Output filename for archive file"
-    );
+    )
 
-    public static final Property ASCIIDOCTOR_ATTRIBUTES = new Property(
+    @JvmField
+    val ASCIIDOCTOR_ATTRIBUTES: Property = Property(
         "asciidoctor.attributes",
         "attributes to be set when processing input"
-    );
+    )
 
-    public static final Property ASCIIDOCTOR_ATTRIBUTES_EXPORT = new Property(
+    val ASCIIDOCTOR_ATTRIBUTES_EXPORT: Property = Property(
         "asciidoctor.attributes.export",
         "Prefix to be used when exporting JBake properties to Asciidoctor"
-    );
+    )
 
-    public static final Property ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX = new Property(
+    val ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX: Property = Property(
         "asciidoctor.attributes.export.prefix",
         "prefix that should be used when JBake config options are exported"
-    );
+    )
 
-    public static final Property ASCIIDOCTOR_OPTION = new Property(
+    val ASCIIDOCTOR_OPTION: Property = Property(
         "asciidoctor.option",
         "default asciidoctor options"
-    );
+    )
 
-    public static final Property ASSET_FOLDER = new Property(
+    @JvmField
+    val ASSET_FOLDER: Property = Property(
         "asset.folder",
         "folder that contains all asset files"
-    );
+    )
 
-    public static final Property ASSET_IGNORE_HIDDEN = new Property(
+    val ASSET_IGNORE_HIDDEN: Property = Property(
         "asset.ignore",
         "Flag indicating if hidden asset resources should be ignored"
-    );
+    )
 
-    public static final Property BUILD_TIMESTAMP = new Property(
+    val BUILD_TIMESTAMP: Property = Property(
         "build.timestamp",
-        "timestamp jbake was build");
+        "timestamp jbake was build"
+    )
 
-    public static final Property CLEAR_CACHE = new Property(
+    val CLEAR_CACHE: Property = Property(
         "db.clear.cache",
         "clear database cache"
-    );
+    )
 
-    public static final Property CONTENT_FOLDER = new Property(
+    val CONTENT_FOLDER: Property = Property(
         "content.folder",
         "folder that contains all content files"
-    );
+    )
 
-    public static final Property DATA_FOLDER = new Property(
+    val DATA_FOLDER: Property = Property(
         "data.folder",
         "folder that contains all data files"
-    );
+    )
 
-    public static final Property DATA_FILE_DOCTYPE = new Property(
+    @JvmField
+    val DATA_FILE_DOCTYPE: Property = Property(
         "data.file.docType",
         "document type to use for data files"
-    );
+    )
 
-    public static final Property DATE_FORMAT = new Property(
+    val DATE_FORMAT: Property = Property(
         "date.format",
         "default date format used in content files"
-    );
+    )
 
-    public static final Property DB_STORE = new Property(
+    val DB_STORE: Property = Property(
         "db.store",
         "database store (plocal, memory)"
-    );
+    )
 
-    public static final Property DB_PATH = new Property(
+    val DB_PATH: Property = Property(
         "db.path",
         "database path for persistent storage"
-    );
+    )
 
-    public static final Property DEFAULT_STATUS = new Property(
+    val DEFAULT_STATUS: Property = Property(
         "default.status",
         "default document status"
-    );
+    )
 
-    public static final Property DEFAULT_TYPE = new Property(
+    val DEFAULT_TYPE: Property = Property(
         "default.type",
         "default document type"
-    );
+    )
 
-    public static final Property DESTINATION_FOLDER = new Property(
+    @JvmField
+    val DESTINATION_FOLDER: Property = Property(
         "destination.folder",
         "path to destination folder by default"
-    );
+    )
 
-    public static final Property DRAFT_SUFFIX = new Property(
+    val DRAFT_SUFFIX: Property = Property(
         "draft.suffix",
         "draft content suffix"
-    );
+    )
 
-    public static final Property ERROR404_FILE = new Property(
+    val ERROR404_FILE: Property = Property(
         "error404.file",
         "filename to use for 404 error"
-    );
+    )
 
-    public static final Property FEED_FILE = new Property(
+    val FEED_FILE: Property = Property(
         "feed.file",
         "filename to use for feed"
-    );
+    )
 
-    public static final Property FREEMARKER_TIMEZONE = new Property(
+    val FREEMARKER_TIMEZONE: Property = Property(
         "freemarker.timezone",
         "TimeZone to use within Freemarker"
-    );
+    )
 
-    public static final Property GIT_HASH = new Property(
+    val GIT_HASH: Property = Property(
         "git.hash",
         "abbreviated git hash"
-    );
+    )
 
-    public static final Property HEADER_SEPARATOR = new Property(
+    val HEADER_SEPARATOR: Property = Property(
         "header.separator",
         "String used to separate the header from the body"
-    );
+    )
 
-    public static final Property IGNORE_FILE = new Property(
+    @JvmField
+    val IGNORE_FILE: Property = Property(
         "ignore.file",
         "file used to ignore a directory"
-    );
+    )
 
-    public static final Property IMG_PATH_UPDATE = new Property(
+    val IMG_PATH_UPDATE: Property = Property(
         "img.path.update",
         "update image path?"
-    );
+    )
 
-    public static final Property IMG_PATH_PREPEND_HOST = new Property(
+    val IMG_PATH_PREPEND_HOST: Property = Property(
         "img.path.prepend.host",
         "Prepend site.host to image paths"
-    );
+    )
 
-    public static final Property INDEX_FILE = new Property(
+    val INDEX_FILE: Property = Property(
         "index.file",
         "filename to use for index file"
-    );
+    )
 
-    public static final Property JVM_LOCALE = new Property(
+    @JvmField
+    val JVM_LOCALE: Property = Property(
         "jvm.locale",
         "locale for the jvm"
-    );
+    )
 
-    public static final Property MARKDOWN_EXTENSIONS = new Property(
+    val MARKDOWN_EXTENSIONS: Property = Property(
         "markdown.extensions",
         "comma delimited default markdown extensions; for available extensions: http://www.decodified.com/pegdown/api/org/pegdown/Extensions.html"
-    );
+    )
 
-    public static final Property OUTPUT_ENCODING = new Property(
+    val OUTPUT_ENCODING: Property = Property(
         "freemarker.outputencoding",
         "default output_encoding setting for freemarker"
-    );
+    )
 
-    public static final Property OUTPUT_EXTENSION = new Property(
+    @JvmField
+    val OUTPUT_EXTENSION: Property = Property(
         "output.extension",
         "file extension for output content files"
-    );
+    )
 
-    public static final Property PAGINATE_INDEX = new Property(
+    @JvmField
+    val PAGINATE_INDEX: Property = Property(
         "index.paginate",
         "paginate index?"
-    );
+    )
 
-    public static final Property POSTS_PER_PAGE = new Property(
+    val POSTS_PER_PAGE: Property = Property(
         "index.posts_per_page",
         "number of post per page for pagination"
-    );
+    )
 
-    public static final Property RENDER_ARCHIVE = new Property(
+    val RENDER_ARCHIVE: Property = Property(
         "render.archive",
         "render archive file?"
-    );
+    )
 
-    public static final Property RENDER_ENCODING = new Property(
+    val RENDER_ENCODING: Property = Property(
         "render.encoding",
         "character encoding MIME name used in templates. use one of http://www.iana.org/assignments/character-sets/character-sets.xhtml"
-    );
+    )
 
-    public static final Property RENDER_ERROR404 = new Property(
+    val RENDER_ERROR404: Property = Property(
         "render.error404",
         "render 404 page?"
-    );
+    )
 
-    public static final Property RENDER_FEED = new Property(
+    val RENDER_FEED: Property = Property(
         "render.feed",
         "render feed file?"
-    );
+    )
 
-    public static final Property RENDER_INDEX = new Property(
+    val RENDER_INDEX: Property = Property(
         "render.index",
         "render index file?"
-    );
+    )
 
-    public static final Property RENDER_SITEMAP = new Property(
+    val RENDER_SITEMAP: Property = Property(
         "render.sitemap",
         "render sitemap.xml file?"
-    );
+    )
 
-    public static final Property RENDER_TAGS = new Property(
+    val RENDER_TAGS: Property = Property(
         "render.tags",
         "render tag files?"
-    );
+    )
 
-    public static final Property RENDER_TAGS_INDEX = new Property(
+    val RENDER_TAGS_INDEX: Property = Property(
         "render.tagsindex",
         "render tag index file?"
-    );
+    )
 
-    public static final Property SERVER_PORT = new Property(
+    val SERVER_PORT: Property = Property(
         "server.port",
         "default server port"
-    );
+    )
 
-    public static final Property SERVER_HOSTNAME = new Property(
+    val SERVER_HOSTNAME: Property = Property(
         "server.hostname",
         "default server hostname"
-    );
+    )
 
-    public static final Property SERVER_CONTEXT_PATH = new Property(
+    val SERVER_CONTEXT_PATH: Property = Property(
         "server.contextPath",
         "default server context path"
-    );
+    )
 
-    public static final Property SITE_HOST = new Property(
+    val SITE_HOST: Property = Property(
         "site.host",
         "site host"
-    );
+    )
 
-    public static final Property SITEMAP_FILE = new Property(
+    val SITEMAP_FILE: Property = Property(
         "sitemap.file",
         "filename to use for sitemap file"
-    );
+    )
 
-    public static final Property TAG_SANITIZE = new Property(
+    @JvmField
+    val TAG_SANITIZE: Property = Property(
         "tag.sanitize",
         "sanitize tag value before it is used as filename (i.e. replace spaces with hyphens)"
-    );
+    )
 
-    public static final Property TAG_PATH = new Property(
+    @JvmField
+    val TAG_PATH: Property = Property(
         "tag.path",
         "folder name to use for tag files"
-    );
+    )
 
-    public static final Property TEMPLATE_FOLDER = new Property(
+    @JvmField
+    val TEMPLATE_FOLDER: Property = Property(
         "template.folder",
         "folder that contains all template files"
-    );
+    )
 
-    public static final Property TEMPLATE_ENCODING = new Property(
+    val TEMPLATE_ENCODING: Property = Property(
         "template.encoding",
         "character encoding MIME name used in templates. use one of http://www.iana.org/assignments/character-sets/character-sets.xhtml"
-    );
+    )
 
-    public static final Property TEMPLATE_MASTERINDEX_FILE = new Property(
+    val TEMPLATE_MASTERINDEX_FILE: Property = Property(
         "template.masterindex.file",
         "filename of masterindex template file"
-    );
+    )
 
-    public static final Property TEMPLATE_FEED_FILE = new Property(
+    val TEMPLATE_FEED_FILE: Property = Property(
         "template.feed.file",
         "filename of feed template file"
-    );
+    )
 
-    public static final Property TEMPLATE_ARCHIVE_FILE = new Property(
+    val TEMPLATE_ARCHIVE_FILE: Property = Property(
         "template.archive.file",
         "filename of archive template file"
-    );
+    )
 
-    public static final Property TEMPLATE_TAG_FILE = new Property(
+    val TEMPLATE_TAG_FILE: Property = Property(
         "template.tag.file",
         "filename of tag template file"
-    );
+    )
 
-    public static final Property TEMPLATE_TAGSINDEX_FILE = new Property(
+    val TEMPLATE_TAGSINDEX_FILE: Property = Property(
         "template.tagsindex.file",
         "filename of tag index template file"
-    );
+    )
 
-    public static final Property TEMPLATE_SITEMAP_FILE = new Property(
+    val TEMPLATE_SITEMAP_FILE: Property = Property(
         "template.sitemap.file",
         "filename of sitemap template file"
-    );
+    )
 
-    public static final Property TEMPLATE_POST_FILE = new Property(
+    val TEMPLATE_POST_FILE: Property = Property(
         "template.post.file",
         "filename of post template file"
-    );
+    )
 
-    public static final Property TEMPLATE_PAGE_FILE = new Property(
+    val TEMPLATE_PAGE_FILE: Property = Property(
         "template.page.file",
         "filename of page template file"
-    );
+    )
 
-    public static final Property EXAMPLE_PROJECT_FREEMARKER = new Property(
+    val EXAMPLE_PROJECT_FREEMARKER: Property = Property(
         "example.project.freemarker",
         "zip file containing example project structure using freemarker templates"
-    );
+    )
 
-    public static final Property EXAMPLE_PROJECT_GROOVY = new Property(
+    val EXAMPLE_PROJECT_GROOVY: Property = Property(
         "example.project.groovy",
         "zip file containing example project structure using groovy templates"
-    );
+    )
 
-    public static final Property EXAMPLE_PROJECT_GROOVY_MTE = new Property(
+    val EXAMPLE_PROJECT_GROOVY_MTE: Property = Property(
         "example.project.groovy-mte",
         "zip file containing example project structure using groovy markup templates"
-    );
+    )
 
-    public static final Property EXAMPLE_PROJECT_THYMELEAF = new Property(
+    val EXAMPLE_PROJECT_THYMELEAF: Property = Property(
         "example.project.thymeleaf",
         "zip file containing example project structure using thymeleaf templates"
-    );
+    )
 
-    public static final Property EXAMPLE_PROJECT_JADE = new Property(
+    val EXAMPLE_PROJECT_JADE: Property = Property(
         "example.project.jade",
         "zip file containing example project structure using jade templates"
-    );
+    )
 
-    public static final Property MARKDOWN_MAX_PARSINGTIME = new Property(
+    val MARKDOWN_MAX_PARSINGTIME: Property = Property(
         "markdown.maxParsingTimeInMillis",
         "millis to parse single markdown page. See PegDown Parse configuration for details"
-    );
+    )
 
-    public static final Property THYMELEAF_LOCALE = new Property(
+    val THYMELEAF_LOCALE: Property = Property(
         "thymeleaf.locale",
         "default thymeleafe locale"
-    );
+    )
 
-    public static final Property URI_NO_EXTENSION = new Property(
+    val URI_NO_EXTENSION: Property = Property(
         "uri.noExtension",
         "enable extension-less URI option?"
-    );
+    )
 
-    public static final Property URI_NO_EXTENSION_PREFIX = new Property(
+    val URI_NO_EXTENSION_PREFIX: Property = Property(
         "uri.noExtension.prefix",
         "Set to a prefix path (starting with a slash) for which to generate extension-less URI's (i.e. a folder with index.html in)"
-    );
+    )
 
-    public static final Property VERSION = new Property(
+    val VERSION: Property = Property(
         "version",
         "jbake application version"
-    );
+    )
 
-    private PropertyList() {
-    }
-
-    public static Property getPropertyByKey(String key) {
-
-        for (Field field : PropertyList.class.getFields()) {
+    @JvmStatic
+    fun getPropertyByKey(key: String?): Property {
+        for (field in PropertyList::class.java.getFields()) {
             try {
-                Property property = (Property) field.get(null);
+                val property = field.get(null) as Property
 
-                if (property.getKey().equals(key)) {
-                    return property;
+                if (property.getKey() == key) {
+                    return property
                 }
-            } catch (IllegalAccessException e) {
-                return new Property(key, "", CUSTOM);
+            } catch (e: IllegalAccessException) {
+                return Property(key, "", Property.Group.CUSTOM)
             }
         }
-        return new Property(key, "", CUSTOM);
+        return Property(key, "", Property.Group.CUSTOM)
     }
 }

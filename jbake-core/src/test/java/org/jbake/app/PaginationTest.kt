@@ -21,74 +21,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jbake.app;
+package org.jbake.app
 
-import org.jbake.FakeDocumentBuilder;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.BeforeClass;
-
-import java.util.Calendar;
-import java.util.Locale;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.assertj.core.api.Assertions
+import org.jbake.FakeDocumentBuilder
+import org.jbake.model.DocumentModel
+import org.jbake.model.DocumentTypes.documentTypes
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
+import java.util.*
 
 /**
  * @author jdlee
  */
-public class PaginationTest extends ContentStoreIntegrationTest {
-
+class PaginationTest : ContentStoreIntegrationTest() {
     @Before
-    public void setUpOwn() {
-        for (String docType : DocumentTypes.getDocumentTypes()) {
-            String fileBaseName = docType;
-            if (docType.equals("masterindex")) {
-                fileBaseName = "index";
+    fun setUpOwn() {
+        for (docType in documentTypes) {
+            var fileBaseName = docType
+            if (docType == "masterindex") {
+                fileBaseName = "index"
             }
-            config.setTemplateFileNameForDocType(docType, fileBaseName + ".ftl");
+            ContentStoreIntegrationTest.Companion.config.setTemplateFileNameForDocType(docType, fileBaseName + ".ftl")
         }
 
-        config.setPaginateIndex(true);
-        config.setPostsPerPage(1);
+        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
+        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
     }
 
     @Test
-    public void testPagination() {
-        final int TOTAL_POSTS = 5;
-        final int PER_PAGE = 2;
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        for (int i = 1; i <= TOTAL_POSTS; i++) {
-            cal.add(Calendar.SECOND, 5);
-            FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
+    fun testPagination() {
+        val TOTAL_POSTS = 5
+        val PER_PAGE = 2
+        val cal = Calendar.getInstance(Locale.ENGLISH)
+        for (i in 1..TOTAL_POSTS) {
+            cal.add(Calendar.SECOND, 5)
+            val builder = FakeDocumentBuilder("post")
             builder.withCached(true)
-                    .withStatus("published")
-                    .withDate(cal.getTime())
-                    .build();
+                .withStatus("published")
+                .withDate(cal.getTime())
+                .build()
         }
 
-        int pageCount = 1;
-        int start = 0;
-        db.setLimit(PER_PAGE);
+        var pageCount = 1
+        var start = 0
+        ContentStoreIntegrationTest.Companion.db.setLimit(PER_PAGE)
 
         while (start < TOTAL_POSTS) {
-            db.setStart(start);
-            DocumentList posts = db.getPublishedPosts(true);
+            ContentStoreIntegrationTest.Companion.db.setStart(start)
+            val posts: DocumentList = ContentStoreIntegrationTest.Companion.db.getPublishedPosts(true)
 
-            assertThat(posts.size()).isLessThanOrEqualTo(2);
+            Assertions.assertThat(posts.size).isLessThanOrEqualTo(2)
 
-            if (posts.size() > 1) {
-                DocumentModel post = (DocumentModel) posts.get(0);
-                DocumentModel nextPost = (DocumentModel) posts.get(1);
+            if (posts.size > 1) {
+                val post = posts.get(0) as DocumentModel
+                val nextPost = posts.get(1) as DocumentModel
 
-                assertThat(post.getDate()).isAfter(nextPost.getDate());
+                Assertions.assertThat(post.date).isAfter(nextPost.date)
             }
 
-            pageCount++;
-            start += PER_PAGE;
+            pageCount++
+            start += PER_PAGE
         }
-        Assert.assertEquals(4, pageCount);
+        Assert.assertEquals(4, pageCount.toLong())
     }
 }

@@ -1,11 +1,9 @@
-package org.jbake.template;
+package org.jbake.template
 
-import org.jbake.model.DocumentTypeListener;
+import org.jbake.model.DocumentTypeListener
 
-public class ModelExtractorsDocumentTypeListener implements DocumentTypeListener {
-
-    @Override
-    public void added(String doctype) {
-        ModelExtractors.getInstance().registerExtractorsForCustomTypes(doctype);
+class ModelExtractorsDocumentTypeListener : DocumentTypeListener {
+    override fun added(doctype: String?) {
+        ModelExtractors.Companion.getInstance().registerExtractorsForCustomTypes(doctype)
     }
 }

@@ -1,8 +1,6 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-import org.jbake.model.DocumentModel;
-
-import java.util.Date;
+import java.util.*
 
 /**
  * An internal rendering engine used to notify the user that the markup format he used requires an engine that couldn't
@@ -10,29 +8,17 @@ import java.util.Date;
  *
  * @author Cédric Champeau
  */
-public class ErrorEngine extends MarkupEngine {
-    private final String engineName;
-
-    public ErrorEngine() {
-        this("unknown");
+class ErrorEngine @JvmOverloads constructor(private val engineName: String? = "unknown") : MarkupEngine() {
+    override fun processHeader(context: ParserContext) {
+        val documentModel = context.getDocumentModel()
+        documentModel.setType("post")
+        documentModel.setStatus("published")
+        documentModel.setTitle("Rendering engine missing")
+        documentModel.setDate(Date())
+        documentModel.setTags(arrayOfNulls<String>(0))
     }
 
-    public ErrorEngine(final String name) {
-        engineName = name;
-    }
-
-    @Override
-    public void processHeader(final ParserContext context) {
-        DocumentModel documentModel = context.getDocumentModel();
-        documentModel.setType("post");
-        documentModel.setStatus("published");
-        documentModel.setTitle("Rendering engine missing");
-        documentModel.setDate(new Date());
-        documentModel.setTags(new String[0]);
-    }
-
-    @Override
-    public void processBody(final ParserContext context) {
-        context.setBody("The markup engine [" + engineName + "] for [" + context.getFile() + "] couldn't be loaded");
+    override fun processBody(context: ParserContext) {
+        context.setBody("The markup engine [" + engineName + "] for [" + context.getFile() + "] couldn't be loaded")
     }
 }

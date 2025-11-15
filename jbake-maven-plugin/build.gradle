@@ -1,6 +1,7 @@
 plugins {
     id 'de.benediktritter.maven-plugin-development' version "$mavenPluginDevVersion"
     id "org.jbake.convention.java-common"
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 group = "org.jbake"
@@ -49,4 +50,11 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
     implementation "io.pebbletemplates:pebble:$pebbleVersion"
     implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(17)
 }

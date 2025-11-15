@@ -1,84 +1,71 @@
-package org.jbake.template.model;
+package org.jbake.template.model
 
-import org.jbake.app.DocumentList;
-import org.jbake.model.BaseModel;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
-import org.jbake.template.DelegatingTemplateEngine;
+import org.jbake.app.DocumentList
+import org.jbake.model.BaseModel
+import org.jbake.model.DocumentModel
+import org.jbake.model.ModelAttributes
+import org.jbake.template.DelegatingTemplateEngine
+import java.io.Writer
 
-import java.io.Writer;
-import java.util.Map;
+open class TemplateModel : BaseModel {
+    constructor()
 
-public class TemplateModel extends BaseModel {
-
-    public TemplateModel() {
+    constructor(model: TemplateModel?) {
+        putAll(model!!)
     }
 
-    public TemplateModel(TemplateModel model) {
-        putAll(model);
+    var config: MutableMap<String?, Any?>?
+        get() = get(ModelAttributes.CONFIG) as MutableMap<String?, Any?>?
+        set(configModel) {
+            put(ModelAttributes.CONFIG, configModel)
+        }
+
+    var content: DocumentModel?
+        get() = get(ModelAttributes.CONTENT) as DocumentModel?
+        set(content) {
+            put(ModelAttributes.CONTENT, content)
+        }
+
+    var renderer: DelegatingTemplateEngine?
+        get() = get(ModelAttributes.RENDERER) as DelegatingTemplateEngine?
+        set(renderingEngine) {
+            put(ModelAttributes.RENDERER, renderingEngine)
+        }
+
+    fun setNumberOfPages(numberOfPages: Int) {
+        put(ModelAttributes.NUMBER_OF_PAGES, numberOfPages)
     }
 
-    public Map<String, Object> getConfig() {
-        return (Map<String, Object>) get(ModelAttributes.CONFIG);
+    fun setCurrentPageNuber(currentPageNumber: Int) {
+        put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber)
     }
 
-    public void setConfig(Map<String, Object> configModel) {
-        put(ModelAttributes.CONFIG, configModel);
+    fun setPreviousFilename(previousFilename: String?) {
+        put(ModelAttributes.PREVIOUS_FILENAME, previousFilename)
     }
 
-    public DocumentModel getContent() {
-        return (DocumentModel) get(ModelAttributes.CONTENT);
+    fun setNextFileName(nextFilename: String?) {
+        put(ModelAttributes.NEXT_FILENAME, nextFilename)
     }
 
-    public void setContent(DocumentModel content) {
-        put(ModelAttributes.CONTENT, content);
+    var tag: String?
+        get() = get(ModelAttributes.TAG) as String?
+        set(tag) {
+            put(ModelAttributes.TAG, tag)
+        }
+
+    fun setTaggedPosts(taggedPosts: DocumentList<*>?) {
+        put(ModelAttributes.TAGGED_POSTS, taggedPosts)
     }
 
-    public DelegatingTemplateEngine getRenderer() {
-        return (DelegatingTemplateEngine) get(ModelAttributes.RENDERER);
+    fun setTaggedDocuments(taggedDocuments: DocumentList<*>?) {
+        put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments)
     }
 
-    public void setRenderer(DelegatingTemplateEngine renderingEngine) {
-        put(ModelAttributes.RENDERER, renderingEngine);
+    fun setVersion(version: String?) {
+        put(ModelAttributes.VERSION, version)
     }
 
-    public void setNumberOfPages(int numberOfPages) {
-        put(ModelAttributes.NUMBER_OF_PAGES, numberOfPages);
-    }
-
-    public void setCurrentPageNuber(int currentPageNumber) {
-        put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber);
-    }
-
-    public void setPreviousFilename(String previousFilename) {
-        put(ModelAttributes.PREVIOUS_FILENAME, previousFilename);
-    }
-
-    public void setNextFileName(String nextFilename) {
-        put(ModelAttributes.NEXT_FILENAME, nextFilename);
-    }
-
-    public String getTag() {
-        return (String) get(ModelAttributes.TAG);
-    }
-
-    public void setTag(String tag) {
-        put(ModelAttributes.TAG, tag);
-    }
-
-    public void setTaggedPosts(DocumentList taggedPosts) {
-        put(ModelAttributes.TAGGED_POSTS, taggedPosts);
-    }
-
-    public void setTaggedDocuments(DocumentList taggedDocuments) {
-        put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments);
-    }
-
-    public void setVersion(String version) {
-        put(ModelAttributes.VERSION, version);
-    }
-
-    public Writer getWriter() {
-        return (Writer) get(ModelAttributes.OUT);
-    }
+    val writer: Writer?
+        get() = get(ModelAttributes.OUT) as Writer?
 }

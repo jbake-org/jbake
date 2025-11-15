@@ -1,23 +1,22 @@
-package org.jbake.app.configuration;
+package org.jbake.app.configuration
 
-import org.junit.Test;
+import org.assertj.core.api.Assertions
+import org.jbake.app.configuration.PropertyList.getPropertyByKey
+import org.junit.Test
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class PropertyListTest {
-
+class PropertyListTest {
     @Test
-    public void getPropertyByKey() {
-        Property property = PropertyList.getPropertyByKey("archive.file");
+    fun getPropertyByKey() {
+        val property = getPropertyByKey("archive.file")
 
-        assertThat(property).isEqualTo(PropertyList.ARCHIVE_FILE);
+        Assertions.assertThat<Property?>(property).isEqualTo(PropertyList.ARCHIVE_FILE)
     }
 
     @Test
-    public void getCustomProperty() {
-        Property property = PropertyList.getPropertyByKey("unknown.option");
+    fun getCustomProperty() {
+        val property = getPropertyByKey("unknown.option")
 
-        assertThat(property.getKey()).isEqualTo("unknown.option");
-        assertThat(property.getGroup()).isEqualTo(Property.Group.CUSTOM);
+        Assertions.assertThat(property.key).isEqualTo("unknown.option")
+        Assertions.assertThat<Property.Group?>(property.group).isEqualTo(Property.Group.CUSTOM)
     }
 }

@@ -1,95 +1,66 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.DocumentModel
+import java.io.File
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
+class ParserContext(
+    val file: File?,
+    val fileLines: MutableList<String?>?,
+    val config: JBakeConfiguration?,
+    private val hasHeader: Boolean
+) {
+    val documentModel: DocumentModel
 
-public class ParserContext {
-    private final File file;
-    private final List<String> fileLines;
-    private final JBakeConfiguration config;
-    private final boolean hasHeader;
-    private final DocumentModel documentModel;
-
-    public ParserContext(
-            File file,
-            List<String> fileLines,
-            JBakeConfiguration config,
-            boolean hasHeader) {
-        this.file = file;
-        this.fileLines = fileLines;
-        this.config = config;
-        this.hasHeader = hasHeader;
-        this.documentModel = DocumentModel.createDefaultDocumentModel();
+    init {
+        this.documentModel = DocumentModel.Companion.createDefaultDocumentModel()
     }
 
-    public File getFile() {
-        return file;
+    fun hasHeader(): Boolean {
+        return hasHeader
     }
 
-    public List<String> getFileLines() {
-        return fileLines;
-    }
-
-    public JBakeConfiguration getConfig() {
-        return config;
-    }
-
-    public DocumentModel getDocumentModel() {
-        return documentModel;
-    }
-
-    public boolean hasHeader() {
-        return hasHeader;
-    }
-
-    // short methods for common use
-    public String getBody() {
-        return documentModel.getBody();
-    }
-
-    public void setBody(String str) {
-        documentModel.setBody(str);
-    }
-
-    public Date getDate() {
-        return getDocumentModel().getDate();
-    }
-
-    public void setDate(Date date) {
-        getDocumentModel().setDate(date);
-    }
-
-    public String getStatus() {
-        if (getDocumentModel().getStatus() != null) {
-            return getDocumentModel().getStatus();
+    var body: String?
+        // short methods for common use
+        get() = documentModel.getBody()
+        set(str) {
+            documentModel.setBody(str)
         }
-        return "";
-    }
 
-    public void setDefaultStatus() {
-        getDocumentModel().setStatus(getConfig().getDefaultStatus());
-    }
-
-    public String getType() {
-        if (getDocumentModel().getType() != null) {
-            return getDocumentModel().getType();
+    var date: Date?
+        get() = this.documentModel.getDate()
+        set(date) {
+            this.documentModel.setDate(date)
         }
-        return "";
+
+    val status: String?
+        get() {
+            if (this.documentModel.getStatus() != null) {
+                return this.documentModel.getStatus()
+            }
+            return ""
+        }
+
+    fun setDefaultStatus() {
+        this.documentModel.setStatus(this.config!!.defaultStatus)
     }
 
-    public void setDefaultType() {
-        getDocumentModel().setType(getConfig().getDefaultType());
+    val type: String?
+        get() {
+            if (this.documentModel.getType() != null) {
+                return this.documentModel.getType()
+            }
+            return ""
+        }
+
+    fun setDefaultType() {
+        this.documentModel.setType(this.config!!.defaultType)
     }
 
-    public Object getTags() {
-        return getDocumentModel().getTags();
-    }
+    val tags: Any?
+        get() = this.documentModel.getTags()
 
-    public void setTags(String[] tags) {
-        getDocumentModel().setTags(tags);
+    fun setTags(tags: Array<String?>?) {
+        this.documentModel.setTags(tags)
     }
 }

@@ -1,39 +1,35 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.jbake.app.JBakeException;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.Closeable;
-import java.io.IOException;
-
+import org.eclipse.jetty.server.Handler
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.server.handler.ContextHandler
+import org.eclipse.jetty.server.handler.DefaultHandler
+import org.eclipse.jetty.server.handler.HandlerList
+import org.eclipse.jetty.server.handler.ResourceHandler
+import org.jbake.app.JBakeException
+import org.jbake.app.configuration.JBakeConfiguration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.Closeable
+import java.io.IOException
 
 /**
  * Provides Jetty server related functions
  *
- * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
+ * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
-public class JettyServer implements Closeable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);
+class JettyServer : Closeable {
+    private var server: Server? = null
 
-    private Server server;
-
-    @Deprecated
-    public void run(String resourceBase, String port) {
-        LOGGER.warn("DEPRECATED. This method will be removed in the next major release. Use run(String resourceBase, JBakeConfiguration config) instead.");
-        run(resourceBase, "/", "localhost", Integer.parseInt(port));
+    @Deprecated("")
+    fun run(resourceBase: String?, port: String) {
+        LOGGER.warn("DEPRECATED. This method will be removed in the next major release. Use run(String resourceBase, JBakeConfiguration config) instead.")
+        run(resourceBase, "/", "localhost", port.toInt())
     }
 
-    public void run(String resourceBase, JBakeConfiguration configuration) {
-        run(resourceBase, configuration.getServerContextPath(), configuration.getServerHostname(), configuration.getServerPort());
+    fun run(resourceBase: String?, configuration: JBakeConfiguration) {
+        run(resourceBase, configuration.serverContextPath, configuration.serverHostname, configuration.serverPort)
     }
 
     /**
@@ -42,51 +38,59 @@ public class JettyServer implements Closeable {
      * @param resourceBase Base directory for resources to be served
      * @param port         Required server port
      */
-    private void run(String resourceBase, String contextPath, String hostname, int port) {
+    private fun run(resourceBase: String?, contextPath: String?, hostname: String?, port: Int) {
         try {
-            server = new Server();
-            ServerConnector connector = new ServerConnector(server);
-            connector.setHost(hostname);
-            connector.setPort(port);
-            server.addConnector(connector);
+            server = Server()
+            val connector = ServerConnector(server)
+            connector.setHost(hostname)
+            connector.setPort(port)
+            server!!.addConnector(connector)
 
-            ResourceHandler resource_handler = new ResourceHandler();
-            resource_handler.setDirectoriesListed(true);
-            resource_handler.setWelcomeFiles(new String[]{"index", "index.html"});
-            resource_handler.setResourceBase(resourceBase);
+            val resource_handler = ResourceHandler()
+            resource_handler.setDirectoriesListed(true)
+            resource_handler.setWelcomeFiles(arrayOf<String>("index", "index.html"))
+            resource_handler.setResourceBase(resourceBase)
 
-            ContextHandler contextHandler = new ContextHandler();
-            contextHandler.setContextPath(contextPath);
-            contextHandler.setHandler(resource_handler);
+            val contextHandler = ContextHandler()
+            contextHandler.setContextPath(contextPath)
+            contextHandler.setHandler(resource_handler)
 
-            HandlerList handlers = new HandlerList();
+            val handlers = HandlerList()
 
-            handlers.setHandlers(new Handler[]{contextHandler, new DefaultHandler()});
-            server.setHandler(handlers);
+            handlers.setHandlers(arrayOf<Handler>(contextHandler, DefaultHandler()))
+            server!!.setHandler(handlers)
 
-            LOGGER.info("Serving out contents of: [{}] on http://{}:{}{}", resourceBase, hostname, port, contextHandler.getContextPath());
-            LOGGER.info("(To stop server hit CTRL-C)");
+            LOGGER.info(
+                "Serving out contents of: [{}] on http://{}:{}{}",
+                resourceBase,
+                hostname,
+                port,
+                contextHandler.getContextPath()
+            )
+            LOGGER.info("(To stop server hit CTRL-C)")
 
-            server.start();
-            server.join();
-        } catch (Exception e) {
-            throw new JBakeException(SystemExit.SERVER_ERROR, "unable to start the server", e);
+            server!!.start()
+            server!!.join()
+        } catch (e: Exception) {
+            throw JBakeException(SystemExit.SERVER_ERROR, "unable to start the server", e)
         }
     }
 
-    public boolean isStarted() {
-        return server != null && server.isStarted();
-    }
+    val isStarted: Boolean
+        get() = server != null && server!!.isStarted()
 
-    @Override
-    public void close() throws IOException {
-        if (server.isRunning()) {
+    @Throws(IOException::class)
+    override fun close() {
+        if (server!!.isRunning()) {
             try {
-                server.stop();
-            } catch (Exception e) {
-                LOGGER.error("unable to stop server");
+                server!!.stop()
+            } catch (e: Exception) {
+                LOGGER.error("unable to stop server")
             }
         }
+    }
 
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(JettyServer::class.java)
     }
 }

@@ -1,71 +1,68 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.parser.PegdownExtensions;
-import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
-import com.vladsch.flexmark.util.ast.Document;
-import com.vladsch.flexmark.util.data.DataHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Field;
-import java.util.List;
+import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.parser.PegdownExtensions
+import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Renders documents in the Markdown format.
  *
  * @author Cédric Champeau
  */
-public class MarkdownEngine extends MarkupEngine {
+class MarkdownEngine : MarkupEngine() {
+    override fun processBody(context: ParserContext) {
+        val mdExts: MutableList<String> = context.getConfig().markdownExtensions
 
-    private static final Logger logger = LoggerFactory.getLogger(MarkdownEngine.class);
+        var extensions = PegdownExtensions.NONE
 
-    @Override
-    public void processBody(final ParserContext context) {
-        List<String> mdExts = context.getConfig().getMarkdownExtensions();
-
-        int extensions = PegdownExtensions.NONE;
-
-        for (String ext : mdExts) {
+        for (ext in mdExts) {
+            var ext = ext
             if (ext.startsWith("-")) {
-                ext = ext.substring(1);
-                extensions = removeExtension(extensions, extensionFor(ext));
+                ext = ext.substring(1)
+                extensions = removeExtension(extensions, extensionFor(ext))
             } else {
                 if (ext.startsWith("+")) {
-                    ext = ext.substring(1);
+                    ext = ext.substring(1)
                 }
-                extensions = addExtension(extensions, extensionFor(ext));
+                extensions = addExtension(extensions, extensionFor(ext))
             }
         }
 
-        DataHolder options = PegdownOptionsAdapter.flexmarkOptions(extensions);
+        val options = PegdownOptionsAdapter.flexmarkOptions(extensions)
 
-        Parser parser = Parser.builder(options).build();
-        HtmlRenderer renderer = HtmlRenderer.builder(options).build();
+        val parser = Parser.builder(options).build()
+        val renderer = HtmlRenderer.builder(options).build()
 
-        Document document = parser.parse(context.getBody());
-        context.setBody(renderer.render(document));
+        val document = parser.parse(context.getBody())
+        context.setBody(renderer.render(document))
     }
 
-    private int extensionFor(String name) {
-        int extension = PegdownExtensions.NONE;
+    private fun extensionFor(name: String): Int {
+        var extension = PegdownExtensions.NONE
 
         try {
-            Field extField = PegdownExtensions.class.getDeclaredField(name);
-            extension = extField.getInt(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            logger.debug("Undeclared extension field '{}', fallback to NONE", name);
+            val extField = PegdownExtensions::class.java.getDeclaredField(name)
+            extension = extField.getInt(null)
+        } catch (e: NoSuchFieldException) {
+            logger.debug("Undeclared extension field '{}', fallback to NONE", name)
+        } catch (e: IllegalAccessException) {
+            logger.debug("Undeclared extension field '{}', fallback to NONE", name)
         }
-        return extension;
+        return extension
     }
 
-    private int addExtension(int previousExtensions, int additionalExtension) {
-        return previousExtensions | additionalExtension;
+    private fun addExtension(previousExtensions: Int, additionalExtension: Int): Int {
+        return previousExtensions or additionalExtension
     }
 
-    private int removeExtension(int previousExtensions, int unwantedExtension) {
-        return previousExtensions & (~unwantedExtension);
+    private fun removeExtension(previousExtensions: Int, unwantedExtension: Int): Int {
+        return previousExtensions and (unwantedExtension.inv())
     }
 
+    companion object {
+        private val logger: Logger = LoggerFactory.getLogger(MarkdownEngine::class.java)
+    }
 }

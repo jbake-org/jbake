@@ -1,59 +1,46 @@
-package org.jbake.app;
+package org.jbake.app
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.apache.commons.io.FileUtils
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.io.FileFilter
+import java.io.IOException
+import java.util.*
 
 /**
  * Deals with assets (static files such as css, js or image files).
  *
- * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
+ * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
-public class Asset {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Asset.class);
-    private final List<Throwable> errors = new LinkedList<>();
-    private final JBakeConfiguration config;
+class Asset {
+    private val errors: MutableList<Throwable?> = LinkedList<Throwable?>()
+    private val config: JBakeConfiguration
 
     /**
      * @param source      Source file for the asset
      * @param destination Destination (target) directory for asset file
      * @param config      Project configuration
-     * @deprecated Use {@link #Asset(JBakeConfiguration)} instead.
-     * Compatibility constructor.
-     * Creates an instance of Asset.
      */
-    @Deprecated
-    public Asset(File source, File destination, CompositeConfiguration config) {
-        this.config = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config);
+    @Deprecated(
+        """Use {@link #Asset(JBakeConfiguration)} instead.
+      Compatibility constructor.
+      Creates an instance of Asset."""
+    )
+    constructor(source: File?, destination: File?, config: CompositeConfiguration?) {
+        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config)
     }
 
     /**
      * Creates an instance of Asset.
      *
-     * @param config The project configuration. @see{{@link JBakeConfiguration}}
+     * @param config The project configuration. @see{[JBakeConfiguration]}
      */
-    public Asset(JBakeConfiguration config) {
-        this.config = config;
-    }
-
-    /**
-     * Copy all files from assets folder to destination folder
-     * read from configuration
-     */
-    public void copy() {
-        copy(config.getAssetFolder());
+    constructor(config: JBakeConfiguration) {
+        this.config = config
     }
 
     /**
@@ -61,14 +48,21 @@ public class Asset {
      *
      * @param path The starting path
      */
-    public void copy(File path) {
-        FileFilter filter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return (!config.getAssetIgnoreHidden() || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config));
+    /**
+     * Copy all files from assets folder to destination folder
+     * read from configuration
+     */
+    @JvmOverloads
+    fun copy(path: File = config.assetFolder) {
+        val filter: FileFilter = object : FileFilter {
+            override fun accept(file: File): Boolean {
+                return (!config.assetIgnoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(
+                    file,
+                    config
+                ))
             }
-        };
-        copy(path, config.getDestinationFolder(), filter);
+        }
+        copy(path, config.destinationFolder, filter)
     }
 
     /**
@@ -76,17 +70,18 @@ public class Asset {
      *
      * @param asset The asset file to copy
      */
-    public void copySingleFile(File asset) {
+    fun copySingleFile(asset: File) {
         try {
-            if ( !asset.isDirectory() ) {
-                String targetPath = config.getDestinationFolder().getCanonicalPath() + File.separatorChar + assetSubPath(asset);
-                LOGGER.info("Copying single asset file to [{}]", targetPath);
-                copyFile(asset, new File(targetPath));
+            if (!asset.isDirectory()) {
+                val targetPath =
+                    (config.destinationFolder!!.getCanonicalPath() + File.separatorChar).toString() + assetSubPath(asset)
+                LOGGER.info("Copying single asset file to [{}]", targetPath)
+                copyFile(asset, File(targetPath))
             } else {
-                LOGGER.info("Skip copying single asset file [{}]. Is a directory.", asset.getPath());
+                LOGGER.info("Skip copying single asset file [{}]. Is a directory.", asset.getPath())
             }
-        } catch (IOException io) {
-            LOGGER.error("Failed to copy the asset file.", io);
+        } catch (io: IOException) {
+            LOGGER.error("Failed to copy the asset file.", io)
         }
     }
 
@@ -95,22 +90,23 @@ public class Asset {
      * @param path to the file to validate.
      * @return true if the path provided points to a file in the asset folder.
      */
-    public boolean isAssetFile(File path) {
-        boolean isAsset = false;
+    fun isAssetFile(path: File): Boolean {
+        var isAsset = false
 
         try {
-            if(FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
-                if (FileUtil.isFileInDirectory(path, config.getAssetFolder())) {
-                    isAsset = true;
-                } else if (FileUtil.isFileInDirectory(path, config.getContentFolder())
-                    && FileUtil.getNotContentFileFilter(config).accept(path)) {
-                    isAsset = true;
+            if (FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
+                if (FileUtil.isFileInDirectory(path, config.assetFolder)) {
+                    isAsset = true
+                } else if (FileUtil.isFileInDirectory(path, config.contentFolder)
+                    && FileUtil.getNotContentFileFilter(config).accept(path)
+                ) {
+                    isAsset = true
                 }
             }
-        } catch (IOException ioe) {
-            LOGGER.error("Unable to determine the path to asset file {}", path.getPath(), ioe);
+        } catch (ioe: IOException) {
+            LOGGER.error("Unable to determine the path to asset file {}", path.getPath(), ioe)
         }
-        return isAsset;
+        return isAsset
     }
 
     /**
@@ -118,8 +114,8 @@ public class Asset {
      *
      * @param path of the content directory
      */
-    public void copyAssetsFromContent(File path) {
-        copy(path, config.getDestinationFolder(), FileUtil.getNotContentFileFilter(config));
+    fun copyAssetsFromContent(path: File) {
+        copy(path, config.destinationFolder, FileUtil.getNotContentFileFilter(config))
     }
 
     /**
@@ -127,40 +123,49 @@ public class Asset {
      *
      * @return a list of errors.
      */
-    public List<Throwable> getErrors() {
-        return new ArrayList<>(errors);
+    fun getErrors(): MutableList<Throwable?> {
+        return ArrayList<Throwable?>(errors)
     }
 
-    private String assetSubPath(File asset) throws IOException {
+    @Throws(IOException::class)
+    private fun assetSubPath(asset: File): String {
         // First, strip asset folder from file path
-        String targetFolder = asset.getCanonicalPath().replace(config.getAssetFolder().getCanonicalPath() + File.separatorChar, "");
+        var targetFolder =
+            asset.getCanonicalPath().replace(config.assetFolder!!.getCanonicalPath() + File.separatorChar, "")
         // And just to be sure, let's also remove the content folder, as some assets are copied from here.
-        targetFolder = targetFolder.replace(config.getContentFolder().getCanonicalPath() + File.separatorChar, "");
-        return targetFolder;
+        targetFolder = targetFolder.replace(config.contentFolder!!.getCanonicalPath() + File.separatorChar, "")
+        return targetFolder
     }
 
-    private void copy(File sourceFolder, File targetFolder, final FileFilter filter) {
-        final File[] assets = sourceFolder.listFiles(filter);
+    private fun copy(sourceFolder: File, targetFolder: File?, filter: FileFilter?) {
+        val assets = sourceFolder.listFiles(filter)
         if (assets != null) {
-            Arrays.sort(assets);
-            for (File asset : assets) {
-                final File target = new File(targetFolder, asset.getName());
+            Arrays.sort(assets)
+            for (asset in assets) {
+                val target = File(targetFolder, asset.getName())
                 if (asset.isFile()) {
-                    copyFile(asset, target);
+                    copyFile(asset, target)
                 } else if (asset.isDirectory()) {
-                    copy(asset, target, filter);
+                    copy(asset, target, filter)
                 }
             }
         }
     }
 
-    private void copyFile(File asset, File targetFolder) {
+    private fun copyFile(asset: File, targetFolder: File) {
         try {
-            FileUtils.copyFile(asset, targetFolder);
-            LOGGER.info("Copying [{}]... done!", asset.getPath());
-        } catch (IOException|IllegalArgumentException e) {
-            LOGGER.error("Copying [{}]... failed!", asset.getPath(), e);
-            errors.add(e);
+            FileUtils.copyFile(asset, targetFolder)
+            LOGGER.info("Copying [{}]... done!", asset.getPath())
+        } catch (e: IOException) {
+            LOGGER.error("Copying [{}]... failed!", asset.getPath(), e)
+            errors.add(e)
+        } catch (e: IllegalArgumentException) {
+            LOGGER.error("Copying [{}]... failed!", asset.getPath(), e)
+            errors.add(e)
         }
+    }
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(Asset::class.java)
     }
 }

@@ -1,6 +1,7 @@
 plugins {
     id "org.jbake.convention.java-common"
     id 'application'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 apply from: "$rootDir/gradle/application.gradle"
@@ -36,6 +37,7 @@ dependencies {
 
     smokeTestImplementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
     smokeTestImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 task smokeTest(type: Test, dependsOn: installDist) {
@@ -56,3 +58,9 @@ smokeTest {
 check.dependsOn smokeTest
 
 jar.enabled=false
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(17)
+}

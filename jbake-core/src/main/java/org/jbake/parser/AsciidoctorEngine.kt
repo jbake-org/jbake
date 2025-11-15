@@ -1,210 +1,199 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.Options;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.jruby.AsciidoctorJRuby;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import static org.asciidoctor.AttributesBuilder.attributes;
-import static org.asciidoctor.OptionsBuilder.options;
-import static org.asciidoctor.SafeMode.UNSAFE;
+import org.asciidoctor.*
+import org.asciidoctor.jruby.AsciidoctorJRuby
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Renders documents in the asciidoc format using the Asciidoctor engine.
  *
  * @author Cédric Champeau
  */
-public class AsciidoctorEngine extends MarkupEngine {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsciidoctorEngine.class);
-    public static final String JBAKE_PREFIX = "jbake-";
-    public static final String REVDATE_KEY = "revdate";
+class AsciidoctorEngine : MarkupEngine() {
+    private val lock = ReentrantReadWriteLock()
 
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private var engine: Asciidoctor? = null
 
-    private Asciidoctor engine;
-    /* comma separated file paths to additional gems */
-    private static final String OPT_GEM_PATH = "gemPath";
-    /* comma separated gem names */
-    private static final String OPT_REQUIRES = "requires";
-
-    public AsciidoctorEngine() {
-        Class engineClass = Asciidoctor.class;
-        assert engineClass != null;
+    init {
+        val engineClass: Class<*> = checkNotNull(Asciidoctor::class.java)
     }
 
-    private Asciidoctor getEngine(Options options) {
+    private fun getEngine(options: Options): Asciidoctor {
         try {
-            lock.readLock().lock();
+            lock.readLock().lock()
             if (engine == null) {
-                lock.readLock().unlock();
+                lock.readLock().unlock()
                 try {
-                    lock.writeLock().lock();
+                    lock.writeLock().lock()
                     if (engine == null) {
-                        LOGGER.info("Initializing Asciidoctor engine...");
+                        LOGGER.info("Initializing Asciidoctor engine...")
                         if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = AsciidoctorJRuby.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
+                            engine = AsciidoctorJRuby.Factory.create(options.map().get(OPT_GEM_PATH).toString())
                         } else {
-                            engine = Asciidoctor.Factory.create();
+                            engine = Asciidoctor.Factory.create()
                         }
 
                         if (options.map().containsKey(OPT_REQUIRES)) {
-                            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
-                            if (requires.length != 0) {
-                                for (String require : requires) {
-                                    engine.requireLibrary(require);
+                            val requires: Array<String?> =
+                                options.map().get(OPT_REQUIRES).toString().split(",".toRegex())
+                                    .dropLastWhile { it.isEmpty() }.toTypedArray()
+                            if (requires.size != 0) {
+                                for (require in requires) {
+                                    engine!!.requireLibrary(require)
                                 }
                             }
                         }
 
-                        LOGGER.info("Asciidoctor engine initialized.");
+                        LOGGER.info("Asciidoctor engine initialized.")
                     }
                 } finally {
-                    lock.readLock().lock();
-                    lock.writeLock().unlock();
+                    lock.readLock().lock()
+                    lock.writeLock().unlock()
                 }
             }
         } finally {
-            lock.readLock().unlock();
+            lock.readLock().unlock()
         }
-        return engine;
+        return engine!!
     }
 
-    @Override
-    public void processHeader(final ParserContext context) {
-        Options options = getAsciiDocOptionsAndAttributes(context);
-        final Asciidoctor asciidoctor = getEngine(options);
-        DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
-        DocumentModel documentModel = context.getDocumentModel();
+    override fun processHeader(context: ParserContext) {
+        val options = getAsciiDocOptionsAndAttributes(context)
+        val asciidoctor = getEngine(options)
+        val header = asciidoctor.readDocumentHeader(context.getFile())
+        val documentModel = context.getDocumentModel()
         if (header.getDocumentTitle() != null) {
-            documentModel.setTitle(header.getDocumentTitle().getCombined());
+            documentModel.setTitle(header.getDocumentTitle().getCombined())
         }
-        Map<String, Object> attributes = header.getAttributes();
-        for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
-            String key = attribute.getKey();
-            Object value = attribute.getValue();
+        val attributes = header.getAttributes()
+        for (attribute in attributes.entries) {
+            val key: String = attribute.key!!
+            val value = attribute.value
 
             if (hasJBakePrefix(key)) {
-                String pKey = key.substring(6);
-                if(canCastToString(value)) {
-                    storeHeaderValue(pKey, (String) value, documentModel);
+                val pKey = key.substring(6)
+                if (canCastToString(value)) {
+                    storeHeaderValue(pKey, value as String, documentModel)
                 } else {
-                    documentModel.put(pKey, value);
+                    documentModel.put(pKey, value)
                 }
             }
             if (hasRevdate(key) && canCastToString(value)) {
-
-                String dateFormat = context.getConfig().getDateFormat();
-                DateFormat df = new SimpleDateFormat(dateFormat);
+                val dateFormat: String = context.getConfig().dateFormat!!
+                val df: DateFormat = SimpleDateFormat(dateFormat)
                 try {
-                    Date date = df.parse((String) value);
-                    context.setDate(date);
-                } catch (ParseException e) {
-                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
+                    val date = df.parse(value as String)
+                    context.setDate(date)
+                } catch (e: ParseException) {
+                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e)
                 }
             }
-            if (key.equals("jbake-tags")) {
+            if (key == "jbake-tags") {
                 if (canCastToString(value)) {
-                    context.setTags(((String) value).split(","));
+                    context.setTags((value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }
+                        .toTypedArray())
                 } else {
-                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
+                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
                 }
             } else {
-                documentModel.put(key, attributes.get(key));
+                documentModel.put(key, attributes.get(key))
             }
         }
     }
 
-    private boolean canCastToString(Object value) {
-        return value instanceof String;
+    private fun canCastToString(value: Any?): Boolean {
+        return value is String
     }
 
-    private String getValueClassName(Object value) {
-        return (value == null) ? "null" : value.getClass().getCanonicalName();
+    private fun getValueClassName(value: Any?): String? {
+        return if (value == null) "null" else value.javaClass.getCanonicalName()
     }
 
-    private boolean hasRevdate(String key) {
-        return key.equals(REVDATE_KEY);
+    private fun hasRevdate(key: String): Boolean {
+        return key == REVDATE_KEY
     }
 
-    private boolean hasJBakePrefix(String key) {
-        return key.startsWith(JBAKE_PREFIX);
+    private fun hasJBakePrefix(key: String): Boolean {
+        return key.startsWith(JBAKE_PREFIX)
     }
 
     // TODO: write tests with options and attributes
-    @Override
-    public void processBody(ParserContext context) {
-        StringBuilder body = new StringBuilder(context.getBody().length());
+    override fun processBody(context: ParserContext) {
+        val body = StringBuilder(context.getBody().length)
         if (!context.hasHeader()) {
-            for (String line : context.getFileLines()) {
-                body.append(line).append("\n");
+            for (line in context.getFileLines()) {
+                body.append(line).append("\n")
             }
-            context.setBody(body.toString());
+            context.setBody(body.toString())
         }
-        processAsciiDoc(context);
+        processAsciiDoc(context)
     }
 
-    private void processAsciiDoc(ParserContext context) {
-        Options options = getAsciiDocOptionsAndAttributes(context);
-        final Asciidoctor asciidoctor = getEngine(options);
-        context.setBody(asciidoctor.convert(context.getBody(), options));
+    private fun processAsciiDoc(context: ParserContext) {
+        val options = getAsciiDocOptionsAndAttributes(context)
+        val asciidoctor = getEngine(options)
+        context.setBody(asciidoctor.convert(context.getBody(), options))
     }
 
-    private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
-        JBakeConfiguration config = context.getConfig();
-        List<String> asciidoctorAttributes = config.getAsciidoctorAttributes();
-        final AttributesBuilder attributes = attributes(asciidoctorAttributes.toArray(new String[0]));
-        if (config.getExportAsciidoctorAttributes()) {
-            final String prefix = config.getAttributesExportPrefixForAsciidoctor();
+    private fun getAsciiDocOptionsAndAttributes(context: ParserContext): Options {
+        val config = context.getConfig()
+        val asciidoctorAttributes: MutableList<String?> = config.asciidoctorAttributes!!
+        val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String?>())
+        if (config.exportAsciidoctorAttributes) {
+            val prefix = config.attributesExportPrefixForAsciidoctor
 
-            for (final Iterator<String> it = config.getKeys(); it.hasNext(); ) {
-                final String key = it.next();
+            val it: MutableIterator<String> = config.keys
+            while (it.hasNext()) {
+                val key = it.next()
                 if (!key.startsWith("asciidoctor")) {
-                    attributes.attribute(prefix + key.replace(".", "_"), config.get(key));
+                    attributes.attribute(prefix + key.replace(".", "_"), config.get(key))
                 }
             }
         }
 
-        final List<String> optionsSubset = config.getAsciidoctorOptionKeys();
-        final Options options = options().attributes(attributes.get()).get();
-        for (final String optionKey : optionsSubset) {
-
-            Object optionValue = config.getAsciidoctorOption(optionKey);
-            if (optionKey.equals(Options.TEMPLATE_DIRS)) {
-                List<String> dirs = getAsList(optionValue);
+        val optionsSubset: MutableList<String> = config.asciidoctorOptionKeys
+        val options = OptionsBuilder.options().attributes(attributes.get()).get()
+        for (optionKey in optionsSubset) {
+            val optionValue = config.getAsciidoctorOption(optionKey)
+            if (optionKey == Options.TEMPLATE_DIRS) {
+                val dirs = getAsList(optionValue)
                 if (!dirs.isEmpty()) {
-                    options.setTemplateDirs(String.valueOf(dirs));
+                    options.setTemplateDirs(dirs.toString())
                 }
             } else {
-                options.setOption(optionKey, optionValue);
+                options.setOption(optionKey, optionValue)
             }
-
         }
-        options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());
-        options.setSafe(UNSAFE);
-        return options;
+        options.setBaseDir(context.getFile().getParentFile().getAbsolutePath())
+        options.setSafe(SafeMode.UNSAFE)
+        return options
     }
 
-    @SuppressWarnings("unchecked")
-    private List<String> getAsList(Object asciidoctorOption) {
-        List<String> values = new ArrayList<>();
+    private fun getAsList(asciidoctorOption: Any?): MutableList<String?> {
+        val values: MutableList<String?> = ArrayList<String?>()
 
-        if (asciidoctorOption instanceof List) {
-            values.addAll((List<String>) asciidoctorOption);
-        } else if (asciidoctorOption instanceof String) {
-            values.add(String.valueOf(asciidoctorOption));
+        if (asciidoctorOption is MutableList<*>) {
+            values.addAll(asciidoctorOption as MutableList<String?>)
+        } else if (asciidoctorOption is String) {
+            values.add(asciidoctorOption.toString())
         }
-        return values;
+        return values
     }
 
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(AsciidoctorEngine::class.java)
+        const val JBAKE_PREFIX: String = "jbake-"
+        const val REVDATE_KEY: String = "revdate"
+
+        /* comma separated file paths to additional gems */
+        private const val OPT_GEM_PATH = "gemPath"
+
+        /* comma separated gem names */
+        private const val OPT_REQUIRES = "requires"
+    }
 }

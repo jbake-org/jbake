@@ -1,20 +1,23 @@
-package org.jbake.render;
+package org.jbake.render
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.ContentStore;
-import org.jbake.app.Renderer;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.RenderingException;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.ContentStore
+import org.jbake.app.Renderer
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.template.RenderingException
+import java.io.File
 
-import java.io.File;
+interface RenderingTool {
+    @Throws(RenderingException::class)
+    fun render(renderer: Renderer?, db: ContentStore?, config: JBakeConfiguration?): Int
 
-public interface RenderingTool {
-
-
-    int render(Renderer renderer, ContentStore db, JBakeConfiguration config) throws RenderingException;
-
-    @Deprecated
-    //TODO: remove at 3.0.0
-    int render(Renderer renderer, ContentStore db, File destination, File templatesPath, CompositeConfiguration config) throws RenderingException;
-
+    @Deprecated("")
+    @Throws(RenderingException::class)
+    fun render(
+        renderer: Renderer?,
+        db: ContentStore?,
+        destination: File?,
+        templatesPath: File?,
+        config: CompositeConfiguration?
+    ): Int
 }

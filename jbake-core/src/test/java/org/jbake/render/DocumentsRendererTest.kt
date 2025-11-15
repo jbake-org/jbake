@@ -1,212 +1,208 @@
-package org.jbake.render;
+package org.jbake.render
 
-import org.jbake.app.ContentStore;
-import org.jbake.app.DocumentList;
-import org.jbake.app.Renderer;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.jbake.model.ModelAttributes;
-import org.jbake.template.RenderingException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.MockitoAnnotations;
+import org.assertj.core.api.Assertions
+import org.jbake.app.ContentStore
+import org.jbake.app.DocumentList
+import org.jbake.app.Renderer
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.DocumentModel
+import org.jbake.model.DocumentTypes.addDocumentType
+import org.jbake.model.ModelAttributes
+import org.jbake.template.RenderingException
+import org.junit.Before
+import org.junit.Test
+import org.junit.jupiter.api.function.Executable
+import org.mockito.*
+import java.util.function.Function
+import java.util.stream.Collectors
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-public class DocumentsRendererTest {
-
-    public DocumentsRenderer documentsRenderer;
-    private ContentStore db;
-    private Renderer renderer;
-    private JBakeConfiguration configuration;
-    private DocumentList<DocumentModel> emptyTemplateModelList;
+class DocumentsRendererTest {
+    var documentsRenderer: DocumentsRenderer? = null
+    private var db: ContentStore? = null
+    private var renderer: Renderer? = null
+    private var configuration: JBakeConfiguration? = null
+    private var emptyTemplateModelList: DocumentList<DocumentModel>? = null
 
     @Captor
-    private ArgumentCaptor<DocumentModel> argument;
+    private val argument: ArgumentCaptor<DocumentModel>? = null
 
     @Before
-    public void setUp() {
+    fun setUp() {
+        MockitoAnnotations.initMocks(this)
 
-        MockitoAnnotations.initMocks(this);
+        documentsRenderer = DocumentsRenderer()
 
-        documentsRenderer = new DocumentsRenderer();
-
-        db = mock(ContentStore.class);
-        renderer = mock(Renderer.class);
-        configuration = mock(JBakeConfiguration.class);
-        emptyTemplateModelList = new DocumentList<>();
+        db = Mockito.mock<ContentStore>(ContentStore::class.java)
+        renderer = Mockito.mock<Renderer>(Renderer::class.java)
+        configuration = Mockito.mock<JBakeConfiguration?>(JBakeConfiguration::class.java)
+        emptyTemplateModelList = DocumentList<DocumentModel>()
     }
 
     @Test
-    public void shouldReturnZeroIfNothingHasRendered() throws Exception {
+    @Throws(Exception::class)
+    fun shouldReturnZeroIfNothingHasRendered() {
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.unrenderedContent).thenReturn(emptyTemplateModelList)
 
-        when(db.getUnrenderedContent()).thenReturn(emptyTemplateModelList);
+        val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
 
-        int renderResponse = documentsRenderer.render(renderer, db, configuration);
-
-        assertThat(renderResponse).isEqualTo(0);
+        Assertions.assertThat(renderResponse).isEqualTo(0)
     }
 
     @Test
-    public void shouldReturnCountOfProcessedDocuments() throws Exception {
-
+    @Throws(Exception::class)
+    fun shouldReturnCountOfProcessedDocuments() {
         // given:
-        DocumentTypes.addDocumentType("customType");
 
-        DocumentList<DocumentModel> templateModelList = new DocumentList<>();
-        templateModelList.add(emptyDocument());
-        templateModelList.add(emptyDocument());
+        addDocumentType("customType")
+
+        val templateModelList: DocumentList<DocumentModel> = DocumentList<DocumentModel>()
+        templateModelList.add(emptyDocument())
+        templateModelList.add(emptyDocument())
 
         // return given DocumentList for DocumentType 'custom type'
-        when(db.getUnrenderedContent()).thenReturn(templateModelList);
-        when(db.getAllContent(any())).thenReturn(templateModelList);
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.unrenderedContent).thenReturn(templateModelList)
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.getAllContent(ArgumentMatchers.any<String?>()))
+            .thenReturn(templateModelList)
 
         // when:
-        int renderResponse = documentsRenderer.render(renderer, db, configuration);
+        val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
 
         // then:
-        assertThat(renderResponse).isEqualTo(2);
+        Assertions.assertThat(renderResponse).isEqualTo(2)
     }
 
     @Test
-    public void shouldThrowAnExceptionWithCollectedErrorMessages() {
-        String fakeExceptionMessage = "fake exception";
+    fun shouldThrowAnExceptionWithCollectedErrorMessages() {
+        val fakeExceptionMessage = "fake exception"
 
         // expect
-        Assertions.assertThrows(
-            RenderingException.class, () -> {
-
+        org.junit.jupiter.api.Assertions.assertThrows<RenderingException?>(
+            RenderingException::class.java, Executable {
                 // given
-                DocumentTypes.addDocumentType("customType");
+                addDocumentType("customType")
 
-                DocumentList<DocumentModel> templateModelList = new DocumentList<>();
-                DocumentModel document = emptyDocument();
-                DocumentModel document2 = emptyDocument();
-                templateModelList.add(document);
-                templateModelList.add(document2);
+                val templateModelList: DocumentList<DocumentModel> = DocumentList<DocumentModel>()
+                val document = emptyDocument()
+                val document2 = emptyDocument()
+                templateModelList.add(document)
+                templateModelList.add(document2)
 
                 // throw an exception for every call of renderer's render method
-                doThrow(new Exception(fakeExceptionMessage)).when(renderer).render(any(DocumentModel.class));
-                when(db.getUnrenderedContent()).thenReturn(templateModelList);
+                Mockito.doThrow(Exception(fakeExceptionMessage)).`when`<Renderer?>(renderer).render(
+                    ArgumentMatchers.any<DocumentModel>(
+                        DocumentModel::class.java
+                    )
+                )
+                Mockito.`when`<DocumentList<DocumentModel>>(db!!.unrenderedContent).thenReturn(templateModelList)
 
                 // when
-                int renderResponse = documentsRenderer.render(renderer, db, configuration);
+                val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
 
                 // then
-                assertThat(renderResponse).isEqualTo(2);
+                Assertions.assertThat(renderResponse).isEqualTo(2)
             },
             fakeExceptionMessage + "\n" + fakeExceptionMessage
-        );
+        )
     }
 
     @Test
-    public void shouldContainPostNavigation() throws Exception {
+    @Throws(Exception::class)
+    fun shouldContainPostNavigation() {
         // given
-        DocumentTypes.addDocumentType("customType");
+        addDocumentType("customType")
 
-        String firstTitle = "First Document";
-        DocumentModel firstDoc = simpleDocument(firstTitle, ModelAttributes.Status.PUBLISHED, "page");
-        String secondTitle = "Second Document";
-        DocumentModel secondDoc = simpleDocument(secondTitle, ModelAttributes.Status.PUBLISHED, "post");
-        String thirdTitle = "Third Document";
-        DocumentModel thirdDoc = simpleDocument(thirdTitle, ModelAttributes.Status.PUBLISHED, "page");
-        String fourthTitle = "Fourth Document (draft)";
-        DocumentModel fourthDoc = simpleDocument(fourthTitle, ModelAttributes.Status.DRAFT, "post");
-        String fifthTitle = "Fifth Document";
-        DocumentModel fifthDoc = simpleDocument(fifthTitle, ModelAttributes.Status.PUBLISHED, "page");
-        String sixthTitle = "Sixth Document";
-        DocumentModel sixthDoc = simpleDocument(sixthTitle, ModelAttributes.Status.PUBLISHED, "post");
-        String seventhTitle = "Seventh Document";
-        DocumentModel seventhDoc = simpleDocument(seventhTitle, ModelAttributes.Status.PUBLISHED, "post");
+        val firstTitle = "First Document"
+        val firstDoc = simpleDocument(firstTitle, ModelAttributes.Status.PUBLISHED, "page")
+        val secondTitle = "Second Document"
+        val secondDoc = simpleDocument(secondTitle, ModelAttributes.Status.PUBLISHED, "post")
+        val thirdTitle = "Third Document"
+        val thirdDoc = simpleDocument(thirdTitle, ModelAttributes.Status.PUBLISHED, "page")
+        val fourthTitle = "Fourth Document (draft)"
+        val fourthDoc = simpleDocument(fourthTitle, ModelAttributes.Status.DRAFT, "post")
+        val fifthTitle = "Fifth Document"
+        val fifthDoc = simpleDocument(fifthTitle, ModelAttributes.Status.PUBLISHED, "page")
+        val sixthTitle = "Sixth Document"
+        val sixthDoc = simpleDocument(sixthTitle, ModelAttributes.Status.PUBLISHED, "post")
+        val seventhTitle = "Seventh Document"
+        val seventhDoc = simpleDocument(seventhTitle, ModelAttributes.Status.PUBLISHED, "post")
 
-        DocumentList allDocs = new DocumentList();
-        allDocs.add(seventhDoc);
-        allDocs.add(sixthDoc);
-        allDocs.add(fifthDoc);
-        allDocs.add(fourthDoc);
-        allDocs.add(thirdDoc);
-        allDocs.add(secondDoc);
-        allDocs.add(firstDoc);
+        val allDocs: DocumentList = DocumentList()
+        allDocs.add(seventhDoc)
+        allDocs.add(sixthDoc)
+        allDocs.add(fifthDoc)
+        allDocs.add(fourthDoc)
+        allDocs.add(thirdDoc)
+        allDocs.add(secondDoc)
+        allDocs.add(firstDoc)
 
-        DocumentList pageDocs = new DocumentList();
-        pageDocs.add(fifthDoc);
-        pageDocs.add(thirdDoc);
-        pageDocs.add(firstDoc);
+        val pageDocs: DocumentList = DocumentList()
+        pageDocs.add(fifthDoc)
+        pageDocs.add(thirdDoc)
+        pageDocs.add(firstDoc)
 
-        DocumentList postDocs = new DocumentList();
-        postDocs.add(seventhDoc);
-        postDocs.add(sixthDoc);
-        postDocs.add(fourthDoc);
-        postDocs.add(secondDoc);
+        val postDocs: DocumentList = DocumentList()
+        postDocs.add(seventhDoc)
+        postDocs.add(sixthDoc)
+        postDocs.add(fourthDoc)
+        postDocs.add(secondDoc)
 
-        when(db.getUnrenderedContent()).thenReturn(allDocs);
-        when(db.getAllContent("page")).thenReturn(pageDocs);
-        when(db.getAllContent("post")).thenReturn(postDocs);
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.unrenderedContent).thenReturn(allDocs)
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.getAllContent("page")).thenReturn(pageDocs)
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.getAllContent("post")).thenReturn(postDocs)
 
         // when
-        int renderResponse = documentsRenderer.render(renderer, db, configuration);
+        val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
 
         // then
-        verify(renderer, times(7)).render(argument.capture());
-        final Map<String, Map<String, Object>> renderedDocs = asTitleToDocMap(argument.getAllValues());
+        Mockito.verify<Renderer?>(renderer, Mockito.times(7)).render(argument!!.capture()!!)
+        val renderedDocs = asTitleToDocMap(argument.getAllValues())
 
         // page checks
-        assertDocumentNavigation(renderedDocs.get(fifthTitle), thirdTitle, null);
-        assertDocumentNavigation(renderedDocs.get(thirdTitle), firstTitle, fifthTitle);
-        assertDocumentNavigation(renderedDocs.get(firstTitle), null, thirdTitle);
+        assertDocumentNavigation(renderedDocs.get(fifthTitle), thirdTitle, null)
+        assertDocumentNavigation(renderedDocs.get(thirdTitle), firstTitle, fifthTitle)
+        assertDocumentNavigation(renderedDocs.get(firstTitle), null, thirdTitle)
 
         // post checks
-        assertDocumentNavigation(renderedDocs.get(seventhTitle), sixthTitle, null);
-        assertDocumentNavigation(renderedDocs.get(sixthTitle), secondTitle, seventhTitle);
-        assertDocumentNavigation(renderedDocs.get(fourthTitle), secondTitle, sixthTitle);
-        assertDocumentNavigation(renderedDocs.get(secondTitle), null, sixthTitle);
+        assertDocumentNavigation(renderedDocs.get(seventhTitle), sixthTitle, null)
+        assertDocumentNavigation(renderedDocs.get(sixthTitle), secondTitle, seventhTitle)
+        assertDocumentNavigation(renderedDocs.get(fourthTitle), secondTitle, sixthTitle)
+        assertDocumentNavigation(renderedDocs.get(secondTitle), null, sixthTitle)
 
-        assertThat(renderResponse).isEqualTo(7);
+        Assertions.assertThat(renderResponse).isEqualTo(7)
     }
 
-    private void assertDocumentNavigation(
-        final Map<String, Object> renderedDoc,
-        final String prevDocumentTitle, String nextDocumentTitle) {
-        assertThat(renderedDoc).flatExtracting(
+    private fun assertDocumentNavigation(
+        renderedDoc: MutableMap<String?, Any?>?,
+        prevDocumentTitle: String?, nextDocumentTitle: String?
+    ) {
+        Assertions.assertThat<String?, Any?>(renderedDoc).flatExtracting(
             "previousContent." + ModelAttributes.TITLE,
-            "nextContent." + ModelAttributes.TITLE)
-            .containsExactly(prevDocumentTitle, nextDocumentTitle);
+            "nextContent." + ModelAttributes.TITLE
+        )
+            .containsExactly(prevDocumentTitle, nextDocumentTitle)
     }
 
-    private Map<String, Map<String, Object>> asTitleToDocMap(List<DocumentModel> values) {
+    private fun asTitleToDocMap(values: MutableList<DocumentModel>): MutableMap<String?, MutableMap<String?, Any?>?> {
         return values.stream()
-            .collect(Collectors.toMap(doc -> doc.get(ModelAttributes.TITLE).toString(), doc -> doc));
+            .collect(
+                Collectors.toMap(
+                    Function { doc: DocumentModel? -> doc!!.get(ModelAttributes.TITLE).toString() },
+                    Function { doc: DocumentModel? -> doc })
+            )
     }
 
-    private DocumentModel emptyDocument() {
-        return new DocumentModel();
+    private fun emptyDocument(): DocumentModel {
+        return DocumentModel()
     }
 
-    private DocumentModel simpleDocument(String title, String status, String docType) {
-        DocumentModel simpleDoc = new DocumentModel();
-        String uri = title.replace(" ", "_");
-        simpleDoc.setNoExtensionUri(uri);
-        simpleDoc.setUri(uri);
-        simpleDoc.setType(docType);
-        simpleDoc.setTitle(title);
-        simpleDoc.setStatus(status);
-        return simpleDoc;
+    private fun simpleDocument(title: String, status: String?, docType: String?): DocumentModel {
+        val simpleDoc = DocumentModel()
+        val uri = title.replace(" ", "_")
+        simpleDoc.noExtensionUri = uri
+        simpleDoc.uri = uri
+        simpleDoc.type = docType
+        simpleDoc.title = title
+        simpleDoc.status = status
+        return simpleDoc
     }
-
 }

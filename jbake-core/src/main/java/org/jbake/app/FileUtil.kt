@@ -1,27 +1,19 @@
-package org.jbake.app;
+package org.jbake.app
 
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.parser.Engines;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.parser.Engines
+import java.io.*
+import java.net.URLDecoder
+import java.nio.file.Paths
+import java.security.MessageDigest
 
 /**
  * Provides File related functions
  *
- * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
+ * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
-public class FileUtil {
-
-    public static final String URI_SEPARATOR_CHAR = "/";
+object FileUtil {
+    const val URI_SEPARATOR_CHAR: String = "/"
 
     /**
      * Filters files based on their file extension.
@@ -29,53 +21,51 @@ public class FileUtil {
      * @param config the jbake configuration
      * @return Object for filtering files
      */
-    public static FileFilter getFileFilter(JBakeConfiguration config) {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
+    fun getFileFilter(config: JBakeConfiguration): FileFilter {
+        return object : FileFilter {
+            override fun accept(pathname: File): Boolean {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile()
-                    && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config));
+                        && Engines.Companion.getRecognizedExtensions()
+                    .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
             }
-        };
+        }
     }
 
-    /**
-     * Filters files based on their file extension.
-     *
-     * @return Object for filtering files
-     * @deprecated use {@link #getFileFilter(JBakeConfiguration)} instead
-     */
-    @Deprecated
-    public static FileFilter getFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
+    @get:Deprecated("use {@link #getFileFilter(JBakeConfiguration)} instead")
+    val fileFilter: FileFilter
+        /**
+         * Filters files based on their file extension.
+         *
+         * @return Object for filtering files
+         */
+        get() = object : FileFilter {
+            override fun accept(pathname: File): Boolean {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile()
-                    && Engines.getRecognizedExtensions().contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname));
+                        && Engines.Companion.getRecognizedExtensions()
+                    .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(
+                    pathname
+                ))
             }
-        };
-    }
+        }
 
-    /**
-     * Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension)
-     *
-     * @return Object for filtering files
-     */
-    public static FileFilter getDataFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                return "yaml".equalsIgnoreCase(fileExt(pathname)) || "yml".equalsIgnoreCase(fileExt(pathname));
+    val dataFileFilter: FileFilter
+        /**
+         * Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension)
+         *
+         * @return Object for filtering files
+         */
+        get() = object : FileFilter {
+            override fun accept(pathname: File): Boolean {
+                return "yaml".equals(
+                    fileExt(pathname),
+                    ignoreCase = true
+                ) || "yml".equals(fileExt(pathname), ignoreCase = true)
             }
-        };
-    }
+        }
 
     /**
      * Gets the list of files that are not content files based on their extension.
@@ -83,42 +73,35 @@ public class FileUtil {
      * @param config the jbake configuration
      * @return FileFilter object
      */
-    public static FileFilter getNotContentFileFilter(JBakeConfiguration config) {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
+    fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
+        return object : FileFilter {
+            override fun accept(pathname: File): Boolean {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                    //extension should not be from registered content extensions
-                    && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
-                    || (directoryOnlyIfNotIgnored(pathname, config));
+                return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
+                        && !Engines.Companion.getRecognizedExtensions().contains(fileExt(pathname)))
+                        || (directoryOnlyIfNotIgnored(pathname, config))
             }
-        };
+        }
     }
 
-    /**
-     * Gets the list of files that are not content files based on their extension.
-     *
-     * @return FileFilter object
-     * @deprecated use {@link #getNotContentFileFilter(JBakeConfiguration)} instead
-     */
-    @Deprecated
-    public static FileFilter getNotContentFileFilter() {
-        return new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
+    @get:Deprecated("use {@link #getNotContentFileFilter(JBakeConfiguration)} instead")
+    val notContentFileFilter: FileFilter
+        /**
+         * Gets the list of files that are not content files based on their extension.
+         *
+         * @return FileFilter object
+         */
+        get() = object : FileFilter {
+            override fun accept(pathname: File): Boolean {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                    //extension should not be from registered content extensions
-                    && !Engines.getRecognizedExtensions().contains(fileExt(pathname)))
-                    || (directoryOnlyIfNotIgnored(pathname));
+                return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
+                        && !Engines.Companion.getRecognizedExtensions()
+                    .contains(fileExt(pathname)))
+                        || (directoryOnlyIfNotIgnored(pathname))
             }
-        };
-    }
+        }
 
     /**
      * Ignores directory (and children) if it contains a file named in the
@@ -128,19 +111,18 @@ public class FileUtil {
      * @param config the jbake configuration
      * @return true if file is directory and not ignored
      */
-    public static boolean directoryOnlyIfNotIgnored(File file, JBakeConfiguration config) {
-        boolean accept = false;
+    fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
+        var accept = false
 
-        FilenameFilter ignoreFile = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.equalsIgnoreCase(config.getIgnoreFileName());
+        val ignoreFile: FilenameFilter = object : FilenameFilter {
+            override fun accept(dir: File?, name: String): Boolean {
+                return name.equals(config.ignoreFileName, ignoreCase = true)
             }
-        };
+        }
 
-        accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
+        accept = file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
 
-        return accept;
+        return accept
     }
 
     /**
@@ -148,60 +130,62 @@ public class FileUtil {
      *
      * @param file the file to test
      * @return true if file is directory and not ignored
-     * @deprecated use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead
      */
-    @Deprecated
-    public static boolean directoryOnlyIfNotIgnored(File file) {
-        boolean accept = false;
+    @Deprecated("use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead")
+    fun directoryOnlyIfNotIgnored(file: File): Boolean {
+        var accept = false
 
-        FilenameFilter ignoreFile = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.equalsIgnoreCase(".jbakeignore");
+        val ignoreFile: FilenameFilter = object : FilenameFilter {
+            override fun accept(dir: File?, name: String): Boolean {
+                return name.equals(".jbakeignore", ignoreCase = true)
             }
-        };
-
-        accept = file.isDirectory() && (file.listFiles(ignoreFile).length == 0);
-
-        return accept;
-    }
-
-    public static boolean isExistingFolder(File f) {
-        return null != f && f.exists() && f.isDirectory();
-    }
-
-    /**
-     * Works out the folder where JBake is running from.
-     *
-     * @return File referencing folder JBake is running from
-     * @throws Exception when application is not able to work out where is JBake running from
-     */
-    public static File getRunningLocation() throws Exception {
-        String codePath = FileUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        String decodedPath = URLDecoder.decode(codePath, "UTF-8");
-        File codeFile = new File(decodedPath);
-        if (!codeFile.exists()) {
-            throw new Exception("Cannot locate running location of JBake!");
-        }
-        File codeFolder = codeFile.getParentFile().getParentFile();
-        if (!codeFolder.exists()) {
-            throw new Exception("Cannot locate running location of JBake!");
         }
 
-        return codeFolder;
+        accept = file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
+
+        return accept
     }
 
-    public static String fileExt(File src) {
-        String name = src.getName();
-        return fileExt(name);
+    fun isExistingFolder(f: File?): Boolean {
+        return null != f && f.exists() && f.isDirectory()
     }
 
-    public static String fileExt(String name) {
-        int idx = name.lastIndexOf('.');
+    @JvmStatic
+    @get:Throws(Exception::class)
+    val runningLocation: File
+        /**
+         * Works out the folder where JBake is running from.
+         *
+         * @return File referencing folder JBake is running from
+         * @throws Exception when application is not able to work out where is JBake running from
+         */
+        get() {
+            val codePath =
+                FileUtil::class.java.getProtectionDomain().getCodeSource().getLocation().getPath()
+            val decodedPath = URLDecoder.decode(codePath, "UTF-8")
+            val codeFile = File(decodedPath)
+            if (!codeFile.exists()) {
+                throw Exception("Cannot locate running location of JBake!")
+            }
+            val codeFolder = codeFile.getParentFile().getParentFile()
+            if (!codeFolder.exists()) {
+                throw Exception("Cannot locate running location of JBake!")
+            }
+
+            return codeFolder
+        }
+
+    fun fileExt(src: File): String {
+        val name = src.getName()
+        return fileExt(name)
+    }
+
+    fun fileExt(name: String): String {
+        val idx = name.lastIndexOf('.')
         if (idx > 0) {
-            return name.substring(idx + 1);
+            return name.substring(idx + 1)
         } else {
-            return "";
+            return ""
         }
     }
 
@@ -212,34 +196,36 @@ public class FileUtil {
      * @return an hex string representing the SHA1 hash of the file or directory.
      * @throws Exception if any IOException of SecurityException occured
      */
-    public static String sha1(File sourceFile) throws Exception {
-        byte[] buffer = new byte[1024];
-        MessageDigest complete = MessageDigest.getInstance("SHA-1");
-        updateDigest(complete, sourceFile, buffer);
-        byte[] bytes = complete.digest();
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
+    @Throws(Exception::class)
+    fun sha1(sourceFile: File): String {
+        val buffer = ByteArray(1024)
+        val complete = MessageDigest.getInstance("SHA-1")
+        updateDigest(complete, sourceFile, buffer)
+        val bytes = complete.digest()
+        val sb = StringBuilder()
+        for (b in bytes) {
+            sb.append(String.format("%02x", b))
         }
-        return sb.toString();
+        return sb.toString()
     }
 
-    private static void updateDigest(final MessageDigest digest, final File sourceFile, final byte[] buffer) throws IOException {
+    @Throws(IOException::class)
+    private fun updateDigest(digest: MessageDigest, sourceFile: File, buffer: ByteArray) {
         if (sourceFile.isFile()) {
-            try (InputStream fis = new FileInputStream(sourceFile)) {
-                int numRead;
+            FileInputStream(sourceFile).use { fis ->
+                var numRead: Int
                 do {
-                    numRead = fis.read(buffer);
+                    numRead = fis.read(buffer)
                     if (numRead > 0) {
-                        digest.update(buffer, 0, numRead);
+                        digest.update(buffer, 0, numRead)
                     }
-                } while (numRead != -1);
+                } while (numRead != -1)
             }
         } else if (sourceFile.isDirectory()) {
-            File[] files = sourceFile.listFiles();
+            val files = sourceFile.listFiles()
             if (files != null) {
-                for (File file : files) {
-                    updateDigest(digest, file, buffer);
+                for (file in files) {
+                    updateDigest(digest, file, buffer)
                 }
             }
         }
@@ -248,40 +234,41 @@ public class FileUtil {
     /**
      * platform independent file.getPath()
      *
-     * @param file the file to transform, or {@code null}
-     * @return The result of file.getPath() with all path Separators beeing a "/", or {@code null}
+     * @param file the file to transform, or `null`
+     * @return The result of file.getPath() with all path Separators beeing a "/", or `null`
      * Needed to transform Windows path separators into slashes.
      */
-    public static String asPath(File file) {
+    fun asPath(file: File?): String? {
         if (file == null) {
-            return null;
+            return null
         }
-        return asPath(file.getPath());
+        return asPath(file.getPath())
     }
 
     /**
      * platform independent file.getPath()
      *
-     * @param path the path to transform, or {@code null}
+     * @param path the path to transform, or `null`
      * @return The result will have all platform path separators replaced by "/".
      */
-    public static String asPath(String path) {
+    fun asPath(path: String?): String? {
         if (path == null) {
-            return null;
+            return null
         }
 
         // On windows we have to replace the backslash
-        if (!File.separator.equals(FileUtil.URI_SEPARATOR_CHAR)) {
-            return path.replace(File.separator, FileUtil.URI_SEPARATOR_CHAR);
+        if (File.separator != URI_SEPARATOR_CHAR) {
+            return path.replace(File.separator, URI_SEPARATOR_CHAR)
         } else {
-            return path;
+            return path
         }
     }
 
     /**
      * Given a file inside content it return
      * the relative path to get to the root.
-     * <p>
+     *
+     *
      * Example: /content and /content/tags/blog will return '../..'
      *
      * @param sourceFile the file to calculate relative path for
@@ -289,31 +276,31 @@ public class FileUtil {
      * @param config the jbake configuration
      * @return the relative path to get to the root
      */
-    static public String getPathToRoot(JBakeConfiguration config, File rootPath, File sourceFile) {
+    fun getPathToRoot(config: JBakeConfiguration, rootPath: File, sourceFile: File): String {
+        val r = Paths.get(rootPath.toURI())
+        val s = Paths.get(sourceFile.getParentFile().toURI())
+        val relativePath = s.relativize(r)
 
-        Path r = Paths.get(rootPath.toURI());
-        Path s = Paths.get(sourceFile.getParentFile().toURI());
-        Path relativePath = s.relativize(r);
+        val sb = StringBuilder()
 
-        StringBuilder sb = new StringBuilder();
+        sb.append(asPath(relativePath.toString()))
 
-        sb.append(asPath(relativePath.toString()));
-
-        if (config.getUriWithoutExtension()) {
-            sb.append("/..");
+        if (config.uriWithoutExtension) {
+            sb.append("/..")
         }
-        if (sb.length() > 0) {  // added as calling logic assumes / at end.
-            sb.append("/");
+        if (sb.length > 0) {  // added as calling logic assumes / at end.
+            sb.append("/")
         }
-        return sb.toString();
+        return sb.toString()
     }
 
-    static public String getUriPathToDestinationRoot(JBakeConfiguration config, File sourceFile) {
-        return getPathToRoot(config, config.getDestinationFolder(), sourceFile);
+    fun getUriPathToDestinationRoot(config: JBakeConfiguration, sourceFile: File): String {
+        return FileUtil.getPathToRoot(config, config.destinationFolder!!, sourceFile)
     }
 
-    static public String getUriPathToContentRoot(JBakeConfiguration config, File sourceFile) {
-        return getPathToRoot(config, config.getContentFolder(), sourceFile);
+    @JvmStatic
+    fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File): String {
+        return FileUtil.getPathToRoot(config, config.contentFolder!!, sourceFile)
     }
 
     /**
@@ -324,10 +311,11 @@ public class FileUtil {
      * @return true if the file is somewhere in the provided directory, false if it is not.
      * @throws IOException if the canonical path for either of the input directories can't be determined.
      */
-    public static boolean isFileInDirectory(File file, File directory) throws IOException {
+    @JvmStatic
+    @Throws(IOException::class)
+    fun isFileInDirectory(file: File, directory: File): Boolean {
         return (file.exists()
-             && !file.isHidden()
-             && directory.isDirectory()
-             && file.getCanonicalPath().startsWith(directory.getCanonicalPath()));
+                && !file.isHidden() && directory.isDirectory()
+                && file.getCanonicalPath().startsWith(directory.getCanonicalPath()))
     }
 }

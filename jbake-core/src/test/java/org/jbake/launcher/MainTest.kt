@@ -1,272 +1,324 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import ch.qos.logback.classic.spi.LoggingEvent;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.itsallcode.junit.sysextensions.ExitGuard;
-import org.jbake.TestUtils;
-import org.jbake.app.JBakeException;
-import org.jbake.app.LoggingTest;
-import org.jbake.app.configuration.ConfigUtil;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import picocli.CommandLine;
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.Appender
+import org.apache.commons.configuration2.ex.ConfigurationException
+import org.assertj.core.api.Assertions
+import org.itsallcode.junit.sysextensions.AssertExit
+import org.itsallcode.junit.sysextensions.ExitGuard
+import org.jbake.TestUtils
+import org.jbake.app.JBakeException
+import org.jbake.app.LoggingTest
+import org.jbake.app.configuration.ConfigUtil
+import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
+import org.junit.Assert
+import org.junit.function.ThrowingRunnable
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
+import org.mockito.ArgumentMatchers
+import org.mockito.Mock
+import org.mockito.Mockito
+import picocli.CommandLine
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.PrintStream
+import java.nio.file.Path
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Path;
+@ExtendWith(ExitGuard::class)
+internal class MainTest : LoggingTest() {
+    private val standardOut: PrintStream? = System.out
+    private val outputStreamCaptor = ByteArrayOutputStream()
+    private var main: Main? = null
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.itsallcode.junit.sysextensions.AssertExit.assertExitWithStatus;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(ExitGuard.class)
-class MainTest extends LoggingTest {
-
-    private final PrintStream standardOut = System.out;
-    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-    private Main main;
     @Mock
-    private Baker mockBaker;
-    @Mock
-    private JettyServer mockJetty;
-    @Mock
-    private BakeWatcher mockWatcher;
-    @Mock
-    private ConfigUtil configUtil;
-    @Mock
-    private JBakeConfigurationFactory factory;
+    private val mockBaker: Baker? = null
 
-    private String workingdir;
+    @Mock
+    private val mockJetty: JettyServer? = null
+
+    @Mock
+    private val mockWatcher: BakeWatcher? = null
+
+    @Mock
+    private val configUtil: ConfigUtil? = null
+
+    @Mock
+    private val factory: JBakeConfigurationFactory? = null
+
+    private var workingdir: String? = null
 
     @BeforeEach
-    void setUp() {
-        this.main = new Main(mockBaker, mockJetty, mockWatcher);
-        workingdir = System.getProperty("user.dir");
-        factory.setConfigUtil(configUtil);
-        main.setJBakeConfigurationFactory(factory);
-        System.setOut(new PrintStream(outputStreamCaptor));
+    fun setUp() {
+        this.main = Main(mockBaker!!, mockJetty!!, mockWatcher!!)
+        workingdir = System.getProperty("user.dir")
+        factory!!.configUtil = configUtil!!
+        main!!.jBakeConfigurationFactory = factory
+        System.setOut(PrintStream(outputStreamCaptor))
     }
 
     @AfterEach
-    void tearDown() {
-        System.setProperty("user.dir", workingdir);
-        System.setOut(standardOut);
+    fun tearDown() {
+        System.setProperty("user.dir", workingdir)
+        System.setOut(standardOut)
     }
 
     @Test
-    void launchJetty(@TempDir Path source) throws Exception {
-        File currentWorkingdir = newFolder(source, "src/jbake");
-        File expectedOutput = new File(currentWorkingdir, "output");
-        JBakeConfiguration configuration = mockJettyConfiguration(currentWorkingdir, expectedOutput);
+    @Throws(Exception::class)
+    fun launchJetty(@TempDir source: Path) {
+        val currentWorkingdir = newFolder(source, "src/jbake")
+        val expectedOutput = File(currentWorkingdir, "output")
+        val configuration = mockJettyConfiguration(currentWorkingdir, expectedOutput)
 
-        String[] args = {"-s"};
-        main.run(args);
+        val args = arrayOf<String?>("-s")
+        main!!.run(args)
 
-        verify(mockJetty).run(expectedOutput.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
     }
 
     @Test
-    public void launchBakeWithCustomPropertiesEncoding(@TempDir Path source) throws Exception {
-        File currentWorkingdir = newFolder(source, "jbake");
-        mockDefaultJbakeConfiguration(currentWorkingdir);
+    @Throws(Exception::class)
+    fun launchBakeWithCustomPropertiesEncoding(@TempDir source: Path) {
+        val currentWorkingdir = newFolder(source, "jbake")
+        mockDefaultJbakeConfiguration(currentWorkingdir)
 
-        String[] args = {"-b", "--prop-encoding", "latin1"};
-        main.run(args);
+        val args = arrayOf<String?>("-b", "--prop-encoding", "latin1")
+        main!!.run(args)
 
-        verify(factory).setEncoding("latin1");
+        Mockito.verify<JBakeConfigurationFactory?>(factory).setEncoding("latin1")
     }
 
     @Test
-    public void launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir Path source) throws Exception {
-        File currentWorkingdir = newFolder(source, "jbake");
-        mockDefaultJbakeConfiguration(currentWorkingdir);
+    @Throws(Exception::class)
+    fun launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir source: Path) {
+        val currentWorkingdir = newFolder(source, "jbake")
+        mockDefaultJbakeConfiguration(currentWorkingdir)
 
-        String[] args = {"-b"};
-        main.run(args);
+        val args = arrayOf<String?>("-b")
+        main!!.run(args)
 
-        verify(factory).setEncoding("utf-8");
+        Mockito.verify<JBakeConfigurationFactory?>(factory).setEncoding("utf-8")
     }
 
     @Test
-    void launchBakeAndJetty(@TempDir Path source) throws Exception {
-        File sourceFolder = newFolder(source, "src/jbake");
-        File expectedOutput = newFolder(sourceFolder.toPath(), "output");
-        JBakeConfiguration configuration = mockJettyConfiguration(sourceFolder, expectedOutput);
+    @Throws(Exception::class)
+    fun launchBakeAndJetty(@TempDir source: Path) {
+        val sourceFolder = newFolder(source, "src/jbake")
+        val expectedOutput = newFolder(sourceFolder.toPath(), "output")
+        val configuration = mockJettyConfiguration(sourceFolder, expectedOutput)
 
-        String[] args = {"-b", "-s"};
-        main.run(args);
+        val args = arrayOf<String?>("-b", "-s")
+        main!!.run(args)
 
-        verify(mockJetty).run(expectedOutput.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
     }
 
     @Test
-    void launchBakeAndJettyWithCustomDirForJetty(@TempDir Path source) throws ConfigurationException {
-        File sourceFolder = newFolder(source, "src/jbake");
-        String expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output";
-        File output = newFolder(source, expectedRunPath);
-        JBakeConfiguration configuration = mockJettyConfiguration(sourceFolder, output);
+    @Throws(ConfigurationException::class)
+    fun launchBakeAndJettyWithCustomDirForJetty(@TempDir source: Path) {
+        val sourceFolder = newFolder(source, "src/jbake")
+        val expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output"
+        val output = newFolder(source, expectedRunPath)
+        val configuration = mockJettyConfiguration(sourceFolder, output)
 
-        String[] args = {"-b", "-s", "src/jbake"};
-        main.run(args);
+        val args = arrayOf<String?>("-b", "-s", "src/jbake")
+        main!!.run(args)
 
-        verify(mockJetty).run(expectedRunPath, configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedRunPath, configuration)
     }
 
     @Test
-    void launchJettyWithCustomServerSourceDir(@TempDir Path output) throws Exception {
-        File build = newFolder(output, "build/jbake");
-        JBakeConfiguration configuration = mockJettyConfiguration(build, build);
+    @Throws(Exception::class)
+    fun launchJettyWithCustomServerSourceDir(@TempDir output: Path) {
+        val build = newFolder(output, "build/jbake")
+        val configuration = mockJettyConfiguration(build, build)
 
-        String[] args = {build.getPath(), "-s"};
-        main.run(args);
+        val args = arrayOf<String?>(build.getPath(), "-s")
+        main!!.run(args)
 
-        verify(mockJetty).run(build.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(build.getPath(), configuration)
     }
 
 
     // ATTENTION
     // There ist no extra argument for -s option. you can call jbake -s /customsource or jbake /customsource -s
     @Test
-    void launchJettyWithCustomDestinationDir(@TempDir Path source) throws Exception {
-        File src = newFolder(source, "src/jbake");
-        JBakeConfiguration configuration = mockJettyConfiguration(src, src);
+    @Throws(Exception::class)
+    fun launchJettyWithCustomDestinationDir(@TempDir source: Path) {
+        val src = newFolder(source, "src/jbake")
+        val configuration = mockJettyConfiguration(src, src)
 
-        String[] args = {"-s", src.getPath()};
-        main.run(args);
+        val args = arrayOf<String?>("-s", src.getPath())
+        main!!.run(args)
 
-        verify(mockJetty).run(src.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(src.getPath(), configuration)
     }
 
     @Test
-    void launchJettyWithCustomSrcAndDestDir(@TempDir Path source, @TempDir Path output) throws Exception {
-        File src = newFolder(source, "src/jbake");
-        File exampleOutput = output.resolve("build/jbake").toFile();
-        JBakeConfiguration configuration = mockJettyConfiguration(src, exampleOutput);
+    @Throws(Exception::class)
+    fun launchJettyWithCustomSrcAndDestDir(@TempDir source: Path, @TempDir output: Path) {
+        val src = newFolder(source, "src/jbake")
+        val exampleOutput = output.resolve("build/jbake").toFile()
+        val configuration = mockJettyConfiguration(src, exampleOutput)
 
-        String[] args = {src.getPath(), exampleOutput.getPath(), "-s"};
-        main.run(args);
+        val args = arrayOf<String?>(src.getPath(), exampleOutput.getPath(), "-s")
+        main!!.run(args)
 
-        verify(mockJetty).run(exampleOutput.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.getPath(), configuration)
     }
 
     @Test
-    void launchJettyWithCustomDestViaConfig(@TempDir Path output) throws Exception {
-        String[] args = {"-s"};
-        final File exampleOutput = output.resolve("build/jbake").toFile();
-        DefaultJBakeConfiguration configuration = stubConfig();
-        configuration.setDestinationFolder(exampleOutput);
+    @Throws(Exception::class)
+    fun launchJettyWithCustomDestViaConfig(@TempDir output: Path) {
+        val args = arrayOf<String?>("-s")
+        val exampleOutput = output.resolve("build/jbake").toFile()
+        val configuration = stubConfig()
+        configuration.setDestinationFolder(exampleOutput)
 
-        main.run(stubOptions(args), configuration);
+        main!!.run(stubOptions(args), configuration)
 
-        verify(mockJetty).run(exampleOutput.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.getPath(), configuration)
     }
 
     @Test
-    void launchJettyWithCmdlineOverridingProperties(@TempDir Path source, @TempDir Path output, @TempDir Path target) throws Exception {
-        final File src = newFolder(source, "src/jbake");
-        final File expectedOutput = newFolder(output, "build/jbake");
-        final File configTarget = newFolder(target, "target/jbake");
+    @Throws(Exception::class)
+    fun launchJettyWithCmdlineOverridingProperties(
+        @TempDir source: Path,
+        @TempDir output: Path,
+        @TempDir target: Path
+    ) {
+        val src = newFolder(source, "src/jbake")
+        val expectedOutput = newFolder(output, "build/jbake")
+        val configTarget = newFolder(target, "target/jbake")
 
-        String[] args = {"-s", src.getPath(), expectedOutput.getPath()};
-        DefaultJBakeConfiguration configuration = stubConfig();
-        configuration.setDestinationFolder(configTarget);
-        main.run(stubOptions(args), configuration);
+        val args = arrayOf<String?>("-s", src.getPath(), expectedOutput.getPath())
+        val configuration = stubConfig()
+        configuration.setDestinationFolder(configTarget)
+        main!!.run(stubOptions(args), configuration)
 
-        verify(mockJetty).run(expectedOutput.getPath(), configuration);
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
     }
 
     @Test
-    void shouldTellUserThatTemplateOptionRequiresInitOption() {
+    fun shouldTellUserThatTemplateOptionRequiresInitOption() {
+        val args = arrayOf<String?>("-t", "groovy-mte")
 
-        String[] args = {"-t", "groovy-mte"};
+        AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status, Runnable { Main.main(args) })
 
-        assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.getStatus(), ()->Main.main(args));
+        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
-
-        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-        assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init");
+        val loggingEvent = captorLoggingEvent.getValue()
+        Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init")
     }
 
     @Test
-    void shouldThrowJBakeExceptionWithSystemExitCodeOnUnexpectedError(@TempDir Path source) throws ConfigurationException {
+    @Throws(ConfigurationException::class)
+    fun shouldThrowJBakeExceptionWithSystemExitCodeOnUnexpectedError(@TempDir source: Path) {
+        val other = Mockito.spy<Main>(main)
+        val currentWorkingdir = newFolder(source, "jbake")
+        mockDefaultJbakeConfiguration(currentWorkingdir)
 
-        Main other = spy(main);
-        File currentWorkingdir = newFolder(source, "jbake");
-        mockDefaultJbakeConfiguration(currentWorkingdir);
+        Mockito.doThrow(RuntimeException("something went wrong")).`when`<Main?>(other).run(
+            ArgumentMatchers.any<LaunchOptions?>(LaunchOptions::class.java),
+            ArgumentMatchers.any<JBakeConfiguration>()
+        )
 
-        doThrow(new RuntimeException("something went wrong")).when(other).run(any(LaunchOptions.class), any());
+        val e = Assert.assertThrows<JBakeException>(
+            JBakeException::class.java,
+            ThrowingRunnable { other.run(arrayOf<String>("")) })
 
-        JBakeException e = assertThrows(JBakeException.class, () -> other.run(new String[]{""}));
-
-        assertThat(e.getMessage()).isEqualTo("An unexpected error occurred: something went wrong");
-        assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.getStatus());
+        Assertions.assertThat(e.message).isEqualTo("An unexpected error occurred: something went wrong")
+        Assertions.assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.status)
     }
 
     @Test
-    void shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
-        when(factory.setEncoding(any())).thenReturn(factory);
-        doThrow(new JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong")).when(factory).createDefaultJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean());
-        JBakeException e = assertThrows(JBakeException.class, () -> main.run(new String[]{"-b"}));
-        assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.getStatus());
+    fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
+        Mockito.`when`<JBakeConfigurationFactory>(factory!!.setEncoding(ArgumentMatchers.any<String>()))
+            .thenReturn(factory)
+        Mockito.doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
+            .`when`<JBakeConfigurationFactory?>(factory).createDefaultJbakeConfiguration(
+                ArgumentMatchers.any<File?>(
+                    File::class.java
+                ),
+                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.anyBoolean()
+            )
+        val e = Assert.assertThrows<JBakeException>(
+            JBakeException::class.java,
+            ThrowingRunnable { main!!.run(arrayOf<String>("-b")) })
+        Assertions.assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
     }
 
     @Test
-    void shouldListCurrentSettings(@TempDir Path source) throws ConfigurationException {
-        File src = newFolder(source, "src/jbake");
-        mockDefaultJbakeConfiguration(src);
+    @Throws(ConfigurationException::class)
+    fun shouldListCurrentSettings(@TempDir source: Path) {
+        val src = newFolder(source, "src/jbake")
+        mockDefaultJbakeConfiguration(src)
 
-        String[] args = {"-ls"};
-        main.run(args);
+        val args = arrayOf<String?>("-ls")
+        main!!.run(args)
 
-        assertThat(outputStreamCaptor.toString()).contains("DEFAULT - Settings");
+        Assertions.assertThat(outputStreamCaptor.toString()).contains("DEFAULT - Settings")
     }
 
-    private LaunchOptions stubOptions(String[] args) {
-        return CommandLine.populateCommand(new LaunchOptions(), args);
+    private fun stubOptions(args: Array<String?>): LaunchOptions {
+        return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
     }
 
-    private DefaultJBakeConfiguration stubConfig() throws ConfigurationException {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
-        configuration.setServerPort(8820);
-        return configuration;
+    @Throws(ConfigurationException::class)
+    private fun stubConfig(): DefaultJBakeConfiguration {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        configuration.setServerPort(8820)
+        return configuration
     }
 
-    private void mockDefaultJbakeConfiguration(File sourceFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false);
-        System.setProperty("user.dir", sourceFolder.getPath());
-        when(factory.setEncoding(any())).thenReturn(factory);
-        when(factory.createDefaultJbakeConfiguration(any(File.class), any(File.class), any(File.class), anyBoolean())).thenReturn(configuration);
+    @Throws(ConfigurationException::class)
+    private fun mockDefaultJbakeConfiguration(sourceFolder: File) {
+        val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false)
+        System.setProperty("user.dir", sourceFolder.getPath())
+        Mockito.`when`<JBakeConfigurationFactory>(factory!!.setEncoding(ArgumentMatchers.any<String>()))
+            .thenReturn(factory)
+        Mockito.`when`<DefaultJBakeConfiguration>(
+            factory.createDefaultJbakeConfiguration(
+                ArgumentMatchers.any<File?>(
+                    File::class.java
+                ),
+                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.anyBoolean()
+            )
+        ).thenReturn(configuration)
     }
 
-    private JBakeConfiguration mockJettyConfiguration(File sourceFolder, File destinationFolder) throws ConfigurationException {
-        DefaultJBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false);
-        System.setProperty("user.dir", sourceFolder.getPath());
-        when(factory.createJettyJbakeConfiguration(any(File.class), any(File.class),  any(File.class), anyBoolean())).thenReturn(configuration);
-        when(factory.setEncoding(any())).thenReturn(factory);
-        return configuration;
+    @Throws(ConfigurationException::class)
+    private fun mockJettyConfiguration(sourceFolder: File, destinationFolder: File?): JBakeConfiguration {
+        val configuration =
+            JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false)
+        System.setProperty("user.dir", sourceFolder.getPath())
+        Mockito.`when`<DefaultJBakeConfiguration>(
+            factory!!.createJettyJbakeConfiguration(
+                ArgumentMatchers.any<File?>(
+                    File::class.java
+                ),
+                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.anyBoolean()
+            )
+        ).thenReturn(configuration)
+        Mockito.`when`<JBakeConfigurationFactory>(factory.setEncoding(ArgumentMatchers.any<String>()))
+            .thenReturn(factory)
+        return configuration
     }
 
-    private File newFolder(Path path, String name) {
-        File sourceFolder = path.resolve(name).toFile();
-        sourceFolder.mkdirs();
-        return sourceFolder;
+    private fun newFolder(path: Path, name: String): File {
+        val sourceFolder = path.resolve(name).toFile()
+        sourceFolder.mkdirs()
+        return sourceFolder
     }
 }

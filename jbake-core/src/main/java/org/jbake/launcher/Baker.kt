@@ -1,47 +1,48 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.JBakeException;
-import org.jbake.app.Oven;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
-
-import java.text.MessageFormat;
-import java.util.List;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.JBakeException
+import org.jbake.app.Oven
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
+import java.text.MessageFormat
 
 /**
  * Delegate class responsible for launching a Bake.
  *
  * @author jmcgarr@gmail.com
  */
-public class Baker {
-
+class Baker {
     /**
      * @param options The given cli options
      * @param config  The project configuration
-     * @deprecated use {@link Baker#bake(JBakeConfiguration)} instead
      */
-    @Deprecated
-    public void bake(final LaunchOptions options, final CompositeConfiguration config) {
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(options.getSource(), options.getDestination(), config, options.isClearCache());
-        bake(configuration);
+    @Deprecated("use {@link Baker#bake(JBakeConfiguration)} instead")
+    fun bake(options: LaunchOptions, config: CompositeConfiguration?) {
+        val configuration: JBakeConfiguration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(
+            options.getSource(),
+            options.getDestination(),
+            config,
+            options.isClearCache()
+        )
+        bake(configuration)
     }
 
-    public void bake(final JBakeConfiguration config) {
-        final Oven oven = new Oven(config);
-        oven.bake();
+    fun bake(config: JBakeConfiguration?) {
+        val oven = Oven(config)
+        oven.bake()
 
-        final List<Throwable> errors = oven.getErrors();
+        val errors = oven.getErrors()
         if (!errors.isEmpty()) {
-            final StringBuilder msg = new StringBuilder();
+            val msg = StringBuilder()
             // TODO: decide, if we want the all errors here
-            msg.append( MessageFormat.format("JBake failed with {0} errors:\n", errors.size()));
-            int errNr = 1;
-            for (final Throwable error : errors) {
-                msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.getMessage()));
-                ++errNr;
+            msg.append(MessageFormat.format("JBake failed with {0} errors:\n", errors.size))
+            var errNr = 1
+            for (error in errors) {
+                msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.message))
+                ++errNr
             }
-            throw new JBakeException(SystemExit.ERROR ,msg.toString(), errors.get(0));
+            throw JBakeException(SystemExit.ERROR, msg.toString(), errors.get(0))
         }
     }
 }

@@ -1,17 +1,9 @@
-package org.jbake.template;
+package org.jbake.template
 
-public class NoModelExtractorException extends RenderingException {
+class NoModelExtractorException : RenderingException {
+    constructor(message: String?) : super(message)
 
-    public NoModelExtractorException(String message) {
-        super(message);
-    }
+    constructor(cause: Throwable?) : super(cause)
 
-    public NoModelExtractorException(Throwable cause) {
-        super(cause);
-    }
-
-    public NoModelExtractorException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
 }

@@ -1,37 +1,33 @@
-package org.jbake.render.support;
+package org.jbake.render.support
+
+import org.apache.commons.configuration2.CompositeConfiguration
 
 
-import org.apache.commons.configuration2.CompositeConfiguration;
+class MockCompositeConfiguration : CompositeConfiguration() {
+    private var _bool = false
+    private var _string: String? = "random string"
 
-public class MockCompositeConfiguration extends CompositeConfiguration {
-
-    private boolean _bool = false;
-    private String _string = "random string";
-
-    public MockCompositeConfiguration withDefaultBoolean(boolean bool) {
-        _bool = bool;
-        return this;
+    fun withDefaultBoolean(bool: Boolean): MockCompositeConfiguration {
+        _bool = bool
+        return this
     }
 
-    public MockCompositeConfiguration withInnerString(String string) {
-        _string = string;
-        return this;
+    fun withInnerString(string: String?): MockCompositeConfiguration {
+        _string = string
+        return this
     }
 
-    @Override
-    public boolean getBoolean(String key) {
-
+    override fun getBoolean(key: String?): Boolean {
         if (super.containsKey(key)) {
-            return super.getBoolean(key);
+            return super.getBoolean(key)
         }
-        return _bool;
+        return _bool
     }
 
-    @Override
-    public String getString(String key) {
+    override fun getString(key: String?): String? {
         if (super.containsKey(key)) {
-            return super.getString(key);
+            return super.getString(key)
         }
-        return _string;
+        return _string
     }
 }

@@ -1,39 +1,29 @@
-package org.jbake;
+package org.jbake
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*
 
-public class BinaryRunner {
+class BinaryRunner(private val folder: File?) {
+    @kotlin.Throws(IOException::class, InterruptedException::class)
+    fun runWithArguments(vararg arguments: String?): Process {
+        val processBuilder = ProcessBuilder(*arguments)
+        processBuilder.directory(folder)
+        processBuilder.redirectErrorStream(true)
 
-    private File folder;
+        val process = processBuilder.start()
+        printOutput(process.getInputStream())
+        process.waitFor()
 
-    public BinaryRunner(File folder) {
-        this.folder = folder;
+        return process
     }
 
-    public Process runWithArguments(String... arguments) throws IOException, InterruptedException {
-        ProcessBuilder processBuilder = new ProcessBuilder(arguments);
-        processBuilder.directory(folder);
-        processBuilder.redirectErrorStream(true);
+    @kotlin.Throws(IOException::class)
+    private fun printOutput(inputStream: InputStream) {
+        var line: String?
+        val reader = BufferedReader(InputStreamReader(inputStream))
 
-        Process process = processBuilder.start();
-        printOutput(process.getInputStream());
-        process.waitFor();
-
-        return process;
-    }
-
-    private void printOutput(InputStream inputStream) throws IOException {
-        String line;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-        while ((line = reader.readLine()) != null ) {
-            System.out.println(line);
+        while ((reader.readLine().also { line = it }) != null) {
+            println(line)
         }
-        reader.close();
+        reader.close()
     }
-
 }

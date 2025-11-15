@@ -1,177 +1,168 @@
-package org.jbake.util;
+package org.jbake.util
 
-import org.jbake.TestUtils;
-import org.jbake.app.configuration.ConfigUtil;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.junit.Before;
-import org.junit.Test;
+import org.assertj.core.api.Assertions
+import org.jbake.TestUtils
+import org.jbake.app.configuration.ConfigUtil
+import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.model.DocumentModel
+import org.junit.Before
+import org.junit.Test
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
-public class HtmlUtilTest {
-
-    private DefaultJBakeConfiguration config;
+class HtmlUtilTest {
+    private var config: DefaultJBakeConfiguration? = null
 
     @Before
-    public void setUp() throws Exception {
-        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder());
+    @Throws(Exception::class)
+    fun setUp() {
+        config = ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder()) as DefaultJBakeConfiguration
     }
 
     @Test
-    public void shouldNotAddBodyHTMLElement() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setBody("<div> Test <img src='/blog/2017/05/first.jpg' /></div>");
+    fun shouldNotAddBodyHTMLElement() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.body = "<div> Test <img src='/blog/2017/05/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).doesNotContain("<body>");
-        assertThat(body).doesNotContain("</body>");
-
+        Assertions.assertThat(body).doesNotContain("<body>")
+        Assertions.assertThat(body).doesNotContain("</body>")
     }
 
     @Test
-    public void shouldNotAddSiteHost() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setBody("<div> Test <img src='./first.jpg' /></div>");
-        config.setImgPathPrependHost(false);
+    fun shouldNotAddSiteHost() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
+        config!!.setImgPathPrependHost(false)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"blog/2017/05/first.jpg\"");
-
+        Assertions.assertThat(body).contains("src=\"blog/2017/05/first.jpg\"")
     }
 
     @Test
-    public void shouldAddSiteHostWithRelativeImageToDocument() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setBody("<div> Test <img src='img/deeper/underground.jpg' /></div>");
-        config.setImgPathPrependHost(true);
+    fun shouldAddSiteHostWithRelativeImageToDocument() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.body = "<div> Test <img src='img/deeper/underground.jpg' /></div>"
+        config!!.setImgPathPrependHost(true)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\"");
+        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\"")
     }
 
     @Test
-    public void shouldAddContentPath() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setBody("<div> Test <img src='./first.jpg' /></div>");
-        config.setImgPathPrependHost(true);
+    fun shouldAddContentPath() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
+        config!!.setImgPathPrependHost(true)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
-
+        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
-    public void shouldAddContentPathForCurrentDirectory() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setBody("<div> Test <img src='first.jpg' /></div>");
-        config.setImgPathPrependHost(true);
+    fun shouldAddContentPathForCurrentDirectory() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.body = "<div> Test <img src='first.jpg' /></div>"
+        config!!.setImgPathPrependHost(true)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
-
+        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
-    public void shouldNotAddRootPath() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setBody("<div> Test <img src='/blog/2017/05/first.jpg' /></div>");
+    fun shouldNotAddRootPath() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.body = "<div> Test <img src='/blog/2017/05/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
-
+        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
-    public void shouldNotAddRootPathForNoExtension() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
-        fileContent.setBody("<div> Test <img src='/blog/2017/05/first.jpg' /></div>");
+    fun shouldNotAddRootPathForNoExtension() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.noExtensionUri = "blog/2017/05/first_post/"
+        fileContent.body = "<div> Test <img src='/blog/2017/05/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
-
+        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
-    public void shouldAddContentPathForNoExtension() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
-        fileContent.setBody("<div> Test <img src='./first.jpg' /></div>");
+    fun shouldAddContentPathForNoExtension() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.noExtensionUri = "blog/2017/05/first_post/"
+        fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"");
+        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
-    public void shouldNotChangeForHTTP() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
-        fileContent.setBody("<div> Test <img src='http://example.com/first.jpg' /></div>");
+    fun shouldNotChangeForHTTP() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.noExtensionUri = "blog/2017/05/first_post/"
+        fileContent.body = "<div> Test <img src='http://example.com/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://example.com/first.jpg\"");
-
+        Assertions.assertThat(body).contains("src=\"http://example.com/first.jpg\"")
     }
 
     @Test
-    public void shouldNotChangeForHTTPS() {
-        DocumentModel fileContent = new DocumentModel();
-        fileContent.setRootPath("../../../");
-        fileContent.setUri("blog/2017/05/first_post.html");
-        fileContent.setNoExtensionUri("blog/2017/05/first_post/");
-        fileContent.setBody("<div> Test <img src='https://example.com/first.jpg' /></div>");
+    fun shouldNotChangeForHTTPS() {
+        val fileContent = DocumentModel()
+        fileContent.rootPath = "../../../"
+        fileContent.uri = "blog/2017/05/first_post.html"
+        fileContent.noExtensionUri = "blog/2017/05/first_post/"
+        fileContent.body = "<div> Test <img src='https://example.com/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config);
+        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
 
-        String body = fileContent.getBody();
+        val body = fileContent.body
 
-        assertThat(body).contains("src=\"https://example.com/first.jpg\"");
+        Assertions.assertThat(body).contains("src=\"https://example.com/first.jpg\"")
     }
 }

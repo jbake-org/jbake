@@ -1,70 +1,66 @@
-package org.jbake.maven.util;
+package org.jbake.maven.util
 
-import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
-import org.apache.commons.io.monitor.FileAlterationMonitor;
-import org.apache.commons.io.monitor.FileAlterationObserver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import org.apache.commons.io.monitor.FileAlterationListenerAdaptor
+import org.apache.commons.io.monitor.FileAlterationMonitor
+import org.apache.commons.io.monitor.FileAlterationObserver
+import java.io.File
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.TimeUnit
 
 /**
  * Example to watch a directory (or tree) for changes to files.
  */
+class DirWatcher(dir: File) {
+    private val observer: FileAlterationObserver
 
-public class DirWatcher {
+    private val monitor: FileAlterationMonitor
 
-  private final FileAlterationObserver observer;
+    private val changeQueue: BlockingQueue<Long?> = ArrayBlockingQueue<Long?>(1)
 
-  private final FileAlterationMonitor monitor;
+    /**
+     * Creates a WatchService and registers the given directory
+     */
+    init {
+        this.observer = FileAlterationObserver(dir)
+        this.monitor = FileAlterationMonitor(1000, observer)
 
-  private final BlockingQueue<Long> changeQueue = new ArrayBlockingQueue<Long>(1);
+        observer.addListener(object : FileAlterationListenerAdaptor() {
+            override fun onFileCreate(file: File?) {
+                onUpdated()
+            }
 
-  /**
-   * Creates a WatchService and registers the given directory
-   */
-  public DirWatcher(File dir) throws IOException {
-    this.observer = new FileAlterationObserver(dir);
-    this.monitor = new FileAlterationMonitor(1000, observer);
-
-    observer.addListener(new FileAlterationListenerAdaptor() {
-      @Override
-      public void onFileCreate(File file) {
-        onUpdated();
-      }
-
-      @Override
-      public void onFileChange(File file) {
-        onUpdated();
-      }
-    });
-  }
-
-  public void start() throws Exception {
-    monitor.start();
-  }
-
-  public void stop() {
-    try {
-      monitor.stop();
-    } catch (Exception exc) {
+            override fun onFileChange(file: File?) {
+                onUpdated()
+            }
+        })
     }
-  }
 
-  private void onUpdated() {
-    try {
-      changeQueue.put(Long.valueOf(System.currentTimeMillis()));
-    } catch (InterruptedException iex) {
-      Thread.currentThread().interrupt();
+    @Throws(Exception::class)
+    fun start() {
+        monitor.start()
     }
-  }
 
-  /**
-   * Process all events for keys queued to the watcher
-   */
-  public Long processEvents() throws InterruptedException {
-    return changeQueue.poll(1, TimeUnit.SECONDS);
-  }
+    fun stop() {
+        try {
+            monitor.stop()
+        } catch (exc: Exception) {
+        }
+    }
+
+    private fun onUpdated() {
+        try {
+            changeQueue.put(System.currentTimeMillis())
+        } catch (iex: InterruptedException) {
+            Thread.currentThread().interrupt()
+        }
+    }
+
+    /**
+     * Process all events for keys queued to the watcher
+     */
+    @Throws(InterruptedException::class)
+    fun processEvents(): Long? {
+        return changeQueue.poll(1, TimeUnit.SECONDS)
+    }
 }

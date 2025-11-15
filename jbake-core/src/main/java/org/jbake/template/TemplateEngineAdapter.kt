@@ -1,4 +1,4 @@
-package org.jbake.template;
+package org.jbake.template
 
 /**
  * Adapts model extractor output to used template engine.
@@ -6,15 +6,11 @@ package org.jbake.template;
  *
  * @author ndx
  */
-public interface TemplateEngineAdapter<Type> {
-
-    class NoopAdapter implements TemplateEngineAdapter<Object> {
-
-        @Override
-        public Object adapt(String key, Object extractedValue) {
-            return extractedValue;
+interface TemplateEngineAdapter<Type> {
+    class NoopAdapter : TemplateEngineAdapter<Any?> {
+        override fun adapt(key: String?, extractedValue: Any?): Any? {
+            return extractedValue
         }
-
     }
 
     /**
@@ -24,6 +20,5 @@ public interface TemplateEngineAdapter<Type> {
      * @param extractedValue Value to be used in template model
      * @return Value adapted for use in template
      */
-    Type adapt(String key, Object extractedValue);
-
+    fun adapt(key: String?, extractedValue: Any?): Type?
 }

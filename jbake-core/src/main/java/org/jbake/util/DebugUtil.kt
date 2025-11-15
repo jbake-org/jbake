@@ -1,14 +1,13 @@
-package org.jbake.util;
+package org.jbake.util
 
-import java.io.PrintStream;
-import java.util.Map;
+import java.io.PrintStream
 
-public class DebugUtil {
-    public static <T extends Object> void printMap(Map<String, T> map, PrintStream printStream) {
-        printStream.println();
-        for (Map.Entry<String, T> entry: map.entrySet()) {
-            printStream.println(entry.getKey() + " :: " + entry.getValue());
+object DebugUtil {
+    fun <T : Any?> printMap(map: MutableMap<String?, T?>, printStream: PrintStream) {
+        printStream.println()
+        for (entry in map.entries) {
+            printStream.println(entry.key + " :: " + entry.value)
         }
-        printStream.println();
+        printStream.println()
     }
 }

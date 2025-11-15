@@ -21,16 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jbake.app.template;
+package org.jbake.app.template
 
 /**
  *
  * @author jdlee
  */
-public class ThymeleafTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest{
-
-    public ThymeleafTemplateEngineRenderingTest() {
-        super("thymeleafTemplates", "thyme");
-    }
-
-}
+class ThymeleafTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("thymeleafTemplates", "thyme")

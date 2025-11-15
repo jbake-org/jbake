@@ -1,45 +1,39 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.apache.commons.vfs2.FileChangeEvent;
-import org.apache.commons.vfs2.FileListener;
-import org.apache.commons.vfs2.FileObject;
-import org.jbake.app.Oven;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.vfs2.FileChangeEvent
+import org.apache.commons.vfs2.FileListener
+import org.apache.commons.vfs2.FileObject
+import org.jbake.app.Oven
+import org.jbake.app.configuration.JBakeConfiguration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.File
 
-import java.io.File;
-
-public class CustomFSChangeListener implements FileListener {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomFSChangeListener.class);
-
-    private final JBakeConfiguration config;
-
-    public CustomFSChangeListener(JBakeConfiguration config) {
-        this.config = config;
+class CustomFSChangeListener(private val config: JBakeConfiguration?) : FileListener {
+    @Throws(Exception::class)
+    override fun fileCreated(event: FileChangeEvent) {
+        LOGGER.info("File created event detected: {}", event.getFileObject().getURL())
+        exec(event.getFileObject())
     }
 
-    @Override
-    public void fileCreated(FileChangeEvent event) throws Exception {
-        LOGGER.info("File created event detected: {}", event.getFileObject().getURL());
-        exec(event.getFileObject());
+    @Throws(Exception::class)
+    override fun fileDeleted(event: FileChangeEvent) {
+        LOGGER.info("File deleted event detected: {}", event.getFileObject().getURL())
+        exec(event.getFileObject())
     }
 
-    @Override
-    public void fileDeleted(FileChangeEvent event) throws Exception {
-        LOGGER.info("File deleted event detected: {}", event.getFileObject().getURL());
-        exec(event.getFileObject());
+    @Throws(Exception::class)
+    override fun fileChanged(event: FileChangeEvent) {
+        LOGGER.info("File changed event detected: {}", event.getFileObject().getURL())
+        exec(event.getFileObject())
     }
 
-    @Override
-    public void fileChanged(FileChangeEvent event) throws Exception {
-        LOGGER.info("File changed event detected: {}", event.getFileObject().getURL());
-        exec(event.getFileObject());
+    private fun exec(file: FileObject) {
+        val oven = Oven(config)
+        oven.bake(File(file.getName().getPath()))
     }
 
-    private void exec(FileObject file) {
-        final Oven oven = new Oven(config);
-        oven.bake(new File(file.getName().getPath()));
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(CustomFSChangeListener::class.java)
     }
 }

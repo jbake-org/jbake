@@ -1,48 +1,46 @@
-package org.jbake.app;
+package org.jbake.app
 
-import com.orientechnologies.orient.core.db.record.OTrackedList;
-import com.orientechnologies.orient.core.record.OElement;
-import com.orientechnologies.orient.core.sql.executor.OResult;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
+import com.orientechnologies.orient.core.db.record.OTrackedList
+import com.orientechnologies.orient.core.sql.executor.OResult
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.DocumentModel
 
-import java.util.ArrayList;
+object DBUtil {
+    private var contentStore: ContentStore? = null
 
-public class DBUtil {
-    private static ContentStore contentStore;
-
-    @Deprecated
-    public static ContentStore createDataStore(final String type, String name) {
+    @Deprecated("")
+    fun createDataStore(type: String?, name: String?): ContentStore {
         if (contentStore == null) {
-            contentStore = new ContentStore(type, name);
+            contentStore = ContentStore(type, name)
         }
-        return contentStore;
+        return contentStore!!
     }
 
-    @Deprecated
-    public static void updateSchema(final ContentStore db) {
-        db.updateSchema();
+    @Deprecated("")
+    fun updateSchema(db: ContentStore) {
+        db.updateSchema()
     }
 
-    public static ContentStore createDataStore(JBakeConfiguration configuration) {
+    @JvmStatic
+    fun createDataStore(configuration: JBakeConfiguration): ContentStore {
         if (contentStore == null) {
-            contentStore = new ContentStore(configuration.getDatabaseStore(), configuration.getDatabasePath());
+            contentStore = ContentStore(configuration.databaseStore, configuration.databasePath)
         }
 
-        return contentStore;
+        return contentStore!!
     }
 
-    public static void closeDataStore() {
-        contentStore = null;
+    fun closeDataStore() {
+        contentStore = null
     }
 
-    public static DocumentModel documentToModel(OResult doc) {
-        DocumentModel result = new DocumentModel();
+    fun documentToModel(doc: OResult): DocumentModel {
+        val result = DocumentModel()
 
-        for (String key : doc.getPropertyNames()) {
-            result.put(key, doc.getProperty(key));
+        for (key in doc.getPropertyNames()) {
+            result.put(key, doc.getProperty<Any?>(key))
         }
-        return result;
+        return result
     }
 
     /**
@@ -51,18 +49,16 @@ public class DBUtil {
      * @param entry Entry input to be converted
      * @return input entry as String[]
      */
-    @SuppressWarnings("unchecked")
-    public static String[] toStringArray(Object entry) {
-        if (entry instanceof String[]) {
-            return (String[]) entry;
-        } else if (entry instanceof OTrackedList) {
-            OTrackedList<String> list = (OTrackedList<String>) entry;
-            return list.toArray(new String[list.size()]);
-        } else if (entry instanceof ArrayList) {
-            ArrayList<String> list = (ArrayList<String>) entry;
-            return list.toArray(new String[list.size()]);
+    fun toStringArray(entry: Any): Array<String?> {
+        if (entry is Array<String>) {
+            return entry as Array<String?>
+        } else if (entry is OTrackedList<*>) {
+            val list = entry as OTrackedList<String?>
+            return list.toTypedArray<String?>()
+        } else if (entry is ArrayList<*>) {
+            val list = entry as ArrayList<String?>
+            return list.toTypedArray<String?>()
         }
-        return new String[0];
+        return arrayOfNulls<String>(0)
     }
-
 }

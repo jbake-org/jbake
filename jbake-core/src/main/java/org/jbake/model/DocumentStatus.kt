@@ -1,4 +1,4 @@
-package org.jbake.model;
+package org.jbake.model
 
 /**
  * Enumeration used to determine whether rendering of a document
@@ -6,7 +6,7 @@ package org.jbake.model;
  *
  * @author Cédric Champeau
  */
-public enum DocumentStatus {
+enum class DocumentStatus {
     NEW,
     UPDATED,
     IDENTICAL

@@ -1,134 +1,147 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
+import java.util.*
 
 /**
- * <p>A singleton class giving access to markup engines. Markup engines are loaded based on classpath.
+ *
+ * A singleton class giving access to markup engines. Markup engines are loaded based on classpath.
  * New engines may be registered either at runtime (not recommanded) or by putting a descriptor file
- * on classpath (recommanded).</p>
+ * on classpath (recommanded).
  *
- * <p>The descriptor file must be found in <i>META-INF</i> directory and named
- * <i>org.jbake.parser.MarkupEngines.properties</i>. The format of the file is easy:</p>
- * <code>
- * org.jbake.parser.RawMarkupEngine=html<br>
- * org.jbake.parser.AsciidoctorEngine=ad,adoc,asciidoc<br>
- * org.jbake.parser.MarkdownEngine=md<br>
- * </code>
- * <p>where the key is the class of the engine (must extend {@link org.jbake.parser.MarkupEngine} and have a no-arg
- * constructor and the value is a comma-separated list of file extensions that this engine is capable of proceeding.</p>
  *
- * <p>Markup engines are singletons, so are typically used to initialize the underlying renderning engines. They
- * <b>must not</b> store specific information of a currently processed file (use {@link ParserContext the parser context}
- * for that).</p>
+ * The descriptor file must be found in *META-INF* directory and named
+ * *org.jbake.parser.MarkupEngines.properties*. The format of the file is easy:
+ * `
+ * org.jbake.parser.RawMarkupEngine=html<br></br>
+ * org.jbake.parser.AsciidoctorEngine=ad,adoc,asciidoc<br></br>
+ * org.jbake.parser.MarkdownEngine=md<br></br>
+` *
+ *
+ * where the key is the class of the engine (must extend [MarkupEngine] and have a no-arg
+ * constructor and the value is a comma-separated list of file extensions that this engine is capable of proceeding.
+ *
+ *
+ * Markup engines are singletons, so are typically used to initialize the underlying renderning engines. They
+ * **must not** store specific information of a currently processed file (use [the parser context][ParserContext]
+ * for that).
  *
  * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
  * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better
  * fit for embedding.
  *
  * @author Cédric Champeau
- *
  */
-public class Engines {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Engines.class);
-    private static final Engines INSTANCE;
-
-    private final Map<String, ParserEngine> parsers;
+class Engines private constructor() {
+    private val parsers: MutableMap<String?, ParserEngine?>
 
 
-    static {
-        INSTANCE = new Engines();
-        loadEngines();
+    init {
+        parsers = HashMap<String?, ParserEngine?>()
     }
 
-    public static ParserEngine get(String fileExtension) {
-        return INSTANCE.getEngine(fileExtension);
-    }
-
-    public static void register(String fileExtension, ParserEngine engine) {
-        INSTANCE.registerEngine(fileExtension, engine);
-    }
-
-    public static Set<String> getRecognizedExtensions() {
-        return Collections.unmodifiableSet(INSTANCE.parsers.keySet());
-    }
-
-    private Engines() {
-        parsers = new HashMap<>();
-    }
-
-    private void registerEngine(String fileExtension, ParserEngine markupEngine) {
-        ParserEngine old = parsers.put(fileExtension, markupEngine);
+    private fun registerEngine(fileExtension: String?, markupEngine: ParserEngine?) {
+        val old = parsers.put(fileExtension, markupEngine)
         if (old != null) {
-            LOGGER.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old);
+            LOGGER.warn(
+                "Registered a markup engine for extension [.{}] but another one was already defined: {}",
+                fileExtension,
+                old
+            )
         }
     }
 
-    private ParserEngine getEngine(String fileExtension) {
-        return parsers.get(fileExtension);
+    private fun getEngine(fileExtension: String?): ParserEngine? {
+        return parsers.get(fileExtension)
     }
 
-    /**
-     * This method is used to search for a specific class, telling if loading the engine would succeed. This is
-     * typically used to avoid loading optional modules.
-     *
-     * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.
-     * @return null if the engine is not available, an instance of the engine otherwise
-     */
-    private static ParserEngine tryLoadEngine(String engineClassName) {
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends ParserEngine> engineClass = (Class<? extends ParserEngine>) Class.forName(engineClassName, false, Engines.class.getClassLoader());
-            return engineClass.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException | NoClassDefFoundError | IllegalAccessException | InstantiationException e) {
-            return new ErrorEngine(engineClassName);
-        } catch (NoSuchMethodException | InvocationTargetException e) {
-            LOGGER.error("unable to instantiate ParserEngine {}", engineClassName);
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(Engines::class.java)
+        private val INSTANCE: Engines
+
+        init {
+            INSTANCE = Engines()
+            loadEngines()
         }
-        return null;
-    }
 
-    /**
-     * This method is used internally to load markup engines. Markup engines are found using descriptor files on classpath, so
-     * adding an engine is as easy as adding a jar on classpath with the descriptor file included.
-     */
-    private static void loadEngines() {
-        try {
-            ClassLoader cl = Engines.class.getClassLoader();
-            Enumeration<URL> resources = cl.getResources("META-INF/org.jbake.parser.MarkupEngines.properties");
-            while (resources.hasMoreElements()) {
-                URL url = resources.nextElement();
-                Properties props = new Properties();
-                props.load(url.openStream());
-                for (Map.Entry<Object, Object> entry : props.entrySet()) {
-                    String className = (String) entry.getKey();
-                    String[] extensions = ((String)entry.getValue()).split(",");
-                    registerEngine(className, extensions);
+        fun get(fileExtension: String?): ParserEngine? {
+            return INSTANCE.getEngine(fileExtension)
+        }
+
+        fun register(fileExtension: String?, engine: ParserEngine?) {
+            INSTANCE.registerEngine(fileExtension, engine)
+        }
+
+        val recognizedExtensions: MutableSet<String?>
+            get() = Collections.unmodifiableSet<String?>(INSTANCE.parsers.keys)
+
+        /**
+         * This method is used to search for a specific class, telling if loading the engine would succeed. This is
+         * typically used to avoid loading optional modules.
+         *
+         * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.
+         * @return null if the engine is not available, an instance of the engine otherwise
+         */
+        private fun tryLoadEngine(engineClassName: String?): ParserEngine? {
+            try {
+                val engineClass = Class.forName(
+                    engineClassName,
+                    false,
+                    Engines::class.java.getClassLoader()
+                ) as Class<out ParserEngine?>
+                return engineClass.getDeclaredConstructor().newInstance()
+            } catch (e: ClassNotFoundException) {
+                return ErrorEngine(engineClassName)
+            } catch (e: NoClassDefFoundError) {
+                return ErrorEngine(engineClassName)
+            } catch (e: IllegalAccessException) {
+                return ErrorEngine(engineClassName)
+            } catch (e: InstantiationException) {
+                return ErrorEngine(engineClassName)
+            } catch (e: NoSuchMethodException) {
+                LOGGER.error("unable to instantiate ParserEngine {}", engineClassName)
+            } catch (e: InvocationTargetException) {
+                LOGGER.error("unable to instantiate ParserEngine {}", engineClassName)
+            }
+            return null
+        }
+
+        /**
+         * This method is used internally to load markup engines. Markup engines are found using descriptor files on classpath, so
+         * adding an engine is as easy as adding a jar on classpath with the descriptor file included.
+         */
+        private fun loadEngines() {
+            try {
+                val cl = Engines::class.java.getClassLoader()
+                val resources = cl.getResources("META-INF/org.jbake.parser.MarkupEngines.properties")
+                while (resources.hasMoreElements()) {
+                    val url = resources.nextElement()
+                    val props = Properties()
+                    props.load(url.openStream())
+                    for (entry in props.entries) {
+                        val className = entry.key as String?
+                        val extensions: Array<String?> =
+                            (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        registerEngine(className, *extensions)
+                    }
                 }
+            } catch (e: IOException) {
+                LOGGER.error("Error loading Engines", e)
             }
-        } catch (IOException e) {
-            LOGGER.error("Error loading Engines", e);
         }
-    }
 
-    private static void registerEngine(String className, String... extensions) {
-        ParserEngine engine = tryLoadEngine(className);
-        if (engine != null) {
-            for (String extension : extensions) {
-                register(extension, engine);
-            }
-            if (engine instanceof ErrorEngine) {
-                LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", (Object) extensions);
+        private fun registerEngine(className: String?, vararg extensions: String?) {
+            val engine: ParserEngine? = tryLoadEngine(className)
+            if (engine != null) {
+                for (extension in extensions) {
+                    register(extension, engine)
+                }
+                if (engine is ErrorEngine) {
+                    LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
+                }
             }
         }
     }

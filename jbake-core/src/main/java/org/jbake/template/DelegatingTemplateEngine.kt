@@ -1,17 +1,14 @@
-package org.jbake.template;
+package org.jbake.template
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.ContentStore;
-import org.jbake.app.FileUtil;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.model.TemplateModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.Writer;
-
-import static org.jbake.app.configuration.PropertyList.PAGINATE_INDEX;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.ContentStore
+import org.jbake.app.FileUtil
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.template.model.TemplateModel
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.io.Writer
 
 /**
  * A template which is responsible for delegating to a supported template engine,
@@ -19,58 +16,65 @@ import static org.jbake.app.configuration.PropertyList.PAGINATE_INDEX;
  *
  * @author Cédric Champeau
  */
-public class DelegatingTemplateEngine extends AbstractTemplateEngine {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingTemplateEngine.class);
-
-    private final TemplateEngines renderers;
+class DelegatingTemplateEngine : AbstractTemplateEngine {
+    private val renderers: TemplateEngines
 
     /**
-     * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
-     *
-     * @param config the {@link CompositeConfiguration} of jbake
-     * @param db the {@link ContentStore}
+     * @param config the [CompositeConfiguration] of jbake
+     * @param db the [ContentStore]
      * @param destination the destination path
      * @param templatesPath the templates path
      */
-    @Deprecated
-    public DelegatingTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
-        this.renderers = new TemplateEngines(this.config, db);
+    @Deprecated(
+        """Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
+
+      """
+    )
+    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
+        config,
+        db,
+        destination,
+        templatesPath
+    ) {
+        this.renderers = TemplateEngines(this.config, db)
     }
 
-    public DelegatingTemplateEngine(final ContentStore db, final JBakeConfiguration config) {
-        super(config, db);
-        this.renderers = new TemplateEngines(config, db);
+    constructor(db: ContentStore?, config: JBakeConfiguration?) : super(config, db) {
+        this.renderers = TemplateEngines(config, db)
     }
 
-    @Override
-    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
-        model.setVersion(config.getVersion());
-        model.setConfig(config.asHashMap());
+    @Throws(RenderingException::class)
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer?) {
+        model.setVersion(config.version)
+        model.setConfig(config.asHashMap())
 
         // if default template exists we will use it
-        File templateFolder = config.getTemplateFolder();
-        File templateFile = new File(templateFolder, templateName);
-        String theTemplateName = templateName;
+        val templateFolder = config.templateFolder
+        var templateFile = File(templateFolder, templateName)
+        var theTemplateName = templateName
         if (!templateFile.exists()) {
-            LOGGER.info("Default template: {} was not found, searching for others...", templateName);
+            LOGGER.info("Default template: {} was not found, searching for others...", templateName)
             // if default template does not exist then check if any alternative engine templates exist
-            String templateNameWithoutExt = templateName.substring(0, templateName.length() - 4);
-            for (String extension : renderers.getRecognizedExtensions()) {
-                templateFile = new File(templateFolder, templateNameWithoutExt + "." + extension);
+            val templateNameWithoutExt = templateName.substring(0, templateName.length - 4)
+            for (extension in renderers.getRecognizedExtensions()) {
+                templateFile = File(templateFolder, templateNameWithoutExt + "." + extension)
                 if (templateFile.exists()) {
-                    LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName());
-                    theTemplateName = templateFile.getName();
-                    break;
+                    LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName())
+                    theTemplateName = templateFile.getName()
+                    break
                 }
             }
         }
-        String ext = FileUtil.fileExt(theTemplateName);
-        AbstractTemplateEngine engine = renderers.getEngine(ext);
+        val ext = FileUtil.fileExt(theTemplateName)
+        val engine = renderers.getEngine(ext)
         if (engine != null) {
-            engine.renderDocument(model, theTemplateName, writer);
+            engine.renderDocument(model, theTemplateName, writer)
         } else {
-            LOGGER.error("Warning - No template engine found for template: {}", theTemplateName);
+            LOGGER.error("Warning - No template engine found for template: {}", theTemplateName)
         }
+    }
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(DelegatingTemplateEngine::class.java)
     }
 }

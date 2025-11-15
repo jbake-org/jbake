@@ -1,98 +1,96 @@
-package org.jbake;
+package org.jbake
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import org.jbake.model.DocumentModel;
+import com.orientechnologies.orient.core.record.impl.ODocument
+import org.jbake.model.DocumentModel
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.util.*
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.Random;
+class FakeDocumentBuilder(private val type: String?) {
+    private val fileModel = DocumentModel()
+    private val hasSourceUri = false
+    private var hasSha1 = false
+    private var hasDate = false
 
-public class FakeDocumentBuilder {
-
-    private DocumentModel fileModel = new DocumentModel();
-    private String type;
-    private boolean hasSourceUri = false;
-    private boolean hasSha1 = false;
-    private boolean hasDate = false;
-
-    public FakeDocumentBuilder(String type) {
-        this.type = type;
-        fileModel.setType(type);
+    init {
+        fileModel.type = type
     }
 
-    public FakeDocumentBuilder withStatus(String status) {
-        fileModel.setStatus(status);
-        return this;
+    fun withStatus(status: String?): FakeDocumentBuilder {
+        fileModel.status = status
+        return this
     }
 
-    public FakeDocumentBuilder withRandomSha1() throws NoSuchAlgorithmException {
-        fileModel.setSha1(getRandomSha1());
-        hasSha1 = true;
-        return this;
+    @Throws(NoSuchAlgorithmException::class)
+    fun withRandomSha1(): FakeDocumentBuilder {
+        fileModel.sha1 = this.randomSha1
+        hasSha1 = true
+        return this
     }
 
-    public FakeDocumentBuilder withDate(Date date) {
-        fileModel.setDate(date);
-        hasDate = true;
-        return this;
+    fun withDate(date: Date?): FakeDocumentBuilder {
+        fileModel.date = date
+        hasDate = true
+        return this
     }
 
-    private FakeDocumentBuilder withCurrentDate() {
-        fileModel.setDate(new Date());
-        return this;
+    private fun withCurrentDate(): FakeDocumentBuilder {
+        fileModel.date = Date()
+        return this
     }
 
-    private FakeDocumentBuilder withRandomSourceUri() throws NoSuchAlgorithmException {
-        String path = "/tmp/" + getRandomSha1() + ".txt";
-        fileModel.setSourceUri(path);
-        return this;
+    @Throws(NoSuchAlgorithmException::class)
+    private fun withRandomSourceUri(): FakeDocumentBuilder {
+        val path = "/tmp/" + this.randomSha1 + ".txt"
+        fileModel.setSourceUri(path)
+        return this
     }
 
-    public FakeDocumentBuilder withCached(boolean cached) {
-        fileModel.setCached(cached);
-        return this;
+    fun withCached(cached: Boolean): FakeDocumentBuilder {
+        fileModel.cached = cached
+        return this
     }
 
-    public void build() {
-
+    fun build() {
         try {
             if (!hasSourceUri()) {
-                this.withRandomSourceUri();
+                this.withRandomSourceUri()
             }
             if (!hasSha1()) {
-                this.withRandomSha1();
+                this.withRandomSha1()
             }
             if (!hasDate()) {
-                this.withCurrentDate();
+                this.withCurrentDate()
             }
-            ODocument document = new ODocument("Documents").fromMap(fileModel);
-            document.save();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            val document = ODocument("Documents").fromMap(fileModel)
+            document.save()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
         }
     }
 
-    private String getRandomSha1() throws NoSuchAlgorithmException {
-        MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
-        Random random = new Random();
-        int size = random.nextInt(1000) + 1000;
-        byte[] content = new byte[size];
+    @get:Throws(NoSuchAlgorithmException::class)
+    private val randomSha1: String
+        get() {
+            val sha1Digest = MessageDigest.getInstance("SHA-1")
+            val random = Random()
+            val size = random.nextInt(1000) + 1000
+            val content = ByteArray(size)
 
-        random.nextBytes(content);
-        return new BigInteger(sha1Digest.digest(content)).toString(16);
+            random.nextBytes(content)
+            return BigInteger(sha1Digest.digest(content)).toString(16)
+        }
+
+    private fun hasDate(): Boolean {
+        return hasDate
     }
 
-    private boolean hasDate() {
-        return hasDate;
+    private fun hasSha1(): Boolean {
+        return hasSha1
     }
 
-    private boolean hasSha1() {
-        return hasSha1;
-    }
-
-    private boolean hasSourceUri() {
-        return hasSourceUri;
+    private fun hasSourceUri(): Boolean {
+        return hasSourceUri
     }
 }

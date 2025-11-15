@@ -1,130 +1,137 @@
-package org.jbake.app.configuration;
+package org.jbake.app.configuration
+
+import org.assertj.core.api.AssertionsForClassTypes
+import org.jbake.TestUtils
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import org.mockito.Mockito
+import java.io.File
+import java.io.FileWriter
+import java.util.*
 
 
-import org.jbake.TestUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.util.Properties;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
-public class JBakeConfigurationFactoryTest {
-
+class JBakeConfigurationFactoryTest {
     @TempDir
-    File root;
+    var root: File? = null
 
     @Test
-    public void shouldReturnDefaultConfigurationWithDefaultFolders() throws Exception {
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output");
-        File templateFolder = TestUtils.newFolder(root, "templates");
-        File assetFolder = TestUtils.newFolder(root, "assets");
+    @Throws(Exception::class)
+    fun shouldReturnDefaultConfigurationWithDefaultFolders() {
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output")
+        val templateFolder = TestUtils.newFolder(root, "templates")
+        val assetFolder = TestUtils.newFolder(root, "assets")
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+        val configuration: JBakeConfiguration =
+            JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
-        assertThat(configuration.getSourceFolder()).isEqualTo(sourceFolder);
-        assertThat(configuration.getDestinationFolder()).isEqualTo(destinationFolder);
-        assertThat(configuration.getTemplateFolder()).isEqualTo(templateFolder);
-        assertThat(configuration.getAssetFolder()).isEqualTo(assetFolder);
-        assertThat(configuration.getClearCache()).isEqualTo(true);
+        assertThat(configuration.sourceFolder).isEqualTo(sourceFolder)
+        assertThat(configuration.destinationFolder).isEqualTo(destinationFolder)
+        assertThat(configuration.templateFolder).isEqualTo(templateFolder)
+        assertThat(configuration.assetFolder).isEqualTo(assetFolder)
+        assertThat(configuration.clearCache).isEqualTo(true)
     }
 
     @Test
-    public void shouldReturnDefaultConfigurationWithCustomFolders() throws Exception {
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output/custom");
-        File templateFolder = TestUtils.newFolder(root, "templates/custom");
-        File assetFolder = TestUtils.newFolder(root, "assets/custom");
-        File contentFolder = TestUtils.newFolder(root, "content/custom");
+    @Throws(Exception::class)
+    fun shouldReturnDefaultConfigurationWithCustomFolders() {
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output/custom")
+        val templateFolder = TestUtils.newFolder(root, "templates/custom")
+        val assetFolder = TestUtils.newFolder(root, "assets/custom")
+        val contentFolder = TestUtils.newFolder(root, "content/custom")
 
 
-        File properties = new File(sourceFolder, "jbake.properties");
+        val properties = File(sourceFolder, "jbake.properties")
 
-        FileWriter pw = new FileWriter(properties);
-        pw.write("template.folder=templates/custom\n");
-        pw.write("asset.folder=assets/custom\n");
-        pw.write("content.folder=content/custom\n");
-        pw.close();
+        val pw = FileWriter(properties)
+        pw.write("template.folder=templates/custom\n")
+        pw.write("asset.folder=assets/custom\n")
+        pw.write("content.folder=content/custom\n")
+        pw.close()
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+        val configuration: JBakeConfiguration =
+            JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
-        assertThat(configuration.getTemplateFolderName()).isEqualTo("templates/custom");
-        assertThat(configuration.getAssetFolderName()).isEqualTo("assets/custom");
-        assertThat(configuration.getContentFolderName()).isEqualTo("content/custom");
+        assertThat(configuration.templateFolderName).isEqualTo("templates/custom")
+        assertThat(configuration.assetFolderName).isEqualTo("assets/custom")
+        assertThat(configuration.contentFolderName).isEqualTo("content/custom")
 
-        assertThat(configuration.getSourceFolder()).isEqualTo(sourceFolder);
-        assertThat(configuration.getDestinationFolder()).isEqualTo(destinationFolder);
-        assertThat(configuration.getTemplateFolder()).isEqualTo(templateFolder);
-        assertThat(configuration.getAssetFolder()).isEqualTo(assetFolder);
-        assertThat(configuration.getContentFolder()).isEqualTo(contentFolder);
+        assertThat(configuration.sourceFolder).isEqualTo(sourceFolder)
+        assertThat(configuration.destinationFolder).isEqualTo(destinationFolder)
+        assertThat(configuration.templateFolder).isEqualTo(templateFolder)
+        assertThat(configuration.assetFolder).isEqualTo(assetFolder)
+        assertThat(configuration.contentFolder).isEqualTo(contentFolder)
 
-        assertThat(configuration.getClearCache()).isEqualTo(true);
+        assertThat(configuration.clearCache).isEqualTo(true)
     }
 
 
     @Test
-    public void shouldReturnADefaultConfigurationWithSitehost() throws Exception {
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output");
-        String siteHost = "http://www.jbake.org";
+    @Throws(Exception::class)
+    fun shouldReturnADefaultConfigurationWithSitehost() {
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output")
+        val siteHost = "http://www.jbake.org"
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+        val configuration: JBakeConfiguration =
+            JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
-        assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
+        assertThat(configuration.siteHost).isEqualTo(siteHost)
     }
 
     @Test
-    public void shouldReturnAJettyConfiguration() throws Exception {
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output");
-        String siteHost = "http://localhost:8820/";
+    @Throws(Exception::class)
+    fun shouldReturnAJettyConfiguration() {
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output")
+        val siteHost = "http://localhost:8820/"
 
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true);
+        val configuration: JBakeConfiguration =
+            JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true)
 
-        assertThat(configuration.getSiteHost()).isEqualTo(siteHost);
+        assertThat(configuration.siteHost).isEqualTo(siteHost)
     }
 
     @Test
-    public void shouldUseDefaultEncodingUTF8() throws Exception {
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output");
-        JBakeConfigurationFactory factory = new JBakeConfigurationFactory();
-        JBakeConfiguration configuration = factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
+    @Throws(Exception::class)
+    fun shouldUseDefaultEncodingUTF8() {
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output")
+        val factory = JBakeConfigurationFactory()
+        val configuration: JBakeConfiguration =
+            factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
-        assertThat(factory.getConfigUtil().getEncoding()).isEqualTo("UTF-8");
+        AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("UTF-8")
     }
 
     @Test
-    public void shouldUseCustomEncoding() throws Exception {
+    @Throws(Exception::class)
+    fun shouldUseCustomEncoding() {
+        val util = Mockito.spy<ConfigUtil>(ConfigUtil::class.java)
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output")
+        val factory = JBakeConfigurationFactory()
+        factory.configUtil = util
+        val configuration: JBakeConfiguration = factory.setEncoding("latin1")
+            .createDefaultJbakeConfiguration(sourceFolder, destinationFolder, null as File?, true)
 
-        ConfigUtil util = spy(ConfigUtil.class);
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output");
-        JBakeConfigurationFactory factory = new JBakeConfigurationFactory();
-        factory.setConfigUtil(util);
-        JBakeConfiguration configuration = factory.setEncoding("latin1").createDefaultJbakeConfiguration(sourceFolder, destinationFolder, (File) null,true);
-
-        assertThat(factory.getConfigUtil().getEncoding()).isEqualTo("latin1");
-        verify(util).loadConfig(sourceFolder, null);
+        AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("latin1")
+        Mockito.verify<ConfigUtil?>(util).loadConfig(sourceFolder, null)
     }
 
     @Test
-    void shouldBeAbleToAddCustomProperties() {
-        File sourceFolder = root;
-        File destinationFolder = TestUtils.newFolder(root, "output");
-        DefaultJBakeConfiguration config = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true);
-        Properties properties = new Properties();
-        properties.setProperty("custom.key", "custom value");
-        properties.setProperty("custom.key2", "custom value 2");
+    fun shouldBeAbleToAddCustomProperties() {
+        val sourceFolder = root!!
+        val destinationFolder = TestUtils.newFolder(root, "output")
+        val config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val properties = Properties()
+        properties.setProperty("custom.key", "custom value")
+        properties.setProperty("custom.key2", "custom value 2")
 
-        config.addConfiguration(properties);
+        config.addConfiguration(properties)
 
-        assertThat(config.get("custom.key")).isEqualTo("custom value");
-        assertThat(config.get("custom.key2")).isEqualTo("custom value 2");
+        AssertionsForClassTypes.assertThat<Any?>(config.get("custom.key")).isEqualTo("custom value")
+        AssertionsForClassTypes.assertThat<Any?>(config.get("custom.key2")).isEqualTo("custom value 2")
     }
 }

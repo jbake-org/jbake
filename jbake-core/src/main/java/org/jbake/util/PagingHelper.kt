@@ -1,54 +1,50 @@
-package org.jbake.util;
+package org.jbake.util
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URI
+import java.net.URISyntaxException
+import kotlin.math.ceil
 
-public class PagingHelper {
-    private static final String URI_SEPARATOR = "/";
-    private long totalDocuments;
-    private int postsPerPage;
+class PagingHelper(private val totalDocuments: Long, private val postsPerPage: Int) {
+    val numberOfPages: Int
+        get() = ceil((totalDocuments * 1.0) / (postsPerPage * 1.0)).toInt()
 
-    public PagingHelper(long totalDocuments, int postsPerPage) {
-        this.totalDocuments = totalDocuments;
-        this.postsPerPage = postsPerPage;
-    }
-
-    public int getNumberOfPages() {
-        return (int) Math.ceil((totalDocuments * 1.0) / (postsPerPage * 1.0));
-    }
-
-    public String getNextFileName(int currentPageNumber) throws URISyntaxException {
-        if (currentPageNumber < getNumberOfPages()) {
-            return new URI((currentPageNumber + 1) + URI_SEPARATOR).toString();
+    @Throws(URISyntaxException::class)
+    fun getNextFileName(currentPageNumber: Int): String? {
+        if (currentPageNumber < this.numberOfPages) {
+            return URI((currentPageNumber + 1).toString() + URI_SEPARATOR).toString()
         } else {
-            return null;
+            return null
         }
     }
 
-    public String getPreviousFileName(int currentPageNumber) throws URISyntaxException {
-
+    @Throws(URISyntaxException::class)
+    fun getPreviousFileName(currentPageNumber: Int): String? {
         if (isFirstPage(currentPageNumber)) {
-            return null;
+            return null
         } else {
             if (currentPageNumber == 2) {
                 // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
-                return "";
+                return ""
             } else {
-                return new URI((currentPageNumber - 1) + URI_SEPARATOR).toString();
+                return URI((currentPageNumber - 1).toString() + URI_SEPARATOR).toString()
             }
         }
     }
 
-    private boolean isFirstPage(int page) {
-        return page == 1;
+    private fun isFirstPage(page: Int): Boolean {
+        return page == 1
     }
 
-    public String getCurrentFileName(int page, String fileName) throws URISyntaxException {
+    @Throws(URISyntaxException::class)
+    fun getCurrentFileName(page: Int, fileName: String?): String? {
         if (isFirstPage(page)) {
-            return fileName;
+            return fileName
         } else {
-            return new URI(page + URI_SEPARATOR + fileName).toString();
+            return URI(page.toString() + URI_SEPARATOR + fileName).toString()
         }
     }
 
+    companion object {
+        private const val URI_SEPARATOR = "/"
+    }
 }

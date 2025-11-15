@@ -1,69 +1,71 @@
-package org.jbake.model;
+package org.jbake.model
 
-import org.junit.Test;
+import org.assertj.core.api.Assertions
+import org.jbake.model.DocumentTypes.addDocumentType
+import org.jbake.model.DocumentTypes.addListener
+import org.jbake.model.DocumentTypes.contains
+import org.jbake.model.DocumentTypes.documentTypes
+import org.junit.Test
+import org.mockito.Mockito
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
-public class DocumentTypesTest {
-
+class DocumentTypesTest {
     @Test
-    public void shouldReturnDefaultDocumentTypes() throws Exception {
-        String[] knownDocumentTypes = DocumentTypes.getDocumentTypes();
-        String[] expectedDocumentType = new String[] {"page", "post", "masterindex", "archive", "feed" };
+    @Throws(Exception::class)
+    fun shouldReturnDefaultDocumentTypes() {
+        val knownDocumentTypes = documentTypes
+        val expectedDocumentType: Array<String?> = arrayOf<String>("page", "post", "masterindex", "archive", "feed")
 
-        assertThat(knownDocumentTypes).contains(expectedDocumentType);
+        Assertions.assertThat<String?>(knownDocumentTypes).contains(*expectedDocumentType)
     }
 
     @Test
-    public void shouldAddNewDocumentType() {
-        String newDocumentType = "newDocumentType";
+    fun shouldAddNewDocumentType() {
+        val newDocumentType = "newDocumentType"
 
-        DocumentTypes.addDocumentType(newDocumentType);
+        addDocumentType(newDocumentType)
 
-        assertThat(DocumentTypes.getDocumentTypes()).contains(newDocumentType);
+        Assertions.assertThat<String?>(documentTypes).contains(newDocumentType)
     }
 
     @Test
-    public void shouldAddDocumentTypeOnlyOnce() {
+    fun shouldAddDocumentTypeOnlyOnce() {
         // A a document type is already known
-        String knownDocumentType = "known";
-        DocumentTypes.addDocumentType(knownDocumentType);
+        val knownDocumentType = "known"
+        addDocumentType(knownDocumentType)
 
         // adding the known document type again
-        DocumentTypes.addDocumentType(knownDocumentType);
+        addDocumentType(knownDocumentType)
 
         // only one document type could be found in the list
-        assertThat(DocumentTypes.getDocumentTypes()).containsOnlyOnce(knownDocumentType);
+        Assertions.assertThat<String?>(documentTypes).containsOnlyOnce(knownDocumentType)
     }
 
     @Test
-    public void shouldTellIfDocumentTypeIsKnown() {
-        String knownDocumentType = "known";
-        DocumentTypes.addDocumentType(knownDocumentType);
+    fun shouldTellIfDocumentTypeIsKnown() {
+        val knownDocumentType = "known"
+        addDocumentType(knownDocumentType)
 
-        assertThat( DocumentTypes.contains(knownDocumentType) ).isTrue();
+        Assertions.assertThat(contains(knownDocumentType)).isTrue()
     }
 
     @Test
-    public void shouldTellIfDocumentTypeIsUnknown() {
-        String unknownType = "unknown";
+    fun shouldTellIfDocumentTypeIsUnknown() {
+        val unknownType = "unknown"
 
-        assertThat( DocumentTypes.contains(unknownType) ).isFalse();
+        Assertions.assertThat(contains(unknownType)).isFalse()
     }
 
     @Test
-    public void shouldNotifyListenersWhenNewDocumentTypeIsAdded() {
+    fun shouldNotifyListenersWhenNewDocumentTypeIsAdded() {
         // A DocumentTypeListener is added
-        String newDocumentType = "newDocumentType";
-        DocumentTypeListener listener = mock(DocumentTypeListener.class);
-        DocumentTypes.addListener(listener);
+        val newDocumentType = "newDocumentType"
+        val listener = Mockito.mock<DocumentTypeListener?>(DocumentTypeListener::class.java)
+        addListener(listener)
 
         // a new document type added
-        DocumentTypes.addDocumentType(newDocumentType);
+        addDocumentType(newDocumentType)
 
         // the listener was called with new document type
-        verify(listener).added(newDocumentType);
+        Mockito.verify<DocumentTypeListener?>(listener).added(newDocumentType)
     }
 }

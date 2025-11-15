@@ -1,55 +1,50 @@
-package org.jbake;
+package org.jbake
 
-import org.apache.commons.vfs2.util.Os;
+import org.apache.commons.vfs2.util.Os
+import java.io.File
+import java.io.FilenameFilter
+import java.io.IOException
+import java.nio.file.Path
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.file.Path;
-
-public class TestUtils {
-
+object TestUtils {
     /**
      * Hides the assets on Windows that start with a dot (e.g. .test.txt but not test.txt) so File.isHidden() returns true for those files.
      */
-    public static void hideAssets(File assets) throws IOException, InterruptedException {
-        if (isWindows()) {
-            final File[] hiddenFiles = assets.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(".");
+    @Throws(IOException::class, InterruptedException::class)
+    fun hideAssets(assets: File) {
+        if (isWindows) {
+            val hiddenFiles = assets.listFiles(object : FilenameFilter {
+                override fun accept(dir: File?, name: String): Boolean {
+                    return name.startsWith(".")
                 }
-            });
-            for (File file : hiddenFiles) {
-                final Process process = Runtime.getRuntime().exec(new String[]{"attrib", "+h", file.getAbsolutePath()});
-                process.waitFor();
+            })
+            for (file in hiddenFiles!!) {
+                val process = Runtime.getRuntime().exec(arrayOf<String>("attrib", "+h", file.getAbsolutePath()))
+                process.waitFor()
             }
         }
     }
 
-    public static boolean isWindows() {
-        return Os.isFamily(Os.OS_FAMILY_WINDOWS);
+    val isWindows: Boolean
+        get() = Os.isFamily(Os.OS_FAMILY_WINDOWS)
+
+    val testResourcesAsSourceFolder: File
+        get() = getTestResourcesAsSourceFolder("/fixture")
+
+    fun getTestResourcesAsSourceFolder(name: String): File {
+        return File(TestUtils::class.java.getResource(name).getFile())
     }
 
-    public static File getTestResourcesAsSourceFolder() {
-        return getTestResourcesAsSourceFolder("/fixture");
+    fun newFolder(base: File?, folderName: String): File {
+        val templateFolder = File(base, folderName)
+        templateFolder.mkdir()
+        return templateFolder
     }
 
-    public static File getTestResourcesAsSourceFolder(String name) {
-        return new File(TestUtils.class.getResource(name).getFile());
-    }
-
-    public static File newFolder(File base, String folderName) {
-        File templateFolder = new File(base,folderName);
-        templateFolder.mkdir();
-        return templateFolder;
-    }
-
-    public static String getOsPath(Path path) {
-
-        if ( isWindows() ) {
-            return path.toString().replace("\\","\\\\");
+    fun getOsPath(path: Path): String {
+        if (isWindows) {
+            return path.toString().replace("\\", "\\\\")
         }
-        return path.toString();
+        return path.toString()
     }
 }

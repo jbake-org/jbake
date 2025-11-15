@@ -1,40 +1,32 @@
-package org.jbake.template.model;
+package org.jbake.template.model
 
-import org.jbake.app.ContentStore;
-import org.jbake.app.DocumentList;
-import org.jbake.app.FileUtil;
-import org.jbake.template.ModelExtractor;
+import org.jbake.app.ContentStore
+import org.jbake.app.DocumentList
+import org.jbake.app.FileUtil
+import org.jbake.template.ModelExtractor
 
-import java.util.Map;
+class TagsExtractor : ModelExtractor<DocumentList<*>?> {
+    override fun get(db: ContentStore, model: MutableMap<*, *>?, key: String?): DocumentList<*> {
+        val dl = DocumentList<TemplateModel?>()
+        val templateModel = TemplateModel()
+        templateModel.putAll(model)
+        val config: MutableMap<*, *> = templateModel.getConfig()
 
-import static org.jbake.app.configuration.PropertyList.OUTPUT_EXTENSION;
-import static org.jbake.app.configuration.PropertyList.TAG_PATH;
+        val tagPath: String? = config.get(TAG_PATH.key.replace(".", "_")).toString()
 
+        for (tag in db.getAllTags()) {
+            val newTag = TemplateModel()
+            val tagName = tag
+            newTag.setName(tagName)
 
-public class TagsExtractor implements ModelExtractor<DocumentList> {
+            val uri = tagPath + FileUtil.URI_SEPARATOR_CHAR + tag + config.get(OUTPUT_EXTENSION.key.replace(".", "_"))
+                .toString()
 
-    @Override
-    public DocumentList get(ContentStore db, Map model, String key) {
-        DocumentList<TemplateModel> dl = new DocumentList<>();
-        TemplateModel templateModel = new TemplateModel();
-        templateModel.putAll(model);
-        Map<?, ?> config = templateModel.getConfig();
-
-        String tagPath = config.get(TAG_PATH.getKey().replace(".", "_")).toString();
-
-        for (String tag : db.getAllTags()) {
-            TemplateModel newTag = new TemplateModel();
-            String tagName = tag;
-            newTag.setName(tagName);
-
-            String uri = tagPath + FileUtil.URI_SEPARATOR_CHAR + tag + config.get(OUTPUT_EXTENSION.getKey().replace(".", "_")).toString();
-
-            newTag.setUri(uri);
-            newTag.setTaggedPosts(db.getPublishedPostsByTag(tagName));
-            newTag.setTaggedDocuments(db.getPublishedDocumentsByTag(tagName));
-            dl.push(newTag);
+            newTag.setUri(uri)
+            newTag.setTaggedPosts(db.getPublishedPostsByTag(tagName))
+            newTag.setTaggedDocuments(db.getPublishedDocumentsByTag(tagName))
+            dl.push(newTag)
         }
-        return dl;
+        return dl
     }
-
 }

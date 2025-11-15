@@ -21,23 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jbake.app.template;
+package org.jbake.app.template
 
-import org.junit.BeforeClass;
+import org.junit.BeforeClass
 
 /**
  *
  * @author jdlee
  */
-public class GroovyTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
-
+object GroovyTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest() {
     @BeforeClass
-    public static void setUpClass() {
+    fun setUpClass() {
         //setUpDatabase(StorageType.PLOCAL);
     }
-
-    public GroovyTemplateEngineRenderingTest() {
-        super("groovyTemplates", "gsp");
-    }
-
 }

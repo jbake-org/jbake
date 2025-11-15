@@ -1,84 +1,95 @@
-package org.jbake.template;
+package org.jbake.template
 
-import groovy.lang.Writable;
-import groovy.text.Template;
-import groovy.text.markup.MarkupTemplateEngine;
-import groovy.text.markup.TemplateConfiguration;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.ContentStore;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.template.model.TemplateModel;
-
-import java.io.File;
-import java.io.Writer;
-import java.util.Map;
+import groovy.text.markup.MarkupTemplateEngine
+import groovy.text.markup.TemplateConfiguration
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.ContentStore
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.template.TemplateEngineAdapter.NoopAdapter
+import org.jbake.template.model.TemplateModel
+import java.io.File
+import java.io.Writer
 
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.
- * <p>
+ *
+ *
  * The file extension to activate this Engine is .tpl
  *
- * @see <a href="http://groovy-lang.org/templating.html#_the_markuptemplateengine">Groovy MarkupTemplateEngine Documentation</a>
+ * @see [Groovy MarkupTemplateEngine Documentation](http://groovy-lang.org/templating.html._the_markuptemplateengine)
  */
-public class GroovyMarkupTemplateEngine extends AbstractTemplateEngine {
-    private TemplateConfiguration templateConfiguration;
-    private MarkupTemplateEngine templateEngine;
+class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
+    private var templateConfiguration: TemplateConfiguration? = null
+    private var templateEngine: MarkupTemplateEngine? = null
 
     /**
-     * @deprecated Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead
-     *
-     * @param config the {@link CompositeConfiguration} of jbake
-     * @param db the {@link ContentStore}
+     * @param config the [CompositeConfiguration] of jbake
+     * @param db the [ContentStore]
      * @param destination the destination path
      * @param templatesPath the templates path
      */
-    @Deprecated
-    public GroovyMarkupTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
-        setupTemplateConfiguration();
-        initializeTemplateEngine();
+    @Deprecated(
+        """Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead
+
+      """
+    )
+    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
+        config,
+        db,
+        destination,
+        templatesPath
+    ) {
+        setupTemplateConfiguration()
+        initializeTemplateEngine()
     }
 
-    public GroovyMarkupTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
-        super(config, db);
-        setupTemplateConfiguration();
-        initializeTemplateEngine();
+    constructor(config: JBakeConfiguration?, db: ContentStore?) : super(config, db) {
+        setupTemplateConfiguration()
+        initializeTemplateEngine()
     }
 
-    private void setupTemplateConfiguration() {
-        templateConfiguration = new TemplateConfiguration();
-        templateConfiguration.setUseDoubleQuotes(true);
-        templateConfiguration.setAutoIndent(true);
-        templateConfiguration.setAutoNewLine(true);
-        templateConfiguration.setAutoEscape(true);
+    private fun setupTemplateConfiguration() {
+        templateConfiguration = TemplateConfiguration()
+        templateConfiguration!!.setUseDoubleQuotes(true)
+        templateConfiguration!!.setAutoIndent(true)
+        templateConfiguration!!.setAutoNewLine(true)
+        templateConfiguration!!.setAutoEscape(true)
     }
 
-    private void initializeTemplateEngine() {
-        templateEngine = new MarkupTemplateEngine(MarkupTemplateEngine.class.getClassLoader(), config.getTemplateFolder(), templateConfiguration);
+    private fun initializeTemplateEngine() {
+        templateEngine = MarkupTemplateEngine(
+            MarkupTemplateEngine::class.java.getClassLoader(),
+            config.templateFolder,
+            templateConfiguration
+        )
     }
 
-    @Override
-    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
+    @Throws(RenderingException::class)
+    override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
         try {
-            Template template = templateEngine.createTemplateByPath(templateName);
-            Map<String, Object> wrappedModel = wrap(model);
-            Writable writable = template.make(wrappedModel);
-            writable.writeTo(writer);
-        } catch (Exception e) {
-            throw new RenderingException(e);
+            val template = templateEngine!!.createTemplateByPath(templateName)
+            val wrappedModel: MutableMap<String?, Any?> = wrap(model)
+            val writable = template.make(wrappedModel)
+            writable.writeTo(writer)
+        } catch (e: Exception) {
+            throw RenderingException(e)
         }
     }
 
-    private TemplateModel wrap(final TemplateModel model) {
-        return new TemplateModel(model) {
-            @Override
-            public Object get(Object key) {
+    private fun wrap(model: TemplateModel?): TemplateModel {
+        return object : TemplateModel(model) {
+            override fun get(key: Any?): Any? {
                 try {
-                    return extractors.extractAndTransform(db, (String) key, model, new TemplateEngineAdapter.NoopAdapter());
-                } catch (NoModelExtractorException e) {
-                    return super.get(key);
+                    return AbstractTemplateEngine.Companion.extractors.extractAndTransform<Any?>(
+                        db,
+                        key as String?,
+                        model,
+                        NoopAdapter()
+                    )
+                } catch (e: NoModelExtractorException) {
+                    return super.get(key)
                 }
             }
-        };
+        }
     }
 }

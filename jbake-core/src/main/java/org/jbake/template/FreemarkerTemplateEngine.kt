@@ -1,136 +1,130 @@
-package org.jbake.template;
+package org.jbake.template
 
+import freemarker.ext.beans.BeansWrapperBuilder
+import freemarker.template.*
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.ContentStore
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.ModelAttributes
+import org.jbake.template.model.TemplateModel
+import org.jbake.util.DataFileUtil
+import java.io.File
+import java.io.IOException
+import java.io.Writer
+import java.util.*
 
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.beans.BeansWrapperBuilder;
-import freemarker.template.Configuration;
-import freemarker.template.ObjectWrapper;
-import freemarker.template.SimpleCollection;
-import freemarker.template.SimpleDate;
-import freemarker.template.SimpleHash;
-import freemarker.template.SimpleSequence;
-import freemarker.template.Template;
-import freemarker.template.TemplateDateModel;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModelException;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.ContentStore;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.ModelAttributes;
-import org.jbake.template.model.TemplateModel;
-import org.jbake.util.DataFileUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collection;
-import java.util.Date;
 
 /**
- * Renders pages using the <a href="http://freemarker.org/">Freemarker</a> template engine.
+ * Renders pages using the [Freemarker](http://freemarker.org/) template engine.
  *
  * @author Cédric Champeau
  */
-public class FreemarkerTemplateEngine extends AbstractTemplateEngine {
+class FreemarkerTemplateEngine : AbstractTemplateEngine {
+    private var templateCfg: Configuration? = null
 
-    private Configuration templateCfg;
-
-    @Deprecated
-    public FreemarkerTemplateEngine(final CompositeConfiguration config, final ContentStore db, final File destination, final File templatesPath) {
-        super(config, db, destination, templatesPath);
-        createTemplateConfiguration();
+    @Deprecated("")
+    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
+        config,
+        db,
+        destination,
+        templatesPath
+    ) {
+        createTemplateConfiguration()
     }
 
-    public FreemarkerTemplateEngine(final JBakeConfiguration config, final ContentStore db) {
-        super(config, db);
-        createTemplateConfiguration();
+    constructor(config: JBakeConfiguration?, db: ContentStore?) : super(config, db) {
+        createTemplateConfiguration()
     }
 
-    private void createTemplateConfiguration() {
-        templateCfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-        templateCfg.setDefaultEncoding(config.getRenderEncoding());
-        templateCfg.setOutputEncoding(config.getOutputEncoding());
-        if (config.getFreemarkerTimeZone() != null) {
-            templateCfg.setTimeZone(config.getFreemarkerTimeZone());
-            templateCfg.setSQLDateAndTimeTimeZone(config.getFreemarkerTimeZone());
+    private fun createTemplateConfiguration() {
+        templateCfg = Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
+        templateCfg!!.setDefaultEncoding(config.renderEncoding)
+        templateCfg!!.setOutputEncoding(config.outputEncoding)
+        if (config.freemarkerTimeZone != null) {
+            templateCfg!!.setTimeZone(config.freemarkerTimeZone)
+            templateCfg!!.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
         }
         try {
-            templateCfg.setDirectoryForTemplateLoading(config.getTemplateFolder());
-        } catch (IOException e) {
-            e.printStackTrace();
+            templateCfg!!.setDirectoryForTemplateLoading(config.templateFolder)
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
-    @Override
-    public void renderDocument(final TemplateModel model, final String templateName, final Writer writer) throws RenderingException {
+    @Throws(RenderingException::class)
+    override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
         try {
-            Template template = templateCfg.getTemplate(templateName);
-            template.process(new LazyLoadingModel(templateCfg.getObjectWrapper(), model, db, config), writer);
-        } catch (IOException | TemplateException e) {
-            throw new RenderingException(e);
+            val template = templateCfg!!.getTemplate(templateName)
+            template.process(LazyLoadingModel(templateCfg!!.getObjectWrapper(), model, db, config), writer)
+        } catch (e: IOException) {
+            throw RenderingException(e)
+        } catch (e: TemplateException) {
+            throw RenderingException(e)
         }
     }
 
     /**
      * A custom Freemarker model that avoids loading the whole documents into memory if not necessary.
      */
-    public static class LazyLoadingModel implements TemplateHashModel {
-        private final ObjectWrapper wrapper;
-        private final SimpleHash eagerModel;
-        private final ContentStore db;
-        private final JBakeConfiguration config;
+    class LazyLoadingModel(
+        wrapper: ObjectWrapper?,
+        eagerModel: TemplateModel?,
+        db: ContentStore?,
+        config: JBakeConfiguration
+    ) : TemplateHashModel {
+        private val wrapper: ObjectWrapper?
+        private val eagerModel: SimpleHash
+        private val db: ContentStore?
+        private val config: JBakeConfiguration
 
-        public LazyLoadingModel(ObjectWrapper wrapper, TemplateModel eagerModel, final ContentStore db, JBakeConfiguration config) {
-            this.eagerModel = new SimpleHash(eagerModel, wrapper);
-            this.db = db;
-            this.wrapper = wrapper;
-            this.config = config;
+        init {
+            this.eagerModel = SimpleHash(eagerModel, wrapper)
+            this.db = db
+            this.wrapper = wrapper
+            this.config = config
         }
 
-        @Override
-        public freemarker.template.TemplateModel get(final String key) throws TemplateModelException {
+        @Throws(TemplateModelException::class)
+        override fun get(key: String): freemarker.template.TemplateModel? {
             try {
-
                 // GIT Issue#357: Accessing db in freemarker template throws exception
                 // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
                 // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
-                if (key.equals(ModelAttributes.DB)) {
-                    BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-                    BeansWrapper bw = bwb.build();
-                    return bw.wrap(db);
+
+                if (key == ModelAttributes.DB) {
+                    val bwb = BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
+                    val bw = bwb.build()
+                    return bw.wrap(db)
                 }
-                if (key.equals(ModelAttributes.DATA)) {
-                    BeansWrapperBuilder bwb = new BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-                    BeansWrapper bw = bwb.build();
-                    return bw.wrap(new DataFileUtil(db, config.getDataFileDocType()));
+                if (key == ModelAttributes.DATA) {
+                    val bwb = BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
+                    val bw = bwb.build()
+                    return bw.wrap(DataFileUtil(db, config.dataFileDocType))
                 }
 
-                return extractors.extractAndTransform(db, key, eagerModel.toMap(), new TemplateEngineAdapter<freemarker.template.TemplateModel>() {
-
-                    @Override
-                    public freemarker.template.TemplateModel adapt(String key, Object extractedValue) {
-                        if (key.equals(ModelAttributes.ALLTAGS)) {
-                            return new SimpleCollection((Collection) extractedValue, wrapper);
-                        } else if (key.equals(ModelAttributes.PUBLISHED_DATE)) {
-                            return new SimpleDate((Date) extractedValue, TemplateDateModel.UNKNOWN);
-                        } else {
-                            // All other cases, as far as I know, are document collections
-                            return new SimpleSequence((Collection) extractedValue, wrapper);
+                return AbstractTemplateEngine.Companion.extractors.extractAndTransform<freemarker.template.TemplateModel?>(
+                    db,
+                    key,
+                    eagerModel.toMap(),
+                    object : TemplateEngineAdapter<freemarker.template.TemplateModel?> {
+                        override fun adapt(key: String, extractedValue: Any?): freemarker.template.TemplateModel {
+                            if (key == ModelAttributes.ALLTAGS) {
+                                return SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
+                            } else if (key == ModelAttributes.PUBLISHED_DATE) {
+                                return SimpleDate(extractedValue as Date?, TemplateDateModel.UNKNOWN)
+                            } else {
+                                // All other cases, as far as I know, are document collections
+                                return SimpleSequence(extractedValue as MutableCollection<*>?, wrapper)
+                            }
                         }
-
-                    }
-                });
-            } catch (NoModelExtractorException e) {
-                return eagerModel.get(key);
+                    })
+            } catch (e: NoModelExtractorException) {
+                return eagerModel.get(key)
             }
         }
 
-        @Override
-        public boolean isEmpty() {
-            return false;
+        override fun isEmpty(): Boolean {
+            return false
         }
-
     }
-
 }

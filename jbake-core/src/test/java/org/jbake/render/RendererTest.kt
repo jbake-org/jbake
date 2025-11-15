@@ -1,50 +1,46 @@
-package org.jbake.render;
+package org.jbake.render
 
-import org.jbake.TestUtils;
-import org.jbake.app.ContentStore;
-import org.jbake.app.Renderer;
-import org.jbake.app.configuration.ConfigUtil;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.jbake.template.DelegatingTemplateEngine;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.assertj.core.api.Assertions
+import org.jbake.TestUtils
+import org.jbake.app.ContentStore
+import org.jbake.app.Renderer
+import org.jbake.app.configuration.ConfigUtil
+import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.model.DocumentModel
+import org.jbake.template.DelegatingTemplateEngine
+import org.junit.Assume
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnitRunner
+import java.io.File
 
-import java.io.File;
-import java.net.URL;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@RunWith(MockitoJUnitRunner.class)
-public class RendererTest {
-
+@RunWith(MockitoJUnitRunner::class)
+class RendererTest {
     @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-    private DefaultJBakeConfiguration config;
-    private File outputPath;
+    var folder: TemporaryFolder = TemporaryFolder()
+    private var config: DefaultJBakeConfiguration? = null
+    private var outputPath: File? = null
 
     @Mock
-    private ContentStore db;
+    private val db: ContentStore? = null
 
     @Mock
-    private DelegatingTemplateEngine renderingEngine;
+    private val renderingEngine: DelegatingTemplateEngine? = null
 
     @Before
-    public void setup() throws Exception {
-
-        File sourcePath = TestUtils.getTestResourcesAsSourceFolder();
+    @Throws(Exception::class)
+    fun setup() {
+        val sourcePath = TestUtils.getTestResourcesAsSourceFolder()
         if (!sourcePath.exists()) {
-            throw new Exception("Cannot find base path for test!");
+            throw Exception("Cannot find base path for test!")
         }
-        outputPath = folder.newFolder("output");
-        config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourcePath);
-        config.setDestinationFolder(outputPath);
+        outputPath = folder.newFolder("output")
+        config = ConfigUtil().loadConfig(sourcePath) as DefaultJBakeConfiguration
+        config!!.setDestinationFolder(outputPath)
     }
 
     /**
@@ -53,24 +49,25 @@ public class RendererTest {
      * @throws Exception
      */
     @Test
-    public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
+    @Throws(Exception::class)
+    fun testRenderFileWorksWhenPathHasDotInButFileDoesNot() {
+        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows())
+        val FOLDER = "real.path"
 
-        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows());
-        String FOLDER = "real.path";
+        val FILENAME = "about"
+        config!!.setOutputExtension("")
+        config!!.setTemplateFolder(folder.newFolder("templates"))
+        val renderer = Renderer(db!!, config!!, renderingEngine!!)
 
-        final String FILENAME = "about";
-        config.setOutputExtension("");
-        config.setTemplateFolder(folder.newFolder("templates"));
-        Renderer renderer = new Renderer(db, config, renderingEngine);
+        val content = DocumentModel()
+        content.type = "page"
+        content.uri = "/" + FOLDER + "/" + FILENAME
+        content.status = "published"
 
-        DocumentModel content = new DocumentModel();
-        content.setType("page");
-        content.setUri("/" + FOLDER + "/" + FILENAME);
-        content.setStatus("published");
+        renderer.render(content)
 
-        renderer.render(content);
-
-        File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
-        assertThat(outputFile).isFile();
+        val outputFile =
+            File(outputPath!!.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME)
+        Assertions.assertThat(outputFile).isFile()
     }
 }

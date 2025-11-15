@@ -4,6 +4,7 @@ plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
     id 'nebula.optional-base' version "$optionalBaseVersion"
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
@@ -55,6 +56,7 @@ dependencies {
     // cli specific dependencies
     implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
     implementation "info.picocli:picocli:$picocli", optional
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 processResources {
@@ -63,4 +65,9 @@ processResources {
             timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
             gitHash: grgit.head().abbreviatedId
     }
+}
+repositories {
+    mavenCentral()
+}
+compileKotlin {
 }

@@ -1,56 +1,43 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-import org.apache.commons.io.IOUtils;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.DocumentModel
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.yaml.snakeyaml.Yaml
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 
-import javax.swing.text.Document;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class YamlEngine extends MarkupEngine {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(YamlEngine.class);
-
-    public static final String JBAKE_PREFIX = "jbake-";
-
+class YamlEngine : MarkupEngine() {
     /**
      * Parses the YAML file and ensures the output is always a Map.
      *
      * @param file
      * @return
      */
-    private DocumentModel parseFile(File file) {
-        DocumentModel model = new DocumentModel();
-        Yaml yaml = new Yaml();
-        try (InputStream is = new FileInputStream(file)) {
-            Object result = yaml.load(is);
-            if (result instanceof List) {
-                model.put("data", result);
-            } else if (result instanceof Map) {
-                model.putAll((Map)result);
-            } else {
-                LOGGER.warn("Unexpected result [{}] while parsing YAML file {}", result.getClass(), file);
+    private fun parseFile(file: File): DocumentModel {
+        val model = DocumentModel()
+        val yaml = Yaml()
+        try {
+            FileInputStream(file).use { `is` ->
+                val result = yaml.load<Any>(`is`)
+                if (result is MutableList<*>) {
+                    model.put("data", result)
+                } else if (result is MutableMap<*, *>) {
+                    model.putAll(result)
+                } else {
+                    LOGGER.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
+                }
             }
-        } catch (IOException e) {
-            LOGGER.error("Error while parsing YAML file {}", file, e);
+        } catch (e: IOException) {
+            LOGGER.error("Error while parsing YAML file {}", file, e)
         }
-        return model;
+        return model
     }
 
-    @Override
-    public DocumentModel parse(JBakeConfiguration config, File file) {
-        return parseFile(file);
+    override fun parse(config: JBakeConfiguration?, file: File): DocumentModel {
+        return parseFile(file)
     }
 
     /**
@@ -58,17 +45,16 @@ public class YamlEngine extends MarkupEngine {
      *
      * @param context the parser context
      */
-    @Override
-    public void processHeader(final ParserContext context) {
-        DocumentModel fileContents = parseFile(context.getFile());
-        DocumentModel documentModel = context.getDocumentModel();
+    override fun processHeader(context: ParserContext) {
+        val fileContents = parseFile(context.getFile())
+        val documentModel = context.getDocumentModel()
 
-        for (String key : fileContents.keySet()) {
+        for (key in fileContents.keys) {
             if (hasJBakePrefix(key)) {
-                String pKey = key.substring(6);
-                documentModel.put(pKey, fileContents.get(key));
+                val pKey = key.substring(6)
+                documentModel.put(pKey, fileContents.get(key))
             } else {
-                documentModel.put(key, fileContents.get(key));
+                documentModel.put(key, fileContents.get(key))
             }
         }
     }
@@ -79,12 +65,17 @@ public class YamlEngine extends MarkupEngine {
      *
      * @param context the parser context
      */
-    @Override
-    public void processBody(ParserContext context) {
-        context.setBody("");
+    override fun processBody(context: ParserContext) {
+        context.setBody("")
     }
 
-    private boolean hasJBakePrefix(String key) {
-        return key.startsWith(JBAKE_PREFIX);
+    private fun hasJBakePrefix(key: String): Boolean {
+        return key.startsWith(JBAKE_PREFIX)
+    }
+
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(YamlEngine::class.java)
+
+        const val JBAKE_PREFIX: String = "jbake-"
     }
 }

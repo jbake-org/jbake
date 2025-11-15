@@ -1,37 +1,37 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.impl.DefaultFileMonitor;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.apache.commons.vfs2.FileSystemException
+import org.apache.commons.vfs2.VFS
+import org.apache.commons.vfs2.impl.DefaultFileMonitor
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Delegate responsible for watching the file system for changes.
  *
  * @author jmcgarr@gmail.com
  */
-public class BakeWatcher {
-
-    private final Logger logger = LoggerFactory.getLogger(BakeWatcher.class);
+class BakeWatcher {
+    private val logger: Logger = LoggerFactory.getLogger(BakeWatcher::class.java)
 
     /**
      * Starts watching the file system for changes to trigger a bake.
      *
-     * @deprecated use {@link BakeWatcher#start(JBakeConfiguration)} instead
-     *
      * @param res    Commandline options
      * @param config Configuration settings
      */
-    @Deprecated
-    public void start(final LaunchOptions res, CompositeConfiguration config) {
-        JBakeConfiguration configuration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), config);
-        start(configuration);
+    @Deprecated(
+        """use {@link BakeWatcher#start(JBakeConfiguration)} instead
+
+      """
+    )
+    fun start(res: LaunchOptions, config: CompositeConfiguration?) {
+        val configuration: JBakeConfiguration =
+            JBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), config)
+        start(configuration)
     }
 
     /**
@@ -39,24 +39,27 @@ public class BakeWatcher {
      *
      * @param config JBakeConfiguration settings
      */
-    public void start(JBakeConfiguration config) {
+    fun start(config: JBakeConfiguration) {
         try {
-            FileSystemManager fsMan = VFS.getManager();
-            FileObject listenPath = fsMan.resolveFile(config.getContentFolder().toURI());
-            FileObject templateListenPath = fsMan.resolveFile(config.getTemplateFolder().toURI());
-            FileObject assetPath = fsMan.resolveFile(config.getAssetFolder().toURI());
-            FileObject dataPath = fsMan.resolveFile(config.getDataFolder().toURI());
+            val fsMan = VFS.getManager()
+            val listenPath = fsMan.resolveFile(config.contentFolder!!.toURI())
+            val templateListenPath = fsMan.resolveFile(config.templateFolder!!.toURI())
+            val assetPath = fsMan.resolveFile(config.assetFolder!!.toURI())
+            val dataPath = fsMan.resolveFile(config.dataFolder!!.toURI())
 
-            logger.info("Watching for (content, data, template, asset) changes in [{}]", config.getSourceFolder().getPath());
-            DefaultFileMonitor monitor = new DefaultFileMonitor(new CustomFSChangeListener(config));
-            monitor.setRecursive(true);
-            monitor.addFile(listenPath);
-            monitor.addFile(templateListenPath);
-            monitor.addFile(assetPath);
-            monitor.addFile(dataPath);
-            monitor.start();
-        } catch (FileSystemException e) {
-            logger.error("Problems watching filesystem changes", e);
+            logger.info(
+                "Watching for (content, data, template, asset) changes in [{}]",
+                config.sourceFolder!!.getPath()
+            )
+            val monitor = DefaultFileMonitor(CustomFSChangeListener(config))
+            monitor.setRecursive(true)
+            monitor.addFile(listenPath)
+            monitor.addFile(templateListenPath)
+            monitor.addFile(assetPath)
+            monitor.addFile(dataPath)
+            monitor.start()
+        } catch (e: FileSystemException) {
+            logger.error("Problems watching filesystem changes", e)
         }
     }
 }

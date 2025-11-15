@@ -21,66 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jbake.app.template;
+package org.jbake.app.template
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
-
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.io.FileUtils
+import org.assertj.core.api.Assertions
+import org.jbake.app.ContentStoreIntegrationTest
+import org.junit.Assert
+import org.junit.Test
+import java.io.File
+import java.nio.charset.Charset
 
 /**
  * @author jdlee
  */
-public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
-
-    public FreemarkerTemplateEngineRenderingTest() {
-        super("freemarkerTemplates", "ftl");
-    }
-
+class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("freemarkerTemplates", "ftl") {
     @Test
-    public void renderPaginatedIndex() throws Exception {
-        config.setPaginateIndex(true);
-        config.setPostsPerPage(1);
+    @Throws(Exception::class)
+    fun renderPaginatedIndex() {
+        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
+        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
 
-        outputStrings.put("index", Arrays.asList(
+        outputStrings.put(
+            "index", mutableListOf<String?>(
                 "\">Previous</a>",
                 "3/\">Next</a>",
                 "2 of 3"
-        ));
+            )
+        )
 
-        renderer.renderIndexPaging("index.html");
+        renderer.renderIndexPaging("index.html")
 
-        File outputFile = new File(destinationFolder, 2 + File.separator + "index.html");
-        String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+        val outputFile = File(destinationFolder, 2.toString() + File.separator + "index.html")
+        val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
-        for (String string : getOutputStrings("index")) {
-            assertThat(output).contains(string);
+        for (string in getOutputStrings("index")) {
+            Assertions.assertThat(output).contains(string)
         }
 
-        assertThat(output).contains("Post Url: blog%2F2013%2Fsecond-post.html");
+        Assertions.assertThat(output).contains("Post Url: blog%2F2013%2Fsecond-post.html")
     }
 
     @Test
-    public void shouldFallbackToRenderSingleIndexIfNoPostArePresent() throws Exception {
-        config.setPaginateIndex(true);
-        config.setPostsPerPage(1);
+    @Throws(Exception::class)
+    fun shouldFallbackToRenderSingleIndexIfNoPostArePresent() {
+        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
+        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
 
-        db.deleteAllByDocType("post");
+        ContentStoreIntegrationTest.Companion.db.deleteAllByDocType("post")
 
-        renderer.renderIndexPaging("index.html");
+        renderer.renderIndexPaging("index.html")
 
-        File paginatedFile = new File(destinationFolder, "index2.html");
-        assertFalse("paginated file is not rendered", paginatedFile.exists());
+        val paginatedFile = File(destinationFolder, "index2.html")
+        Assert.assertFalse("paginated file is not rendered", paginatedFile.exists())
 
-        File indexFile = new File(destinationFolder, "index.html");
-        assertTrue("index file exists", indexFile.exists());
-
+        val indexFile = File(destinationFolder, "index.html")
+        Assert.assertTrue("index file exists", indexFile.exists())
     }
-
 }

@@ -1,4 +1,3 @@
-package org.jbake.parser;
+package org.jbake.parser
 
-public class RawMarkupEngine extends MarkupEngine {
-}
+class RawMarkupEngine : MarkupEngine()

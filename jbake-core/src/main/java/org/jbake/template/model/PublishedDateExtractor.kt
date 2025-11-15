@@ -1,16 +1,11 @@
-package org.jbake.template.model;
+package org.jbake.template.model
 
-import org.jbake.app.ContentStore;
-import org.jbake.template.ModelExtractor;
+import org.jbake.app.ContentStore
+import org.jbake.template.ModelExtractor
+import java.util.*
 
-import java.util.Date;
-import java.util.Map;
-
-public class PublishedDateExtractor implements ModelExtractor<Date> {
-
-    @Override
-    public Date get(ContentStore db, Map model, String key) {
-        return new Date();
+class PublishedDateExtractor : ModelExtractor<Date?> {
+    override fun get(db: ContentStore?, model: MutableMap<*, *>?, key: String?): Date {
+        return Date()
     }
-
 }

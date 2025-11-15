@@ -1,6 +1,5 @@
-package org.jbake.model;
+package org.jbake.model
 
-public interface DocumentTypeListener {
-
-    void added(String doctype);
+interface DocumentTypeListener {
+    fun added(doctype: String?)
 }

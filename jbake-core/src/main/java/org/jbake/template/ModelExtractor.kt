@@ -1,16 +1,11 @@
-package org.jbake.template;
+package org.jbake.template
 
-import org.jbake.app.ContentStore;
-
-import java.util.Map;
-
+import org.jbake.app.ContentStore
 
 /**
  * @param <T> the type of data returned by this model extractor
  * @author ndx
- */
-public interface ModelExtractor<T> {
-
-    T get(ContentStore db, Map model, String key);
-
+</T> */
+interface ModelExtractor<T> {
+    fun get(db: ContentStore?, model: MutableMap<*, *>?, key: String?): T?
 }

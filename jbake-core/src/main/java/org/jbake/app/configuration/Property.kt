@@ -1,72 +1,42 @@
-package org.jbake.app.configuration;
+package org.jbake.app.configuration
 
-import java.util.Objects;
+import java.util.*
 
-public class Property implements Comparable<Property> {
-
-    private final String key;
-    private final String description;
-    private final Group group;
-
-    public Property(String key, String description) {
-        this(key, description, Group.DEFAULT);
+class Property @JvmOverloads constructor(
+    @JvmField val key: String?,
+    @JvmField val description: String?,
+    @JvmField val group: Group? = Group.DEFAULT
+) : Comparable<Property?> {
+    override fun toString(): String {
+        return this.key!!
     }
 
-    public Property(String key, String description, Group group) {
-        this.key = key;
-        this.description = description;
-        this.group = group;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    @Override
-    public String toString() {
-        return getKey();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(o: Any?): Boolean {
+        if (this === o) {
+            return true
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (o == null || javaClass != o.javaClass) {
+            return false
         }
-        Property property = (Property) o;
-        return Objects.equals(key, property.key) &&
-            Objects.equals(description, property.description) &&
-            group == property.group;
+        val property = o as Property
+        return key == property.key &&
+                description == property.description && group == property.group
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(key, description, group);
+    override fun hashCode(): Int {
+        return Objects.hash(key, description, group)
     }
 
-    @Override
-    public int compareTo(Property other) {
-        int result = this.getGroup().compareTo(other.getGroup());
+    override fun compareTo(other: Property): Int {
+        var result = this.group!!.compareTo(other.group!!)
 
         if (result == 0) {
-            result = this.getKey().compareTo(other.getKey());
+            result = this.key!!.compareTo(other.key!!)
         }
-        return result;
+        return result
     }
 
-    public enum Group {
+    enum class Group {
         DEFAULT, CUSTOM
     }
-
-
 }

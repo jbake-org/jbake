@@ -1,64 +1,69 @@
-package org.jbake.util;
+package org.jbake.util
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.Is
+import org.junit.Assert
+import org.junit.Test
 
-import static org.hamcrest.core.Is.is;
-
-public class PagingHelperTest {
+class PagingHelperTest {
     @Test
-    public void getNumberOfPages() throws Exception {
-        int expected = 3;
-        int total = 5;
-        int perPage = 2;
+    @Throws(Exception::class)
+    fun getNumberOfPages() {
+        val expected = 3
+        val total = 5
+        val perPage = 2
 
-        PagingHelper helper = new PagingHelper(total,perPage);
+        val helper = PagingHelper(total.toLong(), perPage)
 
-        Assert.assertEquals( expected, helper.getNumberOfPages() );
+        Assert.assertEquals(expected.toLong(), helper.numberOfPages.toLong())
     }
 
     @Test
-    public void shouldReturnRootIndexPage() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    @Throws(Exception::class)
+    fun shouldReturnRootIndexPage() {
+        val helper = PagingHelper(5, 2)
 
-        String previousFileName = helper.getPreviousFileName(2);
+        val previousFileName = helper.getPreviousFileName(2)
 
-        Assert.assertThat("", is( previousFileName) );
+        Assert.assertThat<String?>("", Is.`is`<String?>(previousFileName))
     }
 
     @Test
-    public void shouldReturnPreviousFileName() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    @Throws(Exception::class)
+    fun shouldReturnPreviousFileName() {
+        val helper = PagingHelper(5, 2)
 
-        String previousFileName = helper.getPreviousFileName(3);
+        val previousFileName = helper.getPreviousFileName(3)
 
-        Assert.assertThat("2/", is( previousFileName) );
+        Assert.assertThat<String?>("2/", Is.`is`<String?>(previousFileName))
     }
 
     @Test
-    public void shouldReturnNullIfNoPreviousPageAvailable() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    @Throws(Exception::class)
+    fun shouldReturnNullIfNoPreviousPageAvailable() {
+        val helper = PagingHelper(5, 2)
 
-        String previousFileName = helper.getPreviousFileName(1);
+        val previousFileName = helper.getPreviousFileName(1)
 
-        Assert.assertNull( previousFileName );
+        Assert.assertNull(previousFileName)
     }
 
     @Test
-    public void shouldReturnNullIfNextPageNotAvailable() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    @Throws(Exception::class)
+    fun shouldReturnNullIfNextPageNotAvailable() {
+        val helper = PagingHelper(5, 2)
 
-        String nextFileName = helper.getNextFileName(3);
+        val nextFileName = helper.getNextFileName(3)
 
-        Assert.assertNull( nextFileName );
+        Assert.assertNull(nextFileName)
     }
 
     @Test
-    public void shouldReturnNextFileName() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    @Throws(Exception::class)
+    fun shouldReturnNextFileName() {
+        val helper = PagingHelper(5, 2)
 
-        String nextFileName = helper.getNextFileName(2);
+        val nextFileName = helper.getNextFileName(2)
 
-        Assert.assertThat("3/", is( nextFileName) );
+        Assert.assertThat<String?>("3/", Is.`is`<String?>(nextFileName))
     }
 }

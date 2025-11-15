@@ -1,123 +1,113 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.jbake.app.configuration.ConfigUtil;
-import picocli.CommandLine.ArgGroup;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import org.jbake.app.configuration.ConfigUtil
+import picocli.CommandLine
+import java.io.File
 
-import java.io.File;
-
-@Command(
-    description = "JBake is a Java based, open source, static site/blog generator for developers & designers",
+@CommandLine.Command(
+    description = ["JBake is a Java based, open source, static site/blog generator for developers & designers"],
     name = "jbake",
     usageHelpAutoWidth = true
 )
-public class LaunchOptions {
-    @Parameters(index = "0", description = "source folder of site content (with templates and assets), if not supplied will default to current directory", arity = "0..1")
-    private String source;
+class LaunchOptions {
+    @CommandLine.Parameters(
+        index = "0",
+        description = ["source folder of site content (with templates and assets), if not supplied will default to current directory"],
+        arity = "0..1"
+    )
+    val sourceValue: String? = null
 
-    @Parameters(index = "1", description = "destination folder for output, if not supplied will default to a folder called \"output\" in the current directory", arity = "0..1")
-    private String destination;
+    @CommandLine.Parameters(
+        index = "1",
+        description = ["destination folder for output, if not supplied will default to a folder called \"output\" in the current directory"],
+        arity = "0..1"
+    )
+    val destinationValue: String? = null
 
-    @Option(names = {"-b", "--bake"}, description = "performs a bake")
-    private boolean bake;
+    @CommandLine.Option(names = ["-b", "--bake"], description = ["performs a bake"])
+    val isBake: Boolean = false
+        get() = field || (this.sourceValue != null && this.destinationValue != null)
 
-    @ArgGroup(exclusive = false, heading = "%n%nJBake initialization%n%n")
-    private InitOptions initGroup;
+    @CommandLine.ArgGroup(exclusive = false, heading = "%n%nJBake initialization%n%n")
+    private val initGroup: InitOptions? = null
 
-    @Option(names = {"-s", "--server"}, description = "runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory")
-    private boolean runServer;
+    @CommandLine.Option(
+        names = ["-s", "--server"],
+        description = ["runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory"]
+    )
+    val isRunServer: Boolean = false
 
-    @Option(names = {"-h", "--help"}, description = "prints this message", usageHelp = true)
-    private boolean helpRequested;
+    @CommandLine.Option(names = ["-h", "--help"], description = ["prints this message"], usageHelp = true)
+    private val helpRequested = false
 
-    @Option(names = {"--reset"}, description = "clears the local cache, enforcing rendering from scratch")
-    private boolean clearCache;
+    @CommandLine.Option(names = ["--reset"], description = ["clears the local cache, enforcing rendering from scratch"])
+    val isClearCache: Boolean = false
 
-    @Option(names = {"-c", "--config"}, description = "use specified file for configuration (defaults to " + ConfigUtil.CONFIG_FILE +" in the source folder if not supplied)")
-    private String config;
+    @CommandLine.Option(
+        names = ["-c", "--config"],
+        description = ["use specified file for configuration (defaults to " + ConfigUtil.CONFIG_FILE + " in the source folder if not supplied)"]
+    )
+    val configValue: String? = null
 
-    @Option(names = {"--prop-encoding"}, description = "use given encoding to load properties file. default: utf-8")
-    private String propertiesEncoding = "utf-8";
+    @JvmField
+    @CommandLine.Option(
+        names = ["--prop-encoding"],
+        description = ["use given encoding to load properties file. default: utf-8"]
+    )
+    val propertiesEncoding: String = "utf-8"
 
-    @Option(names = {"-ls", "--list-settings"}, description = "list configuration settings")
-    private boolean listConfig;
+    @CommandLine.Option(names = ["-ls", "--list-settings"], description = ["list configuration settings"])
+    val isListConfig: Boolean = false
 
-    public String getTemplate() {
-        return initGroup.template;
-    }
+    val template: String?
+        get() = initGroup.template
 
-    public File getSource() {
-        if (source != null) {
-            return new File(source);
+    fun getSource(): File {
+        if (this.sourceValue != null) {
+            return File(this.sourceValue)
         } else {
-            return new File(System.getProperty("user.dir"));
+            return File(System.getProperty("user.dir"))
         }
     }
 
-    public String getSourceValue() {
-        return source;
-    }
-
-    public File getDestination() {
-        if (destination != null) {
-            return new File(destination);
+    fun getDestination(): File {
+        if (this.destinationValue != null) {
+            return File(this.destinationValue)
         } else {
-            return new File(getSource(), "output");
+            return File(getSource(), "output")
         }
     }
 
-    public String getDestinationValue() {
-        return destination;
-    }
-
-    public File getConfig() {
-        if (config != null) {
-            return new File(config);
+    fun getConfig(): File {
+        if (this.configValue != null) {
+            return File(this.configValue)
         } else {
-            return new File(getSource(), "jbake.properties");
+            return File(getSource(), "jbake.properties")
         }
     }
 
-    public String getConfigValue() {
-        return config;
-    }
+    val isHelpNeeded: Boolean
+        get() = helpRequested || !(this.isListConfig || this.isBake || this.isRunServer || this.isInit || this.sourceValue != null || this.destinationValue != null)
 
-    public boolean isHelpNeeded() {
-        return helpRequested || !(isListConfig() || isBake() || isRunServer() || isInit() || source != null || destination != null);
-    }
+    val isInit: Boolean
+        get() = (initGroup != null && initGroup.init)
 
-    public boolean isRunServer() {
-        return runServer;
-    }
+    internal class InitOptions {
+        @CommandLine.Option(
+            names = ["-i", "--init"],
+            paramLabel = "<target>",
+            description = ["initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)"],
+            required = true
+        )
+        private val init = false
 
-    public boolean isInit() {
-        return (initGroup != null && initGroup.init);
-    }
-
-    public boolean isClearCache() {
-        return clearCache;
-    }
-
-    public boolean isBake() {
-        return bake || (source != null && destination != null);
-    }
-
-    public boolean isListConfig() {
-        return listConfig;
-    }
-
-    public String getPropertiesEncoding() {
-        return propertiesEncoding;
-    }
-
-    static class InitOptions {
-
-        @Option(names = {"-i", "--init"}, paramLabel = "<target>", description = "initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)", required = true)
-        private boolean init;
-
-        @Option(names = {"-t", "--template"}, defaultValue = "freemarker", fallbackValue = "freemarker", description = "use specified template engine for default templates (uses Freemarker if <template> is not supplied) ", arity = "0..1")
-        private String template;
+        @CommandLine.Option(
+            names = ["-t", "--template"],
+            defaultValue = "freemarker",
+            fallbackValue = "freemarker",
+            description = ["use specified template engine for default templates (uses Freemarker if <template> is not supplied) "],
+            arity = "0..1"
+        )
+        private val template: String? = null
     }
 }

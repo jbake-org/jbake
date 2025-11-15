@@ -1,140 +1,120 @@
-package org.jbake.model;
+package org.jbake.model
 
-import org.jbake.app.DBUtil;
+import org.jbake.app.DBUtil
+import java.util.*
 
-import java.util.Date;
-
-public class DocumentModel extends BaseModel {
-
-    public static DocumentModel createDefaultDocumentModel() {
-        DocumentModel documentModel = new DocumentModel();
-        documentModel.setCached(true);
-        documentModel.setRendered(false);
-        return documentModel;
-    }
-
-    public String getBody() {
-        return (String) get(ModelAttributes.BODY);
-    }
-
-    public void setBody(String body) {
-        put(ModelAttributes.BODY, body);
-    }
-
-    public Date getDate() {
-        return (Date) get(ModelAttributes.DATE);
-    }
-
-    public void setDate(Date date) {
-        put(ModelAttributes.DATE, date);
-    }
-
-    public String getStatus() {
-        if (containsKey(ModelAttributes.STATUS)) {
-            return (String) get(ModelAttributes.STATUS);
+class DocumentModel : BaseModel() {
+    var body: String?
+        get() = get(ModelAttributes.BODY) as String?
+        set(body) {
+            put(ModelAttributes.BODY, body)
         }
-        return "";
 
-    }
-
-    public void setStatus(String status) {
-        put(ModelAttributes.STATUS, status);
-    }
-
-    public String getType() {
-        if (containsKey(ModelAttributes.TYPE)) {
-            return (String) get(ModelAttributes.TYPE);
+    var date: Date?
+        get() = get(ModelAttributes.DATE) as Date?
+        set(date) {
+            put(ModelAttributes.DATE, date)
         }
-        return "";
-    }
 
-    public void setType(String type) {
-        put(ModelAttributes.TYPE, type);
-    }
-
-    public String[] getTags() {
-        return DBUtil.toStringArray(get(ModelAttributes.TAGS));
-    }
-
-    public void setTags(String[] tags) {
-        put(ModelAttributes.TAGS, tags);
-    }
-
-    public String getSha1() {
-        return (String) get(ModelAttributes.SHA1);
-    }
-
-    public void setSha1(String sha1) {
-        put(ModelAttributes.SHA1, sha1);
-    }
-
-    public String getSourceuri() {
-        return (String) get(ModelAttributes.SOURCE_URI);
-    }
-
-    public void setSourceUri(String uri) {
-        put(ModelAttributes.SOURCE_URI, uri);
-    }
-
-    public String getRootPath() {
-        return (String) get(ModelAttributes.ROOTPATH);
-    }
-
-    public void setRootPath(String pathToRoot) {
-        put(ModelAttributes.ROOTPATH, pathToRoot);
-    }
-
-    public Boolean getRendered() {
-        return (Boolean) getOrDefault(ModelAttributes.RENDERED, false);
-    }
-
-    public void setRendered(boolean rendered) {
-        put(ModelAttributes.RENDERED, rendered);
-    }
-
-    public String getFile() {
-        return (String) get(ModelAttributes.FILE);
-    }
-
-    public void setFile(String path) {
-        put(ModelAttributes.FILE, path);
-    }
-
-    public String getNoExtensionUri() {
-        return (String) get(ModelAttributes.NO_EXTENSION_URI);
-    }
-
-    public void setNoExtensionUri(String noExtensionUri) {
-        put(ModelAttributes.NO_EXTENSION_URI, noExtensionUri);
-    }
-
-    public String getTitle() {
-        return (String) get(ModelAttributes.TITLE);
-    }
-
-    public void setTitle(String title) {
-        put(ModelAttributes.TITLE, title);
-    }
-
-    public Boolean getCached() {
-
-        Object value = get(ModelAttributes.CACHED);
-        if ( value instanceof String ) {
-            return Boolean.valueOf((String) value);
-        } else {
-            return (Boolean) value;
+    var status: String?
+        get() {
+            if (containsKey(ModelAttributes.STATUS)) {
+                return get(ModelAttributes.STATUS) as String?
+            }
+            return ""
         }
+        set(status) {
+            put(ModelAttributes.STATUS, status)
+        }
+
+    var type: String?
+        get() {
+            if (containsKey(ModelAttributes.TYPE)) {
+                return get(ModelAttributes.TYPE) as String?
+            }
+            return ""
+        }
+        set(type) {
+            put(ModelAttributes.TYPE, type)
+        }
+
+    var tags: Array<String?>?
+        get() = DBUtil.toStringArray(get(ModelAttributes.TAGS))
+        set(tags) {
+            put(ModelAttributes.TAGS, tags)
+        }
+
+    var sha1: String?
+        get() = get(ModelAttributes.SHA1) as String?
+        set(sha1) {
+            put(ModelAttributes.SHA1, sha1)
+        }
+
+    val sourceuri: String?
+        get() = get(ModelAttributes.SOURCE_URI) as String?
+
+    fun setSourceUri(uri: String?) {
+        put(ModelAttributes.SOURCE_URI, uri)
     }
 
-    public void setCached(boolean cached) {
-        put(ModelAttributes.CACHED, cached);
+    var rootPath: String?
+        get() = get(ModelAttributes.ROOTPATH) as String?
+        set(pathToRoot) {
+            put(ModelAttributes.ROOTPATH, pathToRoot)
+        }
+
+    var rendered: Boolean?
+        get() = getOrDefault(ModelAttributes.RENDERED, false) as Boolean?
+        set(rendered) {
+            put(ModelAttributes.RENDERED, rendered)
+        }
+
+    var file: String?
+        get() = get(ModelAttributes.FILE) as String?
+        set(path) {
+            put(ModelAttributes.FILE, path)
+        }
+
+    var noExtensionUri: String?
+        get() = get(ModelAttributes.NO_EXTENSION_URI) as String?
+        set(noExtensionUri) {
+            put(ModelAttributes.NO_EXTENSION_URI, noExtensionUri)
+        }
+
+    var title: String?
+        get() = get(ModelAttributes.TITLE) as String?
+        set(title) {
+            put(ModelAttributes.TITLE, title)
+        }
+
+    var cached: Boolean?
+        get() {
+            val value = get(ModelAttributes.CACHED)
+            if (value is String) {
+                return value.toBoolean()
+            } else {
+                return value as Boolean?
+            }
+        }
+        set(cached) {
+            put(ModelAttributes.CACHED, cached)
+        }
+
+    fun setNextContent(nextDocumentModel: DocumentModel?) {
+        put(ModelAttributes.NEXT_CONTENT, nextDocumentModel)
     }
 
-    public void setNextContent(DocumentModel nextDocumentModel) {
-        put(ModelAttributes.NEXT_CONTENT, nextDocumentModel);
+    fun setPreviousContent(previousDocumentModel: DocumentModel?) {
+        put(ModelAttributes.PREVIOUS_CONTENT, previousDocumentModel)
     }
 
-    public void setPreviousContent(DocumentModel previousDocumentModel) {
-        put(ModelAttributes.PREVIOUS_CONTENT, previousDocumentModel);
+    companion object {
+        @JvmStatic
+        fun createDefaultDocumentModel(): DocumentModel {
+            val documentModel = DocumentModel()
+            documentModel.cached = true
+            documentModel.rendered = false
+            return documentModel
+        }
     }
 }

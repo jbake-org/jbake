@@ -21,16 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jbake.app.template;
+package org.jbake.app.template
 
 /**
  *
  * @author jsb
  */
-public class PebbleTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest{
-
-    public PebbleTemplateEngineRenderingTest() {
-        super("pebbleTemplates", "pebble");
-    }
-
-}
+class PebbleTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("pebbleTemplates", "pebble")

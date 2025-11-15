@@ -21,399 +21,388 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jbake.app;
+package org.jbake.app
 
-import com.orientechnologies.common.log.OLogManager;
-import com.orientechnologies.orient.core.Orient;
-import com.orientechnologies.orient.core.db.ODatabaseSession;
-import com.orientechnologies.orient.core.db.ODatabaseType;
-import com.orientechnologies.orient.core.db.OrientDB;
-import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.OElement;
-import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.jbake.model.ModelAttributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import com.orientechnologies.common.log.OLogManager
+import com.orientechnologies.orient.core.Orient
+import com.orientechnologies.orient.core.db.ODatabaseSession
+import com.orientechnologies.orient.core.db.ODatabaseType
+import com.orientechnologies.orient.core.db.OrientDB
+import com.orientechnologies.orient.core.db.OrientDBConfig
+import com.orientechnologies.orient.core.metadata.schema.OClass
+import com.orientechnologies.orient.core.metadata.schema.OSchema
+import com.orientechnologies.orient.core.metadata.schema.OType
+import com.orientechnologies.orient.core.record.ORecord
+import org.jbake.model.DocumentModel
+import org.jbake.model.DocumentTypes
+import org.jbake.model.ModelAttributes
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.util.*
 
 /**
  * @author jdlee
  */
-public class ContentStore {
+class ContentStore(private val type: String, private val name: String?) {
+    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 
-    private static final String STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "select * from Documents where status='published' and type='%s' and ? in tags order by date desc";
-    private static final String STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "select sha1,rendered from Documents where sourceuri=?";
-    private static final String STATEMENT_GET_PUBLISHED_COUNT = "select count(*) as count from Documents where status='published' and type='%s'";
-    private static final String STATEMENT_MARK_CONTENT_AS_RENDERD = "update Documents set rendered=true where rendered=false and type='%s' and sourceuri='%s' and cached=true";
-    private static final String STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from Documents where sourceuri=?";
-    private static final String STATEMENT_GET_UNDRENDERED_CONTENT = "select * from Documents where rendered=false order by date desc";
-    private static final String STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "select sha1 from Signatures where key='templates'";
-    private static final String STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "select tags from Documents where status='published' and type='post'";
-    private static final String STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "select * from Documents where type='%s' order by date desc";
-    private static final String STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "select * from Documents where status='published' and type='%s' order by date desc";
-    private static final String STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "select * from Documents where status='published' and type='post' and ? in tags order by date desc";
-    private static final String STATEMENT_GET_TAGS_BY_DOCTYPE = "select tags from Documents where status='published' and type='%s'";
-    private static final String STATEMENT_INSERT_TEMPLATES_SIGNATURE = "insert into Signatures(key,sha1) values('templates',?)";
-    private static final String STATEMENT_DELETE_ALL = "delete from Documents where type='%s'";
-    private static final String STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "update Signatures set sha1=? where key='templates'";
-    private static final String STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "select count(*) as count from Documents where type='%s'";
+    private var db: ODatabaseSession? = null
 
-    private final Logger logger = LoggerFactory.getLogger(ContentStore.class);
-    private final String type;
-    private final String name;
-
-    private ODatabaseSession db;
-
-    private long start = -1;
-    private long limit = -1;
-    private OrientDB orient;
-
-    public ContentStore(final String type, String name) {
-        this.type = type;
-        this.name = name;
-    }
+    var start: Long = -1
+        private set
+    var limit: Long = -1
+        private set
+    private var orient: OrientDB? = null
 
 
-    public void startup() {
-        startupIfEnginesAreMissing();
+    fun startup() {
+        startupIfEnginesAreMissing()
 
-        if (type.equalsIgnoreCase(ODatabaseType.PLOCAL.name())) {
-            orient = new OrientDB(type + ":" + name, OrientDBConfig.defaultConfig());
+        if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true)) {
+            orient = OrientDB(type + ":" + name, OrientDBConfig.defaultConfig())
         } else {
-            orient = new OrientDB(type + ":", OrientDBConfig.defaultConfig());
+            orient = OrientDB(type + ":", OrientDBConfig.defaultConfig())
         }
 
-        orient.createIfNotExists(name, ODatabaseType.valueOf(type.toUpperCase()));
+        orient!!.createIfNotExists(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
 
-        db = orient.open(name, "admin", "admin");
+        db = orient!!.open(name, "admin", "admin")
 
-        activateOnCurrentThread();
+        activateOnCurrentThread()
 
-        updateSchema();
+        updateSchema()
     }
 
-    public long getStart() {
-        return start;
+    fun setStart(start: Int) {
+        this.start = start.toLong()
     }
 
-    public void setStart(int start) {
-        this.start = start;
+    fun setLimit(limit: Int) {
+        this.limit = limit.toLong()
     }
 
-    public long getLimit() {
-        return limit;
+    fun resetPagination() {
+        this.start = -1
+        this.limit = -1
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
-    public void resetPagination() {
-        this.start = -1;
-        this.limit = -1;
-    }
-
-    public final void updateSchema() {
-
-        OSchema schema = db.getMetadata().getSchema();
+    fun updateSchema() {
+        val schema = db!!.getMetadata().getSchema()
 
         if (!schema.existsClass(Schema.DOCUMENTS)) {
-            createDocType(schema);
+            createDocType(schema)
         }
         if (!schema.existsClass(Schema.SIGNATURES)) {
-            createSignatureType(schema);
+            createSignatureType(schema)
         }
     }
 
-    public void close() {
+    fun close() {
         if (db != null) {
-            activateOnCurrentThread();
-            db.close();
+            activateOnCurrentThread()
+            db!!.close()
         }
 
         if (orient != null) {
-            orient.close();
+            orient!!.close()
         }
-        DBUtil.closeDataStore();
+        DBUtil.closeDataStore()
     }
 
-    public void shutdown() {
-
-//        Orient.instance().shutdown();
+    fun shutdown() {
+        //        Orient.instance().shutdown();
     }
 
-    private void startupIfEnginesAreMissing() {
+    private fun startupIfEnginesAreMissing() {
         // Using a jdk which doesn't bundle a javascript engine
         // throws a NoClassDefFoundError while logging the warning
         // see https://github.com/orientechnologies/orientdb/issues/5855
-        OLogManager.instance().setWarnEnabled(false);
+        OLogManager.instance().setWarnEnabled(false)
 
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
         if (Orient.instance().getEngines().isEmpty()) {
-            Orient.instance().startup();
+            Orient.instance().startup()
         }
-        OLogManager.instance().setWarnEnabled(true);
+        OLogManager.instance().setWarnEnabled(true)
     }
 
-    public void drop() {
-        activateOnCurrentThread();
-//        db.drop();
+    fun drop() {
+        activateOnCurrentThread()
 
-        orient.drop(name);
+        //        db.drop();
+        orient!!.drop(name)
     }
 
-    private void activateOnCurrentThread() {
+    private fun activateOnCurrentThread() {
         if (db != null) {
-            db.activateOnCurrentThread();
+            db!!.activateOnCurrentThread()
         } else {
-            System.out.println("db is null on activate");
+            println("db is null on activate")
         }
     }
 
-    public long getDocumentCount(String docType) {
-        activateOnCurrentThread();
-        String statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType);
-        return (long) query(statement).get(0).get("count");
+    fun getDocumentCount(docType: String?): Long {
+        activateOnCurrentThread()
+        val statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType)
+        return query(statement).get(0).get("count") as Long
     }
 
-    public long getPublishedCount(String docType) {
-        String statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType);
-        return (long) query(statement).get(0).get("count");
+    fun getPublishedCount(docType: String?): Long {
+        val statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType)
+        return query(statement).get(0).get("count") as Long
     }
 
-    public DocumentList<DocumentModel> getDocumentByUri(String uri) {
-        return query("select * from Documents where sourceuri=?", uri);
+    fun getDocumentByUri(uri: String?): DocumentList<DocumentModel> {
+        return query("select * from Documents where sourceuri=?", uri)
     }
 
-    public DocumentList<DocumentModel> getDocumentStatus(String uri) {
-        return query(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, uri);
+    fun getDocumentStatus(uri: String?): DocumentList<DocumentModel> {
+        return query(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, uri)
     }
 
-    public DocumentList<DocumentModel> getPublishedPosts() {
-        return getPublishedContent("post");
+    val publishedPosts: DocumentList<DocumentModel>
+        get() = getPublishedContent("post")
+
+    fun getPublishedPosts(applyPaging: Boolean): DocumentList<DocumentModel> {
+        return getPublishedContent("post", applyPaging)
     }
 
-    public DocumentList<DocumentModel> getPublishedPosts(boolean applyPaging) {
-        return getPublishedContent("post", applyPaging);
+    fun getPublishedPostsByTag(tag: String?): DocumentList<DocumentModel> {
+        return query(STATEMENT_GET_PUBLISHED_POSTS_BY_TAG, tag)
     }
 
-    public DocumentList<DocumentModel> getPublishedPostsByTag(String tag) {
-        return query(STATEMENT_GET_PUBLISHED_POSTS_BY_TAG, tag);
-    }
+    fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
+        val documents = DocumentList<DocumentModel>()
 
-    public DocumentList<DocumentModel> getPublishedDocumentsByTag(String tag) {
-        final DocumentList<DocumentModel> documents = new DocumentList<>();
-
-        for (final String docType : DocumentTypes.getDocumentTypes()) {
-            String statement = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType);
-            DocumentList<DocumentModel> documentsByTag = query(statement, tag);
-            documents.addAll(documentsByTag);
+        for (docType in DocumentTypes.getDocumentTypes()) {
+            val statement: String = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType)
+            val documentsByTag = query(statement, tag)
+            documents.addAll(documentsByTag)
         }
-        return documents;
+        return documents
     }
 
-    public DocumentList<DocumentModel> getPublishedPages() {
-        return getPublishedContent("page");
+    val publishedPages: DocumentList<DocumentModel>
+        get() = getPublishedContent("page")
+
+    fun getPublishedContent(docType: String?): DocumentList<DocumentModel> {
+        return getPublishedContent(docType, false)
     }
 
-    public DocumentList<DocumentModel> getPublishedContent(String docType) {
-        return getPublishedContent(docType, false);
-    }
-
-    private DocumentList<DocumentModel> getPublishedContent(String docType, boolean applyPaging) {
-        String query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType);
+    private fun getPublishedContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
+        var query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType)
         if (applyPaging && hasStartAndLimitBoundary()) {
-            query += " SKIP " + start + " LIMIT " + limit;
+            query += " SKIP " + start + " LIMIT " + limit
         }
-        return query(query);
+        return query(query)
     }
 
-    public DocumentList<DocumentModel> getAllContent(String docType) {
-        return getAllContent(docType, false);
+    fun getAllContent(docType: String?): DocumentList<DocumentModel> {
+        return getAllContent(docType, false)
     }
 
-    public DocumentList<DocumentModel> getAllContent(String docType, boolean applyPaging) {
-        String query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType);
+    fun getAllContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
+        var query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType)
         if (applyPaging && hasStartAndLimitBoundary()) {
-            query += " SKIP " + start + " LIMIT " + limit;
+            query += " SKIP " + start + " LIMIT " + limit
         }
-        return query(query);
+        return query(query)
     }
 
-    private boolean hasStartAndLimitBoundary() {
-        return (start >= 0) && (limit > -1);
+    private fun hasStartAndLimitBoundary(): Boolean {
+        return (start >= 0) && (limit > -1)
     }
 
-    private DocumentList<DocumentModel> getAllTagsFromPublishedPosts() {
-        return query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS);
+    private val allTagsFromPublishedPosts: DocumentList<DocumentModel>
+        get() = query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS)
+
+    private val signaturesForTemplates: DocumentList<DocumentModel>
+        get() = query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES)
+
+    val unrenderedContent: DocumentList<DocumentModel>
+        get() = query(STATEMENT_GET_UNDRENDERED_CONTENT)
+
+    fun deleteContent(uri: String?) {
+        executeCommand(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, uri)
     }
 
-    private DocumentList<DocumentModel> getSignaturesForTemplates() {
-        return query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES);
+    fun markContentAsRendered(document: DocumentModel) {
+        val statement: String =
+            String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.getType(), document.getSourceuri())
+        executeCommand(statement)
     }
 
-    public DocumentList<DocumentModel> getUnrenderedContent() {
-        return query(STATEMENT_GET_UNDRENDERED_CONTENT);
+    private fun updateSignatures(currentTemplatesSignature: String?) {
+        executeCommand(STATEMENT_UPDATE_TEMPLATE_SIGNATURE, currentTemplatesSignature)
     }
 
-    public void deleteContent(String uri) {
-        executeCommand(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, uri);
+    fun deleteAllByDocType(docType: String?) {
+        val statement = String.format(STATEMENT_DELETE_ALL, docType)
+        executeCommand(statement)
     }
 
-    public void markContentAsRendered(DocumentModel document) {
-        String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.getType(), document.getSourceuri());
-        executeCommand(statement);
+    private fun insertTemplatesSignature(currentTemplatesSignature: String?) {
+        executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature)
     }
 
-    private void updateSignatures(String currentTemplatesSignature) {
-        executeCommand(STATEMENT_UPDATE_TEMPLATE_SIGNATURE, currentTemplatesSignature);
+    private fun query(sql: String): DocumentList<DocumentModel> {
+        activateOnCurrentThread()
+        val results = db!!.query(sql)
+        return DocumentList.wrap(results)
     }
 
-    public void deleteAllByDocType(String docType) {
-        String statement = String.format(STATEMENT_DELETE_ALL, docType);
-        executeCommand(statement);
+    private fun query(sql: String?, vararg args: Any?): DocumentList<DocumentModel> {
+        activateOnCurrentThread()
+        val results = db!!.command(sql, *args)
+        return DocumentList.wrap(results)
     }
 
-    private void insertTemplatesSignature(String currentTemplatesSignature) {
-        executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
+    private fun executeCommand(query: String?, vararg args: Any?) {
+        activateOnCurrentThread()
+        db!!.command(query, *args)
     }
 
-    private DocumentList<DocumentModel> query(String sql) {
-        activateOnCurrentThread();
-        OResultSet results = db.query(sql);
-        return DocumentList.wrap(results);
-    }
-
-    private DocumentList<DocumentModel> query(String sql, Object... args) {
-        activateOnCurrentThread();
-        OResultSet results = db.command(sql, args);
-        return DocumentList.wrap(results);
-    }
-
-    private void executeCommand(String query, Object... args) {
-        activateOnCurrentThread();
-        db.command(query, args);
-    }
-
-    public Set<String> getTags() {
-        DocumentList<DocumentModel> docs = this.getAllTagsFromPublishedPosts();
-        Set<String> result = new HashSet<>();
-        for (DocumentModel document : docs) {
-            String[] tags = document.getTags();
-            Collections.addAll(result, tags);
-        }
-        return result;
-    }
-
-    public Set<String> getAllTags() {
-        Set<String> result = new HashSet<>();
-        for (String docType : DocumentTypes.getDocumentTypes()) {
-            String statement = String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType);
-            DocumentList<DocumentModel> docs = query(statement);
-            for (DocumentModel document : docs) {
-                String[] tags = document.getTags();
-                Collections.addAll(result, tags);
+    val tags: MutableSet<String?>
+        get() {
+            val docs = this.allTagsFromPublishedPosts
+            val result: MutableSet<String?> = HashSet<String?>()
+            for (document in docs) {
+                val tags = document.getTags()
+                Collections.addAll<String?>(result, *tags)
             }
+            return result
         }
-        return result;
+
+    val allTags: MutableSet<String?>
+        get() {
+            val result: MutableSet<String?> = HashSet<String?>()
+            for (docType in DocumentTypes.getDocumentTypes()) {
+                val statement: String =
+                    String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType)
+                val docs = query(statement)
+                for (document in docs) {
+                    val tags = document.getTags()
+                    Collections.addAll<String?>(result, *tags)
+                }
+            }
+            return result
+        }
+
+    private fun createDocType(schema: OSchema) {
+        logger.debug("Create document class")
+
+        val page = schema.createClass(Schema.DOCUMENTS)
+        page.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true)
+        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1)
+        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).setNotNull(true)
+        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI)
+        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).setNotNull(true)
+        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED)
+        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).setNotNull(true)
+        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED)
+        page.createProperty(ModelAttributes.STATUS, OType.STRING).setNotNull(true)
+        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS)
+        page.createProperty(ModelAttributes.TYPE, OType.STRING).setNotNull(true)
+        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE)
     }
 
-    private void createDocType(final OSchema schema) {
-        logger.debug("Create document class");
-
-        OClass page = schema.createClass(Schema.DOCUMENTS);
-        page.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1);
-        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI);
-        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED);
-        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED);
-        page.createProperty(ModelAttributes.STATUS, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS);
-        page.createProperty(ModelAttributes.TYPE, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE);
-
+    private fun createSignatureType(schema: OSchema) {
+        val signatures = schema.createClass(Schema.SIGNATURES)
+        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true)
+        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1)
     }
 
-    private void createSignatureType(OSchema schema) {
-        OClass signatures = schema.createClass(Schema.SIGNATURES);
-        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
-    }
-
-    public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
-
-        boolean clearCache = needed;
+    fun updateAndClearCacheIfNeeded(needed: Boolean, templateFolder: File?) {
+        var clearCache = needed
 
         if (!needed) {
-            clearCache = updateTemplateSignatureIfChanged(templateFolder);
+            clearCache = updateTemplateSignatureIfChanged(templateFolder)
         }
 
         if (clearCache) {
-            deleteAllDocumentTypes();
-            this.updateSchema();
+            deleteAllDocumentTypes()
+            this.updateSchema()
         }
     }
 
-    private boolean updateTemplateSignatureIfChanged(File templateFolder) {
-        boolean templateSignatureChanged = false;
+    private fun updateTemplateSignatureIfChanged(templateFolder: File?): Boolean {
+        var templateSignatureChanged = false
 
-        DocumentList<DocumentModel> docs = this.getSignaturesForTemplates();
-        String currentTemplatesSignature;
+        val docs = this.signaturesForTemplates
+        var currentTemplatesSignature: String?
         try {
-            currentTemplatesSignature = FileUtil.sha1(templateFolder);
-        } catch (Exception e) {
-            currentTemplatesSignature = "";
+            currentTemplatesSignature = FileUtil.sha1(templateFolder)
+        } catch (e: Exception) {
+            currentTemplatesSignature = ""
         }
         if (!docs.isEmpty()) {
-            String sha1 = docs.get(0).getSha1();
-            if (!sha1.equals(currentTemplatesSignature)) {
-                this.updateSignatures(currentTemplatesSignature);
-                templateSignatureChanged = true;
+            val sha1 = docs.get(0).getSha1()
+            if (sha1 != currentTemplatesSignature) {
+                this.updateSignatures(currentTemplatesSignature)
+                templateSignatureChanged = true
             }
         } else {
             // first computation of templates signature
-            this.insertTemplatesSignature(currentTemplatesSignature);
-            templateSignatureChanged = true;
+            this.insertTemplatesSignature(currentTemplatesSignature)
+            templateSignatureChanged = true
         }
-        return templateSignatureChanged;
+        return templateSignatureChanged
     }
 
-    private void deleteAllDocumentTypes() {
-        for (String docType : DocumentTypes.getDocumentTypes()) {
+    private fun deleteAllDocumentTypes() {
+        for (docType in DocumentTypes.getDocumentTypes()) {
             try {
-                this.deleteAllByDocType(docType);
-            } catch (Exception e) {
+                this.deleteAllByDocType(docType)
+            } catch (e: Exception) {
                 // maybe a non existing document type
             }
         }
     }
 
-    public boolean isActive() {
-        return db.isActiveOnCurrentThread();
+    val isActive: Boolean
+        get() = db!!.isActiveOnCurrentThread()
+
+    fun addDocument(document: DocumentModel) {
+        val element = db!!.newElement(Schema.DOCUMENTS)
+        document.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
+        element.save<ORecord?>()
     }
 
-    public void addDocument(DocumentModel document) {
-        OElement element = db.newElement(Schema.DOCUMENTS);
-        document.forEach((k, v) -> element.setProperty(k, v, OType.ANY));
-        element.save();
+    protected object Schema {
+        const val DOCUMENTS: String = "Documents"
+        const val SIGNATURES: String = "Signatures"
     }
 
-    protected abstract class Schema {
-        static final String DOCUMENTS = "Documents";
-        static final String SIGNATURES = "Signatures";
+    companion object {
+        private const val STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG =
+            "select * from Documents where status='published' and type='%s' and ? in tags order by date desc"
+        private const val STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI =
+            "select sha1,rendered from Documents where sourceuri=?"
+        private const val STATEMENT_GET_PUBLISHED_COUNT =
+            "select count(*) as count from Documents where status='published' and type='%s'"
+        private const val STATEMENT_MARK_CONTENT_AS_RENDERD =
+            "update Documents set rendered=true where rendered=false and type='%s' and sourceuri='%s' and cached=true"
+        private const val STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from Documents where sourceuri=?"
+        private const val STATEMENT_GET_UNDRENDERED_CONTENT =
+            "select * from Documents where rendered=false order by date desc"
+        private const val STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "select sha1 from Signatures where key='templates'"
+        private const val STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS =
+            "select tags from Documents where status='published' and type='post'"
+        private const val STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE =
+            "select * from Documents where type='%s' order by date desc"
+        private const val STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE =
+            "select * from Documents where status='published' and type='%s' order by date desc"
+        private const val STATEMENT_GET_PUBLISHED_POSTS_BY_TAG =
+            "select * from Documents where status='published' and type='post' and ? in tags order by date desc"
+        private const val STATEMENT_GET_TAGS_BY_DOCTYPE =
+            "select tags from Documents where status='published' and type='%s'"
+        private const val STATEMENT_INSERT_TEMPLATES_SIGNATURE =
+            "insert into Signatures(key,sha1) values('templates',?)"
+        private const val STATEMENT_DELETE_ALL = "delete from Documents where type='%s'"
+        private const val STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "update Signatures set sha1=? where key='templates'"
+        private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE =
+            "select count(*) as count from Documents where type='%s'"
     }
-
 }

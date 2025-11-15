@@ -1,77 +1,76 @@
-package org.jbake.app;
+package org.jbake.app
 
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
-import org.jbake.template.DelegatingTemplateEngine;
-import org.jbake.template.model.TemplateModel;
-import org.jbake.util.PagingHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.commons.configuration2.CompositeConfiguration
+import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
+import org.jbake.model.DocumentModel
+import org.jbake.model.ModelAttributes
+import org.jbake.template.DelegatingTemplateEngine
+import org.jbake.template.model.TemplateModel
+import org.jbake.util.PagingHelper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.*
+import java.nio.file.Files
+import java.util.*
 
 /**
  * Render output to a file.
  *
- * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
+ * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
-public class Renderer {
-    private static final String MASTERINDEX_TEMPLATE_NAME = "masterindex";
-    private static final String SITEMAP_TEMPLATE_NAME = "sitemap";
-    private static final String FEED_TEMPLATE_NAME = "feed";
-    private static final String ARCHIVE_TEMPLATE_NAME = "archive";
-    private static final String ERROR404_TEMPLATE_NAME = "error404";
-
-    private final Logger logger = LoggerFactory.getLogger(Renderer.class);
-    private final JBakeConfiguration config;
-    private final DelegatingTemplateEngine renderingEngine;
-    private final ContentStore db;
+class Renderer {
+    private val logger: Logger = LoggerFactory.getLogger(Renderer::class.java)
+    private val config: JBakeConfiguration
+    private val renderingEngine: DelegatingTemplateEngine
+    private val db: ContentStore
 
     /**
      * @param db            The database holding the content
      * @param destination   The destination folder
      * @param templatesPath The templates folder
      * @param config        Project configuration
-     * @deprecated Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
-     * Creates a new instance of Renderer with supplied references to folders.
      */
-    @Deprecated
-    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config) {
-        this(db, new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config));
-        DefaultJBakeConfiguration configuration = ((DefaultJBakeConfiguration) this.config);
-        configuration.setDestinationFolder(destination);
-        configuration.setTemplateFolder(templatesPath);
+    @Deprecated(
+        """Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
+      Creates a new instance of Renderer with supplied references to folders."""
+    )
+    constructor(db: ContentStore, destination: File?, templatesPath: File, config: CompositeConfiguration?) : this(
+        db,
+        JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
+    ) {
+        val configuration = (this.config as DefaultJBakeConfiguration)
+        configuration.setDestinationFolder(destination)
+        configuration.setTemplateFolder(templatesPath)
     }
 
     // TOqDO: should all content be made available to all templates via this class??
-
     /**
      * @param db              The database holding the content
      * @param destination     The destination folder
      * @param templatesPath   The templates folder
      * @param config          Project configuration
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
-     * @deprecated Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
-     * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      */
-    @Deprecated
-    public Renderer(ContentStore db, File destination, File templatesPath, CompositeConfiguration config, DelegatingTemplateEngine renderingEngine) {
-        this(db, new JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config), renderingEngine);
-        DefaultJBakeConfiguration configuration = ((DefaultJBakeConfiguration) this.config);
-        configuration.setDestinationFolder(destination);
-        configuration.setTemplateFolder(templatesPath);
+    @Deprecated(
+        """Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
+      Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use."""
+    )
+    constructor(
+        db: ContentStore,
+        destination: File?,
+        templatesPath: File,
+        config: CompositeConfiguration?,
+        renderingEngine: DelegatingTemplateEngine
+    ) : this(
+        db,
+        JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config),
+        renderingEngine
+    ) {
+        val configuration = (this.config as DefaultJBakeConfiguration)
+        configuration.setDestinationFolder(destination)
+        configuration.setTemplateFolder(templatesPath)
     }
 
     /**
@@ -80,10 +79,10 @@ public class Renderer {
      * @param db     The database holding the content
      * @param config Project configuration
      */
-    public Renderer(ContentStore db, JBakeConfiguration config) {
-        this.config = config;
-        this.renderingEngine = new DelegatingTemplateEngine(db, config);
-        this.db = db;
+    constructor(db: ContentStore, config: JBakeConfiguration) {
+        this.config = config
+        this.renderingEngine = DelegatingTemplateEngine(db, config)
+        this.db = db
     }
 
     /**
@@ -93,14 +92,14 @@ public class Renderer {
      * @param config          The application specific configuration
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
-    public Renderer(ContentStore db, JBakeConfiguration config, DelegatingTemplateEngine renderingEngine) {
-        this.config = config;
-        this.renderingEngine = renderingEngine;
-        this.db = db;
+    constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {
+        this.config = config
+        this.renderingEngine = renderingEngine
+        this.db = db
     }
 
-    private String findTemplateName(String docType) {
-        return config.getTemplateByDocType(docType);
+    private fun findTemplateName(docType: String?): String? {
+        return config.getTemplateByDocType(docType)
     }
 
     /**
@@ -109,64 +108,70 @@ public class Renderer {
      * @param content The content to renderDocument
      * @throws Exception if IOException or SecurityException are raised
      */
-    public void render(DocumentModel content) throws Exception {
-        String docType = content.getType();
-        String outputFilename = config.getDestinationFolder().getPath() + File.separatorChar + content.getUri();
+    @Throws(Exception::class)
+    fun render(content: DocumentModel) {
+        val docType = content.getType()
+        var outputFilename = (config.destinationFolder!!.getPath() + File.separatorChar).toString() + content.getUri()
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
-            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'));
+            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'))
         }
 
         // delete existing versions if they exist in case status has changed either way
-        String outputExtension = config.getOutputExtensionByDocType(docType);
-        File draftFile = new File(outputFilename, config.getDraftSuffix() + outputExtension);
+        val outputExtension = config.getOutputExtensionByDocType(docType)
+        val draftFile = File(outputFilename, config.draftSuffix + outputExtension)
         if (draftFile.exists()) {
-            Files.delete(draftFile.toPath());
+            Files.delete(draftFile.toPath())
         }
 
-        File publishedFile = new File(outputFilename + outputExtension);
+        val publishedFile = File(outputFilename + outputExtension)
         if (publishedFile.exists()) {
-            Files.delete(publishedFile.toPath());
+            Files.delete(publishedFile.toPath())
         }
 
-        if (content.getStatus().equals(ModelAttributes.Status.DRAFT)) {
-            outputFilename = outputFilename + config.getDraftSuffix();
+        if (content.getStatus() == ModelAttributes.Status.DRAFT) {
+            outputFilename = outputFilename + config.draftSuffix
         }
 
-        File outputFile = new File(outputFilename + outputExtension);
-        TemplateModel model = new TemplateModel();
-        model.setContent(content);
-        model.setRenderer(renderingEngine);
+        val outputFile = File(outputFilename + outputExtension)
+        val model = TemplateModel()
+        model.setContent(content)
+        model.setRenderer(renderingEngine)
 
         try {
-            try (Writer out = createWriter(outputFile)) {
-                renderingEngine.renderDocument(model, findTemplateName(docType), out);
+            createWriter(outputFile).use { out ->
+                renderingEngine.renderDocument(model, findTemplateName(docType), out)
             }
-            logger.info("Rendering [{}]... done!", outputFile);
-        } catch (Exception e) {
-            logger.error("Rendering [{}]... failed!", outputFile, e);
-            throw new Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.getMessage(), e);
+            logger.info("Rendering [{}]... done!", outputFile)
+        } catch (e: Exception) {
+            logger.error("Rendering [{}]... failed!", outputFile, e)
+            throw Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.message, e)
         }
     }
 
-    private Writer createWriter(File file) throws IOException {
+    @Throws(IOException::class)
+    private fun createWriter(file: File): Writer {
         if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
+            file.getParentFile().mkdirs()
+            file.createNewFile()
         }
 
-        return new OutputStreamWriter(new FileOutputStream(file), config.getRenderEncoding());
+        return OutputStreamWriter(FileOutputStream(file), config.renderEncoding)
     }
 
-    private void render(RenderingConfig renderConfig) throws Exception {
-        File outputFile = renderConfig.getPath();
+    @Throws(Exception::class)
+    private fun render(renderConfig: RenderingConfig) {
+        val outputFile = renderConfig.path
         try {
-            try (Writer out = createWriter(outputFile)) {
-                renderingEngine.renderDocument(renderConfig.getModel(), renderConfig.getTemplate(), out);
+            createWriter(outputFile).use { out ->
+                renderingEngine.renderDocument(
+                    renderConfig.model,
+                    renderConfig.template, out
+                )
             }
-            logger.info("Rendering {} [{}]... done!", renderConfig.getName(), outputFile);
-        } catch (Exception e) {
-            logger.error("Rendering {} [{}]... failed!", renderConfig.getName(), outputFile, e);
-            throw new Exception("Failed to render " + renderConfig.getName(), e);
+            logger.info("Rendering {} [{}]... done!", renderConfig.name, outputFile)
+        } catch (e: Exception) {
+            logger.error("Rendering {} [{}]... failed!", renderConfig.name, outputFile, e)
+            throw Exception("Failed to render " + renderConfig.name, e)
         }
     }
 
@@ -176,51 +181,57 @@ public class Renderer {
      * @param indexFile The name of the output file
      * @throws Exception if IOException or SecurityException are raised
      */
-    public void renderIndex(String indexFile) throws Exception {
-        render(new DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME));
+    @Throws(Exception::class)
+    fun renderIndex(indexFile: String?) {
+        render(DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME))
     }
 
-    public void renderIndexPaging(String indexFile) throws Exception {
-        long totalPosts = db.getPublishedCount("post");
-        int postsPerPage = config.getPostsPerPage();
+    @Throws(Exception::class)
+    fun renderIndexPaging(indexFile: String?) {
+        val totalPosts = db.getPublishedCount("post")
+        val postsPerPage = config.postsPerPage
 
-        if (totalPosts == 0) {
+        if (totalPosts == 0L) {
             //paging makes no sense. render single index file instead
-            renderIndex(indexFile);
+            renderIndex(indexFile)
         } else {
-            PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
+            val pagingHelper = PagingHelper(totalPosts, postsPerPage)
 
-            TemplateModel model = new TemplateModel();
-            model.setRenderer(renderingEngine);
-            model.setNumberOfPages(pagingHelper.getNumberOfPages());
+            val model = TemplateModel()
+            model.setRenderer(renderingEngine)
+            model.setNumberOfPages(pagingHelper.getNumberOfPages())
 
             try {
-                db.setLimit(postsPerPage);
-                for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
-                    String fileName = indexFile;
+                db.setLimit(postsPerPage)
+                var pageStart = 0
+                var page = 1
+                while (pageStart < totalPosts) {
+                    var fileName = indexFile
 
-                    db.setStart(pageStart);
-                    model.setCurrentPageNuber(page);
-                    String previous = pagingHelper.getPreviousFileName(page);
-                    model.setPreviousFilename(previous);
-                    String nextFileName = pagingHelper.getNextFileName(page);
-                    model.setNextFileName(nextFileName);
+                    db.setStart(pageStart)
+                    model.setCurrentPageNuber(page)
+                    val previous = pagingHelper.getPreviousFileName(page)
+                    model.setPreviousFilename(previous)
+                    val nextFileName = pagingHelper.getNextFileName(page)
+                    model.setNextFileName(nextFileName)
 
-                    DocumentModel contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
+                    val contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME)
 
                     if (page > 1) {
-                        contentModel.setRootPath("../");
+                        contentModel.setRootPath("../")
                     }
-                    model.setContent(contentModel);
+                    model.setContent(contentModel)
 
                     // Add page number to file name
-                    fileName = pagingHelper.getCurrentFileName(page, fileName);
-                    ModelRenderingConfig renderConfig = new ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME);
-                    render(renderConfig);
+                    fileName = pagingHelper.getCurrentFileName(page, fileName)
+                    val renderConfig = ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME)
+                    render(renderConfig)
+                    pageStart += postsPerPage
+                    page++
                 }
-                db.resetPagination();
-            } catch (Exception e) {
-                throw new Exception("Failed to render index. Cause: " + e.getMessage(), e);
+                db.resetPagination()
+            } catch (e: Exception) {
+                throw Exception("Failed to render index. Cause: " + e.message, e)
             }
         }
     }
@@ -230,11 +241,13 @@ public class Renderer {
      *
      * @param sitemapFile configuration for site map
      * @throws Exception if can't create correct default rendering config
-     * @see <a href="https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476">About Sitemaps</a>
-     * @see <a href="http://www.sitemaps.org/">Sitemap protocol</a>
+     * @see [About Sitemaps](https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476)
+     *
+     * @see [Sitemap protocol](http://www.sitemaps.org/)
      */
-    public void renderSitemap(String sitemapFile) throws Exception {
-        render(new DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME));
+    @Throws(Exception::class)
+    fun renderSitemap(sitemapFile: String?) {
+        render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
     }
 
     /**
@@ -243,8 +256,9 @@ public class Renderer {
      * @param feedFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    public void renderFeed(String feedFile) throws Exception {
-        render(new DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME));
+    @Throws(Exception::class)
+    fun renderFeed(feedFile: String?) {
+        render(DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME))
     }
 
     /**
@@ -253,8 +267,9 @@ public class Renderer {
      * @param archiveFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    public void renderArchive(String archiveFile) throws Exception {
-        render(new DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME));
+    @Throws(Exception::class)
+    fun renderArchive(archiveFile: String?) {
+        render(DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME))
     }
 
     /**
@@ -263,8 +278,9 @@ public class Renderer {
      * @param errorFile      The name of the output file
      * @throws Exception    if default rendering configuration is not loaded correctly
      */
-    public void renderError404(String errorFile) throws Exception {
-        render(new DefaultRenderingConfig(errorFile, ERROR404_TEMPLATE_NAME));
+    @Throws(Exception::class)
+    fun renderError404(errorFile: String?) {
+        render(DefaultRenderingConfig(errorFile, ERROR404_TEMPLATE_NAME))
     }
 
     /**
@@ -274,59 +290,69 @@ public class Renderer {
      * @return Number of rendered tags
      * @throws Exception if cannot render tags correctly
      */
-    public int renderTags(String tagPath) throws Exception {
-        int renderedCount = 0;
-        final List<Throwable> errors = new LinkedList<>();
+    @Throws(Exception::class)
+    fun renderTags(tagPath: String?): Int {
+        var renderedCount = 0
+        val errors: MutableList<Throwable> = LinkedList<Throwable>()
 
-        for (String tag : db.getAllTags()) {
+        for (tag in db.getAllTags()) {
             try {
-                TemplateModel model = new TemplateModel();
-                model.setRenderer(renderingEngine);
-                model.setTag(tag);
-                DocumentModel map = buildSimpleModel(ModelAttributes.TAG.toString());
-                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + tag + config.getOutputExtension());
+                val model = TemplateModel()
+                model.setRenderer(renderingEngine)
+                model.setTag(tag)
+                val map = buildSimpleModel(ModelAttributes.TAG.toString())
+                val path =
+                    File(config.destinationFolder + File.separator + tagPath + File.separator + tag + config.outputExtension)
 
-                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
-                model.setContent(map);
+                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path))
+                model.setContent(map)
 
-                render(new ModelRenderingConfig(path, ModelAttributes.TAG.toString(), model, findTemplateName(ModelAttributes.TAG.toString())));
+                render(
+                    ModelRenderingConfig(
+                        path,
+                        ModelAttributes.TAG.toString(),
+                        model,
+                        findTemplateName(ModelAttributes.TAG.toString())
+                    )
+                )
 
-                renderedCount++;
-            } catch (Exception e) {
-                errors.add(e);
+                renderedCount++
+            } catch (e: Exception) {
+                errors.add(e)
             }
         }
 
-        if (config.getRenderTagsIndex()) {
+        if (config.renderTagsIndex) {
             try {
                 // Add an index file at root folder of tags.
                 // This will prevent directory listing and also provide an option to
                 // display all tags page.
-                TemplateModel model = new TemplateModel();
-                model.setRenderer(renderingEngine);
-                DocumentModel map = buildSimpleModel(ModelAttributes.TAGS.toString());
-                File path = new File(config.getDestinationFolder() + File.separator + tagPath + File.separator + "index" + config.getOutputExtension());
+                val model = TemplateModel()
+                model.setRenderer(renderingEngine)
+                val map = buildSimpleModel(ModelAttributes.TAGS.toString())
+                val path =
+                    File(config.destinationFolder + File.separator + tagPath + File.separator + "index" + config.outputExtension)
 
-                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path));
-                model.setContent(map);
+                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path))
+                model.setContent(map)
 
 
-                render(new ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")));
-                renderedCount++;
-            } catch (Exception e) {
-                errors.add(e);
+                render(ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")))
+                renderedCount++
+            } catch (e: Exception) {
+                errors.add(e)
             }
         }
 
         if (!errors.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Failed to render tags. Cause(s):");
-            for (Throwable error : errors) {
-                sb.append("\n").append(error.getMessage());
+            val sb = StringBuilder()
+            sb.append("Failed to render tags. Cause(s):")
+            for (error in errors) {
+                sb.append("\n").append(error.message)
             }
-            throw new Exception(sb.toString(), errors.get(0));
+            throw Exception(sb.toString(), errors.get(0))
         } else {
-            return renderedCount;
+            return renderedCount
         }
     }
 
@@ -334,88 +360,86 @@ public class Renderer {
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
      *
      * @param type
-     * @return a basic {@link DocumentModel}
+     * @return a basic [DocumentModel]
      */
-    private DocumentModel buildSimpleModel(String type) {
-        DocumentModel content = new DocumentModel();
-        content.setType(type);
-        content.setRootPath("");
+    private fun buildSimpleModel(type: String?): DocumentModel {
+        val content = DocumentModel()
+        content.setType(type)
+        content.setRootPath("")
         // add any more keys here that need to have a default value to prevent need to perform null check in templates
-        return content;
+        return content
     }
 
     private interface RenderingConfig {
+        val path: File
 
-        File getPath();
+        val name: String?
 
-        String getName();
+        val template: String?
 
-        String getTemplate();
-
-        TemplateModel getModel();
+        val model: TemplateModel?
     }
 
-    private abstract static class AbstractRenderingConfig implements RenderingConfig {
-
-        protected final File path;
-        protected final String name;
-        protected final String template;
-
-        public AbstractRenderingConfig(File path, String name, String template) {
-            super();
-            this.path = path;
-            this.name = name;
-            this.template = template;
+    private abstract class AbstractRenderingConfig(
+        protected val path: File?,
+        protected val name: String?,
+        protected val template: String?
+    ) : RenderingConfig {
+        override fun getPath(): File? {
+            return path
         }
 
-        @Override
-        public File getPath() {
-            return path;
+        override fun getName(): String? {
+            return name
         }
 
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getTemplate() {
-            return template;
-        }
-
-    }
-
-    public class ModelRenderingConfig extends AbstractRenderingConfig {
-        private final TemplateModel model;
-
-        public ModelRenderingConfig(String fileName, TemplateModel model, String templateType) {
-            super(new File(config.getDestinationFolder(), fileName), fileName, findTemplateName(templateType));
-            this.model = model;
-        }
-
-        public ModelRenderingConfig(File path, String name, TemplateModel model, String template) {
-            super(path, name, template);
-            this.model = model;
-        }
-
-        @Override
-        public TemplateModel getModel() {
-            return model;
+        override fun getTemplate(): String? {
+            return template
         }
     }
 
-    class DefaultRenderingConfig extends AbstractRenderingConfig {
+    inner class ModelRenderingConfig : AbstractRenderingConfig {
+        private val model: TemplateModel?
 
-        private final DocumentModel content;
-
-        private DefaultRenderingConfig(File path, String allInOneName) {
-            super(path, allInOneName, findTemplateName(allInOneName));
-            this.content = buildSimpleModel(allInOneName);
+        constructor(
+            fileName: String?,
+            model: TemplateModel?,
+            templateType: String?
+        ) : super(File(config.destinationFolder, fileName), fileName, findTemplateName(templateType)) {
+            this.model = model
         }
 
-        public DefaultRenderingConfig(String filename, String allInOneName) {
-            super(new File(config.getDestinationFolder(), File.separator + filename), allInOneName, findTemplateName(allInOneName));
-            this.content = buildSimpleModel(allInOneName);
+        constructor(path: File?, name: String?, model: TemplateModel?, template: String?) : super(
+            path,
+            name,
+            template
+        ) {
+            this.model = model
+        }
+
+        override fun getModel(): TemplateModel? {
+            return model
+        }
+    }
+
+    internal inner class DefaultRenderingConfig : AbstractRenderingConfig {
+        private val content: DocumentModel
+
+        private constructor(path: File?, allInOneName: String?) : super(
+            path,
+            allInOneName,
+            findTemplateName(allInOneName)
+        ) {
+            this.content = buildSimpleModel(allInOneName)
+        }
+
+        constructor(filename: String?, allInOneName: String?) : super(
+            File(
+                config.destinationFolder,
+                File.separator + filename
+            ), allInOneName, findTemplateName(allInOneName)
+        ) {
+            this.content = buildSimpleModel(allInOneName)
         }
 
         /**
@@ -423,26 +447,32 @@ public class Renderer {
          *
          * @param allInOneName
          */
-        public DefaultRenderingConfig(String allInOneName) {
-            this(new File(config.getDestinationFolder().getPath() + File.separator + allInOneName + config.getOutputExtension()),
-                    allInOneName);
-        }
+        constructor(allInOneName: String?) : this(
+            File(config.destinationFolder!!.getPath() + File.separator + allInOneName + config.outputExtension),
+            allInOneName
+        )
 
-        @Override
-        public TemplateModel getModel() {
-            TemplateModel model = new TemplateModel();
-            model.setRenderer(renderingEngine);
-            model.setContent(content);
+        override fun getModel(): TemplateModel {
+            val model = TemplateModel()
+            model.setRenderer(renderingEngine)
+            model.setContent(content)
 
-            if (config.getPaginateIndex()) {
-                model.setNumberOfPages(0);
-                model.setCurrentPageNuber(0);
-                model.setPreviousFilename("");
-                model.setNextFileName("");
+            if (config.paginateIndex) {
+                model.setNumberOfPages(0)
+                model.setCurrentPageNuber(0)
+                model.setPreviousFilename("")
+                model.setNextFileName("")
             }
 
-            return model;
+            return model
         }
+    }
 
+    companion object {
+        private const val MASTERINDEX_TEMPLATE_NAME = "masterindex"
+        private const val SITEMAP_TEMPLATE_NAME = "sitemap"
+        private const val FEED_TEMPLATE_NAME = "feed"
+        private const val ARCHIVE_TEMPLATE_NAME = "archive"
+        private const val ERROR404_TEMPLATE_NAME = "error404"
     }
 }

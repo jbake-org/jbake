@@ -1,10 +1,8 @@
-package org.jbake.app;
+package org.jbake.app
 
-import com.orientechnologies.orient.core.sql.executor.OResult;
-import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import org.jbake.model.DocumentModel;
-
-import java.util.LinkedList;
+import com.orientechnologies.orient.core.sql.executor.OResultSet
+import org.jbake.model.DocumentModel
+import java.util.*
 
 /**
  * Wraps an OrientDB document iterator into a model usable by
@@ -12,16 +10,15 @@ import java.util.LinkedList;
  *
  * @author Cédric Champeau
  */
-public class DocumentList<T> extends LinkedList<T> {
+class DocumentList<T> : LinkedList<T>() {
 
-    public static DocumentList<DocumentModel> wrap(OResultSet docs) {
-        DocumentList<DocumentModel> list = new DocumentList<>();
+    fun wrap(docs: OResultSet): DocumentList<DocumentModel> {
+        val list = DocumentList<DocumentModel>()
         while (docs.hasNext()) {
-            OResult next = docs.next();
-            list.add(DBUtil.documentToModel(next));
+            val next = docs.next()
+            list.add(DBUtil.documentToModel(next))
         }
-        docs.close();
-        return list;
+        docs.close()
+        return list
     }
-
 }

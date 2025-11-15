@@ -1,382 +1,408 @@
-package org.jbake.app.configuration;
+package org.jbake.app.configuration
 
-import ch.qos.logback.classic.spi.LoggingEvent;
-import org.apache.commons.io.FileUtils;
-import org.jbake.TestUtils;
-import org.jbake.app.JBakeException;
-import org.jbake.app.LoggingTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.Appender
+import org.apache.commons.io.FileUtils
+import org.assertj.core.api.Assertions
+import org.jbake.TestUtils
+import org.jbake.app.JBakeException
+import org.jbake.app.LoggingTest
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.io.TempDir
+import org.mockito.Mockito
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.nio.file.Files
+import java.nio.file.Path
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-
-import static ch.qos.logback.classic.Level.WARN;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.jbake.TestUtils.getTestResourcesAsSourceFolder;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-public class ConfigUtilTest extends LoggingTest {
-
-    private Path sourceFolder;
-    private ConfigUtil util;
+class ConfigUtilTest : LoggingTest() {
+    private var sourceFolder: Path? = null
+    private var util: ConfigUtil? = null
 
     @BeforeEach
-    public void setup(@TempDir Path folder) {
-        this.sourceFolder = folder;
-        this.util = new ConfigUtil();
+    fun setup(@TempDir folder: Path) {
+        this.sourceFolder = folder
+        this.util = ConfigUtil()
     }
 
     @Test
-    public void shouldLoadSiteHost() throws Exception {
-        JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
-        assertThat(config.getSiteHost()).isEqualTo("http://www.jbake.org");
+    @Throws(Exception::class)
+    fun shouldLoadSiteHost() {
+        val config = util!!.loadConfig(TestUtils.getTestResourcesAsSourceFolder())
+        assertThat(config.siteHost).isEqualTo("http://www.jbake.org")
     }
 
     @Test
-    public void shouldLoadADefaultConfiguration() throws Exception {
-        JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
-        assertDefaultPropertiesPresent(config);
+    @Throws(Exception::class)
+    fun shouldLoadADefaultConfiguration() {
+        val config = util!!.loadConfig(TestUtils.getTestResourcesAsSourceFolder())
+        assertDefaultPropertiesPresent(config)
     }
 
     @Test
-    public void shouldLoadACustomConfiguration() throws Exception {
-        File customConfigFile = new File(sourceFolder.toFile(), "jbake.properties");
+    @Throws(Exception::class)
+    fun shouldLoadACustomConfiguration() {
+        val customConfigFile = File(sourceFolder!!.toFile(), "jbake.properties")
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(customConfigFile));
-        writer.append("test.property=12345");
-        writer.close();
+        val writer = BufferedWriter(FileWriter(customConfigFile))
+        writer.append("test.property=12345")
+        writer.close()
 
-        JBakeConfiguration configuration = util.loadConfig(sourceFolder.toFile());
+        val configuration = util!!.loadConfig(sourceFolder!!.toFile())
 
-        assertThat(configuration.get("test.property")).isEqualTo("12345");
-        assertDefaultPropertiesPresent(configuration);
+        Assertions.assertThat<Any?>(configuration.get("test.property")).isEqualTo("12345")
+        assertDefaultPropertiesPresent(configuration)
     }
 
     @Test
-    public void shouldThrowAnExceptionIfSourcefolderDoesNotExist() throws Exception {
-        File nonExistentSourceFolder = mock(File.class);
-        when(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent");
-        when(nonExistentSourceFolder.exists()).thenReturn(false);
+    @Throws(Exception::class)
+    fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
+        val nonExistentSourceFolder = Mockito.mock<File>(File::class.java)
+        Mockito.`when`<String?>(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent")
+        Mockito.`when`<Boolean?>(nonExistentSourceFolder.exists()).thenReturn(false)
 
-        JBakeException e = assertThrows(JBakeException.class, () -> util.loadConfig(nonExistentSourceFolder));
-        assertThat(e.getMessage()).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.");
+        val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
+            JBakeException::class.java,
+            Executable { util!!.loadConfig(nonExistentSourceFolder) })
+        Assertions.assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
     }
 
     @Test
-    public void shouldAddSourcefolderToConfiguration() throws Exception {
+    @Throws(Exception::class)
+    fun shouldAddSourcefolderToConfiguration() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder)
 
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
-
-        assertThat(config.getSourceFolder()).isEqualTo(sourceFolder);
+        assertThat(config.sourceFolder).isEqualTo(sourceFolder)
     }
 
     @Test
-    public void shouldThrowAnExceptionIfSourcefolderIsNotADirectory() throws Exception {
+    @Throws(Exception::class)
+    fun shouldThrowAnExceptionIfSourcefolderIsNotADirectory() {
+        val sourceFolder = Mockito.mock<File>(File::class.java)
+        Mockito.`when`<Boolean?>(sourceFolder.exists()).thenReturn(true)
+        Mockito.`when`<Boolean?>(sourceFolder.isDirectory()).thenReturn(false)
 
-        File sourceFolder = mock(File.class);
-        when(sourceFolder.exists()).thenReturn(true);
-        when(sourceFolder.isDirectory()).thenReturn(false);
-
-        JBakeException e = assertThrows(JBakeException.class, () -> util.loadConfig(sourceFolder));
-        assertThat(e.getMessage()).isEqualTo("The given source folder is not a directory.");
+        val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
+            JBakeException::class.java,
+            Executable { util!!.loadConfig(sourceFolder) })
+        Assertions.assertThat(e.message).isEqualTo("The given source folder is not a directory.")
     }
 
     @Test
-    public void shouldReturnDestinationFolderFromConfiguration() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        File expectedDestinationFolder = new File(sourceFolder, "output");
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldReturnDestinationFolderFromConfiguration() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val expectedDestinationFolder = File(sourceFolder, "output")
+        val config = util!!.loadConfig(sourceFolder)
 
-        assertThat(config.getDestinationFolder()).isEqualTo(expectedDestinationFolder);
+        assertThat(config.destinationFolder).isEqualTo(expectedDestinationFolder)
     }
 
     @Test
-    public void shouldReturnAssetFolderFromConfiguration() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        File expectedDestinationFolder = new File(sourceFolder, "assets");
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldReturnAssetFolderFromConfiguration() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val expectedDestinationFolder = File(sourceFolder, "assets")
+        val config = util!!.loadConfig(sourceFolder)
 
-        assertThat(config.getAssetFolder()).isEqualTo(expectedDestinationFolder);
+        assertThat(config.assetFolder).isEqualTo(expectedDestinationFolder)
     }
 
     @Test
-    public void shouldReturnTemplateFolderFromConfiguration() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        File expectedDestinationFolder = new File(sourceFolder, "templates");
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldReturnTemplateFolderFromConfiguration() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val expectedDestinationFolder = File(sourceFolder, "templates")
+        val config = util!!.loadConfig(sourceFolder)
 
-        assertThat(config.getTemplateFolder()).isEqualTo(expectedDestinationFolder);
+        assertThat(config.templateFolder).isEqualTo(expectedDestinationFolder)
     }
 
     @Test
-    public void shouldReturnContentFolderFromConfiguration() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        File expectedDestinationFolder = new File(sourceFolder, "content");
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldReturnContentFolderFromConfiguration() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val expectedDestinationFolder = File(sourceFolder, "content")
+        val config = util!!.loadConfig(sourceFolder)
 
-        assertThat(config.getContentFolder()).isEqualTo(expectedDestinationFolder);
+        assertThat(config.contentFolder).isEqualTo(expectedDestinationFolder)
     }
 
     @Test
-    public void shouldGetTemplateFileDoctype() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        File expectedTemplateFile = new File(sourceFolder, "templates/index.ftl");
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldGetTemplateFileDoctype() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val expectedTemplateFile = File(sourceFolder, "templates/index.ftl")
+        val config = util!!.loadConfig(sourceFolder)
 
-        File templateFile = config.getTemplateFileByDocType("masterindex");
-        assertThat(templateFile).isEqualTo(expectedTemplateFile);
+        val templateFile = config.getTemplateFileByDocType("masterindex")
+        Assertions.assertThat(templateFile).isEqualTo(expectedTemplateFile)
 
-        String templateFile2 = config.getTemplateByDocType("team");
-        assertThat(templateFile2).isEqualTo("special/team.tpl");
+        val templateFile2 = config.getTemplateByDocType("team")
+        Assertions.assertThat(templateFile2).isEqualTo("special/team.tpl")
     }
 
     @Test
-    public void shouldLogWarningIfDocumentTypeNotFound() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldLogWarningIfDocumentTypeNotFound() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder)
 
-        config.getTemplateFileByDocType("none");
+        config.getTemplateFileByDocType("none")
 
-        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+        val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find configuration key '{}' for document type '{}'");
-
+        Assertions.assertThat(loggingEvent.getMessage())
+            .isEqualTo("Cannot find configuration key '{}' for document type '{}'")
     }
 
     @Test
-    public void shouldGetTemplateOutputExtension() throws Exception {
+    @Throws(Exception::class)
+    fun shouldGetTemplateOutputExtension() {
+        val docType = "masterindex"
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        config.setTemplateExtensionForDocType(docType, ".xhtml")
 
-        String docType = "masterindex";
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
-        config.setTemplateExtensionForDocType(docType, ".xhtml");
+        val extension = config.getOutputExtensionByDocType(docType)
 
-        String extension = config.getOutputExtensionByDocType(docType);
-
-        assertThat(extension).isEqualTo(".xhtml");
+        Assertions.assertThat(extension).isEqualTo(".xhtml")
     }
 
     @Test
-    public void shouldGetMarkdownExtensionsAsList() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldGetMarkdownExtensionsAsList() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
-        List<String> markdownExtensions = config.getMarkdownExtensions();
+        val markdownExtensions = config.getMarkdownExtensions()
 
-        assertThat(markdownExtensions).containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS");
+        Assertions.assertThat<String?>(markdownExtensions)
+            .containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS")
     }
 
     @Test
-    public void shouldReturnConfiguredDocTypes() throws Exception {
+    @Throws(Exception::class)
+    fun shouldReturnConfiguredDocTypes() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+        val docTypes = config.getDocumentTypes()
 
-        List<String> docTypes = config.getDocumentTypes();
-
-        assertThat(docTypes).containsExactly("allcontent", "team", "masterindex", "feed", "error404", "archive", "tag", "tagsindex", "sitemap", "post", "page");
-
+        Assertions.assertThat<String?>(docTypes).containsExactly(
+            "allcontent",
+            "team",
+            "masterindex",
+            "feed",
+            "error404",
+            "archive",
+            "tag",
+            "tagsindex",
+            "sitemap",
+            "post",
+            "page"
+        )
     }
 
     @Test
-    public void shouldReturnAListOfAsciidoctorOptionsKeys() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
-        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
-        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
+    @Throws(Exception::class)
+    fun shouldReturnAListOfAsciidoctorOptionsKeys() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
+        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
 
-        List<String> options = config.getAsciidoctorOptionKeys();
+        val options = config.getAsciidoctorOptionKeys()
 
-        assertThat(options).contains("requires", "template_dirs");
+        Assertions.assertThat<String?>(options).contains("requires", "template_dirs")
     }
 
     @Test
-    public void shouldReturnAnAsciidoctorOption() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
-        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
-        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
+    @Throws(Exception::class)
+    fun shouldReturnAnAsciidoctorOption() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
+        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
 
-        List<String> option = config.getAsciidoctorOption("requires");
+        val option = config.getAsciidoctorOption("requires")
 
-        assertThat(option).contains("asciidoctor-diagram");
+        Assertions.assertThat<String?>(option).contains("asciidoctor-diagram")
     }
 
     @Test
-    public void shouldReturnAnAsciidoctorOptionWithAListValue() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
-        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
-        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2");
+    @Throws(Exception::class)
+    fun shouldReturnAnAsciidoctorOptionWithAListValue() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
+        config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
 
-        List<String> option = config.getAsciidoctorOption("template_dirs");
+        val option = config.getAsciidoctorOption("template_dirs")
 
-        assertThat(option).contains("src/template1", "src/template2");
+        Assertions.assertThat<String?>(option).contains("src/template1", "src/template2")
     }
 
     @Test
-    public void shouldReturnEmptyListIfOptionNotAvailable() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldReturnEmptyListIfOptionNotAvailable() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
-        List<String> options = config.getAsciidoctorOption("template_dirs");
+        val options = config.getAsciidoctorOption("template_dirs")
 
-        assertThat(options).isEmpty();
+        Assertions.assertThat<String?>(options).isEmpty()
     }
 
     @Test
-    public void shouldLogAWarningIfAsciidocOptionCouldNotBeFound() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldLogAWarningIfAsciidocOptionCouldNotBeFound() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
-        config.getAsciidoctorOption("template_dirs");
+        config.getAsciidoctorOption("template_dirs")
 
-        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+        val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find asciidoctor option '{}.{}'");
+        Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find asciidoctor option '{}.{}'")
     }
 
     @Test
-    public void shouldHandleNonExistingFiles() throws Exception {
+    @Throws(Exception::class)
+    fun shouldHandleNonExistingFiles() {
+        val source = TestUtils.getTestResourcesAsSourceFolder()
+        val expectedTemplateFolder = File(source, "templates")
+        val expectedAssetFolder = File(source, "assets")
+        val expectedContentFolder = File(source, "content")
+        val expectedDestinationFolder = File(source, "output")
+        val config = util!!.loadConfig(source) as DefaultJBakeConfiguration
 
-        File source = TestUtils.getTestResourcesAsSourceFolder();
-        File expectedTemplateFolder = new File(source, "templates");
-        File expectedAssetFolder = new File(source, "assets");
-        File expectedContentFolder = new File(source, "content");
-        File expectedDestinationFolder = new File(source, "output");
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source);
+        config.setTemplateFolder(null)
+        config.setAssetFolder(null)
+        config.setContentFolder(null)
+        config.setDestinationFolder(null)
 
-        config.setTemplateFolder(null);
-        config.setAssetFolder(null);
-        config.setContentFolder(null);
-        config.setDestinationFolder(null);
+        val templateFolder = config.getTemplateFolder()
+        val assetFolder = config.getAssetFolder()
+        val contentFolder = config.getContentFolder()
+        val destinationFolder = config.getDestinationFolder()
 
-        File templateFolder = config.getTemplateFolder();
-        File assetFolder = config.getAssetFolder();
-        File contentFolder = config.getContentFolder();
-        File destinationFolder = config.getDestinationFolder();
-
-        assertThat(templateFolder).isEqualTo(expectedTemplateFolder);
-        assertThat(assetFolder).isEqualTo(expectedAssetFolder);
-        assertThat(contentFolder).isEqualTo(expectedContentFolder);
-        assertThat(destinationFolder).isEqualTo(expectedDestinationFolder);
+        Assertions.assertThat(templateFolder).isEqualTo(expectedTemplateFolder)
+        Assertions.assertThat(assetFolder).isEqualTo(expectedAssetFolder)
+        Assertions.assertThat(contentFolder).isEqualTo(expectedContentFolder)
+        Assertions.assertThat(destinationFolder).isEqualTo(expectedDestinationFolder)
     }
 
     @Test
-    void shouldSetCustomFoldersWithAbsolutePaths() throws Exception {
+    @Throws(Exception::class)
+    fun shouldSetCustomFoldersWithAbsolutePaths() {
         // given
-        Path source = sourceFolder.resolve("source");
-        Path theme = sourceFolder.resolve("theme");
-        Path destination = sourceFolder.resolve("destination");
+        val source = sourceFolder!!.resolve("source")
+        val theme = sourceFolder!!.resolve("theme")
+        val destination = sourceFolder!!.resolve("destination")
 
-        File originalSource = TestUtils.getTestResourcesAsSourceFolder();
-        FileUtils.copyDirectory(originalSource, source.toFile());
-        File originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme");
-        FileUtils.copyDirectory(originalTheme, theme.toFile());
+        val originalSource = TestUtils.getTestResourcesAsSourceFolder()
+        FileUtils.copyDirectory(originalSource, source.toFile())
+        val originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme")
+        FileUtils.copyDirectory(originalTheme, theme.toFile())
 
-        Path expectedTemplateFolder = theme.resolve("templates");
-        Path expectedAssetFolder = theme.resolve("assets");
-        Path expectedContentFolder = source.resolve("content");
-        Path expectedDestination = destination.resolve("output");
+        val expectedTemplateFolder = theme.resolve("templates")
+        val expectedAssetFolder = theme.resolve("assets")
+        val expectedContentFolder = source.resolve("content")
+        val expectedDestination = destination.resolve("output")
 
-        File properties = source.resolve("jbake.properties").toFile();
-        BufferedWriter fw = Files.newBufferedWriter(properties.toPath());
+        val properties = source.resolve("jbake.properties").toFile()
+        val fw = Files.newBufferedWriter(properties.toPath())
 
-        fw.write(PropertyList.ASSET_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedAssetFolder));
-        fw.newLine();
-        fw.write(PropertyList.TEMPLATE_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedTemplateFolder));
-        fw.newLine();
-        fw.write(PropertyList.DESTINATION_FOLDER.getKey() + "=" + TestUtils.getOsPath(expectedDestination));
-        fw.close();
+        fw.write(PropertyList.ASSET_FOLDER.key + "=" + TestUtils.getOsPath(expectedAssetFolder))
+        fw.newLine()
+        fw.write(PropertyList.TEMPLATE_FOLDER.key + "=" + TestUtils.getOsPath(expectedTemplateFolder))
+        fw.newLine()
+        fw.write(PropertyList.DESTINATION_FOLDER.key + "=" + TestUtils.getOsPath(expectedDestination))
+        fw.close()
 
         // when
+        val config = util!!.loadConfig(source.toFile()) as DefaultJBakeConfiguration
 
-        DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(source.toFile());
-
-        File templateFolder = config.getTemplateFolder();
-        File assetFolder = config.getAssetFolder();
-        File contentFolder = config.getContentFolder();
-        File destinationFolder = config.getDestinationFolder();
+        val templateFolder = config.getTemplateFolder()
+        val assetFolder = config.getAssetFolder()
+        val contentFolder = config.getContentFolder()
+        val destinationFolder = config.getDestinationFolder()
 
         // then
-        assertThat(config.getTemplateFolderName()).isEqualTo(expectedTemplateFolder.toString());
-        assertThat(templateFolder).isEqualTo(expectedTemplateFolder.toFile());
+        Assertions.assertThat(config.getTemplateFolderName()).isEqualTo(expectedTemplateFolder.toString())
+        Assertions.assertThat(templateFolder).isEqualTo(expectedTemplateFolder.toFile())
 
-        assertThat(config.getAssetFolderName()).isEqualTo(expectedAssetFolder.toString());
-        assertThat(assetFolder).isEqualTo(expectedAssetFolder.toFile());
+        Assertions.assertThat(config.getAssetFolderName()).isEqualTo(expectedAssetFolder.toString())
+        Assertions.assertThat(assetFolder).isEqualTo(expectedAssetFolder.toFile())
 
-        assertThat(destinationFolder).isEqualTo(expectedDestination.toFile());
-        assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile());
+        Assertions.assertThat(destinationFolder).isEqualTo(expectedDestination.toFile())
+        Assertions.assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile())
     }
 
     @Test
-    public void shouldUseUtf8EncodingAsDefault() throws Exception{
-        String unicodeString = "中文属性使用默认Properties编码";
-        JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
+    @Throws(Exception::class)
+    fun shouldUseUtf8EncodingAsDefault() {
+        val unicodeString = "中文属性使用默认Properties编码"
+        val config = util!!.loadConfig(TestUtils.getTestResourcesAsSourceFolder())
 
-        String siteAbout = (String) config.get("site.about");
-        assertThat(util.getEncoding()).isEqualTo("UTF-8");
-        assertThat(siteAbout).inUnicode().startsWith(unicodeString);
+        val siteAbout = config.get("site.about") as String?
+        Assertions.assertThat(util!!.encoding).isEqualTo("UTF-8")
+        Assertions.assertThat(siteAbout).inUnicode().startsWith(unicodeString)
     }
 
     @Test
-    public void shouldBePossibleToSetCustomEncoding() throws Exception {
-        String expected = "Latin1 encoded file äöü";
-        JBakeConfiguration config = util.setEncoding("ISO8859_1").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"));
+    @Throws(Exception::class)
+    fun shouldBePossibleToSetCustomEncoding() {
+        val expected = "Latin1 encoded file äöü"
+        val config =
+            util!!.setEncoding("ISO8859_1").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
 
-        String siteAbout = (String) config.get("site.about");
-        assertThat(siteAbout).contains(expected);
+        val siteAbout = config.get("site.about") as String?
+        Assertions.assertThat(siteAbout).contains(expected)
     }
 
     @Test
-    public void shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() throws Exception {
-        JBakeConfiguration config = util.setEncoding("UNSUPPORTED_ENCODING").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"));
-        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+    @Throws(Exception::class)
+    fun shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() {
+        val config = util!!.setEncoding("UNSUPPORTED_ENCODING")
+            .loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
+        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+        val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat(loggingEvent.getLevel()).isEqualTo(WARN);
-        assertThat(loggingEvent.getFormattedMessage()).isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'");
+        Assertions.assertThat<Level?>(loggingEvent.getLevel()).isEqualTo(Level.WARN)
+        Assertions.assertThat(loggingEvent.getFormattedMessage())
+            .isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'")
     }
 
 
     @Test
-    public void shouldReturnIgnoreFileFromConfiguration() throws Exception {
-        File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        JBakeConfiguration config = util.loadConfig(sourceFolder);
+    @Throws(Exception::class)
+    fun shouldReturnIgnoreFileFromConfiguration() {
+        val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+        val config = util!!.loadConfig(sourceFolder)
 
-        assertThat(config.getIgnoreFileName()).isEqualTo(".jbakeignore");
+        assertThat(config.ignoreFileName).isEqualTo(".jbakeignore")
     }
 
-    private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
-        for (Field field : JBakeConfiguration.class.getFields()) {
-
+    @Throws(IllegalAccessException::class)
+    private fun assertDefaultPropertiesPresent(config: JBakeConfiguration) {
+        for (field in JBakeConfiguration::class.java.getFields()) {
             if (field.isAccessible()) {
-                String key = (String) field.get("");
-                System.out.println("Key: " + key);
-                assertThat(config.get(key)).isNotNull();
+                val key = field.get("") as String?
+                println("Key: " + key)
+                Assertions.assertThat<Any?>(config.get(key)).isNotNull()
             }
         }
     }
-
 }

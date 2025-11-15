@@ -1,38 +1,36 @@
-package org.jbake.render;
+package org.jbake.render
 
-import org.junit.Test;
+import org.junit.Assert
+import org.junit.Test
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
+import java.util.*
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
-
-import static org.junit.Assert.assertTrue;
-
-public class ServiceLoaderTest {
-
+class ServiceLoaderTest {
     @Test
-    public void testLoadRenderer() throws Exception {
+    @Throws(Exception::class)
+    fun testLoadRenderer() {
+        val serviceDescription =
+            ClassLoader.getSystemClassLoader().getResource("META-INF/services/org.jbake.render.RenderingTool")
+        val services = File(serviceDescription!!.toURI())
+        Assert.assertTrue("Service definitions File exists", services.exists())
 
-        URL serviceDescription = ClassLoader.getSystemClassLoader().getResource("META-INF/services/org.jbake.render.RenderingTool");
-        File services = new File(serviceDescription.toURI());
-        assertTrue("Service definitions File exists", services.exists());
+        val fileReader = FileReader(services)
+        val reader = BufferedReader(fileReader)
 
-        FileReader fileReader = new FileReader(services);
-        BufferedReader reader = new BufferedReader(fileReader);
+        var serviceProvider: String?
+        val renderingToolClasses: MutableList<String?> = ArrayList<String?>()
 
-        String serviceProvider;
-        List<String> renderingToolClasses = new ArrayList<String>();
-
-        for (RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
-            renderingToolClasses.add(tool.getClass().getName());
+        for (tool in ServiceLoader.load<RenderingTool>(RenderingTool::class.java)) {
+            renderingToolClasses.add(tool.javaClass.getName())
         }
 
-        while ((serviceProvider = reader.readLine()) != null) {
-            assertTrue("Rendering tool " + serviceProvider + " loaded", renderingToolClasses.contains(serviceProvider));
+        while ((reader.readLine().also { serviceProvider = it }) != null) {
+            Assert.assertTrue(
+                "Rendering tool " + serviceProvider + " loaded",
+                renderingToolClasses.contains(serviceProvider)
+            )
         }
     }
 }

@@ -1,66 +1,51 @@
-package org.jbake.util;
+package org.jbake.util
 
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.Property;
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.Property
+import java.io.PrintStream
 
-import java.io.PrintStream;
-import java.util.List;
+class ConfigurationPrinter(private val configuration: JBakeConfiguration, private val out: PrintStream) {
+    fun print() {
+        val properties: MutableList<Property> = configuration.jbakeProperties
+        var lastGroup: Property.Group? = null
 
-public class ConfigurationPrinter {
-
-    private PrintStream out;
-    private JBakeConfiguration configuration;
-
-    public ConfigurationPrinter(JBakeConfiguration configuration, PrintStream out) {
-        this.out = out;
-        this.configuration = configuration;
-    }
-
-    public void print() {
-
-        List<Property> properties = configuration.getJbakeProperties();
-        Property.Group lastGroup = null;
-
-        for (Property property : properties) {
-
-            if (lastGroup != property.getGroup()) {
-                printGroup(property);
-                this.printHeader();
+        for (property in properties) {
+            if (lastGroup != property.group) {
+                printGroup(property)
+                this.printHeader()
             }
-            if (!property.getDescription().isEmpty()) {
-                printDescription(property);
+            if (!property.description!!.isEmpty()) {
+                printDescription(property)
             }
-            printKeyAndValue(property);
+            printKeyAndValue(property)
 
-            lastGroup = property.getGroup();
+            lastGroup = property.group
         }
     }
 
-    private void printHeader() {
-        out.printf("%1$-40s %2$-40s%n", "Key", "Value");
-        out.println(getHorizontalLine());
+    private fun printHeader() {
+        out.printf("%1$-40s %2$-40s%n", "Key", "Value")
+        out.println(this.horizontalLine)
     }
 
-    private String getHorizontalLine() {
-        return String.format("%080d%n", 0).replace("0", "-");
+    private val horizontalLine: String
+        get() = String.format("%080d%n", 0).replace("0", "-")
+
+    private fun printGroup(property: Property) {
+        out.printf("%n%s - Settings%n%n", property.group)
     }
 
-    private void printGroup(Property property) {
-        out.printf("%n%s - Settings%n%n", property.getGroup());
+    private fun printDescription(property: Property) {
+        out.printf("# %s%n", property.description)
     }
 
-    private void printDescription(Property property) {
-        out.printf("# %s%n", property.getDescription());
+    private fun printKeyAndValue(property: Property) {
+        val key = leftFillWithDots(property.key)
+        val value = configuration.get(property.key)
+        out.printf("%1\$s: %2$-40s%n%n", key, value)
     }
 
-    private void printKeyAndValue(Property property) {
-        String key = leftFillWithDots(property.getKey());
-        Object value = configuration.get(property.getKey());
-        out.printf("%1$s: %2$-40s%n%n", key, value);
+    private fun leftFillWithDots(value: String?): String {
+        return String.format("%1$-40s", value).replace(' ', '.')
     }
-
-    private String leftFillWithDots(String value) {
-        return String.format("%1$-40s", value).replace(' ', '.');
-    }
-
 }

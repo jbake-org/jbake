@@ -1,185 +1,182 @@
-package org.jbake.launcher;
+package org.jbake.launcher
 
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.jbake.app.FileUtil;
-import org.jbake.app.JBakeException;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.app.configuration.JBakeConfigurationFactory;
-import org.jbake.util.ConfigurationPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import picocli.CommandLine;
-import picocli.CommandLine.MissingParameterException;
-
-import java.io.File;
+import org.jbake.app.FileUtil
+import org.jbake.app.JBakeException
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
+import org.jbake.util.ConfigurationPrinter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.slf4j.bridge.SLF4JBridgeHandler
+import picocli.CommandLine
+import java.io.File
 
 /**
  * Launcher for JBake.
  *
- * @author Jonathan Bullock <a href="mailto:jonbullock@gmail.com">jonbullock@gmail.com</a>
+ * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
-public class Main {
-
-    private static final String USAGE_PREFIX = "Usage: jbake";
-    private static final String ALT_USAGE_PREFIX = "   or  jbake";
-    private final Baker baker;
-    private final JettyServer jettyServer;
-    private final BakeWatcher watcher;
-    private JBakeConfigurationFactory configurationFactory;
-    private static final Logger logger = LoggerFactory.getLogger("jbake");
-
-    /**
-     * Default constructor.
-     */
-    public Main() {
-        this(new Baker(), new JettyServer(), new BakeWatcher());
-    }
-
+class Main @JvmOverloads constructor(
+    private val baker: Baker = Baker(),
+    private val jettyServer: JettyServer = JettyServer(),
+    private val watcher: BakeWatcher = BakeWatcher()
+) {
+    var jBakeConfigurationFactory: JBakeConfigurationFactory?
     /**
      * Optional constructor to externalize dependencies.
      *
-     * @param baker   A {@link Baker} instance
-     * @param jetty   A {@link JettyServer} instance
-     * @param watcher A {@link BakeWatcher} instance
+     * @param baker   A [Baker] instance
+     * @param jettyServer   A [JettyServer] instance
+     * @param watcher A [BakeWatcher] instance
      */
-    protected Main(Baker baker, JettyServer jetty, BakeWatcher watcher) {
-        this.baker = baker;
-        this.jettyServer = jetty;
-        this.watcher = watcher;
-        this.configurationFactory = new JBakeConfigurationFactory();
-    }
-
     /**
-     * Runs the app with the given arguments.
-     *
-     * @param args Application arguments
+     * Default constructor.
      */
-    public static void main(final String[] args) {
-        try {
-            new Main().run(args);
-        } catch (final JBakeException e) {
-            logger.error(e.getMessage());
-            logger.trace(e.getMessage(), e);
-            if (e.getCause() instanceof MissingParameterException) {
-                Main.printUsage();
-            }
-            System.exit(e.getExit());
-        }
+    init {
+        this.jBakeConfigurationFactory = JBakeConfigurationFactory()
     }
 
-    public void run(String[] args) throws JBakeException {
+    @Throws(JBakeException::class)
+    fun run(args: Array<String?>) {
         try {
-            SLF4JBridgeHandler.removeHandlersForRootLogger();
-            SLF4JBridgeHandler.install();
+            SLF4JBridgeHandler.removeHandlersForRootLogger()
+            SLF4JBridgeHandler.install()
 
-            final JBakeConfiguration config;
+            val config: JBakeConfiguration
 
-            LaunchOptions res = parseArguments(args);
+            val res = parseArguments(args)
             if (res.isRunServer()) {
-                config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createJettyJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
+                config = this.jBakeConfigurationFactory!!.setEncoding(res.getPropertiesEncoding())
+                    .createJettyJbakeConfiguration(
+                        res.getSource(),
+                        res.getDestination(),
+                        res.getConfig(),
+                        res.isClearCache()
+                    )
             } else {
-                config = getJBakeConfigurationFactory().setEncoding(res.getPropertiesEncoding()).createDefaultJbakeConfiguration(res.getSource(), res.getDestination(), res.getConfig(), res.isClearCache());
+                config = this.jBakeConfigurationFactory!!.setEncoding(res.getPropertiesEncoding())
+                    .createDefaultJbakeConfiguration(
+                        res.getSource(),
+                        res.getDestination(),
+                        res.getConfig(),
+                        res.isClearCache()
+                    )
             }
-            run(res, config);
-        } catch (final JBakeException e) {
-            throw e;
-        } catch (MissingParameterException mex) {
-            throw new JBakeException(SystemExit.CONFIGURATION_ERROR, mex.getMessage(), mex);
-        } catch (final Throwable e) {
-            throw new JBakeException(SystemExit.ERROR, "An unexpected error occurred: " + e.getMessage(), e);
+            run(res, config)
+        } catch (e: JBakeException) {
+            throw e
+        } catch (mex: CommandLine.MissingParameterException) {
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, mex.message, mex)
+        } catch (e: Throwable) {
+            throw JBakeException(SystemExit.ERROR, "An unexpected error occurred: " + e.message, e)
         }
     }
 
-    protected void run(LaunchOptions res, JBakeConfiguration config) {
-        System.out.println("JBake " + config.getVersion() + " (" + config.getBuildTimeStamp() + " " + config.getAbbreviatedGitHash()  + "#) [http://jbake.org]");
-        System.out.println();
+    fun run(res: LaunchOptions, config: JBakeConfiguration) {
+        println("JBake " + config.version + " (" + config.buildTimeStamp + " " + config.abbreviatedGitHash + "#) [http://jbake.org]")
+        println()
 
         if (res.isHelpNeeded()) {
-            printUsage(res);
+            printUsage(res)
             // Help was requested, so we are done here
-            return;
+            return
         }
 
         if (res.isListConfig()) {
-            ConfigurationPrinter printer = new ConfigurationPrinter(config, System.out);
-            printer.print();
-            return;
+            val printer = ConfigurationPrinter(config, System.out)
+            printer.print()
+            return
         }
 
         if (res.isBake()) {
-            baker.bake(config);
+            baker.bake(config)
         }
 
         if (res.isInit()) {
-            initStructure(res.getTemplate(), config);
+            initStructure(res.getTemplate(), config)
         }
 
         if (res.isRunServer()) {
-            watcher.start(config);
+            watcher.start(config)
             // TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
             if (res.isBake()) {
                 // bake and server commands have been run together
                 if (res.getDestination() != null) {
                     // use the destination provided via the commandline
-                    runServer(res.getDestination(), config);
-                } else if (!res.getSource().getPath().equals(".")) {
+                    runServer(res.getDestination(), config)
+                } else if (res.getSource().getPath() != ".") {
                     // use the source folder provided via the commandline
-                    runServer(res.getSource(), config);
+                    runServer(res.getSource(), config)
                 } else {
                     // use the default DESTINATION_FOLDER value
-                    runServer(config.getDestinationFolder(), config);
+                    runServer(config.destinationFolder!!, config)
                 }
             } else {
                 // use the default destination folder
-                runServer(config.getDestinationFolder(), config);
+                runServer(config.destinationFolder!!, config)
             }
         }
     }
 
-    private LaunchOptions parseArguments(String[] args) {
-        return CommandLine.populateCommand(new LaunchOptions(), args);
+    private fun parseArguments(args: Array<String?>): LaunchOptions {
+        return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
     }
 
-    private void printUsage(Object options) {
-        CommandLine cli = new CommandLine(options);
-        cli.setUsageHelpLongOptionsMaxWidth(28);
-        cli.usage(System.out);
+    private fun printUsage(options: Any) {
+        val cli = CommandLine(options)
+        cli.setUsageHelpLongOptionsMaxWidth(28)
+        cli.usage(System.out)
     }
 
-    public static void printUsage() {
-        CommandLine.usage(new LaunchOptions(), System.out);
+    private fun runServer(path: File, configuration: JBakeConfiguration) {
+        jettyServer.run(path.getPath(), configuration)
     }
 
-    private void runServer(File path, JBakeConfiguration configuration) {
-        jettyServer.run(path.getPath(), configuration);
-    }
-
-    private void initStructure(String type, JBakeConfiguration config) {
-        Init init = new Init(config);
+    private fun initStructure(type: String?, config: JBakeConfiguration) {
+        val init = Init(config)
         try {
-            File templateFolder = FileUtil.getRunningLocation();
-            File outputFolder;
-            if (config.getSourceFolder() != null) {
-                outputFolder = config.getSourceFolder();
+            val templateFolder = FileUtil.getRunningLocation()
+            val outputFolder: File
+            if (config.sourceFolder != null) {
+                outputFolder = config.sourceFolder!!
             } else {
-                outputFolder = new File(".");
+                outputFolder = File(".")
             }
-            init.run(outputFolder, templateFolder, type);
-            System.out.println("Base folder structure successfully created.");
-        } catch (final Exception e) {
-            final String msg = "Failed to initialise structure: " + e.getMessage();
-            throw new JBakeException(SystemExit.INIT_ERROR, msg, e);
+            init.run(outputFolder, templateFolder, type)
+            println("Base folder structure successfully created.")
+        } catch (e: Exception) {
+            val msg = "Failed to initialise structure: " + e.message
+            throw JBakeException(SystemExit.INIT_ERROR, msg, e)
         }
     }
 
-    public JBakeConfigurationFactory getJBakeConfigurationFactory() {
-        return configurationFactory;
+
+    companion object {
+        private const val USAGE_PREFIX = "Usage: jbake"
+        private const val ALT_USAGE_PREFIX = "   or  jbake"
+        private val logger: Logger = LoggerFactory.getLogger("jbake")
+
+        /**
+         * Runs the app with the given arguments.
+         *
+         * @param args Application arguments
+         */
+        @JvmStatic
+        fun main(args: Array<String>) {
+            try {
+                Main().run(args)
+            } catch (e: JBakeException) {
+                logger.error(e.message)
+                logger.trace(e.message, e)
+                if (e.cause is CommandLine.MissingParameterException) {
+                    printUsage()
+                }
+                System.exit(e.getExit())
+            }
+        }
+
+        fun printUsage() {
+            CommandLine.usage(LaunchOptions(), System.out)
+        }
     }
-
-    public void setJBakeConfigurationFactory(JBakeConfigurationFactory factory) {
-        configurationFactory = factory;
-    }
-
-
 }

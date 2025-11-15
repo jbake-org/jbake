@@ -1,36 +1,33 @@
-package org.jbake.app.configuration;
+package org.jbake.app.configuration
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TimeZone;
+import java.io.File
+import java.util.*
 
 /**
  * JBakeConfiguration gives you access to the project configuration. Typically located in a file called jbake.properties.
  *
- * Use one of {@link JBakeConfigurationFactory} methods to create an instance.
+ * Use one of [JBakeConfigurationFactory] methods to create an instance.
  */
-public interface JBakeConfiguration {
-
+interface JBakeConfiguration {
     /**
      * Get property value by a given key from the configuration
      *
      * @param key a key for the property like site.host
      * @return the value of the property
      */
-    Object get(String key);
+    fun get(key: String?): Any?
 
     /**
-     * @return Output filename for archive file, is only used when {@link #getRenderArchive()} is true
+     * @return Output filename for archive file, is only used when [.getRenderArchive] is true
      */
-    String getArchiveFileName();
+    //@JvmField
+    val archiveFileName: String?
 
     /**
      * @return attributes to be set when processing input
      */
-    List<String> getAsciidoctorAttributes();
+    ////@JvmField
+    val asciidoctorAttributes: MutableList<String>?
 
     /**
      * Get an asciidoctor option by it's key
@@ -38,113 +35,131 @@ public interface JBakeConfiguration {
      * @param optionKey an option key
      * @return the value of the option key
      */
-    Object getAsciidoctorOption(String optionKey);
+    fun getAsciidoctorOption(optionKey: String?): Any?
 
     /**
      * Get a list of asciidoctor options
      *
      * @return list of asciidoctor options
      */
-    List<String> getAsciidoctorOptionKeys();
+    //@JvmField
+    val asciidoctorOptionKeys: MutableList<String?>?
 
     /**
      * @return the folder where assets are stored, they are copied directly in output folder and not processed
      */
-    File getAssetFolder();
+    //@JvmField
+    val assetFolder: File
 
     /**
      * @return name of folder for assets
      */
-    String getAssetFolderName();
+    //@JvmField
+    val assetFolderName: String?
 
     /**
      * @return Flag indicating if hidden asset resources should be ignored
      */
-    boolean getAssetIgnoreHidden();
+    //@JvmField
+    val assetIgnoreHidden: Boolean
 
     /**
      * @return Prefix to be used when exporting JBake properties to Asciidoctor
      */
-    String getAttributesExportPrefixForAsciidoctor();
+    //@JvmField
+    val attributesExportPrefixForAsciidoctor: String?
 
     /**
      * @return Timestamp that records when JBake build was made
      */
-    String getBuildTimeStamp();
+    //@JvmField
+    val buildTimeStamp: String?
 
     /**
      * @return Flag indicating to flash the database cache
      */
-    boolean getClearCache();
+    //@JvmField
+    val clearCache: Boolean
 
     /**
      * @return the content folder
      */
-    File getContentFolder();
+    //@JvmField
+    val contentFolder: File
 
     /**
      * @return name of Folder where content (that's to say files to be transformed) resides in
      */
-    String getContentFolderName();
+    //@JvmField
+    val contentFolderName: String?
 
     /**
      * @return the data folder
      */
-    File getDataFolder();
+    //@JvmField
+    val dataFolder: File?
 
     /**
      * @return name of Folder where data files reside in
      */
-    String getDataFolderName();
+    val dataFolderName: String?
 
     /**
      * @return docType for data files
      */
-    String getDataFileDocType();
+    //@JvmField
+    val dataFileDocType: String?
 
     /**
      * @return Folder to store database files in
      */
-    String getDatabasePath();
+    //@JvmField
+    val databasePath: String?
 
     /**
      * @return name to identify if database is kept in memory (memory) or persisted to disk (plocal)
      */
-    String getDatabaseStore();
+    //@JvmField
+    val databaseStore: String?
 
     /**
      * @return How date is formated
      */
-    String getDateFormat();
+    //@JvmField
+    val dateFormat: String?
 
     /**
      * @return Default status to use (in order to avoid putting it in all files)
      */
-    String getDefaultStatus();
+    //@JvmField
+    val defaultStatus: String?
 
     /**
      * @return Default type to use (in order to avoid putting it in all files)
      */
-    String getDefaultType();
+    //@JvmField
+    val defaultType: String?
 
     /**
      * @return The destination folder to render and copy files to
      */
-    File getDestinationFolder();
+    //@JvmField
+    var destinationFolder: File?
 
-    void setDestinationFolder(File destination);
-
-    List<String> getDocumentTypes();
+    //@JvmField
+    val documentTypes: MutableList<String?>?
 
     /**
      * @return Suffix used to identify draft files
      */
-    String getDraftSuffix();
+    //@JvmField
+    val draftSuffix: String?
 
     /**
-     * @return Output filename for error404 file, is only used when {@link #getRenderError404()} is true
+     * @return Output filename for error404 file, is only used when [.getRenderError404] is true
      */
-    String getError404FileName();
+    //@JvmField
+    val error404FileName: String?
 
     /**
      * Get name for example project name by given template type
@@ -152,192 +167,227 @@ public interface JBakeConfiguration {
      * @param templateType a template type
      * @return example project name
      */
-    String getExampleProjectByType(String templateType);
+    fun getExampleProjectByType(templateType: String?): String?
 
     /**
      * @return Flag indicating if JBake properties should be made available to Asciidoctor
      */
-    boolean getExportAsciidoctorAttributes();
+    //@JvmField
+    val exportAsciidoctorAttributes: Boolean
 
     /**
-     * @return Output filename for feed file, is only used when {@link #getRenderFeed()} is true
+     * @return Output filename for feed file, is only used when [.getRenderFeed] is true
      */
-    String getFeedFileName();
+    //@JvmField
+    val feedFileName: String?
 
 
     /**
      * @return String used to separate the header from the body
      */
-    String getHeaderSeparator();
+    //@JvmField
+    val headerSeparator: String?
 
     /**
      * @return Filename to use to ignore a directory in addition to ".jbakeignore"
      */
-    String getIgnoreFileName();
+    //@JvmField
+    val ignoreFileName: String?
 
     /**
-     * @return Output filename for index, is only used when {@link #getRenderIndex()} is true
+     * @return Output filename for index, is only used when [.getRenderIndex] is true
      */
-    String getIndexFileName();
+    //@JvmField
+    val indexFileName: String?
 
     /**
      * Get an iterator of available configuration keys
      *
      * @return an iterator of configuration keys
      */
-    Iterator<String> getKeys();
+    //@JvmField
+    val keys: MutableIterator<String?>?
 
     /**
      * A list of markdown extensions
-     * <p>
-     * <code>markdown.extension=HARDWRAPS,AUTOLINKS,FENCED_CODE_BLOCKS,DEFINITIONS</code>
+     *
+     *
+     * `markdown.extension=HARDWRAPS,AUTOLINKS,FENCED_CODE_BLOCKS,DEFINITIONS`
      *
      * @return list of markdown extensions as string
      */
-    List<String> getMarkdownExtensions();
+    //@JvmField
+    val markdownExtensions: MutableList<String?>?
 
     /**
      * @return file extension to be used for all output files
      */
-    String getOutputExtension();
+    //@JvmField
+    val outputExtension: String?
 
-    String getOutputExtensionByDocType(String docType);
+    fun getOutputExtensionByDocType(docType: String?): String?
 
     /**
      * @return Flag indicating if there should be pagination when rendering index
      */
-    boolean getPaginateIndex();
+    //@JvmField
+    val paginateIndex: Boolean
 
     /**
      * @return How many posts per page on index
      */
-    int getPostsPerPage();
+    //@JvmField
+    val postsPerPage: Int
 
     /**
      * @return URI prefix for content that should be given extension-less output URI's
      */
-    String getPrefixForUriWithoutExtension();
+    //@JvmField
+    val prefixForUriWithoutExtension: String?
 
     /**
      * @return Flag indicating if archive file should be generated
      */
-    boolean getRenderArchive();
+    //@JvmField
+    val renderArchive: Boolean
 
     /**
      * @return Encoding used when rendering files
      */
-    String getRenderEncoding();
+    //@JvmField
+    val renderEncoding: String?
 
     /**
      * @return Output encoding for freemarker url escaping
      */
-    String getOutputEncoding();
+    //@JvmField
+    val outputEncoding: String?
 
     /**
      * @return Flag indicating if error404 file should be generated
      */
-    boolean getRenderError404();
+    //@JvmField
+    val renderError404: Boolean
 
     /**
      * @return Flag indicating if feed file should be generated
      */
-    boolean getRenderFeed();
+    //@JvmField
+    val renderFeed: Boolean
 
     /**
      * @return Flag indicating if index file should be generated
      */
-    boolean getRenderIndex();
+    //@JvmField
+    val renderIndex: Boolean
 
     /**
      * @return Flag indicating if sitemap file should be generated
      */
-    boolean getRenderSiteMap();
+    //@JvmField
+    val renderSiteMap: Boolean
 
     /**
      * @return Flag indicating if tag files should be generated
      */
-    boolean getRenderTags();
+    //@JvmField
+    val renderTags: Boolean
 
     /**
      * @return Flag indicating if tag index file should be generated
      */
-    boolean getRenderTagsIndex();
+    //@JvmField
+    val renderTagsIndex: Boolean
 
     /**
      * @return Flag indicating if the tag value should be sanitized
      */
-    boolean getSanitizeTag();
+    //@JvmField
+    val sanitizeTag: Boolean
 
     /**
      * @return Port used when running Jetty server
      */
-    int getServerPort();
+    //@JvmField
+    val serverPort: Int
 
     /**
      * @return the host url of the site e.g. http://jbake.org
      */
-    String getSiteHost();
+    //@JvmField
+    val siteHost: String?
 
     /**
-     * @return Sitemap template file name. Used only when {@link #getRenderSiteMap()} is set to true
+     * @return Sitemap template file name. Used only when [.getRenderSiteMap] is set to true
      */
-    String getSiteMapFileName();
+    //@JvmField
+    val siteMapFileName: String?
 
     /**
      * @return the source folder of the project
      */
-    File getSourceFolder();
+    //@JvmField
+    val sourceFolder: File?
 
     /**
-     * @return Tags output path, used only when {@link #getRenderTags()} is true
+     * @return Tags output path, used only when [.getRenderTags] is true
      */
-    String getTagPathName();
+    //@JvmField
+    val tagPathName: String?
 
     /**
      * @return Encoding to be used for template files
      */
-    String getTemplateEncoding();
+    //@JvmField
+    val templateEncoding: String?
 
-    String getTemplateByDocType(String doctype);
+    fun getTemplateByDocType(doctype: String?): String?
 
-    File getTemplateFileByDocType(String doctype);
+    fun getTemplateFileByDocType(doctype: String?): File?
 
     /**
      * @return the template folder
      */
-    File getTemplateFolder();
+    //@JvmField
+    val templateFolder: File?
 
     /**
      * @return name of folder where template files are looked for
      */
-    String getTemplateFolderName();
+    //@JvmField
+    val templateFolderName: String?
 
     /**
      * @return Locale used for Thymeleaf template rendering
      */
-    String getThymeleafLocale();
+    //@JvmField
+    val thymeleafLocale: String?
 
     /**
      * @return Flag indicating if content matching prefix below should be given extension-less URI's
      */
-    boolean getUriWithoutExtension();
+    //@JvmField
+    val uriWithoutExtension: Boolean
 
     /**
-     * @return Flag indicating if image paths should be prepended with {@link #getSiteHost()} value - only has an effect if
-     * {@link #getImgPathUpdate()} is set to true
+     * @return Flag indicating if image paths should be prepended with [.getSiteHost] value - only has an effect if
+     * [.getImgPathUpdate] is set to true
      */
-    boolean getImgPathPrependHost();
+    //@JvmField
+    val imgPathPrependHost: Boolean
 
     /**
      * @return Flag indicating if image paths in content should be updated with absolute path (using URI value of content file),
-     * see {@link #getImgPathUpdate()} which allows you to control the absolute path used
+     * see [.getImgPathUpdate] which allows you to control the absolute path used
      */
-    boolean getImgPathUpdate();
+    //@JvmField
+    val imgPathUpdate: Boolean
 
     /**
      * @return Version of JBake
      */
-    String getVersion();
+    //@JvmField
+    val version: String?
 
     /**
      * Set a property value for the given key
@@ -345,39 +395,45 @@ public interface JBakeConfiguration {
      * @param key   the key for the property
      * @param value the value of the property
      */
-    void setProperty(String key, Object value);
+    fun setProperty(key: String?, value: Any?)
 
     /**
      *
      * @param type the documents type
-     * @return the the thymeleaf render mode ( defaults to {@link DefaultJBakeConfiguration#DEFAULT_TYHMELEAF_TEMPLATE_MODE} )
+     * @return the the thymeleaf render mode ( defaults to [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE] )
      */
-    String getThymeleafModeByType(String type);
+    fun getThymeleafModeByType(type: String?): String?
 
-    String getServerContextPath();
+    //@JvmField
+    val serverContextPath: String?
 
-    String getServerHostname();
+    //@JvmField
+    val serverHostname: String?
 
     /**
      * @return Abbreviated hash of latest git commit
      */
-    String getAbbreviatedGitHash();
+    //@JvmField
+    val abbreviatedGitHash: String?
 
     /**
      * @return Locale to set in the JVM
      */
-    String getJvmLocale();
+    //@JvmField
+    val jvmLocale: String?
 
     /**
      *
      * @return TimeZone to use within Freemarker
      */
-    TimeZone getFreemarkerTimeZone();
+    //@JvmField
+    val freemarkerTimeZone: TimeZone?
 
-    Map<String, Object> asHashMap();
+    fun asHashMap(): MutableMap<String?, Any?>?
 
-    List<Property> getJbakeProperties();
+    //@JvmField
+    val jbakeProperties: MutableList<Property?>?
 
-    void addConfiguration(Properties properties);
+    fun addConfiguration(properties: Properties?)
 }
 

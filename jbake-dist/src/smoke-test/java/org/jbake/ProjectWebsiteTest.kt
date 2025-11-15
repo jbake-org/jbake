@@ -1,72 +1,69 @@
-package org.jbake;
+package org.jbake
 
-import org.apache.commons.vfs2.util.Os;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.apache.commons.vfs2.util.Os
+import org.assertj.core.api.Assertions
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.errors.GitAPIException
+import org.junit.Assume
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import java.io.File
+import java.io.IOException
 
-import java.io.File;
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class ProjectWebsiteTest {
-
-
-    private static final String WEBSITE_REPO_URL = "https://github.com/jbake-org/jbake.org.git";
-
+class ProjectWebsiteTest {
     @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-    private File projectFolder;
-    private File outputFolder;
-    private String jbakeExecutable;
-    private BinaryRunner runner;
+    var folder: TemporaryFolder = TemporaryFolder()
+    private var projectFolder: File? = null
+    private var outputFolder: File? = null
+    private var jbakeExecutable: String? = null
+    private var runner: BinaryRunner? = null
 
     @Before
-    public void setup() throws IOException, GitAPIException {
-        Assume.assumeTrue("JDK 7 is not supported for this test", !isJava7());
+    @kotlin.Throws(IOException::class, GitAPIException::class)
+    fun setup() {
+        Assume.assumeTrue("JDK 7 is not supported for this test", !this.isJava7)
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
+            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath()
         } else {
-            jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
+            jbakeExecutable = File("build/install/jbake/bin/jbake").getAbsolutePath()
         }
-        projectFolder = folder.newFolder("project");
-        new File(projectFolder, "templates");
-        outputFolder = new File(projectFolder, "output");
+        projectFolder = folder.newFolder("project")
+        File(projectFolder, "templates")
+        outputFolder = File(projectFolder, "output")
 
-        runner = new BinaryRunner(projectFolder);
-        cloneJbakeWebsite();
-
+        runner = BinaryRunner(projectFolder)
+        cloneJbakeWebsite()
     }
 
-    private boolean isJava7() {
-        return System.getProperty("java.specification.version").equals("1.7");
-    }
+    private val isJava7: Boolean
+        get() = System.getProperty("java.specification.version") == "1.7"
 
-    private void cloneJbakeWebsite() throws GitAPIException {
-        CloneCommand cmd = Git.cloneRepository();
-        cmd.setBare(false);
-        cmd.setBranch("master");
-        cmd.setRemote("origin");
-        cmd.setURI(WEBSITE_REPO_URL);
-        cmd.setDirectory(projectFolder);
+    @kotlin.Throws(GitAPIException::class)
+    private fun cloneJbakeWebsite() {
+        val cmd = Git.cloneRepository()
+        cmd.setBare(false)
+        cmd.setBranch("master")
+        cmd.setRemote("origin")
+        cmd.setURI(WEBSITE_REPO_URL)
+        cmd.setDirectory(projectFolder)
 
-        cmd.call();
+        cmd.call()
 
-        assertThat(new File(projectFolder, "README.md").exists()).isTrue();
+        Assertions.assertThat(File(projectFolder, "README.md").exists()).isTrue()
     }
 
     @Test
-    public void shouldBakeWebsite() throws IOException, InterruptedException {
-        Process process = runner.runWithArguments(jbakeExecutable, "-b");
-        assertThat(process.exitValue()).isEqualTo(0);
-        assertThat(new File(outputFolder, "index.html")).exists();
-        process.destroy();
+    @kotlin.Throws(IOException::class, InterruptedException::class)
+    fun shouldBakeWebsite() {
+        val process = runner!!.runWithArguments(jbakeExecutable, "-b")
+        Assertions.assertThat(process.exitValue()).isEqualTo(0)
+        Assertions.assertThat(File(outputFolder, "index.html")).exists()
+        process.destroy()
     }
 
+    companion object {
+        private const val WEBSITE_REPO_URL = "https://github.com/jbake-org/jbake.org.git"
+    }
 }
