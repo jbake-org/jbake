@@ -76,19 +76,19 @@ class Main @JvmOverloads constructor(
         println("JBake " + config.version + " (" + config.buildTimeStamp + " " + config.abbreviatedGitHash + "#) [http://jbake.org]")
         println()
 
-        if (res.isHelpNeeded()) {
+        if (res.isHelpNeeded) {
             printUsage(res)
             // Help was requested, so we are done here
             return
         }
 
-        if (res.isListConfig()) {
+        if (res.isListConfig) {
             val printer = ConfigurationPrinter(config, System.out)
             printer.print()
             return
         }
 
-        if (res.isBake()) {
+        if (res.isBake) {
             baker.bake(config)
         }
 

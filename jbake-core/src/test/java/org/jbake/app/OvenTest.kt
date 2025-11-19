@@ -26,9 +26,7 @@ class OvenTest {
     @TempDir
     var root: Path? = null
 
-    private lateinit var _configuration: DefaultJBakeConfiguration
-    private val configuration: DefaultJBakeConfiguration
-        get() = _configuration
+    private lateinit var configuration: DefaultJBakeConfiguration
     private var sourceFolder: File? = null
     private var contentStore: ContentStore? = null
 
@@ -39,7 +37,7 @@ class OvenTest {
         resetDocumentTypes()
         val output = root!!.resolve("output").toFile()
         sourceFolder = TestUtils.testResourcesAsSourceFolder
-        _configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
+        configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
         configuration.setDestinationFolder(output)
         configuration.setTemplateFolder(File(sourceFolder, "groovyMarkupTemplates"))
         configuration.setProperty("template.paper.file", "paper.tpl")
@@ -69,7 +67,7 @@ class OvenTest {
     @Throws(Exception::class)
     fun shouldBakeWithRelativeCustomPaths() {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
-        _configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
+        configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
         val assetFolder = File(configuration.getDestinationFolder(), "css")
         val aboutFile = File(configuration.getDestinationFolder(), "about.html")
         val blogSubFolder = File(configuration.getDestinationFolder(), "blog")
@@ -116,7 +114,7 @@ class OvenTest {
         fw.write(PropertyList.DESTINATION_FOLDER.key + "=" + TestUtils.getOsPath(expectedDestination))
         fw.close()
 
-        _configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
+        configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
         val assetFolder = File(configuration.getDestinationFolder(), "css")
         val aboutFile = File(configuration.getDestinationFolder(), "about.html")
         val blogSubFolder = File(configuration.getDestinationFolder(), "blog")
