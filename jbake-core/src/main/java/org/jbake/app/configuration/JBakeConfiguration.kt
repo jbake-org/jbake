@@ -15,7 +15,7 @@ interface JBakeConfiguration {
      * @param key a key for the property like site.host
      * @return the value of the property
      */
-    fun get(key: String?): Any?
+    fun get(key: String): Any?
 
     /**
      * @return Output filename for archive file, is only used when [.getRenderArchive] is true
@@ -27,7 +27,7 @@ interface JBakeConfiguration {
      * @return attributes to be set when processing input
      */
     ////@JvmField
-    val asciidoctorAttributes: MutableList<String>?
+    val asciidoctorAttributes: MutableList<String>
 
     /**
      * Get an asciidoctor option by it's key
@@ -35,7 +35,7 @@ interface JBakeConfiguration {
      * @param optionKey an option key
      * @return the value of the option key
      */
-    fun getAsciidoctorOption(optionKey: String?): Any?
+    fun getAsciidoctorOption(optionKey: String): Any?
 
     /**
      * Get a list of asciidoctor options
@@ -43,7 +43,7 @@ interface JBakeConfiguration {
      * @return list of asciidoctor options
      */
     //@JvmField
-    val asciidoctorOptionKeys: MutableList<String?>?
+    val asciidoctorOptionKeys: MutableList<String>
 
     /**
      * @return the folder where assets are stored, they are copied directly in output folder and not processed
@@ -429,10 +429,10 @@ interface JBakeConfiguration {
     //@JvmField
     val freemarkerTimeZone: TimeZone?
 
-    fun asHashMap(): MutableMap<String?, Any?>?
+    fun asHashMap(): MutableMap<String, Any>?
 
     //@JvmField
-    val jbakeProperties: MutableList<Property?>?
+    val jbakeProperties: MutableList<Property>
 
     fun addConfiguration(properties: Properties?)
 }

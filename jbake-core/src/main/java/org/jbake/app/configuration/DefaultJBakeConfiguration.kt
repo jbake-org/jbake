@@ -35,7 +35,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setupPaths()
     }
 
-    override fun get(key: String?): Any? {
+    override fun get(key: String): Any? {
         return compositeConfiguration.getProperty(key)
     }
 
@@ -71,25 +71,25 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return getAsList(PropertyList.ASCIIDOCTOR_ATTRIBUTES.getKey())
     }
 
-    override fun getAsciidoctorOption(optionKey: String?): MutableList<String?>? {
+    override fun getAsciidoctorOption(optionKey: String): Any? {
         val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.getKey())
 
         if (subConfig.containsKey(optionKey)) {
-            return subConfig.getList<String?>(String::class.java, optionKey)
+            return subConfig.get(optionKey)
         } else {
             logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.getKey(), optionKey)
-            return mutableListOf<String?>()
+            return null
         }
     }
 
-    override fun getAsciidoctorOptionKeys(): MutableList<String?> {
-        val options: MutableList<String?> = ArrayList<String?>()
+    override fun getAsciidoctorOptionKeys(): MutableList<String> {
+        val options: MutableList<String> = ArrayList()
         val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.getKey())
 
         val iterator = subConfig.getKeys()
         while (iterator.hasNext()) {
             val key = iterator.next()
-            options.add(key)
+            options.add(key!!)
         }
 
         return options
@@ -238,7 +238,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return getAsString(PropertyList.ERROR404_FILE.getKey())
     }
 
-    override fun getExampleProjectByType(templateType: String?): String {
+    override fun getExampleProjectByType(templateType: String): String {
         return getAsString("example.project." + templateType)
     }
 
@@ -447,7 +447,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(projectKey, fileName)
     }
 
-    override fun setProperty(key: String?, value: Any?) {
+    override fun setProperty(key: String, value: Any?) {
         compositeConfiguration.setProperty(key, value)
     }
 
@@ -464,8 +464,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return getAsString(PropertyList.SERVER_HOSTNAME.getKey())
     }
 
-    override fun asHashMap(): MutableMap<String?, Any?> {
-        val configModel = HashMap<String?, Any?>()
+    override fun asHashMap(): MutableMap<String, Any>? {
+        val configModel = HashMap<String, Any>()
         val configKeys = this.getKeys()
         while (configKeys.hasNext()) {
             val key = configKeys.next()
@@ -476,10 +476,12 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             } else {
                 valueObject = this.get(key)
             }
-            //replace "." in key so you can use dot notation in templates
-            configModel.put(key.replace(".", "_"), valueObject)
+            if (valueObject != null) {
+                //replace "." in key so you can use dot notation in templates
+                configModel[key.replace(".", "_")] = valueObject
+            }
         }
-        return configModel
+        return if (configModel.isEmpty()) null else configModel
     }
 
     fun setTemplateExtensionForDocType(docType: String, extension: String?) {
