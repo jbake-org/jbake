@@ -12,13 +12,15 @@ import java.util.*
  */
 class DocumentList<T> : LinkedList<T>() {
 
-    fun wrap(docs: OResultSet): DocumentList<DocumentModel> {
-        val list = DocumentList<DocumentModel>()
-        while (docs.hasNext()) {
-            val next = docs.next()
-            list.add(DBUtil.documentToModel(next))
+    companion object {
+        fun wrap(docs: OResultSet): DocumentList<DocumentModel> {
+            val list = DocumentList<DocumentModel>()
+            while (docs.hasNext()) {
+                val next = docs.next()
+                list.add(DBUtil.documentToModel(next))
+            }
+            docs.close()
+            return list
         }
-        docs.close()
-        return list
     }
 }

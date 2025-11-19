@@ -50,7 +50,7 @@ class DocumentModel : BaseModel() {
             put(ModelAttributes.SHA1, sha1)
         }
 
-    val sourceuri: String?
+    val sourceUri: String?
         get() = get(ModelAttributes.SOURCE_URI) as String?
 
     fun setSourceUri(uri: String?) {

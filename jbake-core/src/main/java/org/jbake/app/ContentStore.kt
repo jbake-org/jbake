@@ -230,7 +230,7 @@ class ContentStore(private val type: String, private val name: String?) {
 
     fun markContentAsRendered(document: DocumentModel) {
         val statement: String =
-            String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.type, document.getSourceuri())
+            String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.type, document.sourceUri)
         executeCommand(statement)
     }
 
@@ -269,7 +269,7 @@ class ContentStore(private val type: String, private val name: String?) {
             val docs = this.allTagsFromPublishedPosts
             val result: MutableSet<String?> = HashSet<String?>()
             for (document in docs) {
-                val tags = document.getTags()
+                val tags = document.tags
                 Collections.addAll<String?>(result, *tags)
             }
             return result
@@ -278,12 +278,12 @@ class ContentStore(private val type: String, private val name: String?) {
     val allTags: MutableSet<String?>
         get() {
             val result: MutableSet<String?> = HashSet<String?>()
-            for (docType in DocumentTypes.getDocumentTypes()) {
+            for (docType in DocumentTypes.documentTypes) {
                 val statement: String =
                     String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType)
                 val docs = query(statement)
                 for (document in docs) {
-                    val tags = document.getTags()
+                    val tags = document.tags
                     Collections.addAll<String?>(result, *tags)
                 }
             }
@@ -314,7 +314,7 @@ class ContentStore(private val type: String, private val name: String?) {
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1)
     }
 
-    fun updateAndClearCacheIfNeeded(needed: Boolean, templateFolder: File?) {
+    fun updateAndClearCacheIfNeeded(needed: Boolean, templateFolder: File) {
         var clearCache = needed
 
         if (!needed) {
@@ -327,7 +327,7 @@ class ContentStore(private val type: String, private val name: String?) {
         }
     }
 
-    private fun updateTemplateSignatureIfChanged(templateFolder: File?): Boolean {
+    private fun updateTemplateSignatureIfChanged(templateFolder: File): Boolean {
         var templateSignatureChanged = false
 
         val docs = this.signaturesForTemplates
@@ -338,7 +338,7 @@ class ContentStore(private val type: String, private val name: String?) {
             currentTemplatesSignature = ""
         }
         if (!docs.isEmpty()) {
-            val sha1 = docs.get(0).getSha1()
+            val sha1 = docs.get(0).sha1
             if (sha1 != currentTemplatesSignature) {
                 this.updateSignatures(currentTemplatesSignature)
                 templateSignatureChanged = true
@@ -352,7 +352,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     private fun deleteAllDocumentTypes() {
-        for (docType in DocumentTypes.getDocumentTypes()) {
+        for (docType in DocumentTypes.documentTypes) {
             try {
                 this.deleteAllByDocType(docType)
             } catch (e: Exception) {

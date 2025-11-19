@@ -60,7 +60,7 @@ class LaunchOptions {
     val isListConfig: Boolean = false
 
     val template: String?
-        get() = initGroup.template
+        get() = initGroup?.template
 
     fun getSource(): File {
         if (this.sourceValue != null) {
@@ -99,7 +99,7 @@ class LaunchOptions {
             description = ["initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)"],
             required = true
         )
-        private val init = false
+        val init = false
 
         @CommandLine.Option(
             names = ["-t", "--template"],
