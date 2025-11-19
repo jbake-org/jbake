@@ -52,6 +52,27 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-test-sources</phase>
+                        <goals><goal>add-test-source</goal></goals>
+                        <configuration><sources><source>src/smoke-test/java</source></sources></configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-resource</id>
+                        <phase>generate-test-resources</phase>
+                        <goals><goal>add-test-resource</goal></goals>
+                        <configuration>
+                            <resources><resource><directory>src/smoke-test/resources</directory></resource></resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.6.0</version>
@@ -145,16 +166,14 @@
                 <configuration>
                     <includes>
                         <include>**/*SmokeTest.java</include>
+                        <include>**/*SmokeTest.kt</include>
+                        <include>**/*IT.java</include>
+                        <include>**/*IT.kt</include>
                     </includes>
                     <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine>
                 </configuration>
                 <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
+                    <execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution>
                 </executions>
             </plugin>
         </plugins>
