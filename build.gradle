@@ -8,23 +8,8 @@ plugins {
     id "eclipse"
     id "idea"
     id 'org.jetbrains.kotlin.jvm'
-    id 'maven-publish'
 }
 
-publishing {
-    publications {
-        customLibrary(MavenPublication) {
-            from components.java
-        }
-    }
-
-    repositories {
-        maven {
-            name = 'sampleRepo'
-            url = layout.buildDirectory.dir("repo")
-        }
-    }
-}
 
 def buildTimeAndDate = grgit.head().dateTime
 
