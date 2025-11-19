@@ -42,31 +42,32 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val archiveFileName: String?
         get() = getAsString(PropertyList.ARCHIVE_FILE.key, null)
 
-    private fun getAsBoolean(key: String?): Boolean {
+    private fun getAsBoolean(key: String): Boolean {
         return compositeConfiguration.getBoolean(key, false)
     }
 
-    private fun getAsFolder(key: String?): File? {
+    private fun getAsFolder(key: String): File? {
         return get(key) as File?
     }
 
-    private fun getAsInt(key: String?, defaultValue: Int): Int {
+    private fun getAsInt(key: String, defaultValue: Int): Int {
         return compositeConfiguration.getInt(key, defaultValue)
     }
 
-    private fun getAsList(key: String?): MutableList<String?>? {
-        return compositeConfiguration.getList<String?>(String::class.java, key)
+    private fun getAsList(key: String): MutableList<String> {
+        val list = compositeConfiguration.getList<String>(String::class.java, key)
+        return list?.filterNotNull()?.toMutableList() ?: mutableListOf()
     }
 
-    private fun getAsString(key: String?): String {
-        return compositeConfiguration.getString(key)
+    private fun getAsString(key: String): String {
+        return compositeConfiguration.getString(key, "")
     }
 
-    private fun getAsString(key: String?, defaultValue: String?): String? {
+    private fun getAsString(key: String, defaultValue: String?): String? {
         return compositeConfiguration.getString(key, defaultValue)
     }
 
-    fun getAsciidoctorAttributes(): MutableList<String?>? {
+    fun getAsciidoctorAttributes(): MutableList<String> {
         return getAsList(PropertyList.ASCIIDOCTOR_ATTRIBUTES.key)
     }
 
@@ -222,7 +223,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val error404FileName: String
         get() = getAsString(PropertyList.ERROR404_FILE.key)
 
-    fun getExampleProjectByType(templateType: String): String {
+    override fun getExampleProjectByType(templateType: String): String {
         return getAsString("example.project." + templateType)
     }
 
@@ -241,7 +242,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val keys: MutableIterator<String>
         get() = compositeConfiguration.getKeys()
 
-    override val markdownExtensions: MutableList<String?>?
+    override val markdownExtensions: MutableList<String>
         get() = getAsList(PropertyList.MARKDOWN_EXTENSIONS.key)
 
     fun setMarkdownExtensions(vararg extensions: String?) {
@@ -255,7 +256,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.OUTPUT_EXTENSION.key, outputExtension)
     }
 
-    fun getOutputExtensionByDocType(docType: String): String? {
+    override fun getOutputExtensionByDocType(docType: String): String? {
         val templateExtensionKey: String = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_EXTENSION_POSTFIX
         val defaultOutputExtension = outputExtension
         return getAsString(templateExtensionKey, defaultOutputExtension)
@@ -401,11 +402,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(projectKey, fileName)
     }
 
-    fun setProperty(key: String, value: Any?) {
+    override fun setProperty(key: String, value: Any?) {
         compositeConfiguration.setProperty(key, value)
     }
 
-    fun getThymeleafModeByType(type: String): String? {
+    override fun getThymeleafModeByType(type: String): String? {
         val key = "template_" + type + "_thymeleaf_mode"
         return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE)
     }
@@ -416,7 +417,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val serverHostname: String
         get() = getAsString(PropertyList.SERVER_HOSTNAME.key)
 
-    override fun asHashMap(): MutableMap<String, Any>? {
+    override fun asHashMap(): MutableMap<String, Any> {
         val configModel = HashMap<String, Any>()
         val configKeys = this.getKeys()
         while (configKeys.hasNext()) {
@@ -433,7 +434,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
                 configModel[key.replace(".", "_")] = valueObject
             }
         }
-        return if (configModel.isEmpty()) null else configModel
+        return configModel
     }
 
     fun setTemplateExtensionForDocType(docType: String, extension: String?) {
@@ -545,7 +546,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return jbakeKeys
     }
 
-    override fun addConfiguration(properties: Properties?) {
+    override fun addConfiguration(properties: Properties) {
         compositeConfiguration.addConfiguration(MapConfiguration(properties))
     }
 
@@ -555,13 +556,15 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val jvmLocale: String
         get() = getAsString(PropertyList.JVM_LOCALE.key)
 
-    fun getFreemarkerTimeZone(): TimeZone? {
-        val timezone = getAsString(PropertyList.FREEMARKER_TIMEZONE.key)
-        if (StringUtils.isNotEmpty(timezone)) {
-            return TimeZone.getTimeZone(timezone)
+    override val freemarkerTimeZone: TimeZone
+        get() {
+            val timezone = getAsString(PropertyList.FREEMARKER_TIMEZONE.key)
+            return if (StringUtils.isNotEmpty(timezone)) {
+                TimeZone.getTimeZone(timezone)
+            } else {
+                TimeZone.getDefault()
+            }
         }
-        return null
-    }
 
     companion object {
         const val DEFAULT_TYHMELEAF_TEMPLATE_MODE: String = "HTML"

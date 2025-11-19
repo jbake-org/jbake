@@ -145,7 +145,7 @@ interface JBakeConfiguration {
      * @param templateType a template type
      * @return example project name
      */
-    fun getExampleProjectByType(templateType: String?): String?
+    fun getExampleProjectByType(templateType: String): String?
 
     /**
      * @return Flag indicating if JBake properties should be made available to Asciidoctor
@@ -188,14 +188,14 @@ interface JBakeConfiguration {
      *
      * @return list of markdown extensions as string
      */
-    val markdownExtensions: MutableList<String?>?
+    val markdownExtensions: MutableList<String>
 
     /**
      * @return file extension to be used for all output files
      */
     val outputExtension: String?
 
-    fun getOutputExtensionByDocType(docType: String?): String?
+    fun getOutputExtensionByDocType(docType: String): String?
 
     /**
      * @return Flag indicating if there should be pagination when rendering index
@@ -339,14 +339,14 @@ interface JBakeConfiguration {
      * @param key   the key for the property
      * @param value the value of the property
      */
-    fun setProperty(key: String?, value: Any?)
+    fun setProperty(key: String, value: Any?)
 
     /**
      *
      * @param type the documents type
-     * @return the the thymeleaf render mode ( defaults to [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE] )
+     * @return the thymeleaf render mode ( defaults to [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE] )
      */
-    fun getThymeleafModeByType(type: String?): String?
+    fun getThymeleafModeByType(type: String): String?
 
     val serverContextPath: String?
 
@@ -368,10 +368,10 @@ interface JBakeConfiguration {
      */
     val freemarkerTimeZone: TimeZone?
 
-    fun asHashMap(): MutableMap<String, Any>?
+    fun asHashMap(): MutableMap<String, Any>
 
     val jbakeProperties: MutableList<Property>
 
-    fun addConfiguration(properties: Properties?)
+    fun addConfiguration(properties: Properties)
 }
 
