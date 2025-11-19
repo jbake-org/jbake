@@ -43,7 +43,7 @@ class Engines private constructor() {
         parsers = HashMap<String?, ParserEngine?>()
     }
 
-    private fun registerEngine(fileExtension: String?, markupEngine: ParserEngine?) {
+    private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {
         val old = parsers.put(fileExtension, markupEngine)
         if (old != null) {
             LOGGER.warn(
@@ -54,7 +54,7 @@ class Engines private constructor() {
         }
     }
 
-    private fun getEngine(fileExtension: String?): ParserEngine? {
+    private fun getEngine(fileExtension: String): ParserEngine? {
         return parsers.get(fileExtension)
     }
 
@@ -67,11 +67,11 @@ class Engines private constructor() {
             loadEngines()
         }
 
-        fun get(fileExtension: String?): ParserEngine? {
+        fun get(fileExtension: String): ParserEngine? {
             return INSTANCE.getEngine(fileExtension)
         }
 
-        fun register(fileExtension: String?, engine: ParserEngine?) {
+        fun register(fileExtension: String, engine: ParserEngine) {
             INSTANCE.registerEngine(fileExtension, engine)
         }
 
@@ -137,7 +137,9 @@ class Engines private constructor() {
             val engine: ParserEngine? = tryLoadEngine(className)
             if (engine != null) {
                 for (extension in extensions) {
-                    register(extension, engine)
+                    if (extension != null) {
+                        register(extension, engine)
+                    }
                 }
                 if (engine is ErrorEngine) {
                     LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)

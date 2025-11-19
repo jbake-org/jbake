@@ -9,7 +9,7 @@ object DBUtil {
     private var contentStore: ContentStore? = null
 
     @Deprecated("")
-    fun createDataStore(type: String?, name: String?): ContentStore {
+    fun createDataStore(type: String, name: String): ContentStore {
         if (contentStore == null) {
             contentStore = ContentStore(type, name)
         }

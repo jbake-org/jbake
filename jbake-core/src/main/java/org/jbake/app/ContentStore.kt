@@ -224,7 +224,7 @@ class ContentStore(private val type: String, private val name: String?) {
     val unrenderedContent: DocumentList<DocumentModel>
         get() = query(STATEMENT_GET_UNDRENDERED_CONTENT)
 
-    fun deleteContent(uri: String?) {
+    fun deleteContent(uri: String) {
         executeCommand(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, uri)
     }
 
@@ -234,16 +234,16 @@ class ContentStore(private val type: String, private val name: String?) {
         executeCommand(statement)
     }
 
-    private fun updateSignatures(currentTemplatesSignature: String?) {
+    private fun updateSignatures(currentTemplatesSignature: String) {
         executeCommand(STATEMENT_UPDATE_TEMPLATE_SIGNATURE, currentTemplatesSignature)
     }
 
-    fun deleteAllByDocType(docType: String?) {
+    fun deleteAllByDocType(docType: String) {
         val statement = String.format(STATEMENT_DELETE_ALL, docType)
         executeCommand(statement)
     }
 
-    private fun insertTemplatesSignature(currentTemplatesSignature: String?) {
+    private fun insertTemplatesSignature(currentTemplatesSignature: String) {
         executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature)
     }
 

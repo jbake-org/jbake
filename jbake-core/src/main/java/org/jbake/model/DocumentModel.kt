@@ -102,11 +102,11 @@ class DocumentModel : BaseModel() {
             put(ModelAttributes.CACHED, cached)
         }
 
-    fun setNextContent(nextDocumentModel: DocumentModel?) {
+    fun setNextContent(nextDocumentModel: DocumentModel) {
         put(ModelAttributes.NEXT_CONTENT, nextDocumentModel)
     }
 
-    fun setPreviousContent(previousDocumentModel: DocumentModel?) {
+    fun setPreviousContent(previousDocumentModel: DocumentModel) {
         put(ModelAttributes.PREVIOUS_CONTENT, previousDocumentModel)
     }
 

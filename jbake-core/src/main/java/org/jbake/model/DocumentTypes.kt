@@ -40,8 +40,8 @@ object DocumentTypes {
     }
 
     @JvmStatic
-    fun addListener(listener: DocumentTypeListener?) {
-        LISTENERS.add(listener!!)
+    fun addListener(listener: DocumentTypeListener) {
+        LISTENERS.add(listener)
     }
 
     @JvmStatic
@@ -59,7 +59,7 @@ object DocumentTypes {
         }
 
     @JvmStatic
-    fun contains(documentType: String?): Boolean {
+    fun contains(documentType: String): Boolean {
         return DEFAULT_DOC_TYPES.contains(documentType)
     }
 }

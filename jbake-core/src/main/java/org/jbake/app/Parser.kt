@@ -18,7 +18,7 @@ class Parser
  * Creates a new instance of Parser.
  *
  * @param config Project configuration
- */(private val config: JBakeConfiguration?) {
+ */(private val config: JBakeConfiguration) {
     /**
      * Process the file by parsing the contents.
      *

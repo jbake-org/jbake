@@ -56,7 +56,7 @@ class Crawler {
     }
 
     fun crawl() {
-        crawl(config.contentFolder!!)
+        crawl(config.contentFolder)
 
         logger.info("Content detected:")
         for (docType in DocumentTypes.documentTypes) {
@@ -68,7 +68,7 @@ class Crawler {
     }
 
     fun crawlDataFiles() {
-        crawlDataFiles(config.dataFolder!!)
+        crawlDataFiles(config.dataFolder)
 
         logger.info("Data files detected:")
         val docType = config.dataFileDocType
@@ -134,26 +134,25 @@ class Crawler {
                     sb.append("Processing [").append(sourceFile.getPath()).append("]... ")
                     val sha1 = buildHash(sourceFile)
                     val uri = buildDataFileURI(sourceFile)
-                    var process = true
-                    var status = DocumentStatus.NEW
                     val docType = config.dataFileDocType
-                    status = findDocumentStatus(uri, sha1)
-                    if (status == DocumentStatus.UPDATED) {
-                        sb.append(" : modified ")
-                        db.deleteContent(uri)
-                    } else if (status == DocumentStatus.IDENTICAL) {
-                        sb.append(" : same ")
-                        process = false
+                    val status = findDocumentStatus(uri, sha1)
+
+                    when (status) {
+                        DocumentStatus.UPDATED -> {
+                            sb.append(" : modified ")
+                            db.deleteContent(uri)
+                        }
+                        DocumentStatus.IDENTICAL -> {
+                            sb.append(" : same ")
+                            logger.info("{}", sb)
+                            continue
+                        }
+                        DocumentStatus.NEW -> {
+                            sb.append(" : new ")
+                        }
                     }
-                    if (!process) {
-                        break
-                    }
-                    if (DocumentStatus.NEW == status) {
-                        sb.append(" : new ")
-                    }
-                    if (process) { // new or updated
-                        crawlDataFile(sourceFile, sha1, uri, docType)
-                    }
+
+                    crawlDataFile(sourceFile, sha1, uri, docType)
                     logger.info("{}", sb)
                 }
                 if (sourceFile.isDirectory()) {
@@ -167,7 +166,7 @@ class Crawler {
         var sha1: String
         try {
             sha1 = FileUtil.sha1(sourceFile)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             logger.error("unable to build sha1 hash for source file '{}'", sourceFile)
             sha1 = ""
         }
@@ -214,7 +213,7 @@ class Crawler {
         }
     }
 
-    private fun createNoExtensionUri(uri: String?): String {
+    private fun createNoExtensionUri(uri: String): String {
         try {
             return (FileUtil.URI_SEPARATOR_CHAR
                     + FilenameUtils.getPath(uri)
@@ -311,7 +310,7 @@ class Crawler {
         if (!match.isEmpty()) {
             val document = match.get(0)
             val oldHash = document.sha1
-            if (oldHash != sha1 || !document.rendered) {
+            if (oldHash != sha1 || document.rendered == false) {
                 return DocumentStatus.UPDATED
             } else {
                 return DocumentStatus.IDENTICAL

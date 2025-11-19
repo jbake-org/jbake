@@ -45,7 +45,7 @@ class ConfigurationPrinter(private val configuration: JBakeConfiguration, privat
         out.printf("%1\$s: %2$-40s%n%n", key, value)
     }
 
-    private fun leftFillWithDots(value: String?): String {
+    private fun leftFillWithDots(value: String): String {
         return String.format("%1$-40s", value).replace(' ', '.')
     }
 }

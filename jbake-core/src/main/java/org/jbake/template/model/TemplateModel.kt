@@ -32,21 +32,29 @@ open class TemplateModel : BaseModel {
             put(ModelAttributes.RENDERER, renderingEngine)
         }
 
-    fun setNumberOfPages(numberOfPages: Int) {
-        put(ModelAttributes.NUMBER_OF_PAGES, numberOfPages)
-    }
+    var numberOfPages: Int
+        get() = get(ModelAttributes.NUMBER_OF_PAGES) as Int? ?: 0
+        set(numberOfPages) {
+            put(ModelAttributes.NUMBER_OF_PAGES, numberOfPages)
+        }
 
-    fun setCurrentPageNuber(currentPageNumber: Int) {
-        put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber)
-    }
+    var currentPageNumber: Int
+        get() = get(ModelAttributes.CURRENT_PAGE_NUMBERS) as Int? ?: 0
+        set(currentPageNumber) {
+            put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber)
+        }
 
-    fun setPreviousFilename(previousFilename: String?) {
-        put(ModelAttributes.PREVIOUS_FILENAME, previousFilename)
-    }
+    var previousFilename: String
+        get() = get(ModelAttributes.PREVIOUS_FILENAME) as String? ?: ""
+        set(previousFilename) {
+            put(ModelAttributes.PREVIOUS_FILENAME, previousFilename)
+        }
 
-    fun setNextFileName(nextFilename: String?) {
-        put(ModelAttributes.NEXT_FILENAME, nextFilename)
-    }
+    var nextFileName: String
+        get() = get(ModelAttributes.NEXT_FILENAME) as String? ?: ""
+        set(nextFileName) {
+            put(ModelAttributes.NEXT_FILENAME, nextFileName)
+        }
 
     var tag: String?
         get() = get(ModelAttributes.TAG) as String?
@@ -54,17 +62,23 @@ open class TemplateModel : BaseModel {
             put(ModelAttributes.TAG, tag)
         }
 
-    fun setTaggedPosts(taggedPosts: DocumentList<*>?) {
-        put(ModelAttributes.TAGGED_POSTS, taggedPosts)
-    }
+    var taggedPosts: DocumentList<*>?
+        get() = get(ModelAttributes.TAGGED_POSTS) as DocumentList<*>?
+        set(taggedPosts) {
+            put(ModelAttributes.TAGGED_POSTS, taggedPosts)
+        }
 
-    fun setTaggedDocuments(taggedDocuments: DocumentList<*>?) {
-        put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments)
-    }
+    var taggedDocuments: DocumentList<*>?
+        get() = get(ModelAttributes.TAGGED_DOCUMENTS) as DocumentList<*>?
+        set(taggedDocuments) {
+            put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments)
+        }
 
-    fun setVersion(version: String?) {
-        put(ModelAttributes.VERSION, version)
-    }
+    var version: String?
+        get() = get(ModelAttributes.VERSION) as String?
+        set(version) {
+            put(ModelAttributes.VERSION, version)
+        }
 
     val writer: Writer?
         get() = get(ModelAttributes.OUT) as Writer?

@@ -8,7 +8,7 @@ import java.util.*
  *
  * @author Cédric Champeau
  */
-class ErrorEngine @JvmOverloads constructor(private val engineName: String? = "unknown") : MarkupEngine() {
+class ErrorEngine @JvmOverloads constructor(private val engineName: String = "unknown") : MarkupEngine() {
     override fun processHeader(context: ParserContext) {
         val documentModel = context.getDocumentModel()
         documentModel.setType("post")

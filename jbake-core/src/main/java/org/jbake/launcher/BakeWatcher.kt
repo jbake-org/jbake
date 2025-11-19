@@ -42,14 +42,14 @@ class BakeWatcher {
     fun start(config: JBakeConfiguration) {
         try {
             val fsMan = VFS.getManager()
-            val listenPath = fsMan.resolveFile(config.contentFolder!!.toURI())
-            val templateListenPath = fsMan.resolveFile(config.templateFolder!!.toURI())
-            val assetPath = fsMan.resolveFile(config.assetFolder!!.toURI())
-            val dataPath = fsMan.resolveFile(config.dataFolder!!.toURI())
+            val listenPath = fsMan.resolveFile(config.contentFolder.toURI())
+            val templateListenPath = fsMan.resolveFile(config.templateFolder.toURI())
+            val assetPath = fsMan.resolveFile(config.assetFolder.toURI())
+            val dataPath = fsMan.resolveFile(config.dataFolder.toURI())
 
             logger.info(
                 "Watching for (content, data, template, asset) changes in [{}]",
-                config.sourceFolder!!.getPath()
+                config.sourceFolder.getPath()
             )
             val monitor = DefaultFileMonitor(CustomFSChangeListener(config))
             monitor.setRecursive(true)

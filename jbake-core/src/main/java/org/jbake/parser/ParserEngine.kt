@@ -14,7 +14,7 @@ interface ParserEngine {
      * @param file   The file to be parsed
      * @return A model representation of the given file
      */
-    fun parse(config: JBakeConfiguration?, file: File?): DocumentModel?
+    fun parse(config: JBakeConfiguration, file: File): DocumentModel?
 
     /**
      * @param config      The project configuration

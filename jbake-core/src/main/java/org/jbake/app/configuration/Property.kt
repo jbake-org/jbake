@@ -3,12 +3,12 @@ package org.jbake.app.configuration
 import java.util.*
 
 class Property @JvmOverloads constructor(
-    @JvmField val key: String?,
+    @JvmField val key: String,
     @JvmField val description: String?,
-    @JvmField val group: Group? = Group.DEFAULT
-) : Comparable<Property?> {
+    @JvmField val group: Group = Group.DEFAULT
+) : Comparable<Property> {
     override fun toString(): String {
-        return this.key!!
+        return this.key
     }
 
     override fun equals(o: Any?): Boolean {
@@ -28,10 +28,10 @@ class Property @JvmOverloads constructor(
     }
 
     override fun compareTo(other: Property): Int {
-        var result = this.group!!.compareTo(other.group!!)
+        var result = this.group.compareTo(other.group)
 
         if (result == 0) {
-            result = this.key!!.compareTo(other.key!!)
+            result = this.key.compareTo(other.key)
         }
         return result
     }

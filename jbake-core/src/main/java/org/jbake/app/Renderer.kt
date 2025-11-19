@@ -246,7 +246,7 @@ class Renderer {
      * @see [Sitemap protocol](http://www.sitemaps.org/)
      */
     @Throws(Exception::class)
-    fun renderSitemap(sitemapFile: String?) {
+    fun renderSitemap(sitemapFile: String) {
         render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
     }
 
@@ -257,7 +257,7 @@ class Renderer {
      * @throws Exception if default rendering configuration is not loaded correctly
      */
     @Throws(Exception::class)
-    fun renderFeed(feedFile: String?) {
+    fun renderFeed(feedFile: String) {
         render(DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME))
     }
 
@@ -268,7 +268,7 @@ class Renderer {
      * @throws Exception if default rendering configuration is not loaded correctly
      */
     @Throws(Exception::class)
-    fun renderArchive(archiveFile: String?) {
+    fun renderArchive(archiveFile: String) {
         render(DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME))
     }
 
@@ -279,7 +279,7 @@ class Renderer {
      * @throws Exception    if default rendering configuration is not loaded correctly
      */
     @Throws(Exception::class)
-    fun renderError404(errorFile: String?) {
+    fun renderError404(errorFile: String) {
         render(DefaultRenderingConfig(errorFile, ERROR404_TEMPLATE_NAME))
     }
 
@@ -291,7 +291,7 @@ class Renderer {
      * @throws Exception if cannot render tags correctly
      */
     @Throws(Exception::class)
-    fun renderTags(tagPath: String?): Int {
+    fun renderTags(tagPath: String): Int {
         var renderedCount = 0
         val errors: MutableList<Throwable> = LinkedList<Throwable>()
 

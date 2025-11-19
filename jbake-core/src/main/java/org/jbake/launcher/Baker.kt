@@ -23,12 +23,12 @@ class Baker {
             options.getSource(),
             options.getDestination(),
             config,
-            options.isClearCache()
+            options.clearCache
         )
         bake(configuration)
     }
 
-    fun bake(config: JBakeConfiguration?) {
+    fun bake(config: JBakeConfiguration) {
         val oven = Oven(config)
         oven.bake()
 

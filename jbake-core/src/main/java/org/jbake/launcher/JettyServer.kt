@@ -23,12 +23,12 @@ class JettyServer : Closeable {
     private var server: Server? = null
 
     @Deprecated("")
-    fun run(resourceBase: String?, port: String) {
+    fun run(resourceBase: String, port: String) {
         LOGGER.warn("DEPRECATED. This method will be removed in the next major release. Use run(String resourceBase, JBakeConfiguration config) instead.")
         run(resourceBase, "/", "localhost", port.toInt())
     }
 
-    fun run(resourceBase: String?, configuration: JBakeConfiguration) {
+    fun run(resourceBase: String, configuration: JBakeConfiguration) {
         run(resourceBase, configuration.serverContextPath, configuration.serverHostname, configuration.serverPort)
     }
 
@@ -38,7 +38,7 @@ class JettyServer : Closeable {
      * @param resourceBase Base directory for resources to be served
      * @param port         Required server port
      */
-    private fun run(resourceBase: String?, contextPath: String?, hostname: String?, port: Int) {
+    private fun run(resourceBase: String, contextPath: String, hostname: String, port: Int) {
         try {
             server = Server()
             val connector = ServerConnector(server)

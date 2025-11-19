@@ -131,13 +131,13 @@ class Asset {
     private fun assetSubPath(asset: File): String {
         // First, strip asset folder from file path
         var targetFolder =
-            asset.getCanonicalPath().replace(config.assetFolder!!.getCanonicalPath() + File.separatorChar, "")
+            asset.getCanonicalPath().replace(config.assetFolder.getCanonicalPath() + File.separatorChar, "")
         // And just to be sure, let's also remove the content folder, as some assets are copied from here.
-        targetFolder = targetFolder.replace(config.contentFolder!!.getCanonicalPath() + File.separatorChar, "")
+        targetFolder = targetFolder.replace(config.contentFolder.getCanonicalPath() + File.separatorChar, "")
         return targetFolder
     }
 
-    private fun copy(sourceFolder: File, targetFolder: File?, filter: FileFilter?) {
+    private fun copy(sourceFolder: File, targetFolder: File, filter: FileFilter) {
         val assets = sourceFolder.listFiles(filter)
         if (assets != null) {
             Arrays.sort(assets)

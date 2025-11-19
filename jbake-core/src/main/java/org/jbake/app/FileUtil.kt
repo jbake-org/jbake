@@ -143,8 +143,8 @@ object FileUtil {
         return accept
     }
 
-    fun isExistingFolder(f: File?): Boolean {
-        return null != f && f.exists() && f.isDirectory()
+    fun isExistingFolder(f: File): Boolean {
+        return f.exists() && f.isDirectory()
     }
 
     @JvmStatic

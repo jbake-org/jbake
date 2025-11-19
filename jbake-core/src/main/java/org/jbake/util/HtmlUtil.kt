@@ -51,7 +51,7 @@ object HtmlUtil {
         return uri
     }
 
-    private fun transformImageSource(img: Element, uri: String?, siteHost: String, prependSiteHost: Boolean) {
+    private fun transformImageSource(img: Element, uri: String, siteHost: String, prependSiteHost: Boolean) {
         var siteHost = siteHost
         var source = img.attr("src")
 

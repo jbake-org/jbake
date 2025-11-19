@@ -39,7 +39,7 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         this.renderers = TemplateEngines(this.config, db)
     }
 
-    constructor(db: ContentStore?, config: JBakeConfiguration?) : super(config, db) {
+    constructor(db: ContentStore, config: JBakeConfiguration) : super(config, db) {
         this.renderers = TemplateEngines(config, db)
     }
 
