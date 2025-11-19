@@ -97,7 +97,7 @@ interface JBakeConfiguration {
      * @return the data folder
      */
     //@JvmField
-    val dataFolder: File?
+    val dataFolder: File
 
     /**
      * @return name of Folder where data files reside in
@@ -349,7 +349,7 @@ interface JBakeConfiguration {
      * @return the template folder
      */
     //@JvmField
-    val templateFolder: File?
+    val templateFolder: File
 
     /**
      * @return name of folder where template files are looked for

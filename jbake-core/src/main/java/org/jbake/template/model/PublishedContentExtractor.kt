@@ -9,7 +9,7 @@ import org.jbake.template.ModelExtractor
 class PublishedContentExtractor : ModelExtractor<DocumentList<*>?> {
     override fun get(db: ContentStore, model: MutableMap<*, *>?, key: String?): DocumentList<*> {
         val publishedContent = DocumentList<DocumentModel>()
-        val documentTypes = DocumentTypes.getDocumentTypes()
+        val documentTypes = DocumentTypes.documentTypes
         for (docType in documentTypes) {
             val query = db.getPublishedContent(docType)
             publishedContent.addAll(query!!)

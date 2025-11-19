@@ -98,7 +98,7 @@ class Renderer {
         this.db = db
     }
 
-    private fun findTemplateName(docType: String?): String? {
+    private fun findTemplateName(docType: String): String? {
         return config.getTemplateByDocType(docType)
     }
 
@@ -110,7 +110,7 @@ class Renderer {
      */
     @Throws(Exception::class)
     fun render(content: DocumentModel) {
-        val docType = content.getType()
+        val docType = content.type
         var outputFilename = (config.destinationFolder!!.getPath() + File.separatorChar).toString() + content.getUri()
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'))
@@ -364,14 +364,14 @@ class Renderer {
      */
     private fun buildSimpleModel(type: String?): DocumentModel {
         val content = DocumentModel()
-        content.setType(type)
-        content.setRootPath("")
+        content.type = type
+        content.rootPath = ""
         // add any more keys here that need to have a default value to prevent need to perform null check in templates
         return content
     }
 
     private interface RenderingConfig {
-        val path: File
+        val path: File?
 
         val name: String?
 
@@ -381,25 +381,13 @@ class Renderer {
     }
 
     private abstract class AbstractRenderingConfig(
-        protected val path: File?,
-        protected val name: String?,
-        protected val template: String?
-    ) : RenderingConfig {
-        override fun getPath(): File? {
-            return path
-        }
-
-        override fun getName(): String? {
-            return name
-        }
-
-        override fun getTemplate(): String? {
-            return template
-        }
-    }
+        override val path: File?,
+        override val name: String?,
+        override val template: String?
+    ) : RenderingConfig
 
     inner class ModelRenderingConfig : AbstractRenderingConfig {
-        private val model: TemplateModel?
+        override val model: TemplateModel?
 
         constructor(
             fileName: String?,
@@ -415,10 +403,6 @@ class Renderer {
             template
         ) {
             this.model = model
-        }
-
-        override fun getModel(): TemplateModel? {
-            return model
         }
     }
 
@@ -452,20 +436,21 @@ class Renderer {
             allInOneName
         )
 
-        override fun getModel(): TemplateModel {
-            val model = TemplateModel()
-            model.setRenderer(renderingEngine)
-            model.setContent(content)
+        override val model: TemplateModel
+            get() {
+                val model = TemplateModel()
+                model.renderer = renderingEngine
+                model.content = content
 
-            if (config.paginateIndex) {
-                model.setNumberOfPages(0)
-                model.setCurrentPageNuber(0)
-                model.setPreviousFilename("")
-                model.setNextFileName("")
+                if (config.paginateIndex) {
+                    model.numberOfPages = 0
+                    model.currentPageNumber = 0
+                    model.previousFilename = ""
+                    model.nextFileName = ""
+                }
+
+                return model
             }
-
-            return model
-        }
     }
 
     companion object {

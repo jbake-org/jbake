@@ -3,7 +3,7 @@ package org.jbake.model
 object DocumentTypeUtils {
     fun unpluralize(pluralized: String): String {
         require(!((pluralized == null) || (pluralized.length == 0))) { "pluralized string should not be null or length should be bigger than zero" }
-        val documentTypes = DocumentTypes.getDocumentTypes()
+        val documentTypes = DocumentTypes.documentTypes
 
         val unpluralizedDoctype = pluralized.substring(0, pluralized.length - 1)
         if (DocumentTypes.contains(unpluralizedDoctype)) {
@@ -16,7 +16,7 @@ object DocumentTypeUtils {
     }
 
     fun pluralize(documentType: String?): String {
-        val documentTypes = DocumentTypes.getDocumentTypes()
+        val documentTypes = DocumentTypes.documentTypes
 
         if (DocumentTypes.contains(documentType)) {
             return documentType + "s"

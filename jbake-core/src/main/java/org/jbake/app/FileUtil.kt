@@ -27,7 +27,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile()
-                        && Engines.Companion.getRecognizedExtensions()
+                        && Engines.Companion.recognizedExtensions
                     .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
             }
         }
@@ -45,7 +45,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile()
-                        && Engines.Companion.getRecognizedExtensions()
+                        && Engines.Companion.recognizedExtensions
                     .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(
                     pathname
                 ))
@@ -79,7 +79,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                        && !Engines.Companion.getRecognizedExtensions().contains(fileExt(pathname)))
+                        && !Engines.Companion.recognizedExtensions.contains(fileExt(pathname)))
                         || (directoryOnlyIfNotIgnored(pathname, config))
             }
         }
@@ -97,7 +97,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                        && !Engines.Companion.getRecognizedExtensions()
+                        && !Engines.Companion.recognizedExtensions
                     .contains(fileExt(pathname)))
                         || (directoryOnlyIfNotIgnored(pathname))
             }
@@ -112,7 +112,6 @@ object FileUtil {
      * @return true if file is directory and not ignored
      */
     fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
-        var accept = false
 
         val ignoreFile: FilenameFilter = object : FilenameFilter {
             override fun accept(dir: File?, name: String): Boolean {
@@ -120,9 +119,7 @@ object FileUtil {
             }
         }
 
-        accept = file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
-
-        return accept
+        return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
     }
 
     /**
@@ -238,10 +235,9 @@ object FileUtil {
      * @return The result of file.getPath() with all path Separators beeing a "/", or `null`
      * Needed to transform Windows path separators into slashes.
      */
-    fun asPath(file: File?): String? {
-        if (file == null) {
-            return null
-        }
+    fun asPath(file: File): String {
+        //if (file == null) return null
+
         return asPath(file.getPath())
     }
 
@@ -251,17 +247,12 @@ object FileUtil {
      * @param path the path to transform, or `null`
      * @return The result will have all platform path separators replaced by "/".
      */
-    fun asPath(path: String?): String? {
-        if (path == null) {
-            return null
-        }
+    fun asPath(path: String): String {
+        //if (path == null) return null
 
-        // On windows we have to replace the backslash
-        if (File.separator != URI_SEPARATOR_CHAR) {
-            return path.replace(File.separator, URI_SEPARATOR_CHAR)
-        } else {
-            return path
-        }
+        // On Windows we have to replace the backslash
+        return if (File.separator == URI_SEPARATOR_CHAR) path
+            else path.replace(File.separator, URI_SEPARATOR_CHAR)
     }
 
     /**

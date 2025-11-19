@@ -194,7 +194,7 @@ class ConfigUtilTest : LoggingTest() {
         val sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
         val config = util!!.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
-        val docTypes = config.getDocumentTypes()
+        val docTypes = config.documentTypes
 
         Assertions.assertThat<String?>(docTypes).containsExactly(
             "allcontent",

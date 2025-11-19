@@ -39,7 +39,10 @@ class DocumentModel : BaseModel() {
         }
 
     var tags: Array<String>
-        get() = DBUtil.toStringArray(get(ModelAttributes.TAGS))
+        get() {
+            val entry = get(ModelAttributes.TAGS) ?: throw Exception("No 'tags' in a DocumentModel")
+            return DBUtil.toStringArray(entry)
+        }
         set(tags) {
             put(ModelAttributes.TAGS, tags)
         }
@@ -50,8 +53,9 @@ class DocumentModel : BaseModel() {
             put(ModelAttributes.SHA1, sha1)
         }
 
-    val sourceUri: String?
-        get() = get(ModelAttributes.SOURCE_URI) as String?
+    // TBD improve this hack
+    var sourceUri: String = this.get(ModelAttributes.SOURCE_URI)!! as String
+        get() = get(ModelAttributes.SOURCE_URI) as String
 
     fun setSourceUri(uri: String?) {
         put(ModelAttributes.SOURCE_URI, uri)

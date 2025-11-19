@@ -59,7 +59,7 @@ class Crawler {
         crawl(config.contentFolder!!)
 
         logger.info("Content detected:")
-        for (docType in DocumentTypes.getDocumentTypes()) {
+        for (docType in DocumentTypes.documentTypes) {
             val count = db.getDocumentCount(docType)
             if (count > 0) {
                 logger.info("Parsed {} files of type: {}", count, docType)
@@ -125,7 +125,7 @@ class Crawler {
      * @param path Folder to start from
      */
     private fun crawlDataFiles(path: File) {
-        val contents = path.listFiles(FileUtil.getDataFileFilter())
+        val contents = path.listFiles(FileUtil.dataFileFilter)
         if (contents != null) {
             Arrays.sort(contents)
             for (sourceFile in contents) {
@@ -163,7 +163,7 @@ class Crawler {
         }
     }
 
-    private fun buildHash(sourceFile: File?): String {
+    private fun buildHash(sourceFile: File): String {
         var sha1: String
         try {
             sha1 = FileUtil.sha1(sourceFile)
@@ -174,8 +174,8 @@ class Crawler {
         return sha1
     }
 
-    private fun buildURI(sourceFile: File?): String {
-        var uri: String = FileUtil.asPath(sourceFile).replace(asPath(config.contentFolder), "")
+    private fun buildURI(sourceFile: File): String {
+        var uri: String = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
 
         if (useNoExtensionUri(uri)) {
             // convert URI from xxx.html to xxx/index.html
@@ -192,8 +192,8 @@ class Crawler {
         return uri
     }
 
-    private fun buildDataFileURI(sourceFile: File?): String {
-        var uri: String = FileUtil.asPath(sourceFile).replace(asPath(config.dataFolder), "")
+    private fun buildDataFileURI(sourceFile: File): String {
+        var uri: String = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.dataFolder), "")
         // strip off leading /
         if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
             uri = uri.substring(1, uri.length)
@@ -203,7 +203,7 @@ class Crawler {
 
     // TODO: Refactor - parametrize the following two methods into one.
     // commons-codec's URLCodec could be used when we add that dependency.
-    private fun createUri(uri: String?): String {
+    private fun createUri(uri: String): String {
         try {
             return (FileUtil.URI_SEPARATOR_CHAR
                     + FilenameUtils.getPath(uri)
@@ -237,15 +237,15 @@ class Crawler {
                 && uri.startsWith(noExtensionUriPrefix)
     }
 
-    private fun crawlDataFile(sourceFile: File, sha1: String?, uri: String?, documentType: String?) {
+    private fun crawlDataFile(sourceFile: File, sha1: String?, uri: String?, documentType: String) {
         try {
             val document = parser.processFile(sourceFile)
             if (document != null) {
-                document.setSha1(sha1)
-                document.setRendered(true)
-                document.setFile(sourceFile.getPath())
-                document.setSourceUri(uri)
-                document.setType(documentType)
+                document.sha1 = sha1
+                document.rendered = true
+                document.file = sourceFile.getPath()
+                document.sourceUri = uri
+                document.type = documentType
 
                 db.addDocument(document)
             } else {
@@ -260,7 +260,7 @@ class Crawler {
         val document = parser.processFile(sourceFile)
 
         if (document != null) {
-            if (DocumentTypes.contains(document.getType())) {
+            if (DocumentTypes.contains(document.type)) {
                 addAdditionalDocumentAttributes(document, sourceFile, sha1, uri)
 
                 if (config.imgPathUpdate) {
@@ -273,7 +273,7 @@ class Crawler {
                 logger.warn(
                     "{} has an unknown document type '{}' and has been ignored!",
                     sourceFile,
-                    document.getType()
+                    document.type
                 )
             }
         } else {
@@ -282,23 +282,23 @@ class Crawler {
     }
 
     private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String?, uri: String) {
-        document.setRootPath(getPathToRoot(sourceFile))
-        document.setSha1(sha1)
-        document.setRendered(false)
-        document.setFile(sourceFile.getPath())
-        document.setSourceUri(uri)
-        document.setUri(uri)
-        document.setCached(true)
+        document.rootPath = getPathToRoot(sourceFile)
+        document.sha1 = sha1
+        document.rendered = false
+        document.file = sourceFile.getPath()
+        document.sourceUri = uri
+        document.uri = uri
+        document.cached = true
 
-        if (document.getStatus() == ModelAttributes.Status.PUBLISHED_DATE
-            && (document.getDate() != null)
-            && Date().after(document.getDate())
+        if (document.status == ModelAttributes.Status.PUBLISHED_DATE
+            && (document.date != null)
+            && Date().after(document.date)
         ) {
-            document.setStatus(ModelAttributes.Status.PUBLISHED)
+            document.status = ModelAttributes.Status.PUBLISHED
         }
 
         if (config.uriWithoutExtension) {
-            document.setNoExtensionUri(uri.replace("/index.html", "/"))
+            document.noExtensionUri = uri.replace("/index.html", "/")
         }
     }
 
@@ -310,8 +310,8 @@ class Crawler {
         val match = db.getDocumentStatus(uri)
         if (!match.isEmpty()) {
             val document = match.get(0)
-            val oldHash = document.getSha1()
-            if (oldHash != sha1 || !document.getRendered()) {
+            val oldHash = document.sha1
+            if (oldHash != sha1 || !document.rendered) {
                 return DocumentStatus.UPDATED
             } else {
                 return DocumentStatus.IDENTICAL
