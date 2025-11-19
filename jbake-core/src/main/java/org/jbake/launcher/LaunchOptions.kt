@@ -108,6 +108,6 @@ class LaunchOptions {
             description = ["use specified template engine for default templates (uses Freemarker if <template> is not supplied) "],
             arity = "0..1"
         )
-        private val template: String? = null
+        val template: String? = null
     }
 }

@@ -37,7 +37,7 @@ class Main @JvmOverloads constructor(
     }
 
     @Throws(JBakeException::class)
-    fun run(args: Array<String?>) {
+    fun run(args: Array<String>) {
         try {
             SLF4JBridgeHandler.removeHandlersForRootLogger()
             SLF4JBridgeHandler.install()
@@ -45,21 +45,21 @@ class Main @JvmOverloads constructor(
             val config: JBakeConfiguration
 
             val res = parseArguments(args)
-            if (res.isRunServer()) {
-                config = this.jBakeConfigurationFactory!!.setEncoding(res.getPropertiesEncoding())
+            if (res.isRunServer) {
+                config = this.jBakeConfigurationFactory!!.setEncoding(res.propertiesEncoding)
                     .createJettyJbakeConfiguration(
                         res.getSource(),
                         res.getDestination(),
                         res.getConfig(),
-                        res.isClearCache()
+                        res.isClearCache
                     )
             } else {
-                config = this.jBakeConfigurationFactory!!.setEncoding(res.getPropertiesEncoding())
+                config = this.jBakeConfigurationFactory!!.setEncoding(res.propertiesEncoding)
                     .createDefaultJbakeConfiguration(
                         res.getSource(),
                         res.getDestination(),
                         res.getConfig(),
-                        res.isClearCache()
+                        res.isClearCache
                     )
             }
             run(res, config)
@@ -92,14 +92,14 @@ class Main @JvmOverloads constructor(
             baker.bake(config)
         }
 
-        if (res.isInit()) {
-            initStructure(res.getTemplate(), config)
+        if (res.isInit) {
+            initStructure(res.template, config)
         }
 
-        if (res.isRunServer()) {
+        if (res.isRunServer) {
             watcher.start(config)
             // TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
-            if (res.isBake()) {
+            if (res.isBake) {
                 // bake and server commands have been run together
                 if (res.getDestination() != null) {
                     // use the destination provided via the commandline
@@ -118,7 +118,7 @@ class Main @JvmOverloads constructor(
         }
     }
 
-    private fun parseArguments(args: Array<String?>): LaunchOptions {
+    private fun parseArguments(args: Array<String>): LaunchOptions {
         return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
     }
 
@@ -135,7 +135,7 @@ class Main @JvmOverloads constructor(
     private fun initStructure(type: String?, config: JBakeConfiguration) {
         val init = Init(config)
         try {
-            val templateFolder = FileUtil.getRunningLocation()
+            val templateFolder = FileUtil.runningLocation
             val outputFolder: File
             if (config.sourceFolder != null) {
                 outputFolder = config.sourceFolder!!
