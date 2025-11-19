@@ -39,9 +39,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return compositeConfiguration.getProperty(key)
     }
 
-    override fun getArchiveFileName(): String {
-        return getAsString(PropertyList.ARCHIVE_FILE.getKey())
-    }
+    override val archiveFileName: String?
+        get() = getAsString(PropertyList.ARCHIVE_FILE.key, null)
 
     private fun getAsBoolean(key: String?): Boolean {
         return compositeConfiguration.getBoolean(key, false)
@@ -67,24 +66,24 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return compositeConfiguration.getString(key, defaultValue)
     }
 
-    override fun getAsciidoctorAttributes(): MutableList<String?>? {
-        return getAsList(PropertyList.ASCIIDOCTOR_ATTRIBUTES.getKey())
+    fun getAsciidoctorAttributes(): MutableList<String?>? {
+        return getAsList(PropertyList.ASCIIDOCTOR_ATTRIBUTES.key)
     }
 
     override fun getAsciidoctorOption(optionKey: String): Any? {
-        val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.getKey())
+        val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.key)
 
         if (subConfig.containsKey(optionKey)) {
             return subConfig.get(optionKey)
         } else {
-            logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.getKey(), optionKey)
+            logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.key, optionKey)
             return null
         }
     }
 
-    override fun getAsciidoctorOptionKeys(): MutableList<String> {
+    fun getAsciidoctorOptionKeys(): MutableList<String> {
         val options: MutableList<String> = ArrayList()
-        val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.getKey())
+        val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.key)
 
         val iterator = subConfig.getKeys()
         while (iterator.hasNext()) {
@@ -95,7 +94,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return options
     }
 
-    override fun getAssetFolder(): File? {
+    fun getAssetFolder(): File? {
         return getAsFolder(ASSET_FOLDER_KEY)
     }
 
@@ -105,35 +104,34 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
     }
 
-    override fun getAssetFolderName(): String {
-        return getAsString(PropertyList.ASSET_FOLDER.getKey())
-    }
+    override val assetFolderName: String
+        get() = getAsString(PropertyList.ASSET_FOLDER.key)
 
-    override fun getAssetIgnoreHidden(): Boolean {
-        return getAsBoolean(PropertyList.ASSET_IGNORE_HIDDEN.getKey())
+    fun getAssetIgnoreHidden(): Boolean {
+        return getAsBoolean(PropertyList.ASSET_IGNORE_HIDDEN.key)
     }
 
     fun setAssetIgnoreHidden(assetIgnoreHidden: Boolean) {
-        setProperty(PropertyList.ASSET_IGNORE_HIDDEN.getKey(), assetIgnoreHidden)
+        setProperty(PropertyList.ASSET_IGNORE_HIDDEN.key, assetIgnoreHidden)
     }
 
-    override fun getAttributesExportPrefixForAsciidoctor(): String? {
-        return getAsString(PropertyList.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX.getKey(), "")
+    fun getAttributesExportPrefixForAsciidoctor(): String? {
+        return getAsString(PropertyList.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX.key, "")
     }
 
-    override fun getBuildTimeStamp(): String {
-        return getAsString(PropertyList.BUILD_TIMESTAMP.getKey())
+    fun getBuildTimeStamp(): String {
+        return getAsString(PropertyList.BUILD_TIMESTAMP.key)
     }
 
-    override fun getClearCache(): Boolean {
-        return getAsBoolean(PropertyList.CLEAR_CACHE.getKey())
+    fun getClearCache(): Boolean {
+        return getAsBoolean(PropertyList.CLEAR_CACHE.key)
     }
 
     fun setClearCache(clearCache: Boolean) {
-        setProperty(PropertyList.CLEAR_CACHE.getKey(), clearCache)
+        setProperty(PropertyList.CLEAR_CACHE.key, clearCache)
     }
 
-    override fun getContentFolder(): File? {
+    fun getContentFolder(): File? {
         return getAsFolder(CONTENT_FOLDER_KEY)
     }
 
@@ -143,11 +141,10 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
     }
 
-    override fun getContentFolderName(): String {
-        return getAsString(PropertyList.CONTENT_FOLDER.getKey())
-    }
+    override val contentFolderName: String
+        get() = getAsString(PropertyList.CONTENT_FOLDER.key)
 
-    override fun getDataFolder(): File? {
+    fun getDataFolder(): File? {
         return getAsFolder(DATA_FOLDER_KEY)
     }
 
@@ -157,66 +154,55 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
     }
 
-    override fun getDataFolderName(): String {
-        return getAsString(PropertyList.DATA_FOLDER.getKey())
-    }
+    override val dataFolderName: String
+        get() = getAsString(PropertyList.DATA_FOLDER.key)
 
-    override fun getDataFileDocType(): String {
-        return getAsString(PropertyList.DATA_FILE_DOCTYPE.getKey())
-    }
+    override val dataFileDocType: String
+        get() = getAsString(PropertyList.DATA_FILE_DOCTYPE.key)
 
     fun setDataFileDocType(dataFileDocType: String?) {
-        setProperty(PropertyList.DATA_FILE_DOCTYPE.getKey(), dataFileDocType)
+        setProperty(PropertyList.DATA_FILE_DOCTYPE.key, dataFileDocType)
     }
 
-    override fun getDatabasePath(): String {
-        return getAsString(PropertyList.DB_PATH.getKey())
-    }
+    override val databasePath: String
+        get() = getAsString(PropertyList.DB_PATH.key)
 
     fun setDatabasePath(path: String?) {
-        setProperty(PropertyList.DB_PATH.getKey(), path)
+        setProperty(PropertyList.DB_PATH.key, path)
     }
 
-    override fun getDatabaseStore(): String {
-        return getAsString(PropertyList.DB_STORE.getKey())
-    }
+    override val databaseStore: String
+        get() = getAsString(PropertyList.DB_STORE.key)
 
     fun setDatabaseStore(storeType: String?) {
-        setProperty(PropertyList.DB_STORE.getKey(), storeType)
+        setProperty(PropertyList.DB_STORE.key, storeType)
     }
 
 
-    override fun getDateFormat(): String {
-        return getAsString(PropertyList.DATE_FORMAT.getKey())
-    }
+    override val dateFormat: String
+        get() = getAsString(PropertyList.DATE_FORMAT.key)
 
-    override fun getDefaultStatus(): String? {
-        return getAsString(PropertyList.DEFAULT_STATUS.getKey(), "")
-    }
+    override val defaultStatus: String?
+        get() = getAsString(PropertyList.DEFAULT_STATUS.key, "")
 
     fun setDefaultStatus(status: String?) {
-        setProperty(PropertyList.DEFAULT_STATUS.getKey(), status)
+        setProperty(PropertyList.DEFAULT_STATUS.key, status)
     }
 
-    override fun getDefaultType(): String? {
-        return getAsString(PropertyList.DEFAULT_TYPE.getKey(), "")
-    }
+    override val defaultType: String?
+        get() = getAsString(PropertyList.DEFAULT_TYPE.key, "")
 
     fun setDefaultType(type: String?) {
-        setProperty(PropertyList.DEFAULT_TYPE.getKey(), type)
+        setProperty(PropertyList.DEFAULT_TYPE.key, type)
     }
 
-    override fun getDestinationFolder(): File? {
-        return getAsFolder(DESTINATION_FOLDER_KEY)
-    }
-
-    override fun setDestinationFolder(destinationFolder: File?) {
-        if (destinationFolder != null) {
-            setProperty(DESTINATION_FOLDER_KEY, destinationFolder)
+    override var destinationFolder: File
+        get() = getAsFolder(DESTINATION_FOLDER_KEY) ?: error("Destination folder must be configured")
+        set(value) {
+            setProperty(DESTINATION_FOLDER_KEY, value)
         }
-    }
 
-    override fun getDocumentTypes(): MutableList<String?> {
+    fun getDocumentTypes(): MutableList<String?> {
         val docTypes: MutableList<String?> = ArrayList<String?>()
         val keyIterator = compositeConfiguration.getKeys()
         while (keyIterator.hasNext()) {
@@ -230,166 +216,138 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return docTypes
     }
 
-    override fun getDraftSuffix(): String? {
-        return getAsString(PropertyList.DRAFT_SUFFIX.getKey(), "")
-    }
+    override val draftSuffix: String?
+        get() = getAsString(PropertyList.DRAFT_SUFFIX.key, "")
 
-    override fun getError404FileName(): String {
-        return getAsString(PropertyList.ERROR404_FILE.getKey())
-    }
+    override val error404FileName: String
+        get() = getAsString(PropertyList.ERROR404_FILE.key)
 
-    override fun getExampleProjectByType(templateType: String): String {
+    fun getExampleProjectByType(templateType: String): String {
         return getAsString("example.project." + templateType)
     }
 
-    override fun getExportAsciidoctorAttributes(): Boolean {
-        return getAsBoolean(PropertyList.ASCIIDOCTOR_ATTRIBUTES_EXPORT.getKey())
-    }
+    override val exportAsciidoctorAttributes: Boolean
+        get() = getAsBoolean(PropertyList.ASCIIDOCTOR_ATTRIBUTES_EXPORT.key)
 
-    override fun getFeedFileName(): String {
-        return getAsString(PropertyList.FEED_FILE.getKey())
-    }
+    override val feedFileName: String
+        get() = getAsString(PropertyList.FEED_FILE.key)
 
-    override fun getIgnoreFileName(): String {
-        return getAsString(PropertyList.IGNORE_FILE.getKey())
-    }
+    override val ignoreFileName: String
+        get() = getAsString(PropertyList.IGNORE_FILE.key)
 
-    override fun getIndexFileName(): String {
-        return getAsString(PropertyList.INDEX_FILE.getKey())
-    }
+    override val indexFileName: String
+        get() = getAsString(PropertyList.INDEX_FILE.key)
 
-    override fun getKeys(): MutableIterator<String> {
-        return compositeConfiguration.getKeys()
-    }
+    override val keys: MutableIterator<String>
+        get() = compositeConfiguration.getKeys()
 
-    override fun getMarkdownExtensions(): MutableList<String?>? {
-        return getAsList(PropertyList.MARKDOWN_EXTENSIONS.getKey())
-    }
+    override val markdownExtensions: MutableList<String?>?
+        get() = getAsList(PropertyList.MARKDOWN_EXTENSIONS.key)
 
     fun setMarkdownExtensions(vararg extensions: String?) {
-        setProperty(PropertyList.MARKDOWN_EXTENSIONS.getKey(), StringUtils.join(extensions, ","))
+        setProperty(PropertyList.MARKDOWN_EXTENSIONS.key, StringUtils.join(extensions, ","))
     }
 
-    override fun getOutputExtension(): String {
-        return getAsString(PropertyList.OUTPUT_EXTENSION.getKey())
-    }
+    override val outputExtension: String
+        get() = getAsString(PropertyList.OUTPUT_EXTENSION.key)
 
     fun setOutputExtension(outputExtension: String?) {
-        setProperty(PropertyList.OUTPUT_EXTENSION.getKey(), outputExtension)
+        setProperty(PropertyList.OUTPUT_EXTENSION.key, outputExtension)
     }
 
-    override fun getOutputExtensionByDocType(docType: String): String? {
+    fun getOutputExtensionByDocType(docType: String): String? {
         val templateExtensionKey: String = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_EXTENSION_POSTFIX
-        val defaultOutputExtension = getOutputExtension()
+        val defaultOutputExtension = outputExtension
         return getAsString(templateExtensionKey, defaultOutputExtension)
     }
 
-    override fun getPaginateIndex(): Boolean {
-        return getAsBoolean(PropertyList.PAGINATE_INDEX.getKey())
-    }
+    override val paginateIndex: Boolean
+        get() = getAsBoolean(PropertyList.PAGINATE_INDEX.key)
 
     fun setPaginateIndex(paginateIndex: Boolean) {
-        setProperty(PropertyList.PAGINATE_INDEX.getKey(), paginateIndex)
+        setProperty(PropertyList.PAGINATE_INDEX.key, paginateIndex)
     }
 
-    override fun getPostsPerPage(): Int {
-        return getAsInt(PropertyList.POSTS_PER_PAGE.getKey(), 5)
-    }
+    override val postsPerPage: Int
+        get() = getAsInt(PropertyList.POSTS_PER_PAGE.key, 5)
 
     fun setPostsPerPage(postsPerPage: Int) {
-        setProperty(PropertyList.POSTS_PER_PAGE.getKey(), postsPerPage)
+        setProperty(PropertyList.POSTS_PER_PAGE.key, postsPerPage)
     }
 
-    override fun getPrefixForUriWithoutExtension(): String {
-        return getAsString(PropertyList.URI_NO_EXTENSION_PREFIX.getKey())
-    }
+    override val prefixForUriWithoutExtension: String
+        get() = getAsString(PropertyList.URI_NO_EXTENSION_PREFIX.key)
 
     fun setPrefixForUriWithoutExtension(prefix: String?) {
-        setProperty(PropertyList.URI_NO_EXTENSION_PREFIX.getKey(), prefix)
+        setProperty(PropertyList.URI_NO_EXTENSION_PREFIX.key, prefix)
     }
 
-    override fun getRenderArchive(): Boolean {
-        return getAsBoolean(PropertyList.RENDER_ARCHIVE.getKey())
-    }
+    override val renderArchive: Boolean
+        get() = getAsBoolean(PropertyList.RENDER_ARCHIVE.key)
 
-    override fun getRenderEncoding(): String {
-        return getAsString(PropertyList.RENDER_ENCODING.getKey())
-    }
+    override val renderEncoding: String
+        get() = getAsString(PropertyList.RENDER_ENCODING.key)
 
-    override fun getOutputEncoding(): String {
-        return getAsString(PropertyList.OUTPUT_ENCODING.getKey())
-    }
+    override val outputEncoding: String
+        get() = getAsString(PropertyList.OUTPUT_ENCODING.key)
 
-    override fun getRenderError404(): Boolean {
-        return getAsBoolean(PropertyList.RENDER_ERROR404.getKey())
-    }
+    override val renderError404: Boolean
+        get() = getAsBoolean(PropertyList.RENDER_ERROR404.key)
 
-    override fun getRenderFeed(): Boolean {
-        return getAsBoolean(PropertyList.RENDER_FEED.getKey())
-    }
+    override val renderFeed: Boolean
+        get() = getAsBoolean(PropertyList.RENDER_FEED.key)
 
-    override fun getRenderIndex(): Boolean {
-        return getAsBoolean(PropertyList.RENDER_INDEX.getKey())
-    }
+    override val renderIndex: Boolean
+        get() = getAsBoolean(PropertyList.RENDER_INDEX.key)
 
-    override fun getRenderSiteMap(): Boolean {
-        return getAsBoolean(PropertyList.RENDER_SITEMAP.getKey())
-    }
+    override val renderSiteMap: Boolean
+        get() = getAsBoolean(PropertyList.RENDER_SITEMAP.key)
 
-    override fun getRenderTags(): Boolean {
-        return getAsBoolean(PropertyList.RENDER_TAGS.getKey())
-    }
+    override val renderTags: Boolean
+        get() = getAsBoolean(PropertyList.RENDER_TAGS.key)
 
-    override fun getRenderTagsIndex(): Boolean {
-        return compositeConfiguration.getBoolean(PropertyList.RENDER_TAGS_INDEX.getKey(), false)
-    }
+    override val renderTagsIndex: Boolean
+        get() = compositeConfiguration.getBoolean(PropertyList.RENDER_TAGS_INDEX.key, false)
 
     fun setRenderTagsIndex(enable: Boolean) {
-        compositeConfiguration.setProperty(PropertyList.RENDER_TAGS_INDEX.getKey(), enable)
+        compositeConfiguration.setProperty(PropertyList.RENDER_TAGS_INDEX.key, enable)
     }
 
-    override fun getSanitizeTag(): Boolean {
-        return getAsBoolean(PropertyList.TAG_SANITIZE.getKey())
-    }
+    override val sanitizeTag: Boolean
+        get() = getAsBoolean(PropertyList.TAG_SANITIZE.key)
 
-    override fun getServerPort(): Int {
-        return getAsInt(PropertyList.SERVER_PORT.getKey(), 8080)
-    }
+    override val serverPort: Int
+        get() = getAsInt(PropertyList.SERVER_PORT.key, 8080)
 
     fun setServerPort(port: Int) {
-        setProperty(PropertyList.SERVER_PORT.getKey(), port)
+        setProperty(PropertyList.SERVER_PORT.key, port)
     }
 
-    override fun getSiteHost(): String? {
-        return getAsString(PropertyList.SITE_HOST.getKey(), "http://www.jbake.org")
-    }
+    override val siteHost: String?
+        get() = getAsString(PropertyList.SITE_HOST.key, "http://www.jbake.org")
 
     fun setSiteHost(siteHost: String?) {
-        setProperty(PropertyList.SITE_HOST.getKey(), siteHost)
+        setProperty(PropertyList.SITE_HOST.key, siteHost)
     }
 
-    override fun getSiteMapFileName(): String {
-        return getAsString(PropertyList.SITEMAP_FILE.getKey())
-    }
+    override val siteMapFileName: String
+        get() = getAsString(PropertyList.SITEMAP_FILE.key)
 
-    override fun getSourceFolder(): File? {
-        return getAsFolder(SOURCE_FOLDER_KEY)
-    }
+    override val sourceFolder: File
+        get() = getAsFolder(SOURCE_FOLDER_KEY) ?: error("Source folder must be configured")
 
     fun setSourceFolder(sourceFolder: File?) {
         setProperty(SOURCE_FOLDER_KEY, sourceFolder)
         setupPaths()
     }
 
-    override fun getTagPathName(): String {
-        return getAsString(PropertyList.TAG_PATH.getKey())
-    }
+    override val tagPathName: String
+        get() = getAsString(PropertyList.TAG_PATH.key)
 
-    override fun getTemplateEncoding(): String {
-        return getAsString(PropertyList.TEMPLATE_ENCODING.getKey())
-    }
+    override val templateEncoding: String
+        get() = getAsString(PropertyList.TEMPLATE_ENCODING.key)
 
-    override fun getTemplateByDocType(docType: String): String? {
+    fun getTemplateByDocType(docType: String): String? {
         val templateKey: String = DOCTYPE_TEMPLATE_PREFIX + docType + DOCTYPE_FILE_POSTFIX
         val templateFileName = getAsString(templateKey)
         if (templateFileName != null) {
@@ -399,7 +357,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return null
     }
 
-    override fun getTemplateFileByDocType(docType: String): File? {
+    fun getTemplateFileByDocType(docType: String): File? {
         val templateFileName = getTemplateByDocType(docType)
         if (templateFileName != null) {
             return File(getTemplateFolder(), templateFileName)
@@ -407,7 +365,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return null
     }
 
-    override fun getTemplateFolder(): File? {
+    fun getTemplateFolder(): File? {
         return getAsFolder(TEMPLATE_FOLDER_KEY)
     }
 
@@ -417,28 +375,24 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
     }
 
-    override fun getTemplateFolderName(): String {
-        return getAsString(PropertyList.TEMPLATE_FOLDER.getKey())
-    }
+    override val templateFolderName: String
+        get() = getAsString(PropertyList.TEMPLATE_FOLDER.key)
 
-    override fun getThymeleafLocale(): String {
-        return getAsString(PropertyList.THYMELEAF_LOCALE.getKey())
-    }
+    override val thymeleafLocale: String
+        get() = getAsString(PropertyList.THYMELEAF_LOCALE.key)
 
-    override fun getUriWithoutExtension(): Boolean {
-        return getAsBoolean(PropertyList.URI_NO_EXTENSION.getKey())
-    }
+    override val uriWithoutExtension: Boolean
+        get() = getAsBoolean(PropertyList.URI_NO_EXTENSION.key)
 
     fun setUriWithoutExtension(withoutExtension: Boolean) {
-        setProperty(PropertyList.URI_NO_EXTENSION.getKey(), withoutExtension)
+        setProperty(PropertyList.URI_NO_EXTENSION.key, withoutExtension)
     }
 
-    override fun getVersion(): String {
-        return getAsString(PropertyList.VERSION.getKey())
-    }
+    override val version: String
+        get() = getAsString(PropertyList.VERSION.key)
 
     fun setDestinationFolderName(folderName: String?) {
-        setProperty(PropertyList.DESTINATION_FOLDER.getKey(), folderName)
+        setProperty(PropertyList.DESTINATION_FOLDER.key, folderName)
         setupDefaultDestination()
     }
 
@@ -447,22 +401,20 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(projectKey, fileName)
     }
 
-    override fun setProperty(key: String, value: Any?) {
+    fun setProperty(key: String, value: Any?) {
         compositeConfiguration.setProperty(key, value)
     }
 
-    override fun getThymeleafModeByType(type: String): String? {
+    fun getThymeleafModeByType(type: String): String? {
         val key = "template_" + type + "_thymeleaf_mode"
         return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE)
     }
 
-    override fun getServerContextPath(): String {
-        return getAsString(PropertyList.SERVER_CONTEXT_PATH.getKey())
-    }
+    override val serverContextPath: String
+        get() = getAsString(PropertyList.SERVER_CONTEXT_PATH.key)
 
-    override fun getServerHostname(): String {
-        return getAsString(PropertyList.SERVER_HOSTNAME.getKey())
-    }
+    override val serverHostname: String
+        get() = getAsString(PropertyList.SERVER_HOSTNAME.key)
 
     override fun asHashMap(): MutableMap<String, Any>? {
         val configModel = HashMap<String, Any>()
@@ -471,7 +423,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             val key = configKeys.next()
             val valueObject: Any?
 
-            if (key == PropertyList.PAGINATE_INDEX.getKey()) {
+            if (key == PropertyList.PAGINATE_INDEX.key) {
                 valueObject = this.getPaginateIndex()
             } else {
                 valueObject = this.get(key)
@@ -503,7 +455,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun setupDefaultDestination() {
-        val destinationPath = getAsString(PropertyList.DESTINATION_FOLDER.getKey())
+        val destinationPath = getAsString(PropertyList.DESTINATION_FOLDER.key)
 
         val destination = File(destinationPath)
         if (destination.isAbsolute()) {
@@ -514,7 +466,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun setupDefaultAssetFolder() {
-        val assetFolder = getAsString(PropertyList.ASSET_FOLDER.getKey())
+        val assetFolder = getAsString(PropertyList.ASSET_FOLDER.key)
 
 
         val asset = File(assetFolder)
@@ -526,7 +478,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun setupDefaultTemplateFolder() {
-        val templateFolder = getAsString(PropertyList.TEMPLATE_FOLDER.getKey())
+        val templateFolder = getAsString(PropertyList.TEMPLATE_FOLDER.key)
 
         val template = File(templateFolder)
         if (template.isAbsolute()) {
@@ -537,7 +489,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun setupDefaultDataFolder() {
-        val dataFolder = getAsString(PropertyList.DATA_FOLDER.getKey())
+        val dataFolder = getAsString(PropertyList.DATA_FOLDER.key)
 
         val data = File(dataFolder)
         if (data.isAbsolute()) {
@@ -551,31 +503,28 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setContentFolder(File(getSourceFolder(), getContentFolderName()))
     }
 
-    override fun getHeaderSeparator(): String {
-        return getAsString(PropertyList.HEADER_SEPARATOR.getKey())
-    }
+    override val headerSeparator: String
+        get() = getAsString(PropertyList.HEADER_SEPARATOR.key)
 
     fun setHeaderSeparator(headerSeparator: String?) {
-        setProperty(PropertyList.HEADER_SEPARATOR.getKey(), headerSeparator)
+        setProperty(PropertyList.HEADER_SEPARATOR.key, headerSeparator)
     }
 
-    override fun getImgPathPrependHost(): Boolean {
-        return getAsBoolean(PropertyList.IMG_PATH_PREPEND_HOST.getKey())
-    }
+    override val imgPathPrependHost: Boolean
+        get() = getAsBoolean(PropertyList.IMG_PATH_PREPEND_HOST.key)
 
     fun setImgPathPrependHost(imgPathPrependHost: Boolean) {
-        setProperty(PropertyList.IMG_PATH_PREPEND_HOST.getKey(), imgPathPrependHost)
+        setProperty(PropertyList.IMG_PATH_PREPEND_HOST.key, imgPathPrependHost)
     }
 
-    override fun getImgPathUpdate(): Boolean {
-        return getAsBoolean(PropertyList.IMG_PATH_UPDATE.getKey())
-    }
+    override val imgPathUpdate: Boolean
+        get() = getAsBoolean(PropertyList.IMG_PATH_UPDATE.key)
 
     fun setImgPathUPdate(imgPathUpdate: Boolean) {
-        setProperty(PropertyList.IMG_PATH_UPDATE.getKey(), imgPathUpdate)
+        setProperty(PropertyList.IMG_PATH_UPDATE.key, imgPathUpdate)
     }
 
-    override fun getJbakeProperties(): MutableList<Property?> {
+    fun getJbakeProperties(): MutableList<Property?> {
         val jbakeKeys: MutableList<Property?> = ArrayList<Property?>()
 
         for (i in 0..<compositeConfiguration.getNumberOfConfigurations()) {
@@ -600,16 +549,14 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         compositeConfiguration.addConfiguration(MapConfiguration(properties))
     }
 
-    override fun getAbbreviatedGitHash(): String {
-        return getAsString(PropertyList.GIT_HASH.getKey())
-    }
+    override val abbreviatedGitHash: String
+        get() = getAsString(PropertyList.GIT_HASH.key)
 
-    override fun getJvmLocale(): String {
-        return getAsString(PropertyList.JVM_LOCALE.getKey())
-    }
+    override val jvmLocale: String
+        get() = getAsString(PropertyList.JVM_LOCALE.key)
 
-    override fun getFreemarkerTimeZone(): TimeZone? {
-        val timezone = getAsString(PropertyList.FREEMARKER_TIMEZONE.getKey())
+    fun getFreemarkerTimeZone(): TimeZone? {
+        val timezone = getAsString(PropertyList.FREEMARKER_TIMEZONE.key)
         if (StringUtils.isNotEmpty(timezone)) {
             return TimeZone.getTimeZone(timezone)
         }

@@ -359,14 +359,12 @@ object PropertyList {
     )
 
     @JvmStatic
-    fun getPropertyByKey(key: String?): Property {
+    fun getPropertyByKey(key: String): Property {
         for (field in PropertyList::class.java.getFields()) {
             try {
                 val property = field.get(null) as Property
-
-                if (property.getKey() == key) {
+                if (property.key == key)
                     return property
-                }
             } catch (e: IllegalAccessException) {
                 return Property(key, "", Property.Group.CUSTOM)
             }
