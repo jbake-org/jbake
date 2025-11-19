@@ -119,7 +119,7 @@
         <mockito.version>4.2.0</mockito.version>
 
         <!-- Build dependencies versions -->
-        <jacoco.maven.plugin.version>0.8.7</jacoco.maven.plugin.version>
+        <jacoco.maven.plugin.version>0.8.12</jacoco.maven.plugin.version>
         <maven.version>3.8.4</maven.version>
         <maven.annotations.version>3.6.2</maven.annotations.version>
         <spark.version>2.9.3</spark.version>
@@ -321,7 +321,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.4</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.7</version>
                 <executions>
                     <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
                 </executions>
@@ -332,6 +332,21 @@
                     </gpgArguments>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><version>3.6.2</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id><goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion><version>3.9.9</version></requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
