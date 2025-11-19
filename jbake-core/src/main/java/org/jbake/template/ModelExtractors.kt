@@ -34,11 +34,7 @@ import java.util.*
 class ModelExtractors private constructor() {
     private val extractors: MutableMap<String, ModelExtractor<*>>
 
-    object Loader {
-        val instance: ModelExtractors = ModelExtractors()
-    }
-
-    init {F
+    init {
         extractors = TreeMap<String, ModelExtractor<*>>()
         loadEngines()
     }
@@ -133,6 +129,8 @@ class ModelExtractors private constructor() {
         private const val PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties"
 
         private val LOGGER: Logger = LoggerFactory.getLogger(ModelExtractors::class.java)
+
+        val instance: ModelExtractors = ModelExtractors()
 
         /**
          * This method is used to search for a specific class, telling if loading the engine would succeed. This is

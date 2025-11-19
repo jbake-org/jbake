@@ -204,7 +204,7 @@ class Oven {
 
     private fun resetDocumentTypesAndExtractors() {
         DocumentTypes.resetDocumentTypes()
-        ModelExtractors.Loader.instance.reset()
+        ModelExtractors.instance.reset()
     }
 
     /**
