@@ -53,22 +53,20 @@ class DocumentModel : BaseModel() {
             put(ModelAttributes.SHA1, sha1)
         }
 
-    // TBD improve this hack
-    var sourceUri: String = this.get(ModelAttributes.SOURCE_URI)!! as String
-        get() = get(ModelAttributes.SOURCE_URI) as String
+    var sourceUri: String?
+        get() = get(ModelAttributes.SOURCE_URI) as String?
+        set(uri) {
+            put(ModelAttributes.SOURCE_URI, uri)
+        }
 
-    fun setSourceUri(uri: String?) {
-        put(ModelAttributes.SOURCE_URI, uri)
-    }
-
-    var rootPath: String?
-        get() = get(ModelAttributes.ROOTPATH) as String?
+    var rootPath: String
+        get() = get(ModelAttributes.ROOTPATH) as String
         set(pathToRoot) {
             put(ModelAttributes.ROOTPATH, pathToRoot)
         }
 
-    var rendered: Boolean?
-        get() = getOrDefault(ModelAttributes.RENDERED, false) as Boolean?
+    var rendered: Boolean
+        get() = getOrDefault(ModelAttributes.RENDERED, false) as Boolean
         set(rendered) {
             put(ModelAttributes.RENDERED, rendered)
         }

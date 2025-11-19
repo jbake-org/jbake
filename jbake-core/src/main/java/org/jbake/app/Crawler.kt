@@ -237,7 +237,7 @@ class Crawler {
                 && uri.startsWith(noExtensionUriPrefix)
     }
 
-    private fun crawlDataFile(sourceFile: File, sha1: String?, uri: String?, documentType: String) {
+    private fun crawlDataFile(sourceFile: File, sha1: String, uri: String, documentType: String) {
         try {
             val document = parser.processFile(sourceFile)
             if (document != null) {
@@ -256,7 +256,7 @@ class Crawler {
         }
     }
 
-    private fun processSourceFile(sourceFile: File, sha1: String?, uri: String) {
+    private fun processSourceFile(sourceFile: File, sha1: String, uri: String) {
         val document = parser.processFile(sourceFile)
 
         if (document != null) {
@@ -281,7 +281,7 @@ class Crawler {
         }
     }
 
-    private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String?, uri: String) {
+    private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String, uri: String) {
         document.rootPath = getPathToRoot(sourceFile)
         document.sha1 = sha1
         document.rendered = false
@@ -302,11 +302,11 @@ class Crawler {
         }
     }
 
-    private fun getPathToRoot(sourceFile: File?): String {
+    private fun getPathToRoot(sourceFile: File): String {
         return FileUtil.getUriPathToContentRoot(config, sourceFile)
     }
 
-    private fun findDocumentStatus(uri: String?, sha1: String?): DocumentStatus {
+    private fun findDocumentStatus(uri: String, sha1: String): DocumentStatus {
         val match = db.getDocumentStatus(uri)
         if (!match.isEmpty()) {
             val document = match.get(0)
