@@ -95,7 +95,7 @@ open class GenerateMojo : AbstractMojo() {
     protected fun createConfiguration(): JBakeConfiguration {
         val jBakeConfiguration =
             JBakeConfigurationFactory().createDefaultJbakeConfiguration(inputDirectory!!, outputDirectory, isClearCache)
-        jBakeConfiguration.addConfiguration(this.project!!.getProperties())
+        jBakeConfiguration.addConfiguration(this.project!!.properties)
         return jBakeConfiguration
     }
 }

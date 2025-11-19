@@ -66,7 +66,7 @@ class Oven {
      *
      * @param config The project configuration. see [JBakeConfiguration]
      */
-    constructor(config: JBakeConfiguration?) {
+    constructor(config: JBakeConfiguration) {
         this.utensils = UtensilsFactory.createDefaultUtensils(config)
     }
 
@@ -76,17 +76,17 @@ class Oven {
      * @param utensils All Utensils necessary to bake
      */
     constructor(utensils: Utensils) {
-        checkConfiguration(utensils.getConfiguration())
+        checkConfiguration(utensils.configuration)
         this.utensils = utensils
     }
 
     @get:Deprecated("")
     @set:Deprecated("")
     var config: CompositeConfiguration
-        get() = (utensils.getConfiguration() as DefaultJBakeConfiguration).compositeConfiguration
+        get() = (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration
         // TODO: do we want to use this. Else, config could be final
         set(config) {
-            (utensils.getConfiguration() as DefaultJBakeConfiguration).compositeConfiguration = config
+            (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration = config
         }
 
     /**
@@ -117,7 +117,7 @@ class Oven {
      *
      */
     private fun setLocale() {
-        val localeString = this.utensils.getConfiguration().jvmLocale
+        val localeString = this.utensils.configuration.jvmLocale
         val locale = if (localeString != null) LocaleUtils.toLocale(localeString) else Locale.getDefault()
         Locale.setDefault(locale)
     }
@@ -128,7 +128,7 @@ class Oven {
      * @param fileToBake The file to bake
      */
     fun bake(fileToBake: File) {
-        val asset = utensils.getAsset()
+        val asset = utensils.asset
         if (asset.isAssetFile(fileToBake)) {
             LOGGER.info("Baking a change to an asset [" + fileToBake.getPath() + "]")
             asset.copySingleFile(fileToBake)
@@ -142,10 +142,10 @@ class Oven {
      * All the good stuff happens in here...
      */
     fun bake() {
-        val contentStore = utensils.getContentStore()
-        val config = utensils.getConfiguration()
-        val crawler = utensils.getCrawler()
-        val asset = utensils.getAsset()
+        val contentStore = utensils.contentStore
+        val config = utensils.configuration
+        val crawler = utensils.crawler
+        val asset = utensils.asset
         setLocale()
 
         try {
@@ -189,12 +189,12 @@ class Oven {
      */
     private fun updateDocTypesFromConfiguration() {
         resetDocumentTypesAndExtractors()
-        val config = utensils.getConfiguration()
+        val config = utensils.configuration
 
         val listener = ModelExtractorsDocumentTypeListener()
         DocumentTypes.addListener(listener)
 
-        for (docType in config.documentTypes!!) {
+        for (docType in config.documentTypes) {
             DocumentTypes.addDocumentType(docType)
         }
 
@@ -204,16 +204,16 @@ class Oven {
 
     private fun resetDocumentTypesAndExtractors() {
         DocumentTypes.resetDocumentTypes()
-        ModelExtractors.Companion.getInstance().reset()
+        ModelExtractors.Loader.instance.reset()
     }
 
     /**
      * Load [RenderingTool] instances and delegate rendering of documents to them
      */
     private fun renderContent() {
-        val config = utensils.getConfiguration()
-        val renderer = utensils.getRenderer()
-        val contentStore = utensils.getContentStore()
+        val config = utensils.configuration
+        val renderer = utensils.renderer
+        val contentStore = utensils.contentStore
 
         for (tool in ServiceLoader.load<RenderingTool>(RenderingTool::class.java)) {
             try {

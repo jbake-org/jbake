@@ -16,14 +16,13 @@ object UtensilsFactory {
         val inspector = JBakeConfigurationInspector(config)
         inspector.inspect()
 
-        val utensils = Utensils()
-        utensils.setConfiguration(config)
         val contentStore = DBUtil.createDataStore(config)
-        utensils.setContentStore(contentStore)
-        utensils.setCrawler(Crawler(contentStore, config))
-        utensils.setRenderer(Renderer(contentStore, config))
-        utensils.setAsset(Asset(config))
-
-        return utensils
+        return Utensils(
+            configuration = config,
+            contentStore = contentStore,
+            crawler = Crawler(contentStore, config),
+            renderer = Renderer(contentStore, config),
+            asset = Asset(config)
+        )
     }
 }

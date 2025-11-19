@@ -32,15 +32,14 @@ import java.util.*
  * @author Cédric Champeau
  */
 class ModelExtractors private constructor() {
-    private val extractors: MutableMap<String?, ModelExtractor<*>?>
+    private val extractors: MutableMap<String, ModelExtractor<*>>
 
-    private object Loader {
+    object Loader {
         val instance: ModelExtractors = ModelExtractors()
-            get() = Loader.field
     }
 
-    init {
-        extractors = TreeMap<String?, ModelExtractor<*>?>()
+    init {F
+        extractors = TreeMap<String, ModelExtractor<*>>()
         loadEngines()
     }
 
@@ -49,7 +48,7 @@ class ModelExtractors private constructor() {
         loadEngines()
     }
 
-    fun registerEngine(key: String?, extractor: ModelExtractor<*>?) {
+    fun registerEngine(key: String, extractor: ModelExtractor<*>) {
         val old = extractors.put(key, extractor)
         if (old != null) {
             LOGGER.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old)
@@ -69,8 +68,8 @@ class ModelExtractors private constructor() {
                 val props = Properties()
                 props.load(url.openStream())
                 for (entry in props.entries) {
-                    val className = entry.key as String?
-                    val extensions: Array<String?> =
+                    val className = entry.key as String
+                    val extensions: Array<String> =
                         (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     loadAndRegisterEngine(className, *extensions)
                 }
@@ -80,7 +79,7 @@ class ModelExtractors private constructor() {
         }
     }
 
-    private fun loadAndRegisterEngine(className: String?, vararg extensions: String?) {
+    private fun loadAndRegisterEngine(className: String?, vararg extensions: String) {
         val engine: ModelExtractor<*>? = tryLoadEngine(className)
         if (engine != null) {
             for (extension in extensions) {
@@ -117,7 +116,7 @@ class ModelExtractors private constructor() {
      * @return  A @[Set] of all known keys a @[ModelExtractor] is registered with
      * @see java.util.Map.keySet
      */
-    fun keySet(): MutableSet<String?> {
+    fun keySet(): MutableSet<String> {
         return extractors.keys
     }
 

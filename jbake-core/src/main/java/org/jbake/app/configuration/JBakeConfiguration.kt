@@ -108,7 +108,7 @@ interface JBakeConfiguration {
      * @return docType for data files
      */
     //@JvmField
-    val dataFileDocType: String?
+    val dataFileDocType: String
 
     /**
      * @return Folder to store database files in
@@ -147,7 +147,7 @@ interface JBakeConfiguration {
     var destinationFolder: File?
 
     //@JvmField
-    val documentTypes: MutableList<String?>?
+    val documentTypes: MutableList<String>
 
     /**
      * @return Suffix used to identify draft files
