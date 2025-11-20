@@ -105,7 +105,7 @@ interface JBakeConfiguration {
     /**
      * @return name to identify if database is kept in memory (memory) or persisted to disk (plocal)
      */
-    val databaseStore: String?
+    val databaseStore: String
 
     /**
      * @return How date is formated
@@ -374,4 +374,3 @@ interface JBakeConfiguration {
 
     fun addConfiguration(properties: Properties)
 }
-

@@ -140,8 +140,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.DB_PATH.key, path)
     }
 
-    override val databaseStore: String?
-        get() = getAsString(PropertyList.DB_STORE.key)
+    override val databaseStore: String
+        get() = getAsString(PropertyList.DB_STORE.key) ?: "memory"
 
     fun setDatabaseStore(storeType: String?) {
         setProperty(PropertyList.DB_STORE.key, storeType)
