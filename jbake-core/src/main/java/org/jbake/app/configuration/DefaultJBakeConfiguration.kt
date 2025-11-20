@@ -448,11 +448,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         val destinationPath = getAsString(PropertyList.DESTINATION_FOLDER.key) ?: ""
 
         val destination = File(destinationPath)
-        if (destination.isAbsolute()) {
-            destinationFolder = destination
-        } else {
-            destinationFolder = File(sourceFolder, destinationPath)
-        }
+        destinationFolder =
+            if (destination.isAbsolute()) destination
+            else File(sourceFolder, destinationPath)
     }
 
     private fun setupDefaultAssetFolder() {
