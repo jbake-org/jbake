@@ -22,7 +22,6 @@ class ParserContext(
     }
 
     var body: String
-        // short methods for common use
         get() = documentModel.body
         set(str) {
             documentModel.body = str

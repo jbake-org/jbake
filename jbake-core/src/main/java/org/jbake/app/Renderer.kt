@@ -36,12 +36,12 @@ class Renderer {
         """Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
       Creates a new instance of Renderer with supplied references to folders."""
     )
-    constructor(db: ContentStore, destination: File?, templatesPath: File, config: CompositeConfiguration?) : this(
+    constructor(db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration) : this(
         db,
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
     ) {
         val configuration = (this.config as DefaultJBakeConfiguration)
-        configuration.setDestinationFolder(destination)
+        configuration.destinationFolder = destination
         configuration.setTemplateFolder(templatesPath)
     }
 
@@ -380,19 +380,20 @@ class Renderer {
         val model: TemplateModel?
     }
 
-    private abstract class AbstractRenderingConfig(
+    internal abstract class AbstractRenderingConfig(
         override val path: File?,
         override val name: String?,
         override val template: String?
     ) : RenderingConfig
 
-    inner class ModelRenderingConfig : AbstractRenderingConfig {
-        override val model: TemplateModel?
+
+    private inner class ModelRenderingConfig : AbstractRenderingConfig {
+        override val model: TemplateModel
 
         constructor(
-            fileName: String?,
-            model: TemplateModel?,
-            templateType: String?
+            fileName: String,
+            model: TemplateModel,
+            templateType: String
         ) : super(File(config.destinationFolder, fileName), fileName, findTemplateName(templateType)) {
             this.model = model
         }
@@ -409,20 +410,18 @@ class Renderer {
     internal inner class DefaultRenderingConfig : AbstractRenderingConfig {
         private val content: DocumentModel
 
-        private constructor(path: File?, allInOneName: String?) : super(
-            path,
-            allInOneName,
-            findTemplateName(allInOneName)
-        ) {
+        private constructor(path: File, allInOneName: String)
+            : super(path, allInOneName, findTemplateName(allInOneName))
+        {
             this.content = buildSimpleModel(allInOneName)
         }
 
-        constructor(filename: String?, allInOneName: String?) : super(
-            File(
-                config.destinationFolder,
-                File.separator + filename
-            ), allInOneName, findTemplateName(allInOneName)
-        ) {
+        constructor(filename: String, allInOneName: String) : super(
+                File(config.destinationFolder, File.separator + filename),
+                allInOneName,
+                findTemplateName(allInOneName)
+            )
+        {
             this.content = buildSimpleModel(allInOneName)
         }
 
@@ -431,8 +430,8 @@ class Renderer {
          *
          * @param allInOneName
          */
-        constructor(allInOneName: String?) : this(
-            File(config.destinationFolder!!.getPath() + File.separator + allInOneName + config.outputExtension),
+        constructor(allInOneName: String) : this(
+            File(config.destinationFolder.getPath() + File.separator + allInOneName + config.outputExtension),
             allInOneName
         )
 
