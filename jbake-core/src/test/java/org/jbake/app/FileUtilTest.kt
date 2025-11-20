@@ -19,13 +19,13 @@ class FileUtilTest {
     @Throws(Exception::class)
     fun testGetRunningLocation() {
         val path = runningLocation
-        Assert.assertEquals(File("build/classes").getAbsolutePath(), path.getPath())
+        Assert.assertEquals(File("build/classes").absolutePath, path.path)
     }
 
     @Test
     @Throws(Exception::class)
     fun testIsFileInDirectory() {
-        val fixtureDir = File(this.javaClass.getResource("/fixture").getFile())
+        val fixtureDir = File(this.javaClass.getResource("/fixture").file)
         val jbakeFile = File(fixtureDir.getCanonicalPath() + File.separatorChar + "jbake.properties")
         Assert.assertTrue(
             "jbake.properties expected to be in /fixture directory",
@@ -49,17 +49,17 @@ class FileUtilTest {
     @Test
     @Throws(Exception::class)
     fun testGetContentRoothPath() {
-        val source = TestUtils.getTestResourcesAsSourceFolder()
+        val source = TestUtils.testResourcesAsSourceFolder
         val util = ConfigUtil()
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 
-        var path = getUriPathToContentRoot(config, File(config.getContentFolder(), "index.html"))
+        var path = getUriPathToContentRoot(config, File(config.contentFolder, "index.html"))
         Assertions.assertThat(path).isEqualTo("")
 
-        path = getUriPathToContentRoot(config, File(config.getContentFolder(), "/blog/index.html"))
+        path = getUriPathToContentRoot(config, File(config.contentFolder, "/blog/index.html"))
         Assertions.assertThat(path).isEqualTo("../")
 
-        path = getUriPathToContentRoot(config, File(config.getContentFolder(), "/blog/level2/index.html"))
+        path = getUriPathToContentRoot(config, File(config.contentFolder, "/blog/level2/index.html"))
         Assertions.assertThat(path).isEqualTo("../../")
     }
 }
