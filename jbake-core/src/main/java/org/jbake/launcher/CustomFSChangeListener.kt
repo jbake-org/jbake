@@ -9,7 +9,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 
-class CustomFSChangeListener(private val config: JBakeConfiguration?) : FileListener {
+class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListener {
+    
     @Throws(Exception::class)
     override fun fileCreated(event: FileChangeEvent) {
         LOGGER.info("File created event detected: {}", event.getFileObject().getURL())

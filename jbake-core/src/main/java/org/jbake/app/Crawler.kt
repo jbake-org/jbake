@@ -37,7 +37,7 @@ class Crawler {
       <p>
       Creates new instance of Crawler."""
     )
-    constructor(db: ContentStore, source: File?, config: CompositeConfiguration?) {
+    constructor(db: ContentStore, source: File, config: CompositeConfiguration) {
         this.db = db
         this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, config)
         this.parser = Parser(this.config)

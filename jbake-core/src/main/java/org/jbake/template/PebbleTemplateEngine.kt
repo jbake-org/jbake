@@ -52,12 +52,11 @@ class PebbleTemplateEngine(config: JBakeConfiguration?, db: ContentStore?) : Abs
         }
     }
 
-    private fun wrap(model: TemplateModel?): TemplateModel {
-        return object : TemplateModel(model) {
-
-            override fun get(property: Any?): Any? {
+    private fun wrap(model: TemplateModel)
+        = object : TemplateModel(model) {
+            override fun get(property: String): Any? {
                 try {
-                    return AbstractTemplateEngine.Companion.extractors.extractAndTransform<Any?>(
+                    return AbstractTemplateEngine.extractors.extractAndTransform(
                         db,
                         property as String?,
                         this,
@@ -68,5 +67,4 @@ class PebbleTemplateEngine(config: JBakeConfiguration?, db: ContentStore?) : Abs
                 }
             }
         }
-    }
 }

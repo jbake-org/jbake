@@ -23,5 +23,5 @@ interface ParserEngine {
      * @return A model representation of the given file
      */
     @Deprecated("use {@link #parse(JBakeConfiguration, File)} instead")
-    fun parse(config: Configuration?, file: File?, contentPath: String?): MutableMap<String?, Any?>?
+    fun parse(config: Configuration?, file: File?, contentPath: String?): MutableMap<String,  Any>
 }

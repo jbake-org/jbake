@@ -68,7 +68,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val authorsList = authorsFileContents.get("authors")
         Assertions.assertThat<Any?>(authorsList).isNotInstanceOf(OTrackedMap::class.java)
         Assertions.assertThat<Any?>(authorsList).isInstanceOf(HashMap::class.java)
-        val authors = authorsList as HashMap<String?, MutableMap<String?, Any?>?>
+        val authors = authorsList as HashMap<String, MutableMap<String,  Any>>
         Assertions.assertThat<Any?>(authors.get("Joe Bloggs")!!.get("last_name")).isEqualTo("Bloggs")
     }
 

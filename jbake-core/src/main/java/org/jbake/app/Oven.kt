@@ -39,7 +39,7 @@ class Oven {
     )
     constructor(
         source: File,
-        destination: File?,
+        destination: File,
         isClearCache: Boolean
     ) : this(JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, isClearCache))
 
@@ -54,7 +54,7 @@ class Oven {
         """Use {@link #Oven(JBakeConfiguration)} instead
       Creates a new instance of the Oven with references to the source and destination folders."""
     )
-    constructor(source: File?, destination: File?, config: CompositeConfiguration?, isClearCache: Boolean) : this(
+    constructor(source: File, destination: File, config: CompositeConfiguration, isClearCache: Boolean) : this(
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config, isClearCache)
     )
 
@@ -224,8 +224,8 @@ class Oven {
         }
     }
 
-    fun getErrors(): MutableList<Throwable?> {
-        return ArrayList<Throwable?>(errors)
+    fun getErrors(): MutableList<Throwable> {
+        return ArrayList<Throwable>(errors)
     }
 
     companion object {

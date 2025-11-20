@@ -86,7 +86,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     }
 
     class FormatHelper {
-        private val formatters: MutableMap<String?, SimpleDateFormat?> = HashMap<String?, SimpleDateFormat?>()
+        private val formatters: MutableMap<String, SimpleDateFormat?> = HashMap<String, SimpleDateFormat?>()
 
         fun format(date: Date?, pattern: String?): String {
             if (date != null && pattern != null) {

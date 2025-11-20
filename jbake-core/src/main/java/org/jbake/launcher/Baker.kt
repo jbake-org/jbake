@@ -18,12 +18,12 @@ class Baker {
      * @param config  The project configuration
      */
     @Deprecated("use {@link Baker#bake(JBakeConfiguration)} instead")
-    fun bake(options: LaunchOptions, config: CompositeConfiguration?) {
+    fun bake(options: LaunchOptions, config: CompositeConfiguration) {
         val configuration: JBakeConfiguration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(
             options.getSource(),
             options.getDestination(),
             config,
-            options.clearCache
+            options.isClearCache
         )
         bake(configuration)
     }

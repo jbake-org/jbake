@@ -10,12 +10,12 @@ import java.io.Writer
 open class TemplateModel : BaseModel {
     constructor()
 
-    constructor(model: TemplateModel?) {
-        putAll(model!!)
+    constructor(model: TemplateModel) {
+        putAll(model)
     }
 
-    var config: MutableMap<String?, Any?>?
-        get() = get(ModelAttributes.CONFIG) as MutableMap<String?, Any?>?
+    var config: MutableMap<String,  Any>
+        get() = get(ModelAttributes.CONFIG) as MutableMap<String,  Any>
         set(configModel) {
             put(ModelAttributes.CONFIG, configModel)
         }
@@ -23,13 +23,13 @@ open class TemplateModel : BaseModel {
     var content: DocumentModel?
         get() = get(ModelAttributes.CONTENT) as DocumentModel?
         set(content) {
-            put(ModelAttributes.CONTENT, content)
+            put(ModelAttributes.CONTENT, content!!)
         }
 
     var renderer: DelegatingTemplateEngine?
         get() = get(ModelAttributes.RENDERER) as DelegatingTemplateEngine?
         set(renderingEngine) {
-            put(ModelAttributes.RENDERER, renderingEngine)
+            put(ModelAttributes.RENDERER, renderingEngine!!)
         }
 
     var numberOfPages: Int
@@ -59,17 +59,17 @@ open class TemplateModel : BaseModel {
     var tag: String?
         get() = get(ModelAttributes.TAG) as String?
         set(tag) {
-            put(ModelAttributes.TAG, tag)
+            put(ModelAttributes.TAG, tag!!)
         }
 
-    var taggedPosts: DocumentList<*>?
-        get() = get(ModelAttributes.TAGGED_POSTS) as DocumentList<*>?
+    var taggedPosts: DocumentList<*>
+        get() = get(ModelAttributes.TAGGED_POSTS) as DocumentList<*>
         set(taggedPosts) {
             put(ModelAttributes.TAGGED_POSTS, taggedPosts)
         }
 
-    var taggedDocuments: DocumentList<*>?
-        get() = get(ModelAttributes.TAGGED_DOCUMENTS) as DocumentList<*>?
+    var taggedDocuments: DocumentList<*>
+        get() = get(ModelAttributes.TAGGED_DOCUMENTS) as DocumentList<*>
         set(taggedDocuments) {
             put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments)
         }
@@ -77,7 +77,7 @@ open class TemplateModel : BaseModel {
     var version: String?
         get() = get(ModelAttributes.VERSION) as String?
         set(version) {
-            put(ModelAttributes.VERSION, version)
+            put(ModelAttributes.VERSION, version!!)
         }
 
     val writer: Writer?

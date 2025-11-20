@@ -28,7 +28,7 @@ class BakeWatcher {
 
       """
     )
-    fun start(res: LaunchOptions, config: CompositeConfiguration?) {
+    fun start(res: LaunchOptions, config: CompositeConfiguration) {
         val configuration: JBakeConfiguration =
             JBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), config)
         start(configuration)

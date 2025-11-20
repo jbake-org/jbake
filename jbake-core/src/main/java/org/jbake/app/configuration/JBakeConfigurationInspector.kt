@@ -19,14 +19,14 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     @Throws(JBakeException::class)
     private fun ensureSource() {
-        val source = configuration.getSourceFolder()
+        val source = configuration.sourceFolder
         if (!FileUtil.isExistingFolder(source)) {
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
                 "Error: Source folder must exist: " + source.getAbsolutePath()
             )
         }
-        if (!configuration.getSourceFolder().canRead()) {
+        if (!configuration.sourceFolder.canRead()) {
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
                 "Error: Source folder is not readable: " + source.getAbsolutePath()
@@ -35,17 +35,17 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     }
 
     private fun ensureTemplateFolder() {
-        val path = configuration.getTemplateFolder()
-        checkRequiredFolderExists(PropertyList.TEMPLATE_FOLDER.getKey(), path)
+        val path = configuration.templateFolder
+        checkRequiredFolderExists(PropertyList.TEMPLATE_FOLDER.key, path)
     }
 
     private fun ensureContentFolder() {
-        val path = configuration.getContentFolder()
-        checkRequiredFolderExists(PropertyList.CONTENT_FOLDER.getKey(), path)
+        val path = configuration.contentFolder
+        checkRequiredFolderExists(PropertyList.CONTENT_FOLDER.key, path)
     }
 
     private fun ensureDestination() {
-        val destination = configuration.getDestinationFolder()
+        val destination = configuration.destinationFolder
         if (!destination.exists()) {
             destination.mkdirs()
         }
@@ -58,9 +58,9 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     }
 
     private fun checkAssetFolder() {
-        val path = configuration.getAssetFolder()
+        val path = configuration.assetFolder
         if (!path.exists()) {
-            LOGGER.warn("No asset folder '{}' was found!", path.getAbsolutePath())
+            LOGGER.warn("No asset folder '{}' was found!", path.absolutePath)
         }
     }
 

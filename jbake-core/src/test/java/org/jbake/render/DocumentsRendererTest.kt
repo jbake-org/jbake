@@ -172,7 +172,7 @@ class DocumentsRendererTest {
     }
 
     private fun assertDocumentNavigation(
-        renderedDoc: MutableMap<String?, Any?>?,
+        renderedDoc: MutableMap<String,  Any>,
         prevDocumentTitle: String?, nextDocumentTitle: String?
     ) {
         Assertions.assertThat<String?, Any?>(renderedDoc).flatExtracting(
@@ -182,7 +182,7 @@ class DocumentsRendererTest {
             .containsExactly(prevDocumentTitle, nextDocumentTitle)
     }
 
-    private fun asTitleToDocMap(values: MutableList<DocumentModel>): MutableMap<String?, MutableMap<String?, Any?>?> {
+    private fun asTitleToDocMap(values: MutableList<DocumentModel>): MutableMap<String, MutableMap<String,  Any>> {
         return values.stream()
             .collect(
                 Collectors.toMap(

@@ -50,7 +50,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     protected val templateDir: String,
     protected val templateExtension: String?
 ) : ContentStoreIntegrationTest() {
-    protected val outputStrings: MutableMap<String?, MutableList<String>?> = HashMap<String?, MutableList<String>?>()
+    protected val outputStrings: MutableMap<String, MutableList<String>?> = HashMap<String, MutableList<String>?>()
 
     protected var destinationFolder: File? = null
     protected var templateFolder: File? = null
@@ -155,7 +155,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "tags", mutableListOf<String?>(
+            "tags", mutableListOf<String>(
                 "<a href=\"blog/2013/second-post.html\"",
                 ">Second Post</a>",
                 "<a href=\"blog/2012/first-post.html\"",
@@ -164,7 +164,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "tags-index", mutableListOf<String?>(
+            "tags-index", mutableListOf<String>(
                 "<h1>Tags</h1>",
                 "<h2><a href=\"../tags/blog.html\">blog</a>",
                 "3</h2>"
@@ -172,7 +172,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "sitemap", mutableListOf<String?>(
+            "sitemap", mutableListOf<String>(
                 "blog/2013/second-post.html",
                 "blog/2012/first-post.html",
                 "papers/published-paper.html"
@@ -322,7 +322,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         Assertions.assertThat(output).doesNotContain("draft-paper.html")
     }
 
-    protected fun getOutputStrings(type: String?): MutableList<String?>? {
+    protected fun getOutputStrings(type: String?): MutableList<String>? {
         return outputStrings.get(type)
     }
 
@@ -332,7 +332,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
         ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
 
-        outputStrings.put("dbSpan", mutableListOf<String?>("<span>3</span>"))
+        outputStrings.put("dbSpan", mutableListOf<String>("<span>3</span>"))
 
         ContentStoreIntegrationTest.Companion.db.deleteAllByDocType("post")
 

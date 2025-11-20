@@ -117,7 +117,7 @@ class LaunchOptionsTest {
     @Test
     @Throws(Exception::class)
     fun defaultEncodingIsUtf8() {
-        val args = arrayOf<String?>()
+        val args = arrayOf<String>()
         val res = parseArgs(args)
 
         Assertions.assertThat(res.propertiesEncoding).isEqualTo("utf-8")
@@ -125,7 +125,7 @@ class LaunchOptionsTest {
 
     @Test
     fun bakeNoArgs() {
-        val args = arrayOf<String?>()
+        val args = arrayOf<String>()
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isHelpNeeded).isTrue()
@@ -141,7 +141,7 @@ class LaunchOptionsTest {
 
     @Test
     fun bakeWithArgs() {
-        val args = arrayOf<String?>("/tmp/source", "/tmp/destination")
+        val args = arrayOf<String>("/tmp/source", "/tmp/destination")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isHelpNeeded).isFalse()
@@ -154,13 +154,13 @@ class LaunchOptionsTest {
 
     @Test
     fun configArg() {
-        val args = arrayOf<String?>("-c", "foo")
+        val args = arrayOf<String>("-c", "foo")
         val res = parseArgs(args)
         Assertions.assertThat(res.getConfig().getAbsoluteFile().toString())
             .isEqualTo(System.getProperty("user.dir") + File.separator + "foo")
     }
 
-    private fun parseArgs(args: Array<String?>): LaunchOptions {
+    private fun parseArgs(args: Array<String>): LaunchOptions {
         return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
     }
 }

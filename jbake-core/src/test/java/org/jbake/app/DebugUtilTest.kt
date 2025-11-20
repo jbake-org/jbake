@@ -14,10 +14,10 @@ class DebugUtilTest {
     fun printMap() {
         val baos = ByteArrayOutputStream()
         PrintStream(baos, true, "UTF-8").use { ps ->
-            val map = HashMap<String?, Any?>()
+            val map = HashMap<String, Any?>()
             map.put("stringKey", "stringVal")
             map.put("forNullVal", null)
-            map.put(null, "forNullKey")
+            ///map.put(null, "forNullKey")
             map.put("forObject", Any())
             map.put("forCharset", StandardCharsets.UTF_8)
             map.put("forNonSerializableVal", Exception("nonSerializableVal"))

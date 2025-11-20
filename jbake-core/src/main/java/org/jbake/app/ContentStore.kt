@@ -277,14 +277,14 @@ class ContentStore(private val type: String, private val name: String?) {
 
     val allTags: MutableSet<String>
         get() {
-            val result: MutableSet<String> = HashSet<String?>()
+            val result: MutableSet<String> = HashSet<String>()
             for (docType in DocumentTypes.documentTypes) {
                 val statement: String =
                     String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType)
                 val docs = query(statement)
                 for (document in docs) {
                     val tags = document.tags
-                    Collections.addAll<String?>(result, *tags)
+                    Collections.addAll<String>(result, *tags)
                 }
             }
             return result

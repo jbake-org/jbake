@@ -81,7 +81,7 @@ class TagsRendererTest {
         val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
 
         val tags: MutableSet<String> = HashSet<String>(mutableListOf<String>("tag1", "tags2"))
-        Mockito.`when`<MutableSet<String?>>(contentStore.tags).thenReturn(tags)
+        Mockito.`when`<MutableSet<String>>(contentStore.tags).thenReturn(tags)
         Mockito.`when`<Any?>(configuration.tagPathName).thenReturn("mockTagfile.html")
 
         renderer.render(mockRenderer, contentStore, configuration)

@@ -68,7 +68,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
         try {
             val template = templateEngine!!.createTemplateByPath(templateName)
-            val wrappedModel: MutableMap<String?, Any?> = wrap(model)
+            val wrappedModel: MutableMap<String, Any> = wrap(model)
             val writable = template.make(wrappedModel)
             writable.writeTo(writer)
         } catch (e: Exception) {

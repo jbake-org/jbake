@@ -36,11 +36,11 @@ import java.util.*
  * @author Cédric Champeau
  */
 class Engines private constructor() {
-    private val parsers: MutableMap<String?, ParserEngine?>
+    private val parsers: MutableMap<String, ParserEngine?>
 
 
     init {
-        parsers = HashMap<String?, ParserEngine?>()
+        parsers = HashMap<String, ParserEngine?>()
     }
 
     private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {

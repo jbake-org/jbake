@@ -22,7 +22,7 @@ import javax.xml.parsers.ParserConfigurationException
  * @author Cédric Champeau
  */
 class GroovyTemplateEngine : AbstractTemplateEngine {
-    private val cachedTemplates: MutableMap<String?, Template?> = HashMap<String?, Template?>()
+    private val cachedTemplates: MutableMap<String, Template?> = HashMap<String, Template?>()
 
     /**
      * @param config the [CompositeConfiguration] of jbake
