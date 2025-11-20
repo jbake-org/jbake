@@ -525,26 +525,27 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.IMG_PATH_UPDATE.key, imgPathUpdate)
     }
 
-    fun getJbakeProperties(): MutableList<Property?> {
-        val jbakeKeys: MutableList<Property?> = ArrayList<Property?>()
+    override val jbakeProperties: MutableList<Property>
+        get() {
+            val jbakeKeys: MutableList<Property> = ArrayList()
 
-        for (i in 0..<compositeConfiguration.getNumberOfConfigurations()) {
-            val configuration = compositeConfiguration.getConfiguration(i)
+            for (i in 0..<compositeConfiguration.getNumberOfConfigurations()) {
+                val configuration = compositeConfiguration.getConfiguration(i)
 
-            if (configuration !is SystemConfiguration) {
-                val it = configuration.getKeys()
-                while (it.hasNext()) {
-                    val key = it.next()
-                    val property = PropertyList.getPropertyByKey(key)
-                    if (!jbakeKeys.contains(property)) {
-                        jbakeKeys.add(property)
+                if (configuration !is SystemConfiguration) {
+                    val it = configuration.keys
+                    while (it.hasNext()) {
+                        val key = it.next()
+                        val property = PropertyList.getPropertyByKey(key)
+                        if (property != null && !jbakeKeys.contains(property)) {
+                            jbakeKeys.add(property)
+                        }
                     }
                 }
             }
+            Collections.sort(jbakeKeys)
+            return jbakeKeys
         }
-        Collections.sort<Property?>(jbakeKeys)
-        return jbakeKeys
-    }
 
     override fun addConfiguration(properties: Properties) {
         compositeConfiguration.addConfiguration(MapConfiguration(properties))
