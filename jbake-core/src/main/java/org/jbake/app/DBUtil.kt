@@ -24,7 +24,7 @@ object DBUtil {
     @JvmStatic
     fun createDataStore(configuration: JBakeConfiguration): ContentStore {
         if (contentStore == null) {
-            val storeType = configuration.databaseStore ?: "memory"
+            val storeType = configuration.databaseStore
             contentStore = ContentStore(storeType, configuration.databasePath)
         }
 

@@ -3,64 +3,56 @@ package org.jbake.parser
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import java.io.File
+import java.util.Date
 
 class ParserContext(
     val file: File?,
-    val fileLines: MutableList<String?>?,
+    val fileLines: MutableList<String>,
     val config: JBakeConfiguration?,
     private val hasHeader: Boolean
 ) {
     val documentModel: DocumentModel
 
     init {
-        this.documentModel = DocumentModel.Companion.createDefaultDocumentModel()
+        this.documentModel = DocumentModel.createDefaultDocumentModel()
     }
 
     fun hasHeader(): Boolean {
         return hasHeader
     }
 
-    var body: String?
+    var body: String
         // short methods for common use
-        get() = documentModel.getBody()
+        get() = documentModel.body
         set(str) {
-            documentModel.setBody(str)
+            documentModel.body = str
         }
 
     var date: Date?
-        get() = this.documentModel.getDate()
+        get() = this.documentModel.date
         set(date) {
-            this.documentModel.setDate(date)
+            this.documentModel.date = date
         }
 
-    val status: String?
-        get() {
-            if (this.documentModel.getStatus() != null) {
-                return this.documentModel.getStatus()
-            }
-            return ""
-        }
+    val status: String
+        get() = this.documentModel.status ?: ""
 
     fun setDefaultStatus() {
-        this.documentModel.setStatus(this.config!!.defaultStatus)
+        this.documentModel.status = this.config?.defaultStatus ?: ""
     }
 
-    val type: String?
-        get() {
-            if (this.documentModel.getType() != null) {
-                return this.documentModel.getType()
-            }
-            return ""
-        }
+    val type: String
+        get() = this.documentModel.type
 
     fun setDefaultType() {
-        this.documentModel.setType(this.config!!.defaultType)
+        this.documentModel.type = this.config?.defaultType ?: ""
     }
 
-    val tags: Any?
-        get() = this.documentModel.getTags()
+    val tags: Array<String>
+        get() = this.documentModel.tags
 
     fun setTags(tags: Array<String?>?) {
-        this.documentModel.setTags(tags)
+        val clean: Array<String> = tags?.filterNotNull()?.toTypedArray() ?: arrayOf()
+        this.documentModel.tags = clean
     }
 }

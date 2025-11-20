@@ -26,7 +26,7 @@ class Parser
      * @return The contents of the file
      */
     fun processFile(file: File): DocumentModel? {
-        val engine: ParserEngine? = Engines.Companion.get(FileUtil.fileExt(file))
+        val engine: ParserEngine? = Engines.get(FileUtil.fileExt(file))
         if (engine == null) {
             LOGGER.error("Unable to find suitable markup engine for {}", file)
             return null

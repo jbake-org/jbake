@@ -4,8 +4,8 @@ import org.jbake.app.DBUtil
 import java.util.*
 
 class DocumentModel : BaseModel() {
-    var body: String?
-        get() = get(ModelAttributes.BODY) as String?
+    var body: String
+        get() = get(ModelAttributes.BODY) as String
         set(body) {
             put(ModelAttributes.BODY, body)
         }

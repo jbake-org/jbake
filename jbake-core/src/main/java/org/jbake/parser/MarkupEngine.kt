@@ -28,6 +28,7 @@ import java.util.*
  * @author Cédric Champeau
  */
 abstract class MarkupEngine : ParserEngine {
+
     private var configuration: JBakeConfiguration? = null
 
     /**
@@ -36,7 +37,7 @@ abstract class MarkupEngine : ParserEngine {
      * @param context the parser context
      * @return true if this markup engine has enough context to process this document. false otherwise
      */
-    fun validate(context: ParserContext?): Boolean {
+    fun validate(context: ParserContext): Boolean {
         return true
     }
 
@@ -46,7 +47,7 @@ abstract class MarkupEngine : ParserEngine {
      *
      * @param context the parser context
      */
-    open fun processHeader(context: ParserContext?) {
+    open fun processHeader(context: ParserContext) {
     }
 
     /**
@@ -55,10 +56,10 @@ abstract class MarkupEngine : ParserEngine {
      *
      * @param context the parser context
      */
-    open fun processBody(context: ParserContext?) {
+    open fun processBody(context: ParserContext) {
     }
 
-    override fun parse(config: Configuration?, file: File, contentPath: String?): MutableMap<String?, Any?>? {
+    override fun parse(config: Configuration, file: File, contentPath: String): MutableMap<String, Any> {
         return parse(DefaultJBakeConfiguration((config as CompositeConfiguration?)!!), file)
     }
 
@@ -318,7 +319,7 @@ abstract class MarkupEngine : ParserEngine {
         }
 
         if (body.length == 0) {
-            for (line in context.getFileLines()) {
+            for (line in context.fileLines) {
                 body.append(line).append("\n")
             }
         }

@@ -8,17 +8,19 @@ import java.util.*
  *
  * @author Cédric Champeau
  */
-class ErrorEngine @JvmOverloads constructor(private val engineName: String = "unknown") : MarkupEngine() {
+class ErrorEngine @JvmOverloads constructor(private val engineName: String = "unknown")
+    : MarkupEngine()
+{
     override fun processHeader(context: ParserContext) {
-        val documentModel = context.getDocumentModel()
-        documentModel.setType("post")
-        documentModel.setStatus("published")
-        documentModel.setTitle("Rendering engine missing")
-        documentModel.setDate(Date())
-        documentModel.setTags(arrayOfNulls<String>(0))
+        val documentModel = context.documentModel
+        documentModel.type = "post"
+        documentModel.status = "published"
+        documentModel.title = "Rendering engine missing"
+        documentModel.date = Date()
+        documentModel.tags = emptyArray<String>()
     }
 
     override fun processBody(context: ParserContext) {
-        context.setBody("The markup engine [" + engineName + "] for [" + context.getFile() + "] couldn't be loaded")
+        context.body = "The markup engine [" + engineName + "] for [" + context.file + "] couldn't be loaded"
     }
 }
