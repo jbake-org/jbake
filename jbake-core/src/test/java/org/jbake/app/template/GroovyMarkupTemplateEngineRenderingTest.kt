@@ -14,7 +14,7 @@ import java.nio.charset.Charset
 class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("groovyMarkupTemplates", "tpl") {
     init {
         outputStrings.put(
-            "post", mutableListOf<String?>(
+            "post", mutableListOf<String>(
                 "<h2>Second Post</h2>",
                 "<p class=\"post-date\">28",
                 "2013</p>",
@@ -24,7 +24,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
             )
         )
         outputStrings.put(
-            "page", mutableListOf<String?>(
+            "page", mutableListOf<String>(
                 "<h4>About</h4>",
                 "All about stuff!",
                 "<h5>Published Pages</h5>",
@@ -32,39 +32,39 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
             )
         )
         outputStrings.put(
-            "index", mutableListOf<String?>(
+            "index", mutableListOf<String>(
                 "<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>",
                 "<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>"
             )
         )
         outputStrings.put(
-            "feed", mutableListOf<String?>(
+            "feed", mutableListOf<String>(
                 "<description>My corner of the Internet</description>",
                 "<title>Second Post</title>",
                 "<title>First Post</title>"
             )
         )
         outputStrings.put(
-            "archive", mutableListOf<String?>(
+            "archive", mutableListOf<String>(
                 "<a href=\"blog/2013/second-post.html\">Second Post</a></h4>",
                 "<a href=\"blog/2012/first-post.html\">First Post</a></h4>"
             )
         )
         outputStrings.put(
-            "tags", mutableListOf<String?>(
+            "tags", mutableListOf<String>(
                 "<a href=\"blog/2013/second-post.html\">Second Post</a></h4>",
                 "<a href=\"blog/2012/first-post.html\">First Post</a></h4>"
             )
         )
         outputStrings.put(
-            "sitemap", mutableListOf<String?>(
+            "sitemap", mutableListOf<String>(
                 "blog/2013/second-post.html",
                 "blog/2012/first-post.html",
                 "papers/published-fixture.groovyMarkupTemplates.paper.html"
             )
         )
         outputStrings.put(
-            "paper", mutableListOf<String?>(
+            "paper", mutableListOf<String>(
                 "<h2>Published Paper</h2>",
                 "<p class=\"post-date\">24",
                 "2014</p>",

@@ -13,9 +13,9 @@ class DocumentTypesTest {
     @Throws(Exception::class)
     fun shouldReturnDefaultDocumentTypes() {
         val knownDocumentTypes = documentTypes
-        val expectedDocumentType: Array<String?> = arrayOf<String>("page", "post", "masterindex", "archive", "feed")
+        val expectedDocumentType: Array<String> = arrayOf<String>("page", "post", "masterindex", "archive", "feed")
 
-        Assertions.assertThat<String?>(knownDocumentTypes).contains(*expectedDocumentType)
+        Assertions.assertThat<String>(knownDocumentTypes).contains(*expectedDocumentType)
     }
 
     @Test
@@ -24,7 +24,7 @@ class DocumentTypesTest {
 
         addDocumentType(newDocumentType)
 
-        Assertions.assertThat<String?>(documentTypes).contains(newDocumentType)
+        Assertions.assertThat<String>(documentTypes).contains(newDocumentType)
     }
 
     @Test
@@ -37,7 +37,7 @@ class DocumentTypesTest {
         addDocumentType(knownDocumentType)
 
         // only one document type could be found in the list
-        Assertions.assertThat<String?>(documentTypes).containsOnlyOnce(knownDocumentType)
+        Assertions.assertThat<String>(documentTypes).containsOnlyOnce(knownDocumentType)
     }
 
     @Test

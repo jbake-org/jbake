@@ -118,7 +118,7 @@ class SeedMojo : AbstractMojo() {
 
     private fun stripLeadingPath(name: String): String? {
         val elements =
-            LinkedList<String?>(Arrays.asList<String>(*name.split("/".toRegex()).dropLastWhile { it.isEmpty() }
+            LinkedList<String>(Arrays.asList<String>(*name.split("/".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()))
 
         elements.pop()

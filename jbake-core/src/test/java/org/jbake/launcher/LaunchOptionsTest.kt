@@ -10,14 +10,14 @@ import java.io.File
 class LaunchOptionsTest {
     @Test
     fun showHelp() {
-        val args = arrayOf<String?>("-h")
+        val args = arrayOf<String>("-h")
         val res = parseArgs(args)
         Assertions.assertThat(res.isHelpNeeded).isTrue()
     }
 
     @Test
     fun runServer() {
-        val args = arrayOf<String?>("-s")
+        val args = arrayOf<String>("-s")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isRunServer).isTrue()
@@ -25,7 +25,7 @@ class LaunchOptionsTest {
 
     @Test
     fun runServerWithFolder() {
-        val args = arrayOf<String?>("-s", "/tmp")
+        val args = arrayOf<String>("-s", "/tmp")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isRunServer).isTrue()
@@ -34,7 +34,7 @@ class LaunchOptionsTest {
 
     @Test
     fun init() {
-        val args = arrayOf<String?>("-i")
+        val args = arrayOf<String>("-i")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -43,7 +43,7 @@ class LaunchOptionsTest {
 
     @Test
     fun initWithTemplate() {
-        val args = arrayOf<String?>("-i", "-t", "foo")
+        val args = arrayOf<String>("-i", "-t", "foo")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -52,7 +52,7 @@ class LaunchOptionsTest {
 
     @Test
     fun initWithSourceDirectory() {
-        val args = arrayOf<String?>("-i", "/tmp")
+        val args = arrayOf<String>("-i", "/tmp")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -61,7 +61,7 @@ class LaunchOptionsTest {
 
     @Test
     fun initWithTemplateAndSourceDirectory() {
-        val args = arrayOf<String?>("-i", "-t", "foo", "/tmp")
+        val args = arrayOf<String>("-i", "-t", "foo", "/tmp")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -71,7 +71,7 @@ class LaunchOptionsTest {
 
     @Test
     fun shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
-        val args = arrayOf<String?>("-t", "groovy-mte")
+        val args = arrayOf<String>("-t", "groovy-mte")
 
         Assertions.assertThatExceptionOfType<CommandLine.MissingParameterException?>(CommandLine.MissingParameterException::class.java)
             .isThrownBy(ThrowingCallable {
@@ -81,7 +81,7 @@ class LaunchOptionsTest {
 
     @Test
     fun bake() {
-        val args = arrayOf<String?>("-b")
+        val args = arrayOf<String>("-b")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isBake).isTrue()
@@ -90,7 +90,7 @@ class LaunchOptionsTest {
     @Test
     @Throws(Exception::class)
     fun listConfig() {
-        val args = arrayOf<String?>("-ls")
+        val args = arrayOf<String>("-ls")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isListConfig).isTrue()
@@ -99,7 +99,7 @@ class LaunchOptionsTest {
     @Test
     @Throws(Exception::class)
     fun listConfigLongOption() {
-        val args = arrayOf<String?>("--list-settings")
+        val args = arrayOf<String>("--list-settings")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isListConfig).isTrue()
@@ -108,7 +108,7 @@ class LaunchOptionsTest {
     @Test
     @Throws(Exception::class)
     fun customPropertiesEncoding() {
-        val args = arrayOf<String?>("--prop-encoding", "utf-16")
+        val args = arrayOf<String>("--prop-encoding", "utf-16")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.propertiesEncoding).isEqualTo("utf-16")

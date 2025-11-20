@@ -62,7 +62,7 @@ class ConfigUtilTest : LoggingTest() {
     @Throws(Exception::class)
     fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
         val nonExistentSourceFolder = Mockito.mock<File>(File::class.java)
-        Mockito.`when`<String?>(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent")
+        Mockito.`when`<String>(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent")
         Mockito.`when`<Boolean?>(nonExistentSourceFolder.exists()).thenReturn(false)
 
         val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
@@ -184,7 +184,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val markdownExtensions = config.getMarkdownExtensions()
 
-        Assertions.assertThat<String?>(markdownExtensions)
+        Assertions.assertThat<String>(markdownExtensions)
             .containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS")
     }
 
@@ -196,7 +196,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val docTypes = config.documentTypes
 
-        Assertions.assertThat<String?>(docTypes).containsExactly(
+        Assertions.assertThat<String>(docTypes).containsExactly(
             "allcontent",
             "team",
             "masterindex",
@@ -221,7 +221,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val options = config.getAsciidoctorOptionKeys()
 
-        Assertions.assertThat<String?>(options).contains("requires", "template_dirs")
+        Assertions.assertThat<String>(options).contains("requires", "template_dirs")
     }
 
     @Test
@@ -234,7 +234,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val option = config.getAsciidoctorOption("requires")
 
-        Assertions.assertThat<String?>(option).contains("asciidoctor-diagram")
+        Assertions.assertThat<String>(option).contains("asciidoctor-diagram")
     }
 
     @Test
@@ -247,7 +247,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val option = config.getAsciidoctorOption("template_dirs")
 
-        Assertions.assertThat<String?>(option).contains("src/template1", "src/template2")
+        Assertions.assertThat<String>(option).contains("src/template1", "src/template2")
     }
 
     @Test
@@ -258,7 +258,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val options = config.getAsciidoctorOption("template_dirs")
 
-        Assertions.assertThat<String?>(options).isEmpty()
+        Assertions.assertThat<String>(options).isEmpty()
     }
 
     @Test

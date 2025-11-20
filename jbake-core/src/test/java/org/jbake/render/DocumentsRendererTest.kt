@@ -61,7 +61,7 @@ class DocumentsRendererTest {
 
         // return given DocumentList for DocumentType 'custom type'
         Mockito.`when`<DocumentList<DocumentModel>>(db!!.unrenderedContent).thenReturn(templateModelList)
-        Mockito.`when`<DocumentList<DocumentModel>>(db!!.getAllContent(ArgumentMatchers.any<String?>()))
+        Mockito.`when`<DocumentList<DocumentModel>>(db!!.getAllContent(ArgumentMatchers.any<String>()))
             .thenReturn(templateModelList)
 
         // when:

@@ -24,7 +24,7 @@ class PagingHelperTest {
 
         val previousFileName = helper.getPreviousFileName(2)
 
-        Assert.assertThat<String?>("", Is.`is`<String?>(previousFileName))
+        Assert.assertThat<String>("", Is.`is`<String>(previousFileName))
     }
 
     @Test
@@ -34,7 +34,7 @@ class PagingHelperTest {
 
         val previousFileName = helper.getPreviousFileName(3)
 
-        Assert.assertThat<String?>("2/", Is.`is`<String?>(previousFileName))
+        Assert.assertThat<String>("2/", Is.`is`<String?>(previousFileName))
     }
 
     @Test

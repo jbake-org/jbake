@@ -75,8 +75,8 @@ class Engines private constructor() {
             INSTANCE.registerEngine(fileExtension, engine)
         }
 
-        val recognizedExtensions: MutableSet<String?>
-            get() = Collections.unmodifiableSet<String?>(INSTANCE.parsers.keys)
+        val recognizedExtensions: MutableSet<String>
+            get() = Collections.unmodifiableSet<String>(INSTANCE.parsers.keys)
 
         /**
          * This method is used to search for a specific class, telling if loading the engine would succeed. This is
@@ -123,7 +123,7 @@ class Engines private constructor() {
                     props.load(url.openStream())
                     for (entry in props.entries) {
                         val className = entry.key as String?
-                        val extensions: Array<String?> =
+                        val extensions: Array<String> =
                             (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                         registerEngine(className, *extensions)
                     }

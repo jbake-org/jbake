@@ -20,7 +20,7 @@ class ServiceLoaderTest {
         val reader = BufferedReader(fileReader)
 
         var serviceProvider: String?
-        val renderingToolClasses: MutableList<String?> = ArrayList<String?>()
+        val renderingToolClasses: MutableList<String> = ArrayList<String>()
 
         for (tool in ServiceLoader.load<RenderingTool>(RenderingTool::class.java)) {
             renderingToolClasses.add(tool.javaClass.getName())

@@ -15,7 +15,7 @@ class DocumentsRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration?): Int {
         var renderedCount = 0
-        val errors: MutableList<String?> = LinkedList<String?>()
+        val errors: MutableList<String> = LinkedList<String>()
 
         val documentList = db.getUnrenderedContent()
         for (document in documentList) {

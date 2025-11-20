@@ -50,8 +50,7 @@ class ParserContext(
     val tags: Array<String>
         get() = this.documentModel.tags
 
-    fun setTags(tags: Array<String?>?) {
-        val clean: Array<String> = tags?.filterNotNull()?.toTypedArray() ?: arrayOf()
-        this.documentModel.tags = clean
+    fun setTags(tags: Array<String>) {
+        this.documentModel.tags = tags
     }
 }

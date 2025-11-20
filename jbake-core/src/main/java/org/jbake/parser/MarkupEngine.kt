@@ -122,7 +122,7 @@ abstract class MarkupEngine : ParserEngine {
             }
         } catch (e: IOException) {
             LOGGER.error("Error while opening file {}", file, e)
-            return mutableListOf<String?>()
+            return mutableListOf<String>()
         }
     }
 
@@ -132,7 +132,7 @@ abstract class MarkupEngine : ParserEngine {
 
     private fun sanitizeTags(context: ParserContext) {
         if (context.getTags() != null) {
-            val tags = context.getTags() as Array<String?>
+            val tags = context.getTags() as Array<String>
             for (i in tags.indices) {
                 tags[i] = sanitize(tags[i]!!)
                 if (context.getConfig().sanitizeTag) {
@@ -207,28 +207,24 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     /**
-     * Checks if header separator demarcates end of metadata header
-     *
-     * @param contents
+     * Checks if header separator demarcates end of metadata header.
      * @return true if header separator resides at end of metadata header, false if not
      */
     private fun headerSeparatorDemarcatesHeader(contents: MutableList<String>): Boolean {
-        var subContents: MutableList<String>? = null
         val index = contents.indexOf(configuration!!.headerSeparator)
-        if (index != -1) {
-            // get every line above header separator
-            subContents = contents.subList(0, index)
-
-            for (line in subContents) {
-                // header should only contain empty lines or lines with '=' in
-                if (!line.contains("=") && !line.isEmpty()) {
-                    return false
-                }
-            }
-            return true
-        } else {
+        if (index == -1)
             return false
+
+        // Get every line above header separator.
+        val subContents = contents.subList(0, index)
+
+        for (line in subContents) {
+            // header should only contain empty lines or lines with '=' in
+            if (!line.contains("=") && !line.isEmpty()) {
+                return false
+            }
         }
+        return true
     }
 
     private fun hasHeaderSeparator(line: String): Boolean {
@@ -260,7 +256,7 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     private fun processHeaderLine(line: String, content: DocumentModel) {
-        val parts: Array<String?> = line.split("=".toRegex(), limit = 2).toTypedArray()
+        val parts: Array<String> = line.split("=".toRegex(), limit = 2).toTypedArray()
         if (!line.isEmpty() && parts.size == 2) {
             storeHeaderValue(parts[0]!!, parts[1]!!, content)
         }
@@ -293,7 +289,7 @@ abstract class MarkupEngine : ParserEngine {
         return part.trim { it <= ' ' }
     }
 
-    private fun getTags(tagsPart: String): Array<String?> {
+    private fun getTags(tagsPart: String): Array<String> {
         return tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     }
 

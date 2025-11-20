@@ -42,7 +42,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
 
         outputStrings.put(
-            "index", mutableListOf<String?>(
+            "index", mutableListOf<String>(
                 "\">Previous</a>",
                 "3/\">Next</a>",
                 "2 of 3"

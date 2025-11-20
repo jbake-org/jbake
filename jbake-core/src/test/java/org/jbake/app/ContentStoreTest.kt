@@ -95,7 +95,7 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         Assert.assertEquals(2, documentList5.size.toLong())
         Assert.assertEquals(Boolean.FALSE, documentList5.get(0)!!.rendered)
         Assert.assertEquals(typeWithHyphen, documentList5.get(0)!!.type)
-        Assertions.assertThat<String?>(documentList5.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assertions.assertThat<String>(documentList5.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentCount3: Long = ContentStoreIntegrationTest.Companion.db.getPublishedCount(typeWithHyphen)
         Assert.assertEquals(1, documentCount3)
@@ -107,21 +107,21 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         Assert.assertEquals(1, documentList6.size.toLong())
         Assert.assertEquals(Boolean.TRUE, documentList6.get(0)!!.rendered)
         Assert.assertEquals(typeWithHyphen, documentList6.get(0)!!.type)
-        Assertions.assertThat<String?>(documentList6.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assertions.assertThat<String>(documentList6.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList7: DocumentList<DocumentModel> =
             ContentStoreIntegrationTest.Companion.db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
         Assert.assertEquals(1, documentList7.size.toLong())
         Assert.assertEquals(Boolean.TRUE, documentList7.get(0)!!.rendered)
         Assert.assertEquals(typeWithHyphen, documentList7.get(0)!!.type)
-        Assertions.assertThat<String?>(documentList7.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assertions.assertThat<String>(documentList7.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList8: DocumentList<DocumentModel> =
             ContentStoreIntegrationTest.Companion.db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)
         Assert.assertEquals(0, documentList8.size.toLong())
 
-        val tags: MutableSet<String?> = ContentStoreIntegrationTest.Companion.db.allTags
-        Assert.assertEquals(mutableSetOf<String?>(tagWithHyphenBackslashAndBacktick), tags)
+        val tags: MutableSet<String> = ContentStoreIntegrationTest.Companion.db.allTags
+        Assert.assertEquals(mutableSetOf<String>(tagWithHyphenBackslashAndBacktick), tags)
 
         ContentStoreIntegrationTest.Companion.db.deleteContent(uri)
 

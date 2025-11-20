@@ -50,7 +50,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     protected val templateDir: String,
     protected val templateExtension: String?
 ) : ContentStoreIntegrationTest() {
-    protected val outputStrings: MutableMap<String?, MutableList<String?>?> = HashMap<String?, MutableList<String?>?>()
+    protected val outputStrings: MutableMap<String?, MutableList<String>?> = HashMap<String?, MutableList<String>?>()
 
     protected var destinationFolder: File? = null
     protected var templateFolder: File? = null
@@ -109,7 +109,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
     private fun setupExpectedOutputStrings() {
         outputStrings.put(
-            "post", mutableListOf<String?>(
+            "post", mutableListOf<String>(
                 "<h2>Second Post</h2>",
                 "<p class=\"post-date\">28",
                 "2013</p>",
@@ -120,7 +120,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "page", mutableListOf<String?>(
+            "page", mutableListOf<String>(
                 "<h4>About</h4>",
                 "All about stuff!",
                 "<h5>Published Pages</h5>",
@@ -129,7 +129,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "index", mutableListOf<String?>(
+            "index", mutableListOf<String>(
                 "<a href=\"blog/2016/another-post.html\"",
                 ">Another Post</a>",
                 "<a href=\"blog/2013/second-post.html\"",
@@ -138,7 +138,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "feed", mutableListOf<String?>(
+            "feed", mutableListOf<String>(
                 "<description>My corner of the Internet</description>",
                 "<title>Second Post</title>",
                 "<title>First Post</title>"
@@ -146,7 +146,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
 
         outputStrings.put(
-            "archive", mutableListOf<String?>(
+            "archive", mutableListOf<String>(
                 "<a href=\"blog/2013/second-post.html\"",
                 ">Second Post</a>",
                 "<a href=\"blog/2012/first-post.html\"",

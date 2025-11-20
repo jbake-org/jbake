@@ -39,7 +39,7 @@ class AsciidoctorEngine : MarkupEngine() {
                         }
 
                         if (options.map().containsKey(OPT_REQUIRES)) {
-                            val requires: Array<String?> =
+                            val requires: Array<String> =
                                 options.map().get(OPT_REQUIRES).toString().split(",".toRegex())
                                     .dropLastWhile { it.isEmpty() }.toTypedArray()
                             if (requires.size != 0) {
@@ -142,8 +142,8 @@ class AsciidoctorEngine : MarkupEngine() {
 
     private fun getAsciiDocOptionsAndAttributes(context: ParserContext): Options {
         val config = context.getConfig()
-        val asciidoctorAttributes: MutableList<String?> = config.asciidoctorAttributes!!
-        val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String?>())
+        val asciidoctorAttributes: MutableList<String> = config.asciidoctorAttributes!!
+        val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String>())
         if (config.exportAsciidoctorAttributes) {
             val prefix = config.attributesExportPrefixForAsciidoctor
 
@@ -174,11 +174,11 @@ class AsciidoctorEngine : MarkupEngine() {
         return options
     }
 
-    private fun getAsList(asciidoctorOption: Any?): MutableList<String?> {
-        val values: MutableList<String?> = ArrayList<String?>()
+    private fun getAsList(asciidoctorOption: Any?): MutableList<String> {
+        val values: MutableList<String> = ArrayList<String>()
 
         if (asciidoctorOption is MutableList<*>) {
-            values.addAll(asciidoctorOption as MutableList<String?>)
+            values.addAll(asciidoctorOption as MutableList<String>)
         } else if (asciidoctorOption is String) {
             values.add(asciidoctorOption.toString())
         }

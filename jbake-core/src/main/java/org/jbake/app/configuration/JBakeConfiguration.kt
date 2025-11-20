@@ -175,18 +175,12 @@ interface JBakeConfiguration {
 
     /**
      * Get an iterator of available configuration keys
-     *
-     * @return an iterator of configuration keys
      */
-    val keys: MutableIterator<String?>?
+    val keys: MutableIterator<String>
 
     /**
      * A list of markdown extensions
-     *
-     *
      * `markdown.extension=HARDWRAPS,AUTOLINKS,FENCED_CODE_BLOCKS,DEFINITIONS`
-     *
-     * @return list of markdown extensions as string
      */
     val markdownExtensions: MutableList<String>
 

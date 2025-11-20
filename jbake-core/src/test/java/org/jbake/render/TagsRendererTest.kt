@@ -58,8 +58,8 @@ class TagsRendererTest {
         val contentStore = Mockito.mock<ContentStore>(ContentStore::class.java)
         val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
 
-        val tags: MutableSet<String?> = HashSet<String?>(mutableListOf<String?>("tag1", "tags2"))
-        Mockito.`when`<MutableSet<String?>>(contentStore.tags).thenReturn(tags)
+        val tags: MutableSet<String> = HashSet<String>(mutableListOf<String>("tag1", "tags2"))
+        Mockito.`when`<MutableSet<String>>(contentStore.tags).thenReturn(tags)
 
         Mockito.`when`<Int?>(mockRenderer.renderTags(ArgumentMatchers.anyString())).thenReturn(1)
 
@@ -80,7 +80,7 @@ class TagsRendererTest {
         val contentStore = Mockito.mock<ContentStore>(ContentStore::class.java)
         val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
 
-        val tags: MutableSet<String?> = HashSet<String?>(mutableListOf<String?>("tag1", "tags2"))
+        val tags: MutableSet<String> = HashSet<String>(mutableListOf<String>("tag1", "tags2"))
         Mockito.`when`<MutableSet<String?>>(contentStore.tags).thenReturn(tags)
         Mockito.`when`<Any?>(configuration.tagPathName).thenReturn("mockTagfile.html")
 
