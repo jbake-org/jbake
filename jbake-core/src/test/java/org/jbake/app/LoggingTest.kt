@@ -20,7 +20,7 @@ abstract class LoggingTest {
     protected var mockAppender: Appender<ILoggingEvent?>? = null
 
     @Captor
-    protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent?>? = null
+    protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent>? = null
 
     protected var root: Logger? = null
 

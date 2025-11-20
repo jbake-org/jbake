@@ -197,7 +197,7 @@ internal class MainTest : LoggingTest() {
 
         val args = arrayOf("-s", src.getPath(), expectedOutput.getPath())
         val configuration = stubConfig()
-        configuration.setDestinationFolder(configTarget)
+        configuration.destinationFolder = configTarget
         main!!.run(stubOptions(args), configuration)
 
         Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
@@ -209,9 +209,9 @@ internal class MainTest : LoggingTest() {
 
         AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status, Runnable { Main.main(args) })
 
-        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
 
-        val loggingEvent = captorLoggingEvent.getValue()
+        val loggingEvent = captorLoggingEvent!!.getValue()
         Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init")
     }
 

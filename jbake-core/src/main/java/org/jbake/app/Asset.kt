@@ -30,7 +30,7 @@ class Asset {
       Compatibility constructor.
       Creates an instance of Asset."""
     )
-    constructor(source: File?, destination: File?, config: CompositeConfiguration?) {
+    constructor(source: File, destination: File, config: CompositeConfiguration) {
         this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config)
     }
 
@@ -45,12 +45,9 @@ class Asset {
 
     /**
      * Copy all files from supplied path.
+     * Copy all files from assets folder to destination folder read from configuration
      *
      * @param path The starting path
-     */
-    /**
-     * Copy all files from assets folder to destination folder
-     * read from configuration
      */
     @JvmOverloads
     fun copy(path: File = config.assetFolder) {
