@@ -297,21 +297,21 @@ internal class MainTest : LoggingTest() {
     }
 
     @Throws(ConfigurationException::class)
-    private fun mockJettyConfiguration(sourceFolder: File, destinationFolder: File?): JBakeConfiguration {
+    private fun mockJettyConfiguration(sourceFolder: File, destinationFolder: File): JBakeConfiguration {
         val configuration =
             JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false)
         System.setProperty("user.dir", sourceFolder.getPath())
+
         Mockito.`when`<DefaultJBakeConfiguration>(
             factory!!.createJettyJbakeConfiguration(
-                ArgumentMatchers.any<File?>(
-                    File::class.java
-                ),
-                ArgumentMatchers.any<File?>(File::class.java),
-                ArgumentMatchers.any<File?>(File::class.java),
+                ArgumentMatchers.any(File::class.java),
+                ArgumentMatchers.any(File::class.java),
+                ArgumentMatchers.any(File::class.java),
                 ArgumentMatchers.anyBoolean()
             )
         ).thenReturn(configuration)
-        Mockito.`when`<JBakeConfigurationFactory>(factory.setEncoding(ArgumentMatchers.any<String>()))
+
+        Mockito.`when`<JBakeConfigurationFactory>(factory.setEncoding(ArgumentMatchers.any()))
             .thenReturn(factory)
         return configuration
     }

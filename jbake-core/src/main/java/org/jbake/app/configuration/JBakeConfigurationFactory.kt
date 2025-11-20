@@ -9,12 +9,9 @@ import java.io.File
  * A [JBakeConfiguration] factory
  */
 class JBakeConfigurationFactory {
-    @JvmField
-    var configUtil: ConfigUtil
 
-    init {
-        this.configUtil = ConfigUtil()
-    }
+    @JvmField
+    var configUtil: ConfigUtil = ConfigUtil()
 
     /**
      * Creates a [DefaultJBakeConfiguration] using default.properties and jbake.properties
@@ -28,7 +25,7 @@ class JBakeConfigurationFactory {
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
         sourceFolder: File,
-        destination: File?,
+        destination: File,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
         return createDefaultJbakeConfiguration(sourceFolder, destination, null as File?, isClearCache)
@@ -46,13 +43,13 @@ class JBakeConfigurationFactory {
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
         sourceFolder: File,
-        destination: File?,
+        destination: File,
         propertiesFile: File?,
-        isClearCache: Boolean
+        isClearCache: Boolean,
     ): DefaultJBakeConfiguration {
         val configuration = this.configUtil.loadConfig(sourceFolder, propertiesFile) as DefaultJBakeConfiguration
-        configuration.setDestinationFolder(destination)
-        configuration.setClearCache(isClearCache)
+        configuration.destinationFolder = destination
+        configuration.clearCache = isClearCache
         return configuration
     }
 
@@ -70,14 +67,14 @@ class JBakeConfigurationFactory {
     @Deprecated("use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
-        sourceFolder: File?,
-        destination: File?,
-        compositeConfiguration: CompositeConfiguration?,
+        sourceFolder: File,
+        destination: File,
+        compositeConfiguration: CompositeConfiguration,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
         val configuration = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration)
-        configuration.setDestinationFolder(destination)
-        configuration.setClearCache(isClearCache)
+        configuration.destinationFolder = destination
+        configuration.clearCache = isClearCache
         return configuration
     }
 
@@ -94,12 +91,12 @@ class JBakeConfigurationFactory {
     @Deprecated("use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
-        sourceFolder: File?,
-        destination: File?,
-        compositeConfiguration: CompositeConfiguration?
+        sourceFolder: File,
+        destination: File,
+        compositeConfiguration: CompositeConfiguration
     ): DefaultJBakeConfiguration {
         val configuration = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration)
-        configuration.setDestinationFolder(destination)
+        configuration.destinationFolder = destination
         return configuration
     }
 
@@ -113,12 +110,8 @@ class JBakeConfigurationFactory {
      */
     @Deprecated("")
     @Throws(JBakeException::class)
-    fun createDefaultJbakeConfiguration(
-        sourceFolder: File?,
-        config: CompositeConfiguration?
-    ): DefaultJBakeConfiguration {
-        return DefaultJBakeConfiguration(sourceFolder, config)
-    }
+    fun createDefaultJbakeConfiguration(sourceFolder: File, config: CompositeConfiguration)
+        = DefaultJBakeConfiguration(sourceFolder, config)
 
     /**
      * Creates a [DefaultJBakeConfiguration] with value site.host replaced
@@ -135,7 +128,7 @@ class JBakeConfigurationFactory {
     @Throws(JBakeException::class)
     fun createJettyJbakeConfiguration(
         sourceFolder: File,
-        destinationFolder: File?,
+        destinationFolder: File,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
         return createJettyJbakeConfiguration(sourceFolder, destinationFolder, null as File?, isClearCache)
@@ -156,14 +149,14 @@ class JBakeConfigurationFactory {
     @Throws(JBakeException::class)
     fun createJettyJbakeConfiguration(
         sourceFolder: File,
-        destinationFolder: File?,
+        destinationFolder: File,
         propertiesFile: File?,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
         val configuration = this.configUtil.loadConfig(sourceFolder, propertiesFile) as DefaultJBakeConfiguration
-        configuration.setDestinationFolder(destinationFolder)
-        configuration.setClearCache(isClearCache)
-        configuration.setSiteHost("http://" + configuration.getServerHostname() + ":" + configuration.getServerPort() + configuration.getServerContextPath())
+        configuration.destinationFolder = destinationFolder
+        configuration.clearCache = isClearCache
+        configuration.setSiteHost("http://" + configuration.serverHostname + ":" + configuration.serverPort + configuration.serverContextPath)
         return configuration
     }
 

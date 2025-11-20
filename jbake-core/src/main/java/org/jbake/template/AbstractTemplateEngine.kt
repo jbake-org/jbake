@@ -33,11 +33,7 @@ abstract class AbstractTemplateEngine protected constructor(
 ) {
     @Deprecated("use {@link AbstractTemplateEngine(JBakeConfiguration,ContentStore)} instead")
     protected constructor(config: Configuration?, db: ContentStore?, destination: File?, templatesPath: File) : this(
-        JBakeConfigurationFactory().createDefaultJbakeConfiguration(
-            templatesPath.getParentFile(),
-            destination,
-            config as CompositeConfiguration?
-        ),
+        JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), destination, config as CompositeConfiguration?),
         db
     )
 
@@ -45,6 +41,6 @@ abstract class AbstractTemplateEngine protected constructor(
     abstract fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?)
 
     companion object {
-        protected var extractors: ModelExtractors? = ModelExtractors.Companion.getInstance()
+        protected var extractors: ModelExtractors? = ModelExtractors.instance
     }
 }

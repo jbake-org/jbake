@@ -15,7 +15,7 @@ import java.util.regex.Pattern
  * The default implementation of a [JBakeConfiguration]
  */
 class DefaultJBakeConfiguration : JBakeConfiguration {
-    private val logger: Logger = LoggerFactory.getLogger(DefaultJBakeConfiguration::class.java)
+
     @JvmField
     var compositeConfiguration: CompositeConfiguration
 
@@ -113,7 +113,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val buildTimeStamp: String?
         get() = getAsString(PropertyList.BUILD_TIMESTAMP.key)
 
-    override val clearCache: Boolean
+    override var clearCache: Boolean = false
         get() = getAsBoolean(PropertyList.CLEAR_CACHE.key)
         // TBD: Setter existed too
 
@@ -565,4 +565,6 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         private const val DOCTYPE_EXTENSION_POSTFIX = ".extension"
         private const val DOCTYPE_TEMPLATE_PREFIX = "template."
     }
+
+    private val logger: Logger = LoggerFactory.getLogger(DefaultJBakeConfiguration::class.java)
 }

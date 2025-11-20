@@ -54,7 +54,6 @@ class PebbleTemplateEngine(config: JBakeConfiguration?, db: ContentStore?) : Abs
 
     private fun wrap(model: TemplateModel?): TemplateModel {
         return object : TemplateModel(model) {
-            private val serialVersionUID = -5489285491728950547L
 
             override fun get(property: Any?): Any? {
                 try {
