@@ -59,9 +59,9 @@ class Renderer {
     )
     constructor(
         db: ContentStore,
-        destination: File?,
+        destination: File,
         templatesPath: File,
-        config: CompositeConfiguration?,
+        config: CompositeConfiguration,
         renderingEngine: DelegatingTemplateEngine
     ) : this(
         db,
@@ -69,7 +69,7 @@ class Renderer {
         renderingEngine
     ) {
         val configuration = (this.config as DefaultJBakeConfiguration)
-        configuration.setDestinationFolder(destination)
+        configuration.destinationFolder = destination
         configuration.setTemplateFolder(templatesPath)
     }
 
@@ -111,7 +111,7 @@ class Renderer {
     @Throws(Exception::class)
     fun render(content: DocumentModel) {
         val docType = content.type
-        var outputFilename = (config.destinationFolder!!.getPath() + File.separatorChar).toString() + content.getUri()
+        var outputFilename = (config.destinationFolder.path + File.separatorChar) + content.uri
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
             outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'))
         }
@@ -128,14 +128,14 @@ class Renderer {
             Files.delete(publishedFile.toPath())
         }
 
-        if (content.getStatus() == ModelAttributes.Status.DRAFT) {
+        if (content.status == ModelAttributes.Status.DRAFT) {
             outputFilename = outputFilename + config.draftSuffix
         }
 
         val outputFile = File(outputFilename + outputExtension)
         val model = TemplateModel()
-        model.setContent(content)
-        model.setRenderer(renderingEngine)
+        model.content = content
+        model.renderer = renderingEngine
 
         try {
             createWriter(outputFile).use { out ->
@@ -155,12 +155,12 @@ class Renderer {
             file.createNewFile()
         }
 
-        return OutputStreamWriter(FileOutputStream(file), config.renderEncoding)
+        return OutputStreamWriter(FileOutputStream(file), (config.renderEncoding ?: "UTF-8"))
     }
 
     @Throws(Exception::class)
     private fun render(renderConfig: RenderingConfig) {
-        val outputFile = renderConfig.path
+        val outputFile = renderConfig.path ?: throw Exception("No output file for rendering")
         try {
             createWriter(outputFile).use { out ->
                 renderingEngine.renderDocument(
@@ -182,12 +182,12 @@ class Renderer {
      * @throws Exception if IOException or SecurityException are raised
      */
     @Throws(Exception::class)
-    fun renderIndex(indexFile: String?) {
+    fun renderIndex(indexFile: String) {
         render(DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME))
     }
 
     @Throws(Exception::class)
-    fun renderIndexPaging(indexFile: String?) {
+    fun renderIndexPaging(indexFile: String) {
         val totalPosts = db.getPublishedCount("post")
         val postsPerPage = config.postsPerPage
 
@@ -198,8 +198,8 @@ class Renderer {
             val pagingHelper = PagingHelper(totalPosts, postsPerPage)
 
             val model = TemplateModel()
-            model.setRenderer(renderingEngine)
-            model.setNumberOfPages(pagingHelper.getNumberOfPages())
+            model.renderer = renderingEngine
+            model.numberOfPages = pagingHelper.numberOfPages
 
             try {
                 db.setLimit(postsPerPage)
@@ -209,18 +209,17 @@ class Renderer {
                     var fileName = indexFile
 
                     db.setStart(pageStart)
-                    model.setCurrentPageNuber(page)
+                    model.currentPageNumber = page
                     val previous = pagingHelper.getPreviousFileName(page)
-                    model.setPreviousFilename(previous)
+                    model.previousFilename = previous
                     val nextFileName = pagingHelper.getNextFileName(page)
-                    model.setNextFileName(nextFileName)
+                    model.nextFileName = nextFileName
 
                     val contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME)
 
-                    if (page > 1) {
-                        contentModel.setRootPath("../")
-                    }
-                    model.setContent(contentModel)
+                    if (page > 1)
+                        contentModel.rootPath = "../"
+                    model.content = contentModel
 
                     // Add page number to file name
                     fileName = pagingHelper.getCurrentFileName(page, fileName)
@@ -235,7 +234,6 @@ class Renderer {
             }
         }
     }
-
     /**
      * Render an XML sitemap file using the supplied content.
      *
@@ -295,24 +293,23 @@ class Renderer {
         var renderedCount = 0
         val errors: MutableList<Throwable> = LinkedList<Throwable>()
 
-        for (tag in db.getAllTags()) {
+        for (tag in db.allTags) {
             try {
                 val model = TemplateModel()
-                model.setRenderer(renderingEngine)
-                model.setTag(tag)
-                val map = buildSimpleModel(ModelAttributes.TAG.toString())
-                val path =
-                    File(config.destinationFolder + File.separator + tagPath + File.separator + tag + config.outputExtension)
-
-                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path))
-                model.setContent(map)
+                model.renderer = renderingEngine
+                model.tag = tag
+                val map = buildSimpleModel(ModelAttributes.TAG)
+                val ext = config.outputExtension ?: ""
+                val path = File(config.destinationFolder, tagPath + File.separator + tag + ext)
+                map.rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
+                model.content = map
 
                 render(
                     ModelRenderingConfig(
                         path,
-                        ModelAttributes.TAG.toString(),
+                        ModelAttributes.TAG,
                         model,
-                        findTemplateName(ModelAttributes.TAG.toString())
+                        findTemplateName(ModelAttributes.TAG)
                     )
                 )
 
@@ -328,33 +325,32 @@ class Renderer {
                 // This will prevent directory listing and also provide an option to
                 // display all tags page.
                 val model = TemplateModel()
-                model.setRenderer(renderingEngine)
-                val map = buildSimpleModel(ModelAttributes.TAGS.toString())
-                val path =
-                    File(config.destinationFolder + File.separator + tagPath + File.separator + "index" + config.outputExtension)
-
-                map.setRootPath(FileUtil.getUriPathToDestinationRoot(config, path))
-                model.setContent(map)
+                model.renderer = renderingEngine
+                val ext = config.outputExtension ?: ""
+                val map = buildSimpleModel(ModelAttributes.TAGS)
+                val path = File(config.destinationFolder, tagPath + File.separator + "index" + ext)
+                map.rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
+                model.content = map
 
 
                 render(ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")))
-                renderedCount++
-            } catch (e: Exception) {
-                errors.add(e)
-            }
-        }
+                 renderedCount++
+             } catch (e: Exception) {
+                 errors.add(e)
+             }
+         }
 
-        if (!errors.isEmpty()) {
-            val sb = StringBuilder()
-            sb.append("Failed to render tags. Cause(s):")
-            for (error in errors) {
-                sb.append("\n").append(error.message)
-            }
-            throw Exception(sb.toString(), errors.get(0))
-        } else {
-            return renderedCount
-        }
-    }
+         if (!errors.isEmpty()) {
+             val sb = StringBuilder()
+             sb.append("Failed to render tags. Cause(s):")
+             for (error in errors) {
+                 sb.append("\n").append(error.message)
+             }
+             throw Exception(sb.toString(), errors[0])
+         } else {
+             return renderedCount
+         }
+     }
 
     /**
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
@@ -362,7 +358,7 @@ class Renderer {
      * @param type
      * @return a basic [DocumentModel]
      */
-    private fun buildSimpleModel(type: String?): DocumentModel {
+    private fun buildSimpleModel(type: String): DocumentModel {
         val content = DocumentModel()
         content.type = type
         content.rootPath = ""
@@ -398,13 +394,13 @@ class Renderer {
             this.model = model
         }
 
-        constructor(path: File?, name: String?, model: TemplateModel?, template: String?) : super(
-            path,
-            name,
-            template
-        ) {
-            this.model = model
-        }
+        constructor(path: File?, name: String?, model: TemplateModel, template: String?) : super(
+             path,
+             name,
+             template
+         ) {
+             this.model = model
+         }
     }
 
     internal inner class DefaultRenderingConfig : AbstractRenderingConfig {
@@ -418,12 +414,12 @@ class Renderer {
 
         constructor(filename: String, allInOneName: String) : super(
                 File(config.destinationFolder, File.separator + filename),
-                allInOneName,
-                findTemplateName(allInOneName)
-            )
-        {
-            this.content = buildSimpleModel(allInOneName)
-        }
+                 allInOneName,
+                 findTemplateName(allInOneName)
+             )
+          {
+              this.content = buildSimpleModel(allInOneName)
+          }
 
         /**
          * Constructor added due to known use of a allInOneName which is used for name, template and content
@@ -431,7 +427,7 @@ class Renderer {
          * @param allInOneName
          */
         constructor(allInOneName: String) : this(
-            File(config.destinationFolder.getPath() + File.separator + allInOneName + config.outputExtension),
+            File(config.destinationFolder.path + File.separator + allInOneName + (config.outputExtension ?: "")),
             allInOneName
         )
 
