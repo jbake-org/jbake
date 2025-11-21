@@ -7,21 +7,18 @@ import java.io.File
 
 interface ParserEngine {
     /**
-     * Parse a given file and transform to a model representation used by [MarkdownEngine] implementations
-     * to render the file content.
+     * Parse a given file and transform to a model used by [MarkdownEngine] to render the file content.
      *
-     * @param config The project configuration
-     * @param file   The file to be parsed
-     * @return A model representation of the given file
+     * @return A model representation of the given file. NULLABLE. TBD: Have a NullDocumentModel to avoid nulls?
      */
     fun parse(config: JBakeConfiguration, file: File): DocumentModel?
 
     /**
      * @param config      The project configuration
-     * @param file        The file to be parsed
+     * @param fileToParse        The file to be parsed
      * @param contentPath unknown
      * @return A model representation of the given file
      */
     @Deprecated("use {@link #parse(JBakeConfiguration, File)} instead")
-    fun parse(config: Configuration?, file: File?, contentPath: String?): MutableMap<String,  Any>
+    fun parse(config: Configuration, fileToParse: File, contentPath: String): MutableMap<String,  Any>
 }

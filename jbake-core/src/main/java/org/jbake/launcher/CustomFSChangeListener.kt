@@ -12,17 +12,17 @@ import java.io.File
 class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListener {
 
     override fun fileCreated(event: FileChangeEvent) {
-        LOGGER.info("File created event detected: {}", event.getFileObject().getURL())
+        log.info("File created event detected: {}", event.getFileObject().getURL())
         exec(event.getFileObject())
     }
 
     override fun fileDeleted(event: FileChangeEvent) {
-        LOGGER.info("File deleted event detected: {}", event.getFileObject().getURL())
+        log.info("File deleted event detected: {}", event.getFileObject().getURL())
         exec(event.getFileObject())
     }
 
     override fun fileChanged(event: FileChangeEvent) {
-        LOGGER.info("File changed event detected: {}", event.getFileObject().getURL())
+        log.info("File changed event detected: {}", event.getFileObject().getURL())
         exec(event.getFileObject())
     }
 
@@ -32,6 +32,6 @@ class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListe
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(CustomFSChangeListener::class.java)
+        private val log: Logger = LoggerFactory.getLogger(CustomFSChangeListener::class.java)
     }
 }

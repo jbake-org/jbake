@@ -6,7 +6,7 @@ import java.io.File
 import java.util.Date
 
 class ParserContext(
-    val file: File?,
+    val file: File,
     val fileLines: MutableList<String>,
     val config: JBakeConfiguration?,
     private val hasHeader: Boolean

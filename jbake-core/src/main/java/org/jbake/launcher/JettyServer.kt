@@ -24,7 +24,7 @@ class JettyServer : Closeable {
 
     @Deprecated("")
     fun run(resourceBase: String, port: String) {
-        LOGGER.warn("DEPRECATED. This method will be removed in the next major release. Use run(String resourceBase, JBakeConfiguration config) instead.")
+        log.warn("DEPRECATED. This method will be removed in the next major release. Use run(String resourceBase, JBakeConfiguration config) instead.")
         run(resourceBase, "/", "localhost", port.toInt())
     }
 
@@ -60,14 +60,14 @@ class JettyServer : Closeable {
             handlers.setHandlers(arrayOf<Handler>(contextHandler, DefaultHandler()))
             server!!.setHandler(handlers)
 
-            LOGGER.info(
+            log.info(
                 "Serving out contents of: [{}] on http://{}:{}{}",
                 resourceBase,
                 hostname,
                 port,
                 contextHandler.getContextPath()
             )
-            LOGGER.info("(To stop server hit CTRL-C)")
+            log.info("(To stop server hit CTRL-C)")
 
             server!!.start()
             server!!.join()
@@ -85,12 +85,12 @@ class JettyServer : Closeable {
             try {
                 server!!.stop()
             } catch (e: Exception) {
-                LOGGER.error("unable to stop server")
+                log.error("unable to stop server")
             }
         }
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(JettyServer::class.java)
+        private val log: Logger = LoggerFactory.getLogger(JettyServer::class.java)
     }
 }

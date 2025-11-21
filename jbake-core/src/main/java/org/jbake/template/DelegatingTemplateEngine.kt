@@ -30,12 +30,9 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
 
       """
     )
-    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
-        config,
-        db,
-        destination,
-        templatesPath
-    ) {
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
+            : super(config, db, destination, templatesPath)
+    {
         this.renderers = TemplateEngines(this.config, db)
     }
 
@@ -44,22 +41,22 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer?) {
-        model.setVersion(config.version)
-        model.setConfig(config.asHashMap())
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+        model.version = (config.version)
+        model.config = (config.asHashMap())
 
         // if default template exists we will use it
         val templateFolder = config.templateFolder
         var templateFile = File(templateFolder, templateName)
         var theTemplateName = templateName
         if (!templateFile.exists()) {
-            LOGGER.info("Default template: {} was not found, searching for others...", templateName)
+            log.info("Default template: {} was not found, searching for others...", templateName)
             // if default template does not exist then check if any alternative engine templates exist
             val templateNameWithoutExt = templateName.substring(0, templateName.length - 4)
-            for (extension in renderers.getRecognizedExtensions()) {
+            for (extension in renderers.recognizedExtensions) {
                 templateFile = File(templateFolder, templateNameWithoutExt + "." + extension)
                 if (templateFile.exists()) {
-                    LOGGER.info("Found alternative template file: {} using this instead", templateFile.getName())
+                    log.info("Found alternative template file: {} using this instead", templateFile.getName())
                     theTemplateName = templateFile.getName()
                     break
                 }
@@ -70,11 +67,11 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         if (engine != null) {
             engine.renderDocument(model, theTemplateName, writer)
         } else {
-            LOGGER.error("Warning - No template engine found for template: {}", theTemplateName)
+            log.error("Warning - No template engine found for template: {}", theTemplateName)
         }
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(DelegatingTemplateEngine::class.java)
+        private val log: Logger = LoggerFactory.getLogger(DelegatingTemplateEngine::class.java)
     }
 }

@@ -19,19 +19,12 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     @Throws(JBakeException::class)
     private fun ensureSource() {
-        val source = configuration.sourceFolder
-        if (!FileUtil.isExistingFolder(source)) {
-            throw JBakeException(
-                SystemExit.CONFIGURATION_ERROR,
-                "Error: Source folder must exist: " + source.getAbsolutePath()
-            )
-        }
-        if (!configuration.sourceFolder.canRead()) {
-            throw JBakeException(
-                SystemExit.CONFIGURATION_ERROR,
-                "Error: Source folder is not readable: " + source.getAbsolutePath()
-            )
-        }
+        val source = configuration.sourceFolder ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not configured.")
+        if (!FileUtil.isExistingFolder(source))
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.getAbsolutePath())
+
+        if (!configuration.sourceFolder!!.canRead())
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.getAbsolutePath())
     }
 
     private fun ensureTemplateFolder() {
@@ -60,21 +53,17 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     private fun checkAssetFolder() {
         val path = configuration.assetFolder
         if (!path.exists()) {
-            LOGGER.warn("No asset folder '{}' was found!", path.absolutePath)
+            log.warn("No asset folder '{}' was found!", path.absolutePath)
         }
     }
 
     private fun checkRequiredFolderExists(folderName: String?, path: File) {
-        if (!FileUtil.isExistingFolder(path)) {
-            throw JBakeException(
-                SystemExit.CONFIGURATION_ERROR,
-                "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.getAbsolutePath()
-            )
-        }
+        if (!FileUtil.isExistingFolder(path))
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.getAbsolutePath())
     }
 
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(JBakeConfigurationInspector::class.java)
+        private val log: Logger = LoggerFactory.getLogger(JBakeConfigurationInspector::class.java)
     }
 }

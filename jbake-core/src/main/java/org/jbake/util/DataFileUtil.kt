@@ -10,18 +10,18 @@ class DataFileUtil(private val db: ContentStore, private val defaultDocType: Str
         var result: MutableMap<String,  Any> = HashMap()
         val docs: DocumentList<*> = db.getDocumentByUri(ref)
         if (docs.isEmpty()) {
-            LOGGER.warn("Unable to locate content for ref: {}", ref)
+            log.warn("Unable to locate content for ref: {}", ref)
         } else {
             if (docs.size == 1) {
                 result = docs[0] as MutableMap<String,  Any>
             } else {
-                LOGGER.warn("Located multiple hits for ref: {}", ref)
+                log.warn("Located multiple hits for ref: {}", ref)
             }
         }
         return result
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(DataFileUtil::class.java)
+        private val log: Logger = LoggerFactory.getLogger(DataFileUtil::class.java)
     }
 }

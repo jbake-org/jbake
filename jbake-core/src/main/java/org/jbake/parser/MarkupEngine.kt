@@ -51,16 +51,14 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     /**
-     * Processes the body of the document. Usually subclasses will parse the document body and render
-     * it, exporting the result using the [ParserContext.setBody] method.
-     *
-     * @param context the parser context
+     * Processes the body of the document. Usually subclasses will parse the document body and render it,
+     * exporting the result using the [ParserContext.setBody] method.
      */
-    open fun processBody(context: ParserContext) {
+    open fun processBody(parserContext: ParserContext) {
     }
 
-    override fun parse(config: Configuration, file: File, contentPath: String): MutableMap<String, Any> {
-        return parse(DefaultJBakeConfiguration((config as CompositeConfiguration?)!!), file)
+    override fun parse(config: Configuration, fileToParse: File, contentPath: String): MutableMap<String, Any> {
+        return parse(DefaultJBakeConfiguration((config as CompositeConfiguration)!!), fileToParse)!!
     }
 
     /**
@@ -73,9 +71,7 @@ abstract class MarkupEngine : ParserEngine {
         this.configuration = config
         val fileContent = getFileContent(file, config.renderEncoding!!)
 
-        if (fileContent.isEmpty()) {
-            return null
-        }
+        if (fileContent.isEmpty()) return null
 
         val hasHeader = hasHeader(fileContent)
         val context = ParserContext(file, fileContent, config, hasHeader)
@@ -88,9 +84,9 @@ abstract class MarkupEngine : ParserEngine {
         setModelDefaultsIfNotSetInHeader(context)
         sanitizeTags(context)
 
-        if (context.getType().isEmpty() || context.getStatus().isEmpty()) {
+        if (context.type.isEmpty() || context.status.isEmpty()) {
             // output error
-            LOGGER.warn("Parsing skipped (missing type or status value in header meta data) for file {}!", file)
+            log.warn("Parsing skipped (missing type or status value in header meta data) for file {}!", file)
             return null
         }
 
@@ -101,27 +97,27 @@ abstract class MarkupEngine : ParserEngine {
         if (validate(context)) {
             processBody(context)
         } else {
-            LOGGER.error("Incomplete source file ({}) for markup engine: {}", file, javaClass.getSimpleName())
+            log.error("Incomplete source file ({}) for markup engine: {}", file, javaClass.getSimpleName())
             return null
         }
 
         // TODO: post parsing plugins to hook in here?
-        return context.getDocumentModel()
+        return context.documentModel
     }
 
     private fun getFileContent(file: File, encoding: String): MutableList<String> {
         try {
             FileInputStream(file).use { `is` ->
-                LOGGER.debug("read file '{}' with encoding '{}'", file, encoding)
+                log.debug("read file '{}' with encoding '{}'", file, encoding)
                 val lines = IOUtils.readLines(`is`, encoding)
                 if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines.get(0))) {
-                    LOGGER.warn("remove BOM from file '{}' read with encoding '{}'", file, encoding)
+                    log.warn("remove BOM from file '{}' read with encoding '{}'", file, encoding)
                     lines.set(0, lines.get(0).replace(UTF_8_BOM, ""))
                 }
                 return lines
             }
         } catch (e: IOException) {
-            LOGGER.error("Error while opening file {}", file, e)
+            log.error("Error while opening file {}", file, e)
             return mutableListOf<String>()
         }
     }
@@ -131,11 +127,11 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     private fun sanitizeTags(context: ParserContext) {
-        if (context.getTags() != null) {
-            val tags = context.getTags() as Array<String>
+        if (context.tags != null) {
+            val tags = context.tags as Array<String>
             for (i in tags.indices) {
                 tags[i] = sanitize(tags[i]!!)
-                if (context.getConfig().sanitizeTag) {
+                if (context.config.sanitizeTag) {
                     tags[i] = tags[i]!!.replace(" ", "-")
                 }
             }
@@ -144,18 +140,18 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     private fun setModelDefaultsIfNotSetInHeader(context: ParserContext) {
-        if (context.getDate() == null) {
-            context.setDate(Date(context.getFile().lastModified()))
+        if (context.date == null) {
+            context.date = (Date(context.file.lastModified()))
         }
 
         // default status has been set
-        if (context.getConfig().defaultStatus != null && context.getStatus().isEmpty()) {
+        if (context.config.defaultStatus != null && context.status.isEmpty()) {
             // file hasn't got status so use default
             context.setDefaultStatus()
         }
 
         // default type has been set
-        if (context.getConfig().defaultType != null && context.getType().isEmpty()) {
+        if (context.config.defaultType != null && context.type.isEmpty()) {
             // file hasn't got type so use default
             context.setDefaultType()
         }
@@ -178,20 +174,20 @@ abstract class MarkupEngine : ParserEngine {
 
         for (line in contents) {
             if (hasHeaderSeparator(line)) {
-                LOGGER.debug("Header separator found")
+                log.debug("Header separator found")
                 break
             }
             if (isTypeProperty(line)) {
-                LOGGER.debug("Type property found")
+                log.debug("Type property found")
                 typeFound = true
             }
 
             if (isStatusProperty(line)) {
-                LOGGER.debug("Status property found")
+                log.debug("Status property found")
                 statusFound = true
             }
             if (!line.isEmpty() && !line.contains("=")) {
-                LOGGER.error("Property found without assignment [{}]", line)
+                log.error("Property found without assignment [{}]", line)
                 headerValid = false
             }
         }
@@ -246,11 +242,11 @@ abstract class MarkupEngine : ParserEngine {
      */
     private fun processDefaultHeader(context: ParserContext) {
         if (context.hasHeader()) {
-            for (line in context.getFileLines()) {
+            for (line in context.fileLines) {
                 if (hasHeaderSeparator(line)) {
                     break
                 }
-                processHeaderLine(line, context.getDocumentModel())
+                processHeaderLine(line, context.documentModel)
             }
         }
     }
@@ -270,14 +266,14 @@ abstract class MarkupEngine : ParserEngine {
             val df: DateFormat = SimpleDateFormat(configuration!!.dateFormat)
             try {
                 val date = df.parse(value)
-                content.setDate(date)
+                content.date = (date)
             } catch (e: ParseException) {
-                LOGGER.error("unable to parse date {}", value)
+                log.error("unable to parse date {}", value)
             }
         } else if (key.equals(ModelAttributes.TAGS, ignoreCase = true)) {
-            content.setTags(getTags(value))
+            content.tags = (getTags(value))
         } else if (key.equals(ModelAttributes.CACHED, ignoreCase = true)) {
-            content.setCached(value.toBoolean())
+            content.cached = (value.toBoolean())
         } else if (isJson(value)) {
             content.put(key, JSONValue.parse(value))
         } else {
@@ -305,7 +301,7 @@ abstract class MarkupEngine : ParserEngine {
     private fun processDefaultBody(context: ParserContext) {
         val body = StringBuilder()
         var inBody = false
-        for (line in context.getFileLines()) {
+        for (line in context.fileLines()) {
             if (inBody) {
                 body.append(line).append("\n")
             }
@@ -319,11 +315,11 @@ abstract class MarkupEngine : ParserEngine {
                 body.append(line).append("\n")
             }
         }
-        context.setBody(body.toString())
+        context.body = (body.toString())
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(MarkupEngine::class.java)
+        private val log: Logger = LoggerFactory.getLogger(MarkupEngine::class.java)
         private const val UTF_8_BOM = "\uFEFF"
     }
 }

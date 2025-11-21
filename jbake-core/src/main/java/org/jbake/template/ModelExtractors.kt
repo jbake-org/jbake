@@ -47,7 +47,7 @@ class ModelExtractors private constructor() {
     fun registerEngine(key: String, extractor: ModelExtractor<*>) {
         val old = extractors.put(key, extractor)
         if (old != null) {
-            LOGGER.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old)
+            log.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old)
         }
     }
 
@@ -119,7 +119,7 @@ class ModelExtractors private constructor() {
     fun registerExtractorsForCustomTypes(docType: String) {
         val pluralizedDoctype = DocumentTypeUtils.pluralize(docType)
         if (!containsKey(pluralizedDoctype)) {
-            LOGGER.info("register new extractors for document type: {}", docType)
+            log.info("register new extractors for document type: {}", docType)
             registerEngine(pluralizedDoctype, TypedDocumentsExtractor())
             registerEngine("published_" + pluralizedDoctype, PublishedCustomExtractor(docType))
         }
@@ -128,7 +128,7 @@ class ModelExtractors private constructor() {
     companion object {
         private const val PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties"
 
-        private val LOGGER: Logger = LoggerFactory.getLogger(ModelExtractors::class.java)
+        private val log: Logger = LoggerFactory.getLogger(ModelExtractors::class.java)
 
         val instance: ModelExtractors = ModelExtractors()
 

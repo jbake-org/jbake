@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory
  * @author Cédric Champeau
  */
 class MarkdownEngine : MarkupEngine() {
-    override fun processBody(context: ParserContext) {
-        val mdExts: MutableList<String> = context.getConfig().markdownExtensions
+    override fun processBody(parserContext: ParserContext) {
+        val mdExts: MutableList<String> = parserContext.config.markdownExtensions
 
         var extensions = PegdownExtensions.NONE
 
@@ -36,8 +36,8 @@ class MarkdownEngine : MarkupEngine() {
         val parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
-        val document = parser.parse(context.getBody())
-        context.setBody(renderer.render(document))
+        val document = parser.parse(parserContext.getBody())
+        parserContext.body = (renderer.render(document))
     }
 
     private fun extensionFor(name: String): Int {

@@ -10,9 +10,8 @@ class TaggedDocumentsExtractor : ModelExtractor<DocumentList<*>> {
         var tag: String? = null
         val templateModel = TemplateModel()
         templateModel.putAll(model)
-        if (templateModel.getTag() != null) {
-            tag = templateModel.getTag()
-        }
+        if (templateModel.tag != null)
+            tag = templateModel.tag
         // fetch the tagged documents from db
         return db.getPublishedDocumentsByTag(tag)
     }

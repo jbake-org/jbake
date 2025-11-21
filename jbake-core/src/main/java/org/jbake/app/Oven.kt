@@ -130,10 +130,10 @@ class Oven {
     fun bake(fileToBake: File) {
         val asset = utensils.asset
         if (asset.isAssetFile(fileToBake)) {
-            LOGGER.info("Baking a change to an asset [" + fileToBake.getPath() + "]")
+            log.info("Baking a change to an asset [" + fileToBake.getPath() + "]")
             asset.copySingleFile(fileToBake)
         } else {
-            LOGGER.info("Playing it safe and running a full bake...")
+            log.info("Playing it safe and running a full bake...")
             bake()
         }
     }
@@ -150,7 +150,7 @@ class Oven {
 
         try {
             val start = Date().getTime()
-            LOGGER.info("Baking has started...")
+            log.info("Baking has started...")
             contentStore.startup()
             updateDocTypesFromConfiguration()
             contentStore.updateSchema()
@@ -171,11 +171,11 @@ class Oven {
 
             errors.addAll(asset.getErrors())
 
-            LOGGER.info("Baking finished!")
+            log.info("Baking finished!")
             val end = Date().getTime()
-            LOGGER.info("Baked {} items in {}ms", renderedCount, end - start)
+            log.info("Baked {} items in {}ms", renderedCount, end - start)
             if (!errors.isEmpty()) {
-                LOGGER.error("Failed to bake {} item(s)!", errors.size)
+                log.error("Failed to bake {} item(s)!", errors.size)
             }
         } finally {
             contentStore.close()
@@ -229,6 +229,6 @@ class Oven {
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(Oven::class.java)
+        private val log: Logger = LoggerFactory.getLogger(Oven::class.java)
     }
 }

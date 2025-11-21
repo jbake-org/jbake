@@ -28,7 +28,7 @@ class Parser
     fun processFile(file: File): DocumentModel? {
         val engine: ParserEngine? = Engines.get(FileUtil.fileExt(file))
         if (engine == null) {
-            LOGGER.error("Unable to find suitable markup engine for {}", file)
+            log.error("Unable to find suitable markup engine for {}", file)
             return null
         }
 
@@ -36,6 +36,6 @@ class Parser
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(Parser::class.java)
+        private val log: Logger = LoggerFactory.getLogger(Parser::class.java)
     }
 }

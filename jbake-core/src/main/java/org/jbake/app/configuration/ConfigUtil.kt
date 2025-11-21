@@ -89,8 +89,8 @@ class ConfigUtil {
     }
 
     private fun displayLegacyConfigFileWarningIfRequired() {
-        LOGGER.warn("You have defined a part of your JBake configuration in {}", LEGACY_CONFIG_FILE)
-        LOGGER.warn(
+        log.warn("You have defined a part of your JBake configuration in {}", LEGACY_CONFIG_FILE)
+        log.warn(
             "Usage of this file is being deprecated, please rename this file to: {} to remove this warning",
             CONFIG_FILE
         )
@@ -132,7 +132,7 @@ class ConfigUtil {
             this.encoding = encoding
         } else {
             this.encoding = DEFAULT_ENCODING
-            LOGGER.warn("Unsupported encoding '{}'. Using default encoding '{}'", encoding, this.encoding)
+            log.warn("Unsupported encoding '{}'. Using default encoding '{}'", encoding, this.encoding)
         }
         return this
     }
@@ -140,7 +140,7 @@ class ConfigUtil {
     companion object {
         const val LIST_DELIMITER: Char = ','
         const val DEFAULT_ENCODING: String = "UTF-8"
-        private val LOGGER: Logger = LoggerFactory.getLogger(ConfigUtil::class.java)
+        private val log: Logger = LoggerFactory.getLogger(ConfigUtil::class.java)
         const val LEGACY_CONFIG_FILE: String = "custom.properties"
         const val CONFIG_FILE: String = "jbake.properties"
         const val DEFAULT_CONFIG_FILE: String = "default.properties"

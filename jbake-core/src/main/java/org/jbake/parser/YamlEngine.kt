@@ -10,11 +10,9 @@ import java.io.FileInputStream
 import java.io.IOException
 
 class YamlEngine : MarkupEngine() {
+
     /**
      * Parses the YAML file and ensures the output is always a Map.
-     *
-     * @param file
-     * @return
      */
     private fun parseFile(file: File): DocumentModel {
         val model = DocumentModel()
@@ -25,18 +23,18 @@ class YamlEngine : MarkupEngine() {
                 if (result is MutableList<*>) {
                     model.put("data", result)
                 } else if (result is MutableMap<*, *>) {
-                    model.putAll(result)
+                    model.putAll(result as Map<String, Any>)
                 } else {
-                    LOGGER.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
+                    log.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
                 }
             }
         } catch (e: IOException) {
-            LOGGER.error("Error while parsing YAML file {}", file, e)
+            log.error("Error while parsing YAML file {}", file, e)
         }
         return model
     }
 
-    override fun parse(config: JBakeConfiguration?, file: File): DocumentModel {
+    override fun parse(config: JBakeConfiguration, file: File): DocumentModel {
         return parseFile(file)
     }
 
@@ -46,15 +44,15 @@ class YamlEngine : MarkupEngine() {
      * @param context the parser context
      */
     override fun processHeader(context: ParserContext) {
-        val fileContents = parseFile(context.getFile())
-        val documentModel = context.getDocumentModel()
+        val fileContents = parseFile(context.file)
+        val documentModel = context.documentModel
 
         for (key in fileContents.keys) {
             if (hasJBakePrefix(key)) {
                 val pKey = key.substring(6)
-                documentModel.put(pKey, fileContents.get(key))
+                documentModel.put(pKey, fileContents.get(key)!!)
             } else {
-                documentModel.put(key, fileContents.get(key))
+                documentModel.put(key, fileContents.get(key)!!)
             }
         }
     }
@@ -63,10 +61,10 @@ class YamlEngine : MarkupEngine() {
      * This method implements the contract allowing use of Yaml files as content files. As such there is
      * no body for Yaml files so this method just sets an empty String as the body.
      *
-     * @param context the parser context
+     * @param parserContext the parser context
      */
-    override fun processBody(context: ParserContext) {
-        context.setBody("")
+    override fun processBody(parserContext: ParserContext) {
+        parserContext.body = ""
     }
 
     private fun hasJBakePrefix(key: String): Boolean {
@@ -74,7 +72,7 @@ class YamlEngine : MarkupEngine() {
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(YamlEngine::class.java)
+        private val log: Logger = LoggerFactory.getLogger(YamlEngine::class.java)
 
         const val JBAKE_PREFIX: String = "jbake-"
     }

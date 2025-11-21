@@ -46,7 +46,7 @@ class Engines private constructor() {
     private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {
         val old = parsers.put(fileExtension, markupEngine)
         if (old != null) {
-            LOGGER.warn(
+            log.warn(
                 "Registered a markup engine for extension [.{}] but another one was already defined: {}",
                 fileExtension,
                 old
@@ -59,7 +59,7 @@ class Engines private constructor() {
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(Engines::class.java)
+        private val log: Logger = LoggerFactory.getLogger(Engines::class.java)
         private val INSTANCE: Engines
 
         init {
@@ -102,9 +102,9 @@ class Engines private constructor() {
             } catch (e: InstantiationException) {
                 return ErrorEngine(engineClassName)
             } catch (e: NoSuchMethodException) {
-                LOGGER.error("unable to instantiate ParserEngine {}", engineClassName)
+                log.error("unable to instantiate ParserEngine {}", engineClassName)
             } catch (e: InvocationTargetException) {
-                LOGGER.error("unable to instantiate ParserEngine {}", engineClassName)
+                log.error("unable to instantiate ParserEngine {}", engineClassName)
             }
             return null
         }
@@ -129,7 +129,7 @@ class Engines private constructor() {
                     }
                 }
             } catch (e: IOException) {
-                LOGGER.error("Error loading Engines", e)
+                log.error("Error loading Engines", e)
             }
         }
 
@@ -142,7 +142,7 @@ class Engines private constructor() {
                     }
                 }
                 if (engine is ErrorEngine) {
-                    LOGGER.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
+                    log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
                 }
             }
         }

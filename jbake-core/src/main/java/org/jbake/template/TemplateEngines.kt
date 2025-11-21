@@ -47,7 +47,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     private fun registerEngine(fileExtension: String, templateEngine: AbstractTemplateEngine) {
         val old = engines.put(fileExtension, templateEngine)
         if (old != null) {
-            LOGGER.warn(
+            log.warn(
                 "Registered a template engine for extension [.{}] but another one was already defined: {}",
                 fileExtension,
                 old
@@ -79,7 +79,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
                 }
             }
         } catch (e: IOException) {
-            LOGGER.error("Error loading engines", e)
+            log.error("Error loading engines", e)
         }
     }
 
@@ -98,7 +98,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(TemplateEngines::class.java)
+        private val log: Logger = LoggerFactory.getLogger(TemplateEngines::class.java)
 
         /**
          * This method is used to search for a specific class, telling if loading the engine would succeed. This is
@@ -125,7 +125,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
                 return ctor.newInstance(config, db)
             } catch (e: Throwable) {
                 // not all engines might be necessary, therefore only emit class loading issue with level warn
-                LOGGER.debug("Template engine not available: {}", engineClassName)
+                log.debug("Template engine not available: {}", engineClassName)
                 return null
             }
         }

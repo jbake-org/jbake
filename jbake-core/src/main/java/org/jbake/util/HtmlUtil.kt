@@ -21,7 +21,7 @@ object HtmlUtil {
      */
     @JvmStatic
     fun fixImageSourceUrls(fileContents: DocumentModel, configuration: JBakeConfiguration) {
-        val htmlContent = fileContents.getBody()
+        val htmlContent = fileContents.body
         val prependSiteHost = configuration.imgPathPrependHost
         val siteHost: String = configuration.siteHost!!
         val uri = getDocumentUri(fileContents)
@@ -34,14 +34,14 @@ object HtmlUtil {
         }
 
         //Use body().html() to prevent adding <body></body> from parsed fragment.
-        fileContents.setBody(document.body().html())
+        fileContents.body = (document.body().html())
     }
 
     private fun getDocumentUri(fileContents: DocumentModel): String {
-        var uri = fileContents.getUri()
+        var uri = fileContents.uri
 
-        if (fileContents.getNoExtensionUri() != null) {
-            uri = fileContents.getNoExtensionUri()
+        if (fileContents.noExtensionUri != null) {
+            uri = fileContents.noExtensionUri!!
             uri = removeTrailingSlash(uri)
         }
 

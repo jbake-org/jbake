@@ -31,7 +31,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 try {
                     lock.writeLock().lock()
                     if (engine == null) {
-                        LOGGER.info("Initializing Asciidoctor engine...")
+                        log.info("Initializing Asciidoctor engine...")
                         if (options.map().containsKey(OPT_GEM_PATH)) {
                             engine = AsciidoctorJRuby.Factory.create(options.map().get(OPT_GEM_PATH).toString())
                         } else {
@@ -49,7 +49,7 @@ class AsciidoctorEngine : MarkupEngine() {
                             }
                         }
 
-                        LOGGER.info("Asciidoctor engine initialized.")
+                        log.info("Asciidoctor engine initialized.")
                     }
                 } finally {
                     lock.readLock().lock()
@@ -65,8 +65,8 @@ class AsciidoctorEngine : MarkupEngine() {
     override fun processHeader(context: ParserContext) {
         val options = getAsciiDocOptionsAndAttributes(context)
         val asciidoctor = getEngine(options)
-        val header = asciidoctor.readDocumentHeader(context.getFile())
-        val documentModel = context.getDocumentModel()
+        val header = asciidoctor.readDocumentHeader(context.file)
+        val documentModel = context.documentModel
         if (header.getDocumentTitle() != null) {
             documentModel.setTitle(header.getDocumentTitle().getCombined())
         }
@@ -84,13 +84,13 @@ class AsciidoctorEngine : MarkupEngine() {
                 }
             }
             if (hasRevdate(key) && canCastToString(value)) {
-                val dateFormat: String = context.getConfig().dateFormat!!
+                val dateFormat: String = context.config.dateFormat!!
                 val df: DateFormat = SimpleDateFormat(dateFormat)
                 try {
                     val date = df.parse(value as String)
                     context.setDate(date)
                 } catch (e: ParseException) {
-                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e)
+                    log.error("Unable to parse revdate. Expected {}", dateFormat, e)
                 }
             }
             if (key == "jbake-tags") {
@@ -98,7 +98,7 @@ class AsciidoctorEngine : MarkupEngine() {
                     context.setTags((value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray())
                 } else {
-                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
+                    log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
                 }
             } else {
                 documentModel.put(key, attributes.get(key))
@@ -123,25 +123,25 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     // TODO: write tests with options and attributes
-    override fun processBody(context: ParserContext) {
-        val body = StringBuilder(context.getBody().length)
-        if (!context.hasHeader()) {
-            for (line in context.getFileLines()) {
+    override fun processBody(parserContext: ParserContext) {
+        val body = StringBuilder(parserContext.getBody().length)
+        if (!parserContext.hasHeader()) {
+            for (line in parserContext.fileLines()) {
                 body.append(line).append("\n")
             }
-            context.setBody(body.toString())
+            parserContext.body = (body.toString())
         }
-        processAsciiDoc(context)
+        processAsciiDoc(parserContext)
     }
 
     private fun processAsciiDoc(context: ParserContext) {
         val options = getAsciiDocOptionsAndAttributes(context)
         val asciidoctor = getEngine(options)
-        context.setBody(asciidoctor.convert(context.getBody(), options))
+        context.body = (asciidoctor.convert(context.getBody(), options))
     }
 
     private fun getAsciiDocOptionsAndAttributes(context: ParserContext): Options {
-        val config = context.getConfig()
+        val config = context.config
         val asciidoctorAttributes: MutableList<String> = config.asciidoctorAttributes!!
         val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String>())
         if (config.exportAsciidoctorAttributes) {
@@ -169,7 +169,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 options.setOption(optionKey, optionValue)
             }
         }
-        options.setBaseDir(context.getFile().getParentFile().getAbsolutePath())
+        options.setBaseDir(context.file.getParentFile().getAbsolutePath())
         options.setSafe(SafeMode.UNSAFE)
         return options
     }
@@ -186,7 +186,7 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(AsciidoctorEngine::class.java)
+        private val log: Logger = LoggerFactory.getLogger(AsciidoctorEngine::class.java)
         const val JBAKE_PREFIX: String = "jbake-"
         const val REVDATE_KEY: String = "revdate"
 

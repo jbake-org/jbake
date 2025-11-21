@@ -20,7 +20,7 @@ class ErrorEngine @JvmOverloads constructor(private val engineName: String = "un
         documentModel.tags = emptyArray<String>()
     }
 
-    override fun processBody(context: ParserContext) {
-        context.body = "The markup engine [" + engineName + "] for [" + context.file + "] couldn't be loaded"
+    override fun processBody(parserContext: ParserContext) {
+        parserContext.body = "The markup engine [" + engineName + "] for [" + parserContext.file + "] couldn't be loaded"
     }
 }

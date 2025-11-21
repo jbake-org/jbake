@@ -72,13 +72,13 @@ class Asset {
             if (!asset.isDirectory()) {
                 val targetPath =
                     (config.destinationFolder!!.getCanonicalPath() + File.separatorChar).toString() + assetSubPath(asset)
-                LOGGER.info("Copying single asset file to [{}]", targetPath)
+                log.info("Copying single asset file to [{}]", targetPath)
                 copyFile(asset, File(targetPath))
             } else {
-                LOGGER.info("Skip copying single asset file [{}]. Is a directory.", asset.getPath())
+                log.info("Skip copying single asset file [{}]. Is a directory.", asset.getPath())
             }
         } catch (io: IOException) {
-            LOGGER.error("Failed to copy the asset file.", io)
+            log.error("Failed to copy the asset file.", io)
         }
     }
 
@@ -101,7 +101,7 @@ class Asset {
                 }
             }
         } catch (ioe: IOException) {
-            LOGGER.error("Unable to determine the path to asset file {}", path.getPath(), ioe)
+            log.error("Unable to determine the path to asset file {}", path.getPath(), ioe)
         }
         return isAsset
     }
@@ -152,17 +152,17 @@ class Asset {
     private fun copyFile(asset: File, targetFolder: File) {
         try {
             FileUtils.copyFile(asset, targetFolder)
-            LOGGER.info("Copying [{}]... done!", asset.getPath())
+            log.info("Copying [{}]... done!", asset.getPath())
         } catch (e: IOException) {
-            LOGGER.error("Copying [{}]... failed!", asset.getPath(), e)
+            log.error("Copying [{}]... failed!", asset.getPath(), e)
             errors.add(e)
         } catch (e: IllegalArgumentException) {
-            LOGGER.error("Copying [{}]... failed!", asset.getPath(), e)
+            log.error("Copying [{}]... failed!", asset.getPath(), e)
             errors.add(e)
         }
     }
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(Asset::class.java)
+        private val log: Logger = LoggerFactory.getLogger(Asset::class.java)
     }
 }
