@@ -6,7 +6,7 @@ import org.jbake.template.ModelExtractor
 
 class PublishedPagesExtractor : ModelExtractor<DocumentList<*>> {
 
-    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
         return db.publishedPages
     }
 }

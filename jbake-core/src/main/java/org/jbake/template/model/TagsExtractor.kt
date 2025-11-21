@@ -8,21 +8,21 @@ import org.jbake.template.ModelExtractor
 
 class TagsExtractor : ModelExtractor<DocumentList<*>> {
 
-    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
-        val dl = DocumentList<TemplateModel>()
-        val templateModel = TemplateModel()
-        templateModel.putAll(model)
-        val config: MutableMap<*, *> = templateModel.config
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
 
-        val tagPath: String? = config.get(PropertyList.TAG_PATH.key.replace(".", "_")).toString()
+        @Suppress("UNCHECKED_CAST")
+        val config = model["config"] as MutableMap<String, Any>
+
+        val tagPath = config[PropertyList.TAG_PATH.key.replace(".", "_")].toString()
+
+        val dl = DocumentList<TemplateModel>()
 
         for (tag in db.allTags) {
             val newTag = TemplateModel()
             val tagName = tag
             newTag.name = tagName
 
-            val uri = tagPath + FileUtil.URI_SEPARATOR_CHAR + tag + config.get(PropertyList.OUTPUT_EXTENSION.key.replace(".", "_"))
-                .toString()
+            val uri = tagPath + FileUtil.URI_SEPARATOR_CHAR + tag + config[PropertyList.OUTPUT_EXTENSION.key.replace(".", "_")].toString()
 
             newTag.uri = uri
             newTag.taggedPosts = db.getPublishedPostsByTag(tagName)

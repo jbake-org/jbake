@@ -7,5 +7,5 @@ import org.jbake.app.ContentStore
  * @author ndx
  */
 interface ModelExtractor<T> {
-    fun get(db: ContentStore, model: MutableMap<*, *>, key: String): T?
+    fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): T?
 }

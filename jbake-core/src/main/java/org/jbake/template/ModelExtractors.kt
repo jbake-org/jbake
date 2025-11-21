@@ -86,12 +86,12 @@ class ModelExtractors private constructor() {
     fun <Type> extractAndTransform(
         db: ContentStore,
         key: String,
-        map: MutableMap<*, *>,
+        map: MutableMap<String, Any>,
         adapter: TemplateEngineAdapter<Type>
-    ): Type {
+    ): Type? {
         if (extractors.containsKey(key)) {
-            val extractedValue = extractors[key]!!.get(db, map, key)!!
-            return adapter.adapt(key, extractedValue)
+            val extractedValue = extractors[key]!!.get(db, map, key)
+            return adapter.adapt(key, extractedValue!!)
         } else {
             throw NoModelExtractorException("no model extractor for key \"" + key + "\"")
         }

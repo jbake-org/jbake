@@ -5,7 +5,7 @@ import org.jbake.template.ModelExtractor
 
 class DBExtractor : ModelExtractor<ContentStore> {
 
-    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): ContentStore {
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): ContentStore {
         return db
     }
 }

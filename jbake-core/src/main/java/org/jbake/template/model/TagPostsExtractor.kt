@@ -6,10 +6,11 @@ import org.jbake.template.ModelExtractor
 
 class TagPostsExtractor : ModelExtractor<DocumentList<*>> {
 
-    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
+        //val tag = model["tag"] as? String
+
         var tag: String? = null
-        val templateModel = TemplateModel()
-        templateModel.putAll(model)
+        val templateModel = TemplateModel().apply { putAll(model) }
         if (templateModel.tag != null) {
             tag = templateModel.tag
         }

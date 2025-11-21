@@ -9,10 +9,12 @@ import org.jbake.template.ModelExtractor
 
 class AllContentExtractor : ModelExtractor<DocumentList<*>> {
 
-    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
-        val config = model.get("config") as MutableMap<String, Any>
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
+
+        val config = model["config"] as MutableMap<String, Any>
         val dataFileDocType: String = config.get(PropertyList.DATA_FILE_DOCTYPE.key.replace(".", "_")).toString()
         val allContent = DocumentList<DocumentModel>()
+
         val documentTypes = DocumentTypes.documentTypes
         for (docType in documentTypes) {
             if (docType != dataFileDocType) {

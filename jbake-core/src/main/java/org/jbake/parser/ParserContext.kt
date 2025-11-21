@@ -37,14 +37,14 @@ class ParserContext(
         get() = this.documentModel.status ?: ""
 
     fun setDefaultStatus() {
-        this.documentModel.status = this.config?.defaultStatus ?: ""
+        this.documentModel.status = this.config.defaultStatus ?: ""
     }
 
     val type: String
         get() = this.documentModel.type
 
     fun setDefaultType() {
-        this.documentModel.type = this.config?.defaultType ?: ""
+        this.documentModel.type = this.config.defaultType ?: ""
     }
 
     val tags: Array<String>

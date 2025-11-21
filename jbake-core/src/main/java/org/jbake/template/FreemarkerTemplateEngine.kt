@@ -23,12 +23,9 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
     lateinit var templateCfg: Configuration
 
     @Deprecated("")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File) : super(
-        config,
-        db,
-        destination,
-        templatesPath
-    ) {
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
+        : super(config, db, destination, templatesPath)
+    {
         createTemplateConfiguration()
     }
 
@@ -65,22 +62,14 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
      * A custom Freemarker model that avoids loading the whole documents into memory if not necessary.
      */
     class LazyLoadingModel(
-        wrapper: ObjectWrapper?,
+        private val wrapper: ObjectWrapper,
         eagerModel: TemplateModel,
-        db: ContentStore,
-        config: JBakeConfiguration
-    ) : TemplateHashModel {
-        private val wrapper: ObjectWrapper?
-        private val eagerModel: SimpleHash
-        private val db: ContentStore
+        private val db: ContentStore,
         private val config: JBakeConfiguration
-
-        init {
-            this.eagerModel = SimpleHash(eagerModel, wrapper)
-            this.db = db
-            this.wrapper = wrapper
-            this.config = config
-        }
+    )
+        : TemplateHashModel
+    {
+        private val eagerModel = SimpleHash(eagerModel, wrapper)
 
         @Throws(TemplateModelException::class)
         override fun get(key: String): freemarker.template.TemplateModel? {
@@ -113,7 +102,9 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                         }
                     }
                 }
-                return extractors.extractAndTransform(db, key, eagerModel.toMap(), adapter)
+                val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
+                val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
+                return extractors.extractAndTransform(db, key, map, adapterTyped)
             }
             catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)

@@ -7,7 +7,7 @@ import org.jbake.template.ModelExtractor
 class PublishedCustomExtractor(private val customDocumentType: String)
         : ModelExtractor<DocumentList<*>>
 {
-    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
         return db.getPublishedContent(customDocumentType)
     }
 }
