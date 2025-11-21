@@ -1,5 +1,6 @@
 package org.jbake.template
 
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.junit.Test
 

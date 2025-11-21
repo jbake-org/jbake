@@ -47,8 +47,8 @@ import java.util.*
  * @author jdlee
  */
 abstract class AbstractTemplateEngineRenderingTest(
-    protected val templateDir: String,
-    protected val templateExtension: String?
+    protected val templateDir: String? = null,
+    protected val templateExtension: String? = null,
 ) : ContentStoreIntegrationTest() {
     protected val outputStrings: MutableMap<String, MutableList<String>> = HashMap()
 
