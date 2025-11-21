@@ -1,3 +1,6 @@
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     id 'java'
     id 'jacoco'
@@ -62,6 +65,48 @@ tasks.withType(AbstractArchiveTask).configureEach {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
+
+tasks.register("commitBuildAndDate", Exec) {
+    group = "build"
+    description = "determine build date and time from last commit"
+
+    executable "git"
+    args "show", "-s", "--format=%cI", "HEAD"
+
+    standardOutput = new ByteArrayOutputStream()
+
+    ext.commitDate = {
+        def zonedDateTime = ZonedDateTime.parse(standardOutput.toString().trim())
+        return zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'"))
+    }
+
+    ext.date = {
+        def zonedDateTime = ZonedDateTime.parse(standardOutput.toString().trim())
+        return zonedDateTime.format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))
+    }
+
+    ext.time = {
+        def zonedDateTime = ZonedDateTime.parse(standardOutput.toString().trim())
+        return zonedDateTime.format(DateTimeFormatter.ofPattern('HH:mm:ss.SSSZ'))
+    }
+}
+
+tasks.register("commitHash", Exec) {
+    group = "build"
+    description = "determine build commit hash for last commit"
+
+    executable "git"
+    args "show", "-s", "--format=%h", "HEAD"
+
+    standardOutput = new ByteArrayOutputStream()
+
+    ext.abbreviated = {
+        return standardOutput.toString().trim()
+    }
+}
+
+processResources.dependsOn(tasks.commitBuildAndDate)
+processResources.dependsOn(tasks.commitHash)
 
 test {
     useJUnitPlatform()

@@ -29,6 +29,8 @@ publishing {
     }
 }
 
+checkstyleMain.exclude("org/jbake/maven/HelpMojo.java")
+
 dependencies {
     implementation project(":jbake-core")
 
