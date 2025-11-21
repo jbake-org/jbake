@@ -49,7 +49,7 @@ class BakeWatcher {
 
             logger.info(
                 "Watching for (content, data, template, asset) changes in [{}]",
-                config.sourceFolder.getPath()
+                config.sourceFolder!!.path
             )
             val monitor = DefaultFileMonitor(CustomFSChangeListener(config))
             monitor.setRecursive(true)

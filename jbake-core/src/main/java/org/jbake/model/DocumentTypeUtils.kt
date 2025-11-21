@@ -15,7 +15,7 @@ object DocumentTypeUtils {
         )
     }
 
-    fun pluralize(documentType: String?): String {
+    fun pluralize(documentType: String): String {
         val documentTypes = DocumentTypes.documentTypes
 
         if (DocumentTypes.contains(documentType)) {

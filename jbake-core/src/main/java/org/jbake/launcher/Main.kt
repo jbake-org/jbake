@@ -132,13 +132,13 @@ class Main @JvmOverloads constructor(
         jettyServer.run(path.getPath(), configuration)
     }
 
-    private fun initStructure(type: String?, config: JBakeConfiguration) {
+    private fun initStructure(type: String, config: JBakeConfiguration) {
         val init = Init(config)
         try {
             val templateFolder = FileUtil.runningLocation
             val outputFolder: File
             if (config.sourceFolder != null) {
-                outputFolder = config.sourceFolder
+                outputFolder = config.sourceFolder!!
             } else {
                 outputFolder = File(".")
             }

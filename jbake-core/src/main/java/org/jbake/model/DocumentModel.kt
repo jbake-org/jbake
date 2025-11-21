@@ -13,7 +13,7 @@ class DocumentModel : BaseModel() {
     var date: Date?
         get() = get(ModelAttributes.DATE) as Date?
         set(date) {
-            put(ModelAttributes.DATE, date)
+            put(ModelAttributes.DATE, date!!)
         }
 
     var status: String?
@@ -24,7 +24,7 @@ class DocumentModel : BaseModel() {
             return ""
         }
         set(status) {
-            put(ModelAttributes.STATUS, status)
+            put(ModelAttributes.STATUS, status!!)
         }
 
     var type: String
@@ -50,13 +50,13 @@ class DocumentModel : BaseModel() {
     var sha1: String?
         get() = get(ModelAttributes.SHA1) as String?
         set(sha1) {
-            put(ModelAttributes.SHA1, sha1)
+            put(ModelAttributes.SHA1, sha1!!)
         }
 
     var sourceUri: String?
         get() = get(ModelAttributes.SOURCE_URI) as String?
         set(uri) {
-            put(ModelAttributes.SOURCE_URI, uri)
+            put(ModelAttributes.SOURCE_URI, uri!!)
         }
 
     var rootPath: String
@@ -74,19 +74,19 @@ class DocumentModel : BaseModel() {
     var file: String?
         get() = get(ModelAttributes.FILE) as String?
         set(path) {
-            put(ModelAttributes.FILE, path)
+            put(ModelAttributes.FILE, path!!)
         }
 
     var noExtensionUri: String?
         get() = get(ModelAttributes.NO_EXTENSION_URI) as String?
         set(noExtensionUri) {
-            put(ModelAttributes.NO_EXTENSION_URI, noExtensionUri)
+            put(ModelAttributes.NO_EXTENSION_URI, noExtensionUri!!)
         }
 
     var title: String?
         get() = get(ModelAttributes.TITLE) as String?
         set(title) {
-            put(ModelAttributes.TITLE, title)
+            put(ModelAttributes.TITLE, title!!)
         }
 
     var cached: Boolean?
@@ -99,7 +99,7 @@ class DocumentModel : BaseModel() {
             }
         }
         set(cached) {
-            put(ModelAttributes.CACHED, cached)
+            put(ModelAttributes.CACHED, cached!!)
         }
 
     fun setNextContent(nextDocumentModel: DocumentModel) {
