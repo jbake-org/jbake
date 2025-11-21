@@ -52,11 +52,11 @@ abstract class AbstractTemplateEngineRenderingTest(
 ) : ContentStoreIntegrationTest() {
     protected val outputStrings: MutableMap<String, MutableList<String>?> = HashMap<String, MutableList<String>?>()
 
-    protected var destinationFolder: File? = null
-    protected var templateFolder: File? = null
-    protected var renderer: Renderer? = null
-    protected var currentLocale: Locale? = null
-    private var parser: Parser? = null
+    protected lateinit var destinationFolder: File
+    protected lateinit var templateFolder: File
+    protected lateinit var renderer: Renderer
+    protected lateinit var currentLocale: Locale
+    private lateinit var parser: Parser
 
     @Before
     fun setup() {
@@ -67,12 +67,12 @@ abstract class AbstractTemplateEngineRenderingTest(
         addListener(listener)
 
         templateFolder = File(ContentStoreIntegrationTest.Companion.sourceFolder, templateDir)
-        if (!templateFolder!!.exists()) {
+        if (!templateFolder.exists()) {
             throw Exception("Cannot find template folder!")
         }
 
         destinationFolder = ContentStoreIntegrationTest.Companion.folder.getRoot()
-        ContentStoreIntegrationTest.Companion.config.setDestinationFolder(destinationFolder)
+        ContentStoreIntegrationTest.Companion.config.destinationFolder = (destinationFolder)
         ContentStoreIntegrationTest.Companion.config.setTemplateFolder(templateFolder)
 
 

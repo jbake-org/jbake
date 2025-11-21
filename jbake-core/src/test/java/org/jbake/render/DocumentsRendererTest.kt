@@ -17,11 +17,11 @@ import java.util.function.Function
 import java.util.stream.Collectors
 
 class DocumentsRendererTest {
-    var documentsRenderer: DocumentsRenderer? = null
-    private var db: ContentStore? = null
-    private var renderer: Renderer? = null
-    private var configuration: JBakeConfiguration? = null
-    private var emptyTemplateModelList: DocumentList<DocumentModel>? = null
+    lateinit var documentsRenderer: DocumentsRenderer
+    private lateinit var db: ContentStore
+    private lateinit var renderer: Renderer
+    private lateinit var configuration: JBakeConfiguration
+    private lateinit var emptyTemplateModelList: DocumentList<DocumentModel>
 
     @Captor
     private val argument: ArgumentCaptor<DocumentModel>? = null

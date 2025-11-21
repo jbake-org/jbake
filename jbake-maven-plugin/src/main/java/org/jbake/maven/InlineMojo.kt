@@ -64,7 +64,7 @@ class InlineMojo : WatchMojo() {
 
     @Throws(MojoExecutionException::class)
     override fun initServer() {
-        Spark.externalStaticFileLocation(outputDirectory.getPath())
+        Spark.externalStaticFileLocation(outputDirectory!!.path)
 
         Spark.ipAddress(listenAddress)
         Spark.port(this.port!!)

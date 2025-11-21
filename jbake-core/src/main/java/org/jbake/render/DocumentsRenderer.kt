@@ -5,6 +5,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
@@ -17,7 +18,6 @@ class DocumentsRenderer : RenderingTool {
     override fun render(
         renderer: Renderer,
         db: ContentStore,
-        /// TODO: Looks like config may be null? Perhaps create some NullConfiguration class to avoid nulls.
         config: JBakeConfiguration
     ): Int {
         var renderedCount = 0
@@ -122,6 +122,8 @@ class DocumentsRenderer : RenderingTool {
         templatesPath: File,
         config: CompositeConfiguration
     ): Int {
-        return render(renderer, db, null)
+        val configuration: JBakeConfiguration =
+            JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
+        return render(renderer, db, configuration)
     }
 }

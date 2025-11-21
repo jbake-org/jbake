@@ -22,18 +22,18 @@ abstract class LoggingTest {
     @Captor
     protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent>? = null
 
-    protected var root: Logger? = null
+    protected lateinit var root: Logger
 
     @BeforeEach
     fun setupBase() {
         root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 
-        root!!.addAppender(mockAppender)
-        root!!.setLevel(Level.INFO)
+        root.addAppender(mockAppender)
+        root.setLevel(Level.INFO)
     }
 
     @AfterEach
     fun teardownBase() {
-        root!!.detachAppender(mockAppender)
+        root.detachAppender(mockAppender)
     }
 }

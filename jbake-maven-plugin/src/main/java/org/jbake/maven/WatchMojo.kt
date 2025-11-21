@@ -36,7 +36,7 @@ open class WatchMojo : GenerateMojo() {
         var lastProcessed = System.currentTimeMillis()
 
         getLog().info(
-            "Now listening for changes on path " + inputDirectory.getPath()
+            "Now listening for changes on path " + inputDirectory!!.getPath()
         )
 
         initServer()
@@ -44,7 +44,7 @@ open class WatchMojo : GenerateMojo() {
         var dirWatcher: DirWatcher? = null
 
         try {
-            dirWatcher = DirWatcher(inputDirectory)
+            dirWatcher = DirWatcher(inputDirectory!!)
             val done = AtomicBoolean(false)
             val reader = BufferedReader(
                 InputStreamReader(System.`in`)

@@ -33,7 +33,7 @@ import java.nio.file.Path
 internal class MainTest : LoggingTest() {
     private val standardOut: PrintStream? = System.out
     private val outputStreamCaptor = ByteArrayOutputStream()
-    private var main: Main? = null
+    private lateinit var main: Main
 
     @Mock
     private val mockBaker: Baker? = null
@@ -50,14 +50,14 @@ internal class MainTest : LoggingTest() {
     @Mock
     private val factory: JBakeConfigurationFactory? = null
 
-    private var workingdir: String? = null
+    private lateinit var workingdir: String
 
     @BeforeEach
     fun setUp() {
         this.main = Main(mockBaker!!, mockJetty!!, mockWatcher!!)
         workingdir = System.getProperty("user.dir")
         factory!!.configUtil = configUtil!!
-        main!!.jBakeConfigurationFactory = factory
+        main.jBakeConfigurationFactory = factory
         System.setOut(PrintStream(outputStreamCaptor))
     }
 

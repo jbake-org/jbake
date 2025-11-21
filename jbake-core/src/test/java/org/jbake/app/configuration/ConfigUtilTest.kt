@@ -20,8 +20,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class ConfigUtilTest : LoggingTest() {
-    private var sourceFolder: Path? = null
-    private var util: ConfigUtil? = null
+    private lateinit var sourceFolder: Path
+    private lateinit var util: ConfigUtil
 
     @BeforeEach
     fun setup(@TempDir folder: Path) {
@@ -268,7 +268,7 @@ class ConfigUtilTest : LoggingTest() {
         config.setTemplateFolder(null)
         config.setAssetFolder(null)
         config.setContentFolder(null)
-        config.setDestinationFolder(null)
+        config.destinationFolder = (null)
 
         val templateFolder = config.getTemplateFolder()
         val assetFolder = config.getAssetFolder()

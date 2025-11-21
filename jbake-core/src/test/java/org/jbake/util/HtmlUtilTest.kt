@@ -9,7 +9,7 @@ import org.junit.Before
 import org.junit.Test
 
 class HtmlUtilTest {
-    private var config: DefaultJBakeConfiguration? = null
+    private lateinit var config: DefaultJBakeConfiguration
 
     @Before
     fun setUp() {

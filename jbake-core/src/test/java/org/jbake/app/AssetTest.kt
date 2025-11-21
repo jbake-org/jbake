@@ -21,7 +21,7 @@ import java.util.function.Supplier
 
 class AssetTest : LoggingTest() {
     var folder: Path? = null
-    private var config: DefaultJBakeConfiguration? = null
+    private lateinit var config: DefaultJBakeConfiguration
     private var fixtureDir: File? = null
 
 
@@ -30,8 +30,8 @@ class AssetTest : LoggingTest() {
         fixtureDir = File(this.javaClass.getResource("/fixture").getFile())
         this.folder = folder
         config = ConfigUtil().loadConfig(fixtureDir!!) as DefaultJBakeConfiguration
-        config!!.setDestinationFolder(folder.toFile())
-        Assertions.assertEquals(".html", config!!.getOutputExtension())
+        config!!.destinationFolder = folder.toFile()
+        Assertions.assertEquals(".html", config!!.outputExtension)
     }
 
 
@@ -98,16 +98,16 @@ class AssetTest : LoggingTest() {
 
         asset.copySingleFile(emptyDir)
 
-        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
 
-        val loggingEvent = captorLoggingEvent.getValue()
+        val loggingEvent = captorLoggingEvent!!.getValue()
         org.assertj.core.api.Assertions.assertThat(loggingEvent.getMessage())
             .isEqualTo("Skip copying single asset file [{}]. Is a directory.")
     }
 
     @Test
     fun testCopyCustomFolder() {
-        config!!.setAssetFolder(File(config!!.getSourceFolder(), "/media"))
+        config!!.setAssetFolder(File(config!!.sourceFolder, "/media"))
         val asset = Asset(config!!)
         asset.copy()
 
@@ -123,7 +123,7 @@ class AssetTest : LoggingTest() {
         assetFolder.mkdirs()
         FileUtils.copyDirectory(File(this.javaClass.getResource("/fixture/ignorables").getFile()), assetFolder)
         config!!.setAssetFolder(assetFolder)
-        config!!.setAssetIgnoreHidden(true)
+        config!!.assetIgnoreHidden = true
         TestUtils.hideAssets(assetFolder)
         val asset = Asset(config!!)
         asset.copy(assetFolder)
@@ -154,7 +154,7 @@ class AssetTest : LoggingTest() {
         cssFile.setReadOnly()
 
         config!!.setAssetFolder(assets)
-        config!!.setDestinationFolder(folder!!.toFile())
+        config!!.destinationFolder = (folder!!.toFile())
         val asset = Asset(config!!)
         asset.copy()
 

@@ -103,7 +103,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val assetFolderName: String?
         get() = getAsString(PropertyList.ASSET_FOLDER.key)
 
-    override val assetIgnoreHidden: Boolean
+    override var assetIgnoreHidden: Boolean = true
         get() = getAsBoolean(PropertyList.ASSET_IGNORE_HIDDEN.key)
         // TBD: Setter existed too
 

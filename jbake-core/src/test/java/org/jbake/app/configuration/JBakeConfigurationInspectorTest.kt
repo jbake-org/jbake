@@ -15,7 +15,7 @@ import java.io.File
 import java.nio.file.Path
 
 class JBakeConfigurationInspectorTest : LoggingTest() {
-    private var folder: Path? = null
+    private lateinit var folder: Path
 
     @BeforeEach
     fun setup(@TempDir folder: Path) {

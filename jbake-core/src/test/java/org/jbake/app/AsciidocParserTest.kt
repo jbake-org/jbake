@@ -5,6 +5,7 @@ import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList
+import org.jbake.app.configuration.PropertyList.ASCIIDOCTOR_ATTRIBUTES
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -17,17 +18,17 @@ class AsciidocParserTest {
     @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
-    private var config: DefaultJBakeConfiguration? = null
-    private var parser: Parser? = null
-    private var rootPath: File? = null
+    private lateinit var config: DefaultJBakeConfiguration
+    private lateinit var parser: Parser
+    private lateinit var rootPath: File
 
-    private var asciidocWithSource: File? = null
-    private var validAsciidocFile: File? = null
-    private var invalidAsciiDocFile: File? = null
-    private var validAsciiDocFileWithoutHeader: File? = null
-    private var invalidAsciiDocFileWithoutHeader: File? = null
-    private var validAsciiDocFileWithHeaderInContent: File? = null
-    private var validAsciiDocFileWithoutJBakeMetaData: File? = null
+    private lateinit var asciidocWithSource: File
+    private lateinit var validAsciidocFile: File
+    private lateinit var invalidAsciiDocFile: File
+    private lateinit var validAsciiDocFileWithoutHeader: File
+    private lateinit var invalidAsciiDocFileWithoutHeader: File
+    private lateinit var validAsciiDocFileWithHeaderInContent: File
+    private lateinit var validAsciiDocFileWithoutJBakeMetaData: File
 
     private val validHeader =
         "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~"
@@ -129,7 +130,7 @@ class AsciidocParserTest {
 
     @Test
     fun parseAsciidocFileWithPrettifyAttribute() {
-        config!!.setProperty(PropertyList.ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
+        config!!.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
         val map = parser!!.processFile(asciidocWithSource!!)
         Assert.assertNotNull(map)
         Assert.assertEquals("draft", map!!.status)
@@ -213,7 +214,7 @@ class AsciidocParserTest {
     fun parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() {
         config!!.setDefaultStatus("published")
         config!!.setDefaultType("page")
-        val parser = Parser(config)
+        val parser = Parser(config!!)
         val map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData!!)
         Assert.assertNotNull(map)
         Assert.assertEquals("published", map!!.status)

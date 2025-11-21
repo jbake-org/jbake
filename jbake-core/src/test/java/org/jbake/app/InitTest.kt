@@ -27,7 +27,7 @@ class InitTest {
         }
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         // override base template config option
-        config!!.setExampleProject("freemarker", "test.zip")
+        config.setExampleProject("freemarker", "test.zip")
     }
 
     @Test

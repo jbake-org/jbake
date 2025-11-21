@@ -7,7 +7,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
 
-class FakeDocumentBuilder(private val type: String?) {
+class FakeDocumentBuilder(private val type: String) {
     private val fileModel = DocumentModel()
     private val hasSourceUri = false
     private var hasSha1 = false

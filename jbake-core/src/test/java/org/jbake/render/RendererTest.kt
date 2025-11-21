@@ -22,8 +22,8 @@ import java.io.File
 class RendererTest {
     @Rule
     var folder: TemporaryFolder = TemporaryFolder()
-    private var config: DefaultJBakeConfiguration? = null
-    private var outputPath: File? = null
+    private lateinit var config: DefaultJBakeConfiguration
+    private lateinit var outputPath: File
 
     @Mock
     private val db: ContentStore? = null
@@ -39,7 +39,7 @@ class RendererTest {
         }
         outputPath = folder.newFolder("output")
         config = ConfigUtil().loadConfig(sourcePath) as DefaultJBakeConfiguration
-        config!!.setDestinationFolder(outputPath)
+        config.destinationFolder = (outputPath)
     }
 
     /**
@@ -49,7 +49,7 @@ class RendererTest {
      */
     @Test
     fun testRenderFileWorksWhenPathHasDotInButFileDoesNot() {
-        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows())
+        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows)
         val FOLDER = "real.path"
 
         val FILENAME = "about"

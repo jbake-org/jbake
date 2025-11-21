@@ -27,7 +27,7 @@ class OvenTest {
     var root: Path? = null
 
     private lateinit var configuration: DefaultJBakeConfiguration
-    private var sourceFolder: File? = null
+    private lateinit var sourceFolder: File
     private var contentStore: ContentStore? = null
 
     @BeforeEach
@@ -36,8 +36,8 @@ class OvenTest {
         resetDocumentTypes()
         val output = root!!.resolve("output").toFile()
         sourceFolder = TestUtils.testResourcesAsSourceFolder
-        configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
-        configuration.setDestinationFolder(output)
+        configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        configuration.destinationFolder = (output)
         configuration.setTemplateFolder(File(sourceFolder, "groovyMarkupTemplates"))
         configuration.setProperty("template.paper.file", "paper.tpl")
     }

@@ -23,47 +23,47 @@ class MdParserTest {
     @Rule
     var folder: TemporaryFolder = TemporaryFolder()
 
-    var config: DefaultJBakeConfiguration? = null
+    lateinit var config: DefaultJBakeConfiguration
 
-    private var validMdFileBasic: File? = null
+    private lateinit var validMdFileBasic: File
 
-    private var invalidMdFileBasic: File? = null
+    private lateinit var invalidMdFileBasic: File
 
-    private var mdFileHardWraps: File? = null
+    private lateinit var mdFileHardWraps: File
 
-    private var mdFileAbbreviations: File? = null
+    private lateinit var mdFileAbbreviations: File
 
-    private var mdFileAutolinks: File? = null
+    private lateinit var mdFileAutolinks: File
 
-    private var mdFileDefinitions: File? = null
+    private lateinit var mdFileDefinitions: File
 
-    private var mdFileFencedCodeBlocks: File? = null
+    private lateinit var mdFileFencedCodeBlocks: File
 
-    private var mdFileQuotes: File? = null
+    private lateinit var mdFileQuotes: File
 
-    private var mdFileSmarts: File? = null
+    private lateinit var mdFileSmarts: File
 
-    private var mdFileSmartypants: File? = null
+    private lateinit var mdFileSmartypants: File
 
-    private var mdFileSuppressAllHTML: File? = null
+    private lateinit var mdFileSuppressAllHTML: File
 
-    private var mdFileSuppressHTMLBlocks: File? = null
+    private lateinit var mdFileSuppressHTMLBlocks: File
 
-    private var mdFileSuppressInlineHTML: File? = null
+    private lateinit var mdFileSuppressInlineHTML: File
 
-    private var mdFileTables: File? = null
+    private lateinit var mdFileTables: File
 
-    private var mdFileWikilinks: File? = null
+    private lateinit var mdFileWikilinks: File
 
-    private var mdFileAtxheaderspace: File? = null
+    private lateinit var mdFileAtxheaderspace: File
 
-    private var mdFileForcelistitempara: File? = null
+    private lateinit var mdFileForcelistitempara: File
 
-    private var mdFileRelaxedhrules: File? = null
+    private lateinit var mdFileRelaxedhrules: File
 
-    private var mdTasklistitems: File? = null
+    private lateinit var mdTasklistitems: File
 
-    private var mdExtanchorlinks: File? = null
+    private lateinit var mdExtanchorlinks: File
 
     private val validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~"
 

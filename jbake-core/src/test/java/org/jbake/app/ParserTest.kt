@@ -25,16 +25,16 @@ class ParserTest {
 
     private lateinit var validHTMLFile: File
     private var invalidHTMLFile: File? = null
-    private var validMarkdownFileWithCustomHeader: File? = null
-    private var validMarkdownFileWithDefaultStatus: File? = null
-    private var validMarkdownFileWithDefaultTypeAndStatus: File? = null
-    private var invalidMarkdownFileWithoutDefaultStatus: File? = null
-    private var invalidMDFile: File? = null
-    private var invalidExtensionFile: File? = null
-    private var validHTMLWithJSONFile: File? = null
-    private var validAsciiDocWithJSONFile: File? = null
-    private var validAsciiDocWithADHeaderJSONFile: File? = null
-    private var validaAsciidocWithUnsanitizedHeader: File? = null
+    private lateinit var validMarkdownFileWithCustomHeader: File
+    private lateinit var validMarkdownFileWithDefaultStatus: File
+    private lateinit var validMarkdownFileWithDefaultTypeAndStatus: File
+    private lateinit var invalidMarkdownFileWithoutDefaultStatus: File
+    private lateinit var invalidMDFile: File
+    private lateinit var invalidExtensionFile: File
+    private lateinit var validHTMLWithJSONFile: File
+    private lateinit var validAsciiDocWithJSONFile: File
+    private lateinit var validAsciiDocWithADHeaderJSONFile: File
+    private lateinit var validaAsciidocWithUnsanitizedHeader: File
 
     private val validHeader =
         "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~"
