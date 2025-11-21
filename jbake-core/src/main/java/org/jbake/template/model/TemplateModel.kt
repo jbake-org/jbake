@@ -14,8 +14,8 @@ open class TemplateModel : BaseModel {
         putAll(model)
     }
 
-    var config: MutableMap<String,  Any>
-        get() = get(ModelAttributes.CONFIG) as MutableMap<String,  Any>
+    var config: MutableMap<String, Any>
+        get() = get(ModelAttributes.CONFIG) as MutableMap<String, Any>
         set(configModel) {
             put(ModelAttributes.CONFIG, configModel)
         }

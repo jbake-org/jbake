@@ -16,14 +16,14 @@ import java.io.PrintWriter
 import java.util.*
 
 class ParserTest {
-    @Rule
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
-    private var config: DefaultJBakeConfiguration? = null
+    private lateinit var config: DefaultJBakeConfiguration
     private var parser: Parser? = null
     private var rootPath: File? = null
 
-    private var validHTMLFile: File? = null
+    private lateinit var validHTMLFile: File
     private var invalidHTMLFile: File? = null
     private var validMarkdownFileWithCustomHeader: File? = null
     private var validMarkdownFileWithDefaultStatus: File? = null
@@ -87,7 +87,7 @@ class ParserTest {
         out = PrintWriter(validMarkdownFileWithDefaultStatus)
         out.println("title=Custom Header separator")
         out.println("type=post")
-        out.println(config!!.getHeaderSeparator())
+        out.println(config.headerSeparator)
         out.println("# Hello Markdown!")
         out.println("")
         out.println("A paragraph")
@@ -102,7 +102,7 @@ class ParserTest {
         out = PrintWriter(validMarkdownFileWithDefaultTypeAndStatus)
         out.println("title=Custom Header separator")
         out.println("cached=false")
-        out.println(config!!.getHeaderSeparator())
+        out.println(config.headerSeparator)
         out.println("# Hello Markdown!")
         out.println("")
         out.println("A paragraph")
@@ -117,7 +117,7 @@ class ParserTest {
         out = PrintWriter(invalidMarkdownFileWithoutDefaultStatus)
         out.println("title=Custom Header separator")
         out.println("type=page")
-        out.println(config!!.getHeaderSeparator())
+        out.println(config.headerSeparator)
         out.println("# Hello Markdown!")
         out.println("")
         out.println("A paragraph")
@@ -232,7 +232,7 @@ class ParserTest {
 
     @Test
     fun parseMarkdownFileWithCustomHeaderSeparator() {
-        config!!.setHeaderSeparator(customHeaderSeparator)
+        config.setHeaderSeparator(customHeaderSeparator)
 
         val documentModel = parser!!.processFile(validMarkdownFileWithCustomHeader!!)
         Assert.assertNotNull(documentModel)
@@ -244,7 +244,7 @@ class ParserTest {
 
     @Test
     fun parseMarkdownFileWithDefaultStatus() {
-        config!!.setDefaultStatus("published")
+        config.setDefaultStatus("published")
 
         val documentModel = parser!!.processFile(validMarkdownFileWithDefaultStatus!!)
         Assert.assertNotNull(documentModel)
@@ -255,8 +255,8 @@ class ParserTest {
 
     @Test
     fun parseMarkdownFileWithDefaultTypeAndStatus() {
-        config!!.setDefaultStatus("published")
-        config!!.setDefaultType("page")
+        config.setDefaultStatus("published")
+        config.setDefaultType("page")
 
         val documentModel = parser!!.processFile(validMarkdownFileWithDefaultTypeAndStatus!!)
         Assert.assertNotNull(documentModel)
@@ -266,8 +266,8 @@ class ParserTest {
 
     @Test
     fun parseMarkdownFileWithDisabledCache() {
-        config!!.setDefaultStatus("published")
-        config!!.setDefaultType("page")
+        config.setDefaultStatus("published")
+        config.setDefaultType("page")
 
         val documentModel = parser!!.processFile(validMarkdownFileWithDefaultTypeAndStatus!!)
         Assert.assertEquals(false, documentModel!!.cached)
@@ -275,8 +275,8 @@ class ParserTest {
 
     @Test
     fun parseInvalidMarkdownFileWithoutDefaultStatus() {
-        config!!.setDefaultStatus("")
-        config!!.setDefaultType("page")
+        config.setDefaultStatus("")
+        config.setDefaultType("page")
 
         val documentModel = parser!!.processFile(invalidMarkdownFileWithoutDefaultStatus!!)
         Assert.assertNull(documentModel)
@@ -302,7 +302,7 @@ class ParserTest {
 
     @Test
     fun sanitizeTags() {
-        config!!.setProperty(TAG_SANITIZE.key, true)
+        config.setProperty(TAG_SANITIZE.key, true)
         val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
 
         Assertions.assertThat<String>(map!!.tags)

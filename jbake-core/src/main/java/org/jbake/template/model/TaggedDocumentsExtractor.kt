@@ -4,8 +4,9 @@ import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.template.ModelExtractor
 
-class TaggedDocumentsExtractor : ModelExtractor<DocumentList<*>?> {
-    override fun get(db: ContentStore, model: MutableMap<*, *>?, key: String?): DocumentList<*>? {
+class TaggedDocumentsExtractor : ModelExtractor<DocumentList<*>> {
+
+    override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
         var tag: String? = null
         val templateModel = TemplateModel()
         templateModel.putAll(model)

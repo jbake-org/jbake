@@ -138,7 +138,7 @@ class Main @JvmOverloads constructor(
             val templateFolder = FileUtil.runningLocation
             val outputFolder: File
             if (config.sourceFolder != null) {
-                outputFolder = config.sourceFolder!!
+                outputFolder = config.sourceFolder
             } else {
                 outputFolder = File(".")
             }

@@ -20,10 +20,10 @@ import java.util.*
  * @author Cédric Champeau
  */
 class FreemarkerTemplateEngine : AbstractTemplateEngine {
-    private var templateCfg: Configuration? = null
+    lateinit var templateCfg: Configuration
 
     @Deprecated("")
-    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File) : super(
         config,
         db,
         destination,
@@ -32,30 +32,28 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
         createTemplateConfiguration()
     }
 
-    constructor(config: JBakeConfiguration?, db: ContentStore?) : super(config, db) {
+    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
         createTemplateConfiguration()
     }
 
     private fun createTemplateConfiguration() {
         templateCfg = Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
-        templateCfg!!.setDefaultEncoding(config.renderEncoding)
-        templateCfg!!.setOutputEncoding(config.outputEncoding)
-        if (config.freemarkerTimeZone != null) {
-            templateCfg!!.setTimeZone(config.freemarkerTimeZone)
-            templateCfg!!.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
-        }
+        templateCfg.setDefaultEncoding(config.renderEncoding)
+        templateCfg.setOutputEncoding(config.outputEncoding)
+        templateCfg.setTimeZone(config.freemarkerTimeZone)
+        templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
         try {
-            templateCfg!!.setDirectoryForTemplateLoading(config.templateFolder)
+            templateCfg.setDirectoryForTemplateLoading(config.templateFolder)
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
-            val template = templateCfg!!.getTemplate(templateName)
-            template.process(LazyLoadingModel(templateCfg!!.getObjectWrapper(), model, db, config), writer)
+            val template = templateCfg.getTemplate(templateName)
+            template.process(LazyLoadingModel(templateCfg.getObjectWrapper(), model, db, config), writer)
         } catch (e: IOException) {
             throw RenderingException(e)
         } catch (e: TemplateException) {
@@ -68,13 +66,13 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
      */
     class LazyLoadingModel(
         wrapper: ObjectWrapper?,
-        eagerModel: TemplateModel?,
-        db: ContentStore?,
+        eagerModel: TemplateModel,
+        db: ContentStore,
         config: JBakeConfiguration
     ) : TemplateHashModel {
         private val wrapper: ObjectWrapper?
         private val eagerModel: SimpleHash
-        private val db: ContentStore?
+        private val db: ContentStore
         private val config: JBakeConfiguration
 
         init {
@@ -102,12 +100,12 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                     return bw.wrap(DataFileUtil(db, config.dataFileDocType))
                 }
 
-                return AbstractTemplateEngine.Companion.extractors.extractAndTransform<freemarker.template.TemplateModel?>(
+                return extractors.extractAndTransform<freemarker.template.TemplateModel?>(
                     db,
                     key,
                     eagerModel.toMap(),
                     object : TemplateEngineAdapter<freemarker.template.TemplateModel?> {
-                        override fun adapt(key: String, extractedValue: Any?): freemarker.template.TemplateModel {
+                        override fun adapt(key: String?, extractedValue: Any?): freemarker.template.TemplateModel? {
                             if (key == ModelAttributes.ALLTAGS) {
                                 return SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
                             } else if (key == ModelAttributes.PUBLISHED_DATE) {
@@ -118,7 +116,7 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                             }
                         }
                     })
-            } catch (e: NoModelExtractorException) {
+            } catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)
             }
         }

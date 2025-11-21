@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.configuration.PropertyList
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -128,7 +129,7 @@ class AsciidocParserTest {
 
     @Test
     fun parseAsciidocFileWithPrettifyAttribute() {
-        config!!.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
+        config!!.setProperty(PropertyList.ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
         val map = parser!!.processFile(asciidocWithSource!!)
         Assert.assertNotNull(map)
         Assert.assertEquals("draft", map!!.status)

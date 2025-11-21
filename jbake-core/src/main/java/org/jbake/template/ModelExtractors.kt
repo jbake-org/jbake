@@ -86,13 +86,13 @@ class ModelExtractors private constructor() {
 
     @Throws(NoModelExtractorException::class)
     fun <Type> extractAndTransform(
-        db: ContentStore?,
-        key: String?,
-        map: MutableMap<*, *>?,
+        db: ContentStore,
+        key: String,
+        map: MutableMap<*, *>,
         adapter: TemplateEngineAdapter<Type?>
     ): Type? {
         if (extractors.containsKey(key)) {
-            val extractedValue = extractors.get(key)!!.get(db, map, key)
+            val extractedValue = extractors[key]!!.get(db, map, key)
             return adapter.adapt(key, extractedValue)
         } else {
             throw NoModelExtractorException("no model extractor for key \"" + key + "\"")
@@ -116,7 +116,7 @@ class ModelExtractors private constructor() {
         return extractors.keys
     }
 
-    fun registerExtractorsForCustomTypes(doctype: String) {
+    fun registerExtractorsForCustomTypes(docType: String) {
         val pluralizedDoctype = DocumentTypeUtils.pluralize(docType)
         if (!containsKey(pluralizedDoctype)) {
             LOGGER.info("register new extractors for document type: {}", docType)
@@ -144,7 +144,7 @@ class ModelExtractors private constructor() {
                     engineClassName,
                     false,
                     ModelExtractors::class.java.getClassLoader()
-                ) as Class<out ModelExtractor<*>?>
+                ) as Class<out ModelExtractor<*>>
                 return engineClass.newInstance()
             } catch (e: ClassNotFoundException) {
                 return null

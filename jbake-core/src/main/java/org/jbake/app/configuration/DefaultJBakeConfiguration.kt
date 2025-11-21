@@ -505,9 +505,6 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.IMG_PATH_PREPEND_HOST.key, imgPathPrependHost)
     }
 
-    override val imgPathUpdate: Boolean
-        get() = getAsBoolean(PropertyList.IMG_PATH_UPDATE.key)
-
     fun setImgPathUPdate(imgPathUpdate: Boolean) {
         setProperty(PropertyList.IMG_PATH_UPDATE.key, imgPathUpdate)
     }
@@ -544,7 +541,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val jvmLocale: String?
         get() = getAsString(PropertyList.JVM_LOCALE.key)
 
-    override val freemarkerTimeZone: TimeZone?
+    override val freemarkerTimeZone: TimeZone
         get() {
             val timezone = getAsString(PropertyList.FREEMARKER_TIMEZONE.key)
             return if (timezone == null || StringUtils.isEmpty(timezone))

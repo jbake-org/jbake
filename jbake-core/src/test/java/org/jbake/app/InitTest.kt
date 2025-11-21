@@ -13,19 +13,19 @@ import java.io.File
 import java.io.IOException
 
 class InitTest {
-    @Rule
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
-    var config: DefaultJBakeConfiguration? = null
-    private var rootPath: File? = null
+    private lateinit var config: DefaultJBakeConfiguration
+    private lateinit var rootPath: File
 
     @Before
     fun setup() {
         rootPath = TestUtils.testResourcesAsSourceFolder
-        if (!rootPath!!.exists()) {
+        if (!rootPath.exists()) {
             throw Exception("Cannot find base path for test!")
         }
-        config = ConfigUtil().loadConfig(rootPath!!) as DefaultJBakeConfiguration
+        config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         // override base template config option
         config!!.setExampleProject("freemarker", "test.zip")
     }
@@ -44,7 +44,7 @@ class InitTest {
     fun initFailDestinationContainsContent() {
         val init = Init(config!!)
         val initPath = folder.newFolder("init")
-        val contentFolder = File(initPath.getPath(), config!!.getContentFolderName())
+        val contentFolder = File(initPath.getPath(), config.contentFolderName)
         contentFolder.mkdir()
         try {
             init.run(initPath, rootPath, "freemarker")

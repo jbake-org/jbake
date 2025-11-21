@@ -8,7 +8,7 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 
 class ModelExtractorsTest {
-    @Rule
+    @Rule @JvmField
     var thrown: ExpectedException = ExpectedException.none()
 
     @After

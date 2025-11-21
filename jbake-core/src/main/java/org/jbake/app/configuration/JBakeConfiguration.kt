@@ -267,8 +267,9 @@ interface JBakeConfiguration {
 
     /**
      * @return the source folder of the project
+     * /// TODO: This is nullable - see Main.kt around line 140.
      */
-    val sourceFolder: File
+    val sourceFolder: File?
 
     /**
      * @return Tags output path, used only when [.getRenderTags] is true
@@ -354,7 +355,7 @@ interface JBakeConfiguration {
      *
      * @return TimeZone to use within Freemarker
      */
-    val freemarkerTimeZone: TimeZone?
+    val freemarkerTimeZone: TimeZone
 
     fun asHashMap(): MutableMap<String, Any>
 
