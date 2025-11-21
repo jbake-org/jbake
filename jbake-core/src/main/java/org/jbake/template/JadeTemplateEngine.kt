@@ -80,22 +80,16 @@ class JadeTemplateEngine : AbstractTemplateEngine {
         private val formatters: MutableMap<String, SimpleDateFormat> = HashMap<String, SimpleDateFormat>()
 
         fun format(date: Date?, pattern: String?): String {
-            if (date != null && pattern != null) {
-                var df = formatters[pattern]
-
-                if (df == null) {
-                    df = SimpleDateFormat(pattern)
-                    formatters[pattern] = df
-                }
-
-                return df.format(date)
-            } else {
+            if (date == null || pattern == null)
                 return ""
-            }
-        }
 
-        fun escape(s: String?): String? {
-            return StringEscapeUtils.escapeHtml(s)
+            var df = formatters[pattern]
+            if (df == null) {
+                df = SimpleDateFormat(pattern)
+                formatters[pattern] = df
+            }
+
+            return df.format(date)
         }
     }
 
