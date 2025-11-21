@@ -68,7 +68,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
                     return MethodClosure(this@GroovyTemplateEngine, "doInclude").curry(this)
                 }
                 try {
-                    return extractors.extractAndTransform<Any?>(db, key as String, model, NoopAdapter())
+                    return extractors.extractAndTransform<Any>(db, key as String, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     return super.get(key)
                 }

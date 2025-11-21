@@ -68,7 +68,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
         return object : JadeModel(model) {
             override fun get(key: String): Any? {
                 return try {
-                    extractors.extractAndTransform<Any?>(db, key, this, NoopAdapter())
+                    extractors.extractAndTransform<Any>(db, key, this, NoopAdapter())
                 } catch (_: NoModelExtractorException) {
                     super.get(key)
                 }

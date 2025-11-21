@@ -71,7 +71,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
         return object : TemplateModel(model) {
             override fun get(key: String): Any? {
                 try {
-                    return extractors.extractAndTransform<Any?>(db, key, model, NoopAdapter())
+                    return extractors.extractAndTransform(db, key, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     return super.get(key)
                 }

@@ -9,7 +9,7 @@ import org.jbake.template.ModelExtractor
 class TagsExtractor : ModelExtractor<DocumentList<*>> {
 
     override fun get(db: ContentStore, model: MutableMap<*, *>, key: String): DocumentList<*> {
-        val dl = DocumentList<TemplateModel?>()
+        val dl = DocumentList<TemplateModel>()
         val templateModel = TemplateModel()
         templateModel.putAll(model)
         val config: MutableMap<*, *> = templateModel.config
