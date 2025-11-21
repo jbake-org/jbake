@@ -33,7 +33,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
 
       """
     )
-    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File) : super(
         config,
         db,
         destination,
@@ -80,7 +80,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
         return object : TemplateModel(model) {
             override fun get(key: Any?): Any? {
                 try {
-                    return AbstractTemplateEngine.Companion.extractors.extractAndTransform<Any?>(
+                    return extractors.extractAndTransform<Any?>(
                         db,
                         key as String?,
                         model,

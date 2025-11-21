@@ -51,7 +51,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
 
       """
     )
-    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File) : super(
         config,
         db,
         destination,
@@ -104,7 +104,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
         context.locale = locale
         context.setVariables(model)
 
-        for (key in AbstractTemplateEngine.Companion.extractors.keySet()) {
+        for (key in extractors.keySet()) {
             context.setVariable(key, ContextVariable(db, key, model))
         }
     }
@@ -119,7 +119,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     ) : LazyContextVariable<Any?>() {
         override fun loadValue(): Any? {
             try {
-                return AbstractTemplateEngine.Companion.extractors.extractAndTransform<LazyContextVariable<*>?>(
+                return extractors.extractAndTransform<LazyContextVariable<*>?>(
                     db,
                     key,
                     model,

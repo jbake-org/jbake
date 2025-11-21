@@ -30,22 +30,14 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
      * @param destination the destination path
      * @param templatesPath the templates path
      */
-    @Deprecated(
-        """Use {@link #GroovyTemplateEngine(JBakeConfiguration, ContentStore)} instead
+    @Deprecated("Use {@link #GroovyTemplateEngine(JBakeConfiguration, ContentStore)} instead")
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
+        : super(config, db, destination, templatesPath)
 
-      """
-    )
-    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
-        config,
-        db,
-        destination,
-        templatesPath
-    )
-
-    constructor(config: JBakeConfiguration?, db: ContentStore?) : super(config, db)
+    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db)
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel?, templateName: String, writer: Writer?) {
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
             val template = findTemplate(templateName)
             val writable = template.make(wrap(model))
@@ -62,29 +54,21 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
         var template = cachedTemplates.get(templateName)
         if (template == null) {
             template = ste.createTemplate(
-                InputStreamReader(
-                    BufferedInputStream(FileInputStream(sourceTemplate)),
-                    config.templateEncoding
-                )
+                InputStreamReader(BufferedInputStream(FileInputStream(sourceTemplate)), config.templateEncoding)
             )
             cachedTemplates.put(templateName, template)
         }
         return template
     }
 
-    private fun wrap(model: TemplateModel?): TemplateModel {
+    private fun wrap(model: TemplateModel): TemplateModel {
         return object : TemplateModel(model) {
-            override fun get(key: Any?): Any? {
+            override fun get(key: String): Any? {
                 if ("include" == key) {
                     return MethodClosure(this@GroovyTemplateEngine, "doInclude").curry(this)
                 }
                 try {
-                    return AbstractTemplateEngine.Companion.extractors.extractAndTransform<Any?>(
-                        db,
-                        key as String?,
-                        model,
-                        NoopAdapter()
-                    )
+                    return extractors.extractAndTransform<Any?>(db, key as String, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     return super.get(key)
                 }
@@ -92,9 +76,9 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
         }
     }
 
-    private fun doInclude(model: TemplateModel, templateName: String?) {
-        val engine: AbstractTemplateEngine = model.getRenderer()
-        val out = model.getWriter()
+    private fun doInclude(model: TemplateModel, templateName: String) {
+        val engine: AbstractTemplateEngine = model.renderer!!
+        val out = model.writer!!
         engine.renderDocument(model, templateName, out)
     }
 }
