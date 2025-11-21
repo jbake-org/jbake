@@ -10,7 +10,6 @@ import org.mockito.Mockito
 
 class DocumentTypesTest {
     @Test
-    @Throws(Exception::class)
     fun shouldReturnDefaultDocumentTypes() {
         val knownDocumentTypes = documentTypes
         val expectedDocumentType: Array<String> = arrayOf<String>("page", "post", "masterindex", "archive", "feed")

@@ -29,7 +29,6 @@ class Error404RendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesNotRenderWhenConfigDoesNotRenderError404() {
         val renderer = Error404Renderer()
 
@@ -63,7 +62,6 @@ class Error404RendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesRenderWhenConfigDoesNotRenderError404() {
         val renderer = Error404Renderer()
         val error404file = "mock404file.html"
@@ -82,7 +80,6 @@ class Error404RendererTest {
     }
 
     @Test(expected = RenderingException::class)
-    @Throws(Exception::class)
     fun propogatesRenderingException() {
         val renderer = Error404Renderer()
         val error404file = "mock404file.html"

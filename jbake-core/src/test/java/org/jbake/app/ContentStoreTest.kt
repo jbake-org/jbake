@@ -18,7 +18,6 @@ import kotlin.arrayOf
 
 class ContentStoreTest : ContentStoreIntegrationTest() {
     @Test
-    @Throws(Exception::class)
     fun shouldGetCountForPublishedDocuments() {
         for (i in 0..4) {
             val builder = FakeDocumentBuilder(DOC_TYPE_POST)

@@ -20,7 +20,7 @@ abstract class ContentStoreIntegrationTest {
         db!!.drop()
     }
 
-    protected enum class StorageType {
+    internal enum class StorageType {
         MEMORY, PLOCAL;
 
         override fun toString(): String {
@@ -29,23 +29,22 @@ abstract class ContentStoreIntegrationTest {
     }
 
     companion object {
-        @ClassRule
+        @ClassRule @JvmField
         var folder: TemporaryFolder = TemporaryFolder()
         protected var db: ContentStore? = null
         protected var config: DefaultJBakeConfiguration? = null
-        protected var storageType: StorageType = StorageType.MEMORY
+        internal var storageType: StorageType = StorageType.MEMORY
         protected var sourceFolder: File? = null
 
-        @BeforeClass
-        @Throws(Exception::class)
+        @BeforeClass @JvmStatic
         fun setUpClass() {
-            sourceFolder = TestUtils.getTestResourcesAsSourceFolder()
+            sourceFolder = TestUtils.testResourcesAsSourceFolder
             Assert.assertTrue("Cannot find sample data structure!", sourceFolder!!.exists())
 
             config = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
             config!!.setSourceFolder(sourceFolder)
 
-            Assert.assertEquals(".html", config!!.getOutputExtension())
+            Assert.assertEquals(".html", config!!.outputExtension)
             config!!.setDatabaseStore(storageType.toString())
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
             var dbPath: String = folder.newFolder("documents" + System.currentTimeMillis()).getName()
@@ -59,7 +58,7 @@ abstract class ContentStoreIntegrationTest {
             db = DBUtil.createDataStore(config!!)
         }
 
-        @AfterClass
+        @AfterClass @JvmStatic
         fun cleanUpClass() {
             db!!.close()
             db!!.shutdown()

@@ -12,9 +12,8 @@ class HtmlUtilTest {
     private var config: DefaultJBakeConfiguration? = null
 
     @Before
-    @Throws(Exception::class)
     fun setUp() {
-        config = ConfigUtil().loadConfig(TestUtils.getTestResourcesAsSourceFolder()) as DefaultJBakeConfiguration
+        config = ConfigUtil().loadConfig(TestUtils.testResourcesAsSourceFolder) as DefaultJBakeConfiguration
     }
 
     @Test

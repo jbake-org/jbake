@@ -9,10 +9,9 @@ import java.io.PrintStream
 
 internal class ConfigurationPrinterTest {
     @Test
-    @Throws(Exception::class)
     fun shouldPrintHeader() {
         val configuration =
-            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.getTestResourcesAsSourceFolder())
+            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
         val data = ByteArrayOutputStream()
         val out = PrintStream(data)
         val printer = ConfigurationPrinter(configuration, out)
@@ -27,10 +26,9 @@ internal class ConfigurationPrinterTest {
 
 
     @Test
-    @Throws(Exception::class)
     fun shouldPrintKeyAndValue() {
         val configuration =
-            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.getTestResourcesAsSourceFolder())
+            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
         val data = ByteArrayOutputStream()
         val out = PrintStream(data)
         val printer = ConfigurationPrinter(configuration, out)

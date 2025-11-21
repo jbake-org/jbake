@@ -92,7 +92,6 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
         }
     }
 
-    @Throws(Exception::class)
     private fun doInclude(model: TemplateModel, templateName: String?) {
         val engine: AbstractTemplateEngine = model.getRenderer()
         val out = model.getWriter()

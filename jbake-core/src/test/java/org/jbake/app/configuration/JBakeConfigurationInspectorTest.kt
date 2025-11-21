@@ -24,7 +24,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
 
     @Test
-    @Throws(Exception::class)
     fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
         val nonExistentFile = File(folder!!.toFile(), "nofolder")
         val configuration = Mockito.mock<JBakeConfiguration>(JBakeConfiguration::class.java)
@@ -39,7 +38,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldThrowExceptionIfSourceFolderIsNotReadable() {
         val nonReadableFile = Mockito.mock<File>(File::class.java)
         Mockito.`when`<Boolean?>(nonReadableFile.exists()).thenReturn(true)
@@ -58,7 +56,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldThrowExceptionIfTemplateFolderDoesNotExist() {
         val templateFolderName = "template/custom"
         val expectedFolder = File(folder!!.toFile(), templateFolderName)
@@ -75,7 +72,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldThrowExceptionIfContentFolderDoesNotExist() {
         val contentFolderName = "content"
         val templateFolderName = "template"
@@ -97,7 +93,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldCreateDestinationFolderIfNotExists() {
         val contentFolderName = "content"
         val templateFolderName = "template"
@@ -122,7 +117,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldThrowExceptionIfDestinationFolderNotWritable() {
         val contentFolderName = "content"
         val templateFolderName = "template"
@@ -146,7 +140,6 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldLogWarningIfAssetFolderDoesNotExist() {
         val contentFolderName = "content"
         val templateFolderName = "template"

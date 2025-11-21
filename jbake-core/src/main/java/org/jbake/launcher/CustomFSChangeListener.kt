@@ -10,20 +10,17 @@ import org.slf4j.LoggerFactory
 import java.io.File
 
 class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListener {
-    
-    @Throws(Exception::class)
+
     override fun fileCreated(event: FileChangeEvent) {
         LOGGER.info("File created event detected: {}", event.getFileObject().getURL())
         exec(event.getFileObject())
     }
 
-    @Throws(Exception::class)
     override fun fileDeleted(event: FileChangeEvent) {
         LOGGER.info("File deleted event detected: {}", event.getFileObject().getURL())
         exec(event.getFileObject())
     }
 
-    @Throws(Exception::class)
     override fun fileChanged(event: FileChangeEvent) {
         LOGGER.info("File changed event detected: {}", event.getFileObject().getURL())
         exec(event.getFileObject())

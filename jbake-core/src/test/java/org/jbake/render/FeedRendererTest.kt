@@ -29,7 +29,6 @@ class FeedRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesNotRenderWhenConfigDoesNotRenderFeeds() {
         val renderer = FeedRenderer()
 
@@ -64,7 +63,6 @@ class FeedRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesRenderWhenConfigDoesRenderFeeds() {
         val renderer = FeedRenderer()
         val configuration: JBakeConfiguration =
@@ -81,7 +79,6 @@ class FeedRendererTest {
     }
 
     @Test(expected = RenderingException::class)
-    @Throws(Exception::class)
     fun propogatesRenderingException() {
         val renderer = FeedRenderer()
 

@@ -23,12 +23,11 @@ internal class JettyServerTest {
     var jBakeConfiguration: JBakeConfiguration? = null
 
     @Test
-    @Throws(Exception::class)
     fun shouldRunWithCustomPortAndContext(@TempDir output: Path) {
         val out = output.resolve("build/jbake").toFile()
         out.mkdirs()
 
-        val source = TestUtils.getTestResourcesAsSourceFolder()
+        val source = TestUtils.testResourcesAsSourceFolder
         val port = this.randoport
         Mockito.`when`<Any?>(jBakeConfiguration!!.serverPort).thenReturn(port)
         Mockito.`when`<Any?>(jBakeConfiguration!!.serverHostname).thenReturn("localhost")

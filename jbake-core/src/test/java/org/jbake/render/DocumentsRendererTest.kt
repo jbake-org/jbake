@@ -39,7 +39,6 @@ class DocumentsRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnZeroIfNothingHasRendered() {
         Mockito.`when`<DocumentList<DocumentModel>>(db!!.unrenderedContent).thenReturn(emptyTemplateModelList)
 
@@ -49,7 +48,6 @@ class DocumentsRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnCountOfProcessedDocuments() {
         // given:
 
@@ -106,7 +104,6 @@ class DocumentsRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldContainPostNavigation() {
         // given
         addDocumentType("customType")

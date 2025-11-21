@@ -76,7 +76,6 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderCustomTypePaper() {
         // setup
 

@@ -16,14 +16,12 @@ import java.io.File
  */
 class FileUtilTest {
     @Test
-    @Throws(Exception::class)
     fun testGetRunningLocation() {
         val path = runningLocation
         Assert.assertEquals(File("build/classes").absolutePath, path.path)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testIsFileInDirectory() {
         val fixtureDir = File(this.javaClass.getResource("/fixture").file)
         val jbakeFile = File(fixtureDir.getCanonicalPath() + File.separatorChar + "jbake.properties")
@@ -47,7 +45,6 @@ class FileUtilTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testGetContentRoothPath() {
         val source = TestUtils.testResourcesAsSourceFolder
         val util = ConfigUtil()

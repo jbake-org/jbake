@@ -36,7 +36,6 @@ import java.nio.charset.Charset
  */
 class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("freemarkerTemplates", "ftl") {
     @Test
-    @Throws(Exception::class)
     fun renderPaginatedIndex() {
         ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
         ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
@@ -62,7 +61,6 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldFallbackToRenderSingleIndexIfNoPostArePresent() {
         ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
         ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)

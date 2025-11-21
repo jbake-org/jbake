@@ -15,9 +15,9 @@ class ModelExtractorsDocumentTypeListenerTest {
         listener.added(newDocumentType)
 
         // then: "an extractor is registered by pluralized type as key"
-        assertThat(ModelExtractors.getInstance().containsKey("projects")).isTrue()
+        assertThat(ModelExtractors.instance.containsKey("projects")).isTrue()
 
         // and: "an extractor for published types is registered"
-        assertThat(ModelExtractors.getInstance().containsKey("published_projects")).isTrue()
+        assertThat(ModelExtractors.instance.containsKey("published_projects")).isTrue()
     }
 }

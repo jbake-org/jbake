@@ -29,7 +29,6 @@ class ArchiveRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesNotRenderWhenConfigDoesNotRenderArchives() {
         val renderer = ArchiveRenderer()
 
@@ -64,7 +63,6 @@ class ArchiveRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesRenderWhenConfigDoesRenderArchives() {
         val renderer = ArchiveRenderer()
 
@@ -82,7 +80,6 @@ class ArchiveRendererTest {
     }
 
     @Test(expected = RenderingException::class)
-    @Throws(Exception::class)
     fun propogatesRenderingException() {
         val renderer = ArchiveRenderer()
 

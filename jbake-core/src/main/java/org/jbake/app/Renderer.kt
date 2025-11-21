@@ -108,7 +108,6 @@ class Renderer {
      * @param content The content to renderDocument
      * @throws Exception if IOException or SecurityException are raised
      */
-    @Throws(Exception::class)
     fun render(content: DocumentModel) {
         val docType = content.type
         var outputFilename = (config.destinationFolder.path + File.separatorChar) + content.uri
@@ -158,7 +157,6 @@ class Renderer {
         return OutputStreamWriter(FileOutputStream(file), (config.renderEncoding ?: "UTF-8"))
     }
 
-    @Throws(Exception::class)
     private fun render(renderConfig: RenderingConfig) {
         val outputFile = renderConfig.path ?: throw Exception("No output file for rendering")
         try {
@@ -181,12 +179,10 @@ class Renderer {
      * @param indexFile The name of the output file
      * @throws Exception if IOException or SecurityException are raised
      */
-    @Throws(Exception::class)
     fun renderIndex(indexFile: String) {
         render(DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME))
     }
 
-    @Throws(Exception::class)
     fun renderIndexPaging(indexFile: String) {
         val totalPosts = db.getPublishedCount("post")
         val postsPerPage = config.postsPerPage
@@ -243,7 +239,6 @@ class Renderer {
      *
      * @see [Sitemap protocol](http://www.sitemaps.org/)
      */
-    @Throws(Exception::class)
     fun renderSitemap(sitemapFile: String) {
         render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
     }
@@ -254,7 +249,6 @@ class Renderer {
      * @param feedFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    @Throws(Exception::class)
     fun renderFeed(feedFile: String) {
         render(DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME))
     }
@@ -265,7 +259,6 @@ class Renderer {
      * @param archiveFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    @Throws(Exception::class)
     fun renderArchive(archiveFile: String) {
         render(DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME))
     }
@@ -276,7 +269,6 @@ class Renderer {
      * @param errorFile      The name of the output file
      * @throws Exception    if default rendering configuration is not loaded correctly
      */
-    @Throws(Exception::class)
     fun renderError404(errorFile: String) {
         render(DefaultRenderingConfig(errorFile, ERROR404_TEMPLATE_NAME))
     }
@@ -288,7 +280,6 @@ class Renderer {
      * @return Number of rendered tags
      * @throws Exception if cannot render tags correctly
      */
-    @Throws(Exception::class)
     fun renderTags(tagPath: String): Int {
         var renderedCount = 0
         val errors: MutableList<Throwable> = LinkedList<Throwable>()

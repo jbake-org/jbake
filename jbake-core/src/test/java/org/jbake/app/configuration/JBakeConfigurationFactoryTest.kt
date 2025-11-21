@@ -15,7 +15,6 @@ class JBakeConfigurationFactoryTest {
     var root: File? = null
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnDefaultConfigurationWithDefaultFolders() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
@@ -33,7 +32,6 @@ class JBakeConfigurationFactoryTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnDefaultConfigurationWithCustomFolders() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output/custom")
@@ -68,7 +66,6 @@ class JBakeConfigurationFactoryTest {
 
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnADefaultConfigurationWithSitehost() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
@@ -81,7 +78,6 @@ class JBakeConfigurationFactoryTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnAJettyConfiguration() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
@@ -94,7 +90,6 @@ class JBakeConfigurationFactoryTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldUseDefaultEncodingUTF8() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
@@ -106,7 +101,6 @@ class JBakeConfigurationFactoryTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldUseCustomEncoding() {
         val util = Mockito.spy<ConfigUtil>(ConfigUtil::class.java)
         val sourceFolder = root!!

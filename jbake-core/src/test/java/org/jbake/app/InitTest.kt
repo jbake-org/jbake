@@ -20,9 +20,8 @@ class InitTest {
     private var rootPath: File? = null
 
     @Before
-    @Throws(Exception::class)
     fun setup() {
-        rootPath = TestUtils.getTestResourcesAsSourceFolder()
+        rootPath = TestUtils.testResourcesAsSourceFolder
         if (!rootPath!!.exists()) {
             throw Exception("Cannot find base path for test!")
         }
@@ -32,7 +31,6 @@ class InitTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun initOK() {
         val init = Init(config!!)
         val initPath = folder.newFolder("init")

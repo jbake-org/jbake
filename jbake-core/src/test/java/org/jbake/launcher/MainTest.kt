@@ -68,7 +68,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchJetty(@TempDir source: Path) {
         val currentWorkingdir = newFolder(source, "src/jbake")
         val expectedOutput = File(currentWorkingdir, "output")
@@ -81,7 +80,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchBakeWithCustomPropertiesEncoding(@TempDir source: Path) {
         val currentWorkingdir = newFolder(source, "jbake")
         mockDefaultJbakeConfiguration(currentWorkingdir)
@@ -93,7 +91,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir source: Path) {
         val currentWorkingdir = newFolder(source, "jbake")
         mockDefaultJbakeConfiguration(currentWorkingdir)
@@ -105,7 +102,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchBakeAndJetty(@TempDir source: Path) {
         val sourceFolder = newFolder(source, "src/jbake")
         val expectedOutput = newFolder(sourceFolder.toPath(), "output")
@@ -132,7 +128,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchJettyWithCustomServerSourceDir(@TempDir output: Path) {
         val build = newFolder(output, "build/jbake")
         val configuration = mockJettyConfiguration(build, build)
@@ -147,7 +142,6 @@ internal class MainTest : LoggingTest() {
     // ATTENTION
     // There ist no extra argument for -s option. you can call jbake -s /customsource or jbake /customsource -s
     @Test
-    @Throws(Exception::class)
     fun launchJettyWithCustomDestinationDir(@TempDir source: Path) {
         val src = newFolder(source, "src/jbake")
         val configuration = mockJettyConfiguration(src, src)
@@ -159,7 +153,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchJettyWithCustomSrcAndDestDir(@TempDir source: Path, @TempDir output: Path) {
         val src = newFolder(source, "src/jbake")
         val exampleOutput = output.resolve("build/jbake").toFile()
@@ -172,7 +165,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchJettyWithCustomDestViaConfig(@TempDir output: Path) {
         val args = arrayOf("-s")
         val exampleOutput = output.resolve("build/jbake").toFile()
@@ -185,7 +177,6 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun launchJettyWithCmdlineOverridingProperties(
         @TempDir source: Path,
         @TempDir output: Path,

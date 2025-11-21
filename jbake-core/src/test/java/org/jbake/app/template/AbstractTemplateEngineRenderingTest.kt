@@ -59,7 +59,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     private var parser: Parser? = null
 
     @Before
-    @Throws(Exception::class)
     fun setup() {
         currentLocale = Locale.getDefault()
         Locale.setDefault(Locale.ENGLISH)
@@ -183,12 +182,11 @@ abstract class AbstractTemplateEngineRenderingTest(
     @After
     fun cleanup() {
         resetDocumentTypes()
-        ModelExtractors.getInstance().reset()
+        ModelExtractors.instance.reset()
         Locale.setDefault(currentLocale)
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderPost() {
         // setup
         val filename = "second-post.html"
@@ -211,7 +209,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderPage() {
         // setup
         val filename = "about.html"
@@ -232,7 +229,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderIndex() {
         //exec
         renderer!!.renderIndex("index.html")
@@ -249,7 +245,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderFeed() {
         renderer!!.renderFeed("feed.xml")
         val outputFile = File(destinationFolder, "feed.xml")
@@ -263,7 +258,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderArchive() {
         renderer!!.renderArchive("archive.html")
         val outputFile = File(destinationFolder, "archive.html")
@@ -277,7 +271,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderTags() {
         renderer!!.renderTags("tags")
 
@@ -291,7 +284,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderTagsIndex() {
         ContentStoreIntegrationTest.Companion.config.setRenderTagsIndex(true)
 
@@ -305,7 +297,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun renderSitemap() {
         addDocumentType("paper")
         ContentStoreIntegrationTest.Companion.db.updateSchema()
@@ -327,7 +318,6 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     @Test
-    @Throws(Exception::class)
     fun checkDbTemplateModelIsPopulated() {
         ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
         ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)

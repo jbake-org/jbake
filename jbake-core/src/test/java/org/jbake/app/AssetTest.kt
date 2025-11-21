@@ -26,7 +26,6 @@ class AssetTest : LoggingTest() {
 
 
     @BeforeEach
-    @Throws(Exception::class)
     fun setup(@TempDir folder: Path) {
         fixtureDir = File(this.javaClass.getResource("/fixture").getFile())
         this.folder = folder
@@ -37,7 +36,6 @@ class AssetTest : LoggingTest() {
 
 
     @Test
-    @Throws(Exception::class)
     fun testCopy() {
         val asset = Asset(config!!)
         asset.copy()
@@ -53,7 +51,6 @@ class AssetTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testCopySingleFile() {
         val asset = Asset(config!!)
         val cssSubPath = File.separatorChar.toString() + "css" + File.separatorChar + "bootstrap.min.css"
@@ -109,7 +106,6 @@ class AssetTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testCopyCustomFolder() {
         config!!.setAssetFolder(File(config!!.getSourceFolder(), "/media"))
         val asset = Asset(config!!)
@@ -122,7 +118,6 @@ class AssetTest : LoggingTest() {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testCopyIgnore() {
         val assetFolder = File(folder!!.toFile(), "ignoredAssets")
         assetFolder.mkdirs()
@@ -150,7 +145,6 @@ class AssetTest : LoggingTest() {
      * @throws Exception
      */
     @Test
-    @Throws(Exception::class)
     fun testWriteProtected() {
         val assets = File(config!!.getSourceFolder(), "assets")
         val css = File(folder!!.toFile(), "css")
@@ -174,7 +168,6 @@ class AssetTest : LoggingTest() {
      * @throws Exception
      */
     @Test
-    @Throws(Exception::class)
     fun testUnlistable() {
         config!!.setAssetFolder(File(config!!.getSourceFolder(), "non-exsitent"))
         val asset = Asset(config!!)

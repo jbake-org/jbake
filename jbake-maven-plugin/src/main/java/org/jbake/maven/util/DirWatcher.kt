@@ -36,7 +36,6 @@ class DirWatcher(dir: File) {
         })
     }
 
-    @Throws(Exception::class)
     fun start() {
         monitor.start()
     }

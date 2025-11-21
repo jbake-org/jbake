@@ -29,7 +29,6 @@ class TagsRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesNotRenderWhenConfigDoesNotRenderTags() {
         val renderer = TagsRenderer()
 
@@ -46,7 +45,6 @@ class TagsRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun returnsOneWhenConfigRendersIndices() {
         val renderer = TagsRenderer()
 
@@ -69,7 +67,6 @@ class TagsRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesRenderWhenConfigDoesRenderIndices() {
         val renderer = TagsRenderer()
 
@@ -90,7 +87,6 @@ class TagsRendererTest {
     }
 
     @Test(expected = RenderingException::class)
-    @Throws(Exception::class)
     fun propogatesRenderingException() {
         val renderer = TagsRenderer()
 

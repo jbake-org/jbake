@@ -193,7 +193,6 @@ object FileUtil {
      * @return an hex string representing the SHA1 hash of the file or directory.
      * @throws Exception if any IOException of SecurityException occured
      */
-    @Throws(Exception::class)
     fun sha1(sourceFile: File): String {
         val buffer = ByteArray(1024)
         val complete = MessageDigest.getInstance("SHA-1")

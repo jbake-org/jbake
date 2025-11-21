@@ -9,7 +9,6 @@ import java.util.*
 
 class ServiceLoaderTest {
     @Test
-    @Throws(Exception::class)
     fun testLoadRenderer() {
         val serviceDescription =
             ClassLoader.getSystemClassLoader().getResource("META-INF/services/org.jbake.render.RenderingTool")

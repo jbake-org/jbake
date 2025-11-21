@@ -49,9 +49,8 @@ class ParserTest {
 
 
     @Before
-    @Throws(Exception::class)
     fun createSampleFile() {
-        rootPath = TestUtils.getTestResourcesAsSourceFolder()
+        rootPath = TestUtils.testResourcesAsSourceFolder
         config = ConfigUtil().loadConfig(rootPath!!) as DefaultJBakeConfiguration
         parser = Parser(config)
 

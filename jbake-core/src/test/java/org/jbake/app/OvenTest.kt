@@ -31,7 +31,6 @@ class OvenTest {
     private var contentStore: ContentStore? = null
 
     @BeforeEach
-    @Throws(Exception::class)
     fun setUp() {
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         resetDocumentTypes()
@@ -64,7 +63,6 @@ class OvenTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldBakeWithRelativeCustomPaths() {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
         configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
@@ -85,7 +83,6 @@ class OvenTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldBakeWithAbsoluteCustomPaths() {
         // given
 
@@ -142,7 +139,6 @@ class OvenTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldInstantiateNeededUtensils() {
         val template = TestUtils.newFolder(root!!.toFile(), "template")
         val content = TestUtils.newFolder(root!!.toFile(), "content")
@@ -184,7 +180,6 @@ class OvenTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldCrawlRenderAndCopyAssets() {
         val template = TestUtils.newFolder(root!!.toFile(), "template")
         val content = TestUtils.newFolder(root!!.toFile(), "content")
@@ -219,7 +214,6 @@ class OvenTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun localeConfiguration() {
         val language = configuration.getJvmLocale()
 
@@ -230,7 +224,6 @@ class OvenTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun noLocaleConfiguration() {
         configuration.setProperty(PropertyList.JVM_LOCALE.key, null)
 

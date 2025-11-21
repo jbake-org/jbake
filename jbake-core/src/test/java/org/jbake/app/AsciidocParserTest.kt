@@ -33,9 +33,8 @@ class AsciidocParserTest {
     private val invalidHeader = "title=This is a Title\n~~~~~~"
 
     @Before
-    @Throws(Exception::class)
     fun createSampleFile() {
-        rootPath = TestUtils.getTestResourcesAsSourceFolder()
+        rootPath = TestUtils.testResourcesAsSourceFolder
         config = ConfigUtil().loadConfig(rootPath!!) as DefaultJBakeConfiguration
         parser = Parser(config)
 

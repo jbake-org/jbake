@@ -88,7 +88,6 @@ class LaunchOptionsTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun listConfig() {
         val args = arrayOf<String>("-ls")
         val res = parseArgs(args)
@@ -97,7 +96,6 @@ class LaunchOptionsTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun listConfigLongOption() {
         val args = arrayOf<String>("--list-settings")
         val res = parseArgs(args)
@@ -106,7 +104,6 @@ class LaunchOptionsTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun customPropertiesEncoding() {
         val args = arrayOf<String>("--prop-encoding", "utf-16")
         val res = parseArgs(args)
@@ -115,7 +112,6 @@ class LaunchOptionsTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun defaultEncodingIsUtf8() {
         val args = arrayOf<String>()
         val res = parseArgs(args)

@@ -32,9 +32,8 @@ class RendererTest {
     private val renderingEngine: DelegatingTemplateEngine? = null
 
     @Before
-    @Throws(Exception::class)
     fun setup() {
-        val sourcePath = TestUtils.getTestResourcesAsSourceFolder()
+        val sourcePath = TestUtils.testResourcesAsSourceFolder
         if (!sourcePath.exists()) {
             throw Exception("Cannot find base path for test!")
         }
@@ -49,7 +48,6 @@ class RendererTest {
      * @throws Exception
      */
     @Test
-    @Throws(Exception::class)
     fun testRenderFileWorksWhenPathHasDotInButFileDoesNot() {
         Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows())
         val FOLDER = "real.path"

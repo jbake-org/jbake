@@ -29,7 +29,6 @@ class IndexRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesNotRenderWhenConfigDoesNotRenderIndices() {
         val renderer = IndexRenderer()
 
@@ -65,7 +64,6 @@ class IndexRendererTest {
 
 
     @Test(expected = RenderingException::class)
-    @Throws(Exception::class)
     fun propagatesRenderingException() {
         val renderer = IndexRenderer()
 
@@ -89,7 +87,6 @@ class IndexRendererTest {
      * @see [Issue 332](https://github.com/jbake-org/jbake/issues/332)
      */
     @Test
-    @Throws(Exception::class)
     fun shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() {
         val renderer = IndexRenderer()
 
@@ -107,7 +104,6 @@ class IndexRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldRenderPaginatedIndex() {
         val renderer = IndexRenderer()
 

@@ -70,9 +70,8 @@ class MdParserTest {
     private val invalidHeader = "title=Title\n~~~~~~"
 
     @Before
-    @Throws(Exception::class)
     fun createSampleFile() {
-        val configFile = TestUtils.getTestResourcesAsSourceFolder()
+        val configFile = TestUtils.testResourcesAsSourceFolder
         config = ConfigUtil().loadConfig(configFile) as DefaultJBakeConfiguration
 
         validMdFileBasic = folder.newFile("validBasic.md")

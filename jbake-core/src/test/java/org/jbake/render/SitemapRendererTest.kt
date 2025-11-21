@@ -29,7 +29,6 @@ class SitemapRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesNotRenderWhenConfigDoesNotRenderSitemaps() {
         val renderer = SitemapRenderer()
 
@@ -64,7 +63,6 @@ class SitemapRendererTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun doesRenderWhenConfigDoesRenderSitemaps() {
         val renderer = SitemapRenderer()
 
@@ -82,7 +80,6 @@ class SitemapRendererTest {
     }
 
     @Test(expected = RenderingException::class)
-    @Throws(Exception::class)
     fun propogatesRenderingException() {
         val renderer = SitemapRenderer()
 

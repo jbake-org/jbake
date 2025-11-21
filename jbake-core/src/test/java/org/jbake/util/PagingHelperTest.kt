@@ -6,7 +6,6 @@ import org.junit.Test
 
 class PagingHelperTest {
     @Test
-    @Throws(Exception::class)
     fun getNumberOfPages() {
         val expected = 3
         val total = 5
@@ -18,7 +17,6 @@ class PagingHelperTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnRootIndexPage() {
         val helper = PagingHelper(5, 2)
 
@@ -28,7 +26,6 @@ class PagingHelperTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnPreviousFileName() {
         val helper = PagingHelper(5, 2)
 
@@ -38,7 +35,6 @@ class PagingHelperTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnNullIfNoPreviousPageAvailable() {
         val helper = PagingHelper(5, 2)
 
@@ -48,7 +44,6 @@ class PagingHelperTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnNullIfNextPageNotAvailable() {
         val helper = PagingHelper(5, 2)
 
@@ -58,7 +53,6 @@ class PagingHelperTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldReturnNextFileName() {
         val helper = PagingHelper(5, 2)
 
