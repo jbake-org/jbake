@@ -36,21 +36,12 @@ import java.util.*
  * @author Cédric Champeau
  */
 class Engines private constructor() {
-    private val parsers: MutableMap<String, ParserEngine?>
-
-
-    init {
-        parsers = HashMap<String, ParserEngine?>()
-    }
+    private val parsers: MutableMap<String, ParserEngine?> = HashMap<String, ParserEngine?>()
 
     private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {
         val old = parsers.put(fileExtension, markupEngine)
         if (old != null) {
-            log.warn(
-                "Registered a markup engine for extension [.{}] but another one was already defined: {}",
-                fileExtension,
-                old
-            )
+            log.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old)
         }
     }
 
@@ -79,34 +70,28 @@ class Engines private constructor() {
             get() = Collections.unmodifiableSet<String>(INSTANCE.parsers.keys)
 
         /**
-         * This method is used to search for a specific class, telling if loading the engine would succeed. This is
-         * typically used to avoid loading optional modules.
+         * This method is used to search for a specific class, telling if loading the engine would succeed.
+         * This is typically used to avoid loading optional modules.
          *
          * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.
          * @return null if the engine is not available, an instance of the engine otherwise
          */
-        private fun tryLoadEngine(engineClassName: String?): ParserEngine? {
+        private fun tryLoadEngine(engineClassName: String): ParserEngine? {
             try {
-                val engineClass = Class.forName(
-                    engineClassName,
-                    false,
-                    Engines::class.java.getClassLoader()
-                ) as Class<out ParserEngine?>
+                val engineClass = Class.forName(engineClassName, false, Engines::class.java.getClassLoader()) as Class<out ParserEngine>
                 return engineClass.getDeclaredConstructor().newInstance()
-            } catch (e: ClassNotFoundException) {
-                return ErrorEngine(engineClassName)
-            } catch (e: NoClassDefFoundError) {
-                return ErrorEngine(engineClassName)
-            } catch (e: IllegalAccessException) {
-                return ErrorEngine(engineClassName)
-            } catch (e: InstantiationException) {
-                return ErrorEngine(engineClassName)
-            } catch (e: NoSuchMethodException) {
-                log.error("unable to instantiate ParserEngine {}", engineClassName)
-            } catch (e: InvocationTargetException) {
-                log.error("unable to instantiate ParserEngine {}", engineClassName)
             }
-            return null
+            catch (e: Exception) {
+                when (e) {
+                    is ClassNotFoundException,
+                    is NoClassDefFoundError,
+                    is IllegalAccessException,
+                    is InstantiationException -> return ErrorEngine(engineClassName)
+                    is NoSuchMethodException,
+                    is InvocationTargetException -> { log.error("unable to instantiate ParserEngine {}", engineClassName) }
+                }
+                return null
+            }
         }
 
         /**
@@ -122,7 +107,7 @@ class Engines private constructor() {
                     val props = Properties()
                     props.load(url.openStream())
                     for (entry in props.entries) {
-                        val className = entry.key as String?
+                        val className = entry.key as String
                         val extensions: Array<String> =
                             (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                         registerEngine(className, *extensions)
@@ -133,7 +118,7 @@ class Engines private constructor() {
             }
         }
 
-        private fun registerEngine(className: String?, vararg extensions: String?) {
+        private fun registerEngine(className: String, vararg extensions: String) {
             val engine: ParserEngine? = tryLoadEngine(className)
             if (engine != null) {
                 for (extension in extensions) {
