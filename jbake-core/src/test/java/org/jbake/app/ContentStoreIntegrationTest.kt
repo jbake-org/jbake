@@ -12,12 +12,12 @@ import java.util.*
 abstract class ContentStoreIntegrationTest {
     @Before
     fun setUp() {
-        db!!.startup()
+        db.startup()
     }
 
     @After
     fun tearDown() {
-        db!!.drop()
+        db.drop()
     }
 
     internal enum class StorageType {
@@ -33,9 +33,10 @@ abstract class ContentStoreIntegrationTest {
         var folder: TemporaryFolder = TemporaryFolder()
 
         internal lateinit var db: ContentStore
-        protected var config: DefaultJBakeConfiguration? = null
+        protected lateinit var config: DefaultJBakeConfiguration
         internal var storageType: StorageType = StorageType.MEMORY
         protected var sourceFolder: File? = null
+
 
         @BeforeClass @JvmStatic
         fun setUpClass() {
@@ -61,8 +62,8 @@ abstract class ContentStoreIntegrationTest {
 
         @AfterClass @JvmStatic
         fun cleanUpClass() {
-            db!!.close()
-            db!!.shutdown()
+            db.close()
+            db.shutdown()
         }
     }
 }

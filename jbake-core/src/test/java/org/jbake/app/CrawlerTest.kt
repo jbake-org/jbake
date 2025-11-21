@@ -16,7 +16,7 @@ import org.junit.Test
 class CrawlerTest : ContentStoreIntegrationTest() {
     @Test
     fun crawl() {
-        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        val crawler = Crawler(db, config)
         crawler.crawl()
 
         Assert.assertEquals(4, db.getDocumentCount("post"))
@@ -50,14 +50,14 @@ class CrawlerTest : ContentStoreIntegrationTest() {
 
     @Test
     fun crawlDataFiles() {
-        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        val crawler = Crawler(db, config)
         // manually register data doctype
-        addDocumentType(ContentStoreIntegrationTest.Companion.config.dataFileDocType)
+        addDocumentType(config.dataFileDocType)
         db.updateSchema()
         crawler.crawlDataFiles()
         Assert.assertEquals(2, db.getDocumentCount("data"))
 
-        val dataFileUtil = DataFileUtil(ContentStoreIntegrationTest.Companion.db, "data")
+        val dataFileUtil = DataFileUtil(db, "data")
         val videos = dataFileUtil.get("videos.yaml")
         Assert.assertFalse(videos!!.isEmpty())
         Assert.assertNotNull(videos.get("data"))
@@ -74,10 +74,10 @@ class CrawlerTest : ContentStoreIntegrationTest() {
 
     @Test
     fun renderWithPrettyUrls() {
-        ContentStoreIntegrationTest.Companion.config.setUriWithoutExtension(true)
-        ContentStoreIntegrationTest.Companion.config.setPrefixForUriWithoutExtension("/blog")
+        config.setUriWithoutExtension(true)
+        config.setPrefixForUriWithoutExtension("/blog")
 
-        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        val crawler = Crawler(db, config)
         crawler.crawl()
 
         Assert.assertEquals(4, db.getDocumentCount("post"))
