@@ -32,19 +32,15 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     private val jadeConfiguration = JadeConfiguration()
 
     @Deprecated("")
-    constructor(config: CompositeConfiguration?, db: ContentStore?, destination: File?, templatesPath: File) : super(
-        config,
-        db,
-        destination,
-        templatesPath
-    )
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
+        : super(config, db, destination, templatesPath)
 
-    constructor(config: JBakeConfiguration, db: ContentStore?) : super(config, db) {
+    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
         val loader: TemplateLoader =
-            FileTemplateLoader(config.templateFolder!!.getPath() + File.separatorChar, config.templateEncoding)
-        jadeConfiguration.setTemplateLoader(loader)
-        jadeConfiguration.setMode(Jade4J.Mode.XHTML)
-        jadeConfiguration.setPrettyPrint(true)
+            FileTemplateLoader(config.templateFolder.path + File.separatorChar, config.templateEncoding)
+        jadeConfiguration.templateLoader = loader
+        jadeConfiguration.mode = Jade4J.Mode.XHTML
+        jadeConfiguration.isPrettyPrint = true
         jadeConfiguration.setFilter(FILTER_CDATA, CDATAFilter())
         jadeConfiguration.setFilter(FILTER_SCRIPT, JsFilter())
         jadeConfiguration.setFilter(FILTER_STYLE, CssFilter())
@@ -52,7 +48,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
             val template = jadeConfiguration.getTemplate(templateName)
 
@@ -62,39 +58,34 @@ class JadeTemplateEngine : AbstractTemplateEngine {
         }
     }
 
-    fun renderTemplate(template: JadeTemplate, model: TemplateModel?, writer: Writer?) {
+    fun renderTemplate(template: JadeTemplate, model: TemplateModel, writer: Writer) {
         val jadeModel = wrap(model)
         jadeModel.putAll(jadeConfiguration.getSharedVariables())
         template.process(jadeModel, writer)
     }
 
-    private fun wrap(model: TemplateModel?): JadeModel {
+    private fun wrap(model: TemplateModel): JadeModel {
         return object : JadeModel(model) {
-            override fun get(property: Any?): Any? {
-                try {
-                    return AbstractTemplateEngine.Companion.extractors.extractAndTransform<Any?>(
-                        db,
-                        property as String?,
-                        this,
-                        NoopAdapter()
-                    )
-                } catch (e: NoModelExtractorException) {
-                    return super.get(property)
+            override fun get(key: String): Any? {
+                return try {
+                    extractors.extractAndTransform<Any?>(db, key, this, NoopAdapter())
+                } catch (_: NoModelExtractorException) {
+                    super.get(key)
                 }
             }
         }
     }
 
     class FormatHelper {
-        private val formatters: MutableMap<String, SimpleDateFormat?> = HashMap<String, SimpleDateFormat?>()
+        private val formatters: MutableMap<String, SimpleDateFormat> = HashMap<String, SimpleDateFormat>()
 
         fun format(date: Date?, pattern: String?): String {
             if (date != null && pattern != null) {
-                var df = formatters.get(pattern)
+                var df = formatters[pattern]
 
                 if (df == null) {
                     df = SimpleDateFormat(pattern)
-                    formatters.put(pattern, df)
+                    formatters[pattern] = df
                 }
 
                 return df.format(date)
