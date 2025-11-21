@@ -61,7 +61,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
         initializeTemplateEngine()
     }
 
-    constructor(config: JBakeConfiguration?, db: ContentStore?) : super(config, db) {
+    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
         this.context = Context()
         initializeTemplateEngine()
     }

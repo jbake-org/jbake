@@ -12,8 +12,6 @@ import java.io.Writer
 
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.
- *
- *
  * The file extension to activate this Engine is .tpl
  *
  * @see [Groovy MarkupTemplateEngine Documentation](http://groovy-lang.org/templating.html._the_markuptemplateengine)
@@ -28,22 +26,15 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
      * @param destination the destination path
      * @param templatesPath the templates path
      */
-    @Deprecated(
-        """Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead
-
-      """
-    )
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File) : super(
-        config,
-        db,
-        destination,
-        templatesPath
-    ) {
+    @Deprecated("Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead")
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
+        : super(config, db, destination, templatesPath)
+    {
         setupTemplateConfiguration()
         initializeTemplateEngine()
     }
 
-    constructor(config: JBakeConfiguration?, db: ContentStore?) : super(config, db) {
+    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
         setupTemplateConfiguration()
         initializeTemplateEngine()
     }
@@ -65,7 +56,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
             val template = templateEngine!!.createTemplateByPath(templateName)
             val wrappedModel: MutableMap<String, Any> = wrap(model)
@@ -76,16 +67,11 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
         }
     }
 
-    private fun wrap(model: TemplateModel?): TemplateModel {
+    private fun wrap(model: TemplateModel): TemplateModel {
         return object : TemplateModel(model) {
-            override fun get(key: Any?): Any? {
+            override fun get(key: String): Any? {
                 try {
-                    return extractors.extractAndTransform<Any?>(
-                        db,
-                        key as String?,
-                        model,
-                        NoopAdapter()
-                    )
+                    return extractors.extractAndTransform<Any?>(db, key, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     return super.get(key)
                 }

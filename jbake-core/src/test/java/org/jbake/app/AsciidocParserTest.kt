@@ -14,7 +14,7 @@ import java.io.File
 import java.io.PrintWriter
 
 class AsciidocParserTest {
-    @Rule
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
     private var config: DefaultJBakeConfiguration? = null
