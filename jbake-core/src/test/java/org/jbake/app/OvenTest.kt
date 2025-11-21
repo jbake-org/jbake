@@ -59,7 +59,7 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat<Throwable?>(oven.getErrors()).isEmpty()
+        Assertions.assertThat<Throwable?>(oven.errors).isEmpty()
     }
 
     @Test

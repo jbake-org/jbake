@@ -30,7 +30,8 @@ import org.junit.BeforeClass
  * @author jdlee
  */
 object GroovyTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest() {
-    @BeforeClass
+
+    @BeforeClass @JvmStatic
     fun setUpClass() {
         //setUpDatabase(StorageType.PLOCAL);
     }

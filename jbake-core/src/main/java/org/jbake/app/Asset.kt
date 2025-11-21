@@ -17,6 +17,10 @@ import java.util.*
  * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Asset {
+
+    /** A list of all errors occurred during asset copying */
+    internal val errors: MutableList<Throwable> = LinkedList<Throwable>()
+
     private val config: JBakeConfiguration
 
     /**
@@ -114,15 +118,6 @@ class Asset {
         copy(path, config.destinationFolder, FileUtil.getNotContentFileFilter(config))
     }
 
-    private val errorsInternal: MutableList<Throwable> = LinkedList<Throwable>()
-
-    /**
-     * Gets a list of all errors occurred during asset copying
-     *
-     * @return a list of errors.
-     */
-    val errors: MutableList<Throwable>
-        get() = ArrayList<Throwable>(errorsInternal)
 
     @Throws(IOException::class)
     private fun assetSubPath(asset: File): String {
@@ -155,10 +150,10 @@ class Asset {
             log.info("Copying [{}]... done!", asset.getPath())
         } catch (e: IOException) {
             log.error("Copying [{}]... failed!", asset.getPath(), e)
-            errorsInternal.add(e)
+            errors.add(e)
         } catch (e: IllegalArgumentException) {
             log.error("Copying [{}]... failed!", asset.getPath(), e)
-            errorsInternal.add(e)
+            errors.add(e)
         }
     }
 

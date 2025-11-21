@@ -164,7 +164,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         inspector.inspect()
 
-        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
 

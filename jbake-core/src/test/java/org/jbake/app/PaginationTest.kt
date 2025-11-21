@@ -70,7 +70,7 @@ class PaginationTest : ContentStoreIntegrationTest() {
 
         while (start < TOTAL_POSTS) {
             db.setStart(start)
-            val posts: DocumentList = db.getPublishedPosts(true)
+            val posts: DocumentList<DocumentModel> = db.getPublishedPosts(true)
 
             Assertions.assertThat(posts.size).isLessThanOrEqualTo(2)
 

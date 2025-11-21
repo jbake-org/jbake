@@ -20,7 +20,7 @@ class BuiltInProjectsTest {
     @Parameterized.Parameter(1)
     var extension: String? = null
 
-    @Rule
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
     private var projectFolder: File? = null
     private var templateFolder: File? = null
@@ -68,15 +68,13 @@ class BuiltInProjectsTest {
 
     companion object {
         @Parameterized.Parameters(name = " {0} ")
-        fun data(): Iterable<Array<Any?>?> {
-            return Arrays.asList<Array<Any?>?>(
-                *arrayOf<Array<Any?>?>(
-                    arrayOf<Any?>("thymeleaf", "thyme"),
-                    arrayOf<Any?>("freemarker", "ftl"),
-                    arrayOf<Any?>("jade", "jade"),
-                    arrayOf<Any?>("groovy", "gsp"),
-                    arrayOf<Any?>("groovy-mte", "tpl")
-                )
+        fun data(): Iterable<Array<Any>> {
+            return listOf(
+                arrayOf("thymeleaf", "thyme"),
+                arrayOf("freemarker", "ftl"),
+                arrayOf("jade", "jade"),
+                arrayOf("groovy", "gsp"),
+                arrayOf("groovy-mte", "tpl")
             )
         }
     }

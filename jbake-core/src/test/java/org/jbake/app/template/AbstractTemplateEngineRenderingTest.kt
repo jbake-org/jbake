@@ -50,7 +50,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     protected val templateDir: String,
     protected val templateExtension: String?
 ) : ContentStoreIntegrationTest() {
-    protected val outputStrings: MutableMap<String, MutableList<String>?> = HashMap<String, MutableList<String>?>()
+    protected val outputStrings: MutableMap<String, MutableList<String>> = HashMap()
 
     protected lateinit var destinationFolder: File
     protected lateinit var templateFolder: File
@@ -66,42 +66,39 @@ abstract class AbstractTemplateEngineRenderingTest(
         val listener = ModelExtractorsDocumentTypeListener()
         addListener(listener)
 
-        templateFolder = File(ContentStoreIntegrationTest.Companion.sourceFolder, templateDir)
+        templateFolder = File(sourceFolder, templateDir)
         if (!templateFolder.exists()) {
             throw Exception("Cannot find template folder!")
         }
 
-        destinationFolder = ContentStoreIntegrationTest.Companion.folder.getRoot()
-        ContentStoreIntegrationTest.Companion.config.destinationFolder = (destinationFolder)
-        ContentStoreIntegrationTest.Companion.config.setTemplateFolder(templateFolder)
+        destinationFolder = folder.getRoot()
+        config.destinationFolder = (destinationFolder)
+        config.setTemplateFolder(templateFolder)
 
 
         for (docType in documentTypes) {
-            val templateFile: File? = ContentStoreIntegrationTest.Companion.config.getTemplateFileByDocType(docType)
+            val templateFile: File? = config.getTemplateFileByDocType(docType)
 
             if (templateFile != null) {
                 val fileName = templateFile.getName()
                 val fileBaseName = fileName.substring(0, fileName.lastIndexOf("."))
-                ContentStoreIntegrationTest.Companion.config.setTemplateFileNameForDocType(
+                config.setTemplateFileNameForDocType(
                     docType,
                     fileBaseName + "." + templateExtension
                 )
             }
         }
 
-        ContentStoreIntegrationTest.Companion.config.setTemplateFileNameForDocType(
-            "paper",
-            "paper." + templateExtension
-        )
+        config.setTemplateFileNameForDocType("paper", "paper." + templateExtension)
         addDocumentType("paper")
         db.updateSchema()
 
         Assert.assertEquals(".html", config.outputExtension)
 
-        val crawler = Crawler(db, ContentStoreIntegrationTest.Companion.config)
+        val crawler = Crawler(db, config)
         crawler.crawl()
-        parser = Parser(ContentStoreIntegrationTest.Companion.config)
-        renderer = Renderer(db, ContentStoreIntegrationTest.Companion.config)
+        parser = Parser(config)
+        renderer = Renderer(db, config)
 
         setupExpectedOutputStrings()
     }
@@ -191,13 +188,13 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "second-post.html"
 
-        val sampleFile: File = File(
-            (ContentStoreIntegrationTest.Companion.sourceFolder.getPath() + File.separator + "content"
-                    + File.separator + "blog" + File.separator + "2013" + File.separator + filename)
+        val sampleFile = File(
+            sourceFolder!!.path + File.separator + "content"
+                    + File.separator + "blog" + File.separator + "2013" + File.separator + filename
         )
-        val content = parser!!.processFile(sampleFile)
+        val content = parser.processFile(sampleFile)
         content!!.uri = "/" + filename
-        renderer!!.render(content)
+        renderer.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
 
@@ -214,7 +211,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val filename = "about.html"
 
         val sampleFile: File =
-            File(ContentStoreIntegrationTest.Companion.sourceFolder.getPath() + File.separator + "content" + File.separator + filename)
+            File(sourceFolder!!.getPath() + File.separator + "content" + File.separator + filename)
         val content = parser!!.processFile(sampleFile)
         content!!.uri = "/" + filename
         renderer!!.render(content)
@@ -285,7 +282,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
     @Test
     fun renderTagsIndex() {
-        ContentStoreIntegrationTest.Companion.config.setRenderTagsIndex(true)
+        config.setRenderTagsIndex(true)
 
         renderer!!.renderTags("tags")
         val outputFile = File(destinationFolder.toString() + File.separator + "tags" + File.separator + "index.html")
@@ -313,14 +310,14 @@ abstract class AbstractTemplateEngineRenderingTest(
         Assertions.assertThat(output).doesNotContain("draft-paper.html")
     }
 
-    protected fun getOutputStrings(type: String?): MutableList<String>? {
-        return outputStrings.get(type)
+    protected fun getOutputStrings(type: String): MutableList<String> {
+        return outputStrings.get(type) ?: mutableListOf()
     }
 
     @Test
     fun checkDbTemplateModelIsPopulated() {
-        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
-        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
+        config.setPaginateIndex(true)
+        config.setPostsPerPage(1)
 
         outputStrings.put("dbSpan", mutableListOf<String>("<span>3</span>"))
 

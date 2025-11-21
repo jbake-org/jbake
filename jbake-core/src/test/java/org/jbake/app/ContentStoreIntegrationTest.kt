@@ -33,9 +33,9 @@ abstract class ContentStoreIntegrationTest {
         var folder: TemporaryFolder = TemporaryFolder()
 
         internal lateinit var db: ContentStore
-        protected lateinit var config: DefaultJBakeConfiguration
+        internal lateinit var config: DefaultJBakeConfiguration
         internal var storageType: StorageType = StorageType.MEMORY
-        protected var sourceFolder: File? = null
+        internal var sourceFolder: File? = null
 
 
         @BeforeClass @JvmStatic

@@ -149,15 +149,15 @@ class JBakeConfigurationFactory {
     @Throws(JBakeException::class)
     fun createJettyJbakeConfiguration(
         sourceFolder: File,
-        destinationFolder: File,
+        destinationFolder: File?,
         propertiesFile: File?,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
-        val configuration = this.configUtil.loadConfig(sourceFolder, propertiesFile) as DefaultJBakeConfiguration
-        configuration.destinationFolder = destinationFolder
-        configuration.clearCache = isClearCache
-        configuration.setSiteHost("http://" + configuration.serverHostname + ":" + configuration.serverPort + configuration.serverContextPath)
-        return configuration
+        val conf = this.configUtil.loadConfig(sourceFolder, propertiesFile) as DefaultJBakeConfiguration
+        conf.destinationFolder = destinationFolder ?: File("./output")
+        conf.clearCache = isClearCache
+        conf.siteHost = "http://" + conf.serverHostname + ":" + conf.serverPort + conf.serverContextPath
+        return conf
     }
 
     fun setEncoding(charset: String): JBakeConfigurationFactory {

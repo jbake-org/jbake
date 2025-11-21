@@ -1,5 +1,6 @@
 package org.jbake.app.configuration
 
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.AssertionsForClassTypes
 import org.jbake.TestUtils
 import org.junit.jupiter.api.Test

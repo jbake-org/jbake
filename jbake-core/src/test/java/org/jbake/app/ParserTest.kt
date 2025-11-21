@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.configuration.PropertyList
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.junit.Assert
@@ -302,7 +303,7 @@ class ParserTest {
 
     @Test
     fun sanitizeTags() {
-        config.setProperty(TAG_SANITIZE.key, true)
+        config.setProperty(PropertyList.TAG_SANITIZE.key, true)
         val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
 
         Assertions.assertThat<String>(map!!.tags)

@@ -33,7 +33,7 @@ import java.nio.file.Path
 internal class MainTest : LoggingTest() {
     private val standardOut: PrintStream? = System.out
     private val outputStreamCaptor = ByteArrayOutputStream()
-    private lateinit var main: Main
+    private var main: Main? = null
 
     @Mock
     private val mockBaker: Baker? = null
@@ -50,14 +50,14 @@ internal class MainTest : LoggingTest() {
     @Mock
     private val factory: JBakeConfigurationFactory? = null
 
-    private lateinit var workingdir: String
+    private var workingdir: String? = null
 
     @BeforeEach
     fun setUp() {
         this.main = Main(mockBaker!!, mockJetty!!, mockWatcher!!)
         workingdir = System.getProperty("user.dir")
         factory!!.configUtil = configUtil!!
-        main.jBakeConfigurationFactory = factory
+        main!!.jBakeConfigurationFactory = factory
         System.setOut(PrintStream(outputStreamCaptor))
     }
 
@@ -200,7 +200,7 @@ internal class MainTest : LoggingTest() {
 
         AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status, Runnable { Main.main(args) })
 
-        Mockito.verify<Appender<ILoggingEvent?>?>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
+        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
 
         val loggingEvent = captorLoggingEvent!!.getValue()
         Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init")
@@ -270,10 +270,10 @@ internal class MainTest : LoggingTest() {
     @Throws(ConfigurationException::class)
     private fun mockDefaultJbakeConfiguration(sourceFolder: File) {
         val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false)
-        System.setProperty("user.dir", sourceFolder.getPath())
+        System.setProperty("user.dir", sourceFolder.path)
         Mockito.`when`<JBakeConfigurationFactory>(factory!!.setEncoding(ArgumentMatchers.any<String>()))
             .thenReturn(factory)
-        Mockito.`when`<DefaultJBakeConfiguration>(
+        Mockito.`when`(
             factory.createDefaultJbakeConfiguration(
                 ArgumentMatchers.any(File::class.java),
                 ArgumentMatchers.any(File::class.java),
@@ -289,7 +289,7 @@ internal class MainTest : LoggingTest() {
             JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false)
         System.setProperty("user.dir", sourceFolder.path)
 
-        Mockito.`when`<DefaultJBakeConfiguration>(
+        Mockito.`when`(
             factory!!.createJettyJbakeConfiguration(
                 ArgumentMatchers.any(File::class.java),
                 ArgumentMatchers.any(File::class.java),

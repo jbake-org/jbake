@@ -4,6 +4,7 @@ import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.configuration2.MapConfiguration
 import org.apache.commons.configuration2.SystemConfiguration
 import org.apache.commons.lang3.StringUtils
+import org.jbake.app.configuration.PropertyList.TEMPLATE_FOLDER
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -97,8 +98,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
 
     // Implement interface properties that previously existed as getX() functions
-    override val assetFolder: File
+    override var assetFolder: File
         get() = getAsFolder(ASSET_FOLDER_KEY) ?: error("Asset folder must be configured")
+        set(value) {}
 
     override val assetFolderName: String?
         get() = getAsString(PropertyList.ASSET_FOLDER.key)
@@ -113,19 +115,20 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val buildTimeStamp: String?
         get() = getAsString(PropertyList.BUILD_TIMESTAMP.key)
 
-    override var clearCache: Boolean = false
+    override var clearCache: Boolean
         get() = getAsBoolean(PropertyList.CLEAR_CACHE.key)
-        // TBD: Setter existed too
+        set(value) = setProperty(PropertyList.CLEAR_CACHE.key, value)
 
-    override val contentFolder: File
+    override var contentFolder: File
         get() = getAsFolder(CONTENT_FOLDER_KEY) ?: error("Content folder must be configured")
-    // TBD: Setter existed too
+        set(value) = setProperty(CONTENT_FOLDER_KEY, value)
 
     override val contentFolderName: String?
         get() = getAsString(PropertyList.CONTENT_FOLDER.key)
 
-    override val dataFolder: File
+    override var dataFolder: File
         get() = getAsFolder(DATA_FOLDER_KEY) ?: error("Data folder must be configured")
+        set(value) { setProperty(DATA_FOLDER_KEY, dataFolder) }
 
     override val dataFolderName: String?
         get() = getAsString(PropertyList.DATA_FOLDER.key)
@@ -167,9 +170,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     override var destinationFolder: File
         get() = getAsFolder(DESTINATION_FOLDER_KEY) ?: error("Destination folder must be configured")
-        set(value) {
-            setProperty(DESTINATION_FOLDER_KEY, value)
-        }
+        set(value) = setProperty(DESTINATION_FOLDER_KEY, value)
 
     override val documentTypes: MutableList<String>
         get() {
@@ -178,9 +179,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             while (keyIterator.hasNext()) {
                 val key = keyIterator.next()
                 val matcher: Matcher = TEMPLATE_DOC_PATTERN.matcher(key)
-                if (matcher.find()) {
+                if (matcher.find())
                     matcher.group(1)?.let { docTypes.add(it) }
-                }
             }
 
             return docTypes
@@ -294,12 +294,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.SERVER_PORT.key, port)
     }
 
-    override val siteHost: String?
+    override var siteHost: String?
         get() = getAsString(PropertyList.SITE_HOST.key)
-
-    fun setSiteHost(siteHost: String?) {
-        setProperty(PropertyList.SITE_HOST.key, siteHost)
-    }
+        set(value) { setProperty(PropertyList.SITE_HOST.key, value) }
 
     override val siteMapFileName: String?
         get() = getAsString(PropertyList.SITEMAP_FILE.key)
@@ -336,14 +333,10 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return null
     }
 
-    override val templateFolder: File
+    override var templateFolder: File
         get() = getAsFolder(TEMPLATE_FOLDER_KEY) ?: error("Template folder must be configured")
+        set(value) = setProperty(TEMPLATE_FOLDER_KEY, value)
 
-    fun setTemplateFolder(templateFolder: File?) {
-        if (templateFolder != null) {
-            setProperty(TEMPLATE_FOLDER_KEY, templateFolder)
-        }
-    }
 
     // Add setters that some internal setup methods rely on
     fun setAssetFolder(assetFolder: File?) {
@@ -358,14 +351,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
     }
 
-    fun setContentFolder(contentFolder: File?) {
-        if (contentFolder != null) {
-            setProperty(CONTENT_FOLDER_KEY, contentFolder)
-        }
-    }
-
     override val templateFolderName: String?
-        get() = getAsString(PropertyList.TEMPLATE_FOLDER.key)
+        get() = getAsString(TEMPLATE_FOLDER.key)
 
     override val thymeleafLocale: String?
         get() = getAsString(PropertyList.THYMELEAF_LOCALE.key)
@@ -466,14 +453,16 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun setupDefaultTemplateFolder() {
-        val templateFolder = getAsString(PropertyList.TEMPLATE_FOLDER.key) ?: ""
 
-        val template = File(templateFolder)
-        if (template.isAbsolute()) {
-            setTemplateFolder(template)
-        } else {
-            setTemplateFolder(File(sourceFolder, templateFolder))
-        }
+        var templateDir = File(getAsString(TEMPLATE_FOLDER.key) ?: "")
+
+        templateDir =
+            if (templateDir.isAbsolute) templateDir
+            else sourceFolder.resolve(templateDir)
+
+        templateFolder = templateDir
+
+
     }
 
     private fun setupDefaultDataFolder() {
@@ -488,7 +477,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun setupDefaultContentFolder() {
-        setContentFolder(File(sourceFolder, contentFolderName ?: ""))
+        contentFolder = File(sourceFolder, contentFolderName ?: "")
     }
 
     override val headerSeparator: String?
