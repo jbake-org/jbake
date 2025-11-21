@@ -394,16 +394,16 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         compositeConfiguration.setProperty(key, value)
     }
 
-    override fun getThymeleafModeByType(type: String): String? {
+    override fun getThymeleafModeByType(type: String): String {
         val key = "template_" + type + "_thymeleaf_mode"
-        return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE)
+        return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE)!!
     }
 
-    override val serverContextPath: String?
-        get() = getAsString(PropertyList.SERVER_CONTEXT_PATH.key)
+    override val serverContextPath: String
+        get() = getAsString(PropertyList.SERVER_CONTEXT_PATH.key)!!
 
-    override val serverHostname: String?
-        get() = getAsString(PropertyList.SERVER_HOSTNAME.key)
+    override val serverHostname: String
+        get() = getAsString(PropertyList.SERVER_HOSTNAME.key)!!
 
     override fun asHashMap(): MutableMap<String, Any> {
         val configModel = HashMap<String, Any>()
@@ -449,7 +449,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
         val destination = File(destinationPath)
         destinationFolder =
-            if (destination.isAbsolute()) destination
+            if (destination.isAbsolute) destination
             else File(sourceFolder, destinationPath)
     }
 
@@ -458,7 +458,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
 
         val asset = File(assetFolder)
-        if (asset.isAbsolute()) {
+        if (asset.isAbsolute) {
             setAssetFolder(asset)
         } else {
             setAssetFolder(File(sourceFolder, assetFolder))
@@ -480,7 +480,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         val dataFolder = getAsString(PropertyList.DATA_FOLDER.key) ?: ""
 
         val data = File(dataFolder)
-        if (data.isAbsolute()) {
+        if (data.isAbsolute) {
             setDataFolder(data)
         } else {
             setDataFolder(File(sourceFolder, dataFolder))
