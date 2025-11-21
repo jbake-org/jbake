@@ -258,7 +258,7 @@ class AssetTest : LoggingTest() {
 
     @Test
     fun testIsFileAsset() {
-        val cssAsset = File(config.assetFolder!!.absolutePath + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
+        val cssAsset = File(config.assetFolder.absolutePath + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
         Assertions.assertTrue(cssAsset.exists())
         val contentFile = File(config.contentFolder.absolutePath + File.separatorChar + "about.html")
         Assertions.assertTrue(contentFile.exists())

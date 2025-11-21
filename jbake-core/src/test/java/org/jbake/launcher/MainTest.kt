@@ -200,9 +200,9 @@ internal class MainTest : LoggingTest() {
 
         AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status, Runnable { Main.main(args) })
 
-        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
+        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        val loggingEvent = captorLoggingEvent!!.getValue()
+        val loggingEvent = captorLoggingEvent.getValue()
         Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init")
     }
 

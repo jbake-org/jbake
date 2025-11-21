@@ -11,6 +11,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.PropertyList
 import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
@@ -133,9 +134,7 @@ class OvenTest {
     fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
         configuration.setSourceFolder(root!!.resolve("none").toFile())
 
-        org.junit.jupiter.api.Assertions.assertThrows<JBakeException?>(
-            JBakeException::class.java,
-            Executable { Oven(configuration) })
+        assertThrows<JBakeException?>( JBakeException::class.java){ Oven(configuration) }
     }
 
     @Test
@@ -174,9 +173,7 @@ class OvenTest {
             asset = asset
         )
 
-        org.junit.jupiter.api.Assertions.assertThrows<JBakeException?>(
-            JBakeException::class.java,
-            Executable { Oven(utensils) })
+        assertThrows(JBakeException::class.java){ Oven(utensils) }
     }
 
     @Test

@@ -37,7 +37,7 @@ class AsciidocParserTest {
     @Before
     fun createSampleFile() {
         rootPath = TestUtils.testResourcesAsSourceFolder
-        config = ConfigUtil().loadConfig(rootPath!!) as DefaultJBakeConfiguration
+        config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
 
         asciidocWithSource = folder.newFile("asciidoc-with-source.ad")
