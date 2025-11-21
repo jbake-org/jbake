@@ -110,45 +110,37 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     }
 
     /**
-     * Helper class to lazy load data form extractors by key
+     * Helper class to lazy load data form extractors by key.
      */
     private inner class ContextVariable(
-        private val db: ContentStore?,
-        private val key: String?,
-        private val model: TemplateModel?
-    ) : LazyContextVariable<Any?>() {
-        override fun loadValue(): Any? {
+        private val db: ContentStore,
+        private val key: String,
+        private val model: TemplateModel
+    ) : LazyContextVariable<Any>() {
+
+        override fun loadValue(): Any {
             try {
-                return extractors.extractAndTransform<LazyContextVariable<*>?>(
-                    db,
-                    key,
-                    model,
-                    object : TemplateEngineAdapter<LazyContextVariable<*>?> {
-                        override fun adapt(key: String, extractedValue: Any): LazyContextVariable<*> {
-                            if (key == ModelAttributes.ALLTAGS) {
-                                return object : LazyContextVariable<MutableSet<*>?>() {
-                                    override fun loadValue(): MutableSet<*>? {
-                                        return extractedValue as MutableSet<*>?
-                                    }
-                                }
-                            } else if (key == ModelAttributes.PUBLISHED_DATE) {
-                                return object : LazyContextVariable<Date?>() {
-                                    override fun loadValue(): Date? {
-                                        return extractedValue as Date?
-                                    }
-                                }
-                            } else {
-                                return object : LazyContextVariable<Any?>() {
-                                    override fun loadValue(): Any {
-                                        return extractedValue
-                                    }
-                                }
+                val adapter = object : TemplateEngineAdapter<LazyContextVariable<*>> {
+
+                    override fun adapt(key: String, extractedValue: Any): LazyContextVariable<*> {
+                        return when (key) {
+                            ModelAttributes.ALLTAGS -> object : LazyContextVariable<MutableSet<*>>() {
+                                override fun loadValue() = extractedValue as MutableSet<*>?
+                            }
+
+                            ModelAttributes.PUBLISHED_DATE -> object : LazyContextVariable<Date>() {
+                                override fun loadValue() = extractedValue as Date?
+                            }
+
+                            else -> object : LazyContextVariable<Any>() {
+                                override fun loadValue(): Any = extractedValue
                             }
                         }
-                    }).getValue()
-            } catch (e: NoModelExtractorException) {
-                return ""
+                    }
+                }
+                return extractors.extractAndTransform(db, key, model, adapter)!!.getValue()
             }
+            catch (e: NoModelExtractorException) { return "" }
         }
     }
 }

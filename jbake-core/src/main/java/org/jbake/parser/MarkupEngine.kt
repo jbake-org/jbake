@@ -130,9 +130,9 @@ abstract class MarkupEngine : ParserEngine {
         if (context.tags != null) {
             val tags = context.tags as Array<String>
             for (i in tags.indices) {
-                tags[i] = sanitize(tags[i]!!)
+                tags[i] = sanitize(tags[i])
                 if (context.config.sanitizeTag) {
-                    tags[i] = tags[i]!!.replace(" ", "-")
+                    tags[i] = tags[i].replace(" ", "-")
                 }
             }
             context.setTags(tags)
@@ -301,7 +301,7 @@ abstract class MarkupEngine : ParserEngine {
     private fun processDefaultBody(context: ParserContext) {
         val body = StringBuilder()
         var inBody = false
-        for (line in context.fileLines()) {
+        for (line in context.fileLines) {
             if (inBody) {
                 body.append(line).append("\n")
             }

@@ -7,11 +7,6 @@ package org.jbake.template
  * @author ndx
  */
 interface TemplateEngineAdapter<Type> {
-    class NoopAdapter : TemplateEngineAdapter<Any?> {
-        override fun adapt(key: String?, extractedValue: Any?): Any? {
-            return extractedValue
-        }
-    }
 
     /**
      * Adapt value to expected output
@@ -20,5 +15,12 @@ interface TemplateEngineAdapter<Type> {
      * @param extractedValue Value to be used in template model
      * @return Value adapted for use in template
      */
-    fun adapt(key: String?, extractedValue: Any?): Type?
+    fun adapt(key: String, extractedValue: Any): Type
+
+
+    class NoopAdapter : TemplateEngineAdapter<Any> {
+        override fun adapt(key: String, extractedValue: Any): Any {
+            return extractedValue
+        }
+    }
 }

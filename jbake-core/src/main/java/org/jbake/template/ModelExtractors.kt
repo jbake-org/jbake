@@ -12,8 +12,7 @@ import java.util.*
 /**
  *
  * A singleton class giving access to model extractors. Model extractors are loaded based on classpath. New
- * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath
- * (recommanded).
+ * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath (recommanded).
  *
  * The descriptor file must be found in *META-INF* directory and named
  * *org.jbake.template.ModelExtractors.properties*. The format of the file is easy:
@@ -26,7 +25,6 @@ import java.util.*
  * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
  * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit
  * for embedding.
- *
  *
  * @author ndx
  * @author Cédric Champeau
@@ -89,10 +87,10 @@ class ModelExtractors private constructor() {
         db: ContentStore,
         key: String,
         map: MutableMap<*, *>,
-        adapter: TemplateEngineAdapter<Type?>
-    ): Type? {
+        adapter: TemplateEngineAdapter<Type>
+    ): Type {
         if (extractors.containsKey(key)) {
-            val extractedValue = extractors[key]!!.get(db, map, key)
+            val extractedValue = extractors[key]!!.get(db, map, key)!!
             return adapter.adapt(key, extractedValue)
         } else {
             throw NoModelExtractorException("no model extractor for key \"" + key + "\"")
@@ -140,22 +138,14 @@ class ModelExtractors private constructor() {
          */
         private fun tryLoadEngine(engineClassName: String?): ModelExtractor<*>? {
             try {
-                val engineClass = Class.forName(
-                    engineClassName,
-                    false,
-                    ModelExtractors::class.java.getClassLoader()
-                ) as Class<out ModelExtractor<*>>
+                val engineClass = Class.forName(engineClassName, false, ModelExtractors::class.java.getClassLoader())
+                    as Class<out ModelExtractor<*>>
                 return engineClass.newInstance()
-            } catch (e: ClassNotFoundException) {
-                return null
-            } catch (e: InstantiationException) {
-                return null
-            } catch (e: IllegalAccessException) {
-                return null
-            } catch (e: NoClassDefFoundError) {
-                // a dependency of the engine may not be found on classpath
-                return null
             }
+            catch (e: ClassNotFoundException) { return null }
+            catch (e: InstantiationException) { return null }
+            catch (e: IllegalAccessException) { return null }
+            catch (e: NoClassDefFoundError) { /* a dependency of the engine may not be found on classpath */ return null }
         }
     }
 }

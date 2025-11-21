@@ -13,7 +13,7 @@ class IndexRenderer : RenderingTool {
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (config.renderIndex) {
             try {
-                val fileName = config.indexFileName
+                val fileName = config.indexFileName ?: "index.html"
 
                 //TODO: refactor this. the renderer has a reference to the configuration
                 if (config.paginateIndex) {
