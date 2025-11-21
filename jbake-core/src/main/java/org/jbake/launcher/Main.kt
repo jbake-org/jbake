@@ -44,25 +44,25 @@ class Main @JvmOverloads constructor(
 
             val config: JBakeConfiguration
 
-            val res = parseArguments(args)
-            if (res.isRunServer) {
-                config = this.jBakeConfigurationFactory!!.setEncoding(res.propertiesEncoding)
+            val arguments = parseArguments(args)
+            if (arguments.isRunServer) {
+                config = this.jBakeConfigurationFactory!!.setEncoding(arguments.propertiesEncoding)
                     .createJettyJbakeConfiguration(
-                        res.getSource(),
-                        res.getDestination(),
-                        res.getConfig(),
-                        res.isClearCache
+                        arguments.getSource(),
+                        arguments.getDestination(),
+                        arguments.getConfig(),
+                        arguments.isClearCache
                     )
             } else {
-                config = this.jBakeConfigurationFactory!!.setEncoding(res.propertiesEncoding)
+                config = this.jBakeConfigurationFactory!!.setEncoding(arguments.propertiesEncoding)
                     .createDefaultJbakeConfiguration(
-                        res.getSource(),
-                        res.getDestination(),
-                        res.getConfig(),
-                        res.isClearCache
+                        arguments.getSource(),
+                        arguments.getDestination(),
+                        arguments.getConfig(),
+                        arguments.isClearCache
                     )
             }
-            run(res, config)
+            run(arguments, config)
         } catch (e: JBakeException) {
             throw e
         } catch (mex: CommandLine.MissingParameterException) {
@@ -72,41 +72,41 @@ class Main @JvmOverloads constructor(
         }
     }
 
-    fun run(res: LaunchOptions, config: JBakeConfiguration) {
+    fun run(launchOptions: LaunchOptions, config: JBakeConfiguration) {
         println("JBake " + config.version + " (" + config.buildTimeStamp + " " + config.abbreviatedGitHash + "#) [http://jbake.org]")
         println()
 
-        if (res.isHelpNeeded) {
-            printUsage(res)
+        if (launchOptions.isHelpNeeded) {
+            printUsage(launchOptions)
             // Help was requested, so we are done here
             return
         }
 
-        if (res.isListConfig) {
+        if (launchOptions.isListConfig) {
             val printer = ConfigurationPrinter(config, System.out)
             printer.print()
             return
         }
 
-        if (res.isBake) {
+        if (launchOptions.isBake) {
             baker.bake(config)
         }
 
-        if (res.isInit) {
-            initStructure(res.template, config)
+        if (launchOptions.isInit) {
+            initStructure(launchOptions.template!!, config)
         }
 
-        if (res.isRunServer) {
+        if (launchOptions.isRunServer) {
             watcher.start(config)
             // TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
-            if (res.isBake) {
+            if (launchOptions.isBake) {
                 // bake and server commands have been run together
-                if (res.getDestination() != null) {
+                if (launchOptions.getDestination() != null) {
                     // use the destination provided via the commandline
-                    runServer(res.getDestination(), config)
-                } else if (res.getSource().getPath() != ".") {
+                    runServer(launchOptions.getDestination(), config)
+                } else if (launchOptions.getSource().getPath() != ".") {
                     // use the source folder provided via the commandline
-                    runServer(res.getSource(), config)
+                    runServer(launchOptions.getSource(), config)
                 } else {
                     // use the default DESTINATION_FOLDER value
                     runServer(config.destinationFolder!!, config)
