@@ -100,23 +100,22 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                     return bw.wrap(DataFileUtil(db, config.dataFileDocType))
                 }
 
-                return extractors.extractAndTransform<freemarker.template.TemplateModel?>(
-                    db,
-                    key,
-                    eagerModel.toMap(),
-                    object : TemplateEngineAdapter<freemarker.template.TemplateModel?> {
-                        override fun adapt(key: String?, extractedValue: Any?): freemarker.template.TemplateModel? {
-                            if (key == ModelAttributes.ALLTAGS) {
-                                return SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
-                            } else if (key == ModelAttributes.PUBLISHED_DATE) {
-                                return SimpleDate(extractedValue as Date?, TemplateDateModel.UNKNOWN)
-                            } else {
-                                // All other cases, as far as I know, are document collections
-                                return SimpleSequence(extractedValue as MutableCollection<*>?, wrapper)
-                            }
+                val adapter = object : TemplateEngineAdapter<freemarker.template.TemplateModel> {
+
+                    override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
+                        return when (key) {
+                            ModelAttributes.ALLTAGS -> SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
+
+                            ModelAttributes.PUBLISHED_DATE -> SimpleDate(extractedValue as Date?, TemplateDateModel.UNKNOWN)
+
+                            // All other cases, as far as I know, are document collections
+                            else -> SimpleSequence(extractedValue as MutableCollection<*>?, wrapper)
                         }
-                    })
-            } catch (_: NoModelExtractorException) {
+                    }
+                }
+                return extractors.extractAndTransform(db, key, eagerModel.toMap(), adapter)
+            }
+            catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)
             }
         }
