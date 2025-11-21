@@ -32,7 +32,7 @@ class InitTest {
 
     @Test
     fun initOK() {
-        val init = Init(config!!)
+        val init = Init(config)
         val initPath = folder.newFolder("init")
         init.run(initPath, rootPath, "freemarker")
         val testFile = File(initPath, "testfile.txt")
@@ -42,7 +42,7 @@ class InitTest {
     @Test
     @Throws(IOException::class)
     fun initFailDestinationContainsContent() {
-        val init = Init(config!!)
+        val init = Init(config)
         val initPath = folder.newFolder("init")
         val contentFolder = File(initPath.getPath(), config.contentFolderName)
         contentFolder.mkdir()
@@ -59,7 +59,7 @@ class InitTest {
     @Test
     @Throws(IOException::class)
     fun initFailInvalidTemplateType() {
-        val init = Init(config!!)
+        val init = Init(config)
         val initPath = folder.newFolder("init")
         try {
             init.run(initPath, rootPath, "invalid")

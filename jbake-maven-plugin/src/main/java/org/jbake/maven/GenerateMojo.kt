@@ -81,8 +81,8 @@ open class GenerateMojo : AbstractMojo() {
             // TODO: At some point, reuse Oven
             val oven = Oven(createConfiguration())
             oven.bake()
-            if (failOnError && !oven.getErrors().isEmpty()) {
-                throw MojoFailureException("Baked with " + oven.getErrors().size + " errors. Check output above for details!")
+            if (failOnError && !oven.errors.isEmpty()) {
+                throw MojoFailureException("Baked with " + oven.errors.size + " errors. Check output above for details!")
             }
         } catch (e: Exception) {
             getLog().info("Oops", e)

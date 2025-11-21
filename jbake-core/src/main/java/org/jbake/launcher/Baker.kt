@@ -32,7 +32,7 @@ class Baker {
         val oven = Oven(config)
         oven.bake()
 
-        val errors = oven.getErrors()
+        val errors = oven.errors
         if (!errors.isEmpty()) {
             val msg = StringBuilder()
             // TODO: decide, if we want the all errors here

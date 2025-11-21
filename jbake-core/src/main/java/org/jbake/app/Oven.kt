@@ -24,7 +24,6 @@ import java.util.*
 class Oven {
     @JvmField
     val utensils: Utensils
-    private val errors: MutableList<Throwable?> = LinkedList<Throwable?>()
     private var renderedCount = 0
 
     /**
@@ -169,13 +168,13 @@ class Oven {
             asset.copy()
             asset.copyAssetsFromContent(config.contentFolder)
 
-            errors.addAll(asset.getErrors())
+            errorsInternal.addAll(asset.errors)
 
             log.info("Baking finished!")
             val end = Date().getTime()
             log.info("Baked {} items in {}ms", renderedCount, end - start)
-            if (!errors.isEmpty()) {
-                log.error("Failed to bake {} item(s)!", errors.size)
+            if (!errorsInternal.isEmpty()) {
+                log.error("Failed to bake {} item(s)!", errorsInternal.size)
             }
         } finally {
             contentStore.close()
@@ -219,14 +218,15 @@ class Oven {
             try {
                 renderedCount += tool.render(renderer, contentStore, config)
             } catch (e: RenderingException) {
-                errors.add(e)
+                errorsInternal.add(e)
             }
         }
     }
 
-    fun getErrors(): MutableList<Throwable> {
-        return ArrayList<Throwable>(errors)
-    }
+    private val errorsInternal: MutableList<Throwable?> = LinkedList<Throwable?>()
+
+    val errors: MutableList<Throwable>
+        get() = ArrayList<Throwable>(errorsInternal.filterNotNull())
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(Oven::class.java)

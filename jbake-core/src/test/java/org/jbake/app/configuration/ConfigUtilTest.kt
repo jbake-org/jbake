@@ -5,6 +5,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.JBakeException
 import org.jbake.app.LoggingTest
@@ -51,7 +52,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val configuration = util!!.loadConfig(sourceFolder!!.toFile())
 
-        Assertions.assertThat<Any?>(configuration.get("test.property")).isEqualTo("12345")
+        assertThat<Any?>(configuration.get("test.property")).isEqualTo("12345")
         assertDefaultPropertiesPresent(configuration)
     }
 
@@ -64,7 +65,7 @@ class ConfigUtilTest : LoggingTest() {
         val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
             JBakeException::class.java,
             Executable { util!!.loadConfig(nonExistentSourceFolder) })
-        Assertions.assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
+        assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
     }
 
     @Test
@@ -84,7 +85,7 @@ class ConfigUtilTest : LoggingTest() {
         val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
             JBakeException::class.java,
             Executable { util!!.loadConfig(sourceFolder) })
-        Assertions.assertThat(e.message).isEqualTo("The given source folder is not a directory.")
+        assertThat(e.message).isEqualTo("The given source folder is not a directory.")
     }
 
     @Test
@@ -130,10 +131,10 @@ class ConfigUtilTest : LoggingTest() {
         val config = util!!.loadConfig(sourceFolder)
 
         val templateFile = config.getTemplateFileByDocType("masterindex")
-        Assertions.assertThat(templateFile).isEqualTo(expectedTemplateFile)
+        assertThat(templateFile).isEqualTo(expectedTemplateFile)
 
         val templateFile2 = config.getTemplateByDocType("team")
-        Assertions.assertThat(templateFile2).isEqualTo("special/team.tpl")
+        assertThat(templateFile2).isEqualTo("special/team.tpl")
     }
 
     @Test
@@ -147,7 +148,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        Assertions.assertThat(loggingEvent.getMessage())
+        assertThat(loggingEvent.getMessage())
             .isEqualTo("Cannot find configuration key '{}' for document type '{}'")
     }
 
@@ -160,7 +161,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val extension = config.getOutputExtensionByDocType(docType)
 
-        Assertions.assertThat(extension).isEqualTo(".xhtml")
+        assertThat(extension).isEqualTo(".xhtml")
     }
 
     @Test
@@ -170,7 +171,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val markdownExtensions = config.getMarkdownExtensions()
 
-        Assertions.assertThat<String>(markdownExtensions)
+        assertThat<String>(markdownExtensions)
             .containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS")
     }
 
@@ -181,7 +182,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val docTypes = config.documentTypes
 
-        Assertions.assertThat<String>(docTypes).containsExactly(
+        assertThat<String>(docTypes).containsExactly(
             "allcontent",
             "team",
             "masterindex",
@@ -205,7 +206,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val options = config.getAsciidoctorOptionKeys()
 
-        Assertions.assertThat<String>(options).contains("requires", "template_dirs")
+        assertThat<String>(options).contains("requires", "template_dirs")
     }
 
     @Test
@@ -217,7 +218,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val option = config.getAsciidoctorOption("requires")
 
-        Assertions.assertThat<String>(option).contains("asciidoctor-diagram")
+        assertThat<String>(option).contains("asciidoctor-diagram")
     }
 
     @Test
@@ -229,7 +230,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val option = config.getAsciidoctorOption("template_dirs")
 
-        Assertions.assertThat<String>(option).contains("src/template1", "src/template2")
+        assertThat<String>(option).contains("src/template1", "src/template2")
     }
 
     @Test
@@ -239,7 +240,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val options = config.getAsciidoctorOption("template_dirs")
 
-        Assertions.assertThat<String>(options).isEmpty()
+        assertThat<String>(options).isEmpty()
     }
 
     @Test
@@ -253,7 +254,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find asciidoctor option '{}.{}'")
+        assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find asciidoctor option '{}.{}'")
     }
 
     @Test
@@ -270,15 +271,15 @@ class ConfigUtilTest : LoggingTest() {
         config.setContentFolder(null)
         config.destinationFolder = (null)
 
-        val templateFolder = config.getTemplateFolder()
-        val assetFolder = config.getAssetFolder()
-        val contentFolder = config.getContentFolder()
-        val destinationFolder = config.getDestinationFolder()
+        val templateFolder = config.templateFolder
+        val assetFolder = config.assetFolder
+        val contentFolder = config.contentFolder
+        val destinationFolder = config.destinationFolder
 
-        Assertions.assertThat(templateFolder).isEqualTo(expectedTemplateFolder)
-        Assertions.assertThat(assetFolder).isEqualTo(expectedAssetFolder)
-        Assertions.assertThat(contentFolder).isEqualTo(expectedContentFolder)
-        Assertions.assertThat(destinationFolder).isEqualTo(expectedDestinationFolder)
+        assertThat(templateFolder).isEqualTo(templatesPath.toFile())
+        assertThat(assetFolder).isEqualTo(expectedAssetFolder)
+        assertThat(contentFolder).isEqualTo(expectedContentFolder)
+        assertThat(destinationFolder).isEqualTo(expectedDestinationFolder)
     }
 
     @Test
@@ -311,20 +312,20 @@ class ConfigUtilTest : LoggingTest() {
         // when
         val config = util!!.loadConfig(source.toFile()) as DefaultJBakeConfiguration
 
-        val templateFolder = config.getTemplateFolder()
-        val assetFolder = config.getAssetFolder()
-        val contentFolder = config.getContentFolder()
-        val destinationFolder = config.getDestinationFolder()
+        val templateFolder = config.templateFolder
+        val assetFolder = config.assetFolder
+        val contentFolder = config.contentFolder
+        val destinationFolder = config.destinationFolder
 
         // then
-        Assertions.assertThat(config.getTemplateFolderName()).isEqualTo(expectedTemplateFolder.toString())
-        Assertions.assertThat(templateFolder).isEqualTo(expectedTemplateFolder.toFile())
+        assertThat(config.templateFolderName).isEqualTo(expectedTemplateFolder.toString())
+        assertThat(templateFolder).isEqualTo(expectedTemplateFolder.toFile())
 
-        Assertions.assertThat(config.getAssetFolderName()).isEqualTo(expectedAssetFolder.toString())
-        Assertions.assertThat(assetFolder).isEqualTo(expectedAssetFolder.toFile())
+        assertThat(config.assetFolderName).isEqualTo(expectedAssetFolder.toString())
+        assertThat(assetFolder).isEqualTo(expectedAssetFolder.toFile())
 
-        Assertions.assertThat(destinationFolder).isEqualTo(expectedDestination.toFile())
-        Assertions.assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile())
+        assertThat(destinationFolder).isEqualTo(expectedDestination.toFile())
+        assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile())
     }
 
     @Test
@@ -333,8 +334,8 @@ class ConfigUtilTest : LoggingTest() {
         val config = util!!.loadConfig(TestUtils.testResourcesAsSourceFolder)
 
         val siteAbout = config.get("site.about") as String?
-        Assertions.assertThat(util!!.encoding).isEqualTo("UTF-8")
-        Assertions.assertThat(siteAbout).inUnicode().startsWith(unicodeString)
+        assertThat(util!!.encoding).isEqualTo("UTF-8")
+        assertThat(siteAbout).inUnicode().startsWith(unicodeString)
     }
 
     @Test
@@ -344,7 +345,7 @@ class ConfigUtilTest : LoggingTest() {
             util!!.setEncoding("ISO8859_1").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
 
         val siteAbout = config.get("site.about") as String?
-        Assertions.assertThat(siteAbout).contains(expected)
+        assertThat(siteAbout).contains(expected)
     }
 
     @Test
@@ -355,8 +356,8 @@ class ConfigUtilTest : LoggingTest() {
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        Assertions.assertThat<Level?>(loggingEvent.getLevel()).isEqualTo(Level.WARN)
-        Assertions.assertThat(loggingEvent.getFormattedMessage())
+        assertThat<Level?>(loggingEvent.getLevel()).isEqualTo(Level.WARN)
+        assertThat(loggingEvent.getFormattedMessage())
             .isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'")
     }
 
@@ -375,7 +376,7 @@ class ConfigUtilTest : LoggingTest() {
             if (field.isAccessible()) {
                 val key = field.get("") as String?
                 println("Key: " + key)
-                Assertions.assertThat<Any?>(config.get(key)).isNotNull()
+                assertThat<Any?>(config.get(key)).isNotNull()
             }
         }
     }

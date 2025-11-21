@@ -43,10 +43,10 @@ abstract class ContentStoreIntegrationTest {
             Assert.assertTrue("Cannot find sample data structure!", sourceFolder!!.exists())
 
             config = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
-            config!!.setSourceFolder(sourceFolder)
+            config.setSourceFolder(sourceFolder)
 
-            Assert.assertEquals(".html", config!!.outputExtension)
-            config!!.setDatabaseStore(storageType.toString())
+            Assert.assertEquals(".html", config.outputExtension)
+            config.setDatabaseStore(storageType.toString())
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
             var dbPath: String = folder.newFolder("documents" + System.currentTimeMillis()).getName()
 
@@ -55,8 +55,8 @@ abstract class ContentStoreIntegrationTest {
             if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
                 dbPath = dbPath.replace(":", "")
             }
-            config!!.setDatabasePath(dbPath)
-            db = DBUtil.createDataStore(config!!)
+            config.setDatabasePath(dbPath)
+            db = DBUtil.createDataStore(config)
         }
 
         @AfterClass @JvmStatic

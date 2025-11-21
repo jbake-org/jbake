@@ -30,14 +30,14 @@ class AssetTest : LoggingTest() {
         fixtureDir = File(this.javaClass.getResource("/fixture").getFile())
         this.folder = folder
         config = ConfigUtil().loadConfig(fixtureDir!!) as DefaultJBakeConfiguration
-        config!!.destinationFolder = folder.toFile()
-        Assertions.assertEquals(".html", config!!.outputExtension)
+        config.destinationFolder = folder.toFile()
+        Assertions.assertEquals(".html", config.outputExtension)
     }
 
 
     @Test
     fun testCopy() {
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         asset.copy()
         val cssFile = File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
         Assertions.assertTrue(cssFile.exists(), Supplier { "File " + cssFile.getAbsolutePath() + " does not exist" })
@@ -47,12 +47,12 @@ class AssetTest : LoggingTest() {
         val jsFile = File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js")
         Assertions.assertTrue(jsFile.exists(), Supplier { "File " + jsFile.getAbsolutePath() + " does not exist" })
 
-        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying")
+        Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
 
     @Test
     fun testCopySingleFile() {
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         val cssSubPath = File.separatorChar.toString() + "css" + File.separatorChar + "bootstrap.min.css"
         val contentImgPath = (File.separatorChar.toString() + "blog" + File.separatorChar + "2013" + File.separatorChar
                 + "images" + File.separatorChar + "custom-image.jpg")
@@ -78,7 +78,7 @@ class AssetTest : LoggingTest() {
     @Test
     @Throws(IOException::class)
     fun shouldSkipCopyingSingleFileIfDirectory() {
-        val asset = Asset(config!!)
+        val asset = Asset(config)
 
         val emptyDir = File(folder!!.toFile(), "emptyDir")
         emptyDir.mkdir()
@@ -92,7 +92,7 @@ class AssetTest : LoggingTest() {
     @Test
     @Throws(IOException::class)
     fun shouldLogSkipCopyingSingleFileIfDirectory() {
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         val emptyDir = File(folder!!.toFile(), "emptyDir")
         emptyDir.mkdir()
 
@@ -107,14 +107,14 @@ class AssetTest : LoggingTest() {
 
     @Test
     fun testCopyCustomFolder() {
-        config!!.setAssetFolder(File(config!!.sourceFolder, "/media"))
-        val asset = Asset(config!!)
+        config.setAssetFolder(File(config.sourceFolder, "/media"))
+        val asset = Asset(config)
         asset.copy()
 
         val favFile = File(folder.toString() + File.separatorChar + "favicon.ico")
         Assertions.assertTrue(favFile.exists(), Supplier { "File " + favFile.getAbsolutePath() + " does not exist" })
 
-        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying")
+        Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
 
     @Test
@@ -122,10 +122,10 @@ class AssetTest : LoggingTest() {
         val assetFolder = File(folder!!.toFile(), "ignoredAssets")
         assetFolder.mkdirs()
         FileUtils.copyDirectory(File(this.javaClass.getResource("/fixture/ignorables").getFile()), assetFolder)
-        config!!.setAssetFolder(assetFolder)
-        config!!.assetIgnoreHidden = true
+        config.setAssetFolder(assetFolder)
+        config.assetIgnoreHidden = true
         TestUtils.hideAssets(assetFolder)
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         asset.copy(assetFolder)
 
         val testFile = File(folder!!.toFile(), "test.txt")
@@ -135,7 +135,7 @@ class AssetTest : LoggingTest() {
             testIgnoreFile.exists(),
             Supplier { "File " + testIgnoreFile.getAbsolutePath() + " does exist" })
 
-        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying")
+        Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
 
 
@@ -146,20 +146,20 @@ class AssetTest : LoggingTest() {
      */
     @Test
     fun testWriteProtected() {
-        val assets = File(config!!.getSourceFolder(), "assets")
+        val assets = File(config.sourceFolder, "assets")
         val css = File(folder!!.toFile(), "css")
         css.mkdir()
         val cssFile = File(css, "bootstrap.min.css")
         FileUtils.touch(cssFile)
         cssFile.setReadOnly()
 
-        config!!.setAssetFolder(assets)
-        config!!.destinationFolder = (folder!!.toFile())
-        val asset = Asset(config!!)
+        config.setAssetFolder(assets)
+        config.destinationFolder = (folder!!.toFile())
+        val asset = Asset(config)
         asset.copy()
 
         cssFile.setWritable(true)
-        Assertions.assertFalse(asset.getErrors().isEmpty(), "At least one error during copy expected")
+        Assertions.assertFalse(asset.errors.isEmpty(), "At least one error during copy expected")
     }
 
     /**
@@ -169,8 +169,8 @@ class AssetTest : LoggingTest() {
      */
     @Test
     fun testUnlistable() {
-        config!!.setAssetFolder(File(config!!.getSourceFolder(), "non-exsitent"))
-        val asset = Asset(config!!)
+        config.setAssetFolder(File(config.sourceFolder, "non-exsitent"))
+        val asset = Asset(config)
         asset.copy()
     }
 
@@ -178,7 +178,7 @@ class AssetTest : LoggingTest() {
     fun testJBakeIgnoredFolder() {
         val assetsUrl = this.javaClass.getResource("/fixture/assets")
         val assets = File(assetsUrl!!.getFile())
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         asset.copy(assets)
 
         val cssFile = File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
@@ -197,16 +197,16 @@ class AssetTest : LoggingTest() {
             fooIgnorableFolder.exists(),
             Supplier { "Folder " + fooIgnorableFolder.getAbsolutePath() + " must exist" })
 
-        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying")
+        Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
 
     @Test
     fun testFooIgnoredFolder() {
-        config!!.setProperty(PropertyList.IGNORE_FILE.key, ".fooignore")
+        config.setProperty(PropertyList.IGNORE_FILE.key, ".fooignore")
 
         val assetsUrl = this.javaClass.getResource("/fixture/assets")
         val assets = File(assetsUrl!!.getFile())
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         asset.copy(assets)
 
         val cssFile = File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
@@ -225,14 +225,14 @@ class AssetTest : LoggingTest() {
             fooIgnorableFolder.exists(),
             Supplier { "Folder " + fooIgnorableFolder.getAbsolutePath() + " must not exist" })
 
-        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying")
+        Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
 
     @Test
     fun testCopyAssetsFromContent() {
         val contentUrl = this.javaClass.getResource("/fixture/content")
         val contents = File(contentUrl!!.getFile())
-        val asset = Asset(config!!)
+        val asset = Asset(config)
         asset.copyAssetsFromContent(contents)
 
         val totalFiles = countFiles(folder!!.toFile())
@@ -253,19 +253,16 @@ class AssetTest : LoggingTest() {
         val jsonFile = File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2012/sample.json")
         Assertions.assertTrue(jsonFile.exists(), Supplier { "File " + jsonFile.getAbsolutePath() + " does not exist" })
 
-        Assertions.assertTrue(asset.getErrors().isEmpty(), "Errors during asset copying")
+        Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
 
     @Test
     fun testIsFileAsset() {
-        val cssAsset = File(
-            config!!.getAssetFolder()!!
-                .getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css"
-        )
+        val cssAsset = File(config.assetFolder!!.absolutePath + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
         Assertions.assertTrue(cssAsset.exists())
-        val contentFile = File(config!!.getContentFolder()!!.getAbsolutePath() + File.separatorChar + "about.html")
+        val contentFile = File(config.contentFolder.absolutePath + File.separatorChar + "about.html")
         Assertions.assertTrue(contentFile.exists())
-        val asset = Asset(config!!)
+        val asset = Asset(config)
 
         Assertions.assertTrue(asset.isAssetFile(cssAsset))
         Assertions.assertFalse(asset.isAssetFile(contentFile))

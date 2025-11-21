@@ -96,12 +96,12 @@ abstract class AbstractTemplateEngineRenderingTest(
         addDocumentType("paper")
         db.updateSchema()
 
-        Assert.assertEquals(".html", ContentStoreIntegrationTest.Companion.config.getOutputExtension())
+        Assert.assertEquals(".html", config.outputExtension)
 
-        val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        val crawler = Crawler(db, ContentStoreIntegrationTest.Companion.config)
         crawler.crawl()
         parser = Parser(ContentStoreIntegrationTest.Companion.config)
-        renderer = Renderer(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
+        renderer = Renderer(db, ContentStoreIntegrationTest.Companion.config)
 
         setupExpectedOutputStrings()
     }

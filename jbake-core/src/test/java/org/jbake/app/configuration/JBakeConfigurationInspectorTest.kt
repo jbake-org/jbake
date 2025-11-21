@@ -2,6 +2,7 @@ package org.jbake.app.configuration
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.JBakeException
 import org.jbake.app.LoggingTest
@@ -33,7 +34,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val e = Assertions.assertThrows<JBakeException>(JBakeException::class.java, Executable { inspector.inspect() })
 
-        org.assertj.core.api.Assertions.assertThat(e.message)
+        assertThat(e.message)
             .isEqualTo("Error: Source folder must exist: " + nonExistentFile.getAbsolutePath())
     }
 
@@ -51,7 +52,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val e = Assertions.assertThrows<JBakeException>(JBakeException::class.java, Executable { inspector.inspect() })
 
-        org.assertj.core.api.Assertions.assertThat(e.message)
+        assertThat(e.message)
             .isEqualTo("Error: Source folder is not readable: " + nonReadableFile.getAbsolutePath())
     }
 
@@ -67,7 +68,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val e = Assertions.assertThrows<JBakeException>(JBakeException::class.java, Executable { inspector.inspect() })
 
-        org.assertj.core.api.Assertions.assertThat(e.message)
+        assertThat(e.message)
             .isEqualTo("Error: Required folder cannot be found! Expected to find [template.folder] at: " + expectedFolder.getAbsolutePath())
     }
 
@@ -88,7 +89,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val e = Assertions.assertThrows<JBakeException>(JBakeException::class.java, Executable { inspector.inspect() })
 
-        org.assertj.core.api.Assertions.assertThat(e.message)
+        assertThat(e.message)
             .isEqualTo("Error: Required folder cannot be found! Expected to find [content.folder] at: " + contentFolder.getAbsolutePath())
     }
 
@@ -113,7 +114,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         inspector.inspect()
 
-        org.assertj.core.api.Assertions.assertThat(destinationFolder).exists()
+        assertThat(destinationFolder).exists()
     }
 
     @Test
@@ -136,7 +137,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val e = Assertions.assertThrows<JBakeException>(JBakeException::class.java, Executable { inspector.inspect() })
 
-        org.assertj.core.api.Assertions.assertThat(e.message).contains("Error: Destination folder is not writable:")
+        assertThat(e.message).contains("Error: Destination folder is not writable:")
     }
 
     @Test
@@ -167,9 +168,9 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        org.assertj.core.api.Assertions.assertThat(loggingEvent.getMessage())
+        assertThat(loggingEvent.getMessage())
             .isEqualTo("No asset folder '{}' was found!")
-        org.assertj.core.api.Assertions.assertThat(loggingEvent.getFormattedMessage())
+        assertThat(loggingEvent.getFormattedMessage())
             .isEqualTo("No asset folder '" + assetFolder.getAbsolutePath() + "' was found!")
     }
 }

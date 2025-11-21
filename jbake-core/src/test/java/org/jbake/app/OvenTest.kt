@@ -66,16 +66,16 @@ class OvenTest {
     fun shouldBakeWithRelativeCustomPaths() {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
         configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
-        val assetFolder = File(configuration.getDestinationFolder(), "css")
-        val aboutFile = File(configuration.getDestinationFolder(), "about.html")
-        val blogSubFolder = File(configuration.getDestinationFolder(), "blog")
+        val assetFolder = File(configuration.destinationFolder, "css")
+        val aboutFile = File(configuration.destinationFolder, "about.html")
+        val blogSubFolder = File(configuration.destinationFolder, "blog")
 
 
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat<Throwable?>(oven.getErrors()).isEmpty()
-        Assertions.assertThat(configuration.getDestinationFolder()).isNotEmptyDirectory()
+        Assertions.assertThat<Throwable?>(oven.errors).isEmpty()
+        Assertions.assertThat(configuration.destinationFolder).isNotEmptyDirectory()
         Assertions.assertThat(assetFolder).isNotEmptyDirectory()
         Assertions.assertThat(aboutFile).isFile()
         Assertions.assertThat(aboutFile).isNotEmpty()
@@ -112,16 +112,16 @@ class OvenTest {
         fw.close()
 
         configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
-        val assetFolder = File(configuration.getDestinationFolder(), "css")
-        val aboutFile = File(configuration.getDestinationFolder(), "about.html")
-        val blogSubFolder = File(configuration.getDestinationFolder(), "blog")
+        val assetFolder = File(configuration.destinationFolder, "css")
+        val aboutFile = File(configuration.destinationFolder, "about.html")
+        val blogSubFolder = File(configuration.destinationFolder, "blog")
 
 
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat<Throwable?>(oven.getErrors()).isEmpty()
-        Assertions.assertThat(configuration.getDestinationFolder()).isNotEmptyDirectory()
+        Assertions.assertThat<Throwable?>(oven.errors).isEmpty()
+        Assertions.assertThat(configuration.destinationFolder).isNotEmptyDirectory()
         Assertions.assertThat(assetFolder).isNotEmptyDirectory()
         Assertions.assertThat(aboutFile).isFile()
         Assertions.assertThat(aboutFile).isNotEmpty()
@@ -215,7 +215,7 @@ class OvenTest {
 
     @Test
     fun localeConfiguration() {
-        val language = configuration.getJvmLocale()
+        val language = configuration.jvmLocale
 
         val oven = Oven(configuration)
         oven.bake()

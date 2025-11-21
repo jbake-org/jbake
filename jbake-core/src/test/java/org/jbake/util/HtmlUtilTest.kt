@@ -23,7 +23,7 @@ class HtmlUtilTest {
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='/blog/2017/05/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -37,9 +37,9 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
-        config!!.setImgPathPrependHost(false)
+        config.setImgPathPrependHost(false)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -52,9 +52,9 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='img/deeper/underground.jpg' /></div>"
-        config!!.setImgPathPrependHost(true)
+        config.setImgPathPrependHost(true)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -67,9 +67,9 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
-        config!!.setImgPathPrependHost(true)
+        config.setImgPathPrependHost(true)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -82,9 +82,9 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='first.jpg' /></div>"
-        config!!.setImgPathPrependHost(true)
+        config.setImgPathPrependHost(true)
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -98,7 +98,7 @@ class HtmlUtilTest {
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='/blog/2017/05/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -113,7 +113,7 @@ class HtmlUtilTest {
         fileContent.noExtensionUri = "blog/2017/05/first_post/"
         fileContent.body = "<div> Test <img src='/blog/2017/05/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -128,7 +128,7 @@ class HtmlUtilTest {
         fileContent.noExtensionUri = "blog/2017/05/first_post/"
         fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -143,7 +143,7 @@ class HtmlUtilTest {
         fileContent.noExtensionUri = "blog/2017/05/first_post/"
         fileContent.body = "<div> Test <img src='http://example.com/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 
@@ -158,7 +158,7 @@ class HtmlUtilTest {
         fileContent.noExtensionUri = "blog/2017/05/first_post/"
         fileContent.body = "<div> Test <img src='https://example.com/first.jpg' /></div>"
 
-        HtmlUtil.fixImageSourceUrls(fileContent, config!!)
+        HtmlUtil.fixImageSourceUrls(fileContent, config)
 
         val body = fileContent.body
 

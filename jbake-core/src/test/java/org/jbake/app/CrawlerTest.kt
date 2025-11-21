@@ -52,7 +52,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
     fun crawlDataFiles() {
         val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
         // manually register data doctype
-        addDocumentType(ContentStoreIntegrationTest.Companion.config.getDataFileDocType())
+        addDocumentType(ContentStoreIntegrationTest.Companion.config.dataFileDocType)
         db.updateSchema()
         crawler.crawlDataFiles()
         Assert.assertEquals(2, db.getDocumentCount("data"))

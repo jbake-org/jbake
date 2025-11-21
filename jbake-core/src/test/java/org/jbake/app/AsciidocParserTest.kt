@@ -130,7 +130,7 @@ class AsciidocParserTest {
 
     @Test
     fun parseAsciidocFileWithPrettifyAttribute() {
-        config!!.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
+        config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
         val map = parser!!.processFile(asciidocWithSource!!)
         Assert.assertNotNull(map)
         Assert.assertEquals("draft", map!!.status)
@@ -146,7 +146,7 @@ class AsciidocParserTest {
 
     @Test
     fun parseAsciidocFileWithCustomAttribute() {
-        config!!.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify,testattribute=I Love Jbake")
+        config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify,testattribute=I Love Jbake")
         val map = parser!!.processFile(asciidocWithSource!!)
         Assert.assertNotNull(map)
         Assert.assertEquals("draft", map!!.status)
@@ -212,9 +212,9 @@ class AsciidocParserTest {
 
     @Test
     fun parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() {
-        config!!.setDefaultStatus("published")
-        config!!.setDefaultType("page")
-        val parser = Parser(config!!)
+        config.setDefaultStatus("published")
+        config.setDefaultType("page")
+        val parser = Parser(config)
         val map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData!!)
         Assert.assertNotNull(map)
         Assert.assertEquals("published", map!!.status)
