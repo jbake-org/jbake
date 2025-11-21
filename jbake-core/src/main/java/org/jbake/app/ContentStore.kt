@@ -143,13 +143,13 @@ class ContentStore(private val type: String, private val name: String?) {
         }
     }
 
-    fun getDocumentCount(doctype: String): Long {
+    fun getDocumentCount(docType: String): Long {
         activateOnCurrentThread()
         val statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType)
         return query(statement).get(0).get("count") as Long
     }
 
-    fun getPublishedCount(doctype: String): Long {
+    fun getPublishedCount(docType: String): Long {
         val statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType)
         return query(statement).get(0).get("count") as Long
     }
@@ -187,19 +187,19 @@ class ContentStore(private val type: String, private val name: String?) {
     val publishedPages: DocumentList<DocumentModel>
         get() = getPublishedContent("page")
 
-    fun getPublishedContent(doctype: String): DocumentList<DocumentModel> {
+    fun getPublishedContent(docType: String): DocumentList<DocumentModel> {
         return getPublishedContent(docType, false)
     }
 
     private fun getPublishedContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
         var query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType)
         if (applyPaging && hasStartAndLimitBoundary()) {
-            query += " SKIP " + start + " LIMIT " + limit
+            query += " SKIP $start LIMIT $limit"
         }
         return query(query)
     }
 
-    fun getAllContent(doctype: String): DocumentList<DocumentModel> {
+    fun getAllContent(docType: String): DocumentList<DocumentModel> {
         return getAllContent(docType, false)
     }
 

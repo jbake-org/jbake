@@ -10,10 +10,8 @@ import java.util.*
  */
 interface JBakeConfiguration {
     /**
-     * Get property value by a given key from the configuration
-     *
-     * @param key a key for the property like site.host
-     * @return the value of the property
+     * Get property value by a given key from the configuration.
+     * @param key a key for the property like `site.host`
      */
     fun get(key: String): Any?
 
@@ -28,17 +26,13 @@ interface JBakeConfiguration {
     val asciidoctorAttributes: MutableList<String>
 
     /**
-     * Get an asciidoctor option by it's key
-     *
+     * Get an asciidoctor option by its key.
      * @param optionKey an option key
-     * @return the value of the option key
      */
     fun getAsciidoctorOption(optionKey: String): Any?
 
     /**
      * Get a list of asciidoctor options
-     *
-     * @return list of asciidoctor options
      */
     val asciidoctorOptionKeys: MutableList<String>
 
@@ -340,11 +334,11 @@ interface JBakeConfiguration {
      * @param type the documents type
      * @return the thymeleaf render mode ( defaults to [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE] )
      */
-    fun getThymeleafModeByType(type: String): String?
+    fun getThymeleafModeByType(type: String): String
 
-    val serverContextPath: String?
+    val serverContextPath: String
 
-    val serverHostname: String?
+    val serverHostname: String
 
     /**
      * @return Abbreviated hash of latest git commit

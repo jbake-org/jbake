@@ -98,8 +98,8 @@ class Renderer {
         this.db = db
     }
 
-    private fun findTemplateName(docType: String): String? {
-        return config.getTemplateByDocType(docType)
+    private fun findTemplateName(docType: String): String {
+        return config.getTemplateByDocType(docType)!!
     }
 
     /**
@@ -367,38 +367,32 @@ class Renderer {
     }
 
     private interface RenderingConfig {
-        val path: File?
+        val path: File
 
-        val name: String?
+        val name: String
 
-        val template: String?
+        val template: String
 
-        val model: TemplateModel?
+        val model: TemplateModel
     }
 
     internal abstract class AbstractRenderingConfig(
-        override val path: File?,
-        override val name: String?,
-        override val template: String?
+        override val path: File,
+        override val name: String,
+        override val template: String
     ) : RenderingConfig
 
 
     private inner class ModelRenderingConfig : AbstractRenderingConfig {
         override val model: TemplateModel
 
-        constructor(
-            fileName: String,
-            model: TemplateModel,
-            templateType: String
-        ) : super(File(config.destinationFolder, fileName), fileName, findTemplateName(templateType)) {
+        constructor(fileName: String, model: TemplateModel, templateType: String)
+                : super(File(config.destinationFolder, fileName), fileName, findTemplateName(templateType))
+        {
             this.model = model
         }
 
-        constructor(path: File?, name: String?, model: TemplateModel, template: String?) : super(
-             path,
-             name,
-             template
-         ) {
+        constructor(path: File, name: String, model: TemplateModel, template: String) : super(path, name, template) {
              this.model = model
          }
     }
@@ -407,7 +401,7 @@ class Renderer {
         private val content: DocumentModel
 
         private constructor(path: File, allInOneName: String)
-            : super(path, allInOneName, findTemplateName(allInOneName))
+            : super(path, allInOneName, findTemplateName(allInOneName)!!)
         {
             this.content = buildSimpleModel(allInOneName)
         }
@@ -415,11 +409,11 @@ class Renderer {
         constructor(filename: String, allInOneName: String) : super(
                 File(config.destinationFolder, File.separator + filename),
                  allInOneName,
-                 findTemplateName(allInOneName)
+                 findTemplateName(allInOneName)!!
              )
-          {
-              this.content = buildSimpleModel(allInOneName)
-          }
+        {
+          this.content = buildSimpleModel(allInOneName)
+        }
 
         /**
          * Constructor added due to known use of a allInOneName which is used for name, template and content
