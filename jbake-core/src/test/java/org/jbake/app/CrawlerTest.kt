@@ -19,10 +19,10 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
         crawler.crawl()
 
-        Assert.assertEquals(4, ContentStoreIntegrationTest.Companion.db.getDocumentCount("post"))
-        Assert.assertEquals(3, ContentStoreIntegrationTest.Companion.db.getDocumentCount("page"))
+        Assert.assertEquals(4, db.getDocumentCount("post"))
+        Assert.assertEquals(3, db.getDocumentCount("page"))
 
-        val results: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.publishedPosts
+        val results: DocumentList<DocumentModel> = db.publishedPosts
 
         Assertions.assertThat(results.size).isEqualTo(3)
 
@@ -32,7 +32,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
                 .containsValue("../../../")
         }
 
-        val allPosts: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.getAllContent("post")
+        val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
 
         Assertions.assertThat(allPosts.size).isEqualTo(4)
 
@@ -44,7 +44,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
 
         // covers bug #213
         val publishedPostsByTag: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getPublishedPostsByTag("blog")
+            db.getPublishedPostsByTag("blog")
         Assert.assertEquals(3, publishedPostsByTag.size.toLong())
     }
 
@@ -53,9 +53,9 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
         // manually register data doctype
         addDocumentType(ContentStoreIntegrationTest.Companion.config.getDataFileDocType())
-        ContentStoreIntegrationTest.Companion.db.updateSchema()
+        db.updateSchema()
         crawler.crawlDataFiles()
-        Assert.assertEquals(2, ContentStoreIntegrationTest.Companion.db.getDocumentCount("data"))
+        Assert.assertEquals(2, db.getDocumentCount("data"))
 
         val dataFileUtil = DataFileUtil(ContentStoreIntegrationTest.Companion.db, "data")
         val videos = dataFileUtil.get("videos.yaml")
@@ -80,10 +80,10 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val crawler = Crawler(ContentStoreIntegrationTest.Companion.db, ContentStoreIntegrationTest.Companion.config)
         crawler.crawl()
 
-        Assert.assertEquals(4, ContentStoreIntegrationTest.Companion.db.getDocumentCount("post"))
-        Assert.assertEquals(3, ContentStoreIntegrationTest.Companion.db.getDocumentCount("page"))
+        Assert.assertEquals(4, db.getDocumentCount("post"))
+        Assert.assertEquals(3, db.getDocumentCount("page"))
 
-        val documents: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.publishedPosts
+        val documents: DocumentList<DocumentModel> = db.publishedPosts
 
         for (model in documents) {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model!!.file) + "/"

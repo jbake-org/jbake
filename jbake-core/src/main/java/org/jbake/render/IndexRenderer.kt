@@ -10,7 +10,7 @@ import java.io.File
 
 class IndexRenderer : RenderingTool {
     @Throws(RenderingException::class)
-    override fun render(renderer: Renderer, db: ContentStore?, config: JBakeConfiguration): Int {
+    override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (config.renderIndex) {
             try {
                 val fileName = config.indexFileName
@@ -33,10 +33,10 @@ class IndexRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(
         renderer: Renderer,
-        db: ContentStore?,
-        destination: File?,
+        db: ContentStore,
+        destination: File,
         templatesPath: File,
-        config: CompositeConfiguration?
+        config: CompositeConfiguration,
     ): Int {
         val configuration: JBakeConfiguration =
             JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)

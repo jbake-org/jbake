@@ -94,7 +94,7 @@ abstract class AbstractTemplateEngineRenderingTest(
             "paper." + templateExtension
         )
         addDocumentType("paper")
-        ContentStoreIntegrationTest.Companion.db.updateSchema()
+        db.updateSchema()
 
         Assert.assertEquals(".html", ContentStoreIntegrationTest.Companion.config.getOutputExtension())
 
@@ -299,7 +299,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     @Test
     fun renderSitemap() {
         addDocumentType("paper")
-        ContentStoreIntegrationTest.Companion.db.updateSchema()
+        db.updateSchema()
 
         renderer!!.renderSitemap("sitemap.xml")
         val outputFile = File(destinationFolder, "sitemap.xml")
@@ -324,7 +324,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         outputStrings.put("dbSpan", mutableListOf<String>("<span>3</span>"))
 
-        ContentStoreIntegrationTest.Companion.db.deleteAllByDocType("post")
+        db.deleteAllByDocType("post")
 
         renderer!!.renderIndexPaging("index.html")
 

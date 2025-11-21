@@ -149,7 +149,7 @@ interface JBakeConfiguration {
     /**
      * @return Output filename for feed file, is only used when [.getRenderFeed] is true
      */
-    val feedFileName: String?
+    val feedFileName: String
 
 
     /**
@@ -165,7 +165,7 @@ interface JBakeConfiguration {
     /**
      * @return Output filename for index, is only used when [.getRenderIndex] is true
      */
-    val indexFileName: String?
+    val indexFileName: String
 
     /**
      * Get an iterator of available configuration keys

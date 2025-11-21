@@ -43,7 +43,7 @@ class FakeDocumentBuilder(private val type: String?) {
     @Throws(NoSuchAlgorithmException::class)
     private fun withRandomSourceUri(): FakeDocumentBuilder {
         val path = "/tmp/" + this.randomSha1 + ".txt"
-        fileModel.setSourceUri(path)
+        fileModel.sourceUri = path
         return this
     }
 

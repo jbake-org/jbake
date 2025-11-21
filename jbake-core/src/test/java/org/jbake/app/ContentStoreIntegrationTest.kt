@@ -31,7 +31,8 @@ abstract class ContentStoreIntegrationTest {
     companion object {
         @ClassRule @JvmField
         var folder: TemporaryFolder = TemporaryFolder()
-        protected var db: ContentStore? = null
+
+        internal lateinit var db: ContentStore
         protected var config: DefaultJBakeConfiguration? = null
         internal var storageType: StorageType = StorageType.MEMORY
         protected var sourceFolder: File? = null

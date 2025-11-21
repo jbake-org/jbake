@@ -66,11 +66,11 @@ class PaginationTest : ContentStoreIntegrationTest() {
 
         var pageCount = 1
         var start = 0
-        ContentStoreIntegrationTest.Companion.db.setLimit(PER_PAGE)
+        db.setLimit(PER_PAGE)
 
         while (start < TOTAL_POSTS) {
-            ContentStoreIntegrationTest.Companion.db.setStart(start)
-            val posts: DocumentList = ContentStoreIntegrationTest.Companion.db.getPublishedPosts(true)
+            db.setStart(start)
+            val posts: DocumentList = db.getPublishedPosts(true)
 
             Assertions.assertThat(posts.size).isLessThanOrEqualTo(2)
 

@@ -12,17 +12,23 @@ import java.io.File
 import java.util.*
 
 class DocumentsRenderer : RenderingTool {
+
     @Throws(RenderingException::class)
-    override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration?): Int {
+    override fun render(
+        renderer: Renderer,
+        db: ContentStore,
+        /// TODO: Looks like config may be null? Perhaps create some NullConfiguration class to avoid nulls.
+        config: JBakeConfiguration
+    ): Int {
         var renderedCount = 0
         val errors: MutableList<String> = LinkedList<String>()
 
-        val documentList = db.getUnrenderedContent()
+        val documentList = db.unrenderedContent
         for (document in documentList) {
             try {
-                val typedDocList = db.getAllContent(document.getType())
-                val prev = getPrevDoc(typedDocList, document)
-                val next = getNextDoc(typedDocList, document)
+                val typedDocList = db.getAllContent(document.type)
+                val prev = getPrevDoc(typedDocList, document)!!
+                val next = getNextDoc(typedDocList, document)!!
                 document.setPreviousContent(prev)
                 document.setNextContent(next)
 
@@ -30,7 +36,7 @@ class DocumentsRenderer : RenderingTool {
                 db.markContentAsRendered(document)
                 renderedCount++
             } catch (e: Exception) {
-                errors.add(e.message)
+                errors.add(e.message!!)
             }
         }
 
@@ -91,7 +97,7 @@ class DocumentsRenderer : RenderingTool {
     private fun isPublished(document: DocumentModel): Boolean {
         // Attributes.Status.PUBLISHED_DATE cannot occur here
         // because it's converted TO either PUBLISHED or DRAFT in the Crawler.
-        return ModelAttributes.Status.PUBLISHED == document.getStatus()
+        return ModelAttributes.Status.PUBLISHED == document.status
     }
 
     /**
@@ -102,9 +108,9 @@ class DocumentsRenderer : RenderingTool {
      */
     private fun getContentForNav(document: DocumentModel): DocumentModel {
         val navDocument = DocumentModel()
-        navDocument.setNoExtensionUri(document.getNoExtensionUri())
-        navDocument.setUri(document.getUri())
-        navDocument.setTitle(document.getTitle())
+        navDocument.noExtensionUri = document.noExtensionUri
+        navDocument.uri = document.uri
+        navDocument.title = document.title
         return navDocument
     }
 
@@ -112,9 +118,9 @@ class DocumentsRenderer : RenderingTool {
     override fun render(
         renderer: Renderer,
         db: ContentStore,
-        destination: File?,
-        templatesPath: File?,
-        config: CompositeConfiguration?
+        destination: File,
+        templatesPath: File,
+        config: CompositeConfiguration
     ): Int {
         return render(renderer, db, null)
     }

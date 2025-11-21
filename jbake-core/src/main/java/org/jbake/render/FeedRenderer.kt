@@ -10,7 +10,7 @@ import java.io.File
 
 class FeedRenderer : RenderingTool {
     @Throws(RenderingException::class)
-    override fun render(renderer: Renderer, db: ContentStore?, config: JBakeConfiguration): Int {
+    override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (config.renderFeed) {
             try {
                 //TODO: refactor this. the renderer has a reference to the configuration
@@ -27,10 +27,10 @@ class FeedRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(
         renderer: Renderer,
-        db: ContentStore?,
-        destination: File?,
+        db: ContentStore,
+        destination: File,
         templatesPath: File,
-        config: CompositeConfiguration?
+        config: CompositeConfiguration,
     ): Int {
         val configuration: JBakeConfiguration =
             JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)

@@ -199,8 +199,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val exportAsciidoctorAttributes: Boolean
         get() = getAsBoolean(PropertyList.ASCIIDOCTOR_ATTRIBUTES_EXPORT.key)
 
-    override val feedFileName: String?
-        get() = getAsString(PropertyList.FEED_FILE.key)
+    override val feedFileName: String
+        get() = getAsString(PropertyList.FEED_FILE.key) ?: "feed.xml"
 
     override val ignoreFileName: String?
         get() = getAsString(PropertyList.IGNORE_FILE.key)
@@ -505,9 +505,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.IMG_PATH_PREPEND_HOST.key, imgPathPrependHost)
     }
 
-    fun setImgPathUPdate(imgPathUpdate: Boolean) {
-        setProperty(PropertyList.IMG_PATH_UPDATE.key, imgPathUpdate)
-    }
+    override val imgPathUpdate: Boolean
+        get() = getAsBoolean(PropertyList.IMG_PATH_UPDATE.key)
+
 
     override val jbakeProperties: MutableList<Property>
         get() {

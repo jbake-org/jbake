@@ -31,8 +31,8 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
             .withRandomSha1()
             .build()
 
-        Assert.assertEquals(6, ContentStoreIntegrationTest.Companion.db.getDocumentCount(DOC_TYPE_POST))
-        Assert.assertEquals(5, ContentStoreIntegrationTest.Companion.db.getPublishedCount(DOC_TYPE_POST))
+        Assert.assertEquals(6, db.getDocumentCount(DOC_TYPE_POST))
+        Assert.assertEquals(5, db.getPublishedCount(DOC_TYPE_POST))
     }
 
     @Test
@@ -48,86 +48,86 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         model.type = typeWithHyphen
         model.tags = arrayOf<String>(tagWithHyphenBackslashAndBacktick)
         model.date = Date()
-        model.setSourceUri(uri)
+        model.sourceUri = uri
         model.put("foo", "originalValue")
 
-        ContentStoreIntegrationTest.Companion.db.addDocument(model)
+        db.addDocument(model)
 
         val documentList1: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getAllContent(typeWithHyphen)
+            db.getAllContent(typeWithHyphen)
 
         Assert.assertEquals(1, documentList1.size.toLong())
 
         val documentList2: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getAllContent(typeWithHyphen, true)
+            db.getAllContent(typeWithHyphen, true)
 
         Assert.assertEquals(1, documentList2.size.toLong())
 
-        val documentList3: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.getDocumentByUri(uri)
+        val documentList3: DocumentList<DocumentModel> = db.getDocumentByUri(uri)
 
         Assert.assertEquals(1, documentList3.size.toLong())
 
-        val documentCount1: Long = ContentStoreIntegrationTest.Companion.db.getDocumentCount(typeWithHyphen)
+        val documentCount1: Long = db.getDocumentCount(typeWithHyphen)
 
         Assert.assertEquals(1L, documentCount1)
 
         val documentList4: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getDocumentStatus(uri)
+            db.getDocumentStatus(uri)
 
         Assert.assertEquals(1, documentList4.size.toLong())
         Assert.assertEquals(Boolean.FALSE, documentList4.get(0)!!.rendered)
 
-        val documentCount2: Long = ContentStoreIntegrationTest.Companion.db.getPublishedCount(typeWithHyphen)
+        val documentCount2: Long = db.getPublishedCount(typeWithHyphen)
         Assert.assertEquals(0, documentCount2)
 
         val published = DocumentModel()
-        published.setSourceUri("test/another-testdocument.adoc")
+        published.sourceUri = "test/another-testdocument.adoc"
         published.tags = arrayOf<String>(tagWithHyphenBackslashAndBacktick)
         published.type = typeWithHyphen
         published.status = ModelAttributes.Status.PUBLISHED
         published.cached = true
         published.rendered = false
 
-        ContentStoreIntegrationTest.Companion.db.addDocument(published)
+        db.addDocument(published)
 
-        val documentList5: DocumentList<DocumentModel> = ContentStoreIntegrationTest.Companion.db.unrenderedContent
+        val documentList5: DocumentList<DocumentModel> = db.unrenderedContent
         Assert.assertEquals(2, documentList5.size.toLong())
         Assert.assertEquals(Boolean.FALSE, documentList5.get(0)!!.rendered)
         Assert.assertEquals(typeWithHyphen, documentList5.get(0)!!.type)
         Assertions.assertThat<String>(documentList5.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
-        val documentCount3: Long = ContentStoreIntegrationTest.Companion.db.getPublishedCount(typeWithHyphen)
+        val documentCount3: Long = db.getPublishedCount(typeWithHyphen)
         Assert.assertEquals(1, documentCount3)
 
-        ContentStoreIntegrationTest.Companion.db.markContentAsRendered(published)
+        db.markContentAsRendered(published)
 
         val documentList6: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getPublishedContent(typeWithHyphen)
+            db.getPublishedContent(typeWithHyphen)
         Assert.assertEquals(1, documentList6.size.toLong())
         Assert.assertEquals(Boolean.TRUE, documentList6.get(0)!!.rendered)
         Assert.assertEquals(typeWithHyphen, documentList6.get(0)!!.type)
         Assertions.assertThat<String>(documentList6.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList7: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
+            db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
         Assert.assertEquals(1, documentList7.size.toLong())
         Assert.assertEquals(Boolean.TRUE, documentList7.get(0)!!.rendered)
         Assert.assertEquals(typeWithHyphen, documentList7.get(0)!!.type)
         Assertions.assertThat<String>(documentList7.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList8: DocumentList<DocumentModel> =
-            ContentStoreIntegrationTest.Companion.db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)
+            db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)
         Assert.assertEquals(0, documentList8.size.toLong())
 
-        val tags: MutableSet<String> = ContentStoreIntegrationTest.Companion.db.allTags
+        val tags: MutableSet<String> = db.allTags
         Assert.assertEquals(mutableSetOf<String>(tagWithHyphenBackslashAndBacktick), tags)
 
-        ContentStoreIntegrationTest.Companion.db.deleteContent(uri)
+        db.deleteContent(uri)
 
-        val documentCount4: Long = ContentStoreIntegrationTest.Companion.db.getDocumentCount(typeWithHyphen)
+        val documentCount4: Long = db.getDocumentCount(typeWithHyphen)
         Assert.assertEquals(1, documentCount4)
 
-        ContentStoreIntegrationTest.Companion.db.deleteAllByDocType(typeWithHyphen)
+        db.deleteAllByDocType(typeWithHyphen)
     }
 
     companion object {

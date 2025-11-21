@@ -9,15 +9,15 @@ import java.io.File
 
 interface RenderingTool {
     @Throws(RenderingException::class)
-    fun render(renderer: Renderer?, db: ContentStore?, config: JBakeConfiguration?): Int
+    fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int
 
     @Deprecated("")
     @Throws(RenderingException::class)
     fun render(
-        renderer: Renderer?,
-        db: ContentStore?,
-        destination: File?,
-        templatesPath: File?,
-        config: CompositeConfiguration?
+        renderer: Renderer,
+        db: ContentStore,
+        destination: File,
+        templatesPath: File,
+        config: CompositeConfiguration
     ): Int
 }

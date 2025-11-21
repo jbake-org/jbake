@@ -65,7 +65,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
         ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
 
-        ContentStoreIntegrationTest.Companion.db.deleteAllByDocType("post")
+        db.deleteAllByDocType("post")
 
         renderer.renderIndexPaging("index.html")
 
