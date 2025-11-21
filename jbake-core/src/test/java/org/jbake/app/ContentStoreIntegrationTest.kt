@@ -47,7 +47,7 @@ abstract class ContentStoreIntegrationTest {
             config.setSourceFolder(sourceFolder)
 
             Assert.assertEquals(".html", config.outputExtension)
-            config.setDatabaseStore(storageType.toString())
+            config.databaseStore = (storageType.toString())
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
             var dbPath: String = folder.newFolder("documents" + System.currentTimeMillis()).getName()
 
@@ -56,7 +56,7 @@ abstract class ContentStoreIntegrationTest {
             if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
                 dbPath = dbPath.replace(":", "")
             }
-            config.setDatabasePath(dbPath)
+            config.databasePath = (dbPath)
             db = DBUtil.createDataStore(config)
         }
 

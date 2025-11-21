@@ -42,7 +42,7 @@ class Renderer {
     ) {
         val configuration = (this.config as DefaultJBakeConfiguration)
         configuration.destinationFolder = destination
-        configuration.setTemplateFolder(templatesPath)
+        configuration.templateFolder = templatesPath
     }
 
     // TOqDO: should all content be made available to all templates via this class??
@@ -70,7 +70,7 @@ class Renderer {
     ) {
         val configuration = (this.config as DefaultJBakeConfiguration)
         configuration.destinationFolder = destination
-        configuration.setTemplateFolder(templatesPath)
+        configuration.templateFolder = templatesPath
     }
 
     /**

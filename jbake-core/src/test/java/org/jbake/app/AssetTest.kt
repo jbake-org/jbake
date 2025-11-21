@@ -107,7 +107,7 @@ class AssetTest : LoggingTest() {
 
     @Test
     fun testCopyCustomFolder() {
-        config.setAssetFolder(File(config.sourceFolder, "/media"))
+        config.assetFolder = (File(config.sourceFolder, "/media"))
         val asset = Asset(config)
         asset.copy()
 
@@ -122,7 +122,7 @@ class AssetTest : LoggingTest() {
         val assetFolder = File(folder!!.toFile(), "ignoredAssets")
         assetFolder.mkdirs()
         FileUtils.copyDirectory(File(this.javaClass.getResource("/fixture/ignorables").getFile()), assetFolder)
-        config.setAssetFolder(assetFolder)
+        config.assetFolder = (assetFolder)
         config.assetIgnoreHidden = true
         TestUtils.hideAssets(assetFolder)
         val asset = Asset(config)
@@ -153,7 +153,7 @@ class AssetTest : LoggingTest() {
         FileUtils.touch(cssFile)
         cssFile.setReadOnly()
 
-        config.setAssetFolder(assets)
+        config.assetFolder = (assets)
         config.destinationFolder = (folder!!.toFile())
         val asset = Asset(config)
         asset.copy()
@@ -169,7 +169,7 @@ class AssetTest : LoggingTest() {
      */
     @Test
     fun testUnlistable() {
-        config.setAssetFolder(File(config.sourceFolder, "non-exsitent"))
+        config.assetFolder = (File(config.sourceFolder, "non-exsitent"))
         val asset = Asset(config)
         asset.copy()
     }

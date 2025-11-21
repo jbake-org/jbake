@@ -73,7 +73,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         destinationFolder = folder.getRoot()
         config.destinationFolder = (destinationFolder)
-        config.setTemplateFolder(templateFolder)
+        config.templateFolder = (templateFolder)
 
 
         for (docType in documentTypes) {

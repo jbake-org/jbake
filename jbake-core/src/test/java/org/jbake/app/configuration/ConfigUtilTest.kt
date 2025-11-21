@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import org.apache.commons.io.FileUtils
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.JBakeException
@@ -266,10 +265,10 @@ class ConfigUtilTest : LoggingTest() {
         val expectedDestinationFolder = File(source, "output")
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 
-        config.templateFolder = null
-        config.assetFolder = null
-        config.contentFolder = null
-        config.destinationFolder = null
+        config.setupDefaultTemplateFolder()
+        config.setupDefaultAssetFolder()
+        config.setupDefaultContentFolder()
+        config.setupDefaultDestinationFolder()
 
         val assetFolder = config.assetFolder
         val contentFolder = config.contentFolder

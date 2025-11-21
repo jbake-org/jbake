@@ -123,7 +123,7 @@ class DocumentsRendererTest {
         val seventhTitle = "Seventh Document"
         val seventhDoc = simpleDocument(seventhTitle, ModelAttributes.Status.PUBLISHED, "post")
 
-        val allDocs: DocumentList = DocumentList()
+        val allDocs = DocumentList<DocumentModel>()
         allDocs.add(seventhDoc)
         allDocs.add(sixthDoc)
         allDocs.add(fifthDoc)
@@ -132,12 +132,12 @@ class DocumentsRendererTest {
         allDocs.add(secondDoc)
         allDocs.add(firstDoc)
 
-        val pageDocs: DocumentList = DocumentList()
+        val pageDocs = DocumentList<DocumentModel>()
         pageDocs.add(fifthDoc)
         pageDocs.add(thirdDoc)
         pageDocs.add(firstDoc)
 
-        val postDocs: DocumentList = DocumentList()
+        val postDocs = DocumentList<DocumentModel>()
         postDocs.add(seventhDoc)
         postDocs.add(sixthDoc)
         postDocs.add(fourthDoc)
@@ -169,10 +169,10 @@ class DocumentsRendererTest {
     }
 
     private fun assertDocumentNavigation(
-        renderedDoc: MutableMap<String,  Any>,
+        renderedDoc: MutableMap<String,  Any>?,
         prevDocumentTitle: String?, nextDocumentTitle: String?
     ) {
-        Assertions.assertThat<String?, Any?>(renderedDoc).flatExtracting(
+        Assertions.assertThat(renderedDoc).flatExtracting(
             "previousContent." + ModelAttributes.TITLE,
             "nextContent." + ModelAttributes.TITLE
         )
@@ -192,7 +192,7 @@ class DocumentsRendererTest {
         return DocumentModel()
     }
 
-    private fun simpleDocument(title: String, status: String?, docType: String?): DocumentModel {
+    private fun simpleDocument(title: String, status: String?, docType: String): DocumentModel {
         val simpleDoc = DocumentModel()
         val uri = title.replace(" ", "_")
         simpleDoc.noExtensionUri = uri

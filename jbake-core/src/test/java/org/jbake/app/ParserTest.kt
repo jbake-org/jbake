@@ -233,7 +233,7 @@ class ParserTest {
 
     @Test
     fun parseMarkdownFileWithCustomHeaderSeparator() {
-        config.setHeaderSeparator(customHeaderSeparator)
+        config.headerSeparator = customHeaderSeparator
 
         val documentModel = parser!!.processFile(validMarkdownFileWithCustomHeader!!)
         Assert.assertNotNull(documentModel)

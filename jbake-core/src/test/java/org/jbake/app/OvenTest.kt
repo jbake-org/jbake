@@ -38,7 +38,7 @@ class OvenTest {
         sourceFolder = TestUtils.testResourcesAsSourceFolder
         configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
         configuration.destinationFolder = (output)
-        configuration.setTemplateFolder(File(sourceFolder, "groovyMarkupTemplates"))
+        configuration.templateFolder = (File(sourceFolder, "groovyMarkupTemplates"))
         configuration.setProperty("template.paper.file", "paper.tpl")
     }
 
@@ -52,9 +52,9 @@ class OvenTest {
 
     @Test
     fun bakeWithAbsolutePaths() {
-        configuration.setTemplateFolder(File(sourceFolder, "groovyMarkupTemplates"))
-        configuration.setContentFolder(File(sourceFolder, "content"))
-        configuration.setAssetFolder(File(sourceFolder, "assets"))
+        configuration.templateFolder = (File(sourceFolder, "groovyMarkupTemplates"))
+        configuration.contentFolder = (File(sourceFolder, "content"))
+        configuration.assetFolder = (File(sourceFolder, "assets"))
 
         val oven = Oven(configuration)
         oven.bake()
@@ -144,9 +144,9 @@ class OvenTest {
         val content = TestUtils.newFolder(root!!.toFile(), "content")
         val assets = TestUtils.newFolder(root!!.toFile(), "assets")
 
-        configuration.setTemplateFolder(template)
-        configuration.setContentFolder(content)
-        configuration.setAssetFolder(assets)
+        configuration.templateFolder = (template)
+        configuration.contentFolder = (content)
+        configuration.assetFolder = (assets)
 
         val oven = Oven(configuration)
 
@@ -185,9 +185,9 @@ class OvenTest {
         val content = TestUtils.newFolder(root!!.toFile(), "content")
         val assets = TestUtils.newFolder(root!!.toFile(), "assets")
 
-        configuration.setTemplateFolder(template)
-        configuration.setContentFolder(content)
-        configuration.setAssetFolder(assets)
+        configuration.templateFolder = (template)
+        configuration.contentFolder = (content)
+        configuration.assetFolder = (assets)
 
         contentStore = Mockito.spy<ContentStore?>(ContentStore("memory", "documents" + System.currentTimeMillis()))
 

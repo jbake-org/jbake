@@ -54,7 +54,7 @@ class RendererTest {
 
         val FILENAME = "about"
         config.setOutputExtension("")
-        config.setTemplateFolder(folder.newFolder("templates"))
+        config.te(folder.newFolder("templates"))
         val renderer = Renderer(db!!, config, renderingEngine!!)
 
         val content = DocumentModel()

@@ -4,6 +4,7 @@ import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.configuration2.MapConfiguration
 import org.apache.commons.configuration2.SystemConfiguration
 import org.apache.commons.lang3.StringUtils
+import org.jbake.app.configuration.PropertyList.ASSET_IGNORE_HIDDEN
 import org.jbake.app.configuration.PropertyList.TEMPLATE_FOLDER
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -100,14 +101,14 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     // Implement interface properties that previously existed as getX() functions
     override var assetFolder: File
         get() = getAsFolder(ASSET_FOLDER_KEY) ?: error("Asset folder must be configured")
-        set(value) {}
+        set(value) { setProperty(ASSET_FOLDER_KEY, value) }
 
     override val assetFolderName: String?
         get() = getAsString(PropertyList.ASSET_FOLDER.key)
 
-    override var assetIgnoreHidden: Boolean = true
-        get() = getAsBoolean(PropertyList.ASSET_IGNORE_HIDDEN.key)
-        // TBD: Setter existed too
+    override var assetIgnoreHidden: Boolean
+        get() = getAsBoolean(ASSET_IGNORE_HIDDEN.key)
+        set(value) { setProperty(ASSET_IGNORE_HIDDEN.key, value) }
 
     override val attributesExportPrefixForAsciidoctor: String?
         get() = getAsString(PropertyList.ASCIIDOCTOR_ATTRIBUTES_EXPORT_PREFIX.key)
@@ -128,27 +129,22 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     override var dataFolder: File
         get() = getAsFolder(DATA_FOLDER_KEY) ?: error("Data folder must be configured")
-        set(value) { setProperty(DATA_FOLDER_KEY, dataFolder) }
+        set(value) { setProperty(DATA_FOLDER_KEY, value) }
 
-    override val dataFolderName: String?
+    override var dataFolderName: String?
         get() = getAsString(PropertyList.DATA_FOLDER.key)
+        set(value) { setProperty(PropertyList.DATA_FOLDER.key, value) }
 
     override val dataFileDocType: String
         get() = getAsString(PropertyList.DATA_FILE_DOCTYPE.key) ?: ""
 
-    override val databasePath: String?
+    override var databasePath: String?
         get() = getAsString(PropertyList.DB_PATH.key)
+        set(value) { setProperty(PropertyList.DB_PATH.key, value) }
 
-    fun setDatabasePath(path: String?) {
-        setProperty(PropertyList.DB_PATH.key, path)
-    }
-
-    override val databaseStore: String
+    override var databaseStore: String
         get() = getAsString(PropertyList.DB_STORE.key) ?: "memory"
-
-    fun setDatabaseStore(storeType: String?) {
-        setProperty(PropertyList.DB_STORE.key, storeType)
-    }
+        set(value) { setProperty(PropertyList.DB_STORE.key, value) }
 
 
     override val dateFormat: String?
@@ -182,7 +178,6 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
                 if (matcher.find())
                     matcher.group(1)?.let { docTypes.add(it) }
             }
-
             return docTypes
         }
 
@@ -337,20 +332,6 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsFolder(TEMPLATE_FOLDER_KEY) ?: error("Template folder must be configured")
         set(value) = setProperty(TEMPLATE_FOLDER_KEY, value)
 
-
-    // Add setters that some internal setup methods rely on
-    fun setAssetFolder(assetFolder: File?) {
-        if (assetFolder != null) {
-            setProperty(ASSET_FOLDER_KEY, assetFolder)
-        }
-    }
-
-    fun setDataFolder(dataFolder: File?) {
-        if (dataFolder != null) {
-            setProperty(DATA_FOLDER_KEY, dataFolder)
-        }
-    }
-
     override val templateFolderName: String?
         get() = getAsString(TEMPLATE_FOLDER.key)
 
@@ -369,7 +350,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     fun setDestinationFolderName(folderName: String?) {
         setProperty(PropertyList.DESTINATION_FOLDER.key, folderName)
-        setupDefaultDestination()
+        setupDefaultDestinationFolder()
     }
 
     fun setExampleProject(type: String, fileName: String?) {
@@ -423,15 +404,15 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(templateKey, fileName)
     }
 
-    private fun setupPaths() {
-        setupDefaultDestination()
+    internal fun setupPaths() {
+        setupDefaultDestinationFolder()
         setupDefaultAssetFolder()
         setupDefaultTemplateFolder()
         setupDefaultContentFolder()
         setupDefaultDataFolder()
     }
 
-    private fun setupDefaultDestination() {
+    internal fun setupDefaultDestinationFolder() {
         val destinationPath = getAsString(PropertyList.DESTINATION_FOLDER.key) ?: ""
 
         val destination = File(destinationPath)
@@ -440,20 +421,17 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             else File(sourceFolder, destinationPath)
     }
 
-    private fun setupDefaultAssetFolder() {
-        val assetFolder = getAsString(PropertyList.ASSET_FOLDER.key) ?: ""
+    /// TODO This is weird logic, review
+    internal fun setupDefaultAssetFolder() {
+        val assetFolderTmp = getAsString(PropertyList.ASSET_FOLDER.key) ?: ""
 
-
-        val asset = File(assetFolder)
-        if (asset.isAbsolute) {
-            setAssetFolder(asset)
-        } else {
-            setAssetFolder(File(sourceFolder, assetFolder))
-        }
+        val asset = File(assetFolderTmp)
+        assetFolder =
+            if (asset.isAbsolute) asset
+            else sourceFolder.resolve( asset)
     }
 
-    private fun setupDefaultTemplateFolder() {
-
+    internal fun setupDefaultTemplateFolder() {
         var templateDir = File(getAsString(TEMPLATE_FOLDER.key) ?: "")
 
         templateDir =
@@ -461,38 +439,27 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             else sourceFolder.resolve(templateDir)
 
         templateFolder = templateDir
-
-
     }
 
-    private fun setupDefaultDataFolder() {
-        val dataFolder = getAsString(PropertyList.DATA_FOLDER.key) ?: ""
+    internal fun setupDefaultDataFolder() {
+        val data = File(getAsString(PropertyList.DATA_FOLDER.key) ?: "")
 
-        val data = File(dataFolder)
-        if (data.isAbsolute) {
-            setDataFolder(data)
-        } else {
-            setDataFolder(File(sourceFolder, dataFolder))
-        }
+        dataFolder =
+            if (data.isAbsolute) data
+            else sourceFolder.resolve(data)
     }
 
-    private fun setupDefaultContentFolder() {
+    internal fun setupDefaultContentFolder() {
         contentFolder = File(sourceFolder, contentFolderName ?: "")
     }
 
-    override val headerSeparator: String?
+    override var headerSeparator: String?
         get() = getAsString(PropertyList.HEADER_SEPARATOR.key)
+        set(value) { setProperty(PropertyList.HEADER_SEPARATOR.key, value) }
 
-    fun setHeaderSeparator(headerSeparator: String?) {
-        setProperty(PropertyList.HEADER_SEPARATOR.key, headerSeparator)
-    }
-
-    override val imgPathPrependHost: Boolean
+    override var imgPathPrependHost: Boolean
         get() = getAsBoolean(PropertyList.IMG_PATH_PREPEND_HOST.key)
-
-    fun setImgPathPrependHost(imgPathPrependHost: Boolean) {
-        setProperty(PropertyList.IMG_PATH_PREPEND_HOST.key, imgPathPrependHost)
-    }
+        set(value) { setProperty(PropertyList.IMG_PATH_PREPEND_HOST.key, value) }
 
     override val imgPathUpdate: Boolean
         get() = getAsBoolean(PropertyList.IMG_PATH_UPDATE.key)
