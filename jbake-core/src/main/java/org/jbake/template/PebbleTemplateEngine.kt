@@ -18,7 +18,7 @@ import java.io.Writer
  *
  * @author Mitchell Bosecke
  */
-class PebbleTemplateEngine(config: JBakeConfiguration?, db: ContentStore?) : AbstractTemplateEngine(config, db) {
+class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     private var engine: PebbleEngine? = null
 
     init {
@@ -27,7 +27,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration?, db: ContentStore?) : Abs
 
     private fun initializeTemplateEngine() {
         val loader: Loader<*> = FileLoader()
-        loader.setPrefix(config.templateFolder!!.getAbsolutePath())
+        loader.setPrefix(config.templateFolder.getAbsolutePath())
 
         /*
          * Turn off the autoescaper because I believe that we can assume all
@@ -40,7 +40,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration?, db: ContentStore?) : Abs
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?) {
+    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         val template: PebbleTemplate
         try {
             template = engine!!.getTemplate(templateName)

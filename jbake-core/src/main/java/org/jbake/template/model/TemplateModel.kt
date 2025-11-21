@@ -20,10 +20,10 @@ open class TemplateModel : BaseModel {
             put(ModelAttributes.CONFIG, configModel)
         }
 
-    var content: DocumentModel?
-        get() = get(ModelAttributes.CONTENT) as DocumentModel?
+    var content: DocumentModel
+        get() = get(ModelAttributes.CONTENT) as DocumentModel
         set(content) {
-            put(ModelAttributes.CONTENT, content!!)
+            put(ModelAttributes.CONTENT, content)
         }
 
     var renderer: DelegatingTemplateEngine?

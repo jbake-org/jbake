@@ -143,13 +143,13 @@ class ContentStore(private val type: String, private val name: String?) {
         }
     }
 
-    fun getDocumentCount(docType: String?): Long {
+    fun getDocumentCount(doctype: String): Long {
         activateOnCurrentThread()
         val statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType)
         return query(statement).get(0).get("count") as Long
     }
 
-    fun getPublishedCount(docType: String?): Long {
+    fun getPublishedCount(doctype: String): Long {
         val statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType)
         return query(statement).get(0).get("count") as Long
     }
@@ -187,7 +187,7 @@ class ContentStore(private val type: String, private val name: String?) {
     val publishedPages: DocumentList<DocumentModel>
         get() = getPublishedContent("page")
 
-    fun getPublishedContent(docType: String?): DocumentList<DocumentModel> {
+    fun getPublishedContent(doctype: String): DocumentList<DocumentModel> {
         return getPublishedContent(docType, false)
     }
 
@@ -199,7 +199,7 @@ class ContentStore(private val type: String, private val name: String?) {
         return query(query)
     }
 
-    fun getAllContent(docType: String?): DocumentList<DocumentModel> {
+    fun getAllContent(doctype: String): DocumentList<DocumentModel> {
         return getAllContent(docType, false)
     }
 

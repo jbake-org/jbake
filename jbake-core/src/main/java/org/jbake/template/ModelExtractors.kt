@@ -116,7 +116,7 @@ class ModelExtractors private constructor() {
         return extractors.keys
     }
 
-    fun registerExtractorsForCustomTypes(docType: String?) {
+    fun registerExtractorsForCustomTypes(doctype: String) {
         val pluralizedDoctype = DocumentTypeUtils.pluralize(docType)
         if (!containsKey(pluralizedDoctype)) {
             LOGGER.info("register new extractors for document type: {}", docType)

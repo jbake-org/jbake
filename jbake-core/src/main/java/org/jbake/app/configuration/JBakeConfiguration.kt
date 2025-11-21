@@ -286,9 +286,9 @@ interface JBakeConfiguration {
      */
     val templateEncoding: String?
 
-    fun getTemplateByDocType(doctype: String?): String?
+    fun getTemplateByDocType(doctype: String): String?
 
-    fun getTemplateFileByDocType(doctype: String?): File?
+    fun getTemplateFileByDocType(doctype: String): File?
 
     /**
      * @return the template folder

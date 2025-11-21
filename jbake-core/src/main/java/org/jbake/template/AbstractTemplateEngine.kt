@@ -28,17 +28,17 @@ import java.io.Writer
  * @author Cédric Champeau
  */
 abstract class AbstractTemplateEngine protected constructor(
-    protected val config: JBakeConfiguration?,
-    protected val db: ContentStore?
+    protected val config: JBakeConfiguration,
+    protected val db: ContentStore
 ) {
     @Deprecated("use {@link AbstractTemplateEngine(JBakeConfiguration,ContentStore)} instead")
-    protected constructor(config: Configuration?, db: ContentStore?, destination: File, templatesPath: File) : this(
+    protected constructor(config: Configuration, db: ContentStore, destination: File, templatesPath: File) : this(
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), destination, config as CompositeConfiguration),
         db
     )
 
     @Throws(RenderingException::class)
-    abstract fun renderDocument(model: TemplateModel?, templateName: String?, writer: Writer?)
+    abstract fun renderDocument(model: TemplateModel, templateName: String, writer: Writer)
 
     companion object {
         internal var extractors: ModelExtractors = ModelExtractors.instance

@@ -318,7 +318,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val templateEncoding: String?
         get() = getAsString(PropertyList.TEMPLATE_ENCODING.key)
 
-    override fun getTemplateByDocType(doctype: String?): String? {
+    override fun getTemplateByDocType(doctype: String): String? {
         val templateKey: String = DOCTYPE_TEMPLATE_PREFIX + (doctype ?: "") + DOCTYPE_FILE_POSTFIX
         val templateFileName = getAsString(templateKey)
         if (templateFileName != null && templateFileName.isNotEmpty()) {
@@ -328,7 +328,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return null
     }
 
-    override fun getTemplateFileByDocType(doctype: String?): File? {
+    override fun getTemplateFileByDocType(doctype: String): File? {
         val templateFileName = getTemplateByDocType(doctype)
         if (!templateFileName.isNullOrEmpty()) {
             return File(templateFolder, templateFileName)

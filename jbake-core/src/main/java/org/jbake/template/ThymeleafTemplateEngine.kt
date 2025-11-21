@@ -81,8 +81,8 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun getTemplateModeByModel(model: TemplateModel): String? {
-        val content = model.getContent()
-        return config.getThymeleafModeByType(content.getType())
+        val content = model.content
+        return config.getThymeleafModeByType(content.type)
     }
 
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
@@ -99,9 +99,9 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
         }
     }
 
-    private fun initializeContext(locale: Locale?, model: TemplateModel?) {
+    private fun initializeContext(locale: Locale, model: TemplateModel) {
         context.clearVariables()
-        context.setLocale(locale)
+        context.locale = locale
         context.setVariables(model)
 
         for (key in AbstractTemplateEngine.Companion.extractors.keySet()) {
