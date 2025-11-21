@@ -8,7 +8,7 @@ import java.util.Date
 class ParserContext(
     val file: File,
     val fileLines: MutableList<String>,
-    val config: JBakeConfiguration?,
+    val config: JBakeConfiguration,
     private val hasHeader: Boolean
 ) {
     val documentModel: DocumentModel

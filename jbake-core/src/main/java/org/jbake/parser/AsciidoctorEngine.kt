@@ -67,10 +67,10 @@ class AsciidoctorEngine : MarkupEngine() {
         val asciidoctor = getEngine(options)
         val header = asciidoctor.readDocumentHeader(context.file)
         val documentModel = context.documentModel
-        if (header.getDocumentTitle() != null) {
-            documentModel.setTitle(header.getDocumentTitle().getCombined())
+        if (header.documentTitle != null) {
+            documentModel.title = (header.documentTitle.combined)
         }
-        val attributes = header.getAttributes()
+        val attributes = header.attributes
         for (attribute in attributes.entries) {
             val key: String = attribute.key!!
             val value = attribute.value
@@ -88,7 +88,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 val df: DateFormat = SimpleDateFormat(dateFormat)
                 try {
                     val date = df.parse(value as String)
-                    context.setDate(date)
+                    context.date = (date)
                 } catch (e: ParseException) {
                     log.error("Unable to parse revdate. Expected {}", dateFormat, e)
                 }
@@ -101,7 +101,7 @@ class AsciidoctorEngine : MarkupEngine() {
                     log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
                 }
             } else {
-                documentModel.put(key, attributes.get(key))
+                documentModel.put(key, attributes.get(key)!!)
             }
         }
     }
@@ -124,9 +124,9 @@ class AsciidoctorEngine : MarkupEngine() {
 
     // TODO: write tests with options and attributes
     override fun processBody(parserContext: ParserContext) {
-        val body = StringBuilder(parserContext.getBody().length)
+        val body = StringBuilder(parserContext.body.length)
         if (!parserContext.hasHeader()) {
-            for (line in parserContext.fileLines()) {
+            for (line in parserContext.fileLines) {
                 body.append(line).append("\n")
             }
             parserContext.body = (body.toString())
@@ -137,12 +137,12 @@ class AsciidoctorEngine : MarkupEngine() {
     private fun processAsciiDoc(context: ParserContext) {
         val options = getAsciiDocOptionsAndAttributes(context)
         val asciidoctor = getEngine(options)
-        context.body = (asciidoctor.convert(context.getBody(), options))
+        context.body = (asciidoctor.convert(context.body, options))
     }
 
     private fun getAsciiDocOptionsAndAttributes(context: ParserContext): Options {
         val config = context.config
-        val asciidoctorAttributes: MutableList<String> = config.asciidoctorAttributes!!
+        val asciidoctorAttributes: MutableList<String> = config.asciidoctorAttributes
         val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String>())
         if (config.exportAsciidoctorAttributes) {
             val prefix = config.attributesExportPrefixForAsciidoctor

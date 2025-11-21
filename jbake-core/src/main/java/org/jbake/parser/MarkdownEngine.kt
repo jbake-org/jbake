@@ -36,7 +36,7 @@ class MarkdownEngine : MarkupEngine() {
         val parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
-        val document = parser.parse(parserContext.getBody())
+        val document = parser.parse(parserContext.body)
         parserContext.body = (renderer.render(document))
     }
 
