@@ -1,0 +1,283 @@
+= ADR-005: Configuration Abstraction Layer
+
+Status: ✅ **Accepted**
+
+Date: 2016-03-15 (Estimated - JBakeConfiguration interface introduction)
+
+== Problem Statement
+
+How should JBake manage configuration across different contexts (standalone, Maven plugin, Gradle plugin) while maintaining backwards compatibility and allowing future evolution?
+
+Challenges:
+
+* Configuration initially based on Apache Commons Configuration (mutable, complex API)
+* Multiple access patterns: `config.getString()`, `config.getBoolean()`, type conversions
+* Hard to test (concrete class, no interface)
+* Tight coupling to Apache Commons Configuration
+* Plugins need different configuration sources (POM, build.gradle, jbake.properties)
+
+== Context
+
+Configuration evolution:
+
+**Phase 1 (2012-2015)**: Direct `CompositeConfiguration` usage
+```java
+public class Oven {
+    public Oven(CompositeConfiguration config) {
+        String output = config.getString("destination.folder");
+    }
+}
+```
+
+Problems:
+
+* Core classes depend on Apache Commons Configuration
+* No type safety (everything returns Object or String)
+* Magic strings everywhere (`"destination.folder"`)
+* Hard to mock for testing
+* Configuration changes require changes throughout codebase
+
+**Phase 2 (2016+)**: Need for abstraction
+
+* Maven plugin wants different config sources
+* Testing requires mocking configuration
+* Type safety needed (getDestinationFolder() vs getString("destination.folder"))
+* Desire to potentially replace Apache Commons Configuration
+
+Design goals:
+
+* **Encapsulation**: Hide configuration library from core
+* **Type safety**: Dedicated methods for each property
+* **Testability**: Interface allows mocking
+* **Documentation**: Each property documented in code
+* **Evolution**: Can change underlying implementation
+
+== Decision
+
+**Introduce `JBakeConfiguration` interface with `DefaultJBakeConfiguration` implementation, hiding Apache Commons Configuration behind abstraction.**
+
+**Architecture:**
+
+```
+┌────────────────────────────────────────┐
+│   Core Classes (Oven, Crawler, etc)   │
+│   - Depend only on interface           │
+└──────────────────┬─────────────────────┘
+                   │
+                   ▼
+┌────────────────────────────────────────┐
+│      JBakeConfiguration interface      │
+│      + getDestinationFolder(): File    │
+│      + getSourceFolder(): File         │
+│      + getTemplateFolder(): File       │
+│      + getSiteHost(): String           │
+│      + get(String): Object             │
+└──────────────────┬─────────────────────┘
+                   │
+                   ▼
+┌────────────────────────────────────────┐
+│   DefaultJBakeConfiguration            │
+│   - Wraps CompositeConfiguration       │
+│   - Implements all typed getters       │
+└──────────────────┬─────────────────────┘
+                   │
+                   ▼
+┌────────────────────────────────────────┐
+│   Apache Commons Configuration         │
+│   (implementation detail)              │
+└────────────────────────────────────────┘
+```
+
+**Key interfaces:**
+
+```java
+public interface JBakeConfiguration {
+    // Typed accessors
+    File getSourceFolder();
+    File getDestinationFolder();
+    File getTemplateFolder();
+    File getAssetFolder();
+    
+    String getSiteHost();
+    boolean getRenderTags();
+    int getPostsPerPage();
+    
+    // Generic access (backwards compatibility)
+    Object get(String key);
+    String getString(String key);
+    
+    // Query capabilities
+    Iterator<String> getKeys();
+}
+```
+
+**Factory pattern:**
+
+```java
+public class JBakeConfigurationFactory {
+    public static JBakeConfiguration createDefaultConfiguration(
+        File source, File destination, CompositeConfiguration config) {
+        return new DefaultJBakeConfiguration(source, destination, config);
+    }
+    
+    public static JBakeConfiguration createDefaultConfiguration(
+        File source, File destination) {
+        // Load jbake.properties from source folder
+    }
+}
+```
+
+**Property enumeration:**
+
+```java
+public abstract class PropertyList {
+    public static final Property SOURCE_FOLDER = new Property(
+        "source.folder",
+        "Source folder for content files"
+    );
+    
+    public static final Property DESTINATION_FOLDER = new Property(
+        "destination.folder", 
+        "Output folder for generated site"
+    );
+    
+    // ... 50+ properties
+}
+```
+
+== Consequences
+
+=== Positive
+
+* ✅ **Decoupling**: Core independent of configuration library
+* ✅ **Type safety**: `getDestinationFolder()` returns `File`, not `Object`
+* ✅ **Discoverability**: IDE autocomplete shows available properties
+* ✅ **Documentation**: Javadoc on each method
+* ✅ **Testability**: Easy to mock `JBakeConfiguration`
+* ✅ **Evolution**: Can replace implementation without API changes
+* ✅ **Plugin flexibility**: Plugins can implement interface differently
+
+=== Negative
+
+* ❌ **Verbosity**: Many getter methods (50+ properties)
+* ❌ **Maintenance**: Adding property requires updating interface, implementation, PropertyList
+* ❌ **Backwards compatibility**: Still exposes `get(String)` for old code
+* ❌ **Partial abstraction**: Some code still uses `CompositeConfiguration` directly
+
+=== Neutral
+
+* ℹ️ Interface doesn't hide everything (still exposes some config details)
+* ℹ️ Default implementation still uses Apache Commons Configuration (could change)
+
+== Alternatives Considered
+
+=== Alternative 1: Keep Direct Configuration Usage
+
+**Description**: Continue using `CompositeConfiguration` directly throughout codebase.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Abstraction (Baseline) | Direct Usage |
+|--------------------|------------------------|--------------|
+| Simplicity         | 0                      | +2           |
+| Type Safety        | 0                      | -3           |
+| Testability        | 0                      | -2           |
+| Coupling           | 0                      | -3           |
+| **Total Score**    | **0**                  | **-6**       |
+
+**Rejection rationale**: Tight coupling to Apache Commons Configuration. Testing requires real configuration files. No type safety. Hard to evolve. Rejected for maintainability reasons.
+
+=== Alternative 2: Property Classes (TypeSafe Config Style)
+
+**Description**: Configuration as immutable objects: `class SourceFolder { File path; }`
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Interface (Baseline) | Property Classes |
+|--------------------|----------------------|------------------|
+| Type Safety        | 0                    | +1               |
+| Immutability       | 0                    | +2               |
+| Backwards Compat   | 0                    | -3               |
+| Complexity         | 0                    | +1               |
+| **Total Score**    | **0**                | **+1**           |
+
+**Rejection rationale**: Close call. Property classes offer better type safety and immutability. However, backwards compatibility is critical. Existing code uses string-based access. Migration would be massive. Interface approach allows gradual migration.
+
+=== Alternative 3: Builder Pattern with Fluent API
+
+**Description**: `new JBakeConfig().withSourceFolder(src).withDestination(dest).build()`
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Interface (Baseline) | Builder Pattern |
+|--------------------|----------------------|-----------------|
+| Usability          | 0                    | +2              |
+| Testability        | 0                    | +1              |
+| File-based Config  | 0                    | -2              |
+| Backwards Compat   | 0                    | -3              |
+| **Total Score**    | **0**                | **-2**          |
+
+**Rejection rationale**: Builder great for programmatic configuration (tests, plugins). Poor fit for file-based config (jbake.properties). Users expect properties files, not Java builders. Could add builder alongside interface in future.
+
+== Implementation Notes
+
+**Migration strategy:**
+
+1. ✅ Create `JBakeConfiguration` interface
+2. ✅ Implement `DefaultJBakeConfiguration` wrapping existing config
+3. ✅ Update core classes to use interface
+4. ⏳ Deprecate direct `CompositeConfiguration` usage
+5. ⏳ Eventually remove `CompositeConfiguration` from public API
+
+**Typed getter example:**
+
+```java
+@Override
+public File getDestinationFolder() {
+    return getAsFolder(DESTINATION_FOLDER.getKey());
+}
+
+private File getAsFolder(String key) {
+    String path = config.getString(key);
+    return path != null ? new File(path) : null;
+}
+```
+
+**Backwards compatibility:**
+
+```java
+@Override
+public Object get(String key) {
+    return config.getProperty(key);
+}
+
+@Override
+public String getString(String key) {
+    return config.getString(key);
+}
+```
+
+**Testing with mocks:**
+
+```java
+@Test
+public void testCrawler() {
+    JBakeConfiguration mockConfig = mock(JBakeConfiguration.class);
+    when(mockConfig.getSourceFolder()).thenReturn(testFolder);
+    
+    Crawler crawler = new Crawler(mockConfig);
+    // Test without real configuration file
+}
+```
+
+== Related Decisions
+
+* link:ADR-001-pipeline-architecture.adoc[ADR-001]: Pipeline Architecture - Configuration passed through pipeline
+* link:ADR-007-deprecation-strategy.adoc[ADR-007]: Deprecation Strategy - Old config methods deprecated gradually
+
+== References
+
+* JBakeConfiguration interface: `jbake-core/src/main/java/org/jbake/app/configuration/JBakeConfiguration.java`
+* DefaultJBakeConfiguration: `jbake-core/src/main/java/org/jbake/app/configuration/DefaultJBakeConfiguration.java`
+* PropertyList enum: `jbake-core/src/main/java/org/jbake/app/configuration/PropertyList.java`
+* Apache Commons Configuration: https://commons.apache.org/proper/commons-configuration/

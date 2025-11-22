@@ -1,0 +1,179 @@
+= ADR-001: Pipeline Architecture
+
+Status: ✅ **Accepted**
+
+Date: 2012-09-15 (Estimated - early design)
+
+== Problem Statement
+
+How should JBake transform content files into a static website? What's the high-level processing model that developers can understand and maintain?
+
+== Context
+
+Building a static site generator requires:
+
+* Reading and parsing multiple file formats
+* Applying templates to generate HTML
+* Copying static assets
+* Handling errors gracefully
+* Supporting incremental builds
+
+The architecture needs to be:
+
+* **Understandable**: New contributors grasp the flow quickly
+* **Testable**: Each stage can be tested independently
+* **Maintainable**: Changes to one stage don't break others
+* **Extensible**: New file formats or output types can be added
+
+Existing static site generators (Jekyll, Hyde) use various approaches, some monolithic, some event-driven.
+
+== Decision
+
+**Adopt a linear pipeline architecture with four distinct stages:**
+
+1. **Crawl**: Scan file system, identify content files
+2. **Parse**: Convert markup to HTML, extract metadata
+3. **Render**: Apply templates to generate final HTML
+4. **Copy**: Transfer static assets to output
+
+**Key architectural elements:**
+
+* `Oven` class orchestrates the pipeline
+* Each stage has clear inputs/outputs
+* Stages execute sequentially
+* `ContentStore` (OrientDB) sits between stages for caching
+* Errors collected, not thrown, until end
+
+**Processing flow:**
+
+```
+┌─────────┐
+│ Crawler │──────> Finds files
+└────┬────┘
+     │ File list
+     ▼
+┌─────────┐
+│ Parser  │──────> Extracts metadata + HTML
+└────┬────┘
+     │ DocumentModel
+     ▼
+┌──────────────┐
+│ ContentStore │──────> Caches parsed content
+└────┬─────────┘
+     │ Query API
+     ▼
+┌──────────┐
+│ Renderer │──────> Applies templates
+└────┬─────┘
+     │ HTML files
+     ▼
+┌─────────┐
+│  Asset  │──────> Copies CSS/JS/images
+└─────────┘
+```
+
+== Consequences
+
+=== Positive
+
+* ✅ **Simple mental model**: Easy to explain ("files flow through stages")
+* ✅ **Testable**: Each component tested in isolation with mock inputs
+* ✅ **Debuggable**: Inspect state between stages, log each transition
+* ✅ **Maintainable**: Changes localized to specific stage
+* ✅ **Incremental builds**: Crawler can skip unchanged files, other stages see smaller input
+
+=== Negative
+
+* ❌ **No cross-stage optimization**: Can't skip parsing if only template changed (solved later with separate template signature)
+* ❌ **Sequential execution**: Can't easily parallelize (future enhancement possible)
+* ❌ **Context passing**: Must thread configuration through all stages
+* ❌ **State management**: ContentStore as shared state requires careful lifecycle management
+
+=== Neutral
+
+* ℹ️ Performance is "good enough" for typical sites (< 10,000 pages)
+* ℹ️ Pipeline could be replaced with different architecture without changing public API
+
+== Alternatives Considered
+
+=== Alternative 1: Event-Driven Architecture
+
+**Description**: Pub/sub pattern where components emit events (FileDiscovered, ContentParsed, TemplateRendered).
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Pipeline (Baseline) | Event-Driven |
+|--------------------|---------------------|--------------|
+| Simplicity         | 0                   | -2           |
+| Testability        | 0                   | -1           |
+| Extensibility      | 0                   | +2           |
+| Debugging          | 0                   | -2           |
+| Parallelization    | 0                   | +2           |
+| **Total Score**    | **0**               | **-1**       |
+
+**Rejection rationale**: Too complex for the problem. Event-driven excels for async, distributed systems. JBake is single-process, sequential by nature. Debugging becomes difficult (event trace instead of stack trace). Adds framework dependency (event bus).
+
+=== Alternative 2: Monolithic Loop
+
+**Description**: Single "process everything" loop that crawls, parses, renders, and copies each file in one iteration.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Pipeline (Baseline) | Monolithic Loop |
+|--------------------|---------------------|-----------------|
+| Simplicity         | 0                   | +1              |
+| Testability        | 0                   | -2              |
+| Maintainability    | 0                   | -2              |
+| Incremental Builds | 0                   | -2              |
+| **Total Score**    | **0**               | **-5**          |
+
+**Rejection rationale**: Tight coupling makes testing difficult. Changes affect entire loop. Hard to implement incremental builds (can't cache parsed content separately from rendering). All logic in one class violates Single Responsibility Principle.
+
+=== Alternative 3: Plugin Architecture with Core Loop
+
+**Description**: Minimal core with plugins for each file type. Core iterates files, delegates to plugins.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Pipeline (Baseline) | Plugin Architecture |
+|--------------------|---------------------|---------------------|
+| Extensibility      | 0                   | +2                  |
+| Core Simplicity    | 0                   | +1                  |
+| Consistency        | 0                   | -1                  |
+| Built-in Features  | 0                   | -1                  |
+| **Total Score**    | **0**               | **+1**              |
+
+**Rejection rationale**: Close call. Plugin arch offers more flexibility but:
+
+* Harder to provide consistent blog features (tags, archives) - each plugin would need to implement
+* Fragmentation risk: plugins may handle metadata differently
+* Core-only approach keeps essential features reliable
+* Pipeline *with* SPI extensions (ADR-002) provides extensibility without fragmentation
+
+== Implementation Notes
+
+**Key classes:**
+
+* `Oven`: Main orchestrator, owns pipeline execution
+* `Crawler`: Recursive file scanner with ignore patterns
+* `Parser`: Delegates to MarkupEngines based on extension
+* `Renderer`: Uses TemplateEngines to generate HTML
+* `Asset`: Copies files with path preservation
+
+**Critical design decision**: `ContentStore` as shared cache between stages. This enables:
+
+* Crawler stores parsed documents
+* Renderer queries documents for tag pages, archives
+* Incremental builds (check SHA1 before re-parsing)
+
+== Related Decisions
+
+* link:ADR-002-spi-extensibility.adoc[ADR-002]: Java SPI for Extensibility - Pluggability within pipeline
+* link:ADR-003-orientdb-cache.adoc[ADR-003]: OrientDB for Caching - ContentStore implementation
+* link:ADR-006-incremental-builds.adoc[ADR-006]: Incremental Build Strategy - Optimization within Crawler stage
+
+== References
+
+* Original Oven.java implementation: `jbake-core/src/main/java/org/jbake/app/Oven.java`
+* Discussion: "Keep it simple" philosophy from initial commits
+* Inspiration: Make (Unix tool) - ordered stages with file dependencies

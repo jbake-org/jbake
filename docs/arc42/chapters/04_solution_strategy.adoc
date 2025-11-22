@@ -1,0 +1,204 @@
+:jbake-title: Solution Strategy
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 4
+:filename: /chapters/04_solution_strategy.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+
+
+[[section-solution-strategy]]
+== Solution Strategy
+
+=== Top 5 Architecture Decisions
+
+==== 1. Pipeline Architecture: Crawl → Parse → Render → Copy
+
+**Decision:** Use a linear pipeline with distinct stages: Crawler finds files, Parser extracts metadata and content, Renderer applies templates, Asset copies static files.
+
+**Rationale:**
+
+* Clear separation of concerns makes each stage independently testable
+* Enables incremental builds (re-run only changed files through pipeline)
+* Facilitates error handling at each stage
+* Allows parallel processing potential in future
+
+**Consequences:**
+
+* ✅ Simple mental model: "input files flow through stages to output"
+* ✅ Easy to debug (inspect state between stages)
+* ✅ Extensible (add new stages or modify existing ones)
+* ❌ Can't optimize cross-stage (e.g., skip parsing if template unchanged)
+* ❌ Must pass context through all stages
+
+**Alternatives Considered:**
+
+* *Event-driven architecture*: Rejected due to complexity for simple use case
+* *Monolithic "process everything" loop*: Rejected due to poor testability and maintainability
+
+**Related ADRs:** ADR-001-pipeline-architecture.adoc
+
+---
+
+==== 2. Java SPI for Extensibility (Template & Markup Engines)
+
+**Decision:** Use Java ServiceLoader SPI pattern for discovering template engines (Freemarker, Groovy, Thymeleaf) and markup parsers (AsciiDoc, Markdown).
+
+**Rationale:**
+
+* Standard Java mechanism (no custom plugin framework)
+* Classpath-based auto-discovery
+* Optional dependencies (engines loaded only if on classpath)
+* No runtime registration code needed
+
+**Consequences:**
+
+* ✅ Plugin developers use familiar Java patterns
+* ✅ Zero-configuration plugin loading
+* ✅ Reduced core size (optional engines)
+* ❌ No programmatic plugin registration (must use META-INF/services)
+* ❌ Classpath scanning overhead at startup
+
+**Alternatives Considered:**
+
+[options="header"]
+|===
+|Criterion |SPI (Baseline) |OSGi |Custom Registry
+
+|Learning Curve |0 |−2 |−1
+|Startup Speed |0 |−1 |+1
+|Flexibility |0 |+2 |+1
+|Simplicity |0 |−2 |−1
+|*Total Score* |*0* |*−3* |*0*
+|===
+
+*Decision:* SPI chosen due to simplicity and familiarity despite tie with custom registry (simplicity weighted higher).
+
+**Related ADRs:** ADR-002-spi-extensibility.adoc
+
+---
+
+==== 3. OrientDB Embedded for Content Cache
+
+**Decision:** Use OrientDB embedded database (in-memory or plocal) for caching parsed content and enabling queries (tags, published posts, etc.).
+
+**Rationale:**
+
+* Avoids re-parsing unchanged files (SHA1-based change detection)
+* Enables SQL-like queries for blog features (tag pages, archives)
+* Embedded = no external database server required
+* Supports graph/document model for complex queries
+
+**Consequences:**
+
+* ✅ Fast incremental builds (only parse changed content)
+* ✅ Rich query capabilities (SQL dialect)
+* ✅ Zero-config embedded mode
+* ❌ OrientDB dependency size (heavyweight for simple use cases)
+* ❌ OrientDB v3.x migration complexity
+* ❌ Schema management in code
+
+**Alternatives Considered:**
+
+[options="header"]
+|===
+|Criterion |OrientDB (Baseline) |H2 Database |In-Memory Maps |SQLite
+
+|Query Power |0 |0 |−2 |0
+|Embedded Support |0 |0 |+2 |0
+|Dependency Size |0 |+1 |+2 |+1
+|Migration Risk |0 |0 |+2 |0
+|*Total Score* |*0* |*+1* |*+4* |*+1*
+|===
+
+*Hindsight:* In-memory maps would have been simpler. OrientDB chosen for query power but introduces complexity. Future versions may reconsider (see Technical Debt in ADR-003).
+
+**Related ADRs:** ADR-003-orientdb-cache.adoc
+
+---
+
+==== 4. Delegating Template Engine Pattern
+
+**Decision:** Implement DelegatingTemplateEngine that routes to specific engines based on file extension (.ftl→Freemarker, .groovy→Groovy, etc.).
+
+**Rationale:**
+
+* Single entry point for rendering simplifies caller code
+* Extension-based routing is intuitive for users
+* Allows mixing template engines in single project
+* Fallback mechanism if default template missing
+
+**Consequences:**
+
+* ✅ Users can choose template engine per file
+* ✅ Renderer code decoupled from specific engines
+* ✅ Easy to add new engines (register extension mapping)
+* ❌ Must maintain extension→engine registry
+* ❌ Ambiguous if multiple engines for same extension
+
+**Alternatives Considered:**
+
+* *Single engine per project*: Rejected—reduces flexibility
+* *Template engine configuration*: Rejected—extension-based is more intuitive
+
+**Related ADRs:** ADR-004-delegating-template-engine.adoc
+
+---
+
+==== 5. Configuration Abstraction Layer (JBakeConfiguration)
+
+**Decision:** Introduce JBakeConfiguration interface to abstract Apache Commons Configuration2, enabling future configuration source changes.
+
+**Rationale:**
+
+* Decouples core code from Commons Configuration API
+* Enables alternative config sources (YAML, JSON, builders)
+* Facilitates testing (mock configurations)
+* Gradual migration from legacy CompositeConfiguration
+
+**Consequences:**
+
+* ✅ Core code independent of config implementation
+* ✅ Testable without files
+* ✅ Future-proof for config format changes
+* ❌ Abstraction layer adds indirection
+* ❌ Both old and new APIs coexist during migration (deprecation period)
+
+**Alternatives Considered:**
+
+* *Direct Commons Configuration usage*: Rejected—tight coupling
+* *Builder pattern only*: Rejected—need to support file-based config
+
+**Related ADRs:** ADR-005-configuration-abstraction.adoc
+
+---
+
+=== Key Quality Goals Mapping
+
+[options="header",cols="2,3,3"]
+|===
+|Quality Goal |Solution Strategy |Implementation
+
+|**Extensibility**
+|Java SPI for engines; Abstract base classes
+|ServiceLoader discovery, AbstractTemplateEngine, MarkupEngine base classes
+
+|**Performance**
+|Embedded cache; SHA1-based change detection
+|OrientDB caching, incremental crawling, cached template compilation
+
+|**Simplicity**
+|Convention over configuration; Sensible defaults
+|`default.properties`, example projects, `-i` init command
+
+|**Modularity**
+|Pipeline architecture; Clear interfaces
+|Crawler → Parser → Renderer → Asset stages; Utensils factory pattern
+
+|**Compatibility**
+|Deprecation strategy; Interface abstraction
+|@Deprecated annotations, parallel old/new APIs, JBakeConfiguration abstraction
+|===
