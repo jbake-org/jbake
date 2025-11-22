@@ -46,11 +46,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
      * @param destination the destination path
      * @param templatesPath the templates path
      */
-    @Deprecated(
-        """Use {@link #ThymeleafTemplateEngine(JBakeConfiguration, ContentStore)} instead
-
-      """
-    )
+    @Deprecated("""Use {@link #ThymeleafTemplateEngine(JBakeConfiguration, ContentStore)} instead """)
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
         : super(config, db, destination, templatesPath)
     {

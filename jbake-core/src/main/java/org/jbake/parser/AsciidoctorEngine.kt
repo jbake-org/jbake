@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Renders documents in the asciidoc format using the Asciidoctor engine.
@@ -15,52 +14,33 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  * @author Cédric Champeau
  */
 class AsciidoctorEngine : MarkupEngine() {
-    private val lock = ReentrantReadWriteLock()
 
+    @Volatile
     private var engine: Asciidoctor? = null
-
-    init {
-        val engineClass: Class<*> = checkNotNull(Asciidoctor::class.java)
-    }
+    private val engineLock = Any()
 
     private fun getEngine(options: Options): Asciidoctor {
-        try {
-            lock.readLock().lock()
-            if (engine == null) {
-                lock.readLock().unlock()
-                try {
-                    lock.writeLock().lock()
-                    if (engine == null) {
-                        log.info("Initializing Asciidoctor engine...")
-                        engine =
-                            if (options.map().containsKey(OPT_GEM_PATH))
-                                AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
-                            else
-                                Asciidoctor.Factory.create()
+        engine?.let { return it }
 
-                        if (options.map().containsKey(OPT_REQUIRES)) {
-                            val requires: Array<String> =
-                                options.map()[OPT_REQUIRES].toString().split(",".toRegex())
-                                    .dropLastWhile { it.isEmpty() }.toTypedArray()
+        synchronized(engineLock) {
+            engine?.let { return it }
+            log.info("Initializing Asciidoctor engine...")
+            val newEngine =
+                if (options.map().containsKey(OPT_GEM_PATH))
+                    AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
+                else
+                    Asciidoctor.Factory.create()
 
-                            if (requires.isNotEmpty()) {
-                                for (require in requires) {
-                                    engine?.requireLibrary(require)
-                                }
-                            }
-                        }
-
-                        log.info("Asciidoctor engine initialized.")
-                    }
-                } finally {
-                    lock.readLock().lock()
-                    lock.writeLock().unlock()
-                }
+            if (options.map().containsKey(OPT_REQUIRES)) {
+                val requires: Array<String> =
+                    options.map()[OPT_REQUIRES].toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }.toTypedArray()
+                requires.forEach { newEngine.requireLibrary(it) }
             }
-        } finally {
-            lock.readLock().unlock()
+
+            log.info("Asciidoctor engine initialized.")
+            engine = newEngine
+            return newEngine
         }
-        return engine ?: error("engine must not be null")
     }
 
     override fun processHeader(context: ParserContext) {

@@ -31,7 +31,7 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
       """
     )
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-            : super(config, db, destination, templatesPath)
+        : super(config, db, destination, templatesPath)
     {
         this.renderers = TemplateEngines(this.config, db)
     }
