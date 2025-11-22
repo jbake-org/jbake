@@ -101,7 +101,7 @@ object FileUtil {
      */
     fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
 
-        val ignoreFile: FilenameFilter = FilenameFilter { dir, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
+        val ignoreFile = FilenameFilter { dir, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
 
         return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
     }

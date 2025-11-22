@@ -128,7 +128,7 @@ class Renderer {
         }
 
         if (content.status == ModelAttributes.Status.DRAFT) {
-            outputFilename = outputFilename + config.draftSuffix
+            outputFilename += config.draftSuffix
         }
 
         val outputFile = File(outputFilename + outputExtension)

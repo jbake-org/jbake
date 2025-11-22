@@ -18,9 +18,9 @@ class YamlEngine : MarkupEngine() {
         val model = DocumentModel()
         val yaml = Yaml()
         try {
-            FileInputStream(file).use { `is` ->
-                val result = yaml.load<Any>(`is`)
-                when (result) {
+            FileInputStream(file).use { inputStream ->
+
+                when (val result = yaml.load<Any>(inputStream)) {
                     is MutableList<*> -> model.put("data", result)
                     is MutableMap<*, *> -> model.putAll(result as Map<String, Any>)
                     else -> log.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)

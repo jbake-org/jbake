@@ -102,7 +102,7 @@ class AsciidoctorEngine : MarkupEngine() {
                     log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
                 }
             } else {
-                documentModel[key] = attributes.get(key)!!
+                documentModel[key] = attributes[key]!!
             }
         }
     }

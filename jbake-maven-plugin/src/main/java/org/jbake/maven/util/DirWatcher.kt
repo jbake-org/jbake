@@ -14,15 +14,14 @@ import java.util.concurrent.TimeUnit
 class DirWatcher(dir: File) {
     private val observer: FileAlterationObserver = FileAlterationObserver(dir)
 
-    private val monitor: FileAlterationMonitor
+    private val monitor = FileAlterationMonitor(1000, observer)
 
-    private val changeQueue: BlockingQueue<Long> = ArrayBlockingQueue<Long>(1)
+    private val changeQueue: BlockingQueue<Long> = ArrayBlockingQueue(1)
 
     /**
      * Creates a WatchService and registers the given directory
      */
     init {
-        this.monitor = FileAlterationMonitor(1000, observer)
 
         observer.addListener(object : FileAlterationListenerAdaptor() {
             override fun onFileCreate(file: File?) {

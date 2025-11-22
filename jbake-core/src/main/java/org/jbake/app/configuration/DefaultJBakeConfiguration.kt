@@ -379,9 +379,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         while (configKeys.hasNext()) {
             val keyNullable = configKeys.next()
             val key = keyNullable ?: continue
-            val valueObject: Any?
 
-            valueObject =
+            val valueObject =
                 if (key == PropertyList.PAGINATE_INDEX.key) this.paginateIndex
                 else this.get(key)
 
