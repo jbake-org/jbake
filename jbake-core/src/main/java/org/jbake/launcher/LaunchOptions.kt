@@ -10,78 +10,78 @@ import java.io.File
     usageHelpAutoWidth = true
 )
 class LaunchOptions {
-    @CommandLine.Parameters(
-        index = "0",
-        description = ["source folder of site content (with templates and assets), if not supplied will default to current directory"],
-        arity = "0..1"
-    )
-    val sourceValue: String? = null
 
-    @CommandLine.Parameters(
-        index = "1",
-        description = ["destination folder for output, if not supplied will default to a folder called \"output\" in the current directory"],
-        arity = "0..1"
+    @CommandLine.Parameters(index = "0", arity = "0..1",
+        description = ["source folder of site content (with templates and assets), if not supplied will default to current directory"],
     )
-    val destinationValue: String? = null
+    var sourceValue: String? = null
+
+    @CommandLine.Parameters(index = "1", arity = "0..1",
+        description = ["destination folder for output, if not supplied will default to a folder called \"output\" in the current directory"],
+    )
+    var destinationValue: String? = null
 
     @CommandLine.Option(names = ["-b", "--bake"], description = ["performs a bake"])
-    val isBake: Boolean = false
+    var isBake: Boolean = false
         get() = field || (this.sourceValue != null && this.destinationValue != null)
 
     @CommandLine.ArgGroup(exclusive = false, heading = "%n%nJBake initialization%n%n")
-    private val initGroup: InitOptions? = null
+    private var initGroup: InitOptions? = null
 
     @CommandLine.Option(
         names = ["-s", "--server"],
         description = ["runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory"]
     )
-    val isRunServer: Boolean = false
+    var isRunServer: Boolean = false
 
     @CommandLine.Option(names = ["-h", "--help"], description = ["prints this message"], usageHelp = true)
-    private val helpRequested = false
+    private var helpRequested = false
 
     @CommandLine.Option(names = ["--reset"], description = ["clears the local cache, enforcing rendering from scratch"])
-    val isClearCache: Boolean = false
+    var isClearCache: Boolean = false
 
     @CommandLine.Option(
         names = ["-c", "--config"],
         description = ["use specified file for configuration (defaults to " + ConfigUtil.CONFIG_FILE + " in the source folder if not supplied)"]
     )
-    val configValue: String? = null
+    var configValue: String? = null
 
     @JvmField
     @CommandLine.Option(
         names = ["--prop-encoding"],
         description = ["use given encoding to load properties file. default: utf-8"]
     )
-    val propertiesEncoding: String = "utf-8"
+    var propertiesEncoding: String = "utf-8"
 
     @CommandLine.Option(names = ["-ls", "--list-settings"], description = ["list configuration settings"])
-    val isListConfig: Boolean = false
+    var isListConfig: Boolean = false
 
     val template: String?
         get() = initGroup?.template
 
     fun getSource(): File {
-        return if (this.sourceValue != null) File(this.sourceValue)
-            else File(System.getProperty("user.dir"))
+        return sourceValue?.let { File(it) }
+            ?: File(System.getProperty("user.dir"))
     }
 
     fun getDestination(): File {
-        return if (this.destinationValue != null) File(this.destinationValue)
-            else File(getSource(), "output")
+        return destinationValue?.let { File(it) }
+            ?: File(getSource(), "output")
     }
 
     fun getConfig(): File {
-        return if (this.configValue != null) File(this.configValue)
-            else File(getSource(), "jbake.properties")
+        return configValue?.let { File(it) }
+            ?: File(getSource(), "jbake.properties")
     }
 
     val isHelpNeeded: Boolean
         get() = helpRequested || !(this.isListConfig || this.isBake || this.isRunServer || this.isInit || this.sourceValue != null || this.destinationValue != null)
 
     val isInit: Boolean
-        get() = (initGroup != null && initGroup.init)
+        get() {
+            val group = initGroup
+            return group != null && group.init
+        }
 
     internal class InitOptions {
         @CommandLine.Option(
@@ -90,7 +90,7 @@ class LaunchOptions {
             description = ["initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)"],
             required = true
         )
-        val init = false
+        var init = false
 
         @CommandLine.Option(
             names = ["-t", "--template"],
@@ -99,6 +99,6 @@ class LaunchOptions {
             description = ["use specified template engine for default templates (uses Freemarker if <template> is not supplied) "],
             arity = "0..1"
         )
-        val template: String? = null
+        var template: String? = null
     }
 }
