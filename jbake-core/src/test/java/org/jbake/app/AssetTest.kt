@@ -27,7 +27,7 @@ class AssetTest : LoggingTest() {
 
     @BeforeEach
     fun setup(@TempDir folder: Path) {
-        fixtureDir = File(this.javaClass.getResource("/fixture").getFile())
+        fixtureDir = File(this.javaClass.getResource("/fixture").file)
         this.folder = folder
         config = ConfigUtil().loadConfig(fixtureDir!!) as DefaultJBakeConfiguration
         config.destinationFolder = folder.toFile()
@@ -40,12 +40,12 @@ class AssetTest : LoggingTest() {
         val asset = Asset(config)
         asset.copy()
         val cssFile = File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
-        Assertions.assertTrue(cssFile.exists(), Supplier { "File " + cssFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(cssFile.exists()) { "File " + cssFile.absolutePath + " does not exist" }
         val imgFile =
             File(folder.toString() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png")
-        Assertions.assertTrue(imgFile.exists(), Supplier { "File " + imgFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(imgFile.exists()) { "File " + imgFile.absolutePath + " does not exist" }
         val jsFile = File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js")
-        Assertions.assertTrue(jsFile.exists(), Supplier { "File " + jsFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(jsFile.exists()) { "File " + jsFile.absolutePath + " does not exist" }
 
         Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
@@ -63,14 +63,14 @@ class AssetTest : LoggingTest() {
             expected.exists(),
             "cssFile should not exist before running the test; avoids false positives"
         )
-        val cssFile = File(fixtureDir!!.getPath() + File.separatorChar + "assets" + cssSubPath)
+        val cssFile = File(fixtureDir!!.path + File.separatorChar + "assets" + cssSubPath)
         asset.copySingleFile(cssFile)
         Assertions.assertTrue(expected.exists(), "Css asset file did not copy")
 
         // Copy single Content file
         expected = File(folder.toString() + contentImgPath)
         Assertions.assertFalse(expected.exists(), "content image file should not exist before running the test")
-        val imgFile = File(fixtureDir!!.getPath() + File.separatorChar + "content" + contentImgPath)
+        val imgFile = File(fixtureDir!!.path + File.separatorChar + "content" + contentImgPath)
         asset.copySingleFile(imgFile)
         Assertions.assertTrue(expected.exists(), "Content img file did not copy")
     }
@@ -101,7 +101,7 @@ class AssetTest : LoggingTest() {
         Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
 
         val loggingEvent = captorLoggingEvent!!.getValue()
-        org.assertj.core.api.Assertions.assertThat(loggingEvent.getMessage())
+        org.assertj.core.api.Assertions.assertThat(loggingEvent.message)
             .isEqualTo("Skip copying single asset file [{}]. Is a directory.")
     }
 
@@ -112,7 +112,7 @@ class AssetTest : LoggingTest() {
         asset.copy()
 
         val favFile = File(folder.toString() + File.separatorChar + "favicon.ico")
-        Assertions.assertTrue(favFile.exists(), Supplier { "File " + favFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(favFile.exists()) { "File " + favFile.absolutePath + " does not exist" }
 
         Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
@@ -121,7 +121,7 @@ class AssetTest : LoggingTest() {
     fun testCopyIgnore() {
         val assetFolder = File(folder!!.toFile(), "ignoredAssets")
         assetFolder.mkdirs()
-        FileUtils.copyDirectory(File(this.javaClass.getResource("/fixture/ignorables").getFile()), assetFolder)
+        FileUtils.copyDirectory(File(this.javaClass.getResource("/fixture/ignorables").file), assetFolder)
         config.assetFolder = (assetFolder)
         config.assetIgnoreHidden = true
         TestUtils.hideAssets(assetFolder)
@@ -129,11 +129,11 @@ class AssetTest : LoggingTest() {
         asset.copy(assetFolder)
 
         val testFile = File(folder!!.toFile(), "test.txt")
-        Assertions.assertTrue(testFile.exists(), Supplier { "File " + testFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(testFile.exists()) { "File " + testFile.absolutePath + " does not exist" }
         val testIgnoreFile = File(folder!!.toFile(), ".test.txt")
         Assertions.assertFalse(
-            testIgnoreFile.exists(),
-            Supplier { "File " + testIgnoreFile.getAbsolutePath() + " does exist" })
+            testIgnoreFile.exists()
+        ) { "File " + testIgnoreFile.absolutePath + " does exist" }
 
         Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
@@ -177,25 +177,25 @@ class AssetTest : LoggingTest() {
     @Test
     fun testJBakeIgnoredFolder() {
         val assetsUrl = this.javaClass.getResource("/fixture/assets")
-        val assets = File(assetsUrl!!.getFile())
+        val assets = File(assetsUrl!!.file)
         val asset = Asset(config)
         asset.copy(assets)
 
         val cssFile = File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
-        Assertions.assertTrue(cssFile.exists(), Supplier { "File " + cssFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(cssFile.exists()) { "File " + cssFile.absolutePath + " does not exist" }
         val imgFile =
             File(folder.toString() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png")
-        Assertions.assertTrue(imgFile.exists(), Supplier { "File " + imgFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(imgFile.exists()) { "File " + imgFile.absolutePath + " does not exist" }
         val jsFile = File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js")
-        Assertions.assertTrue(jsFile.exists(), Supplier { "File " + jsFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(jsFile.exists()) { "File " + jsFile.absolutePath + " does not exist" }
         val ignorableFolder = File(folder.toString() + File.separatorChar + "ignorablefolder")
         val fooIgnorableFolder = File(folder.toString() + File.separatorChar + "fooignorablefolder")
         Assertions.assertFalse(
-            ignorableFolder.exists(),
-            Supplier { "Folder " + ignorableFolder.getAbsolutePath() + " must not exist" })
+            ignorableFolder.exists()
+        ) { "Folder " + ignorableFolder.absolutePath + " must not exist" }
         Assertions.assertTrue(
-            fooIgnorableFolder.exists(),
-            Supplier { "Folder " + fooIgnorableFolder.getAbsolutePath() + " must exist" })
+            fooIgnorableFolder.exists()
+        ) { "Folder " + fooIgnorableFolder.absolutePath + " must exist" }
 
         Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
@@ -205,25 +205,25 @@ class AssetTest : LoggingTest() {
         config.setProperty(PropertyList.IGNORE_FILE.key, ".fooignore")
 
         val assetsUrl = this.javaClass.getResource("/fixture/assets")
-        val assets = File(assetsUrl!!.getFile())
+        val assets = File(assetsUrl!!.file)
         val asset = Asset(config)
         asset.copy(assets)
 
         val cssFile = File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css")
-        Assertions.assertTrue(cssFile.exists(), Supplier { "File " + cssFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(cssFile.exists()) { "File " + cssFile.absolutePath + " does not exist" }
         val imgFile =
             File(folder.toString() + File.separatorChar + "img" + File.separatorChar + "glyphicons-halflings.png")
-        Assertions.assertTrue(imgFile.exists(), Supplier { "File " + imgFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(imgFile.exists()) { "File " + imgFile.absolutePath + " does not exist" }
         val jsFile = File(folder.toString() + File.separatorChar + "js" + File.separatorChar + "bootstrap.min.js")
-        Assertions.assertTrue(jsFile.exists(), Supplier { "File " + jsFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(jsFile.exists()) { "File " + jsFile.absolutePath + " does not exist" }
         val ignorableFolder = File(folder.toString() + File.separatorChar + "ignorablefolder")
         val fooIgnorableFolder = File(folder.toString() + File.separatorChar + "fooignorablefolder")
         Assertions.assertTrue(
-            ignorableFolder.exists(),
-            Supplier { "Folder " + ignorableFolder.getAbsolutePath() + " must exist" })
+            ignorableFolder.exists()
+        ) { "Folder " + ignorableFolder.absolutePath + " must exist" }
         Assertions.assertFalse(
-            fooIgnorableFolder.exists(),
-            Supplier { "Folder " + fooIgnorableFolder.getAbsolutePath() + " must not exist" })
+            fooIgnorableFolder.exists()
+        ) { "Folder " + fooIgnorableFolder.absolutePath + " must not exist" }
 
         Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }
@@ -231,7 +231,7 @@ class AssetTest : LoggingTest() {
     @Test
     fun testCopyAssetsFromContent() {
         val contentUrl = this.javaClass.getResource("/fixture/content")
-        val contents = File(contentUrl!!.getFile())
+        val contents = File(contentUrl!!.file)
         val asset = Asset(config)
         asset.copyAssetsFromContent(contents)
 
@@ -239,19 +239,19 @@ class AssetTest : LoggingTest() {
         val expected = 3
 
         Assertions.assertTrue(
-            totalFiles == expected,
-            Supplier { String.format("Number of files copied must be %d but are %d", expected, totalFiles) })
+            totalFiles == expected
+        ) { String.format("Number of files copied must be %d but are %d", expected, totalFiles) }
 
         val pngFile =
             File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2012/images/custom-image.png")
-        Assertions.assertTrue(pngFile.exists(), Supplier { "File " + pngFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(pngFile.exists()) { "File " + pngFile.absolutePath + " does not exist" }
 
         val jpgFile =
             File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2013/images/custom-image.jpg")
-        Assertions.assertTrue(jpgFile.exists(), Supplier { "File " + jpgFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(jpgFile.exists()) { "File " + jpgFile.absolutePath + " does not exist" }
 
         val jsonFile = File(folder.toString() + File.separatorChar + "blog" + File.separatorChar + "2012/sample.json")
-        Assertions.assertTrue(jsonFile.exists(), Supplier { "File " + jsonFile.getAbsolutePath() + " does not exist" })
+        Assertions.assertTrue(jsonFile.exists()) { "File " + jsonFile.absolutePath + " does not exist" }
 
         Assertions.assertTrue(asset.errors.isEmpty(), "Errors during asset copying")
     }

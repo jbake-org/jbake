@@ -19,7 +19,7 @@ object TestUtils {
                 }
             })
             for (file in hiddenFiles!!) {
-                val process = Runtime.getRuntime().exec(arrayOf<String>("attrib", "+h", file.getAbsolutePath()))
+                val process = Runtime.getRuntime().exec(arrayOf<String>("attrib", "+h", file.absolutePath))
                 process.waitFor()
             }
         }
@@ -32,7 +32,7 @@ object TestUtils {
         get() = getTestResourcesAsSourceFolder("/fixture")
 
     fun getTestResourcesAsSourceFolder(name: String): File {
-        return File(TestUtils::class.java.getResource(name).getFile())
+        return File(TestUtils::class.java.getResource(name).file)
     }
 
     fun newFolder(base: File?, folderName: String): File {

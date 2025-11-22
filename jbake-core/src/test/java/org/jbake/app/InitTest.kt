@@ -44,7 +44,7 @@ class InitTest {
     fun initFailDestinationContainsContent() {
         val init = Init(config)
         val initPath = folder.newFolder("init")
-        val contentFolder = File(initPath.getPath(), config.contentFolderName)
+        val contentFolder = File(initPath.path, config.contentFolderName)
         contentFolder.mkdir()
         try {
             init.run(initPath, rootPath, "freemarker")

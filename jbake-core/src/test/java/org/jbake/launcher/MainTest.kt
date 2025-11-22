@@ -76,7 +76,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
@@ -110,7 +110,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
@@ -132,10 +132,10 @@ internal class MainTest : LoggingTest() {
         val build = newFolder(output, "build/jbake")
         val configuration = mockJettyConfiguration(build, build)
 
-        val args = arrayOf<String>(build.getPath(), "-s")
+        val args = arrayOf<String>(build.path, "-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(build.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(build.path, configuration)
     }
 
 
@@ -146,10 +146,10 @@ internal class MainTest : LoggingTest() {
         val src = newFolder(source, "src/jbake")
         val configuration = mockJettyConfiguration(src, src)
 
-        val args = arrayOf("-s", src.getPath())
+        val args = arrayOf("-s", src.path)
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(src.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(src.path, configuration)
     }
 
     @Test
@@ -158,10 +158,10 @@ internal class MainTest : LoggingTest() {
         val exampleOutput = output.resolve("build/jbake").toFile()
         val configuration = mockJettyConfiguration(src, exampleOutput)
 
-        val args = arrayOf<String>(src.getPath(), exampleOutput.getPath(), "-s")
+        val args = arrayOf<String>(src.path, exampleOutput.path, "-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.path, configuration)
     }
 
     @Test
@@ -173,7 +173,7 @@ internal class MainTest : LoggingTest() {
 
         main!!.run(stubOptions(args), configuration)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.path, configuration)
     }
 
     @Test
@@ -186,24 +186,24 @@ internal class MainTest : LoggingTest() {
         val expectedOutput = newFolder(output, "build/jbake")
         val configTarget = newFolder(target, "target/jbake")
 
-        val args = arrayOf("-s", src.getPath(), expectedOutput.getPath())
+        val args = arrayOf("-s", src.path, expectedOutput.path)
         val configuration = stubConfig()
         configuration.destinationFolder = configTarget
         main!!.run(stubOptions(args), configuration)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.getPath(), configuration)
+        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
     fun shouldTellUserThatTemplateOptionRequiresInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
-        AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status, Runnable { Main.main(args) })
+        AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status) { Main.main(args) }
 
         Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
-        Assertions.assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init")
+        Assertions.assertThat(loggingEvent.message).isEqualTo("Error: Missing required argument(s): --init")
     }
 
     @Test
@@ -219,8 +219,8 @@ internal class MainTest : LoggingTest() {
         )
 
         val e = Assert.assertThrows<JBakeException>(
-            JBakeException::class.java,
-            ThrowingRunnable { other.run(arrayOf("")) })
+            JBakeException::class.java
+        ) { other.run(arrayOf("")) }
 
         Assertions.assertThat(e.message).isEqualTo("An unexpected error occurred: something went wrong")
         Assertions.assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.status)
@@ -238,8 +238,8 @@ internal class MainTest : LoggingTest() {
                 ArgumentMatchers.anyBoolean()
             )
         val e = Assert.assertThrows<JBakeException>(
-            JBakeException::class.java,
-            ThrowingRunnable { main!!.run(arrayOf("-b")) })
+            JBakeException::class.java
+        ) { main!!.run(arrayOf("-b")) }
         Assertions.assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
     }
 

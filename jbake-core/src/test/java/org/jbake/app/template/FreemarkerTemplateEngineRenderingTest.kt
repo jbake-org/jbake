@@ -37,8 +37,8 @@ import java.nio.charset.Charset
 class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("freemarkerTemplates", "ftl") {
     @Test
     fun renderPaginatedIndex() {
-        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
-        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
+        config.setPaginateIndex(true)
+        config.setPostsPerPage(1)
 
         outputStrings.put(
             "index", mutableListOf<String>(
@@ -62,8 +62,8 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
 
     @Test
     fun shouldFallbackToRenderSingleIndexIfNoPostArePresent() {
-        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
-        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
+        config.setPaginateIndex(true)
+        config.setPostsPerPage(1)
 
         db.deleteAllByDocType("post")
 

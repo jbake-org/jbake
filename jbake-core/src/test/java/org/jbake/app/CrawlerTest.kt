@@ -88,8 +88,8 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         for (model in documents) {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model!!.file) + "/"
 
-            Assert.assertThat<String>(model.noExtensionUri, RegexMatcher.Companion.matches(noExtensionUri))
-            Assert.assertThat<String>(model.uri, RegexMatcher.Companion.matches(noExtensionUri + "index\\.html"))
+            Assert.assertThat<String>(model.noExtensionUri, RegexMatcher.matches(noExtensionUri))
+            Assert.assertThat<String>(model.uri, RegexMatcher.matches(noExtensionUri + "index\\.html"))
             Assert.assertThat<String>(model.rootPath, CoreMatchers.`is`<String>("../../../"))
         }
     }

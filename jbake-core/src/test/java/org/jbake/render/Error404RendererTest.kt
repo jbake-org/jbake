@@ -74,7 +74,7 @@ class Error404RendererTest {
         val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
         val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
 
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+        renderer.render(mockRenderer, contentStore, configuration)
 
         Mockito.verify<Renderer?>(mockRenderer, Mockito.times(1)).renderError404(error404file)
     }
@@ -94,7 +94,7 @@ class Error404RendererTest {
 
         Mockito.doThrow(Exception()).`when`<Renderer?>(mockRenderer).renderError404(ArgumentMatchers.anyString())
 
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+        renderer.render(mockRenderer, contentStore, configuration)
 
         Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderError404(error404file)
     }

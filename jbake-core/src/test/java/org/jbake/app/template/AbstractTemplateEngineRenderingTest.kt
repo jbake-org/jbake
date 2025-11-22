@@ -71,7 +71,7 @@ abstract class AbstractTemplateEngineRenderingTest(
             throw Exception("Cannot find template folder!")
         }
 
-        destinationFolder = folder.getRoot()
+        destinationFolder = folder.root
         config.destinationFolder = (destinationFolder)
         config.templateFolder = (templateFolder)
 
@@ -104,75 +104,59 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     private fun setupExpectedOutputStrings() {
-        outputStrings.put(
-            "post", mutableListOf<String>(
-                "<h2>Second Post</h2>",
-                "<p class=\"post-date\">28",
-                "2013</p>",
-                "Lorem ipsum dolor sit amet",
-                "<h5>Published Posts</h5>",
-                "blog/2012/first-post.html"
-            )
+        outputStrings["post"] = mutableListOf<String>(
+            "<h2>Second Post</h2>",
+            "<p class=\"post-date\">28",
+            "2013</p>",
+            "Lorem ipsum dolor sit amet",
+            "<h5>Published Posts</h5>",
+            "blog/2012/first-post.html"
         )
 
-        outputStrings.put(
-            "page", mutableListOf<String>(
-                "<h4>About</h4>",
-                "All about stuff!",
-                "<h5>Published Pages</h5>",
-                "/projects.html"
-            )
+        outputStrings["page"] = mutableListOf<String>(
+            "<h4>About</h4>",
+            "All about stuff!",
+            "<h5>Published Pages</h5>",
+            "/projects.html"
         )
 
-        outputStrings.put(
-            "index", mutableListOf<String>(
-                "<a href=\"blog/2016/another-post.html\"",
-                ">Another Post</a>",
-                "<a href=\"blog/2013/second-post.html\"",
-                ">Second Post</a>"
-            )
+        outputStrings["index"] = mutableListOf<String>(
+            "<a href=\"blog/2016/another-post.html\"",
+            ">Another Post</a>",
+            "<a href=\"blog/2013/second-post.html\"",
+            ">Second Post</a>"
         )
 
-        outputStrings.put(
-            "feed", mutableListOf<String>(
-                "<description>My corner of the Internet</description>",
-                "<title>Second Post</title>",
-                "<title>First Post</title>"
-            )
+        outputStrings["feed"] = mutableListOf<String>(
+            "<description>My corner of the Internet</description>",
+            "<title>Second Post</title>",
+            "<title>First Post</title>"
         )
 
-        outputStrings.put(
-            "archive", mutableListOf<String>(
-                "<a href=\"blog/2013/second-post.html\"",
-                ">Second Post</a>",
-                "<a href=\"blog/2012/first-post.html\"",
-                ">First Post</a>"
-            )
+        outputStrings["archive"] = mutableListOf<String>(
+            "<a href=\"blog/2013/second-post.html\"",
+            ">Second Post</a>",
+            "<a href=\"blog/2012/first-post.html\"",
+            ">First Post</a>"
         )
 
-        outputStrings.put(
-            "tags", mutableListOf<String>(
-                "<a href=\"blog/2013/second-post.html\"",
-                ">Second Post</a>",
-                "<a href=\"blog/2012/first-post.html\"",
-                ">First Post</a>"
-            )
+        outputStrings["tags"] = mutableListOf<String>(
+            "<a href=\"blog/2013/second-post.html\"",
+            ">Second Post</a>",
+            "<a href=\"blog/2012/first-post.html\"",
+            ">First Post</a>"
         )
 
-        outputStrings.put(
-            "tags-index", mutableListOf<String>(
-                "<h1>Tags</h1>",
-                "<h2><a href=\"../tags/blog.html\">blog</a>",
-                "3</h2>"
-            )
+        outputStrings["tags-index"] = mutableListOf<String>(
+            "<h1>Tags</h1>",
+            "<h2><a href=\"../tags/blog.html\">blog</a>",
+            "3</h2>"
         )
 
-        outputStrings.put(
-            "sitemap", mutableListOf<String>(
-                "blog/2013/second-post.html",
-                "blog/2012/first-post.html",
-                "papers/published-paper.html"
-            )
+        outputStrings["sitemap"] = mutableListOf<String>(
+            "blog/2013/second-post.html",
+            "blog/2012/first-post.html",
+            "papers/published-paper.html"
         )
     }
 
@@ -210,8 +194,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "about.html"
 
-        val sampleFile: File =
-            File(sourceFolder!!.getPath() + File.separator + "content" + File.separator + filename)
+        val sampleFile = File(sourceFolder!!.path + File.separator + "content" + File.separator + filename)
         val content = parser!!.processFile(sampleFile)
         content!!.uri = "/" + filename
         renderer!!.render(content)
@@ -319,7 +302,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 
-        outputStrings.put("dbSpan", mutableListOf<String>("<span>3</span>"))
+        outputStrings["dbSpan"] = mutableListOf("<span>3</span>")
 
         db.deleteAllByDocType("post")
 

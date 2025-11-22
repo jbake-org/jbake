@@ -29,7 +29,7 @@ abstract class LoggingTest {
         root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 
         root.addAppender(mockAppender)
-        root.setLevel(Level.INFO)
+        root.level = Level.INFO
     }
 
     @AfterEach

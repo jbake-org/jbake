@@ -224,7 +224,7 @@ class OvenTest {
     fun noLocaleConfiguration() {
         configuration.setProperty(PropertyList.JVM_LOCALE.key, null)
 
-        val language = Locale.getDefault().getLanguage()
+        val language = Locale.getDefault().language
         val oven = Oven(configuration)
         oven.bake()
 

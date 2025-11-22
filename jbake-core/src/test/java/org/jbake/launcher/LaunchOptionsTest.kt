@@ -74,9 +74,9 @@ class LaunchOptionsTest {
         val args = arrayOf<String>("-t", "groovy-mte")
 
         Assertions.assertThatExceptionOfType<CommandLine.MissingParameterException?>(CommandLine.MissingParameterException::class.java)
-            .isThrownBy(ThrowingCallable {
-                val res = parseArgs(args)
-            }).withMessage("Error: Missing required argument(s): --init")
+            .isThrownBy {
+                parseArgs(args)
+            }.withMessage("Error: Missing required argument(s): --init")
     }
 
     @Test
@@ -128,10 +128,10 @@ class LaunchOptionsTest {
         Assertions.assertThat(res.isRunServer).isFalse()
         Assertions.assertThat(res.isInit).isFalse()
         Assertions.assertThat(res.isBake).isFalse()
-        Assertions.assertThat(res.getSource().getPath()).isEqualTo(System.getProperty("user.dir"))
-        Assertions.assertThat(res.getDestination().getPath())
+        Assertions.assertThat(res.getSource().path).isEqualTo(System.getProperty("user.dir"))
+        Assertions.assertThat(res.getDestination().path)
             .isEqualTo(System.getProperty("user.dir") + File.separator + "output")
-        Assertions.assertThat(res.getConfig().getPath())
+        Assertions.assertThat(res.getConfig().path)
             .isEqualTo(System.getProperty("user.dir") + File.separator + ConfigUtil.CONFIG_FILE)
     }
 

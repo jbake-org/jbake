@@ -58,12 +58,12 @@ class ConfigUtilTest : LoggingTest() {
     @Test
     fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
         val nonExistentSourceFolder = Mockito.mock<File>(File::class.java)
-        Mockito.`when`<String>(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent")
+        Mockito.`when`<String>(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
         Mockito.`when`<Boolean?>(nonExistentSourceFolder.exists()).thenReturn(false)
 
         val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
-            JBakeException::class.java,
-            Executable { util.loadConfig(nonExistentSourceFolder) })
+            JBakeException::class.java
+        ) { util.loadConfig(nonExistentSourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
     }
 
@@ -82,8 +82,8 @@ class ConfigUtilTest : LoggingTest() {
         Mockito.`when`<Boolean?>(sourceFolder.isDirectory()).thenReturn(false)
 
         val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
-            JBakeException::class.java,
-            Executable { util.loadConfig(sourceFolder) })
+            JBakeException::class.java
+        ) { util.loadConfig(sourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder is not a directory.")
     }
 
@@ -147,7 +147,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat(loggingEvent.getMessage())
+        assertThat(loggingEvent.message)
             .isEqualTo("Cannot find configuration key '{}' for document type '{}'")
     }
 
@@ -253,7 +253,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat(loggingEvent.getMessage()).isEqualTo("Cannot find asciidoctor option '{}.{}'")
+        assertThat(loggingEvent.message).isEqualTo("Cannot find asciidoctor option '{}.{}'")
     }
 
     @Test
@@ -347,13 +347,13 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() {
-        val config = util.setEncoding("UNSUPPORTED_ENCODING")
+        util.setEncoding("UNSUPPORTED_ENCODING")
             .loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
         Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat<Level?>(loggingEvent.getLevel()).isEqualTo(Level.WARN)
+        assertThat<Level?>(loggingEvent.level).isEqualTo(Level.WARN)
         assertThat(loggingEvent.getFormattedMessage())
             .isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'")
     }
@@ -370,7 +370,7 @@ class ConfigUtilTest : LoggingTest() {
     @Throws(IllegalAccessException::class)
     private fun assertDefaultPropertiesPresent(config: JBakeConfiguration) {
         for (field in JBakeConfiguration::class.java.getFields()) {
-            if (field.isAccessible()) {
+            if (field.isAccessible) {
                 val key = field.get("") as String
                 println("Key: " + key)
                 assertThat<Any?>(config.get(key)).isNotNull()

@@ -17,10 +17,10 @@ class ArchiveRendererTest {
         val renderer = ArchiveRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(false)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
 
         val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)

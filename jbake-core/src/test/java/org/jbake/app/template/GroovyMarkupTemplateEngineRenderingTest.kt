@@ -68,8 +68,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
         val renderer = Renderer(db, config)
         val filename = "published-paper.html"
 
-        val sampleFile: File =
-            File(sourceFolder!!.path + File.separator + "content" + File.separator + "papers" + File.separator + filename)
+        val sampleFile = File(sourceFolder!!.path + File.separator + "content" + File.separator + "papers" + File.separator + filename)
         val content = parser.processFile(sampleFile)
         content!!.uri = "/" + filename
         renderer.render(content)

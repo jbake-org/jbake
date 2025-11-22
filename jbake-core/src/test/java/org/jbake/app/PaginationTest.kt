@@ -43,11 +43,11 @@ class PaginationTest : ContentStoreIntegrationTest() {
             if (docType == "masterindex") {
                 fileBaseName = "index"
             }
-            ContentStoreIntegrationTest.Companion.config.setTemplateFileNameForDocType(docType, fileBaseName + ".ftl")
+            config.setTemplateFileNameForDocType(docType, fileBaseName + ".ftl")
         }
 
-        ContentStoreIntegrationTest.Companion.config.setPaginateIndex(true)
-        ContentStoreIntegrationTest.Companion.config.setPostsPerPage(1)
+        config.setPaginateIndex(true)
+        config.setPostsPerPage(1)
     }
 
     @Test

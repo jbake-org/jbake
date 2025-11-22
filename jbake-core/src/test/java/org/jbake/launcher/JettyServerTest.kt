@@ -36,7 +36,7 @@ internal class JettyServerTest {
         val executorService = Executors.newSingleThreadExecutor()
 
         JettyServer().use { server ->
-            executorService.execute(Runnable { server.run(source.getAbsolutePath(), jBakeConfiguration!!) })
+            executorService.execute { server.run(source.absolutePath, jBakeConfiguration!!) }
             while (!server.isStarted) {
                 println("waiting until jetty is running")
                 Thread.sleep(100)

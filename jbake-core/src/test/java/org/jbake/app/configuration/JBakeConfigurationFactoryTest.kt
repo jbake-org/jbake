@@ -95,8 +95,7 @@ class JBakeConfigurationFactoryTest {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val factory = JBakeConfigurationFactory()
-        val configuration: JBakeConfiguration =
-            factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
         AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("UTF-8")
     }
@@ -108,7 +107,7 @@ class JBakeConfigurationFactoryTest {
         val destinationFolder = TestUtils.newFolder(root, "output")
         val factory = JBakeConfigurationFactory()
         factory.configUtil = util
-        val configuration: JBakeConfiguration = factory.setEncoding("latin1")
+        factory.setEncoding("latin1")
             .createDefaultJbakeConfiguration(sourceFolder, destinationFolder, null as File?, true)
 
         AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("latin1")

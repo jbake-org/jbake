@@ -75,7 +75,7 @@ class DocumentsRendererTest {
 
         // expect
         org.junit.jupiter.api.Assertions.assertThrows<RenderingException?>(
-            RenderingException::class.java, Executable {
+            RenderingException::class.java, {
                 // given
                 addDocumentType("customType")
 
