@@ -1,0 +1,509 @@
+= Open Questions & Clarifications Needed
+
+This document tracks ambiguities, missing information, and areas needing clarification from the JBake team.
+
+**Purpose:** Identify gaps in understanding during mental model documentation creation. These questions highlight areas where:
+
+* Documentation is incomplete or missing
+* Code behavior is unclear
+* Design decisions are not documented
+* Implementation differs from expected patterns
+
+---
+
+== Architecture & Design
+
+=== Q1: DocumentTypes Global Singleton
+
+**Question:** Why is `DocumentTypes` implemented as a mutable global singleton instead of being configuration-driven or passed as a parameter?
+
+**Context:** 
+
+* `DocumentTypes` is a static class with mutable state
+* `addDocumentType()` and `resetDocumentTypes()` mutate global state
+* Thread-safety concerns for concurrent builds
+* Hard to test (state leaks between tests)
+
+**Impact:** 
+
+* Refactoring to instance-based would be significant change
+* Current pattern violates dependency injection principles
+* Need to understand if historical reasons or planned refactoring exists
+
+**Found in:** `jbake-core/src/main/java/org/jbake/model/DocumentTypes.java`
+
+**Assumption made:** This is technical debt from early implementation; future versions may refactor to configuration-based approach.
+
+---
+
+=== Q2: OrientDB Version Migration Strategy
+
+**Question:** What's the long-term strategy for OrientDB? Stay on v3.x, migrate to v4+, or replace with different database?
+
+**Context:**
+
+* OrientDB v3.x has significantly different API from v2.x
+* OrientDB development/community activity unclear
+* Heavy dependency for what's essentially a cache
+* Comments in code reference version migration issues
+
+**Impact:**
+
+* Future maintenance burden
+* Alternative database choices (H2, SQLite, in-memory maps)
+* Should new features depend heavily on OrientDB features?
+
+**Found in:** `jbake-core/src/main/java/org/jbake/app/ContentStore.java`, OrientDB dependency in `build.gradle`
+
+**Assumption made:** Staying on OrientDB v3.x for now; replacement evaluated case-by-case.
+
+---
+
+=== Q3: Utensils Factory Pattern Rationale
+
+**Question:** Why is the factory named "Utensils"? Is this just following the bakery metaphor or is there a deeper design reason?
+
+**Context:**
+
+* `UtensilsFactory` creates Crawler, Parser, Renderer, Asset, ContentStore
+* Name is unique but not immediately intuitive for developers
+* Standard factory pattern but unusual naming
+
+**Impact:**
+
+* Naming impacts code readability
+* Developer onboarding (need to learn metaphor)
+* Should metaphor naming extend to other areas?
+
+**Found in:** `jbake-core/src/main/java/org/jbake/app/Utensils.java`
+
+**Assumption made:** Utensils = tools used in baking = components used by Oven. Metaphor aids understanding once learned.
+
+---
+
+== Configuration & Behavior
+
+=== Q4: Template Signature Mechanism
+
+**Question:** How exactly does template signature detection work? When does template change force content re-rendering without re-parsing?
+
+**Context:**
+
+* Code mentions "template signature" separate from content SHA1
+* `ContentStore.updateAndClearCacheIfNeeded()` checks template changes
+* `updateTemplateSignatureIfChanged()` computes signature
+* Mechanism not clearly documented
+
+**Impact:**
+
+* Users confused about when `-clearCache` needed
+* Incremental build behavior not transparent
+
+**Found in:** `ContentStore.java` methods related to signatures
+
+**Assumption made:** SHA1 of all template files; if changed, marks all content for re-render but not re-parse.
+
+---
+
+=== Q5: Default Status/Type Behavior
+
+**Question:** What's the exact precedence when default status/type conflicts with header-less documents?
+
+**Context:**
+
+* `default.status` and `default.type` in config
+* Documents can omit headers (AsciiDoc native format)
+* What happens if default.status=published but user wants draft?
+
+**Impact:**
+
+* User confusion about why content appears/doesn't appear
+* Edge cases not documented
+
+**Found in:** Parser implementations, configuration handling
+
+**Assumption made:** Header explicit values override defaults; absence uses defaults; documented but could be clearer.
+
+---
+
+=== Q6: Asset Ignore Patterns
+
+**Question:** What's the syntax and precedence for asset ignore patterns? Does `.jbakeignore` apply to assets or only content?
+
+**Context:**
+
+* `asset.ignore` configuration option
+* `.jbakeignore` files in directories
+* Asset copying logic in `Asset.java`
+* Docs unclear on pattern syntax
+
+**Impact:**
+
+* Users can't exclude node_modules, .git, etc. effectively
+* Performance issues on large asset folders
+
+**Found in:** `jbake-core/src/main/java/org/jbake/app/Asset.java`, configuration docs
+
+**Assumption made:** `.jbakeignore` affects both content and assets; contains directory/file names to skip.
+
+---
+
+== Extension & Plugin System
+
+=== Q7: RenderingTool Execution Order
+
+**Question:** Can RenderingTools specify execution order/priority? What if one tool depends on output of another?
+
+**Context:**
+
+* ServiceLoader provides no ordering guarantees
+* Some renderers might depend on others (e.g., sitemap depends on all pages existing)
+* No Priority interface visible in code
+
+**Impact:**
+
+* Plugin authors can't ensure dependencies
+* Potential for race conditions or missing data
+
+**Found in:** `Oven.renderContent()`, ServiceLoader usage
+
+**Assumption made:** Currently unordered; tools should be independent; if ordering needed, implement externally.
+
+---
+
+=== Q8: Template Engine Extension Registration
+
+**Question:** How does extension → engine mapping work exactly? Can users override mappings?
+
+**Context:**
+
+* `META-INF/org.jbake.parser.TemplateEngines.properties` maps extensions
+* Format: `classname=ext1,ext2,ext3`
+* Can user override in their project?
+* What if multiple engines claim same extension?
+
+**Impact:**
+
+* Custom template engine development
+* Conflict resolution strategy
+
+**Found in:** `TemplateEngines.java`, properties files
+
+**Assumption made:** First-registered wins; user can't override without custom JAR.
+
+---
+
+== Performance & Optimization
+
+=== Q9: ContentStore Memory Usage
+
+**Question:** What's the memory footprint of ContentStore for large sites (10K+ pages)? Are there limits?
+
+**Context:**
+
+* OrientDB embedded can be memory or plocal
+* Memory mode loads everything
+* Plocal mode uses disk but still has memory cache
+* No documented limits or recommendations
+
+**Impact:**
+
+* Site size recommendations
+* Memory tuning guidance
+* When to use memory vs. plocal
+
+**Found in:** ContentStore initialization, DB configuration
+
+**Assumption made:** Memory mode for < 1000 pages, plocal for larger sites; no hard limits documented.
+
+---
+
+=== Q10: Parallel Processing Potential
+
+**Question:** Has parallel processing been considered? Can stages or file processing be parallelized?
+
+**Context:**
+
+* Current pipeline is sequential
+* Many files are independent (could parse in parallel)
+* Rendering could be parallelized
+* No threading visible in code
+
+**Impact:**
+
+* Performance on multi-core systems
+* Large site build times
+
+**Found in:** `Oven.java`, `Crawler.java`
+
+**Assumption made:** Sequential for simplicity; parallelization future enhancement.
+
+---
+
+## Testing & Quality
+
+=== Q11: Integration Test Coverage
+
+**Question:** What's the test coverage strategy? Are there coverage targets?
+
+**Context:**
+
+* Many integration tests present
+* Some core classes well-tested
+* Coverage reports not visible
+* SPI extensions testing unclear
+
+**Impact:**
+
+* Confidence in refactoring
+* Regression prevention
+
+**Found in:** Test suite
+
+**Assumption made:** "Good enough" coverage; no strict percentage target.
+
+---
+
+=== Q12: Browser-Based Testing
+
+**Question:** Is there testing of generated HTML in actual browsers? Visual regression testing?
+
+**Context:**
+
+* Tests verify files generated
+* Content correctness checked
+* No browser rendering tests visible
+* HTML structure tested but not rendering
+
+**Impact:**
+
+* CSS/JS integration issues
+* Cross-browser compatibility
+
+**Found in:** Test suite
+
+**Assumption made:** Out of scope; users responsible for template browser testing.
+
+---
+
+## Error Handling & Debugging
+
+=== Q13: Error Aggregation Strategy
+
+**Question:** Why collect errors instead of fail-fast? What's the rationale?
+
+**Context:**
+
+* `Oven` collects errors in List
+* Continues processing after errors
+* Final check throws JBakeException with summary
+* Different from typical fail-fast
+
+**Impact:**
+
+* User experience (see all errors vs. one at a time)
+* Error recovery complexity
+
+**Found in:** `Oven.bake()` error handling
+
+**Assumption made:** Better UX for large sites (fix all errors at once); design trade-off.
+
+---
+
+=== Q14: Logging Configuration
+
+**Question:** How do users customize logging? SLF4J configuration not documented.
+
+**Context:**
+
+* JBake uses SLF4J
+* Tests use Logback
+* User projects - what logger binding?
+* Configuration file location/format?
+
+**Impact:**
+
+* Debugging production issues
+* Performance troubleshooting (verbose logging)
+
+**Found in:** Logging usage throughout codebase
+
+**Assumption made:** Users provide own SLF4J binding (Logback, Log4j2, etc.); configuration standard for chosen binding.
+
+---
+
+## Migration & Compatibility
+
+=== Q15: Java Version Support Policy
+
+**Question:** What triggers minimum Java version increase? When will Java 8 support be dropped?
+
+**Context:**
+
+* Currently Java 8+
+* Java 8 EOL passed (2019)
+* Modern features (modules, records, etc.) unavailable
+* Maintenance burden of old version
+
+**Impact:**
+
+* Adoption of new Java features
+* Dependency updates (libraries require newer Java)
+* User migration planning
+
+**Found in:** Build configuration, documentation
+
+**Assumption made:** Java 8 support continues until major version bump (3.0.0); ADR needed.
+
+---
+
+=== Q16: Breaking Change Policy
+
+**Question:** When are breaking changes acceptable? Only major versions?
+
+**Context:**
+
+* Semantic versioning declared in README
+* Many @Deprecated methods
+* Unclear when deprecations can be removed
+
+**Impact:**
+
+* Upgrade path clarity
+* User migration planning
+
+**Found in:** Version history, deprecation comments
+
+**Assumption made:** Breaking changes only in major versions (X.0.0); deprecations removed after one major version cycle.
+
+---
+
+## Documentation Gaps
+
+=== Q17: User Documentation vs. Developer Documentation
+
+**Question:** What's in scope for different doc types? Where should detailed API docs live?
+
+**Context:**
+
+* jbake.org has user docs
+* arc42 docs (this directory) for architecture
+* Javadoc in code
+* Overlap and gaps
+
+**Impact:**
+
+* Documentation maintenance
+* User vs. contributor guidance
+
+**Found in:** Various doc locations
+
+**Assumption made:** jbake.org = user; arc42 = architecture; Javadoc = API; GitHub wiki = community tips.
+
+---
+
+=== Q18: Example Project Maintenance
+
+**Question:** Who maintains example projects? Are they tested in CI?
+
+**Context:**
+
+* Example ZIPs for each template engine
+* May drift from current JBake version
+* Breaking changes could break examples
+
+**Impact:**
+
+* New user first experience
+* `-init` command reliability
+
+**Found in:** Example project resources
+
+**Assumption made:** Manually maintained; tested as part of smoke tests; should be in CI.
+
+---
+
+## Prioritized Questions for Team Discussion
+
+**HIGH PRIORITY:**
+
+1. Q2: OrientDB strategy - impacts future development
+2. Q7: RenderingTool ordering - affects plugin ecosystem
+3. Q15: Java version policy - affects maintainability
+
+**MEDIUM PRIORITY:**
+
+4. Q4: Template signature mechanism - user confusion
+5. Q6: Asset ignore patterns - common use case
+6. Q13: Error aggregation rationale - document for newcomers
+
+**LOW PRIORITY:**
+
+7. Q3: Utensils naming - nice to know, not blocking
+8. Q11: Test coverage strategy - internal decision
+9. Q18: Example maintenance - process question
+
+---
+
+## How to Use This Document
+
+**For maintainers:**
+
+* Review questions, provide answers
+* Turn answers into documentation or ADRs
+* Mark resolved questions
+* Track action items
+
+**For contributors:**
+
+* Understand known gaps
+* Don't assume when questions exist
+* Add new questions discovered during work
+* Help answer based on code archaeology
+
+**Format for answering:**
+
+```
+**Q#: Question Title**
+
+✅ **RESOLVED**
+
+**Answer:** [Clear explanation]
+
+**Documented in:** [Link to doc/ADR/code comment]
+
+**Resolved by:** @username on DATE
+```
+
+---
+
+## Meta: Questions About This Documentation
+
+### Q19: Mental Model Documentation Completeness
+
+**Question:** Is this mental model documentation sufficient for new senior developers? What's missing?
+
+**Context:** Created comprehensive docs including:
+
+* Arc42 architecture sections
+* ADRs with Pugh matrices
+* Onboarding journey (4 weeks)
+* LLM knowledge graph
+* Anti-patterns catalog
+
+**Need feedback on:**
+
+* Clarity and accuracy
+* Missing critical concepts
+* Depth vs. breadth balance
+* Maintainability
+
+**Action:** Schedule review with core team
+
+---
+
+**Last Updated:** 2025-11-22
+
+**Document Owner:** Architecture documentation team
+
+**Review Cycle:** Quarterly or after major releases

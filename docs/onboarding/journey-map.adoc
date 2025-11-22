@@ -1,0 +1,574 @@
+= JBake Developer Onboarding - 4-Week Journey
+
+This guide provides a structured learning path for new senior developers joining the JBake project. Each week builds on the previous, moving from overview to independence.
+
+== Week 1: Overview & Orientation
+
+**Goal**: Understand what JBake is, why it exists, and how it works at a high level.
+
+=== Learning Objectives
+
+* [ ] Explain JBake's purpose and target users
+* [ ] Describe the "bakery" metaphor and how it maps to components
+* [ ] Run JBake locally and generate a site
+* [ ] Identify the four pipeline stages (Crawl, Parse, Render, Copy)
+* [ ] Navigate the codebase structure
+
+=== Activities
+
+==== Day 1-2: Setup & First Bake
+
+1. **Environment Setup**
+   * Clone repository: `git clone https://github.com/jbake-org/jbake.git`
+   * Build project: `./gradlew build`
+   * Run tests: `./gradlew test`
+   * Create example site: `./gradlew run --args="-i example"`
+
+2. **Run Your First Bake**
+   * Initialize example project with: `java -jar build/libs/jbake-*.jar -i -b example`
+   * Examine the generated output in `example/output/`
+   * Modify `example/content/blog/2013/first-post.md`
+   * Re-bake and see changes: `java -jar build/libs/jbake-*.jar -b example`
+
+3. **Explore Example Project Structure**
+   ```
+   example/
+     ├── assets/         # Static files (CSS, JS, images)
+     ├── content/        # Markup files (Markdown, AsciiDoc)
+     ├── templates/      # Template files (Freemarker, Groovy, etc.)
+     ├── jbake.properties # Configuration
+     └── output/         # Generated HTML (created after baking)
+   ```
+
+==== Day 3: Code Walkthrough
+
+Read these files in order to understand the flow:
+
+1. `jbake-core/src/main/java/org/jbake/launcher/Main.java` - Entry point
+2. `jbake-core/src/main/java/org/jbake/launcher/Baker.java` - Bake orchestration
+3. `jbake-core/src/main/java/org/jbake/app/Oven.java` - Core pipeline
+4. `jbake-core/src/main/java/org/jbake/app/Crawler.java` - File discovery
+5. `jbake-core/src/main/java/org/jbake/app/Parser.java` - Content parsing
+
+==== Day 4-5: Documentation Deep Dive
+
+* Read: `README.asciidoc` - Project overview
+* Read: `docs/arc42/chapters/01_introduction_and_goals.adoc` - System vision
+* Read: `docs/arc42/chapters/04_solution_strategy.adoc` - Key decisions
+* Read: `docs/arc42/chapters/08_concepts.adoc` - Mental model concepts
+* Watch: Debug `Oven.bake()` method in IDE, step through pipeline
+
+=== Validation Questions
+
+Answer these to confirm understanding:
+
+1. **What are the four stages of the JBake pipeline?**
+   * Expected: Crawl, Parse, Render, Copy (Asset)
+
+2. **What's the difference between `content/` and `assets/` folders?**
+   * Expected: `content/` has markup files (processed), `assets/` has static files (copied as-is)
+
+3. **What happens when you run `jbake -b`?**
+   * Expected: Full bake - crawls all content, parses changed files, renders templates, copies assets
+
+4. **Where is configuration stored and what format?**
+   * Expected: `jbake.properties` file using Java Properties format
+
+5. **Name three supported markup formats.**
+   * Expected: Markdown, AsciiDoc, HTML (also JSON/YAML for data)
+
+=== Resources
+
+* User Documentation: http://jbake.org/docs/
+* GitHub Repository: https://github.com/jbake-org/jbake
+* Gitter Chat: https://gitter.im/jbake-org/jbake
+* Test Fixtures: `jbake-core/src/test/resources/fixture/` - canonical structure examples
+
+=== Week 1 Checkpoint
+
+**Self-Assessment Checklist:**
+
+* [ ] I can build JBake from source
+* [ ] I can generate a site and understand the output
+* [ ] I can identify which code handles crawling, parsing, and rendering
+* [ ] I understand the bakery metaphor and can explain it to someone else
+* [ ] I've read the key arc42 sections
+
+**Mentor Checkpoint:**
+
+Schedule 30min with mentor to:
+
+* Walk through your understanding of the pipeline
+* Discuss any confusing parts
+* Get guidance on Week 2 focus areas
+
+---
+
+== Week 2: Fundamentals - Content Processing
+
+**Goal**: Understand how content flows from markup files to HTML output.
+
+=== Learning Objectives
+
+* [ ] Explain DocumentModel structure and lifecycle
+* [ ] Trace a file from disk to DocumentModel to HTML
+* [ ] Understand SHA1-based change detection
+* [ ] Differentiate between markup engines and template engines
+* [ ] Comprehend status (draft/published) and type (post/page) semantics
+
+=== Activities
+
+==== Day 1-2: Document Model Deep Dive
+
+1. **Read Core Classes**
+   * `jbake-core/src/main/java/org/jbake/model/DocumentModel.java`
+   * `jbake-core/src/main/java/org/jbake/model/ModelAttributes.java`
+   * `jbake-core/src/main/java/org/jbake/model/DocumentTypes.java`
+
+2. **Experiment with Document Fields**
+   * Create a test Markdown file with custom fields:
+     ```markdown
+     title=Test Document
+     date=2025-11-22
+     type=post
+     status=published
+     tags=test,learning
+     myCustomField=Hello World
+     ~~~~~~
+     # Content
+     
+     This is test content.
+     ```
+   * Add debug breakpoint in `Parser.processFile()`
+   * Observe DocumentModel population
+   * Check how `myCustomField` appears in model
+
+3. **Study Parsers**
+   * Read: `jbake-core/src/main/java/org/jbake/parser/MarkupEngine.java` - Base class
+   * Read: `jbake-core/src/main/java/org/jbake/parser/MarkdownEngine.java` - Markdown impl
+   * Read: `jbake-core/src/main/java/org/jbake/parser/AsciidoctorEngine.java` - AsciiDoc impl
+   * Read: `jbake-core/src/main/java/org/jbake/parser/Engines.java` - Engine registry
+
+==== Day 3: SHA1 Change Detection
+
+1. **Understand the Mechanism**
+   * Read: `Crawler.crawlFile()` method - see SHA1 computation
+   * Read: `ContentStore.getDocumentStatus()` - see hash comparison
+   * Study DocumentStatus enum: NEW, IDENTICAL, UPDATED
+
+2. **Experiment**
+   * Bake a site once
+   * Check `.jbake` cache directory (if using plocal DB)
+   * Modify one file
+   * Bake again with logging: `./gradlew run --args="-b example" --info`
+   * Observe which files get re-parsed
+
+==== Day 4-5: Template Engines
+
+1. **Study Template Engine Architecture**
+   * Read: `jbake-core/src/main/java/org/jbake/template/AbstractTemplateEngine.java`
+   * Read: `jbake-core/src/main/java/org/jbake/template/DelegatingTemplateEngine.java`
+   * Read: `jbake-core/src/main/java/org/jbake/template/FreemarkerTemplateEngine.java`
+   * Read: `jbake-core/src/main/java/org/jbake/template/TemplateEngines.java`
+
+2. **Create a Simple Template**
+   * Add `test.ftl` to `example/templates/`:
+     ```freemarker
+     <!DOCTYPE html>
+     <html>
+     <head><title>${content.title}</title></head>
+     <body>
+       <h1>${content.title}</h1>
+       <p>Type: ${content.type}</p>
+       <p>Status: ${content.status}</p>
+       <div>${content.body}</div>
+     </body>
+     </html>
+     ```
+   * Configure in `jbake.properties`: `template.mytype.file=test.ftl`
+   * Create content file with `type=mytype`
+   * Bake and examine output
+
+=== Validation Questions
+
+1. **What is a DocumentModel and what does it contain?**
+   * Expected: Map-based structure with metadata (title, date, tags, status, type) and body (HTML)
+
+2. **How does JBake know which parser to use for a file?**
+   * Expected: File extension determines parser via Engines registry (.md → Markdown, .adoc → AsciiDoc)
+
+3. **Explain the three DocumentStatus values.**
+   * Expected: NEW (first time), IDENTICAL (unchanged SHA1), UPDATED (changed SHA1)
+
+4. **What's the difference between a markup engine and a template engine?**
+   * Expected: Markup engines parse content (Markdown → HTML); template engines apply presentation (Freemarker, Groovy)
+
+5. **What happens if you set `status=draft`?**
+   * Expected: Content parsed and cached but not rendered to output (not published)
+
+=== Hands-On Exercise
+
+**Create a Custom Document Type:**
+
+1. Define new type: `tutorial`
+2. Create config: `template.tutorial.file=tutorial.ftl`
+3. Create template: `templates/tutorial.ftl`
+4. Create content: `content/tutorials/my-tutorial.adoc` with `type=tutorial`
+5. Bake and verify output
+6. Submit PR-style branch for mentor review (don't merge)
+
+=== Week 2 Checkpoint
+
+**Self-Assessment:**
+
+* [ ] I can trace a file through Parser to DocumentModel
+* [ ] I understand SHA1-based incremental builds
+* [ ] I can create custom document types with templates
+* [ ] I comprehend the difference between markup and template processing
+* [ ] I've completed the hands-on exercise
+
+**Mentor Session:**
+
+* Review your custom document type implementation
+* Discuss any parsing or template rendering issues
+* Preview Week 3 topics (rendering and database queries)
+
+---
+
+== Week 3: Deep Dive - Rendering & Database
+
+**Goal**: Master content rendering, database queries, and blog-specific features.
+
+=== Learning Objectives
+
+* [ ] Understand ContentStore (OrientDB wrapper) operations
+* [ ] Write ContentStore queries for tag pages, archives
+* [ ] Comprehend RenderingTool SPI pattern
+* [ ] Explain pagination mechanism
+* [ ] Debug template rendering issues
+
+=== Activities
+
+==== Day 1-2: ContentStore & OrientDB
+
+1. **Study Database Layer**
+   * Read: `jbake-core/src/main/java/org/jbake/app/ContentStore.java`
+   * Read: `jbake-core/src/main/java/org/jbake/app/DBUtil.java`
+   * Read: `jbake-core/src/main/java/org/jbake/app/DocumentList.java`
+
+2. **Understand Query Methods**
+   * `getPublishedPosts()` - how does it work?
+   * `getPublishedPostsByTag()` - tag filtering
+   * `getAllTags()` - aggregation
+   * SQL-like syntax: `"select * from Documents where status='published' and type='post' order by date desc"`
+
+3. **Experiment with Queries**
+   * Add breakpoint in `ContentStore.getPublishedPosts()`
+   * Run tests: `ContentStoreTest.java`
+   * Use OrientDB Studio (if plocal mode) to inspect schema
+
+==== Day 3: RenderingTool Architecture
+
+1. **Study SPI Pattern**
+   * Read: `jbake-core/src/main/java/org/jbake/render/RenderingTool.java` (interface)
+   * Read META-INF/services: `org.jbake.render.RenderingTool`
+   * Read implementations:
+     - `IndexRenderer.java`
+     - `ArchiveRenderer.java`
+     - `TagsRenderer.java`
+     - `FeedRenderer.java`
+
+2. **Understand Rendering Flow**
+   * `Oven.renderContent()` uses ServiceLoader
+   * Each RenderingTool gets Renderer, ContentStore, Configuration
+   * Tools query ContentStore, render templates, write HTML files
+   * Return count of rendered documents
+
+==== Day 4-5: Blog Features Implementation
+
+1. **Study Tag Pages**
+   * Read: `TagsRenderer.java` - how tags are extracted and rendered
+   * Read template: `fixture/freemarkerTemplates/tags.ftl`
+   * Trace: content with `tags=java,tutorial` → tag page generation
+
+2. **Study Archives**
+   * Read: `ArchiveRenderer.java` - date-based organization
+   * Examine how posts grouped by date
+
+3. **Study RSS/Atom Feed**
+   * Read: `FeedRenderer.java`
+   * Template: `feed.ftl` generates XML
+
+4. **Implement Custom RenderingTool**
+   * Create class: `AuthorRenderer` (groups posts by author)
+   * Implement `RenderingTool` interface
+   * Add to META-INF/services
+   * Create template: `author.ftl`
+   * Test with example content
+
+=== Validation Questions
+
+1. **What does ContentStore do?**
+   * Expected: Wraps OrientDB, provides content caching and querying, SHA1-based change detection
+
+2. **How does JBake generate tag pages?**
+   * Expected: TagsRenderer queries all tags, for each tag queries posts with that tag, renders template
+
+3. **What is the RenderingTool interface for?**
+   * Expected: SPI for custom renderers (feeds, sitemaps, archives); discovered via ServiceLoader
+
+4. **Explain how pagination works in JBake.**
+   * Expected: Renderer calculates total pages, renders each page with subset of content, links to prev/next
+
+5. **Where are SQL queries defined?**
+   * Expected: As String constants in ContentStore class (e.g., STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG)
+
+=== Hands-On Exercise
+
+**Implement "Category Archive" Feature:**
+
+1. Add `category` field support to DocumentModel
+2. Create `CategoryRenderer` extending RenderingTool
+3. Query posts by category from ContentStore
+4. Create template `category.ftl` to display category pages
+5. Register via META-INF/services
+6. Test with example content
+7. Submit for mentor review
+
+=== Week 3 Checkpoint
+
+**Self-Assessment:**
+
+* [ ] I understand ContentStore queries and OrientDB integration
+* [ ] I can implement a custom RenderingTool
+* [ ] I comprehend blog features (tags, archives, feeds)
+* [ ] I've debugged template rendering successfully
+* [ ] Hands-on exercise completed
+
+**Mentor Session:**
+
+* Code review of CategoryRenderer implementation
+* Discuss OrientDB query optimization
+* Performance testing discussion
+* Preview Week 4 (independence tasks)
+
+---
+
+== Week 4: Independence - Contributing & Extending
+
+**Goal**: Work independently on real issues, understand contribution workflow, and extend JBake.
+
+=== Learning Objectives
+
+* [ ] Navigate GitHub issues and select appropriate tasks
+* [ ] Follow contribution guidelines
+* [ ] Run full test suite and add new tests
+* [ ] Submit quality pull requests
+* [ ] Understand release process
+
+=== Activities
+
+==== Day 1: Contribution Workflow
+
+1. **Read Contribution Guide**
+   * `CONTRIBUTING.asciidoc` - full guidelines
+   * Code style and formatting
+   * Test requirements
+   * PR submission process
+
+2. **Setup Development Environment**
+   * Configure IDE with checkstyle: `config/checkstyle/checkstyle.xml`
+   * Run tests: `./gradlew test`
+   * Run checkstyle: `./gradlew check`
+   * Build distribution: `./gradlew distZip`
+
+3. **Study Test Structure**
+   * Unit tests: `jbake-core/src/test/java/`
+   * Integration tests: `ContentStoreIntegrationTest.java`
+   * Fixtures: `jbake-core/src/test/resources/fixture/`
+   * Template engine tests: `AbstractTemplateEngineRenderingTest.java`
+
+==== Day 2-3: Pick and Implement an Issue
+
+1. **Select Issue**
+   * Browse: https://github.com/jbake-org/jbake/issues
+   * Filter by labels: `good first issue`, `help wanted`
+   * Example types:
+     - Bug fix (parser error, rendering issue)
+     - Enhancement (new config option, template helper)
+     - Documentation (JavaDoc, user guide)
+
+2. **Implementation Process**
+   * Fork repository
+   * Create feature branch: `feature/issue-123-description`
+   * Implement fix/feature
+   * Add tests (required!)
+   * Run full test suite
+   * Run checkstyle
+   * Commit with message: `Fix #123: Description`
+
+3. **Code Review Preparation**
+   * Self-review your changes
+   * Check for:
+     - Backwards compatibility
+     - Test coverage
+     - Javadoc for public APIs
+     - No breaking changes without deprecation
+
+==== Day 4: Pull Request Submission
+
+1. **Create PR**
+   * Push branch to your fork
+   * Open PR on GitHub
+   * Fill in PR template:
+     - Description of change
+     - Issue reference
+     - Testing performed
+     - Breaking changes (if any)
+
+2. **Respond to Review**
+   * Address review comments
+   * Update tests if needed
+   * Discuss design decisions
+
+==== Day 5: Advanced Topics
+
+Choose one deep-dive topic:
+
+**Option A: Performance Optimization**
+
+* Profile JBake with YourKit/VisualVM
+* Identify bottlenecks (parsing, rendering, DB queries)
+* Implement optimization
+* Benchmark before/after
+
+**Option B: New Template Engine**
+
+* Implement support for new template engine (e.g., Velocity, Mustache)
+* Extend `AbstractTemplateEngine`
+* Add to `TemplateEngines` registry
+* Create example templates
+* Write integration tests
+
+**Option C: Build Tool Plugin**
+
+* Study jbake-maven-plugin code
+* Create Gradle plugin equivalent
+* Or enhance existing Maven plugin
+
+=== Validation Questions
+
+1. **What's the contribution workflow?**
+   * Expected: Fork → branch → implement → test → checkstyle → PR → review → merge
+
+2. **Where are integration tests located?**
+   * Expected: `jbake-core/src/test/java/`, extending `ContentStoreIntegrationTest`
+
+3. **What's required for a PR to be accepted?**
+   * Expected: Tests, checkstyle pass, backwards compatibility, no breaking changes (or deprecated), clear description
+
+4. **How would you add a new template engine?**
+   * Expected: Extend AbstractTemplateEngine, register in META-INF/services, add to TemplateEngines.properties, test
+
+5. **What's the release process?**
+   * Expected: Semantic versioning, tag, build artifacts, publish to Maven Central, GitHub release
+
+=== Final Project Options
+
+Choose one to demonstrate mastery:
+
+**Project A: Documentation Improvement**
+
+* Write tutorial: "Creating Custom Document Types"
+* Add examples to jbake.org documentation
+* Create video walkthrough of development workflow
+
+**Project B: Feature Implementation**
+
+* Implement small feature from backlog
+* Full test coverage
+* Documentation
+* Submit PR
+
+**Project C: Performance Analysis**
+
+* Profile JBake on large site (1000+ pages)
+* Create performance report
+* Propose optimization strategies
+* Implement one optimization
+
+=== Week 4 Checkpoint
+
+**Self-Assessment:**
+
+* [ ] I've successfully contributed a PR
+* [ ] I can run and write tests independently
+* [ ] I understand the release and versioning process
+* [ ] I've completed a deep-dive topic
+* [ ] I can work on issues without constant guidance
+
+**Final Mentor Session:**
+
+* Review final project
+* Discuss areas for continued growth
+* Identify specialization areas (parsers, templates, performance, etc.)
+* Transition to regular contributor status
+
+---
+
+== Post-Onboarding: Continued Learning
+
+=== Specialization Paths
+
+**Path 1: Core Architecture**
+
+* Refactor legacy code to modern patterns
+* Improve error handling and logging
+* Performance optimization
+* OrientDB migration strategy
+
+**Path 2: Parser Ecosystem**
+
+* Maintain markup engines (Markdown, AsciiDoc)
+* Add new format support
+* Parser performance optimization
+
+**Path 3: Template Engines**
+
+* Maintain template engine integrations
+* Help users with template issues
+* Create template helpers and utilities
+
+**Path 4: Documentation & Community**
+
+* Maintain jbake.org site
+* Write tutorials and guides
+* Answer forum/Gitter questions
+* Create example projects
+
+=== Resources for Continued Learning
+
+* **API Reference**: Javadoc in code
+* **User Documentation**: http://jbake.org/docs/
+* **Community**:
+  - Mailing List: https://groups.google.com/group/jbake-dev
+  - Forum: https://groups.google.com/group/jbake-user
+  - Gitter: https://gitter.im/jbake-org/jbake
+* **Related Projects**:
+  - DocToolchain: https://doctoolchain.org/
+  - JBake Maven Plugin: jbake-maven-plugin/
+  - Gradle Plugin: Community maintained
+
+=== Success Criteria
+
+You've successfully onboarded when you can:
+
+* ✅ Independently select and complete issues
+* ✅ Review other contributors' PRs
+* ✅ Answer user questions on forum/Gitter
+* ✅ Explain architecture decisions to new contributors
+* ✅ Propose new features with design rationale
+* ✅ Maintain backwards compatibility
+* ✅ Write clear, tested, documented code
+
+Welcome to the JBake team! 🎉

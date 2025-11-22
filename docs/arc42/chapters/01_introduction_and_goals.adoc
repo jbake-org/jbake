@@ -1,0 +1,156 @@
+:jbake-title: Introduction and Goals
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 1
+:filename: /chapters/01_introduction_and_goals.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+[[section-introduction-and-goals]]
+== Introduction and Goals
+
+=== System Vision and Purpose
+
+JBake is a Java-based static site generator designed for developers who want to "bake" websites from content written in markup languages. The core metaphor: *JBake is like an oven that transforms raw ingredients (markup content, templates, assets) into a fully-baked website (HTML files)*.
+
+**Primary Purpose:**
+
+* Convert markup documents (Markdown, AsciiDoc, HTML) into static HTML websites
+* Provide a blog-aware generator with support for posts, pages, tags, and archives
+* Enable template-driven rendering with multiple template engine options
+* Support developer workflows with live preview and incremental building
+
+**Key Business Goals:**
+
+1. **Developer Productivity**: Enable rapid website creation without complex frameworks
+2. **Flexibility**: Support multiple markup languages and template engines
+3. **Simplicity**: Provide "convention over configuration" approach with sensible defaults
+4. **Extensibility**: Allow plugins and customization through Java SPI mechanism
+
+=== Requirements Overview
+
+**Essential Features:**
+
+[cols="1,3"]
+|===
+|Feature |Description
+
+|Content Processing
+|Parse and convert multiple markup formats (Markdown, AsciiDoc, HTML) to HTML
+
+|Template Rendering
+|Support multiple template engines (Freemarker, Groovy, Thymeleaf, Pebble, Jade)
+
+|Blog Support
+|Generate blog structures with posts, pages, archives, tags, and RSS feeds
+
+|Asset Management
+|Copy static assets and handle asset folders
+
+|Incremental Builds
+|Detect changed files and rebuild only what's necessary
+
+|Live Preview
+|Built-in Jetty server for local preview during development
+
+|Caching
+|OrientDB-based content cache for performance optimization
+
+|Data Files
+|Support external data files (JSON, YAML) for template injection
+|===
+
+**Target Users:**
+
+* Developers creating personal blogs or documentation sites
+* Teams building static websites with version-controlled content
+* Technical writers using AsciiDoc or Markdown
+* Users migrating from other static site generators
+
+=== Requirements Overview
+
+**Core Requirements:**
+
+1. **Content Crawling**: Recursively scan content folder and parse markup files
+2. **Incremental Processing**: SHA1-based change detection to avoid redundant processing
+3. **Template Selection**: Automatic template matching based on document type
+4. **Output Generation**: Write rendered HTML to destination folder
+5. **Asset Handling**: Copy static files (CSS, JS, images) to output
+6. **Preview Server**: Serve generated site locally for development
+
+=== Quality Goals
+
+[options="header",cols="1,2,3"]
+|===
+|Priority |Quality Goal |Motivation & Scenarios
+
+|1
+|**Extensibility**
+|Support multiple markup and template engines without modifying core code. New engines can be added via Java SPI mechanism. *Scenario*: A developer wants to add support for a new template engine - they implement AbstractTemplateEngine, register via META-INF/services, and JBake auto-discovers it.
+
+|2
+|**Performance** 
+|Process large sites efficiently through caching and incremental builds. *Scenario*: When rebuilding a 1000-page site, only changed files are reprocessed. OrientDB cache stores parsed content with SHA1 hashing for change detection.
+
+|3
+|**Simplicity**
+|Provide zero-configuration startup with sensible defaults. *Scenario*: Running `jbake -i -b` on an empty folder creates example project structure and generates the site immediately without requiring configuration files.
+
+|4
+|**Modularity**
+|Clear separation between parsing, rendering, and output stages. *Scenario*: Template engine failures don't crash the crawler; each rendering tool handles its own errors independently.
+
+|5
+|**Compatibility**
+|Maintain backwards compatibility with existing projects. *Scenario*: Deprecated constructors and methods are kept with @Deprecated annotations, allowing gradual migration to new APIs while supporting legacy code.
+|===
+
+=== Stakeholders
+
+[options="header",cols="1,2,3"]
+|===
+|Role/Name |Contact |Expectations
+
+|**End Users** (Bloggers & Technical Writers)
+|User community via mailing list, forum
+|Easy-to-use tool for creating static sites; good documentation; support for popular markup formats; fast build times
+
+|**Contributors** (Core Developers)
+|GitHub jbake-org/jbake
+|Clean, maintainable architecture; clear extension points; comprehensive tests; backwards compatibility
+
+|**Plugin Developers**
+|External developers
+|Well-documented SPI interfaces; stable APIs for template engines, markup parsers, and rendering tools; minimal dependencies
+
+|**Embedding Projects**
+|JBake Maven Plugin, Gradle Plugin users
+|Programmatic API access; configuration flexibility; ability to run JBake embedded in build tools
+
+|**Site Maintainers**
+|jbake.org documentation team
+|Dogfooding: JBake documentation site uses JBake itself (with DocToolchain); need stable, reliable builds
+
+|**Java Ecosystem**
+|Maven Central consumers
+|Semantic versioning; proper dependency management; Java 8+ compatibility
+|===
+
+=== Technical Roadmap (Next 12 Months)
+
+**Planned Enhancements:**
+
+* Java 11+ as minimum version (migrate from Java 8)
+* Improved incremental build performance
+* Better error reporting with context
+* Modern template engine support (consider removing legacy engines)
+* Enhanced CLI with picocli improvements
+* Migration guide for breaking changes
+
+**Deprecation Plans:**
+
+* Legacy constructor patterns with File/CompositeConfiguration parameters → JBakeConfiguration-based constructors
+* Direct OrientDB API exposure → Abstract ContentStore methods
+* Mutable configuration via setters → Immutable configuration builders

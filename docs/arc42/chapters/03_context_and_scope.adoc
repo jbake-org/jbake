@@ -1,0 +1,195 @@
+:jbake-title: Context and Scope
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 3
+:filename: /chapters/03_context_and_scope.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+
+
+[[section-context-and-scope]]
+== Context and Scope
+
+=== System Boundaries: What's IN vs OUT
+
+**IN SCOPE (JBake responsibilities):**
+
+* Parsing markup files (Markdown, AsciiDoc, HTML, Raw HTML)
+* Template rendering with multiple engine support
+* Content database management (caching, querying)
+* Static file copying (assets, media)
+* Blog-specific features (archives, tags, feeds, sitemap)
+* Local preview server
+* Command-line interface
+* Configuration management
+
+**OUT OF SCOPE (External responsibilities):**
+
+* Content authoring (use your favorite editor)
+* Version control (use Git, SVN, etc.)
+* Web hosting/deployment (use FTP, rsync, GitHub Pages, etc.)
+* Dynamic server-side processing
+* User authentication/sessions
+* Database-backed content management
+* Real-time collaboration
+* WYSIWYG editing
+
+=== Business Context
+
+[plantuml, jbake-context, svg]
+----
+@startuml
+!include <C4/C4_Context>
+
+title JBake System Context
+
+Person(dev, "Developer", "Content creator and site maintainer")
+Person(reader, "Site Visitor", "Reads the published static site")
+
+System(jbake, "JBake", "Static site generator that transforms markup content into HTML websites")
+
+System_Ext(editor, "Text Editor", "VS Code, IntelliJ, vim, etc.")
+System_Ext(vcs, "Version Control", "Git repository for content")
+System_Ext(webserver, "Web Server", "Nginx, Apache, GitHub Pages")
+System_Ext(browser, "Web Browser", "For preview and consumption")
+
+Rel(dev, editor, "Writes content in", "Markdown/AsciiDoc")
+Rel(dev, jbake, "Runs bake command", "CLI")
+Rel(dev, vcs, "Commits content", "Git")
+Rel(jbake, browser, "Serves preview", "HTTP :8820")
+Rel(dev, webserver, "Deploys output", "FTP/rsync/Git")
+Rel(reader, browser, "Accesses site")
+Rel(browser, webserver, "Loads pages", "HTTPS")
+
+note right of jbake
+  Core boundary: Transform static 
+  files IN, generate HTML OUT.
+  No dynamic processing, no CMS.
+end note
+
+@enduml
+----
+
+**Communication Partners:**
+
+[options="header",cols="2,3,3"]
+|===
+|Partner |Inputs to JBake |Outputs from JBake
+
+|**Developer/User**
+|CLI commands (`-b`, `-s`, `-i`), Configuration files (`jbake.properties`), Content files, Template files
+|Generated HTML site, Console logs, Error messages, Example projects
+
+|**File System**
+|Content folder structure, Asset files (CSS/JS/images), Data files (JSON/YAML)
+|Output folder with rendered HTML, Copied assets, Generated feeds/sitemap
+
+|**Template Engines** (Freemarker, Groovy, etc.)
+|Template files (`.ftl`, `.groovy`, `.tpl`, etc.), Template model (data)
+|Rendered HTML strings
+
+|**Markup Engines** (AsciiDoctor, Flexmark)
+|Raw markup text (AsciiDoc, Markdown)
+|Parsed HTML fragments, Metadata maps
+
+|**OrientDB**
+|Document models for storage, SHA1 hashes, Query requests
+|Cached documents, Query results, Change detection signals
+
+|**Preview Server (Jetty)**
+|Serve requests from JBake
+|HTTP responses with generated content
+|===
+
+=== Technical Context
+
+[plantuml, jbake-technical-context, svg]
+----
+@startuml
+!include <C4/C4_Container>
+
+title JBake Technical Context
+
+Person(user, "User", "")
+
+Container(jbake, "JBake CLI", "Java 8+", "Command-line application")
+
+ContainerDb(orient, "OrientDB", "Embedded DB", "In-memory or plocal storage")
+
+Container_Ext(asciidoctor, "AsciidoctorJ", "JRuby", "AsciiDoc processor")
+Container_Ext(flexmark, "Flexmark", "Java", "Markdown processor")
+Container_Ext(freemarker, "Freemarker", "Java", "Template engine")
+Container_Ext(groovy, "Groovy Templates", "Groovy", "Template engine")
+Container_Ext(thymeleaf, "Thymeleaf", "Java", "Template engine")
+Container_Ext(jetty, "Jetty Server", "Java", "HTTP server")
+
+Rel(user, jbake, "Executes", "java -jar jbake.jar")
+Rel(jbake, orient, "Stores/queries", "OrientDB API")
+Rel(jbake, asciidoctor, "Processes .adoc", "Java API")
+Rel(jbake, flexmark, "Processes .md", "Java API")
+Rel(jbake, freemarker, "Renders .ftl", "Java API")
+Rel(jbake, groovy, "Renders .groovy", "Java API")
+Rel(jbake, thymeleaf, "Renders .html", "Java API")
+Rel(jbake, jetty, "Starts server", "Embedded")
+Rel(user, jetty, "Previews", "HTTP localhost:8820")
+
+@enduml
+----
+
+**Technical Interfaces:**
+
+[options="header",cols="2,2,3,3"]
+|===
+|Interface |Protocol/Technology |Direction |Purpose & Rationale
+
+|**File I/O**
+|Java NIO, Apache Commons IO
+|Bidirectional
+|Read source files, write output HTML. *Rationale*: Standard Java APIs for cross-platform file operations.
+
+|**OrientDB Embedded**
+|OrientDB Java API, SQL-like queries
+|In-process
+|Content caching and querying. *Rationale*: Embedded NoSQL DB avoids external dependencies while providing query capabilities for tags, published posts, etc.
+
+|**Java SPI** (ServiceLoader)
+|Java ServiceLoader mechanism
+|In-process
+|Plugin discovery for RenderingTool, MarkupEngine, TemplateEngine. *Rationale*: Standard Java extension mechanism for classpath-based plugins.
+
+|**Properties Files**
+|`jbake.properties`, Commons Configuration2
+|Read
+|Configuration loading. *Rationale*: Simple key-value format familiar to Java developers.
+
+|**META-INF Services**
+|Properties files
+|Read
+|Engine registration (MarkupEngines.properties, TemplateEngines.properties). *Rationale*: Declarative engine-to-extension mapping.
+
+|**HTTP Server**
+|Jetty embedded server
+|TCP :8820
+|Local preview during development. *Rationale*: Lightweight embedded server, no external server required.
+
+|**Template Engine APIs**
+|Engine-specific (Freemarker API, Groovy Template API, etc.)
+|In-process
+|Template processing. *Rationale*: Use native engine APIs for full feature support; wrapped behind AbstractTemplateEngine interface.
+
+|**Markup Parser APIs**
+|AsciidoctorJ (JRuby bridge), Flexmark (native Java)
+|In-process
+|Content parsing. *Rationale*: Leverage mature, feature-rich parsers; AsciidoctorJ for AsciiDoc compatibility, Flexmark for modern Markdown with Pegdown compatibility.
+|===
+
+**Key Technical Constraints:**
+
+* **Java 8+ Runtime**: Minimum requirement for compatibility with older projects
+* **No Native Dependencies**: Pure Java to support all platforms
+* **Optional Dependencies**: Template engines and markup parsers are optional (compile-time `optional` in Gradle) to reduce footprint
+* **Embedded Database**: OrientDB runs in-process; no external database server needed
+* **File-Based**: All I/O through file system; no network protocols for content
