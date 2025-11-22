@@ -31,7 +31,7 @@ object ZipUtil {
             val outputParent = File(outputFile.getParent())
             outputParent.mkdirs()
 
-            if (entry.isDirectory()) {
+            if (entry.isDirectory) {
                 if (!outputFile.exists()) {
                     outputFile.mkdir()
                 }

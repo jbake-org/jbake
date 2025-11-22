@@ -2,7 +2,6 @@ package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
-import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
 import org.jbake.app.Renderer

@@ -30,10 +30,9 @@ import java.util.*
  * @author Cédric Champeau
  */
 class ModelExtractors private constructor() {
-    private val extractors: MutableMap<String, ModelExtractor<*>>
+    private val extractors: MutableMap<String, ModelExtractor<*>> = TreeMap<String, ModelExtractor<*>>()
 
     init {
-        extractors = TreeMap<String, ModelExtractor<*>>()
         loadEngines()
     }
 

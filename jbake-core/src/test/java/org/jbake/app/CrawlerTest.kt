@@ -60,16 +60,16 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val dataFileUtil = DataFileUtil(db, "data")
         val videos = dataFileUtil.get("videos.yaml")
         Assert.assertFalse(videos!!.isEmpty())
-        Assert.assertNotNull(videos.get("data"))
+        Assert.assertNotNull(videos["data"])
 
         // regression test for issue 747
         val authorsFileContents = dataFileUtil.get("authors.yaml")
         Assert.assertFalse(authorsFileContents!!.isEmpty())
-        val authorsList = authorsFileContents.get("authors")
+        val authorsList = authorsFileContents["authors"]
         Assertions.assertThat<Any?>(authorsList).isNotInstanceOf(OTrackedMap::class.java)
         Assertions.assertThat<Any?>(authorsList).isInstanceOf(HashMap::class.java)
         val authors = authorsList as HashMap<String, MutableMap<String,  Any>>
-        Assertions.assertThat<Any?>(authors.get("Joe Bloggs")!!.get("last_name")).isEqualTo("Bloggs")
+        Assertions.assertThat<Any?>(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
     }
 
     @Test

@@ -51,7 +51,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
     private fun findTemplate(templateName: String): Template {
         val ste = if (templateName.endsWith(".gxml")) XmlTemplateEngine() else SimpleTemplateEngine()
         val sourceTemplate = File(config.templateFolder, templateName)
-        var template = cachedTemplates.get(templateName)
+        var template = cachedTemplates[templateName]
         if (template == null) {
             template = ste.createTemplate(
                 InputStreamReader(BufferedInputStream(FileInputStream(sourceTemplate)), config.templateEncoding)

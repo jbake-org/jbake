@@ -68,8 +68,8 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
 
     private fun initializeTemplateEngine() {
         templateResolver = FileTemplateResolver()
-        templateResolver!!.setPrefix(config.templateFolder!!.getAbsolutePath() + File.separatorChar)
-        templateResolver!!.setCharacterEncoding(config.templateEncoding)
+        templateResolver!!.prefix = config.templateFolder!!.absolutePath + File.separatorChar
+        templateResolver!!.characterEncoding = config.templateEncoding
         templateResolver!!.setTemplateMode(DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE)
         templateEngine = TemplateEngine()
         templateEngine!!.setTemplateResolver(templateResolver)

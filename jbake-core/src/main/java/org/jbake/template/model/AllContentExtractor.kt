@@ -12,7 +12,7 @@ class AllContentExtractor : ModelExtractor<DocumentList<*>> {
     override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
 
         val config = model["config"] as MutableMap<String, Any>
-        val dataFileDocType: String = config.get(PropertyList.DATA_FILE_DOCTYPE.key.replace(".", "_")).toString()
+        val dataFileDocType: String = config[PropertyList.DATA_FILE_DOCTYPE.key.replace(".", "_")].toString()
         val allContent = DocumentList<DocumentModel>()
 
         val documentTypes = DocumentTypes.documentTypes

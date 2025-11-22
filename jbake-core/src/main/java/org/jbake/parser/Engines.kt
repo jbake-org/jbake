@@ -46,15 +46,14 @@ class Engines private constructor() {
     }
 
     private fun getEngine(fileExtension: String): ParserEngine? {
-        return parsers.get(fileExtension)
+        return parsers[fileExtension]
     }
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(Engines::class.java)
-        private val INSTANCE: Engines
+        private val INSTANCE: Engines = Engines()
 
         init {
-            INSTANCE = Engines()
             loadEngines()
         }
 

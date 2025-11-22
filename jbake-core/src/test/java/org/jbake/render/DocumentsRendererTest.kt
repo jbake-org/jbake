@@ -11,7 +11,6 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.function.Executable
 import org.mockito.*
 import java.util.function.Function
 import java.util.stream.Collectors
@@ -155,15 +154,15 @@ class DocumentsRendererTest {
         val renderedDocs = asTitleToDocMap(argument.getAllValues())
 
         // page checks
-        assertDocumentNavigation(renderedDocs.get(fifthTitle), thirdTitle, null)
-        assertDocumentNavigation(renderedDocs.get(thirdTitle), firstTitle, fifthTitle)
-        assertDocumentNavigation(renderedDocs.get(firstTitle), null, thirdTitle)
+        assertDocumentNavigation(renderedDocs[fifthTitle], thirdTitle, null)
+        assertDocumentNavigation(renderedDocs[thirdTitle], firstTitle, fifthTitle)
+        assertDocumentNavigation(renderedDocs[firstTitle], null, thirdTitle)
 
         // post checks
-        assertDocumentNavigation(renderedDocs.get(seventhTitle), sixthTitle, null)
-        assertDocumentNavigation(renderedDocs.get(sixthTitle), secondTitle, seventhTitle)
-        assertDocumentNavigation(renderedDocs.get(fourthTitle), secondTitle, sixthTitle)
-        assertDocumentNavigation(renderedDocs.get(secondTitle), null, sixthTitle)
+        assertDocumentNavigation(renderedDocs[seventhTitle], sixthTitle, null)
+        assertDocumentNavigation(renderedDocs[sixthTitle], secondTitle, seventhTitle)
+        assertDocumentNavigation(renderedDocs[fourthTitle], secondTitle, sixthTitle)
+        assertDocumentNavigation(renderedDocs[secondTitle], null, sixthTitle)
 
         Assertions.assertThat(renderResponse).isEqualTo(7)
     }

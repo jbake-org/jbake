@@ -21,7 +21,7 @@ class Main @JvmOverloads constructor(
     private val jettyServer: JettyServer = JettyServer(),
     private val watcher: BakeWatcher = BakeWatcher()
 ) {
-    var jBakeConfigurationFactory: JBakeConfigurationFactory?
+    var jBakeConfigurationFactory: JBakeConfigurationFactory? = JBakeConfigurationFactory()
     /**
      * Optional constructor to externalize dependencies.
      *
@@ -29,12 +29,6 @@ class Main @JvmOverloads constructor(
      * @param jettyServer   A [JettyServer] instance
      * @param watcher A [BakeWatcher] instance
      */
-    /**
-     * Default constructor.
-     */
-    init {
-        this.jBakeConfigurationFactory = JBakeConfigurationFactory()
-    }
 
     @Throws(JBakeException::class)
     fun run(args: Array<String>) {
@@ -104,7 +98,7 @@ class Main @JvmOverloads constructor(
                 if (launchOptions.getDestination() != null) {
                     // use the destination provided via the commandline
                     runServer(launchOptions.getDestination(), config)
-                } else if (launchOptions.getSource().getPath() != ".") {
+                } else if (launchOptions.getSource().path != ".") {
                     // use the source folder provided via the commandline
                     runServer(launchOptions.getSource(), config)
                 } else {
@@ -124,12 +118,12 @@ class Main @JvmOverloads constructor(
 
     private fun printUsage(options: Any) {
         val cli = CommandLine(options)
-        cli.setUsageHelpLongOptionsMaxWidth(28)
+        cli.usageHelpLongOptionsMaxWidth = 28
         cli.usage(System.out)
     }
 
     private fun runServer(path: File, configuration: JBakeConfiguration) {
-        jettyServer.run(path.getPath(), configuration)
+        jettyServer.run(path.path, configuration)
     }
 
     private fun initStructure(type: String, config: JBakeConfiguration) {

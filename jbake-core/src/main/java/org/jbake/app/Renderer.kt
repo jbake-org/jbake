@@ -143,7 +143,7 @@ class Renderer {
             logger.info("Rendering [{}]... done!", outputFile)
         } catch (e: Exception) {
             logger.error("Rendering [{}]... failed!", outputFile, e)
-            throw Exception("Failed to render file " + outputFile.getAbsolutePath() + ". Cause: " + e.message, e)
+            throw Exception("Failed to render file " + outputFile.absolutePath + ". Cause: " + e.message, e)
         }
     }
 

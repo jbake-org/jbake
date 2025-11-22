@@ -25,9 +25,9 @@ class ProjectWebsiteTest {
     fun setup() {
         Assume.assumeTrue("JDK 7 is not supported for this test", !this.isJava7)
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath()
+            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
         } else {
-            jbakeExecutable = File("build/install/jbake/bin/jbake").getAbsolutePath()
+            jbakeExecutable = File("build/install/jbake/bin/jbake").absolutePath
         }
         projectFolder = folder.newFolder("project")
         File(projectFolder, "templates")

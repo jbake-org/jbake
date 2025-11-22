@@ -21,10 +21,10 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     private fun ensureSource() {
         val source = configuration.sourceFolder ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not configured.")
         if (!FileUtil.isExistingFolder(source))
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.getAbsolutePath())
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.absolutePath)
 
         if (!configuration.sourceFolder!!.canRead())
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.getAbsolutePath())
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.absolutePath)
     }
 
     private fun ensureTemplateFolder() {
@@ -45,7 +45,7 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
         if (!destination.canWrite()) {
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
-                "Error: Destination folder is not writable: " + destination.getAbsolutePath()
+                "Error: Destination folder is not writable: " + destination.absolutePath
             )
         }
     }
@@ -59,7 +59,7 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     private fun checkRequiredFolderExists(folderName: String?, path: File) {
         if (!FileUtil.isExistingFolder(path))
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.getAbsolutePath())
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
     }
 
 

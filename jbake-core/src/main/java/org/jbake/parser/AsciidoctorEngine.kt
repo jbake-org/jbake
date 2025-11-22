@@ -33,14 +33,14 @@ class AsciidoctorEngine : MarkupEngine() {
                     if (engine == null) {
                         log.info("Initializing Asciidoctor engine...")
                         if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = AsciidoctorJRuby.Factory.create(options.map().get(OPT_GEM_PATH).toString())
+                            engine = AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
                         } else {
                             engine = Asciidoctor.Factory.create()
                         }
 
                         if (options.map().containsKey(OPT_REQUIRES)) {
                             val requires: Array<String> =
-                                options.map().get(OPT_REQUIRES).toString().split(",".toRegex())
+                                options.map()[OPT_REQUIRES].toString().split(",".toRegex())
                                     .dropLastWhile { it.isEmpty() }.toTypedArray()
                             if (requires.size != 0) {
                                 for (require in requires) {
@@ -101,7 +101,7 @@ class AsciidoctorEngine : MarkupEngine() {
                     log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
                 }
             } else {
-                documentModel.put(key, attributes.get(key)!!)
+                documentModel.put(key, attributes[key]!!)
             }
         }
     }
@@ -169,7 +169,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 options.setOption(optionKey, optionValue)
             }
         }
-        options.setBaseDir(context.file.getParentFile().getAbsolutePath())
+        options.setBaseDir(context.file.getParentFile().absolutePath)
         options.setSafe(SafeMode.UNSAFE)
         return options
     }

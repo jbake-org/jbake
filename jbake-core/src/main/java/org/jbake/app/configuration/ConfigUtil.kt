@@ -29,7 +29,7 @@ class ConfigUtil {
         if (!source.exists()) {
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
-                "The given source folder '" + source.getAbsolutePath() + "' does not exist."
+                "The given source folder '" + source.absolutePath + "' does not exist."
             )
         }
         if (!source.isDirectory()) {
@@ -37,10 +37,10 @@ class ConfigUtil {
         }
 
         val legacyConfigFile = File(source, LEGACY_CONFIG_FILE)
-        val customConfigFile = if (propertiesFile != null) propertiesFile else File(source, CONFIG_FILE)
+        val customConfigFile = propertiesFile ?: File(source, CONFIG_FILE)
 
         val config = CompositeConfiguration()
-        config.setListDelimiterHandler(DefaultListDelimiterHandler(LIST_DELIMITER))
+        config.listDelimiterHandler = DefaultListDelimiterHandler(LIST_DELIMITER)
 
         if (legacyConfigFile.exists()) {
             displayLegacyConfigFileWarningIfRequired()

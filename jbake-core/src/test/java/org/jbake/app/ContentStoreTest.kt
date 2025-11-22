@@ -10,10 +10,8 @@ import org.junit.Assert
 import org.junit.Test
 import java.lang.Boolean
 import java.util.*
-import kotlin.Exception
 import kotlin.Long
 import kotlin.String
-import kotlin.Throws
 import kotlin.arrayOf
 
 class ContentStoreTest : ContentStoreIntegrationTest() {
@@ -75,7 +73,7 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
             db.getDocumentStatus(uri)
 
         Assert.assertEquals(1, documentList4.size.toLong())
-        Assert.assertEquals(Boolean.FALSE, documentList4.get(0)!!.rendered)
+        Assert.assertEquals(Boolean.FALSE, documentList4[0]!!.rendered)
 
         val documentCount2: Long = db.getPublishedCount(typeWithHyphen)
         Assert.assertEquals(0, documentCount2)
@@ -92,9 +90,9 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
 
         val documentList5: DocumentList<DocumentModel> = db.unrenderedContent
         Assert.assertEquals(2, documentList5.size.toLong())
-        Assert.assertEquals(Boolean.FALSE, documentList5.get(0)!!.rendered)
-        Assert.assertEquals(typeWithHyphen, documentList5.get(0)!!.type)
-        Assertions.assertThat<String>(documentList5.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assert.assertEquals(Boolean.FALSE, documentList5[0]!!.rendered)
+        Assert.assertEquals(typeWithHyphen, documentList5[0]!!.type)
+        Assertions.assertThat<String>(documentList5[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentCount3: Long = db.getPublishedCount(typeWithHyphen)
         Assert.assertEquals(1, documentCount3)
@@ -104,16 +102,16 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         val documentList6: DocumentList<DocumentModel> =
             db.getPublishedContent(typeWithHyphen)
         Assert.assertEquals(1, documentList6.size.toLong())
-        Assert.assertEquals(Boolean.TRUE, documentList6.get(0)!!.rendered)
-        Assert.assertEquals(typeWithHyphen, documentList6.get(0)!!.type)
-        Assertions.assertThat<String>(documentList6.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assert.assertEquals(Boolean.TRUE, documentList6[0]!!.rendered)
+        Assert.assertEquals(typeWithHyphen, documentList6[0]!!.type)
+        Assertions.assertThat<String>(documentList6[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList7: DocumentList<DocumentModel> =
             db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
         Assert.assertEquals(1, documentList7.size.toLong())
-        Assert.assertEquals(Boolean.TRUE, documentList7.get(0)!!.rendered)
-        Assert.assertEquals(typeWithHyphen, documentList7.get(0)!!.type)
-        Assertions.assertThat<String>(documentList7.get(0)!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assert.assertEquals(Boolean.TRUE, documentList7[0]!!.rendered)
+        Assert.assertEquals(typeWithHyphen, documentList7[0]!!.type)
+        Assertions.assertThat<String>(documentList7[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList8: DocumentList<DocumentModel> =
             db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)

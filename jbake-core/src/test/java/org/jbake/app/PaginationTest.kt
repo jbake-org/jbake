@@ -75,8 +75,8 @@ class PaginationTest : ContentStoreIntegrationTest() {
             Assertions.assertThat(posts.size).isLessThanOrEqualTo(2)
 
             if (posts.size > 1) {
-                val post = posts.get(0) as DocumentModel
-                val nextPost = posts.get(1) as DocumentModel
+                val post = posts[0] as DocumentModel
+                val nextPost = posts[1] as DocumentModel
 
                 Assertions.assertThat(post.date).isAfter(nextPost.date)
             }

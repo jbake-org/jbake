@@ -130,7 +130,7 @@ class Oven {
     fun bake(fileToBake: File) {
         val asset = utensils.asset
         if (asset.isAssetFile(fileToBake)) {
-            log.info("Baking a change to an asset [" + fileToBake.getPath() + "]")
+            log.info("Baking a change to an asset [" + fileToBake.path + "]")
             asset.copySingleFile(fileToBake)
         } else {
             log.info("Playing it safe and running a full bake...")
@@ -149,7 +149,7 @@ class Oven {
         setLocale()
 
         try {
-            val start = Date().getTime()
+            val start = Date().time
             log.info("Baking has started...")
             contentStore.startup()
             updateDocTypesFromConfiguration()
@@ -172,7 +172,7 @@ class Oven {
             errors.addAll(asset.errors)
 
             log.info("Baking finished!")
-            val end = Date().getTime()
+            val end = Date().time
             log.info("Baked {} items in {}ms", renderedCount, end - start)
             if (!errors.isEmpty()) {
                 log.error("Failed to bake {} item(s)!", errors.size)

@@ -12,17 +12,16 @@ import java.util.concurrent.TimeUnit
  * Example to watch a directory (or tree) for changes to files.
  */
 class DirWatcher(dir: File) {
-    private val observer: FileAlterationObserver
+    private val observer: FileAlterationObserver = FileAlterationObserver(dir)
 
     private val monitor: FileAlterationMonitor
 
-    private val changeQueue: BlockingQueue<Long?> = ArrayBlockingQueue<Long?>(1)
+    private val changeQueue: BlockingQueue<Long> = ArrayBlockingQueue<Long>(1)
 
     /**
      * Creates a WatchService and registers the given directory
      */
     init {
-        this.observer = FileAlterationObserver(dir)
         this.monitor = FileAlterationMonitor(1000, observer)
 
         observer.addListener(object : FileAlterationListenerAdaptor() {

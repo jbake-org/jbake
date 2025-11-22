@@ -11,11 +11,7 @@ class ParserContext(
     val config: JBakeConfiguration,
     private val hasHeader: Boolean
 ) {
-    val documentModel: DocumentModel
-
-    init {
-        this.documentModel = DocumentModel.createDefaultDocumentModel()
-    }
+    val documentModel: DocumentModel = DocumentModel.createDefaultDocumentModel()
 
     fun hasHeader(): Boolean {
         return hasHeader

@@ -54,14 +54,14 @@ class Init(private val config: JBakeConfiguration) {
             throw Exception(
                 String.format(
                     "Output folder '%s' already contains structure!",
-                    outputFolder.getAbsolutePath()
+                    outputFolder.absolutePath
                 )
             )
         }
         if (config.getExampleProjectByType(templateType) != null) {
             val templateFile = File(templateLocationFolder, config.getExampleProjectByType(templateType))
             if (!templateFile.exists()) {
-                throw Exception("Cannot find example project file: " + templateFile.getPath())
+                throw Exception("Cannot find example project file: " + templateFile.path)
             }
             ZipUtil.extract(FileInputStream(templateFile), outputFolder)
         } else {

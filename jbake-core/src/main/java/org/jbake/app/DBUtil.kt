@@ -38,7 +38,7 @@ object DBUtil {
     fun documentToModel(doc: OResult): DocumentModel {
         val result = DocumentModel()
 
-        for (key in doc.getPropertyNames()) {
+        for (key in doc.propertyNames) {
             result.put(key, doc.getProperty(key))
         }
         return result
@@ -51,15 +51,17 @@ object DBUtil {
      * @return input entry as String[]
      */
     fun toStringArray(entry: Any): Array<String> {
-        if (entry is Array<*>) {
-            return entry as Array<String>
-        } else if (entry is OTrackedList<*>) {
-            val list = entry as OTrackedList<String>
-            return list.toTypedArray<String>()
-        } else if (entry is ArrayList<*>) {
-            val list = entry as ArrayList<String>
-            return list.toTypedArray<String>()
+        when (entry) {
+            is Array<*> -> return entry as Array<String>
+            is OTrackedList<*> -> {
+                val list = entry as OTrackedList<String>
+                return list.toTypedArray<String>()
+            }
+            is ArrayList<*> -> {
+                val list = entry as ArrayList<String>
+                return list.toTypedArray<String>()
+            }
+            else -> return arrayOf()
         }
-        return arrayOf()
     }
 }

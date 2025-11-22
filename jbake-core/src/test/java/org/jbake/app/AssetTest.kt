@@ -1,7 +1,5 @@
 package org.jbake.app
 
-import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.Appender
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.FileFilterUtils
 import org.jbake.TestUtils
@@ -17,7 +15,6 @@ import java.io.File
 import java.io.FileFilter
 import java.io.IOException
 import java.nio.file.Path
-import java.util.function.Supplier
 
 class AssetTest : LoggingTest() {
     var folder: Path? = null

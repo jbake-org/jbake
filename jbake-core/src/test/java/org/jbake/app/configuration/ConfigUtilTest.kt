@@ -1,8 +1,6 @@
 package org.jbake.app.configuration
 
 import ch.qos.logback.classic.Level
-import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.Appender
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
@@ -10,7 +8,6 @@ import org.jbake.app.JBakeException
 import org.jbake.app.LoggingTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito
 import java.io.BufferedWriter

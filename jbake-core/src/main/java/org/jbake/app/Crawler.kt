@@ -99,7 +99,7 @@ class Crawler {
 
     private fun crawlFile(sourceFile: File) {
         val sb = StringBuilder()
-        sb.append("Processing [").append(sourceFile.getPath()).append("]... ")
+        sb.append("Processing [").append(sourceFile.path).append("]... ")
         val sha1 = buildHash(sourceFile)
         val uri = buildURI(sourceFile)
         val status = findDocumentStatus(uri, sha1)
@@ -131,7 +131,7 @@ class Crawler {
             for (sourceFile in contents) {
                 if (sourceFile.isFile()) {
                     val sb = StringBuilder()
-                    sb.append("Processing [").append(sourceFile.getPath()).append("]... ")
+                    sb.append("Processing [").append(sourceFile.path).append("]... ")
                     val sha1 = buildHash(sourceFile)
                     val uri = buildDataFileURI(sourceFile)
                     val docType = config.dataFileDocType
@@ -242,7 +242,7 @@ class Crawler {
             if (document != null) {
                 document.sha1 = sha1
                 document.rendered = true
-                document.file = sourceFile.getPath()
+                document.file = sourceFile.path
                 document.sourceUri = uri
                 document.type = documentType
 
@@ -251,7 +251,7 @@ class Crawler {
                 logger.warn("{} couldn't be parsed so it has been ignored!", sourceFile)
             }
         } catch (ex: Exception) {
-            throw RuntimeException("Failed crawling file: " + sourceFile.getPath() + " " + ex.message, ex)
+            throw RuntimeException("Failed crawling file: " + sourceFile.path + " " + ex.message, ex)
         }
     }
 
@@ -284,7 +284,7 @@ class Crawler {
         document.rootPath = getPathToRoot(sourceFile)
         document.sha1 = sha1
         document.rendered = false
-        document.file = sourceFile.getPath()
+        document.file = sourceFile.path
         document.sourceUri = uri
         document.uri = uri
         document.cached = true
@@ -307,17 +307,13 @@ class Crawler {
 
     private fun findDocumentStatus(uri: String, sha1: String): DocumentStatus {
         val match = db.getDocumentStatus(uri)
-        if (!match.isEmpty()) {
-            val document = match.get(0)
-            val oldHash = document.sha1
-            if (oldHash != sha1 || document.rendered == false) {
-                return DocumentStatus.UPDATED
-            } else {
-                return DocumentStatus.IDENTICAL
-            }
-        } else {
-            return DocumentStatus.NEW
-        }
+        if (match.isEmpty()) return DocumentStatus.NEW
+
+        val document = match[0]
+        val oldHash = document.sha1
+
+        return if (oldHash != sha1 || !document.rendered) DocumentStatus.UPDATED
+            else DocumentStatus.IDENTICAL
     }
 
     companion object {

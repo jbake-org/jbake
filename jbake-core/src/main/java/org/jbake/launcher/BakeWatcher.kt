@@ -52,7 +52,7 @@ class BakeWatcher {
                 config.sourceFolder!!.path
             )
             val monitor = DefaultFileMonitor(CustomFSChangeListener(config))
-            monitor.setRecursive(true)
+            monitor.isRecursive = true
             monitor.addFile(listenPath)
             monitor.addFile(templateListenPath)
             monitor.addFile(assetPath)

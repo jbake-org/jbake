@@ -1,7 +1,6 @@
 package org.jbake.launcher
 
 import org.assertj.core.api.Assertions
-import org.assertj.core.api.ThrowableAssert.ThrowingCallable
 import org.jbake.app.configuration.ConfigUtil
 import org.junit.Test
 import picocli.CommandLine

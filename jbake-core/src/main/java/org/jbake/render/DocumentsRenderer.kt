@@ -60,7 +60,7 @@ class DocumentsRenderer : RenderingTool {
         } else {
             while (true) {
                 try {
-                    val nextDoc = typedList.get(typedListIndex - 1)
+                    val nextDoc = typedList[typedListIndex - 1]
                     if (isPublished(nextDoc)) {
                         return getContentForNav(nextDoc)
                     } else {
@@ -81,7 +81,7 @@ class DocumentsRenderer : RenderingTool {
         } else {
             while (true) {
                 try {
-                    val prevDoc = typedList.get(typedListIndex + 1)
+                    val prevDoc = typedList[typedListIndex + 1]
                     if (isPublished(prevDoc)) {
                         return getContentForNav(prevDoc)
                     } else {

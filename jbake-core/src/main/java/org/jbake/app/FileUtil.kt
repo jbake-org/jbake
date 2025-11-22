@@ -130,7 +130,6 @@ object FileUtil {
      */
     @Deprecated("use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead")
     fun directoryOnlyIfNotIgnored(file: File): Boolean {
-        var accept = false
 
         val ignoreFile: FilenameFilter = object : FilenameFilter {
             override fun accept(dir: File?, name: String): Boolean {
@@ -138,9 +137,7 @@ object FileUtil {
             }
         }
 
-        accept = file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
-
-        return accept
+        return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
     }
 
     fun isExistingFolder(f: File): Boolean {
@@ -158,7 +155,7 @@ object FileUtil {
          */
         get() {
             val codePath =
-                FileUtil::class.java.getProtectionDomain().getCodeSource().getLocation().getPath()
+                FileUtil::class.java.getProtectionDomain().codeSource.location.path
             val decodedPath = URLDecoder.decode(codePath, "UTF-8")
             val codeFile = File(decodedPath)
             if (!codeFile.exists()) {
@@ -237,7 +234,7 @@ object FileUtil {
     fun asPath(file: File): String {
         //if (file == null) return null
 
-        return asPath(file.getPath())
+        return asPath(file.path)
     }
 
     /**

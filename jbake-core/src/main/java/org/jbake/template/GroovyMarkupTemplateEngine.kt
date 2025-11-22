@@ -41,10 +41,10 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
 
     private fun setupTemplateConfiguration() {
         templateConfiguration = TemplateConfiguration()
-        templateConfiguration!!.setUseDoubleQuotes(true)
-        templateConfiguration!!.setAutoIndent(true)
-        templateConfiguration!!.setAutoNewLine(true)
-        templateConfiguration!!.setAutoEscape(true)
+        templateConfiguration!!.isUseDoubleQuotes = true
+        templateConfiguration!!.isAutoIndent = true
+        templateConfiguration!!.isAutoNewLine = true
+        templateConfiguration!!.isAutoEscape = true
     }
 
     private fun initializeTemplateEngine() {

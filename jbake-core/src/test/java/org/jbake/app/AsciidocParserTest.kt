@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.app.configuration.PropertyList
 import org.jbake.app.configuration.PropertyList.ASCIIDOCTOR_ATTRIBUTES
 import org.junit.Assert
 import org.junit.Before

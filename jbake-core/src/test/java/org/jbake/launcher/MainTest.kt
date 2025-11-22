@@ -1,7 +1,5 @@
 package org.jbake.launcher
 
-import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.Appender
 import org.apache.commons.configuration2.ex.ConfigurationException
 import org.assertj.core.api.Assertions
 import org.itsallcode.junit.sysextensions.AssertExit
@@ -14,7 +12,6 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.junit.Assert
-import org.junit.function.ThrowingRunnable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

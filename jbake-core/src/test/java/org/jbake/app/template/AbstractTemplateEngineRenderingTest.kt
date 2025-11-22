@@ -294,7 +294,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     protected fun getOutputStrings(type: String): MutableList<String> {
-        return outputStrings.get(type) ?: mutableListOf()
+        return outputStrings[type] ?: mutableListOf()
     }
 
     @Test

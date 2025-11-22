@@ -110,9 +110,9 @@ abstract class MarkupEngine : ParserEngine {
             FileInputStream(file).use { `is` ->
                 log.debug("read file '{}' with encoding '{}'", file, encoding)
                 val lines = IOUtils.readLines(`is`, encoding)
-                if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines.get(0))) {
+                if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines[0])) {
                     log.warn("remove BOM from file '{}' read with encoding '{}'", file, encoding)
-                    lines.set(0, lines.get(0).replace(UTF_8_BOM, ""))
+                    lines[0] = lines[0].replace(UTF_8_BOM, "")
                 }
                 return lines
             }

@@ -50,7 +50,7 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
             val template = templateCfg.getTemplate(templateName)
-            template.process(LazyLoadingModel(templateCfg.getObjectWrapper(), model, db, config), writer)
+            template.process(LazyLoadingModel(templateCfg.objectWrapper, model, db, config), writer)
         } catch (e: IOException) {
             throw RenderingException(e)
         } catch (e: TemplateException) {

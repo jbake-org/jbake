@@ -89,7 +89,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             val options: MutableList<String> = ArrayList()
             val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.key)
 
-            val iterator = subConfig.getKeys()
+            val iterator = subConfig.keys
             while (iterator.hasNext()) {
                 val key = iterator.next()
                 options.add(key)
@@ -171,7 +171,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val documentTypes: MutableList<String>
         get() {
             val docTypes: MutableList<String> = ArrayList()
-            val keyIterator = compositeConfiguration.getKeys()
+            val keyIterator = compositeConfiguration.keys
             while (keyIterator.hasNext()) {
                 val key = keyIterator.next()
                 val matcher: Matcher = TEMPLATE_DOC_PATTERN.matcher(key)
@@ -205,7 +205,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     // keys property from interface can be nullable iterator of nullable Strings
     override val keys: MutableIterator<String>
-        get() = compositeConfiguration.getKeys() as MutableIterator<String>
+        get() = compositeConfiguration.keys as MutableIterator<String>
 
     override val markdownExtensions: MutableList<String>
         get() = getAsList(PropertyList.MARKDOWN_EXTENSIONS.key)
@@ -469,7 +469,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() {
             val jbakeKeys: MutableList<Property> = ArrayList()
 
-            for (i in 0 until compositeConfiguration.getNumberOfConfigurations()) {
+            for (i in 0 until compositeConfiguration.numberOfConfigurations) {
                 val configuration = compositeConfiguration.getConfiguration(i)
 
                 if (configuration !is SystemConfiguration) {

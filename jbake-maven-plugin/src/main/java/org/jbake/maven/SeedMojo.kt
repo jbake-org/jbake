@@ -70,18 +70,18 @@ class SeedMojo : AbstractMojo() {
             val url = URL(seedUrl)
             val tmpZipFile = File.createTempFile("jbake", ".zip")
 
-            getLog().info(String.format("Downloading contents from %s into %s", seedUrl, tmpZipFile))
+            log.info(String.format("Downloading contents from %s into %s", seedUrl, tmpZipFile))
 
             val fos = FileOutputStream(tmpZipFile)
             val length = IOUtils.copy(url.openStream(), fos)
 
             fos.close()
 
-            getLog().info(String.format("%d bytes downloaded. Unpacking into %s", length, outputDirectory))
+            log.info(String.format("%d bytes downloaded. Unpacking into %s", length, outputDirectory))
 
             unpackZip(tmpZipFile)
         } catch (e: Exception) {
-            getLog().info("Oops", e)
+            log.info("Oops", e)
             throw MojoExecutionException("Failure when running: ", e)
         }
     }
@@ -94,7 +94,7 @@ class SeedMojo : AbstractMojo() {
         var ze = zis.getNextEntry()
 
         while (ze != null) {
-            if (ze.isDirectory()) {
+            if (ze.isDirectory) {
                 ze = zis.getNextEntry()
                 continue
             }

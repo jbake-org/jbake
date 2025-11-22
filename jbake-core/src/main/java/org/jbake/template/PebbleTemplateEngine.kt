@@ -27,7 +27,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
 
     private fun initializeTemplateEngine() {
         val loader: Loader<*> = FileLoader()
-        loader.setPrefix(config.templateFolder.getAbsolutePath())
+        loader.setPrefix(config.templateFolder.absolutePath)
 
         /*
          * Turn off the autoescaper because I believe that we can assume all

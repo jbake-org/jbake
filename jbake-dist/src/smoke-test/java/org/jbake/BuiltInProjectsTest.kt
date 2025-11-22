@@ -10,7 +10,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import java.io.File
 import java.io.IOException
-import java.util.*
 
 @RunWith(Parameterized::class)
 class BuiltInProjectsTest {
@@ -32,9 +31,9 @@ class BuiltInProjectsTest {
     @Throws(IOException::class)
     fun setup() {
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath()
+            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
         } else {
-            jbakeExecutable = File("build/install/jbake/bin/jbake").getAbsolutePath()
+            jbakeExecutable = File("build/install/jbake/bin/jbake").absolutePath
         }
         projectFolder = folder.newFolder("project")
         templateFolder = File(projectFolder, "templates")

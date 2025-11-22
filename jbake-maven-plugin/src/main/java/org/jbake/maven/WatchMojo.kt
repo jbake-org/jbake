@@ -35,8 +35,8 @@ open class WatchMojo : GenerateMojo() {
 
         var lastProcessed = System.currentTimeMillis()
 
-        getLog().info(
-            "Now listening for changes on path " + inputDirectory!!.getPath()
+        log.info(
+            "Now listening for changes on path " + inputDirectory!!.path
         )
 
         initServer()
@@ -53,7 +53,7 @@ open class WatchMojo : GenerateMojo() {
             (object : Thread() {
                 override fun run() {
                     try {
-                        getLog()
+                        log
                             .info("Running. Enter a blank line to finish. Anything else forces re-rendering.")
 
                         while (true) {
@@ -66,7 +66,7 @@ open class WatchMojo : GenerateMojo() {
                             reRender()
                         }
                     } catch (exc: Exception) {
-                        getLog().info("Ooops", exc)
+                        log.info("Ooops", exc)
                     } finally {
                         done.set(true)
                     }
@@ -81,7 +81,7 @@ open class WatchMojo : GenerateMojo() {
                 if (null == result) {
                     // do nothing on purpose
                 } else if (result >= lastProcessed) {
-                    getLog().info("Refreshing")
+                    log.info("Refreshing")
 
                     super.reRender()
 
@@ -89,11 +89,11 @@ open class WatchMojo : GenerateMojo() {
                 }
             } while (!done.get())
         } catch (exc: Exception) {
-            getLog().info("Oops", exc)
+            log.info("Oops", exc)
 
             throw MojoExecutionException("Oops", exc)
         } finally {
-            getLog().info("Finishing")
+            log.info("Finishing")
 
             dirWatcher?.stop()
 

@@ -10,7 +10,7 @@ class BinaryRunner(private val folder: File?) {
         processBuilder.redirectErrorStream(true)
 
         val process = processBuilder.start()
-        printOutput(process.getInputStream())
+        printOutput(process.inputStream)
         process.waitFor()
 
         return process

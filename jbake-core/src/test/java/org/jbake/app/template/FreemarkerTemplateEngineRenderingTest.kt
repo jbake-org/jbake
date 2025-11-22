@@ -25,7 +25,6 @@ package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
-import org.jbake.app.ContentStoreIntegrationTest
 import org.junit.Assert
 import org.junit.Test
 import java.io.File

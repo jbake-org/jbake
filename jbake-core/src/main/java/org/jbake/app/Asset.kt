@@ -78,7 +78,7 @@ class Asset {
                 log.info("Copying single asset file to [{}]", targetPath)
                 copyFile(asset, File(targetPath))
             } else {
-                log.info("Skip copying single asset file [{}]. Is a directory.", asset.getPath())
+                log.info("Skip copying single asset file [{}]. Is a directory.", asset.path)
             }
         } catch (io: IOException) {
             log.error("Failed to copy the asset file.", io)
@@ -104,7 +104,7 @@ class Asset {
                 }
             }
         } catch (ioe: IOException) {
-            log.error("Unable to determine the path to asset file {}", path.getPath(), ioe)
+            log.error("Unable to determine the path to asset file {}", path.path, ioe)
         }
         return isAsset
     }
@@ -147,12 +147,12 @@ class Asset {
     private fun copyFile(asset: File, targetFolder: File) {
         try {
             FileUtils.copyFile(asset, targetFolder)
-            log.info("Copying [{}]... done!", asset.getPath())
+            log.info("Copying [{}]... done!", asset.path)
         } catch (e: IOException) {
-            log.error("Copying [{}]... failed!", asset.getPath(), e)
+            log.error("Copying [{}]... failed!", asset.path, e)
             errors.add(e)
         } catch (e: IllegalArgumentException) {
-            log.error("Copying [{}]... failed!", asset.getPath(), e)
+            log.error("Copying [{}]... failed!", asset.path, e)
             errors.add(e)
         }
     }

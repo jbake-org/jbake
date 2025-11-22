@@ -42,7 +42,7 @@ class ConfigurationPrinter(private val configuration: JBakeConfiguration, privat
     private fun printKeyAndValue(property: Property) {
         val key = leftFillWithDots(property.key)
         val value = configuration.get(property.key)
-        out.printf("%1\$s: %2$-40s%n%n", key, value)
+        out.printf($$"%1$s: %2$-40s%n%n", key, value)
     }
 
     private fun leftFillWithDots(value: String): String {

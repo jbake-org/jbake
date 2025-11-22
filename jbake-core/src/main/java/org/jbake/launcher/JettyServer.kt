@@ -42,30 +42,30 @@ class JettyServer : Closeable {
         try {
             server = Server()
             val connector = ServerConnector(server)
-            connector.setHost(hostname)
-            connector.setPort(port)
+            connector.host = hostname
+            connector.port = port
             server!!.addConnector(connector)
 
             val resource_handler = ResourceHandler()
-            resource_handler.setDirectoriesListed(true)
-            resource_handler.setWelcomeFiles(arrayOf("index", "index.html"))
-            resource_handler.setResourceBase(resourceBase)
+            resource_handler.isDirectoriesListed = true
+            resource_handler.welcomeFiles = arrayOf("index", "index.html")
+            resource_handler.resourceBase = resourceBase
 
             val contextHandler = ContextHandler()
-            contextHandler.setContextPath(contextPath)
-            contextHandler.setHandler(resource_handler)
+            contextHandler.contextPath = contextPath
+            contextHandler.handler = resource_handler
 
             val handlers = HandlerList()
 
-            handlers.setHandlers(arrayOf<Handler>(contextHandler, DefaultHandler()))
-            server!!.setHandler(handlers)
+            handlers.handlers = arrayOf<Handler>(contextHandler, DefaultHandler())
+            server!!.handler = handlers
 
             log.info(
                 "Serving out contents of: [{}] on http://{}:{}{}",
                 resourceBase,
                 hostname,
                 port,
-                contextHandler.getContextPath()
+                contextHandler.contextPath
             )
             log.info("(To stop server hit CTRL-C)")
 
@@ -77,11 +77,11 @@ class JettyServer : Closeable {
     }
 
     val isStarted: Boolean
-        get() = server != null && server!!.isStarted()
+        get() = server != null && server!!.isStarted
 
     @Throws(IOException::class)
     override fun close() {
-        if (server!!.isRunning()) {
+        if (server!!.isRunning) {
             try {
                 server!!.stop()
             } catch (e: Exception) {

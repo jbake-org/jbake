@@ -37,7 +37,7 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
-        config.imgPathPrependHost = (false)
+        config.imgPathPrependHost = false
 
         HtmlUtil.fixImageSourceUrls(fileContent, config)
 
@@ -52,7 +52,7 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='img/deeper/underground.jpg' /></div>"
-        config.imgPathPrependHost = (true)
+        config.imgPathPrependHost = true
 
         HtmlUtil.fixImageSourceUrls(fileContent, config)
 
@@ -67,7 +67,7 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='./first.jpg' /></div>"
-        config.imgPathPrependHost = (true)
+        config.imgPathPrependHost = true
 
         HtmlUtil.fixImageSourceUrls(fileContent, config)
 
@@ -82,7 +82,7 @@ class HtmlUtilTest {
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
         fileContent.body = "<div> Test <img src='first.jpg' /></div>"
-        config.imgPathPrependHost = (true)
+        config.imgPathPrependHost = true
 
         HtmlUtil.fixImageSourceUrls(fileContent, config)
 

@@ -10,7 +10,6 @@ import de.neuland.jade4j.template.FileTemplateLoader
 import de.neuland.jade4j.template.JadeTemplate
 import de.neuland.jade4j.template.TemplateLoader
 import org.apache.commons.configuration2.CompositeConfiguration
-import org.apache.commons.lang.StringEscapeUtils
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
@@ -44,7 +43,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
         jadeConfiguration.setFilter(FILTER_CDATA, CDATAFilter())
         jadeConfiguration.setFilter(FILTER_SCRIPT, JsFilter())
         jadeConfiguration.setFilter(FILTER_STYLE, CssFilter())
-        jadeConfiguration.getSharedVariables().put("formatter", FormatHelper())
+        jadeConfiguration.sharedVariables.put("formatter", FormatHelper())
     }
 
     @Throws(RenderingException::class)
@@ -60,7 +59,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
 
     fun renderTemplate(template: JadeTemplate, model: TemplateModel, writer: Writer) {
         val jadeModel = wrap(model)
-        jadeModel.putAll(jadeConfiguration.getSharedVariables())
+        jadeModel.putAll(jadeConfiguration.sharedVariables)
         template.process(jadeModel, writer)
     }
 

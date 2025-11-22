@@ -34,13 +34,12 @@ import java.util.*
  * @author Cédric Champeau
  */
 class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
-    private val engines: MutableMap<String, AbstractTemplateEngine>
+    private val engines: MutableMap<String, AbstractTemplateEngine> = HashMap<String, AbstractTemplateEngine>()
 
     val recognizedExtensions: MutableSet<String>
         get() = Collections.unmodifiableSet(engines.keys)
 
     init {
-        engines = HashMap<String, AbstractTemplateEngine>()
         loadEngines(config, db)
     }
 
@@ -56,7 +55,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     }
 
     fun getEngine(fileExtension: String): AbstractTemplateEngine? {
-        return engines.get(fileExtension)
+        return engines[fileExtension]
     }
 
     /**

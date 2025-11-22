@@ -88,7 +88,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     fun updateSchema() {
-        val schema = db!!.getMetadata().getSchema()
+        val schema = db!!.metadata.schema
 
         if (!schema.existsClass(Schema.DOCUMENTS)) {
             createDocType(schema)
@@ -118,14 +118,14 @@ class ContentStore(private val type: String, private val name: String?) {
         // Using a jdk which doesn't bundle a javascript engine
         // throws a NoClassDefFoundError while logging the warning
         // see https://github.com/orientechnologies/orientdb/issues/5855
-        OLogManager.instance().setWarnEnabled(false)
+        OLogManager.instance().isWarnEnabled = false
 
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
-        if (Orient.instance().getEngines().isEmpty()) {
+        if (Orient.instance().engines.isEmpty()) {
             Orient.instance().startup()
         }
-        OLogManager.instance().setWarnEnabled(true)
+        OLogManager.instance().isWarnEnabled = true
     }
 
     fun drop() {
@@ -146,12 +146,12 @@ class ContentStore(private val type: String, private val name: String?) {
     fun getDocumentCount(docType: String): Long {
         activateOnCurrentThread()
         val statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType)
-        return query(statement).get(0).get("count") as Long
+        return query(statement)[0].get("count") as Long
     }
 
     fun getPublishedCount(docType: String): Long {
         val statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType)
-        return query(statement).get(0).get("count") as Long
+        return query(statement)[0].get("count") as Long
     }
 
     fun getDocumentByUri(uri: String?): DocumentList<DocumentModel> {
@@ -294,23 +294,23 @@ class ContentStore(private val type: String, private val name: String?) {
         logger.debug("Create document class")
 
         val page = schema.createClass(Schema.DOCUMENTS)
-        page.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true)
+        page.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
         page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1)
-        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).setNotNull(true)
+        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).isNotNull = true
         page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI)
-        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).setNotNull(true)
+        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).isNotNull = true
         page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED)
-        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).setNotNull(true)
+        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).isNotNull = true
         page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED)
-        page.createProperty(ModelAttributes.STATUS, OType.STRING).setNotNull(true)
+        page.createProperty(ModelAttributes.STATUS, OType.STRING).isNotNull = true
         page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS)
-        page.createProperty(ModelAttributes.TYPE, OType.STRING).setNotNull(true)
+        page.createProperty(ModelAttributes.TYPE, OType.STRING).isNotNull = true
         page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE)
     }
 
     private fun createSignatureType(schema: OSchema) {
         val signatures = schema.createClass(Schema.SIGNATURES)
-        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true)
+        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1)
     }
 
@@ -338,7 +338,7 @@ class ContentStore(private val type: String, private val name: String?) {
             currentTemplatesSignature = ""
         }
         if (!docs.isEmpty()) {
-            val sha1 = docs.get(0).sha1
+            val sha1 = docs[0].sha1
             if (sha1 != currentTemplatesSignature) {
                 this.updateSignatures(currentTemplatesSignature)
                 templateSignatureChanged = true
@@ -362,7 +362,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     val isActive: Boolean
-        get() = db!!.isActiveOnCurrentThread()
+        get() = db!!.isActiveOnCurrentThread
 
     fun addDocument(document: DocumentModel) {
         val element = db!!.newElement(Schema.DOCUMENTS)

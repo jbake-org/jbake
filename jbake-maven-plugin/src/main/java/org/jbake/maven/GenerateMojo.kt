@@ -85,7 +85,7 @@ open class GenerateMojo : AbstractMojo() {
                 throw MojoFailureException("Baked with " + oven.errors.size + " errors. Check output above for details!")
             }
         } catch (e: Exception) {
-            getLog().info("Oops", e)
+            log.info("Oops", e)
 
             throw MojoExecutionException("Failure when running: ", e)
         }

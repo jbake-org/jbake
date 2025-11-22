@@ -20,12 +20,10 @@ class YamlEngine : MarkupEngine() {
         try {
             FileInputStream(file).use { `is` ->
                 val result = yaml.load<Any>(`is`)
-                if (result is MutableList<*>) {
-                    model.put("data", result)
-                } else if (result is MutableMap<*, *>) {
-                    model.putAll(result as Map<String, Any>)
-                } else {
-                    log.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
+                when (result) {
+                    is MutableList<*> -> model.put("data", result)
+                    is MutableMap<*, *> -> model.putAll(result as Map<String, Any>)
+                    else -> log.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
                 }
             }
         } catch (e: IOException) {

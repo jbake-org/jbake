@@ -7,14 +7,12 @@ import org.hamcrest.core.Is
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.PropertyList
 import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
