@@ -91,8 +91,8 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         val documentList5: DocumentList<DocumentModel> = db.unrenderedContent
         Assert.assertEquals(2, documentList5.size.toLong())
         Assert.assertEquals(Boolean.FALSE, documentList5[0].rendered)
-        Assert.assertEquals(typeWithHyphen, documentList5[0]!!.type)
-        Assertions.assertThat<String>(documentList5[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assert.assertEquals(typeWithHyphen, documentList5[0].type)
+        Assertions.assertThat<String>(documentList5[0].tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentCount3: Long = db.getPublishedCount(typeWithHyphen)
         Assert.assertEquals(1, documentCount3)

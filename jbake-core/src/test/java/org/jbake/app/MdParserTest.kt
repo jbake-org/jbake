@@ -478,7 +478,7 @@ class MdParserTest {
 
         // Test with TABLES
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdFileTables!!)
+        var documentModel = parser.processFile(mdFileTables)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<table>\n" +
@@ -495,7 +495,7 @@ class MdParserTest {
         // Test without TABLES
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdFileTables!!)
+        documentModel = parser.processFile(mdFileTables)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<p>First Header|Second Header -------------|------------- Content Cell|Content Cell Content Cell|Content Cell</p>"
@@ -509,7 +509,7 @@ class MdParserTest {
 
         // Test with WIKILINKS
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdFileWikilinks!!)
+        var documentModel = parser.processFile(mdFileWikilinks)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<p><a href=\"Wiki-style-links\">Wiki-style links</a></p>"
@@ -518,7 +518,7 @@ class MdParserTest {
         // Test without WIKILINKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdFileWikilinks!!)
+        documentModel = parser.processFile(mdFileWikilinks)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains("<p>[[Wiki-style links]]</p>")
     }
@@ -530,14 +530,14 @@ class MdParserTest {
 
         // Test with ATXHEADERSPACE
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdFileAtxheaderspace!!)
+        var documentModel = parser.processFile(mdFileAtxheaderspace)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains("<p>#Test</p>")
 
         // Test without ATXHEADERSPACE
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdFileAtxheaderspace!!)
+        documentModel = parser.processFile(mdFileAtxheaderspace)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains("<h1>Test</h1>")
     }
@@ -549,7 +549,7 @@ class MdParserTest {
 
         // Test with FORCELISTITEMPARA
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdFileForcelistitempara!!)
+        var documentModel = parser.processFile(mdFileForcelistitempara)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<ol>\n" +
@@ -563,7 +563,7 @@ class MdParserTest {
         // Test without FORCELISTITEMPARA
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdFileForcelistitempara!!)
+        documentModel = parser.processFile(mdFileForcelistitempara)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<ol>\n" +
@@ -581,7 +581,7 @@ class MdParserTest {
 
         // Test with RELAXEDHRULES
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdFileRelaxedhrules!!)
+        var documentModel = parser.processFile(mdFileRelaxedhrules)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<h2>Hello World</h2>\n" +
@@ -600,7 +600,7 @@ class MdParserTest {
         // Test without RELAXEDHRULES
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdFileRelaxedhrules!!)
+        documentModel = parser.processFile(mdFileRelaxedhrules)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<h2>Hello World</h2>\n" +
@@ -620,7 +620,7 @@ class MdParserTest {
 
         // Test with TASKLISTITEMS
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdTasklistitems!!)
+        var documentModel = parser.processFile(mdTasklistitems)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<ul>\n" +
@@ -633,7 +633,7 @@ class MdParserTest {
         // Test without TASKLISTITEMS
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdTasklistitems!!)
+        documentModel = parser.processFile(mdTasklistitems)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<ul>\n" +
@@ -651,7 +651,7 @@ class MdParserTest {
 
         // Test with EXTANCHORLINKS
         var parser = Parser(config)
-        var documentModel = parser.processFile(mdExtanchorlinks!!)
+        var documentModel = parser.processFile(mdExtanchorlinks)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains(
             "<h1><a href=\"#header-some-formatting-chars\" id=\"header-some-formatting-chars\"></a>header &amp; some <em>formatting</em> ~~chars~~</h1>"
@@ -660,7 +660,7 @@ class MdParserTest {
         // Test without EXTANCHORLINKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
-        documentModel = parser.processFile(mdExtanchorlinks!!)
+        documentModel = parser.processFile(mdExtanchorlinks)
         Assert.assertNotNull(documentModel)
         Assertions.assertThat(documentModel!!.body).contains("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>")
     }
