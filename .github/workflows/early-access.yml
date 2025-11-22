@@ -21,20 +21,10 @@ jobs:
               with:
                   java-version: 11
                   distribution: 'temurin'
-                  cache: 'gradle'
 
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.gradle/caches
-                  key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle') }}-${{ hashFiles('**/gradle.properties') }}
-                  restore-keys: |
-                      ${{ runner.os }}-gradle-
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.gradle/wrapper
-                  key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradlew') }}
-                  restore-keys: |
-                      ${{ runner.os }}-gradlew-
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v5
+
             - name: Build
               run: ./gradlew build -S
 
