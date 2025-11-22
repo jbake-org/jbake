@@ -21,11 +21,11 @@ class BuiltInProjectsTest {
 
     @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
-    private var projectFolder: File? = null
-    private var templateFolder: File? = null
-    private var outputFolder: File? = null
-    private var jbakeExecutable: String? = null
-    private var runner: BinaryRunner? = null
+    private lateinit var projectFolder: File
+    private lateinit var templateFolder: File
+    private lateinit var outputFolder: File
+    private lateinit var jbakeExecutable: String
+    private lateinit var runner: BinaryRunner
 
     @Before
     @Throws(IOException::class)
@@ -48,7 +48,7 @@ class BuiltInProjectsTest {
 
     @Throws(IOException::class, InterruptedException::class)
     private fun shouldInitProject(projectName: String?, extension: String?) {
-        val process = runner!!.runWithArguments(jbakeExecutable, "-i", "-t", projectName)
+        val process = runner.runWithArguments(jbakeExecutable, "-i", "-t", projectName)
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
         Assertions.assertThat(File(projectFolder, "jbake.properties")).exists()
         Assertions.assertThat(File(templateFolder, String.format("index.%s", extension))).exists()
@@ -57,7 +57,7 @@ class BuiltInProjectsTest {
 
     @Throws(IOException::class, InterruptedException::class)
     private fun shouldBakeProject() {
-        val process = runner!!.runWithArguments(jbakeExecutable, "-b")
+        val process = runner.runWithArguments(jbakeExecutable, "-b")
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
         Assertions.assertThat(File(outputFolder, "index.html")).exists()
         process.destroy()

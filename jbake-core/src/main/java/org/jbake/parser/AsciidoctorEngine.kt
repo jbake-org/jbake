@@ -45,7 +45,7 @@ class AsciidoctorEngine : MarkupEngine() {
 
                             if (requires.isNotEmpty()) {
                                 for (require in requires) {
-                                    engine!!.requireLibrary(require)
+                                    engine?.requireLibrary(require)
                                 }
                             }
                         }
@@ -60,7 +60,7 @@ class AsciidoctorEngine : MarkupEngine() {
         } finally {
             lock.readLock().unlock()
         }
-        return engine!!
+        return engine ?: error("engine must not be null")
     }
 
     override fun processHeader(context: ParserContext) {

@@ -51,12 +51,9 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
 
       """
     )
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File) : super(
-        config,
-        db,
-        destination,
-        templatesPath
-    ) {
+    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
+        : super(config, db, destination, templatesPath)
+    {
         this.context = Context()
         initializeTemplateEngine()
     }
@@ -67,13 +64,17 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun initializeTemplateEngine() {
-        templateResolver = FileTemplateResolver()
-        templateResolver!!.prefix = config.templateFolder!!.absolutePath + File.separatorChar
-        templateResolver!!.characterEncoding = config.templateEncoding
-        templateResolver!!.setTemplateMode(DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE)
-        templateEngine = TemplateEngine()
-        templateEngine!!.setTemplateResolver(templateResolver)
-        templateEngine!!.clearTemplateCache()
+
+        val resolver = FileTemplateResolver()
+        templateResolver = resolver
+        resolver.prefix = config.templateFolder!!.absolutePath + File.separatorChar
+        resolver.characterEncoding = config.templateEncoding
+        resolver.setTemplateMode(DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE)
+
+        val engine = TemplateEngine()
+        templateEngine = engine
+        engine.setTemplateResolver(templateResolver)
+        engine.clearTemplateCache()
     }
 
     private fun updateTemplateMode(model: TemplateModel) {
@@ -93,7 +94,8 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
         try {
             initializeContext(locale, model)
             updateTemplateMode(model)
-            templateEngine!!.process(templateName, context, writer)
+            val engine = templateEngine ?: error("templateEngine must not be null")
+            engine.process(templateName, context, writer)
         } finally {
             lock.unlock()
         }
@@ -138,7 +140,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
                         }
                     }
                 }
-                return extractors.extractAndTransform(db, key, model, adapter)!!.getValue()
+                return extractors.extractAndTransform(db, key, model, adapter)?.getValue() ?: ""
             }
             catch (e: NoModelExtractorException) { return "" }
         }

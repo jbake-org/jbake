@@ -49,3 +49,24 @@ dependencyUpdates.resolutionStrategy {
     }
 }
 
+// Configure Kotlin projects: add stdlib and set jvmTarget
+/*subprojects {
+    plugins.withId('org.jetbrains.kotlin.jvm') {
+        repositories {
+            mavenCentral()
+        }
+
+        dependencies {
+            // Ensure Kotlin stdlib is available for all Kotlin modules
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+        }
+
+        // Set Kotlin compiler target to Java 21
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { task ->
+            task.kotlinOptions {
+                jvmTarget = '21'
+            }
+        }
+    }
+}
+*/

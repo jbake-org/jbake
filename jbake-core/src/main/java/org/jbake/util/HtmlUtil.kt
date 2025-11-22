@@ -23,7 +23,7 @@ object HtmlUtil {
     fun fixImageSourceUrls(fileContents: DocumentModel, configuration: JBakeConfiguration) {
         val htmlContent = fileContents.body
         val prependSiteHost = configuration.imgPathPrependHost
-        val siteHost: String = configuration.siteHost!!
+        val siteHost: String = configuration.siteHost ?: error("siteHost must not be null")
         val uri = getDocumentUri(fileContents)
 
         val document = Jsoup.parseBodyFragment(htmlContent)

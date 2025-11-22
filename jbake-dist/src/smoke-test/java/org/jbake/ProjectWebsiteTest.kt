@@ -15,10 +15,10 @@ import java.io.IOException
 class ProjectWebsiteTest {
     @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
-    private var projectFolder: File? = null
-    private var outputFolder: File? = null
-    private var jbakeExecutable: String? = null
-    private var runner: BinaryRunner? = null
+    private lateinit var projectFolder: File
+    private lateinit var outputFolder: File
+    private lateinit var jbakeExecutable: String
+    private lateinit var runner: BinaryRunner
 
     @Before
     @Throws(IOException::class, GitAPIException::class)
@@ -57,7 +57,7 @@ class ProjectWebsiteTest {
     @Test
     @Throws(IOException::class, InterruptedException::class)
     fun shouldBakeWebsite() {
-        val process = runner!!.runWithArguments(jbakeExecutable, "-b")
+        val process = runner.runWithArguments(jbakeExecutable, "-b")
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
         Assertions.assertThat(File(outputFolder, "index.html")).exists()
         process.destroy()
