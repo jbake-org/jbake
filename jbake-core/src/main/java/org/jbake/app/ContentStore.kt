@@ -47,7 +47,7 @@ import java.util.*
 class ContentStore(private val type: String, private val name: String?) {
     private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 
-    private var db: ODatabaseSession? = null
+    private lateinit var db: ODatabaseSession
 
     var start: Long = -1
         private set
@@ -70,24 +70,23 @@ class ContentStore(private val type: String, private val name: String?) {
         // Try to open as admin, if fails, create admin user and role, then retry
         try {
             db = orient.open(name, "admin", "admin")
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             // Open as root (OrientDB default superuser)
             val rootUser = System.getProperty("orientdb.root.user", "root")
             val rootPass = System.getProperty("orientdb.root.password", "root")
             db = orient.open(name, rootUser, rootPass)
             // Check if admin user exists
-            val result = db!!.query("SELECT FROM OUser WHERE name = 'admin'")
+            val result = db.query("SELECT FROM OUser WHERE name = 'admin'")
             if (!result.hasNext()) {
-                db!!.command("INSERT INTO OUser SET name = 'admin', password = 'admin', status = 'ACTIVE'")
-                db!!.command("INSERT INTO ORole SET name = 'admin', mode = 0, rules = {}")
-                db!!.command("UPDATE OUser SET roles = (SELECT FROM ORole WHERE name = 'admin') WHERE name = 'admin'")
+                db.command("INSERT INTO OUser SET name = 'admin', password = 'admin', status = 'ACTIVE'")
+                db.command("INSERT INTO ORole SET name = 'admin', mode = 0, rules = {}")
+                db.command("UPDATE OUser SET roles = (SELECT FROM ORole WHERE name = 'admin') WHERE name = 'admin'")
             }
-            db!!.close()
+            db.close()
             db = orient.open(name, "admin", "admin")
         }
-
         activateOnCurrentThread()
-
         updateSchema()
     }
 
@@ -105,7 +104,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     fun updateSchema() {
-        val schema = db!!.metadata.schema
+        val schema = db.metadata.schema
 
         if (!schema.existsClass(Schema.DOCUMENTS)) {
             createDocType(schema)
@@ -118,7 +117,7 @@ class ContentStore(private val type: String, private val name: String?) {
     fun close() {
         if (db != null) {
             activateOnCurrentThread()
-            db!!.close()
+            db.close()
         }
 
         if (orient != null) {
@@ -154,7 +153,7 @@ class ContentStore(private val type: String, private val name: String?) {
 
     private fun activateOnCurrentThread() {
         if (db != null) {
-            db!!.activateOnCurrentThread()
+            db.activateOnCurrentThread()
         } else {
             println("db is null on activate")
         }
@@ -266,19 +265,19 @@ class ContentStore(private val type: String, private val name: String?) {
 
     private fun query(sql: String): DocumentList<DocumentModel> {
         activateOnCurrentThread()
-        val results = db!!.query(sql)
+        val results = db.query(sql)
         return DocumentList.wrap(results)
     }
 
     private fun query(sql: String?, vararg args: Any?): DocumentList<DocumentModel> {
         activateOnCurrentThread()
-        val results = db!!.command(sql, *args)
+        val results = db.command(sql, *args)
         return DocumentList.wrap(results)
     }
 
     private fun executeCommand(query: String?, vararg args: Any?) {
         activateOnCurrentThread()
-        db!!.command(query, *args)
+        db.command(query, *args)
     }
 
     val tags: MutableSet<String>
@@ -376,10 +375,10 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     val isActive: Boolean
-        get() = db!!.isActiveOnCurrentThread
+        get() = db.isActiveOnCurrentThread
 
     fun addDocument(document: DocumentModel) {
-        val element = db!!.newElement(Schema.DOCUMENTS)
+        val element = db.newElement(Schema.DOCUMENTS)
         document.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
         element.save<ORecord?>()
     }
