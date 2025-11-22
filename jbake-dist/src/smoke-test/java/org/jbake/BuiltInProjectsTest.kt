@@ -29,7 +29,7 @@ class BuiltInProjectsTest {
     private var runner: BinaryRunner? = null
 
     @Before
-    @kotlin.Throws(IOException::class)
+    @Throws(IOException::class)
     fun setup() {
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
             jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath()
@@ -43,13 +43,13 @@ class BuiltInProjectsTest {
     }
 
     @Test
-    @kotlin.Throws(Exception::class)
+    @Throws(Exception::class)
     fun shouldBakeWithProject() {
         shouldInitProject(projectName, extension)
         shouldBakeProject()
     }
 
-    @kotlin.Throws(IOException::class, InterruptedException::class)
+    @Throws(IOException::class, InterruptedException::class)
     private fun shouldInitProject(projectName: String?, extension: String?) {
         val process = runner!!.runWithArguments(jbakeExecutable, "-i", "-t", projectName)
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
@@ -58,7 +58,7 @@ class BuiltInProjectsTest {
         process.destroy()
     }
 
-    @kotlin.Throws(IOException::class, InterruptedException::class)
+    @Throws(IOException::class, InterruptedException::class)
     private fun shouldBakeProject() {
         val process = runner!!.runWithArguments(jbakeExecutable, "-b")
         Assertions.assertThat(process.exitValue()).isEqualTo(0)

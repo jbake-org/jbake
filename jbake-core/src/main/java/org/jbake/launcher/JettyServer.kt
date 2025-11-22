@@ -48,7 +48,7 @@ class JettyServer : Closeable {
 
             val resource_handler = ResourceHandler()
             resource_handler.setDirectoriesListed(true)
-            resource_handler.setWelcomeFiles(arrayOf<String>("index", "index.html"))
+            resource_handler.setWelcomeFiles(arrayOf("index", "index.html"))
             resource_handler.setResourceBase(resourceBase)
 
             val contextHandler = ContextHandler()

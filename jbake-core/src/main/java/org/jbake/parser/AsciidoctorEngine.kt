@@ -175,12 +175,12 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     private fun getAsList(asciidoctorOption: Any?): MutableList<String> {
-        val values: MutableList<String> = ArrayList<String>()
+        val values: MutableList<String> = ArrayList()
 
         if (asciidoctorOption is MutableList<*>) {
             values.addAll(asciidoctorOption as MutableList<String>)
         } else if (asciidoctorOption is String) {
-            values.add(asciidoctorOption.toString())
+            values.add(asciidoctorOption)
         }
         return values
     }

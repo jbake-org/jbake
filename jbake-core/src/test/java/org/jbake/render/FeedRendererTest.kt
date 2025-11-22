@@ -17,12 +17,12 @@ class FeedRendererTest {
         val renderer = FeedRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(false)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
@@ -33,15 +33,15 @@ class FeedRendererTest {
         val renderer = FeedRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(false)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderFeed(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.never()).renderFeed(ArgumentMatchers.anyString())
     }
 
     @Test
@@ -50,12 +50,12 @@ class FeedRendererTest {
         val renderer = FeedRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(true)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -66,16 +66,16 @@ class FeedRendererTest {
     fun doesRenderWhenConfigDoesRenderFeeds() {
         val renderer = FeedRenderer()
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(true)
         Mockito.`when`<Any?>(configuration.feedFileName).thenReturn("mockfeedfile.xml")
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.times(1)).renderFeed(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.times(1)).renderFeed(ArgumentMatchers.anyString())
     }
 
     @Test(expected = RenderingException::class)
@@ -83,18 +83,18 @@ class FeedRendererTest {
         val renderer = FeedRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(true)
         Mockito.`when`<Any?>(configuration.feedFileName).thenReturn("mockfeedfile.xml")
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`<Renderer?>(mockRenderer).renderFeed(ArgumentMatchers.anyString())
+        Mockito.doThrow(Exception()).`when`(mockRenderer).renderFeed(ArgumentMatchers.anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderFeed("random string")
+        Mockito.verify(mockRenderer, Mockito.never()).renderFeed("random string")
     }
 }
 

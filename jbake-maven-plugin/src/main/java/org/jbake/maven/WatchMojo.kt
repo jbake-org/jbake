@@ -95,7 +95,7 @@ open class WatchMojo : GenerateMojo() {
         } finally {
             getLog().info("Finishing")
 
-            if (null != dirWatcher) dirWatcher.stop()
+            dirWatcher?.stop()
 
             stopServer()
         }

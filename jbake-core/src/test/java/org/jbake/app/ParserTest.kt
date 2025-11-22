@@ -297,8 +297,8 @@ class ParserTest {
         Assertions.assertThat(map.title).isEqualTo("Title")
         Assertions.assertThat(map.type).isEqualTo("post")
         Assertions.assertThat<Any?>(map.get("custom")).isEqualTo("custom without bom's")
-        Assertions.assertThat<String>(map.tags)
-            .isEqualTo(mutableListOf<String>("jbake", "java", "tag with space").toTypedArray())
+        Assertions.assertThat(map.tags)
+            .isEqualTo(mutableListOf("jbake", "java", "tag with space").toTypedArray())
     }
 
     @Test
@@ -306,8 +306,8 @@ class ParserTest {
         config.setProperty(PropertyList.TAG_SANITIZE.key, true)
         val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
 
-        Assertions.assertThat<String>(map!!.tags)
-            .isEqualTo(mutableListOf<String>("jbake", "java", "tag-with-space").toTypedArray())
+        Assertions.assertThat(map!!.tags)
+            .isEqualTo(mutableListOf("jbake", "java", "tag-with-space").toTypedArray())
     }
 
 

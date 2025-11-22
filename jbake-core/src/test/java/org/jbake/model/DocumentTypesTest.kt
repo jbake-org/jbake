@@ -12,9 +12,9 @@ class DocumentTypesTest {
     @Test
     fun shouldReturnDefaultDocumentTypes() {
         val knownDocumentTypes = documentTypes
-        val expectedDocumentType: Array<String> = arrayOf<String>("page", "post", "masterindex", "archive", "feed")
+        val expectedDocumentType: Array<String> = arrayOf("page", "post", "masterindex", "archive", "feed")
 
-        Assertions.assertThat<String>(knownDocumentTypes).contains(*expectedDocumentType)
+        Assertions.assertThat(knownDocumentTypes).contains(*expectedDocumentType)
     }
 
     @Test
@@ -23,7 +23,7 @@ class DocumentTypesTest {
 
         addDocumentType(newDocumentType)
 
-        Assertions.assertThat<String>(documentTypes).contains(newDocumentType)
+        Assertions.assertThat(documentTypes).contains(newDocumentType)
     }
 
     @Test
@@ -36,7 +36,7 @@ class DocumentTypesTest {
         addDocumentType(knownDocumentType)
 
         // only one document type could be found in the list
-        Assertions.assertThat<String>(documentTypes).containsOnlyOnce(knownDocumentType)
+        Assertions.assertThat(documentTypes).containsOnlyOnce(knownDocumentType)
     }
 
     @Test
@@ -58,13 +58,13 @@ class DocumentTypesTest {
     fun shouldNotifyListenersWhenNewDocumentTypeIsAdded() {
         // A DocumentTypeListener is added
         val newDocumentType = "newDocumentType"
-        val listener = Mockito.mock<DocumentTypeListener?>(DocumentTypeListener::class.java)
+        val listener = Mockito.mock(DocumentTypeListener::class.java)
         addListener(listener)
 
         // a new document type added
         addDocumentType(newDocumentType)
 
         // the listener was called with new document type
-        Mockito.verify<DocumentTypeListener?>(listener).added(newDocumentType)
+        Mockito.verify(listener).added(newDocumentType)
     }
 }

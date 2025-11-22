@@ -27,7 +27,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         Assertions.assertThat(results.size).isEqualTo(3)
 
         for (content in results) {
-            Assertions.assertThat<String?, Any?>(content)
+            Assertions.assertThat(content)
                 .containsKey(ModelAttributes.ROOTPATH)
                 .containsValue("../../../")
         }
@@ -38,7 +38,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
 
         for (content in allPosts) {
             if (content!!.title == "Draft Post") {
-                Assertions.assertThat<String?, Any?>(content).containsKey(ModelAttributes.DATE)
+                Assertions.assertThat(content).containsKey(ModelAttributes.DATE)
             }
         }
 
@@ -89,8 +89,8 @@ class CrawlerTest : ContentStoreIntegrationTest() {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model!!.file) + "/"
 
             Assert.assertThat<String>(model.noExtensionUri, RegexMatcher.matches(noExtensionUri))
-            Assert.assertThat<String>(model.uri, RegexMatcher.matches(noExtensionUri + "index\\.html"))
-            Assert.assertThat<String>(model.rootPath, CoreMatchers.`is`<String>("../../../"))
+            Assert.assertThat(model.uri, RegexMatcher.matches(noExtensionUri + "index\\.html"))
+            Assert.assertThat(model.rootPath, CoreMatchers.`is`("../../../"))
         }
     }
 

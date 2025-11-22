@@ -74,7 +74,7 @@ class Asset {
         try {
             if (!asset.isDirectory()) {
                 val targetPath =
-                    (config.destinationFolder!!.getCanonicalPath() + File.separatorChar).toString() + assetSubPath(asset)
+                    (config.destinationFolder!!.getCanonicalPath() + File.separatorChar) + assetSubPath(asset)
                 log.info("Copying single asset file to [{}]", targetPath)
                 copyFile(asset, File(targetPath))
             } else {

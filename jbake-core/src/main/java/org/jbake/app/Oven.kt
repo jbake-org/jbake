@@ -215,7 +215,7 @@ class Oven {
         val renderer = utensils.renderer
         val contentStore = utensils.contentStore
 
-        for (tool in ServiceLoader.load<RenderingTool>(RenderingTool::class.java)) {
+        for (tool in ServiceLoader.load(RenderingTool::class.java)) {
             try {
                 renderedCount += tool.render(renderer, contentStore, config)
             } catch (e: RenderingException) {

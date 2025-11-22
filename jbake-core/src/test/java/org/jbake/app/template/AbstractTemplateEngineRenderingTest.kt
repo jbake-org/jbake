@@ -104,7 +104,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     private fun setupExpectedOutputStrings() {
-        outputStrings["post"] = mutableListOf<String>(
+        outputStrings["post"] = mutableListOf(
             "<h2>Second Post</h2>",
             "<p class=\"post-date\">28",
             "2013</p>",
@@ -113,47 +113,47 @@ abstract class AbstractTemplateEngineRenderingTest(
             "blog/2012/first-post.html"
         )
 
-        outputStrings["page"] = mutableListOf<String>(
+        outputStrings["page"] = mutableListOf(
             "<h4>About</h4>",
             "All about stuff!",
             "<h5>Published Pages</h5>",
             "/projects.html"
         )
 
-        outputStrings["index"] = mutableListOf<String>(
+        outputStrings["index"] = mutableListOf(
             "<a href=\"blog/2016/another-post.html\"",
             ">Another Post</a>",
             "<a href=\"blog/2013/second-post.html\"",
             ">Second Post</a>"
         )
 
-        outputStrings["feed"] = mutableListOf<String>(
+        outputStrings["feed"] = mutableListOf(
             "<description>My corner of the Internet</description>",
             "<title>Second Post</title>",
             "<title>First Post</title>"
         )
 
-        outputStrings["archive"] = mutableListOf<String>(
+        outputStrings["archive"] = mutableListOf(
             "<a href=\"blog/2013/second-post.html\"",
             ">Second Post</a>",
             "<a href=\"blog/2012/first-post.html\"",
             ">First Post</a>"
         )
 
-        outputStrings["tags"] = mutableListOf<String>(
+        outputStrings["tags"] = mutableListOf(
             "<a href=\"blog/2013/second-post.html\"",
             ">Second Post</a>",
             "<a href=\"blog/2012/first-post.html\"",
             ">First Post</a>"
         )
 
-        outputStrings["tags-index"] = mutableListOf<String>(
+        outputStrings["tags-index"] = mutableListOf(
             "<h1>Tags</h1>",
             "<h2><a href=\"../tags/blog.html\">blog</a>",
             "3</h2>"
         )
 
-        outputStrings["sitemap"] = mutableListOf<String>(
+        outputStrings["sitemap"] = mutableListOf(
             "blog/2013/second-post.html",
             "blog/2012/first-post.html",
             "papers/published-paper.html"

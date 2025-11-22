@@ -200,7 +200,7 @@ internal class MainTest : LoggingTest() {
 
         AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status) { Main.main(args) }
 
-        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
         Assertions.assertThat(loggingEvent.message).isEqualTo("Error: Missing required argument(s): --init")
@@ -213,12 +213,12 @@ internal class MainTest : LoggingTest() {
         val currentWorkingdir = newFolder(source, "jbake")
         mockDefaultJbakeConfiguration(currentWorkingdir)
 
-        Mockito.doThrow(RuntimeException("something went wrong")).`when`<Main?>(other).run(
-            ArgumentMatchers.any<LaunchOptions?>(LaunchOptions::class.java),
-            ArgumentMatchers.any<JBakeConfiguration>()
+        Mockito.doThrow(RuntimeException("something went wrong")).`when`(other).run(
+            ArgumentMatchers.any(LaunchOptions::class.java),
+            ArgumentMatchers.any()
         )
 
-        val e = Assert.assertThrows<JBakeException>(
+        val e = Assert.assertThrows(
             JBakeException::class.java
         ) { other.run(arrayOf("")) }
 
@@ -228,16 +228,16 @@ internal class MainTest : LoggingTest() {
 
     @Test
     fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
-        Mockito.`when`<JBakeConfigurationFactory>(factory!!.setEncoding(ArgumentMatchers.any<String>()))
+        Mockito.`when`(factory!!.setEncoding(ArgumentMatchers.any()))
             .thenReturn(factory)
         Mockito.doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
-            .`when`<JBakeConfigurationFactory?>(factory).createDefaultJbakeConfiguration(
+            .`when`(factory).createDefaultJbakeConfiguration(
                 ArgumentMatchers.any(File::class.java),
                 ArgumentMatchers.any(File::class.java),
                 ArgumentMatchers.any(File::class.java),
                 ArgumentMatchers.anyBoolean()
             )
-        val e = Assert.assertThrows<JBakeException>(
+        val e = Assert.assertThrows(
             JBakeException::class.java
         ) { main!!.run(arrayOf("-b")) }
         Assertions.assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
@@ -256,7 +256,7 @@ internal class MainTest : LoggingTest() {
     }
 
     private fun stubOptions(args: Array<String>): LaunchOptions {
-        return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
+        return CommandLine.populateCommand(LaunchOptions(), *args)
     }
 
     @Throws(ConfigurationException::class)
@@ -271,7 +271,7 @@ internal class MainTest : LoggingTest() {
     private fun mockDefaultJbakeConfiguration(sourceFolder: File) {
         val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false)
         System.setProperty("user.dir", sourceFolder.path)
-        Mockito.`when`<JBakeConfigurationFactory>(factory!!.setEncoding(ArgumentMatchers.any<String>()))
+        Mockito.`when`(factory!!.setEncoding(ArgumentMatchers.any()))
             .thenReturn(factory)
         Mockito.`when`(
             factory.createDefaultJbakeConfiguration(
@@ -298,7 +298,7 @@ internal class MainTest : LoggingTest() {
             )
         ).thenReturn(configuration)
 
-        Mockito.`when`<JBakeConfigurationFactory>(factory.setEncoding(ArgumentMatchers.any()))
+        Mockito.`when`(factory.setEncoding(ArgumentMatchers.any()))
             .thenReturn(factory)
         return configuration
     }

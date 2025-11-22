@@ -21,7 +21,7 @@ class ProjectWebsiteTest {
     private var runner: BinaryRunner? = null
 
     @Before
-    @kotlin.Throws(IOException::class, GitAPIException::class)
+    @Throws(IOException::class, GitAPIException::class)
     fun setup() {
         Assume.assumeTrue("JDK 7 is not supported for this test", !this.isJava7)
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
@@ -40,7 +40,7 @@ class ProjectWebsiteTest {
     private val isJava7: Boolean
         get() = System.getProperty("java.specification.version") == "1.7"
 
-    @kotlin.Throws(GitAPIException::class)
+    @Throws(GitAPIException::class)
     private fun cloneJbakeWebsite() {
         val cmd = Git.cloneRepository()
         cmd.setBare(false)
@@ -55,7 +55,7 @@ class ProjectWebsiteTest {
     }
 
     @Test
-    @kotlin.Throws(IOException::class, InterruptedException::class)
+    @Throws(IOException::class, InterruptedException::class)
     fun shouldBakeWebsite() {
         val process = runner!!.runWithArguments(jbakeExecutable, "-b")
         Assertions.assertThat(process.exitValue()).isEqualTo(0)

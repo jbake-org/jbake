@@ -22,7 +22,7 @@ import javax.xml.parsers.ParserConfigurationException
  * @author Cédric Champeau
  */
 class GroovyTemplateEngine : AbstractTemplateEngine {
-    private val cachedTemplates: MutableMap<String, Template?> = HashMap<String, Template?>()
+    private val cachedTemplates: MutableMap<String, Template?> = HashMap()
 
     /**
      * @param config the [CompositeConfiguration] of jbake
@@ -68,7 +68,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
                     return MethodClosure(this@GroovyTemplateEngine, "doInclude").curry(this)
                 }
                 try {
-                    return extractors.extractAndTransform<Any>(db, key as String, model, NoopAdapter())
+                    return extractors.extractAndTransform(db, key as String, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     return super.get(key)
                 }

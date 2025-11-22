@@ -19,14 +19,13 @@ class TagsExtractor : ModelExtractor<DocumentList<*>> {
 
         for (tag in db.allTags) {
             val newTag = TemplateModel()
-            val tagName = tag
-            newTag.name = tagName
+            newTag.name = tag
 
             val uri = tagPath + FileUtil.URI_SEPARATOR_CHAR + tag + config[PropertyList.OUTPUT_EXTENSION.key.replace(".", "_")].toString()
 
             newTag.uri = uri
-            newTag.taggedPosts = db.getPublishedPostsByTag(tagName)
-            newTag.taggedDocuments = db.getPublishedDocumentsByTag(tagName)
+            newTag.taggedPosts = db.getPublishedPostsByTag(tag)
+            newTag.taggedDocuments = db.getPublishedDocumentsByTag(tag)
             dl.push(newTag)
         }
         return dl

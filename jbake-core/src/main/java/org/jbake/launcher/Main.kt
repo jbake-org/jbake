@@ -119,7 +119,7 @@ class Main @JvmOverloads constructor(
     }
 
     private fun parseArguments(args: Array<String>): LaunchOptions {
-        return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
+        return CommandLine.populateCommand(LaunchOptions(), *args)
     }
 
     private fun printUsage(options: Any) {

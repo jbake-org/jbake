@@ -21,7 +21,7 @@ class ServiceLoaderTest {
         var serviceProvider: String?
         val renderingToolClasses: MutableList<String> = ArrayList<String>()
 
-        for (tool in ServiceLoader.load<RenderingTool>(RenderingTool::class.java)) {
+        for (tool in ServiceLoader.load(RenderingTool::class.java)) {
             renderingToolClasses.add(tool.javaClass.getName())
         }
 

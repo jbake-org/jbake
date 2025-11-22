@@ -60,7 +60,7 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat<Throwable?>(oven.errors).isEmpty()
+        Assertions.assertThat(oven.errors).isEmpty()
     }
 
     @Test
@@ -75,7 +75,7 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat<Throwable?>(oven.errors).isEmpty()
+        Assertions.assertThat(oven.errors).isEmpty()
         Assertions.assertThat(configuration.destinationFolder).isNotEmptyDirectory()
         Assertions.assertThat(assetFolder).isNotEmptyDirectory()
         Assertions.assertThat(aboutFile).isFile()
@@ -121,7 +121,7 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat<Throwable?>(oven.errors).isEmpty()
+        Assertions.assertThat(oven.errors).isEmpty()
         Assertions.assertThat(configuration.destinationFolder).isNotEmptyDirectory()
         Assertions.assertThat(assetFolder).isNotEmptyDirectory()
         Assertions.assertThat(aboutFile).isFile()
@@ -134,7 +134,7 @@ class OvenTest {
     fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
         configuration.setSourceFolder(root!!.resolve("none").toFile())
 
-        assertThrows<JBakeException?>( JBakeException::class.java){ Oven(configuration) }
+        assertThrows( JBakeException::class.java){ Oven(configuration) }
     }
 
     @Test
@@ -149,11 +149,11 @@ class OvenTest {
 
         val oven = Oven(configuration)
 
-        Assertions.assertThat<ContentStore?>(oven.utensils.contentStore).isNotNull()
-        Assertions.assertThat<Crawler?>(oven.utensils.crawler).isNotNull()
-        Assertions.assertThat<Renderer?>(oven.utensils.renderer).isNotNull()
-        Assertions.assertThat<Asset?>(oven.utensils.asset).isNotNull()
-        Assertions.assertThat<JBakeConfiguration?>(oven.utensils.configuration).isEqualTo(configuration)
+        Assertions.assertThat(oven.utensils.contentStore).isNotNull()
+        Assertions.assertThat(oven.utensils.crawler).isNotNull()
+        Assertions.assertThat(oven.utensils.renderer).isNotNull()
+        Assertions.assertThat(oven.utensils.asset).isNotNull()
+        Assertions.assertThat(oven.utensils.configuration).isEqualTo(configuration)
     }
 
     @Test
@@ -186,11 +186,11 @@ class OvenTest {
         configuration.contentFolder = (content)
         configuration.assetFolder = (assets)
 
-        contentStore = Mockito.spy<ContentStore?>(ContentStore("memory", "documents" + System.currentTimeMillis()))
+        contentStore = Mockito.spy(ContentStore("memory", "documents" + System.currentTimeMillis()))
 
-        val crawler = Mockito.mock<Crawler?>(Crawler::class.java)
-        val renderer = Mockito.mock<Renderer?>(Renderer::class.java)
-        val asset = Mockito.mock<Asset?>(Asset::class.java)
+        val crawler = Mockito.mock(Crawler::class.java)
+        val renderer = Mockito.mock(Renderer::class.java)
+        val asset = Mockito.mock(Asset::class.java)
 
         val utensils = Utensils(
             configuration = configuration,
@@ -205,9 +205,9 @@ class OvenTest {
         oven.bake()
 
         Mockito.verify<ContentStore?>(contentStore, Mockito.times(1)).startup()
-        Mockito.verify<Renderer?>(renderer, Mockito.atLeastOnce()).renderIndex(ArgumentMatchers.anyString())
-        Mockito.verify<Crawler?>(crawler, Mockito.times(1)).crawl()
-        Mockito.verify<Asset?>(asset, Mockito.times(1)).copy()
+        Mockito.verify(renderer, Mockito.atLeastOnce()).renderIndex(ArgumentMatchers.anyString())
+        Mockito.verify(crawler, Mockito.times(1)).crawl()
+        Mockito.verify(asset, Mockito.times(1)).copy()
     }
 
     @Test
@@ -217,7 +217,7 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        MatcherAssert.assertThat<Locale?>(Locale.getDefault(), Is.`is`<Locale?>(Locale(language)))
+        MatcherAssert.assertThat(Locale.getDefault(), Is.`is`(Locale(language)))
     }
 
     @Test
@@ -228,6 +228,6 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        MatcherAssert.assertThat<Locale?>(Locale.getDefault(), Is.`is`<Locale?>(Locale(language)))
+        MatcherAssert.assertThat(Locale.getDefault(), Is.`is`(Locale(language)))
     }
 }

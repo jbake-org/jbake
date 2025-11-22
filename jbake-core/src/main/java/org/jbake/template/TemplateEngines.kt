@@ -37,7 +37,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     private val engines: MutableMap<String, AbstractTemplateEngine>
 
     val recognizedExtensions: MutableSet<String>
-        get() = Collections.unmodifiableSet<String>(engines.keys)
+        get() = Collections.unmodifiableSet(engines.keys)
 
     init {
         engines = HashMap<String, AbstractTemplateEngine>()

@@ -17,12 +17,12 @@ class TagsRendererTest {
         val renderer = TagsRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderTags).thenReturn(false)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
@@ -33,15 +33,15 @@ class TagsRendererTest {
         val renderer = TagsRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderTags).thenReturn(false)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderTags(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.never()).renderTags(ArgumentMatchers.anyString())
     }
 
     @Test
@@ -49,17 +49,17 @@ class TagsRendererTest {
         val renderer = TagsRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderTags).thenReturn(true)
         Mockito.`when`<Any?>(configuration.tagPathName).thenReturn("mocktagpath")
 
-        val contentStore = Mockito.mock<ContentStore>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        val tags: MutableSet<String> = HashSet<String>(mutableListOf<String>("tag1", "tags2"))
-        Mockito.`when`<MutableSet<String>>(contentStore.tags).thenReturn(tags)
+        val tags: MutableSet<String> = HashSet(mutableListOf("tag1", "tags2"))
+        Mockito.`when`(contentStore.tags).thenReturn(tags)
 
-        Mockito.`when`<Int?>(mockRenderer.renderTags(ArgumentMatchers.anyString())).thenReturn(1)
+        Mockito.`when`(mockRenderer.renderTags(ArgumentMatchers.anyString())).thenReturn(1)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -71,19 +71,19 @@ class TagsRendererTest {
         val renderer = TagsRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderTags).thenReturn(true)
 
-        val contentStore = Mockito.mock<ContentStore>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        val tags: MutableSet<String> = HashSet<String>(mutableListOf<String>("tag1", "tags2"))
-        Mockito.`when`<MutableSet<String>>(contentStore.tags).thenReturn(tags)
+        val tags: MutableSet<String> = HashSet(mutableListOf("tag1", "tags2"))
+        Mockito.`when`(contentStore.tags).thenReturn(tags)
         Mockito.`when`<Any?>(configuration.tagPathName).thenReturn("mockTagfile.html")
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.times(1)).renderTags(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.times(1)).renderTags(ArgumentMatchers.anyString())
     }
 
     @Test(expected = RenderingException::class)
@@ -91,18 +91,18 @@ class TagsRendererTest {
         val renderer = TagsRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderTags).thenReturn(true)
         Mockito.`when`<Any?>(configuration.tagPathName).thenReturn("mocktagpath/tag")
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`<Renderer?>(mockRenderer).renderTags(ArgumentMatchers.anyString())
+        Mockito.doThrow(Exception()).`when`(mockRenderer).renderTags(ArgumentMatchers.anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderTags(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.never()).renderTags(ArgumentMatchers.anyString())
     }
 }
 

@@ -98,7 +98,7 @@ class AssetTest : LoggingTest() {
 
         asset.copySingleFile(emptyDir)
 
-        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
+        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
 
         val loggingEvent = captorLoggingEvent!!.getValue()
         org.assertj.core.api.Assertions.assertThat(loggingEvent.message)

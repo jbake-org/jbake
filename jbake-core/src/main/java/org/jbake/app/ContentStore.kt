@@ -270,7 +270,7 @@ class ContentStore(private val type: String, private val name: String?) {
             val result: MutableSet<String> = HashSet<String>()
             for (document in docs) {
                 val tags = document.tags
-                Collections.addAll<String>(result, *tags)
+                Collections.addAll(result, *tags)
             }
             return result
         }
@@ -284,7 +284,7 @@ class ContentStore(private val type: String, private val name: String?) {
                 val docs = query(statement)
                 for (document in docs) {
                     val tags = document.tags
-                    Collections.addAll<String>(result, *tags)
+                    Collections.addAll(result, *tags)
                 }
             }
             return result

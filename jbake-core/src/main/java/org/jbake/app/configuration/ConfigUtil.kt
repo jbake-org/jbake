@@ -61,7 +61,7 @@ class ConfigUtil {
     @Throws(ConfigurationException::class)
     private fun getFileBasedPropertiesConfiguration(propertiesFile: File?): PropertiesConfiguration? {
         val builder =
-            FileBasedConfigurationBuilder<PropertiesConfiguration?>(PropertiesConfiguration::class.java)
+            FileBasedConfigurationBuilder(PropertiesConfiguration::class.java)
                 .configure(
                     Parameters().properties()
                         .setFile(propertiesFile)
@@ -76,7 +76,7 @@ class ConfigUtil {
     @Throws(ConfigurationException::class)
     private fun getFileBasedPropertiesConfiguration(propertiesFile: URL?): PropertiesConfiguration? {
         val builder =
-            FileBasedConfigurationBuilder<PropertiesConfiguration?>(PropertiesConfiguration::class.java)
+            FileBasedConfigurationBuilder(PropertiesConfiguration::class.java)
                 .configure(
                     Parameters().properties()
                         .setURL(propertiesFile)

@@ -22,7 +22,7 @@ class ArchiveRendererTest {
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
@@ -33,15 +33,15 @@ class ArchiveRendererTest {
         val renderer = ArchiveRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(false)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderArchive(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.never()).renderArchive(ArgumentMatchers.anyString())
     }
 
     @Test
@@ -50,12 +50,12 @@ class ArchiveRendererTest {
         val renderer = ArchiveRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(true)
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -67,16 +67,16 @@ class ArchiveRendererTest {
         val renderer = ArchiveRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(true)
         Mockito.`when`<Any?>(configuration.archiveFileName).thenReturn("mockarchive.html")
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.times(1)).renderArchive(ArgumentMatchers.anyString())
+        Mockito.verify(mockRenderer, Mockito.times(1)).renderArchive(ArgumentMatchers.anyString())
     }
 
     @Test(expected = RenderingException::class)
@@ -84,18 +84,18 @@ class ArchiveRendererTest {
         val renderer = ArchiveRenderer()
 
         val configuration: JBakeConfiguration =
-            Mockito.mock<DefaultJBakeConfiguration>(DefaultJBakeConfiguration::class.java)
+            Mockito.mock(DefaultJBakeConfiguration::class.java)
         Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(true)
         Mockito.`when`<Any?>(configuration.archiveFileName).thenReturn("mockarchive.html")
 
-        val contentStore = Mockito.mock<ContentStore?>(ContentStore::class.java)
-        val mockRenderer = Mockito.mock<Renderer>(Renderer::class.java)
+        val contentStore = Mockito.mock(ContentStore::class.java)
+        val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`<Renderer?>(mockRenderer).renderArchive(ArgumentMatchers.anyString())
+        Mockito.doThrow(Exception()).`when`(mockRenderer).renderArchive(ArgumentMatchers.anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify<Renderer?>(mockRenderer, Mockito.never()).renderArchive("random string")
+        Mockito.verify(mockRenderer, Mockito.never()).renderArchive("random string")
     }
 }
 

@@ -9,7 +9,7 @@ class PropertyListTest {
     fun getPropertyByKey() {
         val property = getPropertyByKey("archive.file")
 
-        Assertions.assertThat<Property?>(property).isEqualTo(PropertyList.ARCHIVE_FILE)
+        Assertions.assertThat(property).isEqualTo(PropertyList.ARCHIVE_FILE)
     }
 
     @Test
@@ -17,6 +17,6 @@ class PropertyListTest {
         val property = getPropertyByKey("unknown.option")
 
         Assertions.assertThat(property.key).isEqualTo("unknown.option")
-        Assertions.assertThat<Property.Group?>(property.group).isEqualTo(Property.Group.CUSTOM)
+        Assertions.assertThat(property.group).isEqualTo(Property.Group.CUSTOM)
     }
 }

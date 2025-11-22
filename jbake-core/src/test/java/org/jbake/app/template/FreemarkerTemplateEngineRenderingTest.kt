@@ -41,7 +41,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         config.setPostsPerPage(1)
 
         outputStrings.put(
-            "index", mutableListOf<String>(
+            "index", mutableListOf(
                 "\">Previous</a>",
                 "3/\">Next</a>",
                 "2 of 3"

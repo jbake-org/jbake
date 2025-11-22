@@ -3,7 +3,7 @@ package org.jbake
 import java.io.*
 
 class BinaryRunner(private val folder: File?) {
-    @kotlin.Throws(IOException::class, InterruptedException::class)
+    @Throws(IOException::class, InterruptedException::class)
     fun runWithArguments(vararg arguments: String?): Process {
         val processBuilder = ProcessBuilder(*arguments)
         processBuilder.directory(folder)
@@ -16,7 +16,7 @@ class BinaryRunner(private val folder: File?) {
         return process
     }
 
-    @kotlin.Throws(IOException::class)
+    @Throws(IOException::class)
     private fun printOutput(inputStream: InputStream) {
         var line: String?
         val reader = BufferedReader(InputStreamReader(inputStream))

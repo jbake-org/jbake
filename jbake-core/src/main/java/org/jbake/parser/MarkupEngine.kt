@@ -118,7 +118,7 @@ abstract class MarkupEngine : ParserEngine {
             }
         } catch (e: IOException) {
             log.error("Error while opening file {}", file, e)
-            return mutableListOf<String>()
+            return mutableListOf()
         }
     }
 

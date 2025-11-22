@@ -19,7 +19,7 @@ class ModelExtractorsTest {
     @Test
     fun shouldLoadExtractorsOnInstantiation() {
         ModelExtractors.instance
-        val expectedKeys: Array<String> = arrayOf<String>(
+        val expectedKeys: Array<String> = arrayOf(
             "pages",
             "posts",
             "indexs",

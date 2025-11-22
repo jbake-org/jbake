@@ -27,7 +27,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile()
-                        && Engines.Companion.recognizedExtensions
+                        && Engines.recognizedExtensions
                     .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
             }
         }
@@ -45,7 +45,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile()
-                        && Engines.Companion.recognizedExtensions
+                        && Engines.recognizedExtensions
                     .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(
                     pathname
                 ))
@@ -79,7 +79,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                        && !Engines.Companion.recognizedExtensions.contains(fileExt(pathname)))
+                        && !Engines.recognizedExtensions.contains(fileExt(pathname)))
                         || (directoryOnlyIfNotIgnored(pathname, config))
             }
         }
@@ -97,7 +97,7 @@ object FileUtil {
                 //Accept if input  is a non-hidden file with NOT-registered extension
                 //or if a non-hidden and not-ignored directory
                 return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                        && !Engines.Companion.recognizedExtensions
+                        && !Engines.recognizedExtensions
                     .contains(fileExt(pathname)))
                         || (directoryOnlyIfNotIgnored(pathname))
             }
@@ -285,12 +285,12 @@ object FileUtil {
     }
 
     fun getUriPathToDestinationRoot(config: JBakeConfiguration, sourceFile: File): String {
-        return FileUtil.getPathToRoot(config, config.destinationFolder!!, sourceFile)
+        return getPathToRoot(config, config.destinationFolder!!, sourceFile)
     }
 
     @JvmStatic
     fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File): String {
-        return FileUtil.getPathToRoot(config, config.contentFolder!!, sourceFile)
+        return getPathToRoot(config, config.contentFolder!!, sourceFile)
     }
 
     /**

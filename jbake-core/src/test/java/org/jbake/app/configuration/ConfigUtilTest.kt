@@ -57,11 +57,11 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
-        val nonExistentSourceFolder = Mockito.mock<File>(File::class.java)
-        Mockito.`when`<String>(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
-        Mockito.`when`<Boolean?>(nonExistentSourceFolder.exists()).thenReturn(false)
+        val nonExistentSourceFolder = Mockito.mock(File::class.java)
+        Mockito.`when`(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
+        Mockito.`when`(nonExistentSourceFolder.exists()).thenReturn(false)
 
-        val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
+        val e = org.junit.jupiter.api.Assertions.assertThrows(
             JBakeException::class.java
         ) { util.loadConfig(nonExistentSourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
@@ -77,11 +77,11 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldThrowAnExceptionIfSourcefolderIsNotADirectory() {
-        val sourceFolder = Mockito.mock<File>(File::class.java)
-        Mockito.`when`<Boolean?>(sourceFolder.exists()).thenReturn(true)
-        Mockito.`when`<Boolean?>(sourceFolder.isDirectory()).thenReturn(false)
+        val sourceFolder = Mockito.mock(File::class.java)
+        Mockito.`when`(sourceFolder.exists()).thenReturn(true)
+        Mockito.`when`(sourceFolder.isDirectory()).thenReturn(false)
 
-        val e = org.junit.jupiter.api.Assertions.assertThrows<JBakeException>(
+        val e = org.junit.jupiter.api.Assertions.assertThrows(
             JBakeException::class.java
         ) { util.loadConfig(sourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder is not a directory.")
@@ -143,7 +143,7 @@ class ConfigUtilTest : LoggingTest() {
 
         config.getTemplateFileByDocType("none")
 
-        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
 
@@ -181,7 +181,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val docTypes = config.documentTypes
 
-        assertThat<String>(docTypes).containsExactly(
+        assertThat(docTypes).containsExactly(
             "allcontent",
             "team",
             "masterindex",
@@ -205,7 +205,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val options = config.asciidoctorOptionKeys
 
-        assertThat<String>(options).contains("requires", "template_dirs")
+        assertThat(options).contains("requires", "template_dirs")
     }
 
     @Test
@@ -217,7 +217,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val option = config.getAsciidoctorOption("requires") as Collection<String>
 
-        assertThat<String>(option).contains("asciidoctor-diagram")
+        assertThat(option).contains("asciidoctor-diagram")
     }
 
     @Test
@@ -229,7 +229,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val option = config.getAsciidoctorOption("template_dirs") as Collection<String>
 
-        assertThat<String>(option).contains("src/template1", "src/template2")
+        assertThat(option).contains("src/template1", "src/template2")
     }
 
     @Test
@@ -239,7 +239,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val options = config.getAsciidoctorOption("template_dirs") as Collection<String>
 
-        assertThat<String>(options).isEmpty()
+        assertThat(options).isEmpty()
     }
 
     @Test
@@ -249,7 +249,7 @@ class ConfigUtilTest : LoggingTest() {
 
         config.getAsciidoctorOption("template_dirs")
 
-        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
 
@@ -349,11 +349,11 @@ class ConfigUtilTest : LoggingTest() {
     fun shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() {
         util.setEncoding("UNSUPPORTED_ENCODING")
             .loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
-        Mockito.verify<Appender<ILoggingEvent>>(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
 
-        assertThat<Level?>(loggingEvent.level).isEqualTo(Level.WARN)
+        assertThat(loggingEvent.level).isEqualTo(Level.WARN)
         assertThat(loggingEvent.getFormattedMessage())
             .isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'")
     }

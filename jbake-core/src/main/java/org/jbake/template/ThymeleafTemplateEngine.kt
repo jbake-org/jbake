@@ -80,7 +80,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
         templateResolver!!.setTemplateMode(getTemplateModeByModel(model))
     }
 
-    private fun getTemplateModeByModel(model: TemplateModel): String? {
+    private fun getTemplateModeByModel(model: TemplateModel): String {
         val content = model.content
         return config.getThymeleafModeByType(content.type)
     }
@@ -112,7 +112,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     /**
      * Helper class to lazy load data form extractors by key.
      */
-    private inner class ContextVariable(
+    private class ContextVariable(
         private val db: ContentStore,
         private val key: String,
         private val model: TemplateModel

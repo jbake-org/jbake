@@ -10,14 +10,14 @@ import java.io.File
 class LaunchOptionsTest {
     @Test
     fun showHelp() {
-        val args = arrayOf<String>("-h")
+        val args = arrayOf("-h")
         val res = parseArgs(args)
         Assertions.assertThat(res.isHelpNeeded).isTrue()
     }
 
     @Test
     fun runServer() {
-        val args = arrayOf<String>("-s")
+        val args = arrayOf("-s")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isRunServer).isTrue()
@@ -25,7 +25,7 @@ class LaunchOptionsTest {
 
     @Test
     fun runServerWithFolder() {
-        val args = arrayOf<String>("-s", "/tmp")
+        val args = arrayOf("-s", "/tmp")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isRunServer).isTrue()
@@ -34,7 +34,7 @@ class LaunchOptionsTest {
 
     @Test
     fun init() {
-        val args = arrayOf<String>("-i")
+        val args = arrayOf("-i")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -43,7 +43,7 @@ class LaunchOptionsTest {
 
     @Test
     fun initWithTemplate() {
-        val args = arrayOf<String>("-i", "-t", "foo")
+        val args = arrayOf("-i", "-t", "foo")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -52,7 +52,7 @@ class LaunchOptionsTest {
 
     @Test
     fun initWithSourceDirectory() {
-        val args = arrayOf<String>("-i", "/tmp")
+        val args = arrayOf("-i", "/tmp")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -61,7 +61,7 @@ class LaunchOptionsTest {
 
     @Test
     fun initWithTemplateAndSourceDirectory() {
-        val args = arrayOf<String>("-i", "-t", "foo", "/tmp")
+        val args = arrayOf("-i", "-t", "foo", "/tmp")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isInit).isTrue()
@@ -71,9 +71,9 @@ class LaunchOptionsTest {
 
     @Test
     fun shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
-        val args = arrayOf<String>("-t", "groovy-mte")
+        val args = arrayOf("-t", "groovy-mte")
 
-        Assertions.assertThatExceptionOfType<CommandLine.MissingParameterException?>(CommandLine.MissingParameterException::class.java)
+        Assertions.assertThatExceptionOfType(CommandLine.MissingParameterException::class.java)
             .isThrownBy {
                 parseArgs(args)
             }.withMessage("Error: Missing required argument(s): --init")
@@ -81,7 +81,7 @@ class LaunchOptionsTest {
 
     @Test
     fun bake() {
-        val args = arrayOf<String>("-b")
+        val args = arrayOf("-b")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isBake).isTrue()
@@ -89,7 +89,7 @@ class LaunchOptionsTest {
 
     @Test
     fun listConfig() {
-        val args = arrayOf<String>("-ls")
+        val args = arrayOf("-ls")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isListConfig).isTrue()
@@ -97,7 +97,7 @@ class LaunchOptionsTest {
 
     @Test
     fun listConfigLongOption() {
-        val args = arrayOf<String>("--list-settings")
+        val args = arrayOf("--list-settings")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isListConfig).isTrue()
@@ -105,7 +105,7 @@ class LaunchOptionsTest {
 
     @Test
     fun customPropertiesEncoding() {
-        val args = arrayOf<String>("--prop-encoding", "utf-16")
+        val args = arrayOf("--prop-encoding", "utf-16")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.propertiesEncoding).isEqualTo("utf-16")
@@ -137,7 +137,7 @@ class LaunchOptionsTest {
 
     @Test
     fun bakeWithArgs() {
-        val args = arrayOf<String>("/tmp/source", "/tmp/destination")
+        val args = arrayOf("/tmp/source", "/tmp/destination")
         val res = parseArgs(args)
 
         Assertions.assertThat(res.isHelpNeeded).isFalse()
@@ -150,13 +150,13 @@ class LaunchOptionsTest {
 
     @Test
     fun configArg() {
-        val args = arrayOf<String>("-c", "foo")
+        val args = arrayOf("-c", "foo")
         val res = parseArgs(args)
         Assertions.assertThat(res.getConfig().getAbsoluteFile().toString())
             .isEqualTo(System.getProperty("user.dir") + File.separator + "foo")
     }
 
     private fun parseArgs(args: Array<String>): LaunchOptions {
-        return CommandLine.populateCommand<LaunchOptions>(LaunchOptions(), *args)
+        return CommandLine.populateCommand(LaunchOptions(), *args)
     }
 }

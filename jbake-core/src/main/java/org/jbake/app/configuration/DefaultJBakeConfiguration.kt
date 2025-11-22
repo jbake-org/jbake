@@ -57,7 +57,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     private fun getAsList(key: String): MutableList<String> {
-        val list = compositeConfiguration.getList<String>(String::class.java, key)
+        val list = compositeConfiguration.getList(String::class.java, key)
         return list?.filterNotNull()?.toMutableList() ?: mutableListOf()
     }
 

@@ -102,7 +102,7 @@ class JBakeConfigurationFactoryTest {
 
     @Test
     fun shouldUseCustomEncoding() {
-        val util = Mockito.spy<ConfigUtil>(ConfigUtil::class.java)
+        val util = Mockito.spy(ConfigUtil::class.java)
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val factory = JBakeConfigurationFactory()
@@ -111,7 +111,7 @@ class JBakeConfigurationFactoryTest {
             .createDefaultJbakeConfiguration(sourceFolder, destinationFolder, null as File?, true)
 
         AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("latin1")
-        Mockito.verify<ConfigUtil?>(util).loadConfig(sourceFolder, null)
+        Mockito.verify(util).loadConfig(sourceFolder, null)
     }
 
     @Test
