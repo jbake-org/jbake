@@ -76,11 +76,25 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.key)
 
         if (subConfig.containsKey(optionKey)) {
-            // use the two-arg get overload to retrieve a raw Object
-            return subConfig.get(Any::class.java, optionKey)
+            // Use getList to properly handle comma-separated values
+            // Commons Configuration will automatically split on commas if configured
+            val list = subConfig.getList(optionKey) ?: emptyList()
+
+            // If list is not empty, return it; otherwise check for single value
+            if (list.isNotEmpty())
+                return list.map { it.toString().trim() }
+
+            // Fallback to getting raw value. TBD: Is this all needed? Can't it always be a list?
+            val value = subConfig.get(Any::class.java, optionKey)
+            return when (value) {
+                is String -> listOf(value)
+                is Collection<*> -> value
+                null -> emptyList<String>()
+                else -> value
+            }
         }
         logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.key, optionKey)
-        return null
+        return emptyList<String>()
     }
 
     override val asciidoctorOptionKeys: MutableList<String>
