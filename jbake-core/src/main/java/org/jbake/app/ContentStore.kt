@@ -53,7 +53,7 @@ class ContentStore(private val type: String, private val name: String?) {
         private set
     var limit: Long = -1
         private set
-    private var orient: OrientDB? = null
+    private lateinit var orient: OrientDB
 
 
     fun startup() {
@@ -65,9 +65,26 @@ class ContentStore(private val type: String, private val name: String?) {
             else
                 OrientDB("$type:", OrientDBConfig.defaultConfig())
 
-        orient!!.createIfNotExists(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
+        orient.createIfNotExists(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
 
-        db = orient!!.open(name, "admin", "admin")
+        // Try to open as admin, if fails, create admin user and role, then retry
+        try {
+            db = orient.open(name, "admin", "admin")
+        } catch (e: Exception) {
+            // Open as root (OrientDB default superuser)
+            val rootUser = System.getProperty("orientdb.root.user", "root")
+            val rootPass = System.getProperty("orientdb.root.password", "root")
+            db = orient.open(name, rootUser, rootPass)
+            // Check if admin user exists
+            val result = db!!.query("SELECT FROM OUser WHERE name = 'admin'")
+            if (!result.hasNext()) {
+                db!!.command("INSERT INTO OUser SET name = 'admin', password = 'admin', status = 'ACTIVE'")
+                db!!.command("INSERT INTO ORole SET name = 'admin', mode = 0, rules = {}")
+                db!!.command("UPDATE OUser SET roles = (SELECT FROM ORole WHERE name = 'admin') WHERE name = 'admin'")
+            }
+            db!!.close()
+            db = orient.open(name, "admin", "admin")
+        }
 
         activateOnCurrentThread()
 
@@ -105,7 +122,7 @@ class ContentStore(private val type: String, private val name: String?) {
         }
 
         if (orient != null) {
-            orient!!.close()
+            orient.close()
         }
         DBUtil.closeDataStore()
     }
@@ -132,7 +149,7 @@ class ContentStore(private val type: String, private val name: String?) {
         activateOnCurrentThread()
 
         //        db.drop();
-        orient!!.drop(name)
+        orient.drop(name)
     }
 
     private fun activateOnCurrentThread() {
