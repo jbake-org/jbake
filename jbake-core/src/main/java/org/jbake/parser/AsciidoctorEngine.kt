@@ -32,17 +32,18 @@ class AsciidoctorEngine : MarkupEngine() {
                     lock.writeLock().lock()
                     if (engine == null) {
                         log.info("Initializing Asciidoctor engine...")
-                        if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
-                        } else {
-                            engine = Asciidoctor.Factory.create()
-                        }
+                        engine =
+                            if (options.map().containsKey(OPT_GEM_PATH))
+                                AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
+                            else
+                                Asciidoctor.Factory.create()
 
                         if (options.map().containsKey(OPT_REQUIRES)) {
                             val requires: Array<String> =
                                 options.map()[OPT_REQUIRES].toString().split(",".toRegex())
                                     .dropLastWhile { it.isEmpty() }.toTypedArray()
-                            if (requires.size != 0) {
+
+                            if (requires.isNotEmpty()) {
                                 for (require in requires) {
                                     engine!!.requireLibrary(require)
                                 }
@@ -80,7 +81,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 if (canCastToString(value)) {
                     storeHeaderValue(pKey, value as String, documentModel)
                 } else {
-                    documentModel.put(pKey, value)
+                    documentModel[pKey] = value
                 }
             }
             if (hasRevdate(key) && canCastToString(value)) {
@@ -101,7 +102,7 @@ class AsciidoctorEngine : MarkupEngine() {
                     log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
                 }
             } else {
-                documentModel.put(key, attributes[key]!!)
+                documentModel[key] = attributes.get(key)!!
             }
         }
     }

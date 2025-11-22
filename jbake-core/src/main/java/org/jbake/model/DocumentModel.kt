@@ -92,10 +92,10 @@ class DocumentModel : BaseModel() {
     var cached: Boolean?
         get() {
             val value = get(ModelAttributes.CACHED)
-            if (value is String) {
-                return value.toBoolean()
+            return if (value is String) {
+                value.toBoolean()
             } else {
-                return value as Boolean?
+                value as Boolean?
             }
         }
         set(cached) {

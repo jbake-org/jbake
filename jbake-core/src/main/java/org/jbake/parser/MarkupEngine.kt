@@ -275,9 +275,9 @@ abstract class MarkupEngine : ParserEngine {
         } else if (key.equals(ModelAttributes.CACHED, ignoreCase = true)) {
             content.cached = (value.toBoolean())
         } else if (isJson(value)) {
-            content.put(key, JSONValue.parse(value))
+            content[key] = JSONValue.parse(value)
         } else {
-            content.put(key, value)
+            content[key] = value
         }
     }
 
@@ -310,7 +310,7 @@ abstract class MarkupEngine : ParserEngine {
             }
         }
 
-        if (body.length == 0) {
+        if (body.isEmpty()) {
             for (line in context.fileLines) {
                 body.append(line).append("\n")
             }

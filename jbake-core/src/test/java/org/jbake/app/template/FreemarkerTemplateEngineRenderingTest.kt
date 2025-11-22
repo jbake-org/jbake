@@ -39,12 +39,10 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 
-        outputStrings.put(
-            "index", mutableListOf(
-                "\">Previous</a>",
-                "3/\">Next</a>",
-                "2 of 3"
-            )
+        outputStrings["index"] = mutableListOf(
+            "\">Previous</a>",
+            "3/\">Next</a>",
+            "2 of 3"
         )
 
         renderer.renderIndexPaging("index.html")

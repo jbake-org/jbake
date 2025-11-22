@@ -34,7 +34,7 @@ import java.io.File
  */
 @Mojo(name = "generate", requiresProject = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 open class GenerateMojo : AbstractMojo() {
-    @Parameter(defaultValue = "\${project}")
+    @Parameter(defaultValue = $$"${project}")
     protected var project: MavenProject? = null
 
     /**
@@ -42,7 +42,7 @@ open class GenerateMojo : AbstractMojo() {
      */
     @Parameter(
         property = "jbake.outputDirectory",
-        defaultValue = "\${project.build.directory}/\${project.build.finalName}",
+        defaultValue = $$"${project.build.directory}/${project.build.finalName}",
         required = true
     )
     protected var outputDirectory: File? = null
@@ -50,7 +50,7 @@ open class GenerateMojo : AbstractMojo() {
     /**
      * Location of the Output Directory.
      */
-    @Parameter(property = "jbake.inputDirectory", defaultValue = "\${project.basedir}/src/main/jbake", required = true)
+    @Parameter(property = "jbake.inputDirectory", defaultValue = $$"${project.basedir}/src/main/jbake", required = true)
     protected var inputDirectory: File? = null
 
     /**

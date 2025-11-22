@@ -65,7 +65,7 @@ class Init(private val config: JBakeConfiguration) {
             }
             ZipUtil.extract(FileInputStream(templateFile), outputFolder)
         } else {
-            throw Exception("Cannot locate example project type: " + templateType)
+            throw Exception("Cannot locate example project type: $templateType")
         }
     }
 }

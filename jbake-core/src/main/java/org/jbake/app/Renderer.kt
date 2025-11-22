@@ -112,7 +112,7 @@ class Renderer {
         val docType = content.type
         var outputFilename = (config.destinationFolder.path + File.separatorChar) + content.uri
         if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
-            outputFilename = outputFilename.substring(0, outputFilename.lastIndexOf('.'))
+            outputFilename = outputFilename.take(outputFilename.lastIndexOf('.'))
         }
 
         // delete existing versions if they exist in case status has changed either way

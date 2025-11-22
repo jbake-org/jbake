@@ -30,11 +30,9 @@ class BuiltInProjectsTest {
     @Before
     @Throws(IOException::class)
     fun setup() {
-        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
-        } else {
-            jbakeExecutable = File("build/install/jbake/bin/jbake").absolutePath
-        }
+        jbakeExecutable =
+            if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
+            else File("build/install/jbake/bin/jbake").absolutePath
         projectFolder = folder.newFolder("project")
         templateFolder = File(projectFolder, "templates")
         outputFolder = File(projectFolder, "output")

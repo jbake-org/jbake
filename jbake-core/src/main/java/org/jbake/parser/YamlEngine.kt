@@ -48,9 +48,9 @@ class YamlEngine : MarkupEngine() {
         for (key in fileContents.keys) {
             if (hasJBakePrefix(key)) {
                 val pKey = key.substring(6)
-                documentModel.put(pKey, fileContents.get(key)!!)
+                documentModel[pKey] = fileContents.get(key)!!
             } else {
-                documentModel.put(key, fileContents.get(key)!!)
+                documentModel[key] = fileContents.get(key)!!
             }
         }
     }

@@ -42,7 +42,7 @@ internal class JettyServerTest {
                 Thread.sleep(100)
             }
 
-            val url = URL("http://localhost:" + port + "/foo/content/about.html")
+            val url = URL("http://localhost:$port/foo/content/about.html")
             val con = url.openConnection() as HttpURLConnection
             con.setRequestMethod("GET")
 

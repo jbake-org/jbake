@@ -54,13 +54,8 @@ class Asset {
      */
     @JvmOverloads
     fun copy(path: File = config.assetFolder) {
-        val filter: FileFilter = object : FileFilter {
-            override fun accept(file: File): Boolean {
-                return (!config.assetIgnoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(
-                    file,
-                    config
-                ))
-            }
+        val filter: FileFilter = FileFilter { file ->
+            (!config.assetIgnoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config))
         }
         copy(path, config.destinationFolder, filter)
     }

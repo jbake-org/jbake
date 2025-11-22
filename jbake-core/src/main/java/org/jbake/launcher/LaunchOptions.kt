@@ -63,27 +63,18 @@ class LaunchOptions {
         get() = initGroup?.template
 
     fun getSource(): File {
-        if (this.sourceValue != null) {
-            return File(this.sourceValue)
-        } else {
-            return File(System.getProperty("user.dir"))
-        }
+        return if (this.sourceValue != null) File(this.sourceValue)
+            else File(System.getProperty("user.dir"))
     }
 
     fun getDestination(): File {
-        if (this.destinationValue != null) {
-            return File(this.destinationValue)
-        } else {
-            return File(getSource(), "output")
-        }
+        return if (this.destinationValue != null) File(this.destinationValue)
+            else File(getSource(), "output")
     }
 
     fun getConfig(): File {
-        if (this.configValue != null) {
-            return File(this.configValue)
-        } else {
-            return File(getSource(), "jbake.properties")
-        }
+        return if (this.configValue != null) File(this.configValue)
+            else File(getSource(), "jbake.properties")
     }
 
     val isHelpNeeded: Boolean

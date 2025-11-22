@@ -43,7 +43,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
         jadeConfiguration.setFilter(FILTER_CDATA, CDATAFilter())
         jadeConfiguration.setFilter(FILTER_SCRIPT, JsFilter())
         jadeConfiguration.setFilter(FILTER_STYLE, CssFilter())
-        jadeConfiguration.sharedVariables.put("formatter", FormatHelper())
+        jadeConfiguration.getSharedVariables()["formatter"] = FormatHelper()
     }
 
     @Throws(RenderingException::class)

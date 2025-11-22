@@ -13,11 +13,7 @@ object TestUtils {
     @Throws(IOException::class, InterruptedException::class)
     fun hideAssets(assets: File) {
         if (isWindows) {
-            val hiddenFiles = assets.listFiles(object : FilenameFilter {
-                override fun accept(dir: File?, name: String): Boolean {
-                    return name.startsWith(".")
-                }
-            })
+            val hiddenFiles = assets.listFiles { dir, name -> name.startsWith(".") }
             for (file in hiddenFiles!!) {
                 val process = Runtime.getRuntime().exec(arrayOf<String>("attrib", "+h", file.absolutePath))
                 process.waitFor()

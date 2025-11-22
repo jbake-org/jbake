@@ -59,7 +59,7 @@ class RendererTest {
 
         val content = DocumentModel()
         content.type = "page"
-        content.uri = "/" + FOLDER + "/" + FILENAME
+        content.uri = "/$FOLDER/$FILENAME"
         content.status = "published"
 
         renderer.render(content)

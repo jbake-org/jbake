@@ -52,9 +52,9 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         if (!templateFile.exists()) {
             log.info("Default template: {} was not found, searching for others...", templateName)
             // if default template does not exist then check if any alternative engine templates exist
-            val templateNameWithoutExt = templateName.substring(0, templateName.length - 4)
+            val templateNameWithoutExt = templateName.dropLast(4)
             for (extension in renderers.recognizedExtensions) {
-                templateFile = File(templateFolder, templateNameWithoutExt + "." + extension)
+                templateFile = File(templateFolder, "$templateNameWithoutExt.$extension")
                 if (templateFile.exists()) {
                     log.info("Found alternative template file: {} using this instead", templateFile.getName())
                     theTemplateName = templateFile.getName()

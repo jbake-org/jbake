@@ -69,7 +69,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
 
         val sampleFile = File(sourceFolder!!.path + File.separator + "content" + File.separator + "papers" + File.separator + filename)
         val content = parser.processFile(sampleFile)
-        content!!.uri = "/" + filename
+        content!!.uri = "/$filename"
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())

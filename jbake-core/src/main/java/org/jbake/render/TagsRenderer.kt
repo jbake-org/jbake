@@ -11,15 +11,15 @@ import java.io.File
 class TagsRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
-        if (config.renderTags) {
+        return if (config.renderTags) {
             try {
                 //TODO: refactor this. The renderer has a reference to the configuration.
-                return renderer.renderTags(config.tagPathName ?: "tags")
+                renderer.renderTags(config.tagPathName ?: "tags")
             } catch (e: Exception) {
                 throw RenderingException(e)
             }
         } else {
-            return 0
+            0
         }
     }
 

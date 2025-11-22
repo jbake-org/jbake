@@ -81,15 +81,15 @@ abstract class AbstractTemplateEngineRenderingTest(
 
             if (templateFile != null) {
                 val fileName = templateFile.getName()
-                val fileBaseName = fileName.substring(0, fileName.lastIndexOf("."))
+                val fileBaseName = fileName.take(fileName.lastIndexOf("."))
                 config.setTemplateFileNameForDocType(
                     docType,
-                    fileBaseName + "." + templateExtension
+                    "$fileBaseName.$templateExtension"
                 )
             }
         }
 
-        config.setTemplateFileNameForDocType("paper", "paper." + templateExtension)
+        config.setTemplateFileNameForDocType("paper", "paper.$templateExtension")
         addDocumentType("paper")
         db.updateSchema()
 
@@ -177,7 +177,7 @@ abstract class AbstractTemplateEngineRenderingTest(
                     + File.separator + "blog" + File.separator + "2013" + File.separator + filename
         )
         val content = parser.processFile(sampleFile)
-        content!!.uri = "/" + filename
+        content!!.uri = "/$filename"
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
@@ -196,7 +196,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         val sampleFile = File(sourceFolder!!.path + File.separator + "content" + File.separator + filename)
         val content = parser!!.processFile(sampleFile)
-        content!!.uri = "/" + filename
+        content!!.uri = "/$filename"
         renderer!!.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())

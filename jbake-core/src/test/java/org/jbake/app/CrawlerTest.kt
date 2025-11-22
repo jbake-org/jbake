@@ -100,7 +100,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         }
 
         override fun describeTo(description: Description) {
-            description.appendText("matches regex: " + regex)
+            description.appendText("matches regex: $regex")
         }
 
         companion object {

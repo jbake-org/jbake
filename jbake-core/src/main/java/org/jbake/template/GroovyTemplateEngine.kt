@@ -56,7 +56,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
             template = ste.createTemplate(
                 InputStreamReader(BufferedInputStream(FileInputStream(sourceTemplate)), config.templateEncoding)
             )
-            cachedTemplates.put(templateName, template)
+            cachedTemplates[templateName] = template
         }
         return template
     }
@@ -68,7 +68,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
                     return MethodClosure(this@GroovyTemplateEngine, "doInclude").curry(this)
                 }
                 try {
-                    return extractors.extractAndTransform(db, key as String, model, NoopAdapter())
+                    return extractors.extractAndTransform(db, key, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     return super.get(key)
                 }

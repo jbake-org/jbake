@@ -369,7 +369,7 @@ class ConfigUtilTest : LoggingTest() {
         for (field in JBakeConfiguration::class.java.getFields()) {
             if (field.isAccessible) {
                 val key = field.get("") as String
-                println("Key: " + key)
+                println("Key: $key")
                 assertThat<Any?>(config.get(key)).isNotNull()
             }
         }

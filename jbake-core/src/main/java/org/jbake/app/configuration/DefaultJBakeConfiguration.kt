@@ -188,7 +188,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsString(PropertyList.ERROR404_FILE.key)
 
     override fun getExampleProjectByType(templateType: String): String? {
-        return getAsString("example.project." + templateType)
+        return getAsString("example.project.$templateType")
     }
 
     override val exportAsciidoctorAttributes: Boolean
@@ -354,7 +354,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     fun setExampleProject(type: String, fileName: String?) {
-        val projectKey = "example.project." + type
+        val projectKey = "example.project.$type"
         setProperty(projectKey, fileName)
     }
 
@@ -381,11 +381,10 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
             val key = keyNullable ?: continue
             val valueObject: Any?
 
-            if (key == PropertyList.PAGINATE_INDEX.key) {
-                valueObject = this.paginateIndex
-            } else {
-                valueObject = this.get(key)
-            }
+            valueObject =
+                if (key == PropertyList.PAGINATE_INDEX.key) this.paginateIndex
+                else this.get(key)
+
             if (valueObject != null) {
                 //replace "." in key so you can use dot notation in templates
                 configModel[key.replace(".", "_")] = valueObject
@@ -483,7 +482,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
                     }
                 }
             }
-            Collections.sort(jbakeKeys)
+            jbakeKeys.sort()
             return jbakeKeys
         }
 

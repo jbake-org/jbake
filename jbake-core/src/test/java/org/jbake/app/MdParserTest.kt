@@ -20,7 +20,7 @@ import java.io.PrintWriter
  * @author Kevin S. Clarke <ksclarke></ksclarke>@gmail.com>
  */
 class MdParserTest {
-    @Rule
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
     lateinit var config: DefaultJBakeConfiguration

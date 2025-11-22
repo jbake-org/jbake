@@ -92,7 +92,7 @@ class ModelExtractors private constructor() {
             val extractedValue = extractors[key]!!.get(db, map, key)
             return adapter.adapt(key, extractedValue!!)
         } else {
-            throw NoModelExtractorException("no model extractor for key \"" + key + "\"")
+            throw NoModelExtractorException("no model extractor for key \"$key\"")
         }
     }
 
@@ -118,7 +118,7 @@ class ModelExtractors private constructor() {
         if (!containsKey(pluralizedDoctype)) {
             log.info("register new extractors for document type: {}", docType)
             registerEngine(pluralizedDoctype, TypedDocumentsExtractor())
-            registerEngine("published_" + pluralizedDoctype, PublishedCustomExtractor(docType))
+            registerEngine("published_$pluralizedDoctype", PublishedCustomExtractor(docType))
         }
     }
 

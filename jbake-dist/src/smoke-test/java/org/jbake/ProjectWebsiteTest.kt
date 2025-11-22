@@ -13,7 +13,7 @@ import java.io.File
 import java.io.IOException
 
 class ProjectWebsiteTest {
-    @Rule
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
     private var projectFolder: File? = null
     private var outputFolder: File? = null
@@ -24,10 +24,10 @@ class ProjectWebsiteTest {
     @Throws(IOException::class, GitAPIException::class)
     fun setup() {
         Assume.assumeTrue("JDK 7 is not supported for this test", !this.isJava7)
-        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            jbakeExecutable = File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
+        jbakeExecutable = if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
+            File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
         } else {
-            jbakeExecutable = File("build/install/jbake/bin/jbake").absolutePath
+            File("build/install/jbake/bin/jbake").absolutePath
         }
         projectFolder = folder.newFolder("project")
         File(projectFolder, "templates")

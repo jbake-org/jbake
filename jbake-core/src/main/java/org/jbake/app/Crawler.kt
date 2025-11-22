@@ -176,12 +176,10 @@ class Crawler {
     private fun buildURI(sourceFile: File): String {
         var uri: String = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
 
-        if (useNoExtensionUri(uri)) {
+        uri = if (useNoExtensionUri(uri)) {
             // convert URI from xxx.html to xxx/index.html
-            uri = createNoExtensionUri(uri)
-        } else {
-            uri = createUri(uri)
-        }
+            createNoExtensionUri(uri)
+        } else createUri(uri)
 
         // strip off leading / to enable generating non-root based sites
         if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
@@ -232,7 +230,7 @@ class Crawler {
 
         return noExtensionUri
                 && (noExtensionUriPrefix != null)
-                && (noExtensionUriPrefix.length > 0)
+                && (noExtensionUriPrefix.isNotEmpty())
                 && uri.startsWith(noExtensionUriPrefix)
     }
 

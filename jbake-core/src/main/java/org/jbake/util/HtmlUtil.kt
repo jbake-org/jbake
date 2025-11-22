@@ -63,7 +63,7 @@ object HtmlUtil {
 
             if (prependSiteHost) {
                 if (!siteHost.endsWith("/") && isRelative(source)) {
-                    siteHost = siteHost + "/"
+                    siteHost = "$siteHost/"
                 }
                 source = siteHost + source
             }
@@ -74,14 +74,14 @@ object HtmlUtil {
 
     private fun removeFilename(uri: String): String {
         var uri = uri
-        uri = uri.substring(0, uri.lastIndexOf('/') + 1)
+        uri = uri.take(uri.lastIndexOf('/') + 1)
         return uri
     }
 
     private fun removeTrailingSlash(uri: String): String {
         var uri = uri
         if (uri.endsWith("/")) {
-            uri = uri.substring(0, uri.length - 1)
+            uri = uri.dropLast(1)
         }
         return uri
     }

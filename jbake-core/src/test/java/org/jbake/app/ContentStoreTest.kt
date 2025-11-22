@@ -47,7 +47,7 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         model.tags = arrayOf<String>(tagWithHyphenBackslashAndBacktick)
         model.date = Date()
         model.sourceUri = uri
-        model.put("foo", "originalValue")
+        model["foo"] = "originalValue"
 
         db.addDocument(model)
 

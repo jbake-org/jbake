@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
 import picocli.CommandLine
 import java.io.File
+import kotlin.system.exitProcess
 
 /**
  * Launcher for JBake.
@@ -130,12 +131,9 @@ class Main @JvmOverloads constructor(
         val init = Init(config)
         try {
             val templateFolder = FileUtil.runningLocation
-            val outputFolder: File
-            if (config.sourceFolder != null) {
-                outputFolder = config.sourceFolder!!
-            } else {
-                outputFolder = File(".")
-            }
+            val outputFolder = if (config.sourceFolder != null) config.sourceFolder!!
+                else File(".")
+
             init.run(outputFolder, templateFolder, type)
             println("Base folder structure successfully created.")
         } catch (e: Exception) {
@@ -165,7 +163,7 @@ class Main @JvmOverloads constructor(
                 if (e.cause is CommandLine.MissingParameterException) {
                     printUsage()
                 }
-                System.exit(e.getExit())
+                exitProcess(e.getExit())
             }
         }
 

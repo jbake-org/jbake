@@ -27,7 +27,7 @@ class ServiceLoaderTest {
 
         while ((reader.readLine().also { serviceProvider = it }) != null) {
             Assert.assertTrue(
-                "Rendering tool " + serviceProvider + " loaded",
+                "Rendering tool $serviceProvider loaded",
                 renderingToolClasses.contains(serviceProvider)
             )
         }

@@ -22,14 +22,11 @@ object FileUtil {
      * @return Object for filtering files
      */
     fun getFileFilter(config: JBakeConfiguration): FileFilter {
-        return object : FileFilter {
-            override fun accept(pathname: File): Boolean {
-                //Accept if input  is a non-hidden file with registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                        && Engines.recognizedExtensions
-                    .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
-            }
+        return FileFilter { pathname -> //Accept if input  is a non-hidden file with registered extension
+            //or if a non-hidden and not-ignored directory
+            !pathname.isHidden() && (pathname.isFile()
+                && Engines.recognizedExtensions
+                .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
         }
     }
 
@@ -40,16 +37,13 @@ object FileUtil {
          *
          * @return Object for filtering files
          */
-        get() = object : FileFilter {
-            override fun accept(pathname: File): Boolean {
-                //Accept if input  is a non-hidden file with registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile()
-                        && Engines.recognizedExtensions
-                    .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(
-                    pathname
-                ))
-            }
+        get() = FileFilter { pathname -> //Accept if input  is a non-hidden file with registered extension
+            //or if a non-hidden and not-ignored directory
+            !pathname.isHidden() && (pathname.isFile()
+                && Engines.recognizedExtensions
+                .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(
+                pathname
+            ))
         }
 
     val dataFileFilter: FileFilter
@@ -58,13 +52,11 @@ object FileUtil {
          *
          * @return Object for filtering files
          */
-        get() = object : FileFilter {
-            override fun accept(pathname: File): Boolean {
-                return "yaml".equals(
-                    fileExt(pathname),
-                    ignoreCase = true
-                ) || "yml".equals(fileExt(pathname), ignoreCase = true)
-            }
+        get() = FileFilter { pathname ->
+            "yaml".equals(
+                fileExt(pathname),
+                ignoreCase = true
+            ) || "yml".equals(fileExt(pathname), ignoreCase = true)
         }
 
     /**
@@ -74,14 +66,12 @@ object FileUtil {
      * @return FileFilter object
      */
     fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
-        return object : FileFilter {
-            override fun accept(pathname: File): Boolean {
-                //Accept if input  is a non-hidden file with NOT-registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                        && !Engines.recognizedExtensions.contains(fileExt(pathname)))
-                        || (directoryOnlyIfNotIgnored(pathname, config))
-            }
+        return FileFilter { pathname ->
+            //Accept if input  is a non-hidden file with NOT-registered extension
+            //or if a non-hidden and not-ignored directory
+            (!pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
+                && !Engines.recognizedExtensions.contains(fileExt(pathname)))
+                || (directoryOnlyIfNotIgnored(pathname, config)))
         }
     }
 
@@ -92,15 +82,13 @@ object FileUtil {
          *
          * @return FileFilter object
          */
-        get() = object : FileFilter {
-            override fun accept(pathname: File): Boolean {
-                //Accept if input  is a non-hidden file with NOT-registered extension
-                //or if a non-hidden and not-ignored directory
-                return !pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                        && !Engines.recognizedExtensions
-                    .contains(fileExt(pathname)))
-                        || (directoryOnlyIfNotIgnored(pathname))
-            }
+        get() = FileFilter { pathname ->
+            //Accept if input  is a non-hidden file with NOT-registered extension
+            //or if a non-hidden and not-ignored directory
+            (!pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
+                && !Engines.recognizedExtensions
+                .contains(fileExt(pathname)))
+                || (directoryOnlyIfNotIgnored(pathname)))
         }
 
     /**
@@ -113,11 +101,7 @@ object FileUtil {
      */
     fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
 
-        val ignoreFile: FilenameFilter = object : FilenameFilter {
-            override fun accept(dir: File?, name: String): Boolean {
-                return name.equals(config.ignoreFileName, ignoreCase = true)
-            }
-        }
+        val ignoreFile: FilenameFilter = FilenameFilter { dir, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
 
         return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
     }
@@ -131,11 +115,7 @@ object FileUtil {
     @Deprecated("use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead")
     fun directoryOnlyIfNotIgnored(file: File): Boolean {
 
-        val ignoreFile: FilenameFilter = object : FilenameFilter {
-            override fun accept(dir: File?, name: String): Boolean {
-                return name.equals(".jbakeignore", ignoreCase = true)
-            }
-        }
+        val ignoreFile = FilenameFilter { dir, name -> name.equals(".jbakeignore", ignoreCase = true) }
 
         return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
     }
@@ -176,18 +156,14 @@ object FileUtil {
 
     fun fileExt(name: String): String {
         val idx = name.lastIndexOf('.')
-        if (idx > 0) {
-            return name.substring(idx + 1)
-        } else {
-            return ""
-        }
+        return if (idx <= 0) "" else name.substring(idx + 1)
     }
 
     /**
      * Computes the hash of a file or directory.
      *
      * @param sourceFile the original file or directory
-     * @return an hex string representing the SHA1 hash of the file or directory.
+     * @return A hex string representing the SHA1 hash of the file or directory.
      * @throws Exception if any IOException of SecurityException occured
      */
     fun sha1(sourceFile: File): String {
@@ -275,19 +251,19 @@ object FileUtil {
         if (config.uriWithoutExtension) {
             sb.append("/..")
         }
-        if (sb.length > 0) {  // added as calling logic assumes / at end.
+        if (sb.isNotEmpty()) {  // added as calling logic assumes / at end.
             sb.append("/")
         }
         return sb.toString()
     }
 
     fun getUriPathToDestinationRoot(config: JBakeConfiguration, sourceFile: File): String {
-        return getPathToRoot(config, config.destinationFolder!!, sourceFile)
+        return getPathToRoot(config, config.destinationFolder, sourceFile)
     }
 
     @JvmStatic
     fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File): String {
-        return getPathToRoot(config, config.contentFolder!!, sourceFile)
+        return getPathToRoot(config, config.contentFolder, sourceFile)
     }
 
     /**

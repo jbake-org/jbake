@@ -39,7 +39,7 @@ object DBUtil {
         val result = DocumentModel()
 
         for (key in doc.propertyNames) {
-            result.put(key, doc.getProperty(key))
+            result[key] = doc.getProperty(key)
         }
         return result
     }

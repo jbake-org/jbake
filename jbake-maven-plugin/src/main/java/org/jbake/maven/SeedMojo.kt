@@ -43,19 +43,19 @@ class SeedMojo : AbstractMojo() {
         defaultValue = "https://github.com/jbake-org/jbake-template-bootstrap/zipball/master/",
         required = true
     )
-    protected var seedUrl: String? = null
+    private var seedUrl: String? = null
 
     /**
      * Location of the Output Directory.
      */
-    @Parameter(property = "jbake.outputDirectory", defaultValue = "\${project.basedir}/src/main/jbake", required = true)
-    protected var outputDirectory: File? = null
+    @Parameter(property = "jbake.outputDirectory", defaultValue = $$"${project.basedir}/src/main/jbake", required = true)
+    private var outputDirectory: File? = null
 
     /**
      * Really force overwrite if output dir exists? defaults to false
      */
     @Parameter(property = "jbake.force", defaultValue = "false")
-    protected var force: Boolean? = null
+    private var force: Boolean? = null
 
     @Throws(MojoExecutionException::class)
     override fun execute() {
@@ -118,7 +118,7 @@ class SeedMojo : AbstractMojo() {
 
     private fun stripLeadingPath(name: String): String? {
         val elements =
-            LinkedList(Arrays.asList(*name.split("/".toRegex()).dropLastWhile { it.isEmpty() }
+            LinkedList(listOf(*name.split("/".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()))
 
         elements.pop()

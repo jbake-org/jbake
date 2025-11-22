@@ -59,11 +59,11 @@ class ContentStore(private val type: String, private val name: String?) {
     fun startup() {
         startupIfEnginesAreMissing()
 
-        if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true)) {
-            orient = OrientDB(type + ":" + name, OrientDBConfig.defaultConfig())
-        } else {
-            orient = OrientDB(type + ":", OrientDBConfig.defaultConfig())
-        }
+        orient =
+            if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
+                OrientDB("$type:$name", OrientDBConfig.defaultConfig())
+            else
+                OrientDB("$type:", OrientDBConfig.defaultConfig())
 
         orient!!.createIfNotExists(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
 
@@ -206,7 +206,7 @@ class ContentStore(private val type: String, private val name: String?) {
     fun getAllContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
         var query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType)
         if (applyPaging && hasStartAndLimitBoundary()) {
-            query += " SKIP " + start + " LIMIT " + limit
+            query += " SKIP $start LIMIT $limit"
         }
         return query(query)
     }
@@ -332,11 +332,9 @@ class ContentStore(private val type: String, private val name: String?) {
 
         val docs = this.signaturesForTemplates
         var currentTemplatesSignature: String?
-        try {
-            currentTemplatesSignature = FileUtil.sha1(templateFolder)
-        } catch (e: Exception) {
-            currentTemplatesSignature = ""
-        }
+        try { currentTemplatesSignature = FileUtil.sha1(templateFolder) }
+        catch (e: Exception) { currentTemplatesSignature = "" }
+
         if (!docs.isEmpty()) {
             val sha1 = docs[0].sha1
             if (sha1 != currentTemplatesSignature) {
@@ -370,7 +368,7 @@ class ContentStore(private val type: String, private val name: String?) {
         element.save<ORecord?>()
     }
 
-    protected object Schema {
+    private object Schema {
         const val DOCUMENTS: String = "Documents"
         const val SIGNATURES: String = "Signatures"
     }
