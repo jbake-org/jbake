@@ -184,7 +184,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("post")!!) {
+        for (string in getOutputStrings("post")) {
             Assertions.assertThat(output).contains(string)
         }
     }
@@ -203,7 +203,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("page")!!) {
+        for (string in getOutputStrings("page")) {
             Assertions.assertThat(output).contains(string)
         }
     }
@@ -211,7 +211,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     @Test
     fun renderIndex() {
         //exec
-        renderer!!.renderIndex("index.html")
+        renderer.renderIndex("index.html")
 
         //validate
         val outputFile = File(destinationFolder, "index.html")
@@ -219,46 +219,46 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("index")!!) {
+        for (string in getOutputStrings("index")) {
             Assertions.assertThat(output).contains(string)
         }
     }
 
     @Test
     fun renderFeed() {
-        renderer!!.renderFeed("feed.xml")
+        renderer.renderFeed("feed.xml")
         val outputFile = File(destinationFolder, "feed.xml")
         Assert.assertTrue(outputFile.exists())
 
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("feed")!!) {
+        for (string in getOutputStrings("feed")) {
             Assertions.assertThat(output).contains(string)
         }
     }
 
     @Test
     fun renderArchive() {
-        renderer!!.renderArchive("archive.html")
+        renderer.renderArchive("archive.html")
         val outputFile = File(destinationFolder, "archive.html")
         Assert.assertTrue(outputFile.exists())
 
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("archive")!!) {
+        for (string in getOutputStrings("archive")) {
             Assertions.assertThat(output).contains(string)
         }
     }
 
     @Test
     fun renderTags() {
-        renderer!!.renderTags("tags")
+        renderer.renderTags("tags")
 
         // verify
         val outputFile = File(destinationFolder.toString() + File.separator + "tags" + File.separator + "blog.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("tags")!!) {
+        for (string in getOutputStrings("tags")) {
             Assertions.assertThat(output).contains(string)
         }
     }
@@ -267,11 +267,11 @@ abstract class AbstractTemplateEngineRenderingTest(
     fun renderTagsIndex() {
         config.setRenderTagsIndex(true)
 
-        renderer!!.renderTags("tags")
+        renderer.renderTags("tags")
         val outputFile = File(destinationFolder.toString() + File.separator + "tags" + File.separator + "index.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("tags-index")!!) {
+        for (string in getOutputStrings("tags-index")) {
             Assertions.assertThat(output).contains(string)
         }
     }
@@ -281,13 +281,13 @@ abstract class AbstractTemplateEngineRenderingTest(
         addDocumentType("paper")
         db.updateSchema()
 
-        renderer!!.renderSitemap("sitemap.xml")
+        renderer.renderSitemap("sitemap.xml")
         val outputFile = File(destinationFolder, "sitemap.xml")
         Assert.assertTrue(outputFile.exists())
 
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("sitemap")!!) {
+        for (string in getOutputStrings("sitemap")) {
             Assertions.assertThat(output).contains(string)
         }
         Assertions.assertThat(output).doesNotContain("draft-paper.html")
@@ -306,12 +306,12 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         db.deleteAllByDocType("post")
 
-        renderer!!.renderIndexPaging("index.html")
+        renderer.renderIndexPaging("index.html")
 
         val outputFile = File(destinationFolder, "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
-        for (string in getOutputStrings("dbSpan")!!) {
+        for (string in getOutputStrings("dbSpan")) {
             Assertions.assertThat(output).contains(string)
         }
     }

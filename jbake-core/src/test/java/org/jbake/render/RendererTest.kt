@@ -64,8 +64,7 @@ class RendererTest {
 
         renderer.render(content)
 
-        val outputFile =
-            File(outputPath!!.absolutePath + File.separatorChar + FOLDER + File.separatorChar + FILENAME)
+        val outputFile = File(outputPath.absolutePath + File.separatorChar + FOLDER + File.separatorChar + FILENAME)
         Assertions.assertThat(outputFile).isFile()
     }
 }

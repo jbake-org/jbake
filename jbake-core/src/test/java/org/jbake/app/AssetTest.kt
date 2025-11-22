@@ -95,9 +95,9 @@ class AssetTest : LoggingTest() {
 
         asset.copySingleFile(emptyDir)
 
-        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent!!.capture())
+        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        val loggingEvent = captorLoggingEvent!!.getValue()
+        val loggingEvent = captorLoggingEvent.getValue()
         org.assertj.core.api.Assertions.assertThat(loggingEvent.message)
             .isEqualTo("Skip copying single asset file [{}]. Is a directory.")
     }
