@@ -5,7 +5,8 @@ plugins {
 }
 
 apply from: "$rootDir/gradle/application.gradle"
-apply from: "$rootDir/gradle/release.gradle"
+// JReleaser plugin doesn't support Gradle 9 yet
+// apply from: "$rootDir/gradle/release.gradle"
 description = "The binary distribution package that bundles JBake cli"
 
 sourceSets {
@@ -62,5 +63,5 @@ repositories {
     mavenCentral()
 }
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(21)
 }

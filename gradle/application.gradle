@@ -1,5 +1,7 @@
-mainClassName = "org.jbake.launcher.Main"
-applicationName = "jbake"
+application {
+    mainClass = "org.jbake.launcher.Main"
+    applicationName = "jbake"
+}
 
 def examplesBase = "$project.buildDir/examples"
 

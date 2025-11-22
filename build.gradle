@@ -7,7 +7,7 @@ plugins {
     id 'org.jreleaser'                          version "$jreleaserVersion" apply false
     id "eclipse"
     id "idea"
-    id 'org.jetbrains.kotlin.jvm'
+    id 'org.jetbrains.kotlin.jvm'               version "$kotlinVersion" apply false
 }
 
 
@@ -48,11 +48,4 @@ dependencyUpdates.resolutionStrategy {
         }
     }
 }
-repositories {
-    mavenCentral()
-}
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-}
-compileKotlin {
-}
+
