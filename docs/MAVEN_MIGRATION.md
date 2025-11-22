@@ -137,20 +137,18 @@ mvn clean deploy -P release
 The parent POM defines all versions as properties for easy centralization:
 
 ```properties
-<properties>
-  <maven.compiler.source>1.8</maven.compiler.source>
-  <maven.compiler.target>1.8</maven.compiler.target>
-
-  <!-- Runtime dependencies versions -->
-  <asciidoctorj.version>2.5.7</asciidoctorj.version>
-  <groovy.version>3.0.9</groovy.version>
-  <!-- ... more versions ... -->
-
-  <!-- Testing dependencies versions -->
-  <junit5.version>5.8.2</junit5.version>
-  <mockito.version>4.2.0</mockito.version>
-  <!-- ... more versions ... -->
-</properties>
+<properties>=
+<maven.compiler.source>1.8</maven.compiler.source>=
+<maven.compiler.target>1.8</maven.compiler.target>=
+<!--=Runtime dependencies versions -->
+<asciidoctorj.version>2.5.7</asciidoctorj.version>=
+<groovy.version>3.0.9</groovy.version>=
+<!--=... more versions ... -->
+<!--=Testing dependencies versions -->
+<junit5.version>5.8.2</junit5.version>=
+<mockito.version>4.2.0</mockito.version>=
+<!--=... more versions ... -->
+</properties>=
 ```
 
 ## Test Configuration

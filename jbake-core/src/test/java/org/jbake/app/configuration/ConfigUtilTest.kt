@@ -40,13 +40,13 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldLoadACustomConfiguration() {
-        val customConfigFile = File(sourceFolder!!.toFile(), "jbake.properties")
+        val customConfigFile = File(sourceFolder.toFile(), "jbake.properties")
 
         val writer = BufferedWriter(FileWriter(customConfigFile))
         writer.append("test.property=12345")
         writer.close()
 
-        val configuration = util.loadConfig(sourceFolder!!.toFile())
+        val configuration = util.loadConfig(sourceFolder.toFile())
 
         assertThat<Any?>(configuration.get("test.property")).isEqualTo("12345")
         assertDefaultPropertiesPresent(configuration)
@@ -279,9 +279,9 @@ class ConfigUtilTest : LoggingTest() {
     @Test
     fun shouldSetCustomFoldersWithAbsolutePaths() {
         // given
-        val source = sourceFolder!!.resolve("source")
-        val theme = sourceFolder!!.resolve("theme")
-        val destination = sourceFolder!!.resolve("destination")
+        val source = sourceFolder.resolve("source")
+        val theme = sourceFolder.resolve("theme")
+        val destination = sourceFolder.resolve("destination")
 
         val originalSource = TestUtils.testResourcesAsSourceFolder
         FileUtils.copyDirectory(originalSource, source.toFile())

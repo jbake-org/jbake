@@ -58,7 +58,7 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     override fun parse(config: Configuration, fileToParse: File, contentPath: String): MutableMap<String, Any> {
-        return parse(DefaultJBakeConfiguration((config as CompositeConfiguration)!!), fileToParse)!!
+        return parse(DefaultJBakeConfiguration((config as CompositeConfiguration)), fileToParse)!!
     }
 
     /**
@@ -254,7 +254,7 @@ abstract class MarkupEngine : ParserEngine {
     private fun processHeaderLine(line: String, content: DocumentModel) {
         val parts: Array<String> = line.split("=".toRegex(), limit = 2).toTypedArray()
         if (!line.isEmpty() && parts.size == 2) {
-            storeHeaderValue(parts[0]!!, parts[1]!!, content)
+            storeHeaderValue(parts[0], parts[1], content)
         }
     }
 
@@ -263,7 +263,7 @@ abstract class MarkupEngine : ParserEngine {
         val value = sanitize(inputValue)
 
         if (key.equals(ModelAttributes.DATE, ignoreCase = true)) {
-            val df: DateFormat = SimpleDateFormat(configuration!!.dateFormat)
+            val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
             try {
                 val date = df.parse(value)
                 content.date = (date)

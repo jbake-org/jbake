@@ -357,6 +357,8 @@ class Renderer {
     }
 
     private interface RenderingConfig {
+
+        // TODO Possibly nullable.
         val path: File
 
         val name: String
@@ -391,7 +393,7 @@ class Renderer {
         private val content: DocumentModel
 
         private constructor(path: File, allInOneName: String)
-            : super(path, allInOneName, findTemplateName(allInOneName)!!)
+            : super(path, allInOneName, findTemplateName(allInOneName))
         {
             this.content = buildSimpleModel(allInOneName)
         }
@@ -399,7 +401,7 @@ class Renderer {
         constructor(filename: String, allInOneName: String) : super(
                 File(config.destinationFolder, File.separator + filename),
                  allInOneName,
-                 findTemplateName(allInOneName)!!
+            findTemplateName(allInOneName)
              )
         {
           this.content = buildSimpleModel(allInOneName)

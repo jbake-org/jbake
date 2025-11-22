@@ -22,6 +22,7 @@ class ArchiveRenderer : RenderingTool {
         return 0
     }
 
+    @Deprecated("")
     @Throws(RenderingException::class)
     override fun render(
         renderer: Renderer,

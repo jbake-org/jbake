@@ -43,6 +43,7 @@ class ParserContext(
         this.documentModel.type = this.config.defaultType ?: ""
     }
 
+    // TODO: Possibly nullable
     val tags: Array<String>
         get() = this.documentModel.tags
 

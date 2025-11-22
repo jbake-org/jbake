@@ -146,7 +146,7 @@ class ContentStore(private val type: String, private val name: String?) {
     fun getDocumentCount(docType: String): Long {
         activateOnCurrentThread()
         val statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType)
-        return query(statement)[0].get("count") as Long
+        return query(statement)[0]["count"] as Long
     }
 
     fun getPublishedCount(docType: String): Long {
@@ -331,8 +331,7 @@ class ContentStore(private val type: String, private val name: String?) {
         var templateSignatureChanged = false
 
         val docs = this.signaturesForTemplates
-        var currentTemplatesSignature: String?
-        currentTemplatesSignature = try { FileUtil.sha1(templateFolder) }
+        var currentTemplatesSignature = try { FileUtil.sha1(templateFolder) }
             catch (e: Exception) { "" }
 
         if (!docs.isEmpty()) {
