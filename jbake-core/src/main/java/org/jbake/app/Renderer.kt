@@ -338,10 +338,9 @@ class Renderer {
                  sb.append("\n").append(error.message)
              }
              throw Exception(sb.toString(), errors[0])
-         } else {
-             return renderedCount
          }
-     }
+        return renderedCount
+    }
 
     /**
      * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.

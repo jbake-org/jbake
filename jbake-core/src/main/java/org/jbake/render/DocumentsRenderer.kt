@@ -47,9 +47,8 @@ class DocumentsRenderer : RenderingTool {
                 sb.append("\n").append(error)
             }
             throw RenderingException(sb.toString())
-        } else {
-            return renderedCount
         }
+        return renderedCount
     }
 
     private fun getNextDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
@@ -57,18 +56,16 @@ class DocumentsRenderer : RenderingTool {
         if (typedList.getFirst() == doc) {
             // initial doc in typed list so there is no next
             return null
-        } else {
-            while (true) {
-                try {
-                    val nextDoc = typedList[typedListIndex - 1]
-                    if (isPublished(nextDoc)) {
-                        return getContentForNav(nextDoc)
-                    } else {
-                        typedListIndex--
-                    }
-                } catch (ex: IndexOutOfBoundsException) {
-                    return null
+        }
+        while (true) {
+            try {
+                val nextDoc = typedList[typedListIndex - 1]
+                if (isPublished(nextDoc)) {
+                    return getContentForNav(nextDoc)
                 }
+                typedListIndex--
+            } catch (ex: IndexOutOfBoundsException) {
+                return null
             }
         }
     }
@@ -78,18 +75,16 @@ class DocumentsRenderer : RenderingTool {
         if (typedList.getLast() == doc) {
             // last doc in typed list so there is no previous
             return null
-        } else {
-            while (true) {
-                try {
-                    val prevDoc = typedList[typedListIndex + 1]
-                    if (isPublished(prevDoc)) {
-                        return getContentForNav(prevDoc)
-                    } else {
-                        typedListIndex++
-                    }
-                } catch (ex: IndexOutOfBoundsException) {
-                    return null
+        }
+        while (true) {
+            try {
+                val prevDoc = typedList[typedListIndex + 1]
+                if (isPublished(prevDoc)) {
+                    return getContentForNav(prevDoc)
                 }
+                typedListIndex++
+            } catch (ex: IndexOutOfBoundsException) {
+                return null
             }
         }
     }

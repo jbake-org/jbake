@@ -78,10 +78,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         if (subConfig.containsKey(optionKey)) {
             // use the two-arg get overload to retrieve a raw Object
             return subConfig.get(Any::class.java, optionKey)
-        } else {
-            logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.key, optionKey)
-            return null
         }
+        logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.key, optionKey)
+        return null
     }
 
     override val asciidoctorOptionKeys: MutableList<String>

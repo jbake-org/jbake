@@ -19,9 +19,8 @@ class SitemapRenderer : RenderingTool {
             } catch (e: Exception) {
                 throw RenderingException(e)
             }
-        } else {
-            return 0
         }
+        return 0
     }
 
     @Throws(RenderingException::class)

@@ -91,9 +91,8 @@ class ModelExtractors private constructor() {
         if (extractors.containsKey(key)) {
             val extractedValue = extractors[key]!!.get(db, map, key)
             return adapter.adapt(key, extractedValue!!)
-        } else {
-            throw NoModelExtractorException("no model extractor for key \"$key\"")
         }
+        throw NoModelExtractorException("no model extractor for key \"$key\"")
     }
 
     /**

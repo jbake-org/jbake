@@ -90,7 +90,7 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
 
         val documentList5: DocumentList<DocumentModel> = db.unrenderedContent
         Assert.assertEquals(2, documentList5.size.toLong())
-        Assert.assertEquals(Boolean.FALSE, documentList5[0]!!.rendered)
+        Assert.assertEquals(Boolean.FALSE, documentList5[0].rendered)
         Assert.assertEquals(typeWithHyphen, documentList5[0]!!.type)
         Assertions.assertThat<String>(documentList5[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
 
@@ -102,16 +102,16 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         val documentList6: DocumentList<DocumentModel> =
             db.getPublishedContent(typeWithHyphen)
         Assert.assertEquals(1, documentList6.size.toLong())
-        Assert.assertEquals(Boolean.TRUE, documentList6[0]!!.rendered)
-        Assert.assertEquals(typeWithHyphen, documentList6[0]!!.type)
-        Assertions.assertThat<String>(documentList6[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assert.assertEquals(Boolean.TRUE, documentList6[0].rendered)
+        Assert.assertEquals(typeWithHyphen, documentList6[0].type)
+        Assertions.assertThat<String>(documentList6[0].tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList7: DocumentList<DocumentModel> =
             db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
         Assert.assertEquals(1, documentList7.size.toLong())
-        Assert.assertEquals(Boolean.TRUE, documentList7[0]!!.rendered)
-        Assert.assertEquals(typeWithHyphen, documentList7[0]!!.type)
-        Assertions.assertThat<String>(documentList7[0]!!.tags).contains(tagWithHyphenBackslashAndBacktick)
+        Assert.assertEquals(Boolean.TRUE, documentList7[0].rendered)
+        Assert.assertEquals(typeWithHyphen, documentList7[0].type)
+        Assertions.assertThat<String>(documentList7[0].tags).contains(tagWithHyphenBackslashAndBacktick)
 
         val documentList8: DocumentList<DocumentModel> =
             db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)
