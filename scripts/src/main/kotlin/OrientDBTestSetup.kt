@@ -37,11 +37,10 @@ object OrientDBTestSetup {
             //orient.create(dbName, ODatabaseType.PLOCAL)
             // Alternative way:
             orient.execute("CREATE DATABASE $dbName PLOCAL USERS ($adminUser IDENTIFIED BY '$adminPass' ROLE admin)")
-            println("Database '$dbName' created with admin user.")
+            println("Test database '$dbName' created with admin user '$adminUser' / '$adminPass'.")
 
             // Test opening the database.
             val db = orient.open(dbName, adminUser, adminPass)
-
             db.close()
             orient.close()
             println("Database setup complete!")

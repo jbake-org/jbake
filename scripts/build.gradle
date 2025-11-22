@@ -1,0 +1,27 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' apply true
+}
+
+dependencies {
+    implementation platform("org.jetbrains.kotlin:kotlin-bom")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "com.orientechnologies:orientdb-core:3.2.46"
+}
+
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(21)
+}
+
+task setupOrientDB(type: JavaExec) {
+    description = 'Sets up OrientDB test database'
+    group = 'setup'
+    dependsOn 'classes'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'OrientDBTestSetup'
+    systemProperty 'orientdb.script.pool.enabled', 'false'
+    workingDir = project.rootDir
+}
+
