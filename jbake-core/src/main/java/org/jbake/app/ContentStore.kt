@@ -60,15 +60,13 @@ class ContentStore(private val type: String, private val name: String?) {
         // Disable OrientDB's script manager to avoid JSR223 dependencies
         System.setProperty("orientdb.script.pool.enabled", "false")
 
-        // For PLOCAL databases, the 'name' is the database directory path
-        // For MEMORY databases, we just need the type
-        orient = if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true)) {
+        orient =
             // For PLOCAL, the name is the database path/name
-            OrientDB("$type:$name", OrientDBConfig.defaultConfig())
-        } else {
+            if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
+                OrientDB("$type:$name", OrientDBConfig.defaultConfig())
             // For MEMORY databases, no path needed
-            OrientDB("$type:", OrientDBConfig.defaultConfig())
-        }
+            else
+                OrientDB("$type:", OrientDBConfig.defaultConfig())
 
         // Set up database: create with proper admin user if it doesn't exist, or just open if it does
         setupDatabase()
