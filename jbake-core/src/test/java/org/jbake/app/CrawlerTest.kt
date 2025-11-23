@@ -10,7 +10,6 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 

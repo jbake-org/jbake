@@ -3,7 +3,6 @@ package org.jbake.render
 import org.assertj.core.api.Assertions
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.RenderingException
 import org.junit.Test

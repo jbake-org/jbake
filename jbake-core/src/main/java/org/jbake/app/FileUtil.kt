@@ -2,7 +2,6 @@ package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.parser.Engines
-import org.jbake.util.PathConstants
 import org.jbake.util.PathConstants.fS
 import java.io.*
 import java.net.URLDecoder

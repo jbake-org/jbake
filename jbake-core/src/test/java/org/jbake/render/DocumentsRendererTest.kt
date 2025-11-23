@@ -12,7 +12,9 @@ import org.jbake.template.RenderingException
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertThrows
-import org.mockito.*
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito
 import java.util.function.Function
 import java.util.stream.Collectors
 

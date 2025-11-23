@@ -24,8 +24,7 @@
 package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
@@ -36,7 +35,6 @@ import org.jbake.model.DocumentTypes.documentTypes
 import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
-import org.jbake.util.PathConstants
 import org.jbake.util.PathConstants.fS
 import org.junit.After
 import org.junit.Assert

@@ -9,7 +9,6 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.PagingHelper
-import org.jbake.util.PathConstants
 import org.jbake.util.PathConstants.fS
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

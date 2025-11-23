@@ -3,7 +3,7 @@ package org.jbake.parser
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import java.io.File
-import java.util.Date
+import java.util.*
 
 class ParserContext(
     val file: File,

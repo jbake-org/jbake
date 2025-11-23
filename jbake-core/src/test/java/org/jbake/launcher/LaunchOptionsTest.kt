@@ -1,8 +1,8 @@
 package org.jbake.launcher
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.jbake.app.configuration.ConfigUtil
-import org.jbake.util.PathConstants
 import org.jbake.util.PathConstants.fS
 import org.junit.Test
 import picocli.CommandLine
@@ -13,7 +13,7 @@ class LaunchOptionsTest {
     fun showHelp() {
         val args = arrayOf("-h")
         val res = parseArgs(args)
-        Assertions.assertThat(res.isHelpNeeded).isTrue()
+        assertThat(res.isHelpNeeded).isTrue()
     }
 
     @Test
@@ -21,7 +21,7 @@ class LaunchOptionsTest {
         val args = arrayOf("-s")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isRunServer).isTrue()
+        assertThat(res.isRunServer).isTrue()
     }
 
     @Test
@@ -29,8 +29,8 @@ class LaunchOptionsTest {
         val args = arrayOf("-s", "/tmp")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isRunServer).isTrue()
-        Assertions.assertThat(res.getSource()).isEqualTo(File("/tmp"))
+        assertThat(res.isRunServer).isTrue()
+        assertThat(res.getSource()).isEqualTo(File("/tmp"))
     }
 
     @Test
@@ -38,8 +38,8 @@ class LaunchOptionsTest {
         val args = arrayOf("-i")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isInit).isTrue()
-        Assertions.assertThat(res.template).isEqualTo("freemarker")
+        assertThat(res.isInit).isTrue()
+        assertThat(res.template).isEqualTo("freemarker")
     }
 
     @Test
@@ -47,8 +47,8 @@ class LaunchOptionsTest {
         val args = arrayOf("-i", "-t", "foo")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isInit).isTrue()
-        Assertions.assertThat(res.template).isEqualTo("foo")
+        assertThat(res.isInit).isTrue()
+        assertThat(res.template).isEqualTo("foo")
     }
 
     @Test
@@ -56,8 +56,8 @@ class LaunchOptionsTest {
         val args = arrayOf("-i", "/tmp")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isInit).isTrue()
-        Assertions.assertThat(res.sourceValue).isEqualTo("/tmp")
+        assertThat(res.isInit).isTrue()
+        assertThat(res.sourceValue).isEqualTo("/tmp")
     }
 
     @Test
@@ -65,16 +65,16 @@ class LaunchOptionsTest {
         val args = arrayOf("-i", "-t", "foo", "/tmp")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isInit).isTrue()
-        Assertions.assertThat(res.template).isEqualTo("foo")
-        Assertions.assertThat(res.sourceValue).isEqualTo("/tmp")
+        assertThat(res.isInit).isTrue()
+        assertThat(res.template).isEqualTo("foo")
+        assertThat(res.sourceValue).isEqualTo("/tmp")
     }
 
     @Test
     fun shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
-        Assertions.assertThatExceptionOfType(CommandLine.MissingParameterException::class.java)
+        assertThatExceptionOfType(CommandLine.MissingParameterException::class.java)
             .isThrownBy {
                 parseArgs(args)
             }.withMessage("Error: Missing required argument(s): --init")
@@ -85,7 +85,7 @@ class LaunchOptionsTest {
         val args = arrayOf("-b")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isBake).isTrue()
+        assertThat(res.isBake).isTrue()
     }
 
     @Test
@@ -93,7 +93,7 @@ class LaunchOptionsTest {
         val args = arrayOf("-ls")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isListConfig).isTrue()
+        assertThat(res.isListConfig).isTrue()
     }
 
     @Test
@@ -101,7 +101,7 @@ class LaunchOptionsTest {
         val args = arrayOf("--list-settings")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isListConfig).isTrue()
+        assertThat(res.isListConfig).isTrue()
     }
 
     @Test
@@ -109,7 +109,7 @@ class LaunchOptionsTest {
         val args = arrayOf("--prop-encoding", "utf-16")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.propertiesEncoding).isEqualTo("utf-16")
+        assertThat(res.propertiesEncoding).isEqualTo("utf-16")
     }
 
     @Test
@@ -117,7 +117,7 @@ class LaunchOptionsTest {
         val args = arrayOf<String>()
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.propertiesEncoding).isEqualTo("utf-8")
+        assertThat(res.propertiesEncoding).isEqualTo("utf-8")
     }
 
     @Test
@@ -125,14 +125,14 @@ class LaunchOptionsTest {
         val args = arrayOf<String>()
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isHelpNeeded).isTrue()
-        Assertions.assertThat(res.isRunServer).isFalse()
-        Assertions.assertThat(res.isInit).isFalse()
-        Assertions.assertThat(res.isBake).isFalse()
-        Assertions.assertThat(res.getSource().path).isEqualTo(System.getProperty("user.dir"))
-        Assertions.assertThat(res.getDestination().path)
+        assertThat(res.isHelpNeeded).isTrue()
+        assertThat(res.isRunServer).isFalse()
+        assertThat(res.isInit).isFalse()
+        assertThat(res.isBake).isFalse()
+        assertThat(res.getSource().path).isEqualTo(System.getProperty("user.dir"))
+        assertThat(res.getDestination().path)
             .isEqualTo(System.getProperty("user.dir") + fS + "output")
-        Assertions.assertThat(res.getConfig().path)
+        assertThat(res.getConfig().path)
             .isEqualTo(System.getProperty("user.dir") + fS + ConfigUtil.CONFIG_FILE)
     }
 
@@ -141,19 +141,19 @@ class LaunchOptionsTest {
         val args = arrayOf("/tmp/source", "/tmp/destination")
         val res = parseArgs(args)
 
-        Assertions.assertThat(res.isHelpNeeded).isFalse()
-        Assertions.assertThat(res.isRunServer).isFalse()
-        Assertions.assertThat(res.isInit).isFalse()
-        Assertions.assertThat(res.isBake).isTrue()
-        Assertions.assertThat(res.getSource()).isEqualTo(File("/tmp/source"))
-        Assertions.assertThat(res.getDestination()).isEqualTo(File("/tmp/destination"))
+        assertThat(res.isHelpNeeded).isFalse()
+        assertThat(res.isRunServer).isFalse()
+        assertThat(res.isInit).isFalse()
+        assertThat(res.isBake).isTrue()
+        assertThat(res.getSource()).isEqualTo(File("/tmp/source"))
+        assertThat(res.getDestination()).isEqualTo(File("/tmp/destination"))
     }
 
     @Test
     fun configArg() {
         val args = arrayOf("-c", "foo")
         val res = parseArgs(args)
-        Assertions.assertThat(res.getConfig().getAbsoluteFile().toString())
+        assertThat(res.getConfig().getAbsoluteFile().toString())
             .isEqualTo(System.getProperty("user.dir") + fS + "foo")
     }
 

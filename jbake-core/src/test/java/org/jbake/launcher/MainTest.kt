@@ -9,7 +9,6 @@ import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
-import org.jbake.util.PathConstants
 import org.jbake.util.PathConstants.fS
 import org.junit.Assert
 import org.junit.jupiter.api.AfterEach
