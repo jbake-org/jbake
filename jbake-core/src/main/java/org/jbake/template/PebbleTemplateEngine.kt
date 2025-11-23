@@ -54,12 +54,11 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
 
     private fun wrap(model: TemplateModel) = object : TemplateModel(model) {
 
-        override fun get(property: String): Any? {
+        override fun get(key: String): Any? {
             return try {
-                extractors.extractAndTransform(db, property, this, NoopAdapter())
-            } catch (e: NoModelExtractorException) {
-                model[property]
+                extractors.extractAndTransform(db, key, this, NoopAdapter())
             }
+            catch (e: NoModelExtractorException) { model[key] }
         }
     }
 }

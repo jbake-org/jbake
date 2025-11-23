@@ -74,9 +74,9 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
             override fun get(key: String): Any? {
                 return try {
                     extractors.extractAndTransform(db, key, model, NoopAdapter())
-                } catch (e: NoModelExtractorException) {
-                    model[key] // super.get() which would recurse
                 }
+                // super.get() which would recurse
+                catch (e: NoModelExtractorException) { model[key] }
             }
         }
     }
