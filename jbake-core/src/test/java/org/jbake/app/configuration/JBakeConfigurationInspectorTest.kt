@@ -4,11 +4,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.JBakeException
 import org.jbake.app.LoggingTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import java.io.File
 import java.nio.file.Path
 
@@ -25,11 +26,11 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
         val nonExistentFile = File(folder.toFile(), "nofolder")
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(nonExistentFile)
+        `when`(configuration.sourceFolder).thenReturn(nonExistentFile)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = Assertions.assertThrows(JBakeException::class.java) { inspector.inspect() }
+        val e = assertThrows(JBakeException::class.java) { inspector.inspect() }
 
         assertThat(e.message)
             .isEqualTo("Error: Source folder must exist: " + nonExistentFile.absolutePath)
@@ -38,16 +39,16 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     @Test
     fun shouldThrowExceptionIfSourceFolderIsNotReadable() {
         val nonReadableFile = Mockito.mock(File::class.java)
-        Mockito.`when`(nonReadableFile.exists()).thenReturn(true)
-        Mockito.`when`(nonReadableFile.isDirectory()).thenReturn(true)
-        Mockito.`when`(nonReadableFile.canRead()).thenReturn(false)
+        `when`(nonReadableFile.exists()).thenReturn(true)
+        `when`(nonReadableFile.isDirectory()).thenReturn(true)
+        `when`(nonReadableFile.canRead()).thenReturn(false)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(nonReadableFile)
+        `when`(configuration.sourceFolder).thenReturn(nonReadableFile)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = Assertions.assertThrows(JBakeException::class.java) { inspector.inspect() }
+        val e = assertThrows(JBakeException::class.java) { inspector.inspect() }
 
         assertThat(e.message)
             .isEqualTo("Error: Source folder is not readable: " + nonReadableFile.absolutePath)
@@ -58,12 +59,12 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val templateFolderName = "template/custom"
         val expectedFolder = File(folder.toFile(), templateFolderName)
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`(configuration.templateFolder).thenReturn(expectedFolder)
+        `when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        `when`(configuration.templateFolder).thenReturn(expectedFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = Assertions.assertThrows(JBakeException::class.java) { inspector.inspect() }
+        val e = assertThrows(JBakeException::class.java) { inspector.inspect() }
 
         assertThat(e.message)
             .isEqualTo("Error: Required folder cannot be found! Expected to find [template.folder] at: " + expectedFolder.absolutePath)
@@ -77,14 +78,14 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val contentFolder = File(folder.toFile(), contentFolderName)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
+        `when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        `when`(configuration.templateFolder).thenReturn(templateFolder)
+        `when`(configuration.contentFolder).thenReturn(contentFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
 
-        val e = Assertions.assertThrows(JBakeException::class.java) { inspector.inspect() }
+        val e = assertThrows(JBakeException::class.java) { inspector.inspect() }
 
         assertThat(e.message)
             .isEqualTo("Error: Required folder cannot be found! Expected to find [content.folder] at: " + contentFolder.absolutePath)
@@ -101,11 +102,11 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val destinationFolder = File(folder.toFile(), destinationFolderName)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
-        Mockito.`when`(configuration.destinationFolder).thenReturn(destinationFolder)
-        Mockito.`when`(configuration.assetFolder).thenReturn(destinationFolder)
+        `when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        `when`(configuration.templateFolder).thenReturn(templateFolder)
+        `when`(configuration.contentFolder).thenReturn(contentFolder)
+        `when`(configuration.destinationFolder).thenReturn(destinationFolder)
+        `when`(configuration.assetFolder).thenReturn(destinationFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -122,17 +123,17 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val templateFolder = TestUtils.newFolder(folder.toFile(), templateFolderName)
         val contentFolder = TestUtils.newFolder(folder.toFile(), contentFolderName)
         val destinationFolder = Mockito.mock(File::class.java)
-        Mockito.`when`(destinationFolder.exists()).thenReturn(true)
+        `when`(destinationFolder.exists()).thenReturn(true)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
-        Mockito.`when`(configuration.destinationFolder).thenReturn(destinationFolder)
+        `when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        `when`(configuration.templateFolder).thenReturn(templateFolder)
+        `when`(configuration.contentFolder).thenReturn(contentFolder)
+        `when`(configuration.destinationFolder).thenReturn(destinationFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = Assertions.assertThrows(JBakeException::class.java) { inspector.inspect() }
+        val e = assertThrows(JBakeException::class.java) { inspector.inspect() }
 
         assertThat(e.message).contains("Error: Destination folder is not writable:")
     }
@@ -150,11 +151,11 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val assetFolder = File(folder.toFile(), assetFolderName)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
-        Mockito.`when`(configuration.destinationFolder).thenReturn(destinationFolder)
-        Mockito.`when`(configuration.assetFolder).thenReturn(assetFolder)
+        `when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        `when`(configuration.templateFolder).thenReturn(templateFolder)
+        `when`(configuration.contentFolder).thenReturn(contentFolder)
+        `when`(configuration.destinationFolder).thenReturn(destinationFolder)
+        `when`(configuration.assetFolder).thenReturn(assetFolder)
 
 
         val inspector = JBakeConfigurationInspector(configuration)
