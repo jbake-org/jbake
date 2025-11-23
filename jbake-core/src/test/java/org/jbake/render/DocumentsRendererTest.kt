@@ -24,7 +24,7 @@ class DocumentsRendererTest {
     private lateinit var emptyTemplateModelList: DocumentList<DocumentModel>
 
     @Captor
-    private val argument: ArgumentCaptor<DocumentModel>? = null
+    private lateinit var argument: ArgumentCaptor<DocumentModel>
 
     @Before
     fun setUp() {
@@ -42,7 +42,7 @@ class DocumentsRendererTest {
     fun shouldReturnZeroIfNothingHasRendered() {
         Mockito.`when`(db.unrenderedContent).thenReturn(emptyTemplateModelList)
 
-        val renderResponse = documentsRenderer!!.render(renderer!!, db, configuration)
+        val renderResponse = documentsRenderer.render(renderer, db, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
     }
@@ -61,7 +61,7 @@ class DocumentsRendererTest {
         Mockito.`when`(db.getAllContent(ArgumentMatchers.any())).thenReturn(templateModelList)
 
         // when:
-        val renderResponse = documentsRenderer!!.render(renderer!!, db, configuration)
+        val renderResponse = documentsRenderer.render(renderer, db, configuration)
 
         // then:
         Assertions.assertThat(renderResponse).isEqualTo(2)
@@ -143,10 +143,10 @@ class DocumentsRendererTest {
         Mockito.`when`(db.getAllContent("post")).thenReturn(postDocs)
 
         // when
-        val renderResponse = documentsRenderer!!.render(renderer!!, db, configuration)
+        val renderResponse = documentsRenderer.render(renderer, db, configuration)
 
         // then
-        Mockito.verify(renderer, Mockito.times(7)).render(argument!!.capture()!!)
+        Mockito.verify(renderer, Mockito.times(7)).render(argument.capture())
         val renderedDocs = asTitleToDocMap(argument.getAllValues())
 
         // page checks
@@ -175,11 +175,10 @@ class DocumentsRendererTest {
     }
 
     private fun asTitleToDocMap(values: MutableList<DocumentModel>): MutableMap<String, MutableMap<String,  Any>> {
-        return values.stream()
-            .collect(
-                Collectors.toMap(
-                    Function { doc: DocumentModel? -> doc!!.get(ModelAttributes.TITLE).toString() },
-                    Function { doc: DocumentModel? -> doc })
+        return values.stream().collect(
+            Collectors.toMap(
+            Function { doc: DocumentModel -> doc.get(ModelAttributes.TITLE).toString() },
+            Function { doc: DocumentModel -> doc })
             )
     }
 
