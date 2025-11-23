@@ -1,6 +1,7 @@
 package org.jbake.app
 
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -36,7 +37,7 @@ class InitTest {
         val initPath = folder.newFolder("init")
         init.run(initPath, rootPath, "freemarker")
         val testFile = File(initPath, "testfile.txt")
-        Assertions.assertThat(testFile).exists()
+        assertThat(testFile).exists()
     }
 
     @Test
@@ -48,12 +49,12 @@ class InitTest {
         contentFolder.mkdir()
         try {
             init.run(initPath, rootPath, "freemarker")
-            Assertions.fail<Any?>("Shouldn't be able to initialise folder with content folder within it!")
+            fail<Any?>("Shouldn't be able to initialise folder with content folder within it!")
         } catch (e: Exception) {
             e.printStackTrace()
         }
         val testFile = File(initPath, "testfile.txt")
-        Assertions.assertThat(testFile).doesNotExist()
+        assertThat(testFile).doesNotExist()
     }
 
     @Test
@@ -63,11 +64,11 @@ class InitTest {
         val initPath = folder.newFolder("init")
         try {
             init.run(initPath, rootPath, "invalid")
-            Assertions.fail<Any?>("Shouldn't be able to initialise folder with invalid template type")
+            fail<Any?>("Shouldn't be able to initialise folder with invalid template type")
         } catch (e: Exception) {
             e.printStackTrace()
         }
         val testFile = File(initPath, "testfile.txt")
-        Assertions.assertThat(testFile).doesNotExist()
+        assertThat(testFile).doesNotExist()
     }
 }

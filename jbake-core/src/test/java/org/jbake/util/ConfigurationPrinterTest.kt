@@ -1,6 +1,6 @@
 package org.jbake.util
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.junit.jupiter.api.Test
@@ -18,10 +18,10 @@ internal class ConfigurationPrinterTest {
 
         printer.print()
 
-        Assertions.assertThat(data.toString()).contains("DEFAULT - Settings")
-        Assertions.assertThat(data.toString()).contains("CUSTOM - Settings")
-        Assertions.assertThat(data.toString()).contains("Key")
-        Assertions.assertThat(data.toString()).contains("Value")
+        assertThat(data.toString()).contains("DEFAULT - Settings")
+        assertThat(data.toString()).contains("CUSTOM - Settings")
+        assertThat(data.toString()).contains("Key")
+        assertThat(data.toString()).contains("Value")
     }
 
 
@@ -35,7 +35,7 @@ internal class ConfigurationPrinterTest {
 
         printer.print()
 
-        Assertions.assertThat(data.toString()).contains("site.host")
-        Assertions.assertThat(data.toString()).contains("http://www.jbake.org")
+        assertThat(data.toString()).contains("site.host")
+        assertThat(data.toString()).contains("http://www.jbake.org")
     }
 }

@@ -1,6 +1,6 @@
 package org.jbake.model
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.DocumentTypes.addListener
 import org.jbake.model.DocumentTypes.contains
@@ -14,7 +14,7 @@ class DocumentTypesTest {
         val knownDocumentTypes = documentTypes
         val expectedDocumentType: Array<String> = arrayOf("page", "post", "masterindex", "archive", "feed")
 
-        Assertions.assertThat(knownDocumentTypes).contains(*expectedDocumentType)
+        assertThat(knownDocumentTypes).contains(*expectedDocumentType)
     }
 
     @Test
@@ -23,7 +23,7 @@ class DocumentTypesTest {
 
         addDocumentType(newDocumentType)
 
-        Assertions.assertThat(documentTypes).contains(newDocumentType)
+        assertThat(documentTypes).contains(newDocumentType)
     }
 
     @Test
@@ -36,7 +36,7 @@ class DocumentTypesTest {
         addDocumentType(knownDocumentType)
 
         // only one document type could be found in the list
-        Assertions.assertThat(documentTypes).containsOnlyOnce(knownDocumentType)
+        assertThat(documentTypes).containsOnlyOnce(knownDocumentType)
     }
 
     @Test
@@ -44,14 +44,14 @@ class DocumentTypesTest {
         val knownDocumentType = "known"
         addDocumentType(knownDocumentType)
 
-        Assertions.assertThat(contains(knownDocumentType)).isTrue()
+        assertThat(contains(knownDocumentType)).isTrue()
     }
 
     @Test
     fun shouldTellIfDocumentTypeIsUnknown() {
         val unknownType = "unknown"
 
-        Assertions.assertThat(contains(unknownType)).isFalse()
+        assertThat(contains(unknownType)).isFalse()
     }
 
     @Test

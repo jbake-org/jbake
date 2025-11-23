@@ -1,7 +1,7 @@
 package org.jbake.app
 
 import org.apache.commons.io.FileUtils
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.MatcherAssert
 import org.hamcrest.core.Is
 import org.jbake.TestUtils
@@ -58,7 +58,7 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat(oven.errors).isEmpty()
+        assertThat(oven.errors).isEmpty()
     }
 
     @Test
@@ -73,12 +73,12 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat(oven.errors).isEmpty()
-        Assertions.assertThat(configuration.destinationFolder).isNotEmptyDirectory()
-        Assertions.assertThat(assetFolder).isNotEmptyDirectory()
-        Assertions.assertThat(aboutFile).isFile()
-        Assertions.assertThat(aboutFile).isNotEmpty()
-        Assertions.assertThat(blogSubFolder).isNotEmptyDirectory()
+        assertThat(oven.errors).isEmpty()
+        assertThat(configuration.destinationFolder).isNotEmptyDirectory()
+        assertThat(assetFolder).isNotEmptyDirectory()
+        assertThat(aboutFile).isFile()
+        assertThat(aboutFile).isNotEmpty()
+        assertThat(blogSubFolder).isNotEmptyDirectory()
     }
 
     @Test
@@ -119,12 +119,12 @@ class OvenTest {
         val oven = Oven(configuration)
         oven.bake()
 
-        Assertions.assertThat(oven.errors).isEmpty()
-        Assertions.assertThat(configuration.destinationFolder).isNotEmptyDirectory()
-        Assertions.assertThat(assetFolder).isNotEmptyDirectory()
-        Assertions.assertThat(aboutFile).isFile()
-        Assertions.assertThat(aboutFile).isNotEmpty()
-        Assertions.assertThat(blogSubFolder).isNotEmptyDirectory()
+        assertThat(oven.errors).isEmpty()
+        assertThat(configuration.destinationFolder).isNotEmptyDirectory()
+        assertThat(assetFolder).isNotEmptyDirectory()
+        assertThat(aboutFile).isFile()
+        assertThat(aboutFile).isNotEmpty()
+        assertThat(blogSubFolder).isNotEmptyDirectory()
     }
 
 
@@ -147,11 +147,11 @@ class OvenTest {
 
         val oven = Oven(configuration)
 
-        Assertions.assertThat(oven.utensils.contentStore).isNotNull()
-        Assertions.assertThat(oven.utensils.crawler).isNotNull()
-        Assertions.assertThat(oven.utensils.renderer).isNotNull()
-        Assertions.assertThat(oven.utensils.asset).isNotNull()
-        Assertions.assertThat(oven.utensils.configuration).isEqualTo(configuration)
+        assertThat(oven.utensils.contentStore).isNotNull()
+        assertThat(oven.utensils.crawler).isNotNull()
+        assertThat(oven.utensils.renderer).isNotNull()
+        assertThat(oven.utensils.asset).isNotNull()
+        assertThat(oven.utensils.configuration).isEqualTo(configuration)
     }
 
     @Test

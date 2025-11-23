@@ -1,6 +1,6 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
@@ -66,6 +66,6 @@ class RendererTest {
         renderer.render(content)
 
         val outputFile = File(outputPath.absolutePath + File.separatorChar + FOLDER + File.separatorChar + FILENAME)
-        Assertions.assertThat(outputFile).isFile()
+        assertThat(outputFile).isFile()
     }
 }

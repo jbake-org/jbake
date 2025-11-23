@@ -1,7 +1,6 @@
 package org.jbake.app.configuration
 
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.AssertionsForClassTypes
 import org.jbake.TestUtils
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -97,7 +96,7 @@ class JBakeConfigurationFactoryTest {
         val factory = JBakeConfigurationFactory()
         factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
-        AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("UTF-8")
+        assertThat(factory.configUtil.encoding).isEqualTo("UTF-8")
     }
 
     @Test
@@ -110,7 +109,7 @@ class JBakeConfigurationFactoryTest {
         factory.setEncoding("latin1")
             .createDefaultJbakeConfiguration(sourceFolder, destinationFolder, null as File?, true)
 
-        AssertionsForClassTypes.assertThat(factory.configUtil.encoding).isEqualTo("latin1")
+        assertThat(factory.configUtil.encoding).isEqualTo("latin1")
         Mockito.verify(util).loadConfig(sourceFolder, null)
     }
 
@@ -125,7 +124,7 @@ class JBakeConfigurationFactoryTest {
 
         config.addConfiguration(properties)
 
-        AssertionsForClassTypes.assertThat(config.get("custom.key")).isEqualTo("custom value")
-        AssertionsForClassTypes.assertThat(config.get("custom.key2")).isEqualTo("custom value 2")
+        assertThat(config.get("custom.key")).isEqualTo("custom value")
+        assertThat(config.get("custom.key2")).isEqualTo("custom value 2")
     }
 }

@@ -23,7 +23,7 @@
  */
 package org.jbake.app
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.FakeDocumentBuilder
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes.documentTypes
@@ -72,13 +72,13 @@ class PaginationTest : ContentStoreIntegrationTest() {
             db.setStart(start)
             val posts: DocumentList<DocumentModel> = db.getPublishedPosts(true)
 
-            Assertions.assertThat(posts.size).isLessThanOrEqualTo(2)
+            assertThat(posts.size).isLessThanOrEqualTo(2)
 
             if (posts.size > 1) {
                 val post = posts[0] as DocumentModel
                 val nextPost = posts[1] as DocumentModel
 
-                Assertions.assertThat(post.date).isAfter(nextPost.date)
+                assertThat(post.date).isAfter(nextPost.date)
             }
 
             pageCount++

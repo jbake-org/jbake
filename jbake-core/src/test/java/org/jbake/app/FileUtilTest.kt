@@ -1,6 +1,6 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.FileUtil.getUriPathToContentRoot
 import org.jbake.app.FileUtil.isFileInDirectory
@@ -51,12 +51,12 @@ class FileUtilTest {
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 
         var path = getUriPathToContentRoot(config, File(config.contentFolder, "index.html"))
-        Assertions.assertThat(path).isEqualTo("")
+        assertThat(path).isEqualTo("")
 
         path = getUriPathToContentRoot(config, File(config.contentFolder, "/blog/index.html"))
-        Assertions.assertThat(path).isEqualTo("../")
+        assertThat(path).isEqualTo("../")
 
         path = getUriPathToContentRoot(config, File(config.contentFolder, "/blog/level2/index.html"))
-        Assertions.assertThat(path).isEqualTo("../../")
+        assertThat(path).isEqualTo("../../")
     }
 }

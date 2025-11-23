@@ -1,7 +1,7 @@
 package org.jbake.util
 
 import org.hamcrest.core.Is
-import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Test
 
 class PagingHelperTest {
@@ -13,7 +13,7 @@ class PagingHelperTest {
 
         val helper = PagingHelper(total.toLong(), perPage)
 
-        Assert.assertEquals(expected.toLong(), helper.numberOfPages.toLong())
+        assertEquals(expected.toLong(), helper.numberOfPages.toLong())
     }
 
     @Test
@@ -22,7 +22,7 @@ class PagingHelperTest {
 
         val previousFileName = helper.getPreviousFileName(2)
 
-        Assert.assertThat("", Is.`is`(previousFileName))
+        assertThat("", Is.`is`(previousFileName))
     }
 
     @Test
@@ -31,7 +31,7 @@ class PagingHelperTest {
 
         val previousFileName = helper.getPreviousFileName(3)
 
-        Assert.assertThat("2/", Is.`is`(previousFileName))
+        assertThat("2/", Is.`is`(previousFileName))
     }
 
     @Test
@@ -40,7 +40,7 @@ class PagingHelperTest {
 
         val previousFileName = helper.getPreviousFileName(1)
 
-        Assert.assertNull(previousFileName)
+        assertNull(previousFileName)
     }
 
     @Test
@@ -49,7 +49,7 @@ class PagingHelperTest {
 
         val nextFileName = helper.getNextFileName(3)
 
-        Assert.assertNull(nextFileName)
+        assertNull(nextFileName)
     }
 
     @Test
@@ -58,6 +58,6 @@ class PagingHelperTest {
 
         val nextFileName = helper.getNextFileName(2)
 
-        Assert.assertThat("3/", Is.`is`(nextFileName))
+        assertThat("3/", Is.`is`(nextFileName))
     }
 }

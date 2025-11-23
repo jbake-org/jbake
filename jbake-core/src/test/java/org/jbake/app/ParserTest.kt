@@ -1,6 +1,6 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -239,7 +239,7 @@ class ParserTest {
         Assert.assertNotNull(documentModel)
         Assert.assertEquals("draft", documentModel!!.status)
         Assert.assertEquals("post", documentModel.type)
-        Assertions.assertThat(documentModel.body)
+        assertThat(documentModel.body)
             .contains("<p>A paragraph</p>")
     }
 
@@ -293,11 +293,11 @@ class ParserTest {
     fun sanitizeKeysAndValues() {
         val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
 
-        Assertions.assertThat(map!!.status).isEqualTo("draft")
-        Assertions.assertThat(map.title).isEqualTo("Title")
-        Assertions.assertThat(map.type).isEqualTo("post")
-        Assertions.assertThat(map.get("custom")).isEqualTo("custom without bom's")
-        Assertions.assertThat(map.tags)
+        assertThat(map!!.status).isEqualTo("draft")
+        assertThat(map.title).isEqualTo("Title")
+        assertThat(map.type).isEqualTo("post")
+        assertThat(map.get("custom")).isEqualTo("custom without bom's")
+        assertThat(map.tags)
             .isEqualTo(mutableListOf("jbake", "java", "tag with space").toTypedArray())
     }
 
@@ -306,7 +306,7 @@ class ParserTest {
         config.setProperty(PropertyList.TAG_SANITIZE.key, true)
         val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
 
-        Assertions.assertThat(map!!.tags)
+        assertThat(map!!.tags)
             .isEqualTo(mutableListOf("jbake", "java", "tag-with-space").toTypedArray())
     }
 
@@ -330,23 +330,23 @@ class ParserTest {
     }
 
     private fun assertJSONExtracted(jsonDataEntry: Any?) {
-        Assertions.assertThat(jsonDataEntry).isInstanceOf(JSONObject::class.java)
+        assertThat(jsonDataEntry).isInstanceOf(JSONObject::class.java)
         val jsonData = jsonDataEntry as JSONObject
-        Assertions.assertThat(jsonData.containsKey("numberValue")).isTrue()
-        Assertions.assertThat(jsonData.get("numberValue")).isInstanceOf(Number::class.java)
-        Assertions.assertThat((jsonData.get("numberValue") as Number).toInt()).isEqualTo(42)
-        Assertions.assertThat(jsonData.containsKey("stringValue")).isTrue()
-        Assertions.assertThat(jsonData.get("stringValue")).isInstanceOf(String::class.java)
-        Assertions.assertThat(jsonData.get("stringValue") as String?)
+        assertThat(jsonData.containsKey("numberValue")).isTrue()
+        assertThat(jsonData.get("numberValue")).isInstanceOf(Number::class.java)
+        assertThat((jsonData.get("numberValue") as Number).toInt()).isEqualTo(42)
+        assertThat(jsonData.containsKey("stringValue")).isTrue()
+        assertThat(jsonData.get("stringValue")).isInstanceOf(String::class.java)
+        assertThat(jsonData.get("stringValue") as String?)
             .isEqualTo("Answer to live, the universe and everything")
-        Assertions.assertThat(jsonData.containsKey("nullValue")).isTrue()
-        Assertions.assertThat(jsonData.get("nullValue")).isNull()
-        Assertions.assertThat(jsonData.containsKey("arrayValue")).isTrue()
-        Assertions.assertThat(jsonData.get("arrayValue")).isInstanceOf(JSONArray::class.java)
-        Assertions.assertThat(jsonData.get("arrayValue") as JSONArray?).contains(1L, 2L)
-        Assertions.assertThat(jsonData.containsKey("objectValue")).isTrue()
-        Assertions.assertThat(jsonData.get("objectValue")).isInstanceOf(JSONObject::class.java)
-        Assertions.assertThat<Any?, Any?>(jsonData.get("objectValue") as JSONObject?)
+        assertThat(jsonData.containsKey("nullValue")).isTrue()
+        assertThat(jsonData.get("nullValue")).isNull()
+        assertThat(jsonData.containsKey("arrayValue")).isTrue()
+        assertThat(jsonData.get("arrayValue")).isInstanceOf(JSONArray::class.java)
+        assertThat(jsonData.get("arrayValue") as JSONArray?).contains(1L, 2L)
+        assertThat(jsonData.containsKey("objectValue")).isTrue()
+        assertThat(jsonData.get("objectValue")).isInstanceOf(JSONObject::class.java)
+        assertThat<Any?, Any?>(jsonData.get("objectValue") as JSONObject?)
             .contains(AbstractMap.SimpleEntry<Any?, Any?>("val1", 1L), AbstractMap.SimpleEntry<Any?, Any?>("val2", 2L))
     }
 }

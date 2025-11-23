@@ -25,6 +25,7 @@ package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
@@ -187,7 +188,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("post")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -206,7 +207,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("page")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -222,7 +223,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("index")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -235,7 +236,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("feed")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -248,7 +249,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("archive")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -261,7 +262,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -274,7 +275,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags-index")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 
@@ -290,9 +291,9 @@ abstract class AbstractTemplateEngineRenderingTest(
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("sitemap")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
-        Assertions.assertThat(output).doesNotContain("draft-paper.html")
+        assertThat(output).doesNotContain("draft-paper.html")
     }
 
     protected fun getOutputStrings(type: String): MutableList<String> {
@@ -314,7 +315,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in getOutputStrings("dbSpan")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 }

@@ -1,6 +1,6 @@
 package org.jbake.util
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -27,8 +27,8 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).doesNotContain("<body>")
-        Assertions.assertThat(body).doesNotContain("</body>")
+        assertThat(body).doesNotContain("<body>")
+        assertThat(body).doesNotContain("</body>")
     }
 
     @Test
@@ -43,7 +43,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"blog/2017/05/first.jpg\"")
+        assertThat(body).contains("src=\"blog/2017/05/first.jpg\"")
     }
 
     @Test
@@ -58,7 +58,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\"")
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\"")
     }
 
     @Test
@@ -73,7 +73,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
@@ -88,7 +88,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
@@ -102,7 +102,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
@@ -117,7 +117,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
@@ -132,7 +132,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
     }
 
     @Test
@@ -147,7 +147,7 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"http://example.com/first.jpg\"")
+        assertThat(body).contains("src=\"http://example.com/first.jpg\"")
     }
 
     @Test
@@ -162,6 +162,6 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        Assertions.assertThat(body).contains("src=\"https://example.com/first.jpg\"")
+        assertThat(body).contains("src=\"https://example.com/first.jpg\"")
     }
 }

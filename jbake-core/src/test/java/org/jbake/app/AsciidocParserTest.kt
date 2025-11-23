@@ -1,11 +1,11 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList.ASCIIDOCTOR_ATTRIBUTES
-import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -131,15 +131,15 @@ class AsciidocParserTest {
     fun parseAsciidocFileWithPrettifyAttribute() {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
         val map = parser!!.processFile(asciidocWithSource!!)
-        Assert.assertNotNull(map)
-        Assert.assertEquals("draft", map!!.status)
-        Assert.assertEquals("post", map.type)
-        Assertions.assertThat(map.body)
+        assertNotNull(map)
+        assertEquals("draft", map!!.status)
+        assertEquals("post", map.type)
+        assertThat(map.body)
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>")
             .contains("class=\"prettyprint highlight\"")
 
-        Assertions.assertThat(map.body).doesNotContain("I Love Jbake")
+        assertThat(map.body).doesNotContain("I Love Jbake")
         println(map.body)
     }
 
@@ -147,10 +147,10 @@ class AsciidocParserTest {
     fun parseAsciidocFileWithCustomAttribute() {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify,testattribute=I Love Jbake")
         val map = parser!!.processFile(asciidocWithSource!!)
-        Assert.assertNotNull(map)
-        Assert.assertEquals("draft", map!!.status)
-        Assert.assertEquals("post", map.type)
-        Assertions.assertThat(map.body)
+        assertNotNull(map)
+        assertEquals("draft", map!!.status)
+        assertEquals("post", map.type)
+        assertThat(map.body)
             .contains("I Love Jbake")
             .contains("class=\"prettyprint highlight\"")
 
@@ -160,10 +160,10 @@ class AsciidocParserTest {
     @Test
     fun parseValidAsciiDocFile() {
         val map = parser!!.processFile(validAsciidocFile!!)
-        Assert.assertNotNull(map)
-        Assert.assertEquals("draft", map!!.status)
-        Assert.assertEquals("post", map.type)
-        Assertions.assertThat(map.body)
+        assertNotNull(map)
+        assertEquals("draft", map!!.status)
+        assertEquals("post", map.type)
+        assertThat(map.body)
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>")
     }
@@ -171,17 +171,17 @@ class AsciidocParserTest {
     @Test
     fun parseInvalidAsciiDocFile() {
         val map = parser!!.processFile(invalidAsciiDocFile!!)
-        Assert.assertNull(map)
+        assertNull(map)
     }
 
     @Test
     fun parseValidAsciiDocFileWithoutHeader() {
         val map = parser!!.processFile(validAsciiDocFileWithoutHeader!!)
-        Assert.assertNotNull(map)
-        Assert.assertEquals("Hello: AsciiDoc!", map!!.get("title"))
-        Assert.assertEquals("published", map.status)
-        Assert.assertEquals("page", map.type)
-        Assertions.assertThat(map.body)
+        assertNotNull(map)
+        assertEquals("Hello: AsciiDoc!", map!!.get("title"))
+        assertEquals("published", map.status)
+        assertEquals("page", map.type)
+        assertThat(map.body)
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>")
     }
@@ -189,16 +189,16 @@ class AsciidocParserTest {
     @Test
     fun parseInvalidAsciiDocFileWithoutHeader() {
         val map = parser!!.processFile(invalidAsciiDocFileWithoutHeader!!)
-        Assert.assertNull(map)
+        assertNull(map)
     }
 
     @Test
     fun parseValidAsciiDocFileWithExampleHeaderInContent() {
         val map = parser!!.processFile(validAsciiDocFileWithHeaderInContent!!)
-        Assert.assertNotNull(map)
-        Assert.assertEquals("published", map!!.status)
-        Assert.assertEquals("page", map.type)
-        Assertions.assertThat(map.body)
+        assertNotNull(map)
+        assertEquals("published", map!!.status)
+        assertEquals("page", map.type)
+        assertThat(map.body)
             .contains("class=\"paragraph\"")
             .contains("<p>JBake now supports AsciiDoc.</p>")
             .contains("class=\"listingblock\"")
@@ -215,10 +215,10 @@ class AsciidocParserTest {
         config.setDefaultType("page")
         val parser = Parser(config)
         val map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData!!)
-        Assert.assertNotNull(map)
-        Assert.assertEquals("published", map!!.status)
-        Assert.assertEquals("page", map.type)
-        Assertions.assertThat(map.body)
+        assertNotNull(map)
+        assertEquals("published", map!!.status)
+        assertEquals("page", map.type)
+        assertThat(map.body)
             .contains("<p>JBake now supports AsciiDoc documents without JBake meta data.</p>")
     }
 }

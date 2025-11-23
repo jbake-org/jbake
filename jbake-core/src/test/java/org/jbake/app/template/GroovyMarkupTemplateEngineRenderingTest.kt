@@ -1,11 +1,10 @@
 package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
 import org.jbake.app.Renderer
-import org.jbake.util.PathConstants
 import org.jbake.util.PathConstants.fS
 import org.junit.Assert
 import org.junit.Test
@@ -79,7 +78,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
         // verify
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("paper")) {
-            Assertions.assertThat(output).contains(string)
+            assertThat(output).contains(string)
         }
     }
 }

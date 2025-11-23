@@ -1,6 +1,6 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -25,7 +25,7 @@ class FeedRendererTest {
         val mockRenderer = Mockito.mock(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        Assertions.assertThat(renderResponse).isEqualTo(0)
+        assertThat(renderResponse).isEqualTo(0)
     }
 
     @Test
@@ -59,7 +59,7 @@ class FeedRendererTest {
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        Assertions.assertThat(renderResponse).isEqualTo(1)
+        assertThat(renderResponse).isEqualTo(1)
     }
 
     @Test

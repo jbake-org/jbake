@@ -2,7 +2,7 @@ package org.jbake.app
 
 import com.orientechnologies.orient.core.db.record.OTrackedMap
 import org.apache.commons.io.FilenameUtils
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.BaseMatcher
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Description
@@ -11,6 +11,7 @@ import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
 import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Test
 
 class CrawlerTest : ContentStoreIntegrationTest() {
@@ -19,33 +20,33 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val crawler = Crawler(db, config)
         crawler.crawl()
 
-        Assert.assertEquals(4, db.getDocumentCount("post"))
-        Assert.assertEquals(3, db.getDocumentCount("page"))
+        assertEquals(4, db.getDocumentCount("post"))
+        assertEquals(3, db.getDocumentCount("page"))
 
         val results: DocumentList<DocumentModel> = db.publishedPosts
 
-        Assertions.assertThat(results.size).isEqualTo(3)
+        assertThat(results.size).isEqualTo(3)
 
         for (content in results) {
-            Assertions.assertThat(content)
+            assertThat(content)
                 .containsKey(ModelAttributes.ROOTPATH)
                 .containsValue("../../../")
         }
 
         val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
 
-        Assertions.assertThat(allPosts.size).isEqualTo(4)
+        assertThat(allPosts.size).isEqualTo(4)
 
         for (content in allPosts) {
             if (content!!.title == "Draft Post") {
-                Assertions.assertThat(content).containsKey(ModelAttributes.DATE)
+                assertThat(content).containsKey(ModelAttributes.DATE)
             }
         }
 
         // covers bug #213
         val publishedPostsByTag: DocumentList<DocumentModel> =
             db.getPublishedPostsByTag("blog")
-        Assert.assertEquals(3, publishedPostsByTag.size.toLong())
+        assertEquals(3, publishedPostsByTag.size.toLong())
     }
 
     @Test
@@ -55,21 +56,21 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         addDocumentType(config.dataFileDocType)
         db.updateSchema()
         crawler.crawlDataFiles()
-        Assert.assertEquals(2, db.getDocumentCount("data"))
+        assertEquals(2, db.getDocumentCount("data"))
 
         val dataFileUtil = DataFileUtil(db, "data")
         val videos = dataFileUtil.get("videos.yaml")
-        Assert.assertFalse(videos!!.isEmpty())
-        Assert.assertNotNull(videos["data"])
+        assertFalse(videos!!.isEmpty())
+        assertNotNull(videos["data"])
 
         // regression test for issue 747
         val authorsFileContents = dataFileUtil.get("authors.yaml")
-        Assert.assertFalse(authorsFileContents.isEmpty())
+        assertFalse(authorsFileContents.isEmpty())
         val authorsList = authorsFileContents["authors"]
-        Assertions.assertThat(authorsList).isNotInstanceOf(OTrackedMap::class.java)
-        Assertions.assertThat(authorsList).isInstanceOf(HashMap::class.java)
+        assertThat(authorsList).isNotInstanceOf(OTrackedMap::class.java)
+        assertThat(authorsList).isInstanceOf(HashMap::class.java)
         val authors = authorsList as HashMap<String, MutableMap<String,  Any>>
-        Assertions.assertThat(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
+        assertThat(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
     }
 
     @Test
@@ -80,17 +81,17 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val crawler = Crawler(db, config)
         crawler.crawl()
 
-        Assert.assertEquals(4, db.getDocumentCount("post"))
-        Assert.assertEquals(3, db.getDocumentCount("page"))
+        assertEquals(4, db.getDocumentCount("post"))
+        assertEquals(3, db.getDocumentCount("page"))
 
         val documents: DocumentList<DocumentModel> = db.publishedPosts
 
         for (model in documents) {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.file) + "/"
 
-            Assert.assertThat<String>(model.noExtensionUri, RegexMatcher.matches(noExtensionUri))
-            Assert.assertThat(model.uri, RegexMatcher.matches(noExtensionUri + "index\\.html"))
-            Assert.assertThat(model.rootPath, CoreMatchers.`is`("../../../"))
+            assertThat<String>(model.noExtensionUri, RegexMatcher.matches(noExtensionUri))
+            assertThat(model.uri, RegexMatcher.matches(noExtensionUri + "index\\.html"))
+            assertThat(model.rootPath, CoreMatchers.`is`("../../../"))
         }
     }
 
