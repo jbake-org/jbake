@@ -45,15 +45,12 @@ import java.util.*
  * @author jdlee
  */
 class ContentStore(private val type: String, private val name: String?) {
-    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 
     private lateinit var db: ODatabaseSession
-
-    var start: Long = -1
-        private set
-    var limit: Long = -1
-        private set
     private lateinit var orient: OrientDB
+
+    var start: Long = -1; private set
+    var limit: Long = -1; private set
 
 
     fun startup() {
@@ -423,4 +420,6 @@ class ContentStore(private val type: String, private val name: String?) {
         private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE =
             "select count(*) as count from Documents where type='%s'"
     }
+
+    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 }
