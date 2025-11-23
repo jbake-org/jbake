@@ -48,6 +48,7 @@ abstract class ContentStoreIntegrationTest {
 
             Assert.assertEquals(".html", config.outputExtension)
             config.databaseStore = (storageType.toString())
+
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
             var dbPath: String = folder.newFolder("documents" + System.currentTimeMillis()).getName()
 

@@ -45,6 +45,7 @@ import java.util.*
  * @author jdlee
  */
 class ContentStore(private val type: String, private val name: String?) {
+    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 
     private lateinit var db: ODatabaseSession
     private lateinit var orient: OrientDB
@@ -59,11 +60,15 @@ class ContentStore(private val type: String, private val name: String?) {
         // Disable OrientDB's script manager to avoid JSR223 dependencies
         System.setProperty("orientdb.script.pool.enabled", "false")
 
-        orient =
-            if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
-                OrientDB("$type:$name", OrientDBConfig.defaultConfig())
-            else
-                OrientDB("$type:", OrientDBConfig.defaultConfig())
+        // For PLOCAL databases, the 'name' is the database directory path
+        // For MEMORY databases, we just need the type
+        orient = if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true)) {
+            // For PLOCAL, the name is the database path/name
+            OrientDB("$type:$name", OrientDBConfig.defaultConfig())
+        } else {
+            // For MEMORY databases, no path needed
+            OrientDB("$type:", OrientDBConfig.defaultConfig())
+        }
 
         // Set up database: create with proper admin user if it doesn't exist, or just open if it does
         setupDatabase()
@@ -444,5 +449,4 @@ class ContentStore(private val type: String, private val name: String?) {
             "select count(*) as count from Documents where type='%s'"
     }
 
-    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 }
