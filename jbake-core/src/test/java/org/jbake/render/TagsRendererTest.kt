@@ -98,7 +98,7 @@ class TagsRendererTest {
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`(mockRenderer).renderTags(ArgumentMatchers.anyString())
+        Mockito.doThrow(RuntimeException()).`when`(mockRenderer).renderTags(ArgumentMatchers.anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 

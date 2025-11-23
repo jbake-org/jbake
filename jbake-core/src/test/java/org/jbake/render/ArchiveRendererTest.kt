@@ -92,7 +92,7 @@ class ArchiveRendererTest {
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`(mockRenderer).renderArchive(ArgumentMatchers.anyString())
+        Mockito.doThrow(RuntimeException()).`when`(mockRenderer).renderArchive(ArgumentMatchers.anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 

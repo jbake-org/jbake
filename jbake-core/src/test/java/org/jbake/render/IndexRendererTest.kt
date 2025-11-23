@@ -75,7 +75,7 @@ class IndexRendererTest {
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`(mockRenderer).renderIndex(ArgumentMatchers.anyString())
+        Mockito.doThrow(RuntimeException()).`when`(mockRenderer).renderIndex(ArgumentMatchers.anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
