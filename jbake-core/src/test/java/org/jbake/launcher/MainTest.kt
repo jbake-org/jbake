@@ -2,8 +2,6 @@ package org.jbake.launcher
 
 import org.apache.commons.configuration2.ex.ConfigurationException
 import org.assertj.core.api.Assertions
-import org.itsallcode.junit.sysextensions.AssertExit
-import org.itsallcode.junit.sysextensions.ExitGuard
 import org.jbake.TestUtils
 import org.jbake.app.JBakeException
 import org.jbake.app.LoggingTest
@@ -22,13 +20,33 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
 import picocli.CommandLine
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
 import java.nio.file.Path
 
-@ExtendWith(ExitGuard::class)
+// Helper functions for Kotlin null-safety with Mockito
+@Suppress("UNCHECKED_CAST")
+private fun <T> any(type: Class<T>): T {
+    ArgumentMatchers.any(type)
+    return null as T
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> anyNullable(type: Class<T>): T {
+    ArgumentMatchers.nullable(type)
+    return null as T
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun anyString(): String {
+    ArgumentMatchers.anyString()
+    return ""
+}
+
+@ExtendWith(MockitoExtension::class)
 internal class MainTest : LoggingTest() {
     private val standardOut: PrintStream? = System.out
     private val outputStreamCaptor = ByteArrayOutputStream()
@@ -75,7 +93,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
@@ -86,7 +104,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "--prop-encoding", "latin1")
         main!!.run(args)
 
-        Mockito.verify<JBakeConfigurationFactory?>(factory).setEncoding("latin1")
+        Mockito.verify<JBakeConfigurationFactory>(factory).setEncoding("latin1")
     }
 
     @Test
@@ -97,7 +115,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b")
         main!!.run(args)
 
-        Mockito.verify<JBakeConfigurationFactory?>(factory).setEncoding("utf-8")
+        Mockito.verify<JBakeConfigurationFactory>(factory).setEncoding("utf-8")
     }
 
     @Test
@@ -109,7 +127,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
@@ -123,7 +141,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "-s", "src/jbake")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedRunPath, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(expectedRunPath, configuration)
     }
 
     @Test
@@ -134,7 +152,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf<String>(build.path, "-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(build.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(build.path, configuration)
     }
 
 
@@ -148,7 +166,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-s", src.path)
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(src.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(src.path, configuration)
     }
 
     @Test
@@ -160,7 +178,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf<String>(src.path, exampleOutput.path, "-s")
         main!!.run(args)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
     }
 
     @Test
@@ -172,7 +190,7 @@ internal class MainTest : LoggingTest() {
 
         main!!.run(stubOptions(args), configuration)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(exampleOutput.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
     }
 
     @Test
@@ -190,15 +208,18 @@ internal class MainTest : LoggingTest() {
         configuration.destinationFolder = configTarget
         main!!.run(stubOptions(args), configuration)
 
-        Mockito.verify<JettyServer?>(mockJetty).run(expectedOutput.path, configuration)
+        Mockito.verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
     fun shouldTellUserThatTemplateOptionRequiresInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
-        AssertExit.assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.status) { Main.main(args) }
+        val exception = Assert.assertThrows(JBakeException::class.java) {
+            main!!.run(args)
+        }
 
+        Assertions.assertThat(exception.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
         Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
@@ -213,8 +234,8 @@ internal class MainTest : LoggingTest() {
         mockDefaultJbakeConfiguration(currentWorkingdir)
 
         Mockito.doThrow(RuntimeException("something went wrong")).`when`(other).run(
-            ArgumentMatchers.any(LaunchOptions::class.java),
-            ArgumentMatchers.any()
+            any(LaunchOptions::class.java),
+            any(JBakeConfiguration::class.java)
         )
 
         val e = Assert.assertThrows(
@@ -227,13 +248,13 @@ internal class MainTest : LoggingTest() {
 
     @Test
     fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
-        Mockito.`when`(factory!!.setEncoding(ArgumentMatchers.any()))
+        Mockito.`when`(factory!!.setEncoding(anyString()))
             .thenReturn(factory)
         Mockito.doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
             .`when`(factory).createDefaultJbakeConfiguration(
-                ArgumentMatchers.any(File::class.java),
-                ArgumentMatchers.any(File::class.java),
-                ArgumentMatchers.any(File::class.java),
+                any(File::class.java),
+                any(File::class.java),
+                any(File::class.java),
                 ArgumentMatchers.anyBoolean()
             )
         val e = Assert.assertThrows(
@@ -270,13 +291,13 @@ internal class MainTest : LoggingTest() {
     private fun mockDefaultJbakeConfiguration(sourceFolder: File) {
         val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false)
         System.setProperty("user.dir", sourceFolder.path)
-        Mockito.`when`(factory!!.setEncoding(ArgumentMatchers.any()))
+        Mockito.`when`(factory!!.setEncoding(anyString()))
             .thenReturn(factory)
         Mockito.`when`(
             factory.createDefaultJbakeConfiguration(
-                ArgumentMatchers.any(File::class.java),
-                ArgumentMatchers.any(File::class.java),
-                ArgumentMatchers.any(File::class.java),
+                any(File::class.java),
+                any(File::class.java),
+                any(File::class.java),
                 ArgumentMatchers.anyBoolean()
             )
         ).thenReturn(configuration)
@@ -290,14 +311,14 @@ internal class MainTest : LoggingTest() {
 
         Mockito.`when`(
             factory!!.createJettyJbakeConfiguration(
-                ArgumentMatchers.any(File::class.java),
-                ArgumentMatchers.any(File::class.java),
-                ArgumentMatchers.any(File::class.java),
+                any(File::class.java),
+                any(File::class.java),
+                any(File::class.java),
                 ArgumentMatchers.anyBoolean()
             )
         ).thenReturn(configuration)
 
-        Mockito.`when`(factory.setEncoding(ArgumentMatchers.any()))
+        Mockito.`when`(factory.setEncoding(anyString()))
             .thenReturn(factory)
         return configuration
     }
