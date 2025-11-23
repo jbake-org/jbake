@@ -25,7 +25,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
         val nonExistentFile = File(folder.toFile(), "nofolder")
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(nonExistentFile)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(nonExistentFile)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -43,7 +43,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         Mockito.`when`(nonReadableFile.canRead()).thenReturn(false)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(nonReadableFile)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(nonReadableFile)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -58,8 +58,8 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val templateFolderName = "template/custom"
         val expectedFolder = File(folder.toFile(), templateFolderName)
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`<Any?>(configuration.templateFolder).thenReturn(expectedFolder)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        Mockito.`when`(configuration.templateFolder).thenReturn(expectedFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -77,9 +77,9 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val contentFolder = File(folder.toFile(), contentFolderName)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`<Any?>(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`<Any?>(configuration.contentFolder).thenReturn(contentFolder)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
+        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -101,11 +101,11 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val destinationFolder = File(folder.toFile(), destinationFolderName)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`<Any?>(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`<Any?>(configuration.contentFolder).thenReturn(contentFolder)
-        Mockito.`when`<Any?>(configuration.destinationFolder).thenReturn(destinationFolder)
-        Mockito.`when`<Any?>(configuration.assetFolder).thenReturn(destinationFolder)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
+        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
+        Mockito.`when`(configuration.destinationFolder).thenReturn(destinationFolder)
+        Mockito.`when`(configuration.assetFolder).thenReturn(destinationFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -125,10 +125,10 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         Mockito.`when`(destinationFolder.exists()).thenReturn(true)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`<Any?>(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`<Any?>(configuration.contentFolder).thenReturn(contentFolder)
-        Mockito.`when`<Any?>(configuration.destinationFolder).thenReturn(destinationFolder)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
+        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
+        Mockito.`when`(configuration.destinationFolder).thenReturn(destinationFolder)
 
         val inspector = JBakeConfigurationInspector(configuration)
 
@@ -150,11 +150,11 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         val assetFolder = File(folder.toFile(), assetFolderName)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.sourceFolder).thenReturn(folder.toFile())
-        Mockito.`when`<Any?>(configuration.templateFolder).thenReturn(templateFolder)
-        Mockito.`when`<Any?>(configuration.contentFolder).thenReturn(contentFolder)
-        Mockito.`when`<Any?>(configuration.destinationFolder).thenReturn(destinationFolder)
-        Mockito.`when`<Any?>(configuration.assetFolder).thenReturn(assetFolder)
+        Mockito.`when`(configuration.sourceFolder).thenReturn(folder.toFile())
+        Mockito.`when`(configuration.templateFolder).thenReturn(templateFolder)
+        Mockito.`when`(configuration.contentFolder).thenReturn(contentFolder)
+        Mockito.`when`(configuration.destinationFolder).thenReturn(destinationFolder)
+        Mockito.`when`(configuration.assetFolder).thenReturn(assetFolder)
 
 
         val inspector = JBakeConfigurationInspector(configuration)

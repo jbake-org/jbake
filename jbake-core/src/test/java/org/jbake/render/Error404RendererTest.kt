@@ -18,7 +18,7 @@ class Error404RendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderError404).thenReturn(false)
+        Mockito.`when`(configuration.renderError404).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -34,7 +34,7 @@ class Error404RendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderError404).thenReturn(false)
+        Mockito.`when`(configuration.renderError404).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -51,7 +51,7 @@ class Error404RendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderError404).thenReturn(true)
+        Mockito.`when`(configuration.renderError404).thenReturn(true)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -68,8 +68,8 @@ class Error404RendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderError404).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.error404FileName).thenReturn(error404file)
+        Mockito.`when`(configuration.renderError404).thenReturn(true)
+        Mockito.`when`(configuration.error404FileName).thenReturn(error404file)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -86,8 +86,8 @@ class Error404RendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderError404).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.error404FileName).thenReturn(error404file)
+        Mockito.`when`(configuration.renderError404).thenReturn(true)
+        Mockito.`when`(configuration.error404FileName).thenReturn(error404file)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)

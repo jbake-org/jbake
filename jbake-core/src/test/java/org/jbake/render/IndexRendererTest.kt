@@ -18,7 +18,7 @@ class IndexRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderIndex).thenReturn(false)
+        Mockito.`when`(configuration.renderIndex).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -34,7 +34,7 @@ class IndexRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderIndex).thenReturn(false)
+        Mockito.`when`(configuration.renderIndex).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -51,7 +51,7 @@ class IndexRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderIndex).thenReturn(true)
+        Mockito.`when`(configuration.renderIndex).thenReturn(true)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -69,8 +69,8 @@ class IndexRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderIndex).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.indexFileName).thenReturn("mockindex.html")
+        Mockito.`when`(configuration.renderIndex).thenReturn(true)
+        Mockito.`when`(configuration.indexFileName).thenReturn("mockindex.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -92,8 +92,8 @@ class IndexRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderIndex).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.indexFileName).thenReturn("mockindex.html")
+        Mockito.`when`(configuration.renderIndex).thenReturn(true)
+        Mockito.`when`(configuration.indexFileName).thenReturn("mockindex.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -109,9 +109,9 @@ class IndexRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderIndex).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.paginateIndex).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.indexFileName).thenReturn("mockindex.html")
+        Mockito.`when`(configuration.renderIndex).thenReturn(true)
+        Mockito.`when`(configuration.paginateIndex).thenReturn(true)
+        Mockito.`when`(configuration.indexFileName).thenReturn("mockindex.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)

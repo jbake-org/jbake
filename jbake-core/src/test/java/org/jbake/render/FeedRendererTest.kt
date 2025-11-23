@@ -18,7 +18,7 @@ class FeedRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(false)
+        Mockito.`when`(configuration.renderFeed).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -34,7 +34,7 @@ class FeedRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(false)
+        Mockito.`when`(configuration.renderFeed).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -51,7 +51,7 @@ class FeedRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(true)
+        Mockito.`when`(configuration.renderFeed).thenReturn(true)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -67,8 +67,8 @@ class FeedRendererTest {
         val renderer = FeedRenderer()
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.feedFileName).thenReturn("mockfeedfile.xml")
+        Mockito.`when`(configuration.renderFeed).thenReturn(true)
+        Mockito.`when`(configuration.feedFileName).thenReturn("mockfeedfile.xml")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -84,13 +84,15 @@ class FeedRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderFeed).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.feedFileName).thenReturn("mockfeedfile.xml")
+        Mockito.`when`(configuration.renderFeed).thenReturn(true)
+        Mockito.`when`(configuration.feedFileName).thenReturn("mockfeedfile.xml")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`(mockRenderer).renderFeed(ArgumentMatchers.anyString())
+        //Mockito.doThrow(Exception()).`when`(mockRenderer).renderFeed(ArgumentMatchers.anyString())
+        Mockito.`when`(mockRenderer.renderFeed(ArgumentMatchers.anyString()))
+            .thenThrow(Exception())
 
         renderer.render(mockRenderer, contentStore, configuration)
 

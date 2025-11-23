@@ -18,7 +18,7 @@ class ArchiveRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(false)
+        Mockito.`when`(configuration.renderArchive).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -34,7 +34,7 @@ class ArchiveRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(false)
+        Mockito.`when`(configuration.renderArchive).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -51,7 +51,8 @@ class ArchiveRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(true)
+        Mockito.`when`<Boolean>(configuration.renderArchive).thenReturn(true)
+        Mockito.`when`<String>(configuration.archiveFileName).thenReturn("archive.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -68,8 +69,8 @@ class ArchiveRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.archiveFileName).thenReturn("mockarchive.html")
+        Mockito.`when`(configuration.renderArchive).thenReturn(true)
+        Mockito.`when`(configuration.archiveFileName).thenReturn("mockarchive.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -85,8 +86,8 @@ class ArchiveRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderArchive).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.archiveFileName).thenReturn("mockarchive.html")
+        Mockito.`when`(configuration.renderArchive).thenReturn(true)
+        Mockito.`when`(configuration.archiveFileName).thenReturn("mockarchive.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)

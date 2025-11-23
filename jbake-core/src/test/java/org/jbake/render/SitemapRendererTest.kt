@@ -18,7 +18,7 @@ class SitemapRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderSiteMap).thenReturn(false)
+        Mockito.`when`(configuration.renderSiteMap).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -34,7 +34,7 @@ class SitemapRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderSiteMap).thenReturn(false)
+        Mockito.`when`(configuration.renderSiteMap).thenReturn(false)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -51,7 +51,7 @@ class SitemapRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderSiteMap).thenReturn(true)
+        Mockito.`when`(configuration.renderSiteMap).thenReturn(true)
 
         val contentStore = Mockito.mock(ContentStore::class.java)
 
@@ -68,8 +68,8 @@ class SitemapRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderSiteMap).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.siteMapFileName).thenReturn("mocksitemap.html")
+        Mockito.`when`(configuration.renderSiteMap).thenReturn(true)
+        Mockito.`when`(configuration.siteMapFileName).thenReturn("mocksitemap.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
@@ -85,8 +85,8 @@ class SitemapRendererTest {
 
         val configuration: JBakeConfiguration =
             Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`<Any?>(configuration.renderSiteMap).thenReturn(true)
-        Mockito.`when`<Any?>(configuration.siteMapFileName).thenReturn("mocksitemap.html")
+        Mockito.`when`(configuration.renderSiteMap).thenReturn(true)
+        Mockito.`when`(configuration.siteMapFileName).thenReturn("mocksitemap.html")
 
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)

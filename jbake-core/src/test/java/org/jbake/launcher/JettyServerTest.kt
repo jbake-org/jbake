@@ -29,9 +29,9 @@ internal class JettyServerTest {
 
         val source = TestUtils.testResourcesAsSourceFolder
         val port = this.randoport
-        Mockito.`when`<Any?>(jBakeConfiguration!!.serverPort).thenReturn(port)
-        Mockito.`when`<Any?>(jBakeConfiguration!!.serverHostname).thenReturn("localhost")
-        Mockito.`when`<Any?>(jBakeConfiguration!!.serverContextPath).thenReturn("/foo")
+        Mockito.`when`(jBakeConfiguration!!.serverPort).thenReturn(port)
+        Mockito.`when`(jBakeConfiguration!!.serverHostname).thenReturn("localhost")
+        Mockito.`when`(jBakeConfiguration!!.serverContextPath).thenReturn("/foo")
 
         val executorService = Executors.newSingleThreadExecutor()
 
