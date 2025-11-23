@@ -27,8 +27,8 @@ class DocumentsRenderer : RenderingTool {
         for (document in documentList) {
             try {
                 val typedDocList = db.getAllContent(document.type)
-                val prev = getPrevDoc(typedDocList, document)!!
-                val next = getNextDoc(typedDocList, document)!!
+                val prev = getPrevDoc(typedDocList, document)
+                val next = getNextDoc(typedDocList, document)
                 document.setPreviousContent(prev)
                 document.setNextContent(next)
 
@@ -36,7 +36,7 @@ class DocumentsRenderer : RenderingTool {
                 db.markContentAsRendered(document)
                 renderedCount++
             } catch (e: Exception) {
-                errors.add(e.message!!)
+                errors.add(e.message ?: e.toString())
             }
         }
 

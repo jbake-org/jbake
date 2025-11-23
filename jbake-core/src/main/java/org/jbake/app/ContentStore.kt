@@ -56,37 +56,60 @@ class ContentStore(private val type: String, private val name: String?) {
     fun startup() {
         startupIfEnginesAreMissing()
 
+        // Disable OrientDB's script manager to avoid JSR223 dependencies
+        System.setProperty("orientdb.script.pool.enabled", "false")
+
         orient =
             if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
                 OrientDB("$type:$name", OrientDBConfig.defaultConfig())
             else
                 OrientDB("$type:", OrientDBConfig.defaultConfig())
 
-        orient.createIfNotExists(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
+        // Set up database: create with proper admin user if it doesn't exist, or just open if it does
+        setupDatabase()
+    }
 
-        // Try to open with default admin credentials (OrientDB creates admin/admin by default in embedded mode)
+    /**
+     * Sets up the OrientDB database, creating it with proper admin credentials if needed.
+     * This ensures the database is always created with admin/admin credentials.
+     */
+    private fun setupDatabase() {
+        val adminUser = "admin"
+        val adminPass = "admin"
+        val dbType = ODatabaseType.valueOf(type.uppercase(Locale.getDefault()))
+
         try {
-            db = orient.open(name, "admin", "admin")
+            // Try to open existing database
+            db = orient.open(name, adminUser, adminPass)
+            logger.debug("Opened existing database: {}", name)
         }
-        // If admin/admin doesn't work, drop and recreate the database
         catch (e: Exception) {
-            logger.warn("Failed to open database with admin/admin, dropping and recreating: {}", e.message)
+            // Database doesn't exist or credentials don't work - recreate it properly
+            logger.info("Database '{}' not accessible with admin/admin, creating fresh database", name)
+
             try {
-                if (orient.exists(name)) orient.drop(name)
-            } catch (dropEx: Exception) { logger.warn("Failed to drop database: {}", dropEx.message) }
+                // Drop existing database if it exists but is inaccessible
+                if (orient.exists(name)) {
+                    logger.warn("Dropping existing database '{}' due to authentication failure", name)
+                    orient.drop(name)
+                }
+            } catch (dropEx: Exception) {
+                logger.warn("Failed to drop database: {}", dropEx.message)
+            }
 
-            // Close and recreate OrientDB instance to clear any cached state
-            try { orient.close() }
-            catch (closeEx: Exception) { logger.warn("Failed to close OrientDB instance: {}", closeEx.message) }
+            try {
+                // Create database with explicit admin user using SQL command
+                // This ensures the database is created with known admin/admin credentials
+                orient.execute("CREATE DATABASE $name ${dbType.name} USERS ($adminUser IDENTIFIED BY '$adminPass' ROLE admin)")
+                logger.info("Created database '{}' with admin user", name)
+            } catch (createEx: Exception) {
+                // If SQL create fails, try the API method
+                logger.warn("SQL CREATE DATABASE failed, trying API method: {}", createEx.message)
+                orient.create(name, dbType)
+            }
 
-            // Recreate OrientDB instance
-            orient = if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
-                OrientDB("$type:$name", OrientDBConfig.defaultConfig())
-            else
-                OrientDB("$type:", OrientDBConfig.defaultConfig())
-
-            orient.create(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
-            db = orient.open(name, "admin", "admin")
+            // Open the newly created database
+            db = orient.open(name, adminUser, adminPass)
         }
         activateOnCurrentThread()
         updateSchema()
