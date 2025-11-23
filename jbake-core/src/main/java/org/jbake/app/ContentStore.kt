@@ -60,23 +60,23 @@ class ContentStore(private val type: String, private val name: String?) {
         // Disable OrientDB's script manager to avoid JSR223 dependencies
         System.setProperty("orientdb.script.pool.enabled", "false")
 
-        orient =
-            // For PLOCAL, the name is the database path/name
+        // For PLOCAL, the name is the database path/name. For MEMORY databases, no path needed
+        val dbUri =
             if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
-                OrientDB("$type:$name", OrientDBConfig.defaultConfig())
-            // For MEMORY databases, no path needed
-            else
-                OrientDB("$type:", OrientDBConfig.defaultConfig())
+                "$type:$name"
+            else "$type:"
+
+        orient = OrientDB(dbUri, OrientDBConfig.defaultConfig())
 
         // Set up database: create with proper admin user if it doesn't exist, or just open if it does
-        setupDatabase()
+        setupOrOpenDatabase()
     }
 
     /**
      * Sets up the OrientDB database, creating it with proper admin credentials if needed.
      * This ensures the database is always created with admin/admin credentials.
      */
-    private fun setupDatabase() {
+    private fun setupOrOpenDatabase() {
         val adminUser = "admin"
         val adminPass = "admin"
         val dbType = ODatabaseType.valueOf(type.uppercase(Locale.getDefault()))
@@ -134,12 +134,10 @@ class ContentStore(private val type: String, private val name: String?) {
     fun updateSchema() {
         val schema = db.metadata.schema
 
-        if (!schema.existsClass(Schema.DOCUMENTS)) {
+        if (!schema.existsClass(Schema.DOCUMENTS))
             createDocType(schema)
-        }
-        if (!schema.existsClass(Schema.SIGNATURES)) {
+        if (!schema.existsClass(Schema.SIGNATURES))
             createSignatureType(schema)
-        }
     }
 
     fun close() {
@@ -166,16 +164,13 @@ class ContentStore(private val type: String, private val name: String?) {
 
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
-        if (Orient.instance().engines.isEmpty()) {
+        if (Orient.instance().engines.isEmpty())
             Orient.instance().startup()
-        }
         OLogManager.instance().isWarnEnabled = true
     }
 
     fun drop() {
         activateOnCurrentThread()
-
-        //        db.drop();
         orient.drop(name)
     }
 
@@ -199,7 +194,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     fun getDocumentByUri(uri: String?): DocumentList<DocumentModel> {
-        return query("select * from Documents where sourceuri=?", uri)
+        return query("SELECT * FROM Documents WHERE sourceuri=?", uri)
     }
 
     fun getDocumentStatus(uri: String?): DocumentList<DocumentModel> {
@@ -237,9 +232,8 @@ class ContentStore(private val type: String, private val name: String?) {
 
     private fun getPublishedContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
         var query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType)
-        if (applyPaging && hasStartAndLimitBoundary()) {
+        if (applyPaging && hasStartAndLimitBoundary())
             query += " SKIP $start LIMIT $limit"
-        }
         return query(query)
     }
 
@@ -249,9 +243,8 @@ class ContentStore(private val type: String, private val name: String?) {
 
     fun getAllContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
         var query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType)
-        if (applyPaging && hasStartAndLimitBoundary()) {
+        if (applyPaging && hasStartAndLimitBoundary())
             query += " SKIP $start LIMIT $limit"
-        }
         return query(query)
     }
 
@@ -361,9 +354,8 @@ class ContentStore(private val type: String, private val name: String?) {
     fun updateAndClearCacheIfNeeded(needed: Boolean, templateFolder: File) {
         var clearCache = needed
 
-        if (!needed) {
+        if (!needed)
             clearCache = updateTemplateSignatureIfChanged(templateFolder)
-        }
 
         if (clearCache) {
             deleteAllDocumentTypes()
@@ -417,34 +409,22 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     companion object {
-        private const val STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG =
-            "select * from Documents where status='published' and type='%s' and ? in tags order by date desc"
-        private const val STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI =
-            "select sha1,rendered from Documents where sourceuri=?"
-        private const val STATEMENT_GET_PUBLISHED_COUNT =
-            "select count(*) as count from Documents where status='published' and type='%s'"
-        private const val STATEMENT_MARK_CONTENT_AS_RENDERD =
-            "update Documents set rendered=true where rendered=false and type='%s' and sourceuri='%s' and cached=true"
-        private const val STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from Documents where sourceuri=?"
-        private const val STATEMENT_GET_UNDRENDERED_CONTENT =
-            "select * from Documents where rendered=false order by date desc"
-        private const val STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "select sha1 from Signatures where key='templates'"
-        private const val STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS =
-            "select tags from Documents where status='published' and type='post'"
-        private const val STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE =
-            "select * from Documents where type='%s' order by date desc"
-        private const val STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE =
-            "select * from Documents where status='published' and type='%s' order by date desc"
-        private const val STATEMENT_GET_PUBLISHED_POSTS_BY_TAG =
-            "select * from Documents where status='published' and type='post' and ? in tags order by date desc"
-        private const val STATEMENT_GET_TAGS_BY_DOCTYPE =
-            "select tags from Documents where status='published' and type='%s'"
-        private const val STATEMENT_INSERT_TEMPLATES_SIGNATURE =
-            "insert into Signatures(key,sha1) values('templates',?)"
-        private const val STATEMENT_DELETE_ALL = "delete from Documents where type='%s'"
-        private const val STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "update Signatures set sha1=? where key='templates'"
-        private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE =
-            "select count(*) as count from Documents where type='%s'"
+        private const val STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "SELECT * FROM Documents WHERE status='published' AND type='%s' AND ? IN tags ORDER BY date DESC"
+        private const val STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "SELECT sha1,rendered FROM Documents WHERE sourceuri=?"
+        private const val STATEMENT_GET_PUBLISHED_COUNT = "SELECT count(*) AS count FROM Documents WHERE status='published' AND type='%s'"
+        private const val STATEMENT_MARK_CONTENT_AS_RENDERD = "UPDATE Documents SET rendered=true WHERE rendered=false AND type='%s' AND sourceuri='%s' AND cached=true"
+        private const val STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "DELETE FROM Documents WHERE sourceuri=?"
+        private const val STATEMENT_GET_UNDRENDERED_CONTENT = "SELECT * FROM Documents WHERE rendered=false ORDER BY date DESC"
+        private const val STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "SELECT sha1 FROM Signatures WHERE key='templates'"
+        private const val STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "SELECT tags FROM Documents WHERE status='published' AND type='post'"
+        private const val STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "SELECT * FROM Documents WHERE type='%s' ORDER BY date DESC"
+        private const val STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "SELECT * FROM Documents WHERE status='published' AND type='%s' ORDER BY date DESC"
+        private const val STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "SELECT * FROM Documents WHERE status='published' AND type='post' AND ? IN tags ORDER BY date DESC"
+        private const val STATEMENT_GET_TAGS_BY_DOCTYPE = "SELECT tags FROM Documents WHERE status='published' AND type='%s'"
+        private const val STATEMENT_INSERT_TEMPLATES_SIGNATURE = "INSERT INTO Signatures(key,sha1) VALUES('templates',?)"
+        private const val STATEMENT_DELETE_ALL = "DELETE FROM Documents WHERE type='%s'"
+        private const val STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "UPDATE Signatures SET sha1=? WHERE key='templates'"
+        private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "SELECT count(*) AS count FROM Documents WHERE type='%s'"
     }
 
 }
