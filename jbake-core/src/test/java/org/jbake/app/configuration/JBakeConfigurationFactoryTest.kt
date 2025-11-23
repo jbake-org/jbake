@@ -125,7 +125,7 @@ class JBakeConfigurationFactoryTest {
 
         config.addConfiguration(properties)
 
-        AssertionsForClassTypes.assertThat<Any?>(config.get("custom.key")).isEqualTo("custom value")
-        AssertionsForClassTypes.assertThat<Any?>(config.get("custom.key2")).isEqualTo("custom value 2")
+        AssertionsForClassTypes.assertThat(config.get("custom.key")).isEqualTo("custom value")
+        AssertionsForClassTypes.assertThat(config.get("custom.key2")).isEqualTo("custom value 2")
     }
 }

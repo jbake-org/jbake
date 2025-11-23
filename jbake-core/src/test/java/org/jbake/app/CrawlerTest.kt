@@ -66,10 +66,10 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         val authorsFileContents = dataFileUtil.get("authors.yaml")
         Assert.assertFalse(authorsFileContents.isEmpty())
         val authorsList = authorsFileContents["authors"]
-        Assertions.assertThat<Any?>(authorsList).isNotInstanceOf(OTrackedMap::class.java)
-        Assertions.assertThat<Any?>(authorsList).isInstanceOf(HashMap::class.java)
+        Assertions.assertThat(authorsList).isNotInstanceOf(OTrackedMap::class.java)
+        Assertions.assertThat(authorsList).isInstanceOf(HashMap::class.java)
         val authors = authorsList as HashMap<String, MutableMap<String,  Any>>
-        Assertions.assertThat<Any?>(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
+        Assertions.assertThat(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
     }
 
     @Test
