@@ -16,13 +16,7 @@ publishing {
         mavenJava(MavenPublication) {
             pom {
                 name = "jbake-core"
-
-                licenses {
-                    license {
-                        name = 'The MIT License (MIT)'
-                        url = 'http://opensource.org/licenses/MIT'
-                    }
-                }
+                licenses { license { name = 'The MIT License (MIT)'; url = 'http://opensource.org/licenses/MIT' } }
             }
         }
     }
@@ -60,6 +54,15 @@ dependencies {
     // Test dependencies need access to optional compile dependencies
     testImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     testImplementation "info.picocli:picocli:$picocli"
+    testImplementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    testImplementation "org.freemarker:freemarker:$freemarkerVersion"
+    testImplementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    testImplementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    testImplementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    testImplementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    testImplementation "io.pebbletemplates:pebble:$pebbleVersion"
+    testImplementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    testImplementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
 }
 
 processResources {

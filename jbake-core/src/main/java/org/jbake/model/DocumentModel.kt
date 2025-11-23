@@ -40,7 +40,7 @@ class DocumentModel : BaseModel() {
 
     var tags: Array<String>
         get() {
-            val entry = get(ModelAttributes.TAGS) ?: throw Exception("No 'tags' in a DocumentModel")
+            val entry = get(ModelAttributes.TAGS) ?: return emptyArray()
             return DBUtil.toStringArray(entry)
         }
         set(tags) {
