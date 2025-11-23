@@ -25,6 +25,8 @@ package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -47,7 +49,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
 
         renderer.renderIndexPaging("index.html")
 
-        val outputFile = File(destinationFolder, 2.toString() + File.separator + "index.html")
+        val outputFile = File(destinationFolder, 2.toString() + fS + "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in getOutputStrings("index")) {

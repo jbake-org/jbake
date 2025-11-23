@@ -35,6 +35,8 @@ import org.jbake.model.DocumentTypes.documentTypes
 import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -173,8 +175,8 @@ abstract class AbstractTemplateEngineRenderingTest(
         val filename = "second-post.html"
 
         val sampleFile = File(
-            sourceFolder!!.path + File.separator + "content"
-                    + File.separator + "blog" + File.separator + "2013" + File.separator + filename
+            sourceFolder!!.path + fS + "content"
+                    + fS + "blog" + fS + "2013" + fS + filename
         )
         val content = parser.processFile(sampleFile)
         content!!.uri = "/$filename"
@@ -194,7 +196,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "about.html"
 
-        val sampleFile = File(sourceFolder!!.path + File.separator + "content" + File.separator + filename)
+        val sampleFile = File(sourceFolder!!.path + fS + "content" + fS + filename)
         val content = parser!!.processFile(sampleFile)
         content!!.uri = "/$filename"
         renderer!!.render(content)
@@ -255,7 +257,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         renderer.renderTags("tags")
 
         // verify
-        val outputFile = File(destinationFolder.toString() + File.separator + "tags" + File.separator + "blog.html")
+        val outputFile = File(destinationFolder.toString() + fS + "tags" + fS + "blog.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags")) {
@@ -268,7 +270,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         config.setRenderTagsIndex(true)
 
         renderer.renderTags("tags")
-        val outputFile = File(destinationFolder.toString() + File.separator + "tags" + File.separator + "index.html")
+        val outputFile = File(destinationFolder.toString() + fS + "tags" + fS + "index.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags-index")) {

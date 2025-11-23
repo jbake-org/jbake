@@ -5,6 +5,8 @@ import org.assertj.core.api.Assertions
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
 import org.jbake.app.Renderer
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import org.junit.Assert
 import org.junit.Test
 import java.io.File
@@ -67,7 +69,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
         val renderer = Renderer(db, config)
         val filename = "published-paper.html"
 
-        val sampleFile = File(sourceFolder!!.path + File.separator + "content" + File.separator + "papers" + File.separator + filename)
+        val sampleFile = File(sourceFolder!!.path + fS + "content" + fS + "papers" + fS + filename)
         val content = parser.processFile(sampleFile)
         content!!.uri = "/$filename"
         renderer.render(content)

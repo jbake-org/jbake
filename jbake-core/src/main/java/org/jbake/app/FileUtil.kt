@@ -2,6 +2,8 @@ package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.parser.Engines
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import java.io.*
 import java.net.URLDecoder
 import java.nio.file.Paths
@@ -223,8 +225,8 @@ object FileUtil {
         //if (path == null) return null
 
         // On Windows we have to replace the backslash
-        return if (File.separator == URI_SEPARATOR_CHAR) path
-            else path.replace(File.separator, URI_SEPARATOR_CHAR)
+        return if (fS == URI_SEPARATOR_CHAR) path
+            else path.replace(fS, URI_SEPARATOR_CHAR)
     }
 
     /**

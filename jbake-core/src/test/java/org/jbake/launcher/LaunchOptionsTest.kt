@@ -2,6 +2,8 @@ package org.jbake.launcher
 
 import org.assertj.core.api.Assertions
 import org.jbake.app.configuration.ConfigUtil
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import org.junit.Test
 import picocli.CommandLine
 import java.io.File
@@ -129,9 +131,9 @@ class LaunchOptionsTest {
         Assertions.assertThat(res.isBake).isFalse()
         Assertions.assertThat(res.getSource().path).isEqualTo(System.getProperty("user.dir"))
         Assertions.assertThat(res.getDestination().path)
-            .isEqualTo(System.getProperty("user.dir") + File.separator + "output")
+            .isEqualTo(System.getProperty("user.dir") + fS + "output")
         Assertions.assertThat(res.getConfig().path)
-            .isEqualTo(System.getProperty("user.dir") + File.separator + ConfigUtil.CONFIG_FILE)
+            .isEqualTo(System.getProperty("user.dir") + fS + ConfigUtil.CONFIG_FILE)
     }
 
     @Test
@@ -152,7 +154,7 @@ class LaunchOptionsTest {
         val args = arrayOf("-c", "foo")
         val res = parseArgs(args)
         Assertions.assertThat(res.getConfig().getAbsoluteFile().toString())
-            .isEqualTo(System.getProperty("user.dir") + File.separator + "foo")
+            .isEqualTo(System.getProperty("user.dir") + fS + "foo")
     }
 
     private fun parseArgs(args: Array<String>): LaunchOptions {

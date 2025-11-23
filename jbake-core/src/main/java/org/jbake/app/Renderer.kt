@@ -9,6 +9,8 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.PagingHelper
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.*
@@ -289,7 +291,7 @@ class Renderer {
                 model.tag = tag
                 val map = buildSimpleModel(ModelAttributes.TAG)
                 val ext = config.outputExtension ?: ""
-                val path = File(config.destinationFolder, tagPath + File.separator + tag + ext)
+                val path = File(config.destinationFolder, tagPath + fS + tag + ext)
                 map.rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 model.content = map
 
@@ -317,7 +319,7 @@ class Renderer {
                 model.renderer = renderingEngine
                 val ext = config.outputExtension ?: ""
                 val map = buildSimpleModel(ModelAttributes.TAGS)
-                val path = File(config.destinationFolder, tagPath + File.separator + "index" + ext)
+                val path = File(config.destinationFolder, tagPath + fS + "index" + ext)
                 map.rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 model.content = map
 
@@ -397,7 +399,7 @@ class Renderer {
         }
 
         constructor(filename: String, allInOneName: String) : super(
-                File(config.destinationFolder, File.separator + filename),
+                File(config.destinationFolder, fS + filename),
                  allInOneName,
             findTemplateName(allInOneName)
              )
@@ -411,7 +413,7 @@ class Renderer {
          * @param allInOneName
          */
         constructor(allInOneName: String) : this(
-            File(config.destinationFolder.path + File.separator + allInOneName + (config.outputExtension ?: "")),
+            File(config.destinationFolder.path + fS + allInOneName + (config.outputExtension ?: "")),
             allInOneName
         )
 

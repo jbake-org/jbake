@@ -11,6 +11,8 @@ import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
+import org.jbake.util.PathConstants
+import org.jbake.util.PathConstants.fS
 import org.junit.Assert
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -114,7 +116,7 @@ internal class MainTest : LoggingTest() {
     @Throws(ConfigurationException::class)
     fun launchBakeAndJettyWithCustomDirForJetty(@TempDir source: Path) {
         val sourceFolder = newFolder(source, "src/jbake")
-        val expectedRunPath = "src" + File.separator + "jbake" + File.separator + "output"
+        val expectedRunPath = "src" + fS + "jbake" + fS + "output"
         val output = newFolder(source, expectedRunPath)
         val configuration = mockJettyConfiguration(sourceFolder, output)
 
