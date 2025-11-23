@@ -13,4 +13,9 @@ abstract class BaseModel : HashMap<String, Any>() {
         set(name) {
             put(ModelAttributes.NAME, name)
         }
+
+    fun putOrRemoveIfNull(key: String, value: Any?) {
+        if (value == null) remove(key)
+        else put(key, value)
+    }
 }

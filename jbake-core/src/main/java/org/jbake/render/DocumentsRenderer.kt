@@ -36,7 +36,7 @@ class DocumentsRenderer : RenderingTool {
                 db.markContentAsRendered(document)
                 renderedCount++
             } catch (e: Exception) {
-                errors.add(e.message ?: e.toString())
+                errors.add(e.message ?: e.toString() + " " + e.stackTrace.first().toString())
             }
         }
 
