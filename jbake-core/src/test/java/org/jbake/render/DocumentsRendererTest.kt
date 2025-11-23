@@ -36,6 +36,7 @@ class DocumentsRendererTest {
         renderer = Mockito.mock(Renderer::class.java)
         configuration = Mockito.mock(JBakeConfiguration::class.java)
         emptyTemplateModelList = DocumentList()
+        argument = ArgumentCaptor.captor()
     }
 
     @Test

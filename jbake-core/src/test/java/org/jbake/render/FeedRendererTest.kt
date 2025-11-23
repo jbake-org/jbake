@@ -90,9 +90,8 @@ class FeedRendererTest {
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        //Mockito.doThrow(Exception()).`when`(mockRenderer).renderFeed(ArgumentMatchers.anyString())
-        Mockito.`when`(mockRenderer.renderFeed(ArgumentMatchers.anyString()))
-            .thenThrow(Exception())
+        Mockito.doThrow(Exception()).`when`(mockRenderer).renderFeed(ArgumentMatchers.anyString())
+        //Mockito.`when`(mockRenderer.renderFeed(ArgumentMatchers.anyString())).thenThrow(Exception())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
