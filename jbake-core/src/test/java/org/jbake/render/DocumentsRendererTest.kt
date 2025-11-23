@@ -11,6 +11,7 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.mockito.*
 import java.util.function.Function
 import java.util.stream.Collectors
@@ -39,9 +40,9 @@ class DocumentsRendererTest {
 
     @Test
     fun shouldReturnZeroIfNothingHasRendered() {
-        Mockito.`when`(db!!.unrenderedContent).thenReturn(emptyTemplateModelList)
+        Mockito.`when`(db.unrenderedContent).thenReturn(emptyTemplateModelList)
 
-        val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
+        val renderResponse = documentsRenderer!!.render(renderer!!, db, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
     }
@@ -49,7 +50,6 @@ class DocumentsRendererTest {
     @Test
     fun shouldReturnCountOfProcessedDocuments() {
         // given:
-
         addDocumentType("customType")
 
         val templateModelList: DocumentList<DocumentModel> = DocumentList()
@@ -57,12 +57,11 @@ class DocumentsRendererTest {
         templateModelList.add(emptyDocument())
 
         // return given DocumentList for DocumentType 'custom type'
-        Mockito.`when`(db!!.unrenderedContent).thenReturn(templateModelList)
-        Mockito.`when`(db!!.getAllContent(ArgumentMatchers.any()))
-            .thenReturn(templateModelList)
+        Mockito.`when`(db.unrenderedContent).thenReturn(templateModelList)
+        Mockito.`when`(db.getAllContent(ArgumentMatchers.any())).thenReturn(templateModelList)
 
         // when:
-        val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
+        val renderResponse = documentsRenderer!!.render(renderer!!, db, configuration)
 
         // then:
         Assertions.assertThat(renderResponse).isEqualTo(2)
@@ -73,33 +72,30 @@ class DocumentsRendererTest {
         val fakeExceptionMessage = "fake exception"
 
         // expect
-        org.junit.jupiter.api.Assertions.assertThrows(
-            RenderingException::class.java, {
-                // given
-                addDocumentType("customType")
+        val executable: () -> Unit = {
+            // given
+            addDocumentType("customType")
 
-                val templateModelList: DocumentList<DocumentModel> = DocumentList()
-                val document = emptyDocument()
-                val document2 = emptyDocument()
-                templateModelList.add(document)
-                templateModelList.add(document2)
+            val templateModelList: DocumentList<DocumentModel> = DocumentList()
+            val document = emptyDocument()
+            val document2 = emptyDocument()
+            templateModelList.add(document)
+            templateModelList.add(document2)
 
-                // throw an exception for every call of renderer's render method
-                Mockito.doThrow(Exception(fakeExceptionMessage)).`when`(renderer).render(
-                    ArgumentMatchers.any(
-                        DocumentModel::class.java
-                    )
-                )
-                Mockito.`when`(db!!.unrenderedContent).thenReturn(templateModelList)
+            // throw an exception for every call of renderer's render method
+            Mockito.doThrow(Exception(fakeExceptionMessage))
+                .`when`(renderer)
+                .render(ArgumentMatchers.any(DocumentModel::class.java))
+            Mockito.`when`(db.unrenderedContent).thenReturn(templateModelList)
 
-                // when
-                val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
+            // when
+            val renderResponse = documentsRenderer.render(renderer, db, configuration)
 
-                // then
-                Assertions.assertThat(renderResponse).isEqualTo(2)
-            },
-            fakeExceptionMessage + "\n" + fakeExceptionMessage
-        )
+            // then
+            Assertions.assertThat(renderResponse).isEqualTo(2)
+        }
+
+        assertThrows(RenderingException::class.java, executable, fakeExceptionMessage + "\n" + fakeExceptionMessage)
     }
 
     @Test
@@ -142,12 +138,12 @@ class DocumentsRendererTest {
         postDocs.add(fourthDoc)
         postDocs.add(secondDoc)
 
-        Mockito.`when`(db!!.unrenderedContent).thenReturn(allDocs)
-        Mockito.`when`(db!!.getAllContent("page")).thenReturn(pageDocs)
-        Mockito.`when`(db!!.getAllContent("post")).thenReturn(postDocs)
+        Mockito.`when`(db.unrenderedContent).thenReturn(allDocs)
+        Mockito.`when`(db.getAllContent("page")).thenReturn(pageDocs)
+        Mockito.`when`(db.getAllContent("post")).thenReturn(postDocs)
 
         // when
-        val renderResponse = documentsRenderer!!.render(renderer!!, db!!, configuration)
+        val renderResponse = documentsRenderer!!.render(renderer!!, db, configuration)
 
         // then
         Mockito.verify(renderer, Mockito.times(7)).render(argument!!.capture()!!)

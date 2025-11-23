@@ -20,7 +20,8 @@ import java.io.File
 
 @RunWith(MockitoJUnitRunner::class)
 class RendererTest {
-    @Rule
+
+    @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
     private lateinit var config: DefaultJBakeConfiguration
     private lateinit var outputPath: File
