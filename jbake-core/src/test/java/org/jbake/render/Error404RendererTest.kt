@@ -92,7 +92,8 @@ class Error404RendererTest {
         val contentStore = Mockito.mock(ContentStore::class.java)
         val mockRenderer = Mockito.mock(Renderer::class.java)
 
-        Mockito.doThrow(Exception()).`when`(mockRenderer).renderError404(ArgumentMatchers.anyString())
+        /// TODO This is the correct way to mock and check.
+        Mockito.`when`(mockRenderer.renderError404(ArgumentMatchers.anyString())).thenThrow(Exception())
 
         renderer.render(mockRenderer, contentStore, configuration)
 

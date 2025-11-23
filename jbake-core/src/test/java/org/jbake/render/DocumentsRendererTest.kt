@@ -85,8 +85,8 @@ class DocumentsRendererTest {
 
             // throw an exception for every call of renderer's render method
             Mockito.doThrow(Exception(fakeExceptionMessage))
-                .`when`(renderer)
-                .render(ArgumentMatchers.any(DocumentModel::class.java))
+                .`when`(renderer.render(ArgumentMatchers.any(DocumentModel::class.java)))
+
             Mockito.`when`(db.unrenderedContent).thenReturn(templateModelList)
 
             // when
