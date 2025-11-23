@@ -150,8 +150,10 @@ class Oven {
 
         try {
             val start = Date().time
-            log.info("Baking has started...")
+            log.info("Baking has started at $start. Starting ContentStore...")
+
             contentStore.startup()
+
             updateDocTypesFromConfiguration()
             contentStore.updateSchema()
             contentStore.updateAndClearCacheIfNeeded(config.clearCache, config.templateFolder)

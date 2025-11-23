@@ -67,23 +67,28 @@ class ContentStore(private val type: String, private val name: String?) {
 
         orient.createIfNotExists(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
 
-        // Try to open as admin, if fails, create admin user and role, then retry
+        // Try to open with default admin credentials (OrientDB creates admin/admin by default in embedded mode)
         try {
             db = orient.open(name, "admin", "admin")
         }
+        // If admin/admin doesn't work, drop and recreate the database
         catch (e: Exception) {
-            // Open as root (OrientDB default superuser)
-            val rootUser = System.getProperty("orientdb.root.user", "root")
-            val rootPass = System.getProperty("orientdb.root.password", "root")
-            db = orient.open(name, rootUser, rootPass)
-            // Check if admin user exists
-            val result = db.query("SELECT FROM OUser WHERE name = 'admin'")
-            if (!result.hasNext()) {
-                db.command("INSERT INTO OUser SET name = 'admin', password = 'admin', status = 'ACTIVE'")
-                db.command("INSERT INTO ORole SET name = 'admin', mode = 0, rules = {}")
-                db.command("UPDATE OUser SET roles = (SELECT FROM ORole WHERE name = 'admin') WHERE name = 'admin'")
-            }
-            db.close()
+            logger.warn("Failed to open database with admin/admin, dropping and recreating: {}", e.message)
+            try {
+                if (orient.exists(name)) orient.drop(name)
+            } catch (dropEx: Exception) { logger.warn("Failed to drop database: {}", dropEx.message) }
+
+            // Close and recreate OrientDB instance to clear any cached state
+            try { orient.close() }
+            catch (closeEx: Exception) { logger.warn("Failed to close OrientDB instance: {}", closeEx.message) }
+
+            // Recreate OrientDB instance
+            orient = if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
+                OrientDB("$type:$name", OrientDBConfig.defaultConfig())
+            else
+                OrientDB("$type:", OrientDBConfig.defaultConfig())
+
+            orient.create(name, ODatabaseType.valueOf(type.uppercase(Locale.getDefault())))
             db = orient.open(name, "admin", "admin")
         }
         activateOnCurrentThread()
@@ -115,12 +120,12 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     fun close() {
-        if (db != null) {
+        if (::db.isInitialized) {
             activateOnCurrentThread()
             db.close()
         }
 
-        if (orient != null) {
+        if (::orient.isInitialized) {
             orient.close()
         }
         DBUtil.closeDataStore()
@@ -152,7 +157,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     private fun activateOnCurrentThread() {
-        if (db != null) {
+        if (::db.isInitialized) {
             db.activateOnCurrentThread()
         } else {
             println("db is null on activate")
