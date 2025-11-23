@@ -44,16 +44,28 @@ open class TemplateModel : BaseModel {
             put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber)
         }
 
-    var previousFilename: String
-        get() = get(ModelAttributes.PREVIOUS_FILENAME) as String? ?: ""
+    /**
+     * Previous page filename for pagination. Null when on the first page (no previous page exists).
+     */
+    var previousFilename: String?
+        get() = get(ModelAttributes.PREVIOUS_FILENAME) as String?
         set(previousFilename) {
-            put(ModelAttributes.PREVIOUS_FILENAME, previousFilename)
+            if (previousFilename != null)
+                put(ModelAttributes.PREVIOUS_FILENAME, previousFilename)
+            else
+                remove(ModelAttributes.PREVIOUS_FILENAME)
         }
 
-    var nextFileName: String
-        get() = get(ModelAttributes.NEXT_FILENAME) as String? ?: ""
+    /**
+     * Next page filename for pagination. Null when on the last page (no next page exists).
+     */
+    var nextFileName: String?
+        get() = get(ModelAttributes.NEXT_FILENAME) as String?
         set(nextFileName) {
-            put(ModelAttributes.NEXT_FILENAME, nextFileName)
+            if (nextFileName != null)
+                put(ModelAttributes.NEXT_FILENAME, nextFileName)
+            else
+                remove(ModelAttributes.NEXT_FILENAME)
         }
 
     var tag: String?

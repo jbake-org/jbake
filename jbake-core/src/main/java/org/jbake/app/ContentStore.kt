@@ -395,7 +395,7 @@ class ContentStore(private val type: String, private val name: String?) {
     }
 
     val isActive: Boolean
-        get() = db.isActiveOnCurrentThread
+        get() = ::db.isInitialized && db.isActiveOnCurrentThread
 
     fun addDocument(document: DocumentModel) {
         val element = db.newElement(Schema.DOCUMENTS)

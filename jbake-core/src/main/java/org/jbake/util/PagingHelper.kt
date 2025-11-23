@@ -8,19 +8,17 @@ class PagingHelper(private val totalDocuments: Long, private val postsPerPage: I
     val numberOfPages: Int
         get() = ceil((totalDocuments * 1.0) / (postsPerPage * 1.0)).toInt()
 
+    /** Returns the next page file name or null if there is no next page.  */
     @Throws(URISyntaxException::class)
-    fun getNextFileName(currentPageNumber: Int): String {
-        return if (currentPageNumber < this.numberOfPages) {
-            URI((currentPageNumber + 1).toString() + URI_SEPARATOR).toString()
-        } else {
-            ""
-        }
+    fun getNextFileName(currentPageNumber: Int): String? {
+        return if (currentPageNumber >= this.numberOfPages) null
+        else URI((currentPageNumber + 1).toString() + URI_SEPARATOR).toString()
     }
 
     @Throws(URISyntaxException::class)
-    fun getPreviousFileName(currentPageNumber: Int): String {
+    fun getPreviousFileName(currentPageNumber: Int): String? {
         return if (isFirstPage(currentPageNumber)) {
-            ""
+            null
         } else if (currentPageNumber == 2) {
             // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
             ""

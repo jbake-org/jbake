@@ -206,10 +206,8 @@ class Renderer {
 
                     db.setStart(pageStart)
                     model.currentPageNumber = page
-                    val previous = pagingHelper.getPreviousFileName(page)
-                    model.previousFilename = previous
-                    val nextFileName = pagingHelper.getNextFileName(page)
-                    model.nextFileName = nextFileName
+                    model.previousFilename = pagingHelper.getPreviousFileName(page)
+                    model.nextFileName = pagingHelper.getNextFileName(page)
 
                     val contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME)
 
@@ -426,8 +424,8 @@ class Renderer {
                 if (config.paginateIndex) {
                     model.numberOfPages = 0
                     model.currentPageNumber = 0
-                    model.previousFilename = ""
-                    model.nextFileName = ""
+                    model.previousFilename = null
+                    model.nextFileName = null
                 }
 
                 return model
