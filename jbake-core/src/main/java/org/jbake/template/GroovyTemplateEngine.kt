@@ -62,15 +62,17 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun wrap(model: TemplateModel): TemplateModel {
+
         return object : TemplateModel(model) {
+
             override fun get(key: String): Any? {
-                if ("include" == key) {
+                if ("include" == key)
                     return MethodClosure(this@GroovyTemplateEngine, "doInclude").curry(this)
-                }
-                try {
-                    return extractors.extractAndTransform(db, key, model, NoopAdapter())
+
+                return try {
+                    extractors.extractAndTransform(db, key, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
-                    return super.get(key)
+                    model[key] // super.get() which would recurse
                 }
             }
         }

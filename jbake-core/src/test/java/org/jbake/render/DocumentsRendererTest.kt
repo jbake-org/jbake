@@ -24,7 +24,7 @@ class DocumentsRendererTest {
     private lateinit var emptyTemplateModelList: DocumentList<DocumentModel>
 
     @Captor
-    private lateinit var argument: ArgumentCaptor<DocumentModel>
+    private var argument = ArgumentCaptor.captor<DocumentModel>()
 
     @Before
     fun setUp() {

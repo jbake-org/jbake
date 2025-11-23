@@ -68,12 +68,14 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun wrap(model: TemplateModel): TemplateModel {
+
         return object : TemplateModel(model) {
+
             override fun get(key: String): Any? {
-                try {
-                    return extractors.extractAndTransform(db, key, model, NoopAdapter())
+                return try {
+                    extractors.extractAndTransform(db, key, model, NoopAdapter())
                 } catch (e: NoModelExtractorException) {
-                    return super.get(key)
+                    model[key] // super.get() which would recurse
                 }
             }
         }

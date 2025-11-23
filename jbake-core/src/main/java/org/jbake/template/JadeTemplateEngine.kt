@@ -64,12 +64,13 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun wrap(model: TemplateModel): JadeModel {
+
         return object : JadeModel(model) {
             override fun get(key: String): Any? {
                 return try {
                     extractors.extractAndTransform(db, key, this, NoopAdapter())
                 } catch (_: NoModelExtractorException) {
-                    super.get(key)
+                    model[key]
                 }
             }
         }

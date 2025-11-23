@@ -20,7 +20,7 @@ abstract class LoggingTest {
     protected lateinit var mockAppender: Appender<ILoggingEvent>
 
     @Captor
-    protected lateinit var captorLoggingEvent: ArgumentCaptor<LoggingEvent>
+    protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent> = ArgumentCaptor.captor()
 
     protected lateinit var root: Logger
 
