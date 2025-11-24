@@ -30,9 +30,15 @@ class JadeTemplateEngine : AbstractTemplateEngine {
 
     @Deprecated("")
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath)
+        : super(config, db, destination, templatesPath) {
+        initJadeConfiguration()
+    }
 
     constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
+        initJadeConfiguration()
+    }
+
+    private fun initJadeConfiguration() {
         val loader: TemplateLoader =
             FileTemplateLoader(config.templateFolder.path + File.separatorChar, config.templateEncoding)
         jadeConfiguration.templateLoader = loader
@@ -65,10 +71,13 @@ class JadeTemplateEngine : AbstractTemplateEngine {
 
         return object : JadeModel(model) {
             override fun get(key: String): Any? {
+                // First check if it's in the JadeModel map itself (e.g., shared variables like formatter)
+                val value = super.get(key)
+                if (value != null) return value
+
                 return try {
                     extractors.extractAndTransform(db, key, this, NoopAdapter())
                 }
-                // super.get() which would recurse
                 catch (e: NoModelExtractorException) { model[key] }
             }
         }
