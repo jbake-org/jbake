@@ -15,122 +15,75 @@ interface JBakeConfiguration {
      */
     fun get(key: String): Any?
 
-    /**
-     * @return Output filename for archive file, is only used when [.getRenderArchive] is true
-     */
+    /** Output filename for archive file, is only used when [.getRenderArchive] is true. */
     val archiveFileName: String?
 
-    /**
-     * @return attributes to be set when processing input
-     */
+    /** attributes to be set when processing input. */
     val asciidoctorAttributes: MutableList<String>
 
-    /**
-     * Get an asciidoctor option by its key.
-     * @param optionKey an option key
-     */
+    /** Get an asciidoctor option by its key. */
     fun getAsciidoctorOption(optionKey: String): Any?
 
-    /**
-     * Get a list of asciidoctor options
-     */
+    /** Get a list of asciidoctor options. */
     val asciidoctorOptionKeys: MutableList<String>
 
-    /**
-     * @return the folder where assets are stored, they are copied directly in output folder and not processed
-     */
+    /** the folder where assets are stored, they are copied directly in output folder and not processed. */
     val assetFolder: File
 
-    /**
-     * @return name of folder for assets
-     */
+    /** name of folder for assets. */
     val assetFolderName: String?
 
-    /**
-     * @return Flag indicating if hidden asset resources should be ignored
-     */
+    /** Flag indicating if hidden asset resources should be ignored. */
     val assetIgnoreHidden: Boolean
 
-    /**
-     * @return Prefix to be used when exporting JBake properties to Asciidoctor
-     */
+    /** Prefix to be used when exporting JBake properties to Asciidoctor. */
     val attributesExportPrefixForAsciidoctor: String?
 
-    /**
-     * @return Timestamp that records when JBake build was made
-     */
+    /** Timestamp that records when JBake build was made. */
     val buildTimeStamp: String?
 
-    /**
-     * @return Flag indicating to flash the database cache
-     */
+    /** Flag indicating to flash the database cache. */
     val clearCache: Boolean
 
-    /**
-     * @return the content folder
-     */
+    /** the content folder. */
     val contentFolder: File
 
-    /**
-     * @return name of Folder where content (that's to say files to be transformed) resides in
-     */
+    /** name of Folder where content (that's to say files to be transformed) resides in. */
     val contentFolderName: String?
 
-    /**
-     * @return the data folder
-     */
+    /** the data folder. */
     val dataFolder: File
 
-    /**
-     * @return name of Folder where data files reside in
-     */
+    /** name of Folder where data files reside in. */
     val dataFolderName: String?
 
-    /**
-     * @return docType for data files
-     */
+    /** docType for data files. */
     val dataFileDocType: String
 
-    /**
-     * @return Folder to store database files in
-     */
+    /** Folder to store database files in. */
     val databasePath: String?
 
-    /**
-     * @return name to identify if database is kept in memory (memory) or persisted to disk (plocal)
-     */
+    /** name to identify if database is kept in memory (memory) or persisted to disk (plocal). */
     val databaseStore: String
 
-    /**
-     * @return How date is formated
-     */
+    /** How date is formated. */
     val dateFormat: String?
 
-    /**
-     * @return Default status to use (in order to avoid putting it in all files)
-     */
+    /** Default status to use (in order to avoid putting it in all files). */
     val defaultStatus: String?
 
-    /**
-     * @return Default type to use (in order to avoid putting it in all files)
-     */
+    /** Default type to use (in order to avoid putting it in all files). */
     val defaultType: String?
 
-    /**
-     * @return The destination folder to render and copy files to
-     */
+    /** The destination folder to render and copy files to. */
     var destinationFolder: File
 
     val documentTypes: MutableList<String>
 
-    /**
-     * @return Suffix used to identify draft files
-     */
+    /** Suffix used to identify draft files. */
     val draftSuffix: String?
 
-    /**
-     * @return Output filename for error404 file, is only used when [.getRenderError404] is true
-     */
+    /** Output filename for error404 file, is only used when [.getRenderError404] is true. */
     val error404FileName: String?
 
     /**
@@ -141,35 +94,23 @@ interface JBakeConfiguration {
      */
     fun getExampleProjectByType(templateType: String): String?
 
-    /**
-     * @return Flag indicating if JBake properties should be made available to Asciidoctor
-     */
+    /** Flag indicating if JBake properties should be made available to Asciidoctor. */
     val exportAsciidoctorAttributes: Boolean
 
-    /**
-     * @return Output filename for feed file, is only used when [.getRenderFeed] is true
-     */
+    /** Output filename for feed file, is only used when [.getRenderFeed] is true. */
     val feedFileName: String
 
 
-    /**
-     * @return String used to separate the header from the body
-     */
+    /** String used to separate the header from the body. */
     val headerSeparator: String?
 
-    /**
-     * @return Filename to use to ignore a directory in addition to ".jbakeignore"
-     */
+    /** Filename to use to ignore a directory in addition to ".jbakeignore". */
     val ignoreFileName: String?
 
-    /**
-     * @return Output filename for index, is only used when [.getRenderIndex] is true
-     */
+    /** Output filename for index, is only used when [.getRenderIndex] is true. */
     val indexFileName: String?
 
-    /**
-     * Get an iterator of available configuration keys
-     */
+    /** Get an iterator of available configuration keys. */
     val keys: MutableIterator<String>
 
     /**
@@ -178,148 +119,100 @@ interface JBakeConfiguration {
      */
     val markdownExtensions: MutableList<String>
 
-    /**
-     * @return file extension to be used for all output files
-     */
+    /** file extension to be used for all output files. */
     val outputExtension: String?
 
     fun getOutputExtensionByDocType(docType: String): String?
 
-    /**
-     * @return Flag indicating if there should be pagination when rendering index
-     */
+    /** Flag indicating if there should be pagination when rendering index. */
     val paginateIndex: Boolean
 
-    /**
-     * @return How many posts per page on index
-     */
+    /** How many posts per page on index. */
     val postsPerPage: Int
 
-    /**
-     * @return URI prefix for content that should be given extension-less output URI's
-     */
+    /** URI prefix for content that should be given extension-less output URI's. */
     val prefixForUriWithoutExtension: String?
 
-    /**
-     * @return Flag indicating if archive file should be generated
-     */
+    /** Flag indicating if archive file should be generated. */
     val renderArchive: Boolean
 
-    /**
-     * @return Encoding used when rendering files
-     */
+    /** Encoding used when rendering files. */
     val renderEncoding: String?
 
-    /**
-     * @return Output encoding for freemarker url escaping
-     */
+    /** Output encoding for freemarker url escaping. */
     val outputEncoding: String?
 
-    /**
-     * @return Flag indicating if error404 file should be generated
-     */
+    /** Flag indicating if error404 file should be generated. */
     val renderError404: Boolean
 
-    /**
-     * @return Flag indicating if feed file should be generated
-     */
+    /** Flag indicating if feed file should be generated. */
     val renderFeed: Boolean
 
-    /**
-     * @return Flag indicating if index file should be generated
-     */
+    /** Flag indicating if index file should be generated. */
     val renderIndex: Boolean
 
-    /**
-     * @return Flag indicating if sitemap file should be generated
-     */
+    /** Flag indicating if sitemap file should be generated. */
     val renderSiteMap: Boolean
 
-    /**
-     * @return Flag indicating if tag files should be generated
-     */
+    /** Flag indicating if tag files should be generated. */
     val renderTags: Boolean
 
-    /**
-     * @return Flag indicating if tag index file should be generated
-     */
+    /** Flag indicating if tag index file should be generated. */
     val renderTagsIndex: Boolean
 
-    /**
-     * @return Flag indicating if the tag value should be sanitized
-     */
+    /** Flag indicating if the tag value should be sanitized. */
     val sanitizeTag: Boolean
 
-    /**
-     * @return Port used when running Jetty server
-     */
+    /** Port used when running Jetty server. */
     val serverPort: Int
 
-    /**
-     * @return the host url of the site e.g. http://jbake.org
-     */
+    /** the host url of the site e.g. http://jbake.org. */
     val siteHost: String?
 
-    /**
-     * @return Sitemap template file name. Used only when [.getRenderSiteMap] is set to true
-     */
+    /** Sitemap template file name. Used only when [.getRenderSiteMap] is set to true. */
     val siteMapFileName: String?
 
     /**
-     * @return the source folder of the project
+     * the source folder of the project
      * /// TODO: This is nullable - see Main.kt around line 140.
      */
     val sourceFolder: File?
 
-    /**
-     * @return Tags output path, used only when [.getRenderTags] is true
-     */
+    /** Tags output path, used only when [.getRenderTags] is true. */
     val tagPathName: String?
 
-    /**
-     * @return Encoding to be used for template files
-     */
+    /** Encoding to be used for template files. */
     val templateEncoding: String?
 
     fun getTemplateByDocType(doctype: String): String?
 
     fun getTemplateFileByDocType(doctype: String): File?
 
-    /**
-     * @return the template folder
-     */
+    /** the template folder. */
     val templateFolder: File
 
-    /**
-     * @return name of folder where template files are looked for
-     */
+    /** name of folder where template files are looked for. */
     val templateFolderName: String?
 
-    /**
-     * @return Locale used for Thymeleaf template rendering
-     */
+    /** Locale used for Thymeleaf template rendering. */
     val thymeleafLocale: String?
 
-    /**
-     * @return Flag indicating if content matching prefix below should be given extension-less URI's
-     */
+    /** Flag indicating if content matching prefix below should be given extension-less URI's. */
     val uriWithoutExtension: Boolean
 
     /**
-     * @return Flag indicating if image paths should be prepended with [.getSiteHost] value - only has an effect if
+     * Flag indicating if image paths should be prepended with [.getSiteHost] value - only has an effect if
      * [.getImgPathUpdate] is set to true
      */
     val imgPathPrependHost: Boolean
 
     /**
-     * @return Flag indicating if image paths in content should be updated with absolute path (using URI value of content file),
+     * Flag indicating if image paths in content should be updated with absolute path (using URI value of content file),
      * see [.getImgPathUpdate] which allows you to control the absolute path used
      */
     val imgPathUpdate: Boolean
 
-    /**
-     * @return Version of JBake
-     */
+    /** Version of JBake. */
     val version: String?
 
     /**
@@ -331,7 +224,6 @@ interface JBakeConfiguration {
     fun setProperty(key: String, value: Any?)
 
     /**
-     *
      * @param type the documents type
      * @return the thymeleaf render mode ( defaults to [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE] )
      */
@@ -341,20 +233,13 @@ interface JBakeConfiguration {
 
     val serverHostname: String
 
-    /**
-     * @return Abbreviated hash of latest git commit
-     */
+    /** Abbreviated hash of latest git commit. */
     val abbreviatedGitHash: String?
 
-    /**
-     * @return Locale to set in the JVM
-     */
+    /** Locale to set in the JVM. */
     val jvmLocale: String?
 
-    /**
-     *
-     * @return TimeZone to use within Freemarker
-     */
+    /** TimeZone to use within Freemarker */
     val freemarkerTimeZone: TimeZone
 
     fun asHashMap(): MutableMap<String, Any>

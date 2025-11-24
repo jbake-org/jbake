@@ -27,7 +27,6 @@ class Oven {
 
     /**
      * @param source       Project source directory
-     *  The destination folder
      * @param isClearCache Should the cache be cleaned
      * @throws Exception if configuration is not loaded correctly
      */
