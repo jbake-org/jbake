@@ -216,21 +216,33 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${version.kotlin}</version>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
                 <executions>
-                    <execution><id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals></execution>
-                    <execution><id>kotlin-test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals></execution>
+                    <execution>
+                        <id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>${version.java}</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                <!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>kotlin-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals><goal>test-compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>${version.java}</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                                <!--<sourceDir>${project.basedir}/src/test/kotlin</sourceDir>-->
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
                 </executions>
                 <configuration>
                     <jvmTarget>${version.java}</jvmTarget>
-                    <sourceDirs>
-                        <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                        <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                        <sourceDir>${project.basedir}/src/test/java</sourceDir>
-                        <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                    </sourceDirs>
                 </configuration>
             </plugin>
 

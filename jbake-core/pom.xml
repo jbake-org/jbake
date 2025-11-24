@@ -41,6 +41,8 @@
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><optional>true</optional></dependency>
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><optional>true</optional></dependency>
         <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>2.0.17</version></dependency>
+
 
         <!-- Implementation Dependencies -->
         <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId></dependency>
@@ -87,7 +89,26 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version>
             </plugin>
+
+            <!-- Add kotlin-maven-plugin at module level so it compiles with module dependencies on classpath -->
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
+                <executions>
+                    <execution><id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals></execution>
+                    <execution><id>kotlin-test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals></execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${version.java}</jvmTarget>
+                    <sourceDirs>
+                        <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                        <!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
+                    </sourceDirs>
+                    <testSourceDirs>
+                        <testSourceDir>${project.basedir}/src/test/java</testSourceDir>
+                        <!--<testSourceDir>${project.basedir}/src/test/kotlin</testSourceDir>-->
+                    </testSourceDirs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
-
