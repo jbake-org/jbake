@@ -12,11 +12,10 @@ class DataFileUtil(private val db: ContentStore, private val defaultDocType: Str
         if (docs.isEmpty()) {
             log.warn("Unable to locate content for ref: {}", ref)
         } else {
-            if (docs.size == 1) {
-                result = docs[0] as MutableMap<String,  Any>
-            } else {
+            if (docs.size == 1)
+                result = docs[0] as MutableMap<String, Any>
+            else
                 log.warn("Located multiple hits for ref: {}", ref)
-            }
         }
         return result
     }

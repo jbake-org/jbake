@@ -11,9 +11,8 @@ class TagPostsExtractor : ModelExtractor<DocumentList<*>> {
 
         var tag: String? = null
         val templateModel = TemplateModel().apply { putAll(model) }
-        if (templateModel.tag != null) {
+        if (templateModel.tag != null)
             tag = templateModel.tag
-        }
         // fetch the tag posts from db
         return db.getPublishedPostsByTag(tag)
     }

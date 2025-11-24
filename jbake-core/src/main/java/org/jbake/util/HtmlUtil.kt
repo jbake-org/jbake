@@ -45,9 +45,8 @@ object HtmlUtil {
             uri = removeTrailingSlash(uri)
         }
 
-        if (uri.contains("/")) {
+        if (uri.contains("/"))
             uri = removeFilename(uri)
-        }
         return uri
     }
 
@@ -56,37 +55,24 @@ object HtmlUtil {
         var source = img.attr("src")
 
         // Now add the root path
-        if (!source.startsWith("http://") && !source.startsWith("https://")) {
-            if (isRelative(source)) {
-                source = uri + source.replaceFirst("\\./".toRegex(), "")
-            }
+        if (source.startsWith("http://") || source.startsWith("https://"))
+            return
 
-            if (prependSiteHost) {
-                if (!siteHost.endsWith("/") && isRelative(source)) {
-                    siteHost = "$siteHost/"
-                }
-                source = siteHost + source
-            }
+        if (isRelative(source))
+            source = uri + source.replaceFirst("\\./".toRegex(), "")
 
-            img.attr("src", source)
+        if (prependSiteHost) {
+            if (!siteHost.endsWith("/") && isRelative(source))
+                siteHost = "$siteHost/"
+            source = siteHost + source
         }
+
+        img.attr("src", source)
     }
 
-    private fun removeFilename(uri: String): String {
-        var uri = uri
-        uri = uri.take(uri.lastIndexOf('/') + 1)
-        return uri
-    }
+    private fun removeFilename(uri: String) = uri.take(uri.lastIndexOf('/') + 1)
 
-    private fun removeTrailingSlash(uri: String): String {
-        var uri = uri
-        if (uri.endsWith("/")) {
-            uri = uri.dropLast(1)
-        }
-        return uri
-    }
+    private fun removeTrailingSlash(uri: String) = uri.trimEnd('/')
 
-    private fun isRelative(source: String): Boolean {
-        return !source.startsWith("/")
-    }
+    private fun isRelative(source: String) = !source.startsWith("/")
 }

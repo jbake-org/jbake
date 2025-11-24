@@ -35,9 +35,8 @@ class RendererTest {
     @Before
     fun setup() {
         val sourcePath = TestUtils.testResourcesAsSourceFolder
-        if (!sourcePath.exists()) {
+        if (!sourcePath.exists())
             throw Exception("Cannot find base path for test!")
-        }
         outputPath = folder.newFolder("output")
         config = ConfigUtil().loadConfig(sourcePath) as DefaultJBakeConfiguration
         config.destinationFolder = (outputPath)
