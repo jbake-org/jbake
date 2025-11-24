@@ -11,7 +11,7 @@ import org.gradle.api.tasks.testing.Test
 class JavaCommonConventionPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply('java')
-        project.plugins.apply('jacoco')
+        //project.plugins.apply('jacoco')
         project.plugins.apply('checkstyle')
 
         project.repositories {
