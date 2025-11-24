@@ -76,35 +76,32 @@ class Crawler {
      * @param path Folder to start from
      */
     private fun crawl(path: File) {
-        val contents = path.listFiles(FileUtil.getFileFilter(config))
-        if (contents != null) {
-            Arrays.sort(contents)
-            for (sourceFile in contents) {
-                if (sourceFile.isFile()) {
-                    crawlFile(sourceFile)
-                } else if (sourceFile.isDirectory()) {
-                    crawl(sourceFile)
-                }
+        val contents = path.listFiles(FileUtil.getFileFilter(config)) ?: return
+
+        Arrays.sort(contents)
+        for (sourceFile in contents) {
+            when {
+                sourceFile.isFile -> crawlFile(sourceFile)
+                sourceFile.isDirectory -> crawl(sourceFile)
             }
         }
     }
 
     private fun crawlFile(sourceFile: File) {
-        val sb = StringBuilder()
-        sb.append("Processing [").append(sourceFile.path).append("]... ")
         val sha1 = buildHash(sourceFile)
         val uri = buildURI(sourceFile)
         val status = findDocumentStatus(uri, sha1)
-        if (status == DocumentStatus.UPDATED) {
-            sb.append(" : modified ")
-            db.deleteContent(uri)
-        } else if (status == DocumentStatus.IDENTICAL) {
-            sb.append(" : same ")
-        } else if (DocumentStatus.NEW == status) {
-            sb.append(" : new ")
+
+        val message = buildString {
+            append("Processing [").append(sourceFile.path).append("]... ")
+            when (status) {
+                DocumentStatus.UPDATED -> { append(" : modified "); db.deleteContent(uri) }
+                DocumentStatus.IDENTICAL -> append(" : same ")
+                DocumentStatus.NEW -> append(" : new ")
+            }
         }
 
-        logger.info("{}", sb)
+        logger.info("{}", message)
 
         if (status != DocumentStatus.IDENTICAL) {
             processSourceFile(sourceFile, sha1, uri)
@@ -117,77 +114,69 @@ class Crawler {
      * @param path Folder to start from
      */
     private fun crawlDataFiles(path: File) {
-        val contents = path.listFiles(FileUtil.dataFileFilter)
-        if (contents != null) {
-            Arrays.sort(contents)
-            for (sourceFile in contents) {
-                if (sourceFile.isFile()) {
-                    val sb = StringBuilder()
-                    sb.append("Processing [").append(sourceFile.path).append("]... ")
-                    val sha1 = buildHash(sourceFile)
-                    val uri = buildDataFileURI(sourceFile)
-                    val docType = config.dataFileDocType
-                    val status = findDocumentStatus(uri, sha1)
+        val contents = path.listFiles(FileUtil.dataFileFilter) ?: return
 
-                    when (status) {
-                        DocumentStatus.UPDATED -> {
-                            sb.append(" : modified ")
-                            db.deleteContent(uri)
-                        }
-                        DocumentStatus.IDENTICAL -> {
-                            sb.append(" : same ")
-                            logger.info("{}", sb)
-                            continue
-                        }
-                        DocumentStatus.NEW -> {
-                            sb.append(" : new ")
-                        }
+        Arrays.sort(contents)
+        for (sourceFile in contents) {
+            if (sourceFile.isFile) {
+                val sb = StringBuilder()
+                sb.append("Processing [").append(sourceFile.path).append("]... ")
+                val sha1 = buildHash(sourceFile)
+                val uri = buildDataFileURI(sourceFile)
+                val docType = config.dataFileDocType
+                val status = findDocumentStatus(uri, sha1)
+
+                when (status) {
+                    DocumentStatus.UPDATED -> {
+                        sb.append(" : modified ")
+                        db.deleteContent(uri)
                     }
+                    DocumentStatus.IDENTICAL -> {
+                        sb.append(" : same ")
+                        logger.info("{}", sb)
+                        continue
+                    }
+                    DocumentStatus.NEW -> {
+                        sb.append(" : new ")
+                    }
+                }
 
-                    crawlDataFile(sourceFile, sha1, uri, docType)
-                    logger.info("{}", sb)
-                }
-                if (sourceFile.isDirectory()) {
-                    crawlDataFiles(sourceFile)
-                }
+                crawlDataFile(sourceFile, sha1, uri, docType)
+                logger.info("{}", sb)
+            }
+            if (sourceFile.isDirectory) {
+                crawlDataFiles(sourceFile)
             }
         }
     }
 
     private fun buildHash(sourceFile: File): String {
-        var sha1: String
-        try {
-            sha1 = FileUtil.sha1(sourceFile)
+        return try {
+            FileUtil.sha1(sourceFile)
         } catch (_: Exception) {
             logger.error("unable to build sha1 hash for source file '{}'", sourceFile)
-            sha1 = ""
+            ""
         }
-        return sha1
     }
 
     private fun buildURI(sourceFile: File): String {
-        var uri: String = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
+        val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
 
-        uri = if (useNoExtensionUri(uri)) {
+        val processedUri = if (useNoExtensionUri(uri)) {
             // convert URI from xxx.html to xxx/index.html
             createNoExtensionUri(uri)
-        } else createUri(uri)
-
-        // strip off leading / to enable generating non-root based sites
-        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1)
+        } else {
+            createUri(uri)
         }
 
-        return uri
+        // strip off leading / to enable generating non-root based sites
+        return processedUri.removePrefix(FileUtil.URI_SEPARATOR_CHAR)
     }
 
     private fun buildDataFileURI(sourceFile: File): String {
-        var uri: String = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.dataFolder), "")
+        val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.dataFolder), "")
         // strip off leading /
-        if (uri.startsWith(FileUtil.URI_SEPARATOR_CHAR)) {
-            uri = uri.substring(1, uri.length)
-        }
-        return uri
+        return uri.removePrefix(FileUtil.URI_SEPARATOR_CHAR)
     }
 
     // TODO: Refactor - parametrize the following two methods into one.
@@ -228,46 +217,46 @@ class Crawler {
 
     private fun crawlDataFile(sourceFile: File, sha1: String, uri: String, documentType: String) {
         try {
-            val document = parser.processFile(sourceFile)
-            if (document != null) {
-                document.sha1 = sha1
-                document.rendered = true
-                document.file = sourceFile.path
-                document.sourceUri = uri
-                document.type = documentType
-
-                db.addDocument(document)
-            } else {
+            val document = parser.processFile(sourceFile) ?: run {
                 logger.warn("{} couldn't be parsed so it has been ignored!", sourceFile)
+                return
             }
+
+            document.sha1 = sha1
+            document.rendered = true
+            document.file = sourceFile.path
+            document.sourceUri = uri
+            document.type = documentType
+
+            db.addDocument(document)
         } catch (ex: Exception) {
             throw RuntimeException("Failed crawling file: " + sourceFile.path + " " + ex.message, ex)
         }
     }
 
     private fun processSourceFile(sourceFile: File, sha1: String, uri: String) {
-        val document = parser.processFile(sourceFile)
-
-        if (document != null) {
-            if (DocumentTypes.contains(document.type)) {
-                addAdditionalDocumentAttributes(document, sourceFile, sha1, uri)
-
-                if (config.imgPathUpdate) {
-                    // Prevent image source url's from breaking
-                    HtmlUtil.fixImageSourceUrls(document, config)
-                }
-
-                db.addDocument(document)
-            } else {
-                logger.warn(
-                    "{} has an unknown document type '{}' and has been ignored!",
-                    sourceFile,
-                    document.type
-                )
-            }
-        } else {
+        val document = parser.processFile(sourceFile) ?: run {
             logger.warn("{} has an invalid header, it has been ignored!", sourceFile)
+            return
         }
+
+        if (!DocumentTypes.contains(document.type)) {
+            logger.warn(
+                "{} has an unknown document type '{}' and has been ignored!",
+                sourceFile,
+                document.type
+            )
+            return
+        }
+
+        addAdditionalDocumentAttributes(document, sourceFile, sha1, uri)
+
+        if (config.imgPathUpdate) {
+            // Prevent image source url's from breaking
+            HtmlUtil.fixImageSourceUrls(document, config)
+        }
+
+        db.addDocument(document)
     }
 
     private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String, uri: String) {

@@ -68,52 +68,44 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun wrap(model: TemplateModel): JadeModel {
-
         return object : JadeModel(model) {
             override fun get(key: String): Any? {
                 // First check if it's in the JadeModel map itself (e.g., shared variables like formatter)
-                val value = super.get(key)
-                if (value != null) return value
+                super.get(key)?.let { return it }
 
                 return try {
                     extractors.extractAndTransform(db, key, this, NoopAdapter())
+                } catch (e: NoModelExtractorException) {
+                    model[key]
                 }
-                catch (e: NoModelExtractorException) { model[key] }
             }
         }
     }
 
     class FormatHelper {
-        private val formatters: MutableMap<String, SimpleDateFormat> = HashMap<String, SimpleDateFormat>()
+        private val formatters: MutableMap<String, SimpleDateFormat> = HashMap()
 
         fun format(date: Date?, pattern: String?): String {
-            if (date == null || pattern == null)
-                return ""
+            if (date == null || pattern == null) return ""
 
-            var df = formatters[pattern]
-            if (df == null) {
-                df = SimpleDateFormat(pattern)
-                formatters[pattern] = df
-            }
-
-            return df.format(date)
+            return formatters.getOrPut(pattern) { SimpleDateFormat(pattern) }.format(date)
         }
 
         // Provide an HTML-escaping helper method accessible from Jade/JEXL as formatter.escape(...)
         fun escape(input: Any?): String {
             val s = input?.toString() ?: ""
-            val sb = StringBuilder(s.length)
-            for (ch in s) {
-                when (ch) {
-                    '&' -> sb.append("&amp;")
-                    '<' -> sb.append("&lt;")
-                    '>' -> sb.append("&gt;")
-                    '"' -> sb.append("&quot;")
-                    '\'' -> sb.append("&#39;")
-                    else -> sb.append(ch)
+            return buildString(s.length) {
+                s.forEach { ch ->
+                    when (ch) {
+                        '&' -> append("&amp;")
+                        '<' -> append("&lt;")
+                        '>' -> append("&gt;")
+                        '"' -> append("&quot;")
+                        '\'' -> append("&#39;")
+                        else -> append(ch)
+                    }
                 }
             }
-            return sb.toString()
         }
     }
 

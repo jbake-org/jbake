@@ -38,12 +38,7 @@ object HtmlUtil {
     }
 
     private fun getDocumentUri(fileContents: DocumentModel): String {
-        var uri = fileContents.uri
-
-        if (fileContents.noExtensionUri != null) {
-            uri = fileContents.noExtensionUri!!
-            uri = removeTrailingSlash(uri)
-        }
+        var uri = fileContents.noExtensionUri?.let { removeTrailingSlash(it) } ?: fileContents.uri
 
         if (uri.contains("/"))
             uri = removeFilename(uri)
@@ -51,20 +46,18 @@ object HtmlUtil {
     }
 
     private fun transformImageSource(img: Element, uri: String, siteHost: String, prependSiteHost: Boolean) {
-        var siteHost = siteHost
         var source = img.attr("src")
 
-        // Now add the root path
-        if (source.startsWith("http://") || source.startsWith("https://"))
-            return
+        // Early return for absolute URLs
+        if (source.startsWith("http://") || source.startsWith("https://")) return
 
-        if (isRelative(source))
+        if (isRelative(source)) {
             source = uri + source.replaceFirst("\\./".toRegex(), "")
+        }
 
         if (prependSiteHost) {
-            if (!siteHost.endsWith("/") && isRelative(source))
-                siteHost = "$siteHost/"
-            source = siteHost + source
+            val prefix = if (!siteHost.endsWith("/") && isRelative(source)) "$siteHost/" else siteHost
+            source = prefix + source
         }
 
         img.attr("src", source)

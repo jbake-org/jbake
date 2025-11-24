@@ -24,32 +24,31 @@ class ConfigUtil {
 
     @Throws(ConfigurationException::class)
     private fun load(source: File, propertiesFile: File?): CompositeConfiguration {
-        if (!source.exists()) {
+        if (!source.exists())
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
                 "The given source folder '" + source.absolutePath + "' does not exist."
             )
-        }
-        if (!source.isDirectory()) {
+        if (!source.isDirectory)
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "The given source folder is not a directory.")
-        }
 
         val legacyConfigFile = File(source, LEGACY_CONFIG_FILE)
         val customConfigFile = propertiesFile ?: File(source, CONFIG_FILE)
 
-        val config = CompositeConfiguration()
-        config.listDelimiterHandler = DefaultListDelimiterHandler(LIST_DELIMITER)
+        val config = CompositeConfiguration().apply {
+            listDelimiterHandler = DefaultListDelimiterHandler(LIST_DELIMITER)
+        }
 
         if (legacyConfigFile.exists()) {
             displayLegacyConfigFileWarningIfRequired()
             config.addConfiguration(getFileBasedPropertiesConfiguration(legacyConfigFile))
         }
-        if (customConfigFile.exists()) {
+        if (customConfigFile.exists())
             config.addConfiguration(getFileBasedPropertiesConfiguration(customConfigFile))
-        }
-        val defaultPropertiesLocation = this.javaClass.getClassLoader().getResource(DEFAULT_CONFIG_FILE)
-        if (defaultPropertiesLocation != null) {
-            config.addConfiguration(getFileBasedPropertiesConfiguration(defaultPropertiesLocation))
+
+        val defaultPropertiesLocation = this.javaClass.classLoader.getResource(DEFAULT_CONFIG_FILE)
+        defaultPropertiesLocation?.let {
+            config.addConfiguration(getFileBasedPropertiesConfiguration(it))
         }
 
         config.addConfiguration(SystemConfiguration())

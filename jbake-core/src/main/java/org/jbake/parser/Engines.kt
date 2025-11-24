@@ -34,13 +34,12 @@ import java.util.*
  * fit for embedding.
  */
 class Engines private constructor() {
-    private val parsers: MutableMap<String, ParserEngine?> = HashMap<String, ParserEngine?>()
+    private val parsers: MutableMap<String, ParserEngine?> = HashMap()
 
     private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {
         val old = parsers.put(fileExtension, markupEngine)
-        if (old != null) {
+        if (old != null)
             log.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old)
-        }
     }
 
     private fun getEngine(fileExtension: String): ParserEngine? {
@@ -116,17 +115,15 @@ class Engines private constructor() {
         }
 
         private fun registerEngine(className: String, vararg extensions: String) {
-            val engine: ParserEngine? = tryLoadEngine(className)
-            if (engine != null) {
-                for (extension in extensions) {
-                    if (extension != null) {
-                        register(extension, engine)
-                    }
-                }
-                if (engine is ErrorEngine) {
-                    log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
-                }
+            val engine = tryLoadEngine(className) ?: return
+
+            for (extension in extensions) {
+                if (extension != null)
+                    register(extension, engine)
             }
+
+            if (engine is ErrorEngine)
+                log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
         }
     }
 }

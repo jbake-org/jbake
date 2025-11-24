@@ -1,6 +1,7 @@
 package org.jbake.app
 
 import org.apache.commons.configuration2.CompositeConfiguration
+import org.eclipse.jetty.util.log.JettyLogHandler.config
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
@@ -117,9 +118,10 @@ class Renderer {
         }
 
         val outputFile = File(outputFilename + outputExtension)
-        val model = TemplateModel()
-        model.content = content
-        model.renderer = renderingEngine
+        val model = TemplateModel().apply {
+            this.content = content
+            this.renderer = renderingEngine
+        }
 
         try {
             createWriter(outputFile).use { out ->
@@ -175,42 +177,43 @@ class Renderer {
         if (totalPosts == 0L) {
             //paging makes no sense. render single index file instead
             renderIndex(indexFile)
-        } else {
-            val pagingHelper = PagingHelper(totalPosts, postsPerPage)
+            return
+        }
 
-            val model = TemplateModel()
-            model.renderer = renderingEngine
-            model.numberOfPages = pagingHelper.numberOfPages
+        val pagingHelper = PagingHelper(totalPosts, postsPerPage)
+        val model = TemplateModel().apply {
+            renderer = renderingEngine
+            numberOfPages = pagingHelper.numberOfPages
+        }
 
-            try {
-                db.setLimit(postsPerPage)
-                var pageStart = 0
-                var page = 1
-                while (pageStart < totalPosts) {
-                    var fileName = indexFile
+        try {
+            db.setLimit(postsPerPage)
+            var pageStart = 0
+            var page = 1
+            while (pageStart < totalPosts) {
+                var fileName = indexFile
 
-                    db.setStart(pageStart)
-                    model.currentPageNumber = page
-                    model.previousFilename = pagingHelper.getPreviousFileName(page)
-                    model.nextFileName = pagingHelper.getNextFileName(page)
+                db.setStart(pageStart)
+                model.currentPageNumber = page
+                model.previousFilename = pagingHelper.getPreviousFileName(page)
+                model.nextFileName = pagingHelper.getNextFileName(page)
 
-                    val contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME)
+                val contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME)
 
-                    if (page > 1)
-                        contentModel.rootPath = "../"
-                    model.content = contentModel
+                if (page > 1)
+                    contentModel.rootPath = "../"
+                model.content = contentModel
 
-                    // Add page number to file name
-                    fileName = pagingHelper.getCurrentFileName(page, fileName)
-                    val renderConfig = ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME)
-                    render(renderConfig)
-                    pageStart += postsPerPage
-                    page++
-                }
-                db.resetPagination()
-            } catch (e: Exception) {
-                throw Exception("Failed to render index. Cause: " + e.message, e)
+                // Add page number to file name
+                fileName = pagingHelper.getCurrentFileName(page, fileName)
+                val renderConfig = ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME)
+                render(renderConfig)
+                pageStart += postsPerPage
+                page++
             }
+            db.resetPagination()
+        } catch (e: Exception) {
+            throw Exception("Failed to render index. Cause: " + e.message, e)
         }
     }
     /**
@@ -269,14 +272,16 @@ class Renderer {
 
         for (tag in db.allTags) {
             try {
-                val model = TemplateModel()
-                model.renderer = renderingEngine
-                model.tag = tag
-                val map = buildSimpleModel(ModelAttributes.TAG)
                 val ext = config.outputExtension ?: ""
                 val path = File(config.destinationFolder, tagPath + fS + tag + ext)
-                map.rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
-                model.content = map
+                val map = buildSimpleModel(ModelAttributes.TAG).apply {
+                    rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
+                }
+                val model = TemplateModel().apply {
+                    renderer = renderingEngine
+                    this.tag = tag
+                    content = map
+                }
 
                 render(
                     ModelRenderingConfig(
@@ -298,30 +303,32 @@ class Renderer {
                 // Add an index file at root folder of tags.
                 // This will prevent directory listing and also provide an option to
                 // display all tags page.
-                val model = TemplateModel()
-                model.renderer = renderingEngine
                 val ext = config.outputExtension ?: ""
-                val map = buildSimpleModel(ModelAttributes.TAGS)
                 val path = File(config.destinationFolder, tagPath + fS + "index" + ext)
-                map.rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
-                model.content = map
-
+                val map = buildSimpleModel(ModelAttributes.TAGS).apply {
+                    rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
+                }
+                val model = TemplateModel().apply {
+                    renderer = renderingEngine
+                    content = map
+                }
 
                 render(ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")))
-                 renderedCount++
-             } catch (e: Exception) {
-                 errors.add(e)
-             }
-         }
+                renderedCount++
+            } catch (e: Exception) {
+                errors.add(e)
+            }
+        }
 
-         if (!errors.isEmpty()) {
-             val sb = StringBuilder()
-             sb.append("Failed to render tags. Cause(s):")
-             for (error in errors) {
-                 sb.append("\n").append(error.message)
-             }
-             throw Exception(sb.toString(), errors[0])
-         }
+        if (errors.isNotEmpty()) {
+            val message = buildString {
+                append("Failed to render tags. Cause(s):")
+                for (error in errors) {
+                    append("\n").append(error.message)
+                }
+            }
+            throw Exception(message, errors[0])
+        }
         return renderedCount
     }
 

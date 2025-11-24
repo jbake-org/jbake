@@ -103,7 +103,7 @@ class Oven {
      */
     private fun setLocale() {
         val localeString = this.utensils.configuration.jvmLocale
-        val locale = if (localeString != null) LocaleUtils.toLocale(localeString) else Locale.getDefault()
+        val locale = localeString?.let { LocaleUtils.toLocale(it) } ?: Locale.getDefault()
         Locale.setDefault(locale)
     }
 
@@ -117,10 +117,11 @@ class Oven {
         if (asset.isAssetFile(fileToBake)) {
             log.info("Baking a change to an asset [" + fileToBake.path + "]")
             asset.copySingleFile(fileToBake)
-        } else {
-            log.info("Playing it safe and running a full bake...")
-            bake()
+            return
         }
+
+        log.info("Playing it safe and running a full bake...")
+        bake()
     }
 
     /**

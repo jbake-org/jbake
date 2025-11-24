@@ -41,9 +41,8 @@ class ModelExtractors private constructor() {
 
     fun registerEngine(key: String, extractor: ModelExtractor<*>) {
         val old = extractors.put(key, extractor)
-        if (old != null) {
+        if (old != null)
             log.warn("Registered a model extractor for key [.{}] but another one was already defined: {}", key, old)
-        }
     }
 
     /**
@@ -86,11 +85,9 @@ class ModelExtractors private constructor() {
         map: MutableMap<String, Any>,
         adapter: TemplateEngineAdapter<Type>
     ): Type? {
-        if (extractors.containsKey(key)) {
-            val extractedValue = extractors[key]!!.get(db, map, key)
-            return adapter.adapt(key, extractedValue!!)
-        }
-        throw NoModelExtractorException("no model extractor for key \"$key\"")
+        val extractor = extractors[key] ?: throw NoModelExtractorException("no model extractor for key \"$key\"")
+        val extractedValue = extractor.get(db, map, key)
+        return adapter.adapt(key, extractedValue!!)
     }
 
     /**
@@ -133,15 +130,19 @@ class ModelExtractors private constructor() {
          * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
          */
         private fun tryLoadEngine(engineClassName: String?): ModelExtractor<*>? {
-            try {
+            return try {
                 val engineClass = Class.forName(engineClassName, false, ModelExtractors::class.java.getClassLoader())
                     as Class<out ModelExtractor<*>>
-                return engineClass.newInstance()
+                engineClass.newInstance()
+            } catch (e: Exception) {
+                when (e) {
+                    is ClassNotFoundException,
+                    is InstantiationException,
+                    is IllegalAccessException,
+                    is NoClassDefFoundError -> null /* a dependency of the engine may not be found on classpath */
+                    else -> throw e
+                }
             }
-            catch (e: ClassNotFoundException) { return null }
-            catch (e: InstantiationException) { return null }
-            catch (e: IllegalAccessException) { return null }
-            catch (e: NoClassDefFoundError) { /* a dependency of the engine may not be found on classpath */ return null }
         }
     }
 }

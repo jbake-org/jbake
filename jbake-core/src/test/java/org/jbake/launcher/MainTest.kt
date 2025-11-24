@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.nullable
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -37,16 +36,11 @@ private fun <T> any(type: Class<T>): T {
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <T> anyNullable(type: Class<T>): T {
-    nullable(type)
-    return null as T
-}
-
-@Suppress("UNCHECKED_CAST")
 private fun anyString(): String {
     ArgumentMatchers.anyString()
     return ""
 }
+
 
 @ExtendWith(MockitoExtension::class)
 internal class MainTest : LoggingTest() {
@@ -54,20 +48,11 @@ internal class MainTest : LoggingTest() {
     private val outputStreamCaptor = ByteArrayOutputStream()
     private lateinit var main: Main
 
-    @Mock
-    private lateinit var mockBaker: Baker
-
-    @Mock
-    private lateinit var mockJetty: JettyServer
-
-    @Mock
-    private lateinit var mockWatcher: BakeWatcher
-
-    @Mock
-    private lateinit var mockConfigUtil: ConfigUtil
-
-    @Mock
-    private lateinit var mockFactory: JBakeConfigurationFactory
+    @Mock private lateinit var mockBaker: Baker
+    @Mock private lateinit var mockJetty: JettyServer
+    @Mock private lateinit var mockWatcher: BakeWatcher
+    @Mock private lateinit var mockConfigUtil: ConfigUtil
+    @Mock private lateinit var mockFactory: JBakeConfigurationFactory
 
     private var workingdir: String? = null
 

@@ -68,22 +68,21 @@ class Asset {
      * @return true if the path provided points to a file in the asset folder.
      */
     fun isAssetFile(path: File): Boolean {
-        var isAsset = false
-
         try {
-            if (FileUtil.directoryOnlyIfNotIgnored(path.getParentFile(), config)) {
-                if (FileUtil.isFileInDirectory(path, config.assetFolder)) {
-                    isAsset = true
-                } else if (FileUtil.isFileInDirectory(path, config.contentFolder)
-                    && FileUtil.getNotContentFileFilter(config).accept(path)
-                ) {
-                    isAsset = true
-                }
-            }
+            if (!FileUtil.directoryOnlyIfNotIgnored(path.parentFile, config))
+                return false
+
+            if (FileUtil.isFileInDirectory(path, config.assetFolder))
+                return true
+
+            if (FileUtil.isFileInDirectory(path, config.contentFolder)
+                && FileUtil.getNotContentFileFilter(config).accept(path))
+                return true
+
         } catch (ioe: IOException) {
             log.error("Unable to determine the path to asset file {}", path.path, ioe)
         }
-        return isAsset
+        return false
     }
 
     /**

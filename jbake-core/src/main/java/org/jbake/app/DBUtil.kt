@@ -23,12 +23,8 @@ object DBUtil {
 
     @JvmStatic
     fun createDataStore(configuration: JBakeConfiguration): ContentStore {
-        if (contentStore == null) {
-            val storeType = configuration.databaseStore
-            contentStore = ContentStore(storeType, configuration.databasePath)
-        }
-
-        return contentStore!!
+        return contentStore ?: ContentStore(configuration.databaseStore, configuration.databasePath)
+            .also { contentStore = it }
     }
 
     fun closeDataStore() {
@@ -37,8 +33,7 @@ object DBUtil {
 
     fun documentToModel(doc: OResult): DocumentModel {
         val result = DocumentModel()
-
-        for (key in doc.propertyNames) {
+        doc.propertyNames.forEach { key ->
             result[key] = doc.getProperty(key)
         }
         return result
@@ -50,18 +45,10 @@ object DBUtil {
      * @param entry Entry input to be converted
      * @return input entry as String[]
      */
-    fun toStringArray(entry: Any): Array<String> {
-        when (entry) {
-            is Array<*> -> return entry as Array<String>
-            is OTrackedList<*> -> {
-                val list = entry as OTrackedList<String>
-                return list.toTypedArray<String>()
-            }
-            is ArrayList<*> -> {
-                val list = entry as ArrayList<String>
-                return list.toTypedArray<String>()
-            }
-            else -> return arrayOf()
-        }
+    fun toStringArray(entry: Any): Array<String> = when (entry) {
+        is Array<*> -> entry as Array<String>
+        is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray()
+        is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
+        else -> arrayOf()
     }
 }

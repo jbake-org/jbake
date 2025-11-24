@@ -77,10 +77,8 @@ object FileUtil {
      * @return true if file is directory and not ignored
      */
     fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
-
-        val ignoreFile = FilenameFilter { dir, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
-
-        return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
+        val ignoreFile = FilenameFilter { _, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
+        return file.isDirectory && file.listFiles(ignoreFile).isEmpty()
     }
 
     /**
@@ -91,10 +89,8 @@ object FileUtil {
      */
     @Deprecated("use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead")
     fun directoryOnlyIfNotIgnored(file: File): Boolean {
-
-        val ignoreFile = FilenameFilter { dir, name -> name.equals(".jbakeignore", ignoreCase = true) }
-
-        return file.isDirectory() && (file.listFiles(ignoreFile).size == 0)
+        val ignoreFile = FilenameFilter { _, name -> name.equals(".jbakeignore", ignoreCase = true) }
+        return file.isDirectory && file.listFiles(ignoreFile).isEmpty()
     }
 
     fun isExistingFolder(f: File): Boolean {
@@ -127,10 +123,8 @@ object FileUtil {
         }
 
     // TBD: Could be replaced with Kotlin extension function File.extension.
-    fun fileExt(src: File): String {
-        val name = src.getName()
-        return fileExt(name)
-    }
+    fun fileExt(src: File): String = fileExt(src.name)
+
     fun fileExt(name: String): String {
         val idx = name.lastIndexOf('.')
         return if (idx <= 0) "" else name.substring(idx + 1)
@@ -146,15 +140,9 @@ object FileUtil {
     fun sha1(sourceFile: File): String {
         val buffer = ByteArray(1024)
         val complete = MessageDigest.getInstance("SHA-1")
-        updateDigest(complete, sourceFile, buffer)
         val bytes = complete.digest()
 
-        // TBD: Could be replaced with: bytes.joinToString("") { "%02x".format(it) }
-        val sb = StringBuilder()
-        for (b in bytes) {
-            sb.append(String.format("%02x", b))
-        }
-        return sb.toString()
+        return bytes.joinToString("") { "%02x".format(it) }
     }
 
     @Throws(IOException::class)

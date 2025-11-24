@@ -85,24 +85,13 @@ class Main @JvmOverloads constructor(
             watcher.start(config)
 
             // TODO: Short term fix until bake, server, init commands no longer share underlying values (such as source/dest).
-            if (!launchOptions.isBake) {
-                // Use the default destination folder.
-                runServer(config.destinationFolder, config)
+            val serverPath = when {
+                !launchOptions.isBake -> config.destinationFolder // Use the default destination folder.
+                launchOptions.getDestination() != null -> launchOptions.getDestination() // Use the destination provided via the commandline.
+                launchOptions.getSource().path != "." -> launchOptions.getSource() // Use the source folder provided via the commandline.
+                else -> config.destinationFolder // Use the default DESTINATION_FOLDER value.
             }
-            else {
-                // Bake and server commands have been run together.
-                when {
-                    launchOptions.getDestination() != null ->
-                        // Use the destination provided via the commandline.
-                        runServer(launchOptions.getDestination(), config)
-                    launchOptions.getSource().path != "." ->
-                        // Use the source folder provided via the commandline.
-                        runServer(launchOptions.getSource(), config)
-                    else ->
-                        // Use the default DESTINATION_FOLDER value.
-                        runServer(config.destinationFolder, config)
-                }
-            }
+            runServer(serverPath, config)
         }
     }
 
@@ -124,8 +113,7 @@ class Main @JvmOverloads constructor(
         val init = Init(config)
         try {
             val templateFolder = FileUtil.runningLocation
-            val outputFolder = if (config.sourceFolder != null) config.sourceFolder!!
-                else File(".")
+            val outputFolder = config.sourceFolder ?: File(".")
 
             init.run(outputFolder, templateFolder, type)
             println("Base folder structure successfully created.")
@@ -143,8 +131,6 @@ class Main @JvmOverloads constructor(
 
         /**
          * Runs the app with the given arguments.
-         *
-         * @param args Application arguments
          */
         @JvmStatic
         fun main(args: Array<String>) {
@@ -153,9 +139,7 @@ class Main @JvmOverloads constructor(
             } catch (e: JBakeException) {
                 logger.error(e.message)
                 logger.trace(e.message, e)
-                if (e.cause is CommandLine.MissingParameterException) {
-                    printUsage()
-                }
+                if (e.cause is CommandLine.MissingParameterException) printUsage()
                 exitProcess(e.getExit())
             }
         }
