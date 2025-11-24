@@ -98,6 +98,23 @@ class JadeTemplateEngine : AbstractTemplateEngine {
 
             return df.format(date)
         }
+
+        // Provide an HTML-escaping helper method accessible from Jade/JEXL as formatter.escape(...)
+        fun escape(input: Any?): String {
+            val s = input?.toString() ?: ""
+            val sb = StringBuilder(s.length)
+            for (ch in s) {
+                when (ch) {
+                    '&' -> sb.append("&amp;")
+                    '<' -> sb.append("&lt;")
+                    '>' -> sb.append("&gt;")
+                    '"' -> sb.append("&quot;")
+                    '\'' -> sb.append("&#39;")
+                    else -> sb.append(ch)
+                }
+            }
+            return sb.toString()
+        }
     }
 
     companion object {
