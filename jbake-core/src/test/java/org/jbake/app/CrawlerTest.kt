@@ -3,9 +3,6 @@ package org.jbake.app
 import com.orientechnologies.orient.core.db.record.OTrackedMap
 import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.BaseMatcher
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Description
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.ModelAttributes
@@ -83,16 +80,9 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         for (model in documents) {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.file) + "/"
 
-            assertThat<String>(model.noExtensionUri, RegexMatcher(noExtensionUri))
-            assertThat(model.uri, RegexMatcher(noExtensionUri + "index\\.html"))
-            assertThat(model.rootPath, CoreMatchers.`is`("../../../"))
-        }
-    }
-
-    private class RegexMatcher(private val regex: String) : BaseMatcher<Any>() {
-        override fun matches(o: Any) = (o as String).matches(regex.toRegex())
-        override fun describeTo(description: Description) {
-            description.appendText("matches regex: $regex")
+            assertThat(model.noExtensionUri).matches(noExtensionUri)
+            assertThat(model.uri).matches(noExtensionUri + "index\\.html")
+            assertThat(model.rootPath).isEqualTo("../../../")
         }
     }
 }
