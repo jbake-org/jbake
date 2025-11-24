@@ -1,7 +1,6 @@
 package org.jbake.app
 
 import org.apache.commons.configuration2.CompositeConfiguration
-import org.eclipse.jetty.util.log.JettyLogHandler.config
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
@@ -86,6 +85,28 @@ class Renderer {
 
     private fun findTemplateName(docType: String): String {
         return config.getTemplateByDocType(docType)!!
+    }
+
+    /**
+     * Render using the new type-safe RenderContext.
+     * This is the preferred method for new code.
+     *
+     * @param context The rendering context
+     * @param outputFile The output file
+     * @param templateName The template to use
+     */
+    fun renderWithContext(context: org.jbake.template.model.RenderContext, outputFile: File, templateName: String) {
+        try {
+            createWriter(outputFile).use { out ->
+                // For now, convert to legacy model for compatibility
+                val legacyModel = TemplateModel.fromContext(context)
+                renderingEngine.renderDocument(legacyModel, templateName, out)
+            }
+            logger.info("Rendering [{}]... done!", outputFile)
+        } catch (e: Exception) {
+            logger.error("Rendering [{}]... failed!", outputFile, e)
+            throw Exception("Failed to render file " + outputFile.absolutePath + ". Cause: " + e.message, e)
+        }
     }
 
     /**

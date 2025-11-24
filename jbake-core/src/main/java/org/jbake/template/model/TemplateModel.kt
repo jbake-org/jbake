@@ -94,4 +94,47 @@ open class TemplateModel : BaseModel {
 
     val writer: Writer?
         get() = get(ModelAttributes.OUT) as Writer?
+
+    companion object {
+
+        /** Create TemplateModel from a type-safe RenderContext. This is the new preferred way to create template models. */
+        fun fromContext(context: RenderContext) = TemplateModel().apply { putAll(context.toLegacyMap()) }
+
+        /**
+         * Convert TemplateModel to RenderContext.
+         * This allows gradual migration to the new architecture.
+         */
+        fun toContext(model: TemplateModel, db: org.jbake.app.ContentStore): RenderContext {
+            val config = model.config
+            val configObj = if (config.containsKey("config") && config["config"] is org.jbake.app.configuration.JBakeConfiguration) {
+                config["config"] as org.jbake.app.configuration.JBakeConfiguration
+            } else {
+                // Fallback - this shouldn't happen but handle gracefully
+                throw IllegalStateException("Configuration not found in template model")
+            }
+
+            val content = if (!model.containsKey(ModelAttributes.CONTENT)) null else model.content
+
+            val renderer = model.renderer
+
+            val pagination =
+                if (!model.containsKey(ModelAttributes.NUMBER_OF_PAGES)) null
+                else PaginationContext(
+                    currentPage = model.currentPageNumber,
+                    totalPages = model.numberOfPages,
+                    previousFilename = model.previousFilename,
+                    nextFilename = model.nextFileName
+                )
+
+            val tag =
+                if (!model.containsKey(ModelAttributes.TAG)) null
+                else TagContext(
+                    name = model.tag ?: "",
+                    taggedPosts = model.taggedPosts,
+                    taggedDocuments = model.taggedDocuments
+                )
+
+            return RenderContext(configObj, db, content, renderer, pagination, tag, model.version)
+        }
+    }
 }
