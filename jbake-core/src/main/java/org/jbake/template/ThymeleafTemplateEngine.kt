@@ -1,7 +1,7 @@
 package org.jbake.template
 
 import org.apache.commons.configuration2.CompositeConfiguration
-import org.apache.commons.lang.LocaleUtils
+import org.apache.commons.lang3.LocaleUtils
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
