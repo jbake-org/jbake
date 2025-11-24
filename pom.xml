@@ -12,12 +12,7 @@
     <url>http://jbake.org</url>
     <inceptionYear>2012</inceptionYear>
 
-    <licenses>
-        <license>
-            <name>The MIT License (MIT)</name>
-            <url>http://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
+    <licenses><license><name>The MIT License (MIT)</name><url>http://opensource.org/licenses/MIT</url></license></licenses>
 
     <scm>
         <url>https://github.com/jbake-org/jbake/</url>
@@ -59,8 +54,9 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <version.java>1.8</version.java>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -220,7 +216,7 @@
                     <execution><id>kotlin-test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals></execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>1.8</jvmTarget>
+                    <jvmTarget>${version.java}</jvmTarget>
                     <sourceDirs>
                         <sourceDir>${project.basedir}/src/main/java</sourceDir>
                         <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
@@ -237,7 +233,7 @@
                     <execution><id>testCompile-after-kotlin</id><phase>test-compile</phase><goals><goal>testCompile</goal></goals></execution>
                 </executions>
                 <configuration>
-                    <source>1.8</source>
+                    <source>${version.java}</source>
                     <excludes><exclude>**/*.kt</exclude></excludes>
                 </configuration>
             </plugin>
@@ -247,26 +243,19 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version><executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals><goal>sign</goal></goals>
-                    </execution>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version>
+                <executions>
+                    <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
                 </executions>
                 <configuration>
-                    <gpgArguments>
-                        <arg>--pinentry-mode</arg>
-                        <arg>loopback</arg>
-                    </gpgArguments>
+                    <gpgArguments><arg>--pinentry-mode</arg><arg>loopback</arg></gpgArguments>
                 </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><version>3.6.2</version><executions>
                     <execution>
-                        <id>enforce-maven</id>
-                        <goals><goal>enforce</goal></goals>
+                        <id>enforce-maven</id><goals><goal>enforce</goal></goals>
                         <configuration>
                             <rules>
                                 <requireMavenVersion><version>3.9.9</version></requireMavenVersion>
@@ -280,14 +269,8 @@
     </build>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
+        <snapshotRepository><id>ossrh</id><url>https://s01.oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
+        <repository><id>ossrh</id><url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url></repository>
     </distributionManagement>
 
     <profiles>
