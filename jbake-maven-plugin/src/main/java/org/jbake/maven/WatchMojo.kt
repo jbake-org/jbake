@@ -19,10 +19,7 @@ open class WatchMojo : GenerateMojo() {
 
         var lastProcessed = System.currentTimeMillis()
 
-        log.info(
-            "Now listening for changes on path " + inputDirectory!!.path
-        )
-
+        log.info("Now listening for changes on path " + inputDirectory!!.path)
         initServer()
 
         var dirWatcher: DirWatcher? = null
@@ -30,28 +27,23 @@ open class WatchMojo : GenerateMojo() {
         try {
             dirWatcher = DirWatcher(inputDirectory!!)
             val done = AtomicBoolean(false)
-            val reader = BufferedReader(
-                InputStreamReader(System.`in`)
-            )
+            val reader = BufferedReader(InputStreamReader(System.`in`))
 
             (object : Thread() {
                 override fun run() {
                     try {
-                        log
-                            .info("Running. Enter a blank line to finish. Anything else forces re-rendering.")
+                        log.info("Running. Enter a blank line to finish. Anything else forces re-rendering.")
 
                         while (true) {
                             val line = reader.readLine()
-
-                            if (StringUtils.isBlank(line)) {
-                                break
-                            }
-
+                            if (StringUtils.isBlank(line)) break
                             reRender()
                         }
-                    } catch (exc: Exception) {
+                    }
+                    catch (exc: Exception) {
                         log.info("Ooops", exc)
-                    } finally {
+                    }
+                    finally {
                         done.set(true)
                     }
                 }
@@ -62,34 +54,27 @@ open class WatchMojo : GenerateMojo() {
             do {
                 val result = dirWatcher.processEvents()
 
-                if (null == result) {
-                    // Do nothing on purpose.
-                } else if (result >= lastProcessed) {
+                if (null != result && result >= lastProcessed) {
                     log.info("Refreshing")
-
                     super.reRender()
-
                     lastProcessed = System.currentTimeMillis()
                 }
             } while (!done.get())
-        } catch (exc: Exception) {
+        }
+        catch (exc: Exception) {
             log.info("Oops", exc)
-
             throw MojoExecutionException("Oops", exc)
-        } finally {
+        }
+        finally {
             log.info("Finishing")
-
             dirWatcher?.stop()
-
             stopServer()
         }
     }
 
     @Throws(MojoExecutionException::class)
-    protected open fun stopServer() {
-    }
+    protected open fun stopServer() {}
 
     @Throws(MojoExecutionException::class)
-    protected open fun initServer() {
-    }
+    protected open fun initServer() {}
 }

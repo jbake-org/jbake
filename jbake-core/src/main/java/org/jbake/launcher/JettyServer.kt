@@ -58,13 +58,7 @@ class JettyServer : Closeable {
             handlers.handlers = arrayOf<Handler>(contextHandler, DefaultHandler())
             server!!.handler = handlers
 
-            log.info(
-                "Serving out contents of: [{}] on http://{}:{}{}",
-                resourceBase,
-                hostname,
-                port,
-                contextHandler.contextPath
-            )
+            log.info("Serving out contents of: [{}] on http://{}:{}{}", resourceBase, hostname, port, contextHandler.contextPath)
             log.info("(To stop server hit CTRL-C)")
 
             server!!.start()
@@ -88,7 +82,5 @@ class JettyServer : Closeable {
         }
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(JettyServer::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(JettyServer::class.java)
 }
