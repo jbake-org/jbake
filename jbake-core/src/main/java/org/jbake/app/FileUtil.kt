@@ -16,11 +16,7 @@ import java.security.MessageDigest
 object FileUtil {
     const val URI_SEPARATOR_CHAR: String = "/"
 
-    /**
-     * Filters files based on their file extension.
-     *
-     * @param config the jbake configuration
-     */
+    /** Filters files based on their file extension. */
     fun getFileFilter(config: JBakeConfiguration): FileFilter {
         return FileFilter { pathname ->
             // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
@@ -44,10 +40,8 @@ object FileUtil {
                 || directoryOnlyIfNotIgnored(pathname)
         }
 
+    /** Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension). */
     val dataFileFilter: FileFilter
-        /**
-         * Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension)
-         */
         get() = FileFilter { pathname ->
             "yaml".equals(
                 fileExt(pathname),
@@ -55,11 +49,7 @@ object FileUtil {
             ) || "yml".equals(fileExt(pathname), ignoreCase = true)
         }
 
-    /**
-     * Gets the list of files that are not content files based on their extension.
-     *
-     * @param config the jbake configuration
-     */
+    /** Gets the list of files that are not content files based on their extension. */
     fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
         return FileFilter { pathname ->
             //Accept if input  is a non-hidden file with NOT-registered extension
@@ -71,12 +61,8 @@ object FileUtil {
     }
 
     @get:Deprecated("use {@link #getNotContentFileFilter(JBakeConfiguration)} instead")
+    /** Gets the list of files that are not content files based on their extension. */
     val notContentFileFilter: FileFilter
-        /**
-         * Gets the list of files that are not content files based on their extension.
-         *
-         * @return FileFilter object
-         */
         get() = FileFilter { pathname ->
             // Accept if input is a non-hidden file with NOT-registered extension, or if a non-hidden and not-ignored directory.
             (!pathname.isHidden() && (pathname.isFile() // Extension should not be from registered content extensions.
@@ -143,11 +129,11 @@ object FileUtil {
             return codeFolder
         }
 
+    // TBD: Could be replaced with Kotlin extension function File.extension.
     fun fileExt(src: File): String {
         val name = src.getName()
         return fileExt(name)
     }
-
     fun fileExt(name: String): String {
         val idx = name.lastIndexOf('.')
         return if (idx <= 0) "" else name.substring(idx + 1)
@@ -165,6 +151,8 @@ object FileUtil {
         val complete = MessageDigest.getInstance("SHA-1")
         updateDigest(complete, sourceFile, buffer)
         val bytes = complete.digest()
+
+        // TBD: Could be replaced with: bytes.joinToString("") { "%02x".format(it) }
         val sb = StringBuilder()
         for (b in bytes) {
             sb.append(String.format("%02x", b))
@@ -203,7 +191,6 @@ object FileUtil {
      */
     fun asPath(file: File): String {
         // If (file == null) return null.
-
         return asPath(file.path)
     }
 

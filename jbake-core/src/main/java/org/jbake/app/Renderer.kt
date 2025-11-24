@@ -46,7 +46,7 @@ class Renderer {
         configuration.templateFolder = templatesPath
     }
 
-    // TOqDO: should all content be made available to all templates via this class??
+    // TODO: Should all content be made available to all templates via this class?
     /**
      * @param db              The database holding the content
      * @param destination     The destination folder

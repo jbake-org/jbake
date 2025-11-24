@@ -17,7 +17,7 @@ class TaggedDocumentsExtractor : ModelExtractor<DocumentList<*>> {
 */
         val tag = model["tag"] as? String
 
-        // fetch the tagged documents from db
+        // Fetch the tagged documents from the database.
         return db.getPublishedDocumentsByTag(tag)
     }
 }

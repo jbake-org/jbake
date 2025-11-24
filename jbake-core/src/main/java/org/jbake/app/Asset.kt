@@ -37,11 +37,7 @@ class Asset {
         this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config)
     }
 
-    /**
-     * Creates an instance of Asset.
-     *
-     * @param config The project configuration. @see{[JBakeConfiguration]}
-     */
+    /** Creates an instance of Asset. */
     constructor(config: JBakeConfiguration) {
         this.config = config
     }
@@ -60,11 +56,7 @@ class Asset {
         copy(path, config.destinationFolder, filter)
     }
 
-    /**
-     * Copy one asset file at a time.
-     *
-     * @param asset The asset file to copy
-     */
+    /** Copy one asset file at a time. */
     fun copySingleFile(asset: File) {
         try {
             if (!asset.isDirectory()) {
