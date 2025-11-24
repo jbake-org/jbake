@@ -35,9 +35,7 @@ class Asset {
     }
 
     /** Copy all files from assets folder to destination folder read from configuration */
-    fun copy() {
-        copy(config.assetFolder)
-    }
+    fun copy() = copy(config.assetFolder)
 
     /** Copy all files from assets folder to destination folder read from configuration */
     fun copy(startingPath: File) {
@@ -50,15 +48,15 @@ class Asset {
 
     /** Copy one asset file at a time. */
     fun copySingleFile(asset: File) {
+        if (asset.isDirectory()) {
+            log.info("Skip copying single asset file [{}]. Is a directory.", asset.path)
+            return
+        }
+
         try {
-            if (!asset.isDirectory()) {
-                val targetPath =
-                    (config.destinationFolder.getCanonicalPath() + File.separatorChar) + assetSubPath(asset)
-                log.info("Copying single asset file to [{}]", targetPath)
-                copyFile(asset, File(targetPath))
-            } else {
-                log.info("Skip copying single asset file [{}]. Is a directory.", asset.path)
-            }
+            val targetPath = (config.destinationFolder.getCanonicalPath() + File.separatorChar) + assetSubPath(asset)
+            log.info("Copying single asset file to [{}]", targetPath)
+            copyFile(asset, File(targetPath))
         } catch (io: IOException) {
             log.error("Failed to copy the asset file.", io)
         }
