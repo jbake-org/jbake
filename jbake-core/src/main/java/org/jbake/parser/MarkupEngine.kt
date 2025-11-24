@@ -194,44 +194,32 @@ abstract class MarkupEngine : ParserEngine {
             return false
 
         // Get every line above header separator.
-        val subContents = contents.subList(0, index)
-
-        /*for (line in subContents) {
-            // header should only contain empty lines or lines with '=' in
-            if (!line.contains("=") && !line.isEmpty())
-                return false
-        }
-        return true*/
-        return subContents.all { it.contains("=") || it.isEmpty() }
+        return contents.subList(0, index).all { it.contains("=") || it.isEmpty() }
     }
 
-    private fun hasHeaderSeparator(line: String): Boolean {
-        return sanitize(line) == configuration!!.headerSeparator
-    }
+    private fun hasHeaderSeparator(line: String)
+        = sanitize(line) == configuration!!.headerSeparator
 
-    private fun isStatusProperty(line: String): Boolean {
-        return sanitize(line).startsWith("status=")
-    }
+    private fun isStatusProperty(line: String)
+        = sanitize(line).startsWith("status=")
 
-    private fun isTypeProperty(line: String): Boolean {
-        return sanitize(line).startsWith("type=")
-    }
+    private fun isTypeProperty(line: String)
+        = sanitize(line).startsWith("type=")
 
     /** Process the header of the file. */
     private fun processDefaultHeader(context: ParserContext) {
-        if (context.hasHeader()) {
-            for (line in context.fileLines) {
-                if (hasHeaderSeparator(line)) break
-                processHeaderLine(line, context.documentModel)
-            }
+        if (!context.hasHeader()) return
+
+        for (line in context.fileLines) {
+            if (hasHeaderSeparator(line)) break
+            processHeaderLine(line, context.documentModel)
         }
     }
 
     private fun processHeaderLine(line: String, content: DocumentModel) {
-        val parts: Array<String> = line.split("=".toRegex(), limit = 2).toTypedArray()
-        if (!line.isEmpty() && parts.size == 2) {
+        val parts = line.split("=".toRegex(), limit = 2).toTypedArray()
+        if (!line.isEmpty() && parts.size == 2)
             storeHeaderValue(parts[0], parts[1], content)
-        }
     }
 
     fun storeHeaderValue(inputKey: String, inputValue: String, content: DocumentModel) {
@@ -242,16 +230,12 @@ abstract class MarkupEngine : ParserEngine {
             key.equals(ModelAttributes.DATE, ignoreCase = true) -> {
                 val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
                 try {
-                    val date = df.parse(value)
-                    content.date = (date)
-                } catch (e: ParseException) {
-                    log.error("unable to parse date {}", value)
+                    content.date = (df.parse(value))
                 }
+                catch (e: ParseException) { log.error("unable to parse date {}", value) }
             }
-            key.equals(ModelAttributes.TAGS, ignoreCase = true) ->
-                content.tags = (getTags(value))
-            key.equals(ModelAttributes.CACHED, ignoreCase = true) ->
-                content.cached = (value.toBoolean())
+            key.equals(ModelAttributes.TAGS, ignoreCase = true) -> content.tags = (getTags(value))
+            key.equals(ModelAttributes.CACHED, ignoreCase = true) -> content.cached = (value.toBoolean())
             isJson(value) ->
                 content[key] = JSONValue.parse(value)
             else ->
@@ -270,19 +254,14 @@ abstract class MarkupEngine : ParserEngine {
 
     /** Process the body of the file. */
     private fun processDefaultBody(context: ParserContext) {
-        val body = StringBuilder()
-        var inBody = false
-        for (line in context.fileLines) {
-            if (inBody) body.append(line).append("\n")
-            if (line == configuration!!.headerSeparator) inBody = true
-        }
+        val headerSeparator = configuration!!.headerSeparator
+        val body = context.fileLines
+            .dropWhile { it != headerSeparator }
+            .drop(1) // Skip the separator itself
+            .joinToString("\n")
+            .ifEmpty { context.fileLines.joinToString("\n") }
 
-        if (body.isEmpty()) {
-            for (line in context.fileLines) {
-                body.append(line).append("\n")
-            }
-        }
-        context.body = body.toString()
+        context.body = body
     }
 
     companion object {

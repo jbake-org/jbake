@@ -14,6 +14,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CrawlerTest : ContentStoreIntegrationTest() {
+
     @Test
     fun crawl() {
         val crawler = Crawler(db, config)
@@ -26,21 +27,15 @@ class CrawlerTest : ContentStoreIntegrationTest() {
 
         assertThat(results.size).isEqualTo(3)
 
-        for (content in results) {
-            assertThat(content)
-                .containsKey(ModelAttributes.ROOTPATH)
-                .containsValue("../../../")
-        }
+        for (content in results)
+            assertThat(content).containsKey(ModelAttributes.ROOTPATH).containsValue("../../../")
 
         val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
 
         assertThat(allPosts.size).isEqualTo(4)
 
-        for (content in allPosts) {
-            if (content!!.title == "Draft Post") {
-                assertThat(content).containsKey(ModelAttributes.DATE)
-            }
-        }
+        allPosts.filter { it.title == "Draft Post" }
+            .forEach { assertThat(it).containsKey(ModelAttributes.DATE) }
 
         // Covers bug #213
         val publishedPostsByTag: DocumentList<DocumentModel> =
