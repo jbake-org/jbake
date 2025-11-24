@@ -20,7 +20,6 @@ object FileUtil {
      * Filters files based on their file extension.
      *
      * @param config the jbake configuration
-     * @return Object for filtering files
      */
     fun getFileFilter(config: JBakeConfiguration): FileFilter {
         return FileFilter { pathname ->
@@ -35,8 +34,6 @@ object FileUtil {
     val fileFilter: FileFilter
         /**
          * Filters files based on their file extension.
-         *
-         * @return Object for filtering files
          */
         get() = FileFilter { pathname ->
             // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
@@ -50,8 +47,6 @@ object FileUtil {
     val dataFileFilter: FileFilter
         /**
          * Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension)
-         *
-         * @return Object for filtering files
          */
         get() = FileFilter { pathname ->
             "yaml".equals(
@@ -64,7 +59,6 @@ object FileUtil {
      * Gets the list of files that are not content files based on their extension.
      *
      * @param config the jbake configuration
-     * @return FileFilter object
      */
     fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
         return FileFilter { pathname ->

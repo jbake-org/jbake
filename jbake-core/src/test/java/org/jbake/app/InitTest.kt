@@ -27,7 +27,7 @@ class InitTest {
             throw Exception("Cannot find base path for test!")
         }
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
-        // override base template config option
+        // Override base template config option.
         config.setExampleProject("freemarker", "test.zip")
     }
 

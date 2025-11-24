@@ -1,4 +1,4 @@
-import com.orientechnologies.orient.core.db.ODatabaseType
+
 import com.orientechnologies.orient.core.db.OrientDB
 import com.orientechnologies.orient.core.db.OrientDBConfig
 import java.io.File

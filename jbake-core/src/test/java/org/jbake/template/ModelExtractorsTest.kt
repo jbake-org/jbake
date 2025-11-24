@@ -54,17 +54,17 @@ class ModelExtractorsTest {
 
     @Test
     fun shouldRegisterExtractorsForCustomType() {
-        // A document type is known
+        // A document type is known.
         val newDocumentType = "project"
         addDocumentType(newDocumentType)
 
-        // when we register extractors for the new type
+        // When we register extractors for the new type.
         ModelExtractors.instance.registerExtractorsForCustomTypes(newDocumentType)
 
-        // then an extractor is registered by pluralized type as key
+        // Then an extractor is registered by pluralized type as key.
         assertThat(ModelExtractors.instance.containsKey("projects")).isTrue()
 
-        // and an extractor for published types is registered
+        // And an extractor for published types is registered.
         assertThat(ModelExtractors.instance.containsKey("published_projects")).isTrue()
     }
 
@@ -78,22 +78,20 @@ class ModelExtractorsTest {
 
     @Test
     fun shouldResetToNonCustomizedExtractors() {
-        //given:
-        // A document type is known
-
+        // Given: A document type is known.
         val newDocumentType = "project"
         addDocumentType(newDocumentType)
 
-        // when we register extractors for the new type
+        // When we register extractors for the new type.
         ModelExtractors.instance.registerExtractorsForCustomTypes(newDocumentType)
 
-        //expect:
+        // Expect: 18 extractors.
         assertThat(ModelExtractors.instance.keySet().size).isEqualTo(18)
 
-        //when:
+        // When: reset.
         ModelExtractors.instance.reset()
 
-        //then:
+        // Then: 16 extractors.
         assertThat(ModelExtractors.instance.keySet().size).isEqualTo(16)
     }
 }

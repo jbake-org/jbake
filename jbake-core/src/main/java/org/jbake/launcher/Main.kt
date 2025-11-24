@@ -73,7 +73,7 @@ class Main @JvmOverloads constructor(
 
         if (launchOptions.isHelpNeeded) {
             printUsage(launchOptions)
-            // Help was requested, so we are done here
+            // Help was requested, so we are done here.
             return
         }
 
@@ -93,21 +93,21 @@ class Main @JvmOverloads constructor(
 
         if (launchOptions.isRunServer) {
             watcher.start(config)
-            // TODO: short term fix until bake, server, init commands no longer share underlying values (such as source/dest)
+            // TODO: Short term fix until bake, server, init commands no longer share underlying values (such as source/dest).
             if (launchOptions.isBake) {
-                // bake and server commands have been run together
+                // Bake and server commands have been run together.
                 if (launchOptions.getDestination() != null) {
-                    // use the destination provided via the commandline
+                    // Use the destination provided via the commandline.
                     runServer(launchOptions.getDestination(), config)
                 } else if (launchOptions.getSource().path != ".") {
-                    // use the source folder provided via the commandline
+                    // Use the source folder provided via the commandline.
                     runServer(launchOptions.getSource(), config)
                 } else {
-                    // use the default DESTINATION_FOLDER value
+                    // Use the default DESTINATION_FOLDER value.
                     runServer(config.destinationFolder!!, config)
                 }
             } else {
-                // use the default destination folder
+                // Use the default destination folder.
                 runServer(config.destinationFolder!!, config)
             }
         }

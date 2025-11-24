@@ -28,14 +28,14 @@ class DocumentTypesTest {
 
     @Test
     fun shouldAddDocumentTypeOnlyOnce() {
-        // A a document type is already known
+        // A document type is already known.
         val knownDocumentType = "known"
         addDocumentType(knownDocumentType)
 
-        // adding the known document type again
+        // Adding the known document type again.
         addDocumentType(knownDocumentType)
 
-        // only one document type could be found in the list
+        // Only one document type could be found in the list.
         assertThat(documentTypes).containsOnlyOnce(knownDocumentType)
     }
 

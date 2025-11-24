@@ -53,7 +53,7 @@ object DocumentTypes {
          */
         get() {
             // TODO: is this needed?
-            // make sure engines are loaded before to get document types
+            // Make sure engines are loaded before to get document types.
             Engines.recognizedExtensions
             return DEFAULT_DOC_TYPES.toTypedArray()
         }

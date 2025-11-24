@@ -35,7 +35,7 @@ class Baker {
         val errors = oven.errors
         if (!errors.isEmpty()) {
             val msg = StringBuilder()
-            // TODO: decide, if we want the all errors here
+            // TODO: Decide if we want all errors here.
             msg.append(MessageFormat.format("JBake failed with {0} errors:\n", errors.size))
             var errNr = 1
             for (error in errors) {
