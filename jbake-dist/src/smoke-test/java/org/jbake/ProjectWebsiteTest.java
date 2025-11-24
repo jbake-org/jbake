@@ -49,7 +49,7 @@ class ProjectWebsiteTest {
         process.destroy();
     }
 
-    private void cloneJbakeWebsite() throws GitAPIException {
+    private void cloneJbakeWebsite() throws GitAPIException, IOException {
         CloneCommand cmd = Git.cloneRepository();
         cmd.setBare(false);
         cmd.setBranch("master");
@@ -57,7 +57,8 @@ class ProjectWebsiteTest {
         cmd.setURI(WEBSITE_REPO_URL);
         cmd.setDirectory(projectFolder);
 
-        cmd.call();
+        Git cloned = cmd.call();
+        cloned.close();
 
         assertThat(new File(projectFolder, "README.md").exists()).isTrue();
     }
