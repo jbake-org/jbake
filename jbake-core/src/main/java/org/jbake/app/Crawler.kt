@@ -19,8 +19,6 @@ import java.util.*
 
 /**
  * Crawls a file system looking for content.
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Crawler {
     private val db: ContentStore
@@ -28,7 +26,6 @@ class Crawler {
     private val parser: Parser
 
     /**
-     * @param db     Database instance for content
      * @param source Base directory where content directory is located
      */
     @Deprecated("""Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.
@@ -43,7 +40,6 @@ class Crawler {
     /**
      * Creates new instance of Crawler.
      *
-     * @param db     Database instance for content
      */
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.db = db

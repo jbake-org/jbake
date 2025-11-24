@@ -9,8 +9,6 @@ import java.text.MessageFormat
 
 /**
  * Delegate class responsible for launching a Bake.
- *
- * @author jmcgarr@gmail.com
  */
 class Baker {
     /**

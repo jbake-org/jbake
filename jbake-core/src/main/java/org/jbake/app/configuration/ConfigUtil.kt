@@ -17,8 +17,6 @@ import java.nio.charset.Charset
 
 /**
  * Provides Configuration related functions.
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class ConfigUtil {
     var encoding: String = DEFAULT_ENCODING

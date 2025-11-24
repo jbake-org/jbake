@@ -24,8 +24,6 @@ import java.io.Writer
  * Note that some rendering engines may rely on a different rendering model than the one
  * provided by the first argument of [.renderDocument].
  * In this case, it is the responsibility of the engine to convert it.
- *
- * @author Cédric Champeau
  */
 abstract class AbstractTemplateEngine protected constructor(
     protected val config: JBakeConfiguration,

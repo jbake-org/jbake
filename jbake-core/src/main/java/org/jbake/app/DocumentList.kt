@@ -7,8 +7,6 @@ import java.util.*
 /**
  * Wraps an OrientDB document iterator into a model usable by
  * template engines.
- *
- * @author Cédric Champeau
  */
 class DocumentList<T> : LinkedList<T>() {
 

@@ -30,8 +30,6 @@ import java.util.*
  * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit
  * for embedding.
  *
- *
- * @author Cédric Champeau
  */
 class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     private val engines: MutableMap<String, AbstractTemplateEngine> = HashMap<String, AbstractTemplateEngine>()
@@ -104,8 +102,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
          * typically used to avoid loading optional modules.
          *
          *
-             * @param db database instance
-         * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
+                 * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
          */
         private fun tryLoadEngine(
             config: JBakeConfiguration,

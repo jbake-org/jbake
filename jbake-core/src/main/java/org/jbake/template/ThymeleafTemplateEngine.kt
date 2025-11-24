@@ -31,8 +31,6 @@ import java.util.concurrent.locks.ReentrantLock
  * `
  * template.feed.thymeleaf.mode=XML
 ` *
- *
- * @author Cédric Champeau
  */
 class ThymeleafTemplateEngine : AbstractTemplateEngine {
     private val lock = ReentrantLock()
@@ -41,8 +39,6 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     private var templateResolver: FileTemplateResolver? = null
 
     /**
-     * @param db the [ContentStore]
-     * @param destination the destination path
      * @param templatesPath the templates path
      */
     @Deprecated("""Use {@link #ThymeleafTemplateEngine(JBakeConfiguration, ContentStore)} instead """)

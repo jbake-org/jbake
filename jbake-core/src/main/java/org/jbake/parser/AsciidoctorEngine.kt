@@ -10,8 +10,6 @@ import java.text.SimpleDateFormat
 
 /**
  * Renders documents in the asciidoc format using the Asciidoctor engine.
- *
- * @author Cédric Champeau
  */
 class AsciidoctorEngine : MarkupEngine() {
 

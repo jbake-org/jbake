@@ -25,8 +25,6 @@ import java.util.*
  * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
  * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit
  * for embedding.
- *
- * @author ndx
  * @author Cédric Champeau
  */
 class ModelExtractors private constructor() {

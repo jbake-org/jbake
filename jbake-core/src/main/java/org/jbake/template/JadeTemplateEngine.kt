@@ -23,8 +23,6 @@ import java.util.*
 
 /**
  * Renders pages using the [Jade](http://jade.org/) template language.
- *
- * @author Aleksandar Vidakovic
  * @author Mariusz Smykuła
  */
 class JadeTemplateEngine : AbstractTemplateEngine {

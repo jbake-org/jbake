@@ -9,8 +9,6 @@ import java.util.zip.ZipInputStream
 
 /**
  * Provides Zip file related functions
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 object ZipUtil {
     /**

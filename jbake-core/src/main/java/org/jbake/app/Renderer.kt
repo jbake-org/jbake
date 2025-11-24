@@ -18,8 +18,6 @@ import java.util.*
 
 /**
  * Render output to a file.
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Renderer {
     private val logger: Logger = LoggerFactory.getLogger(Renderer::class.java)
@@ -28,8 +26,6 @@ class Renderer {
     private val db: ContentStore
 
     /**
-     * @param db            The database holding the content
-     * @param destination   The destination folder
      * @param templatesPath The templates folder
      */
     @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
@@ -45,8 +41,6 @@ class Renderer {
 
     // TODO: Should all content be made available to all templates via this class?
     /**
-     * @param db              The database holding the content
-     * @param destination     The destination folder
      * @param templatesPath   The templates folder
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
@@ -71,7 +65,6 @@ class Renderer {
     /**
      * Creates a new instance of Renderer with supplied references to folders.
      *
-     * @param db     The database holding the content
      */
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.config = config
@@ -82,7 +75,6 @@ class Renderer {
     /**
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
-     * @param db              The database holding the content
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
     constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {

@@ -18,8 +18,6 @@ import java.util.*
 
 /**
  * All the baking happens in the Oven!
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Oven {
     @JvmField
@@ -29,7 +27,7 @@ class Oven {
 
     /**
      * @param source       Project source directory
-     * @param destination  The destination folder
+     *  The destination folder
      * @param isClearCache Should the cache be cleaned
      * @throws Exception if configuration is not loaded correctly
      */
@@ -43,7 +41,6 @@ class Oven {
 
     /**
      * @param source       Project source directory
-     * @param destination  The destination folder
      * @param isClearCache Should the cache be cleaned
      * @throws Exception if configuration is not loaded correctly
      */

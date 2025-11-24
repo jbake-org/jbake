@@ -8,8 +8,6 @@ import org.jbake.parser.Engines
  * "archive" and "feed".
  *
  * Additional document types are added at runtime based on the types found in the configuration.
- *
- * @author Cédric Champeau
  */
 object DocumentTypes {
 

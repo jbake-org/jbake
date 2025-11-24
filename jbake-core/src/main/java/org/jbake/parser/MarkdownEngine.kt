@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory
 
 /**
  * Renders documents in the Markdown format.
- *
- * @author Cédric Champeau
  */
 class MarkdownEngine : MarkupEngine() {
     override fun processBody(parserContext: ParserContext) {

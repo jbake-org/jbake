@@ -17,7 +17,6 @@ class JBakeConfigurationFactory {
      * Creates a [DefaultJBakeConfiguration] using default.properties and jbake.properties
      *
      * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
      * @throws JBakeException if loading the configuration fails
@@ -34,7 +33,6 @@ class JBakeConfigurationFactory {
     /**
      * Creates a [DefaultJBakeConfiguration]
      * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
@@ -59,7 +57,6 @@ class JBakeConfigurationFactory {
      * This is a compatibility factory method
      *
      * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
      * @param compositeConfiguration A given [CompositeConfiguration]
      * @param isClearCache Whether to clear database cache or not
      * @return A configuration by given parameters
@@ -84,7 +81,6 @@ class JBakeConfigurationFactory {
      * This is a compatibility factory method
      *
      * @param sourceFolder The source folder of the project
-     * @param destination The destination folder to render and copy files to
      * @param compositeConfiguration A given [CompositeConfiguration]
      * @return A configuration by given parameters
      */

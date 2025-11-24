@@ -10,8 +10,6 @@ import java.security.MessageDigest
 
 /**
  * Provides File related functions
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 object FileUtil {
     const val URI_SEPARATOR_CHAR: String = "/"

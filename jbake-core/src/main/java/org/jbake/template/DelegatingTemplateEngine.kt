@@ -13,15 +13,11 @@ import java.io.Writer
 /**
  * A template which is responsible for delegating to a supported template engine,
  * based on the file extension.
- *
- * @author Cédric Champeau
  */
 class DelegatingTemplateEngine : AbstractTemplateEngine {
     private val renderers: TemplateEngines
 
     /**
-     * @param db the [ContentStore]
-     * @param destination the destination path
      * @param templatesPath the templates path
      */
     @Deprecated("""Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.""")

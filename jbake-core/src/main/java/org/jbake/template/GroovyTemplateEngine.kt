@@ -19,8 +19,6 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
     private val cachedTemplates: MutableMap<String, Template?> = HashMap()
 
     /**
-     * @param db the [ContentStore]
-     * @param destination the destination path
      * @param templatesPath the templates path
      */
     @Deprecated("Use {@link #GroovyTemplateEngine(JBakeConfiguration, ContentStore)} instead")

@@ -16,8 +16,6 @@ import java.io.IOException
 
 /**
  * Provides Jetty server related functions
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class JettyServer : Closeable {
     private var server: Server? = null

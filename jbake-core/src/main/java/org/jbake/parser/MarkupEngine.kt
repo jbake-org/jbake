@@ -24,8 +24,6 @@ import java.util.*
  *
  *
  * This specific engine does nothing, meaning that the body is rendered as raw contents.
- *
- * @author Cédric Champeau
  */
 abstract class MarkupEngine : ParserEngine {
 

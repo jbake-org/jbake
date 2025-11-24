@@ -15,8 +15,6 @@ import java.io.PrintWriter
 /**
  * Tests basic Markdown syntax and the extensions supported by the Markdown
  * processor (Pegdown).
- *
- * @author Jonathan Bullock <jonbullock></jonbullock>@gmail.com>
  * @author Kevin S. Clarke <ksclarke></ksclarke>@gmail.com>
  */
 class MdParserTest {

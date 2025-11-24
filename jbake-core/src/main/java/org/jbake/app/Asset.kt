@@ -13,8 +13,6 @@ import java.util.*
 
 /**
  * Deals with assets (static files such as css, js or image files).
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Asset {
 
@@ -25,7 +23,6 @@ class Asset {
 
     /**
      * @param source      Source file for the asset
-     * @param destination Destination (target) directory for asset file
      */
     @Deprecated("""Use {@link #Asset(JBakeConfiguration)} instead. Compatibility constructor.  Creates an instance of Asset.""")
     constructor(source: File, destination: File, config: CompositeConfiguration) {

@@ -14,8 +14,6 @@ import kotlin.system.exitProcess
 
 /**
  * Launcher for JBake.
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Main @JvmOverloads constructor(
     private val baker: Baker = Baker(),

@@ -5,8 +5,6 @@ import java.util.*
 /**
  * An internal rendering engine used to notify the user that the markup format he used requires an engine that couldn't
  * be loaded.
- *
- * @author Cédric Champeau
  */
 class ErrorEngine @JvmOverloads constructor(private val engineName: String = "unknown")
     : MarkupEngine()

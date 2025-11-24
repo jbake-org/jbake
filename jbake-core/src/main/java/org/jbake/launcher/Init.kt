@@ -9,8 +9,6 @@ import java.io.FileInputStream
 
 /**
  * Initialises sample folder structure with pre-defined template
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Init(private val config: JBakeConfiguration) {
     /**

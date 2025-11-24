@@ -15,7 +15,6 @@ interface ParserEngine {
 
     /**
      * @param fileToParse        The file to be parsed
-     * @param contentPath unknown
      * @return A model representation of the given file
      */
     @Deprecated("use {@link #parse(JBakeConfiguration, File)} instead")

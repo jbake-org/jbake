@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory
 
 /**
  * Delegate responsible for watching the file system for changes.
- *
- * @author jmcgarr@gmail.com
  */
 class BakeWatcher {
     private val logger: Logger = LoggerFactory.getLogger(BakeWatcher::class.java)

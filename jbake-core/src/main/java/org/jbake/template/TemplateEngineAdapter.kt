@@ -3,8 +3,6 @@ package org.jbake.template
 /**
  * Adapts model extractor output to used template engine.
  * This method typically wraps results of model extractions into data types suited to template engine
- *
- * @author ndx
  */
 interface TemplateEngineAdapter<Type> {
 

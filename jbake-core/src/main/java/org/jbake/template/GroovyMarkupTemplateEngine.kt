@@ -21,8 +21,6 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     private var templateEngine: MarkupTemplateEngine? = null
 
     /**
-     * @param db the [ContentStore]
-     * @param destination the destination path
      * @param templatesPath the templates path
      */
     @Deprecated("Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead")

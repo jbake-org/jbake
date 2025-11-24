@@ -10,8 +10,6 @@ import java.io.File
 
 /**
  * Parses a File for content.
- *
- * @author Jonathan Bullock [jonbullock@gmail.com](mailto:jonbullock@gmail.com)
  */
 class Parser
 /**
