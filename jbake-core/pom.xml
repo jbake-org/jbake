@@ -66,6 +66,8 @@
         <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><scope>test</scope></dependency>
         <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><scope>test</scope></dependency>
         <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><scope>test</scope></dependency>
+        <!-- Logging for tests -->
+        <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version><scope>test</scope></dependency>
     </dependencies>
 
     <build>
@@ -94,21 +96,32 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
                 <executions>
-                    <execution><id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals></execution>
-                    <execution><id>kotlin-test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals></execution>
+                    <execution>
+                        <id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>17</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>kotlin-test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>17</jvmTarget>
+                            <sourceDirs>
+                                <testSourceDir>${project.basedir}/src/test/java</testSourceDir>
+                                <testSourceDir>${project.basedir}/src/test/kotlin</testSourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
                 </executions>
                 <configuration>
                     <jvmTarget>${version.java}</jvmTarget>
-                    <sourceDirs>
-                        <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                        <!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
-                    </sourceDirs>
-                    <testSourceDirs>
-                        <testSourceDir>${project.basedir}/src/test/java</testSourceDir>
-                        <!--<testSourceDir>${project.basedir}/src/test/kotlin</testSourceDir>-->
-                    </testSourceDirs>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>
