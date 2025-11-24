@@ -8,6 +8,7 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 
 class ModelExtractorsTest {
+
     @Rule @JvmField
     var thrown: ExpectedException = ExpectedException.none()
 
@@ -20,22 +21,8 @@ class ModelExtractorsTest {
     fun shouldLoadExtractorsOnInstantiation() {
         ModelExtractors.instance
         val expectedKeys: Array<String> = arrayOf(
-            "pages",
-            "posts",
-            "indexs",
-            "archives",
-            "feeds",
-            "published_posts",
-            "published_pages",
-            "published_content",
-            "published_date",
-            "all_content",
-            "alltags",
-            "db",
-            "tag_posts",
-            "tags",
-            "tagged_documents",
-        )
+            "pages", "posts", "indexs", "archives", "feeds", "published_posts", "published_pages",
+            "published_content", "published_date", "all_content", "alltags", "db", "tag_posts", "tags", "tagged_documents")
 
         for (aKey in expectedKeys) {
             assertThat(ModelExtractors.instance.containsKey(aKey)).isTrue()

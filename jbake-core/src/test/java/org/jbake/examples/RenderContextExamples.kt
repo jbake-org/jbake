@@ -19,73 +19,58 @@ object RenderContextExamples {
     /**
      * Example 1: Creating a simple render context for rendering a document.
      */
-    fun createSimpleContext(
-        config: JBakeConfiguration,
-        db: ContentStore,
-        document: DocumentModel,
-        renderer: DelegatingTemplateEngine
-    ): RenderContext {
-        return RenderContext(
+    fun createSimpleContext(config: JBakeConfiguration, db: ContentStore, document: DocumentModel, renderer: DelegatingTemplateEngine)
+        = RenderContext(
             config = config,
             db = db,
             content = document,
             renderer = renderer
         )
-    }
 
     /**
      * Example 2: Using apply{} for construction (idiomatic Kotlin).
      */
-    fun createContextWithApply(
-        config: JBakeConfiguration,
-        db: ContentStore
-    ) = RenderContext(
-        config = config,
-        db = db,
-        content = DocumentModel().apply {
-            title = "My Page"
-            body = "<p>Hello World</p>"
-            type = "page"
-        },
-        version = "2.7.0",
-        customData = mapOf("customKey" to "customValue")
-    )
+    fun createContextWithApply(config: JBakeConfiguration, db: ContentStore)
+        = RenderContext(
+            db = db,
+            config = config,
+            content = DocumentModel().apply {
+                title = "My Page"
+                body = "<p>Hello World</p>"
+                type = "page"
+            },
+            version = "2.7.0",
+            customData = mapOf("customKey" to "customValue")
+        )
 
     /**
      * Example 3: Creating a context with pagination for index pages.
      */
-    fun createPaginatedContext(
-        config: JBakeConfiguration,
-        db: ContentStore,
-        currentPage: Int,
-        totalPages: Int
-    ) = RenderContext(
-        config = config,
-        db = db,
-        pagination = PaginationContext(
-            currentPage = currentPage,
-            totalPages = totalPages,
-            previousFilename = if (currentPage > 1) "index${currentPage - 1}.html" else null,
-            nextFilename = if (currentPage < totalPages) "index${currentPage + 1}.html" else null
+    fun createPaginatedContext(config: JBakeConfiguration, db: ContentStore, currentPage: Int, totalPages: Int)
+        = RenderContext(
+            config = config,
+            db = db,
+            pagination = PaginationContext(
+                currentPage = currentPage,
+                totalPages = totalPages,
+                previousFilename = if (currentPage > 1) "index${currentPage - 1}.html" else null,
+                nextFilename = if (currentPage < totalPages) "index${currentPage + 1}.html" else null
+            )
         )
-    )
 
     /**
      * Example 4: Creating a context for tag pages.
      */
-    fun createTagContext(
-        config: JBakeConfiguration,
-        db: ContentStore,
-        tagName: String
-    ) = RenderContext(
-        config = config,
-        db = db,
-        tag = TagContext(
-            name = tagName,
-            taggedPosts = db.getPublishedPostsByTag(tagName),
-            taggedDocuments = db.getPublishedDocumentsByTag(tagName)
+    fun createTagContext(config: JBakeConfiguration, db: ContentStore, tagName: String)
+        = RenderContext(
+            config = config,
+            db = db,
+            tag = TagContext(
+                name = tagName,
+                taggedPosts = db.getPublishedPostsByTag(tagName),
+                taggedDocuments = db.getPublishedDocumentsByTag(tagName)
+            )
         )
-    )
 
     /**
      * Example 5: Modifying an existing context using copy() (data class feature).
@@ -156,17 +141,15 @@ object RenderContextExamples {
     /**
      * Example 10: Custom data for template-specific needs.
      */
-    fun customTemplateData(
-        config: JBakeConfiguration,
-        db: ContentStore
-    ) = RenderContext(
-        config = config,
-        db = db,
-        customData = mapOf(
-            "siteTitle" to "My Awesome Blog",
-            "author" to "John Doe",
-            "year" to 2024
+    fun customTemplateData(config: JBakeConfiguration, db: ContentStore)
+        = RenderContext(
+            config = config,
+            db = db,
+            customData = mapOf(
+                "siteTitle" to "My Awesome Blog",
+                "author" to "John Doe",
+                "year" to 2024
+            )
         )
-    )
 }
 
