@@ -54,15 +54,9 @@ class FakeDocumentBuilder(private val type: String) {
 
     fun build() {
         try {
-            if (!hasSourceUri()) {
-                this.withRandomSourceUri()
-            }
-            if (!hasSha1()) {
-                this.withRandomSha1()
-            }
-            if (!hasDate()) {
-                this.withCurrentDate()
-            }
+            if (!hasSourceUri()) this.withRandomSourceUri()
+            if (!hasSha1()) this.withRandomSha1()
+            if (!hasDate()) this.withCurrentDate()
             val document = ODocument("Documents").fromMap(fileModel)
             document.save()
         } catch (e: NoSuchAlgorithmException) {
@@ -82,15 +76,9 @@ class FakeDocumentBuilder(private val type: String) {
             return BigInteger(sha1Digest.digest(content)).toString(16)
         }
 
-    private fun hasDate(): Boolean {
-        return hasDate
-    }
+    private fun hasDate(): Boolean = hasDate
 
-    private fun hasSha1(): Boolean {
-        return hasSha1
-    }
+    private fun hasSha1(): Boolean = hasSha1
 
-    private fun hasSourceUri(): Boolean {
-        return hasSourceUri
-    }
+    private fun hasSourceUri(): Boolean = hasSourceUri
 }
