@@ -5,59 +5,34 @@ import org.apache.commons.io.monitor.FileAlterationMonitor
 import org.apache.commons.io.monitor.FileAlterationObserver
 import java.io.File
 import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
 
 /**
- * Example to watch a directory (or tree) for changes to files.
+ * Watches a directory for file changes and queues modification timestamps.
  */
 class DirWatcher(dir: File) {
-    private val observer: FileAlterationObserver = FileAlterationObserver(dir)
 
-    private val monitor = FileAlterationMonitor(1000, observer)
+    private val changeQueue = ArrayBlockingQueue<Long>(1)
 
-    private val changeQueue: BlockingQueue<Long> = ArrayBlockingQueue(1)
-
-    /**
-     * Creates a WatchService and registers the given directory
-     */
-    init {
-
-        observer.addListener(object : FileAlterationListenerAdaptor() {
-            override fun onFileCreate(file: File?) {
-                onUpdated()
-            }
-
-            override fun onFileChange(file: File?) {
-                onUpdated()
-            }
+    private val monitor = FileAlterationMonitor(1000, FileAlterationObserver(dir).apply {
+        addListener(object : FileAlterationListenerAdaptor() {
+            override fun onFileCreate(file: File) = recordChange()
+            override fun onFileChange(file: File) = recordChange()
         })
-    }
+    })
 
-    fun start() {
-        monitor.start()
-    }
+    fun start() = monitor.start()
 
-    fun stop() {
-        try {
-            monitor.stop()
-        } catch (exc: Exception) {
-        }
-    }
+    fun stop() = runCatching { monitor.stop() }
 
-    private fun onUpdated() {
+    private fun recordChange() {
         try {
             changeQueue.put(System.currentTimeMillis())
-        } catch (iex: InterruptedException) {
+        } catch (e: InterruptedException) {
             Thread.currentThread().interrupt()
         }
     }
 
-    /**
-     * Process all events for keys queued to the watcher
-     */
-    @Throws(InterruptedException::class)
-    fun processEvents(): Long? {
-        return changeQueue.poll(1, TimeUnit.SECONDS)
-    }
+    /** Polls for file change events, returning the timestamp of the last change or null if no changes. */
+    fun processEvents(): Long? = changeQueue.poll(1, TimeUnit.SECONDS)
 }
