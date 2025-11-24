@@ -23,8 +23,8 @@ object FileUtil {
      * @return Object for filtering files
      */
     fun getFileFilter(config: JBakeConfiguration): FileFilter {
-        return FileFilter { pathname -> //Accept if input  is a non-hidden file with registered extension
-            //or if a non-hidden and not-ignored directory
+        return FileFilter { pathname ->
+            // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
             !pathname.isHidden() && (pathname.isFile()
                 && Engines.recognizedExtensions
                 .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
@@ -38,13 +38,13 @@ object FileUtil {
          *
          * @return Object for filtering files
          */
-        get() = FileFilter { pathname -> //Accept if input  is a non-hidden file with registered extension
-            //or if a non-hidden and not-ignored directory
-            !pathname.isHidden() && (pathname.isFile()
-                && Engines.recognizedExtensions
-                .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(
-                pathname
-            ))
+        get() = FileFilter { pathname ->
+            // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
+            val fileWithExtension = pathname.isFile() && Engines.recognizedExtensions.contains(fileExt(pathname))
+
+            !pathname.isHidden()
+                && fileWithExtension
+                || directoryOnlyIfNotIgnored(pathname)
         }
 
     val dataFileFilter: FileFilter
@@ -84,9 +84,8 @@ object FileUtil {
          * @return FileFilter object
          */
         get() = FileFilter { pathname ->
-            //Accept if input  is a non-hidden file with NOT-registered extension
-            //or if a non-hidden and not-ignored directory
-            (!pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
+            // Accept if input is a non-hidden file with NOT-registered extension, or if a non-hidden and not-ignored directory.
+            (!pathname.isHidden() && (pathname.isFile() // Extension should not be from registered content extensions.
                 && !Engines.recognizedExtensions
                 .contains(fileExt(pathname)))
                 || (directoryOnlyIfNotIgnored(pathname)))
@@ -209,7 +208,7 @@ object FileUtil {
      * Needed to transform Windows path separators into slashes.
      */
     fun asPath(file: File): String {
-        //if (file == null) return null
+        // If (file == null) return null.
 
         return asPath(file.path)
     }
@@ -221,9 +220,7 @@ object FileUtil {
      * @return The result will have all platform path separators replaced by "/".
      */
     fun asPath(path: String): String {
-        //if (path == null) return null
-
-        // On Windows we have to replace the backslash
+        // If path == null, return null. On Windows we have to replace the backslash.
         return if (fS == URI_SEPARATOR_CHAR) path
             else path.replace(fS, URI_SEPARATOR_CHAR)
     }
@@ -252,7 +249,7 @@ object FileUtil {
         if (config.uriWithoutExtension) {
             sb.append("/..")
         }
-        if (sb.isNotEmpty()) {  // added as calling logic assumes / at end.
+        if (sb.isNotEmpty()) {  // Added as calling logic assumes / at end.
             sb.append("/")
         }
         return sb.toString()
