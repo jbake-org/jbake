@@ -14,8 +14,7 @@ class PaginationTest : ContentStoreIntegrationTest() {
     @Before
     fun setUpOwn() {
         for (docType in documentTypes) {
-            var fileBaseName = docType
-            if (docType == "masterindex") fileBaseName = "index"
+            val fileBaseName = if (docType == "masterindex") "index" else docType
             config.setTemplateFileNameForDocType(docType, "$fileBaseName.ftl")
         }
         config.setPaginateIndex(true)
