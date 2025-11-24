@@ -7,41 +7,32 @@ import org.jbake.app.FileUtil.isFileInDirectory
 import org.jbake.app.FileUtil.runningLocation
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.junit.Assert
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-/**
- * Created by frank on 28.03.16.
- */
 class FileUtilTest {
+
     @Test
     fun testGetRunningLocation() {
         val path = runningLocation
-        Assert.assertEquals(File("build/classes").absolutePath, path.path)
+        val pathA = File("build/classes").absolutePath
+        val pathB = File("target/classes").absolutePath
+        assertTrue("Running location should be $pathA or $pathB, was: ${path.path}", path.path == pathA || path.path == pathB)
     }
 
     @Test
     fun testIsFileInDirectory() {
         val fixtureDir = File(this.javaClass.getResource("/fixture").file)
         val jbakeFile = File(fixtureDir.getCanonicalPath() + File.separatorChar + "jbake.properties")
-        Assert.assertTrue(
-            "jbake.properties expected to be in /fixture directory",
-            isFileInDirectory(jbakeFile, fixtureDir)
-        )
+        assertTrue("jbake.properties expected to be in /fixture directory", isFileInDirectory(jbakeFile, fixtureDir))
 
-        val contentFile =
-            File(fixtureDir.getCanonicalPath() + File.separatorChar + "content" + File.separatorChar + "projects.html")
-        Assert.assertTrue(
-            "projects.html expected to be nested in the /fixture directory",
-            isFileInDirectory(contentFile, fixtureDir)
-        )
+        val contentFile = File(fixtureDir.getCanonicalPath() + File.separatorChar + "content" + File.separatorChar + "projects.html")
+        assertTrue("projects.html expected to be nested in the /fixture directory", isFileInDirectory(contentFile, fixtureDir))
 
         val contentDir = contentFile.getParentFile()
-        Assert.assertFalse(
-            "jbake.properties file should not be in the /fixture/content directory",
-            isFileInDirectory(jbakeFile, contentDir)
-        )
+        assertFalse("jbake.properties file should not be in the /fixture/content directory", isFileInDirectory(jbakeFile, contentDir))
     }
 
     @Test
