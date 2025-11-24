@@ -13,26 +13,20 @@ import java.util.zip.ZipInputStream
 object ZipUtil {
     /**
      * Extracts content of Zip file to specified output path.
-     *
-     * @param is             [InputStream] InputStream of Zip file
-     * @param outputFolder    folder where Zip file should be extracted to
-     * @throws IOException    if IOException occurs
      */
     @Throws(IOException::class)
-    fun extract(`is`: InputStream, outputFolder: File) {
-        val zis = ZipInputStream(`is`)
+    fun extract(inputStream: InputStream, extractToDir: File) {
+        val zis = ZipInputStream(inputStream)
         var entry: ZipEntry?
         val buffer = ByteArray(1024)
 
         while ((zis.getNextEntry().also { entry = it }) != null) {
-            val outputFile = File(outputFolder.getCanonicalPath() + File.separatorChar + entry!!.getName())
+            val outputFile = File(extractToDir.getCanonicalPath() + File.separatorChar + entry!!.getName())
             val outputParent = File(outputFile.getParent())
             outputParent.mkdirs()
 
             if (entry.isDirectory) {
-                if (!outputFile.exists()) {
-                    outputFile.mkdir()
-                }
+                if (!outputFile.exists()) outputFile.mkdir()
             } else {
                 FileOutputStream(outputFile).use { fos ->
                     var len: Int

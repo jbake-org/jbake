@@ -95,17 +95,13 @@ class ModelExtractors private constructor() {
      * @param key A key a [ModelExtractor] is registered with
      * @return true if key is registered
      */
-    fun containsKey(key: Any?): Boolean {
-        return extractors.containsKey(key)
-    }
+    fun containsKey(key: Any?): Boolean = extractors.containsKey(key)
 
     /**
      *  A @[Set] of all known keys a @[ModelExtractor] is registered with
      * @see java.util.Map.keySet
      */
-    fun keySet(): MutableSet<String> {
-        return extractors.keys
-    }
+    fun keySet(): MutableSet<String> = extractors.keys
 
     fun registerExtractorsForCustomTypes(docType: String) {
         val pluralizedDoctype = DocumentTypeUtils.pluralize(docType)
