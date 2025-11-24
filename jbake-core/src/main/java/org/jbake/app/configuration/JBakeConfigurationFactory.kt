@@ -10,8 +10,7 @@ import java.io.File
  */
 class JBakeConfigurationFactory {
 
-    @JvmField
-    var configUtil: ConfigUtil = ConfigUtil()
+    @JvmField var configUtil: ConfigUtil = ConfigUtil()
 
     /**
      * Creates a [DefaultJBakeConfiguration] using default.properties and jbake.properties
@@ -52,14 +51,8 @@ class JBakeConfigurationFactory {
     }
 
     /**
-     * Creates a [DefaultJBakeConfiguration]
-     *
-     * This is a compatibility factory method
-     *
-     * @param sourceFolder The source folder of the project
-     * @param compositeConfiguration A given [CompositeConfiguration]
+     * Creates a [DefaultJBakeConfiguration]. This is a compatibility factory method.
      * @param isClearCache Whether to clear database cache or not
-     * @return A configuration by given parameters
      */
     @Deprecated("use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
@@ -68,21 +61,14 @@ class JBakeConfigurationFactory {
         destination: File,
         compositeConfiguration: CompositeConfiguration,
         isClearCache: Boolean
-    ): DefaultJBakeConfiguration {
-        val configuration = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration)
-        configuration.destinationFolder = destination
-        configuration.clearCache = isClearCache
-        return configuration
-    }
+    )
+        = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration).apply {
+            destinationFolder = destination
+            clearCache = isClearCache
+        }
 
     /**
-     * Creates a [DefaultJBakeConfiguration]
-     *
-     * This is a compatibility factory method
-     *
-     * @param sourceFolder The source folder of the project
-     * @param compositeConfiguration A given [CompositeConfiguration]
-     * @return A configuration by given parameters
+     * Creates a [DefaultJBakeConfiguration]. This is a compatibility factory method.
      */
     @Deprecated("use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
@@ -90,18 +76,11 @@ class JBakeConfigurationFactory {
         sourceFolder: File,
         destination: File,
         compositeConfiguration: CompositeConfiguration
-    ): DefaultJBakeConfiguration {
-        val configuration = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration)
-        configuration.destinationFolder = destination
-        return configuration
-    }
+    )
+        = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration).apply { destinationFolder = destination }
 
     /**
      * Creates a [DefaultJBakeConfiguration]
-     *
-     *
-     * @param sourceFolder The source folder of the project
-     * @return A configuration by given parameters
      */
     @Deprecated("")
     @Throws(JBakeException::class)
@@ -113,10 +92,8 @@ class JBakeConfigurationFactory {
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param sourceFolder The source folder of the project
      * @param destinationFolder The destination folder to render and copy files to
      * @param isClearCache Whether to clear database cache or not
-     * @return A configuration by given parameters
      * @throws JBakeException if loading the configuration fails
      */
     @Deprecated("use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead")
@@ -134,12 +111,9 @@ class JBakeConfigurationFactory {
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param sourceFolder The source folder of the project
      * @param destinationFolder The destination folder to render and copy files to
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
-     * @return A configuration by given parameters
-     * @throws JBakeException if loading the configuration fails
      */
     @Throws(JBakeException::class)
     fun createJettyJbakeConfiguration(
@@ -155,8 +129,5 @@ class JBakeConfigurationFactory {
         return conf
     }
 
-    fun setEncoding(charset: String): JBakeConfigurationFactory {
-        this.configUtil.setEncoding(charset)
-        return this
-    }
+    fun setEncoding(charset: String) = this.apply { configUtil.setEncoding(charset) }
 }
