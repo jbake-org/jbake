@@ -58,32 +58,27 @@ class AsciidoctorEngine : MarkupEngine() {
 
             if (hasJBakePrefix(key)) {
                 val pKey = key.substring(6)
-                if (canCastToString(value)) {
+                if (canCastToString(value))
                     storeHeaderValue(pKey, value as String, documentModel)
-                } else {
-                    documentModel[pKey] = value
-                }
+                else documentModel[pKey] = value
             }
+
             if (hasRevdate(key) && canCastToString(value)) {
                 val dateFormat: String = context.config.dateFormat!!
                 val df: DateFormat = SimpleDateFormat(dateFormat)
                 try {
-                    val date = df.parse(value as String)
-                    context.date = (date)
+                    context.date = (df.parse(value as String))
                 } catch (e: ParseException) {
                     log.error("Unable to parse revdate. Expected {}", dateFormat, e)
                 }
             }
+
             if (key == "jbake-tags") {
-                if (canCastToString(value)) {
-                    context.setTags((value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray())
-                } else {
-                    log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
-                }
-            } else {
-                documentModel[key] = attributes[key]!!
+                if (canCastToString(value))
+                    context.setTags((value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+                else log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
             }
+            else documentModel[key] = attributes[key]!!
         }
     }
 
@@ -146,9 +141,8 @@ class AsciidoctorEngine : MarkupEngine() {
                 if (!dirs.isEmpty()) {
                     options.setTemplateDirs(dirs.toString())
                 }
-            } else {
-                options.setOption(optionKey, optionValue)
             }
+            else options.setOption(optionKey, optionValue)
         }
         options.setBaseDir(context.file.getParentFile().absolutePath)
         options.setSafe(SafeMode.UNSAFE)
@@ -158,10 +152,9 @@ class AsciidoctorEngine : MarkupEngine() {
     private fun getAsList(asciidoctorOption: Any?): MutableList<String> {
         val values: MutableList<String> = ArrayList()
 
-        if (asciidoctorOption is MutableList<*>) {
-            values.addAll(asciidoctorOption as MutableList<String>)
-        } else if (asciidoctorOption is String) {
-            values.add(asciidoctorOption)
+        when (asciidoctorOption) {
+            is MutableList<*> -> values.addAll(asciidoctorOption as MutableList<String>)
+            is String -> values.add(asciidoctorOption)
         }
         return values
     }

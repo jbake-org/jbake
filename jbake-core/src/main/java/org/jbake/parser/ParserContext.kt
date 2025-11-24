@@ -25,9 +25,7 @@ class ParserContext(
 
     var date: Date?
         get() = this.documentModel.date
-        set(date) {
-            this.documentModel.date = date
-        }
+        set(date) { this.documentModel.date = date}
 
     val status: String
         get() = this.documentModel.status ?: ""

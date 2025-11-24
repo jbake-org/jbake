@@ -17,13 +17,11 @@ class PagingHelper(private val totalDocuments: Long, private val postsPerPage: I
 
     @Throws(URISyntaxException::class)
     fun getPreviousFileName(currentPageNumber: Int): String? {
-        return if (isFirstPage(currentPageNumber)) {
-            null
-        } else if (currentPageNumber == 2) {
+        return when {
+            isFirstPage(currentPageNumber) -> null
             // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
-            ""
-        } else {
-            URI((currentPageNumber - 1).toString() + URI_SEPARATOR).toString()
+            currentPageNumber == 2 -> ""
+            else -> URI((currentPageNumber - 1).toString() + URI_SEPARATOR).toString()
         }
     }
 
@@ -33,11 +31,8 @@ class PagingHelper(private val totalDocuments: Long, private val postsPerPage: I
 
     @Throws(URISyntaxException::class)
     fun getCurrentFileName(page: Int, fileName: String): String {
-        return if (isFirstPage(page)) {
-            fileName
-        } else {
-            URI(page.toString() + URI_SEPARATOR + fileName).toString()
-        }
+        return if (isFirstPage(page)) fileName
+            else URI(page.toString() + URI_SEPARATOR + fileName).toString()
     }
 
     companion object {

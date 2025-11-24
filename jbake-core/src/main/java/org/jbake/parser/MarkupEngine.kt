@@ -34,7 +34,6 @@ abstract class MarkupEngine : ParserEngine {
     /**
      * Tests if this markup engine can process the document.
      *
-     * @param context the parser context
      * @return true if this markup engine has enough context to process this document. false otherwise
      */
     fun validate(context: ParserContext): Boolean {
@@ -44,8 +43,6 @@ abstract class MarkupEngine : ParserEngine {
     /**
      * Processes the document header. Usually subclasses will parse the document body and look for
      * specific header metadata and export it into [contents][ParserContext.getDocumentModel] map.
-     *
-     * @param context the parser context
      */
     open fun processHeader(context: ParserContext) {
     }
@@ -173,19 +170,9 @@ abstract class MarkupEngine : ParserEngine {
         }
 
         for (line in contents) {
-            if (hasHeaderSeparator(line)) {
-                log.debug("Header separator found")
-                break
-            }
-            if (isTypeProperty(line)) {
-                log.debug("Type property found")
-                typeFound = true
-            }
-
-            if (isStatusProperty(line)) {
-                log.debug("Status property found")
-                statusFound = true
-            }
+            if (hasHeaderSeparator(line)) { log.debug("Header separator found"); break }
+            if (isTypeProperty(line)) { log.debug("Type property found"); typeFound = true }
+            if (isStatusProperty(line)) { log.debug("Status property found"); statusFound = true }
             if (!line.isEmpty() && !line.contains("=")) {
                 log.error("Property found without assignment [{}]", line)
                 headerValid = false
@@ -194,13 +181,10 @@ abstract class MarkupEngine : ParserEngine {
         return headerValid && (statusFound || hasDefaultStatus()) && (typeFound || hasDefaultType())
     }
 
-    private fun hasDefaultType(): Boolean {
-        return !configuration!!.defaultType!!.isEmpty()
-    }
+    private fun hasDefaultType() = !configuration!!.defaultType!!.isEmpty()
 
-    private fun hasDefaultStatus(): Boolean {
-        return !configuration!!.defaultStatus!!.isEmpty()
-    }
+    private fun hasDefaultStatus() = !configuration!!.defaultStatus!!.isEmpty()
+
 
     /**
      * Checks if header separator demarcates end of metadata header.
@@ -214,13 +198,13 @@ abstract class MarkupEngine : ParserEngine {
         // Get every line above header separator.
         val subContents = contents.subList(0, index)
 
-        for (line in subContents) {
+        /*for (line in subContents) {
             // header should only contain empty lines or lines with '=' in
-            if (!line.contains("=") && !line.isEmpty()) {
+            if (!line.contains("=") && !line.isEmpty())
                 return false
-            }
         }
-        return true
+        return true*/
+        return subContents.all { it.contains("=") || it.isEmpty() }
     }
 
     private fun hasHeaderSeparator(line: String): Boolean {
@@ -235,17 +219,11 @@ abstract class MarkupEngine : ParserEngine {
         return sanitize(line).startsWith("type=")
     }
 
-    /**
-     * Process the header of the file.
-     *
-     * @param context the parser context
-     */
+    /** Process the header of the file. */
     private fun processDefaultHeader(context: ParserContext) {
         if (context.hasHeader()) {
             for (line in context.fileLines) {
-                if (hasHeaderSeparator(line)) {
-                    break
-                }
+                if (hasHeaderSeparator(line)) break
                 processHeaderLine(line, context.documentModel)
             }
         }
@@ -262,52 +240,43 @@ abstract class MarkupEngine : ParserEngine {
         val key = sanitize(inputKey)
         val value = sanitize(inputValue)
 
-        if (key.equals(ModelAttributes.DATE, ignoreCase = true)) {
-            val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
-            try {
-                val date = df.parse(value)
-                content.date = (date)
-            } catch (e: ParseException) {
-                log.error("unable to parse date {}", value)
+        when {
+            key.equals(ModelAttributes.DATE, ignoreCase = true) -> {
+                val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
+                try {
+                    val date = df.parse(value)
+                    content.date = (date)
+                } catch (e: ParseException) {
+                    log.error("unable to parse date {}", value)
+                }
             }
-        } else if (key.equals(ModelAttributes.TAGS, ignoreCase = true)) {
-            content.tags = (getTags(value))
-        } else if (key.equals(ModelAttributes.CACHED, ignoreCase = true)) {
-            content.cached = (value.toBoolean())
-        } else if (isJson(value)) {
-            content[key] = JSONValue.parse(value)
-        } else {
-            content[key] = value
+            key.equals(ModelAttributes.TAGS, ignoreCase = true) ->
+                content.tags = (getTags(value))
+            key.equals(ModelAttributes.CACHED, ignoreCase = true) ->
+                content.cached = (value.toBoolean())
+            isJson(value) ->
+                content[key] = JSONValue.parse(value)
+            else ->
+                content[key] = value
         }
     }
 
-    private fun sanitize(part: String): String {
-        return part.trim { it <= ' ' }
-    }
+    private fun sanitize(part: String)= part.trim { it <= ' ' }
 
-    private fun getTags(tagsPart: String): Array<String> {
-        return tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-    }
+    private fun getTags(tagsPart: String): Array<String>
+        = tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
-    private fun isJson(part: String): Boolean {
-        return part.startsWith("{") && part.endsWith("}")
-    }
+    private fun isJson(part: String)
+        = part.startsWith("{") && part.endsWith("}")
 
-    /**
-     * Process the body of the file.
-     *
-     * @param context the parser context
-     */
+
+    /** Process the body of the file. */
     private fun processDefaultBody(context: ParserContext) {
         val body = StringBuilder()
         var inBody = false
         for (line in context.fileLines) {
-            if (inBody) {
-                body.append(line).append("\n")
-            }
-            if (line == configuration!!.headerSeparator) {
-                inBody = true
-            }
+            if (inBody) body.append(line).append("\n")
+            if (line == configuration!!.headerSeparator) inBody = true
         }
 
         if (body.isEmpty()) {
@@ -315,7 +284,7 @@ abstract class MarkupEngine : ParserEngine {
                 body.append(line).append("\n")
             }
         }
-        context.body = (body.toString())
+        context.body = body.toString()
     }
 
     companion object {

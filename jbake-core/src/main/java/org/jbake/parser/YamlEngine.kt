@@ -39,7 +39,6 @@ class YamlEngine : MarkupEngine() {
     /**
      * This method implements the contract allowing use of Yaml files as content files
      *
-     * @param context the parser context
      */
     override fun processHeader(context: ParserContext) {
         val fileContents = parseFile(context.file)
