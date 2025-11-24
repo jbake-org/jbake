@@ -6,10 +6,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jbake.TestUtils
 import org.jbake.app.JBakeException
 import org.jbake.app.LoggingTest
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -54,11 +57,11 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
-        val nonExistentSourceFolder = Mockito.mock(File::class.java)
-        Mockito.`when`(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
-        Mockito.`when`(nonExistentSourceFolder.exists()).thenReturn(false)
+        val nonExistentSourceFolder = mock(File::class.java)
+        `when`(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
+        `when`(nonExistentSourceFolder.exists()).thenReturn(false)
 
-        val e = org.junit.jupiter.api.Assertions.assertThrows(
+        val e = assertThrows(
             JBakeException::class.java
         ) { util.loadConfig(nonExistentSourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
@@ -74,13 +77,11 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldThrowAnExceptionIfSourcefolderIsNotADirectory() {
-        val sourceFolder = Mockito.mock(File::class.java)
-        Mockito.`when`(sourceFolder.exists()).thenReturn(true)
-        Mockito.`when`(sourceFolder.isDirectory()).thenReturn(false)
+        val sourceFolder = mock(File::class.java)
+        `when`(sourceFolder.exists()).thenReturn(true)
+        `when`(sourceFolder.isDirectory()).thenReturn(false)
 
-        val e = org.junit.jupiter.api.Assertions.assertThrows(
-            JBakeException::class.java
-        ) { util.loadConfig(sourceFolder) }
+        val e = assertThrows(JBakeException::class.java) { util.loadConfig(sourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder is not a directory.")
     }
 
