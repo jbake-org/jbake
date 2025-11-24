@@ -14,6 +14,7 @@ import java.io.File
 import java.io.PrintWriter
 
 class AsciidocParserTest {
+
     @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
@@ -130,7 +131,7 @@ class AsciidocParserTest {
     @Test
     fun parseAsciidocFileWithPrettifyAttribute() {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
-        val map = parser!!.processFile(asciidocWithSource!!)
+        val map = parser.processFile(asciidocWithSource)
         assertNotNull(map)
         assertEquals("draft", map!!.status)
         assertEquals("post", map.type)
@@ -146,7 +147,7 @@ class AsciidocParserTest {
     @Test
     fun parseAsciidocFileWithCustomAttribute() {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify,testattribute=I Love Jbake")
-        val map = parser!!.processFile(asciidocWithSource!!)
+        val map = parser.processFile(asciidocWithSource)
         assertNotNull(map)
         assertEquals("draft", map!!.status)
         assertEquals("post", map.type)
@@ -159,7 +160,7 @@ class AsciidocParserTest {
 
     @Test
     fun parseValidAsciiDocFile() {
-        val map = parser!!.processFile(validAsciidocFile!!)
+        val map = parser.processFile(validAsciidocFile)
         assertNotNull(map)
         assertEquals("draft", map!!.status)
         assertEquals("post", map.type)
@@ -170,13 +171,13 @@ class AsciidocParserTest {
 
     @Test
     fun parseInvalidAsciiDocFile() {
-        val map = parser!!.processFile(invalidAsciiDocFile!!)
+        val map = parser.processFile(invalidAsciiDocFile!!)
         assertNull(map)
     }
 
     @Test
     fun parseValidAsciiDocFileWithoutHeader() {
-        val map = parser!!.processFile(validAsciiDocFileWithoutHeader!!)
+        val map = parser.processFile(validAsciiDocFileWithoutHeader!!)
         assertNotNull(map)
         assertEquals("Hello: AsciiDoc!", map!!.get("title"))
         assertEquals("published", map.status)
@@ -188,13 +189,13 @@ class AsciidocParserTest {
 
     @Test
     fun parseInvalidAsciiDocFileWithoutHeader() {
-        val map = parser!!.processFile(invalidAsciiDocFileWithoutHeader!!)
+        val map = parser.processFile(invalidAsciiDocFileWithoutHeader)
         assertNull(map)
     }
 
     @Test
     fun parseValidAsciiDocFileWithExampleHeaderInContent() {
-        val map = parser!!.processFile(validAsciiDocFileWithHeaderInContent!!)
+        val map = parser.processFile(validAsciiDocFileWithHeaderInContent)
         assertNotNull(map)
         assertEquals("published", map!!.status)
         assertEquals("page", map.type)
@@ -214,7 +215,7 @@ class AsciidocParserTest {
         config.setDefaultStatus("published")
         config.setDefaultType("page")
         val parser = Parser(config)
-        val map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData!!)
+        val map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData)
         assertNotNull(map)
         assertEquals("published", map!!.status)
         assertEquals("page", map.type)

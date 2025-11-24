@@ -21,11 +21,11 @@ class ParserTest {
     var folder: TemporaryFolder = TemporaryFolder()
 
     private lateinit var config: DefaultJBakeConfiguration
-    private var parser: Parser? = null
-    private var rootPath: File? = null
+    private lateinit var parser: Parser
+    private lateinit var rootPath: File
 
     private lateinit var validHTMLFile: File
-    private var invalidHTMLFile: File? = null
+    private lateinit var invalidHTMLFile: File
     private lateinit var validMarkdownFileWithCustomHeader: File
     private lateinit var validMarkdownFileWithDefaultStatus: File
     private lateinit var validMarkdownFileWithDefaultTypeAndStatus: File
@@ -52,7 +52,7 @@ class ParserTest {
     @Before
     fun createSampleFile() {
         rootPath = TestUtils.testResourcesAsSourceFolder
-        config = ConfigUtil().loadConfig(rootPath!!) as DefaultJBakeConfiguration
+        config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
 
         validHTMLFile = folder.newFile("valid.html")
@@ -205,9 +205,9 @@ class ParserTest {
 
     @Test
     fun parseValidHTMLFile() {
-        val documentModel = parser!!.processFile(validHTMLFile!!)
+        val documentModel = parser.processFile(validHTMLFile)!!
         Assert.assertNotNull(documentModel)
-        Assert.assertEquals("draft", documentModel!!.status)
+        Assert.assertEquals("draft", documentModel.status)
         Assert.assertEquals("post", documentModel.type)
         Assert.assertEquals("This is a Title = This is a valid Title", documentModel.title)
         Assert.assertNotNull(documentModel.date)
@@ -220,13 +220,13 @@ class ParserTest {
 
     @Test
     fun parseInvalidHTMLFile() {
-        val documentModel = parser!!.processFile(invalidHTMLFile!!)
+        val documentModel = parser.processFile(invalidHTMLFile)
         Assert.assertNull(documentModel)
     }
 
     @Test
     fun parseInvalidExtension() {
-        val documentModel = parser!!.processFile(invalidExtensionFile!!)
+        val documentModel = parser.processFile(invalidExtensionFile)
         Assert.assertNull(documentModel)
     }
 
@@ -235,9 +235,9 @@ class ParserTest {
     fun parseMarkdownFileWithCustomHeaderSeparator() {
         config.headerSeparator = customHeaderSeparator
 
-        val documentModel = parser!!.processFile(validMarkdownFileWithCustomHeader!!)
+        val documentModel = parser.processFile(validMarkdownFileWithCustomHeader)!!
         Assert.assertNotNull(documentModel)
-        Assert.assertEquals("draft", documentModel!!.status)
+        Assert.assertEquals("draft", documentModel.status)
         Assert.assertEquals("post", documentModel.type)
         assertThat(documentModel.body)
             .contains("<p>A paragraph</p>")
@@ -247,9 +247,9 @@ class ParserTest {
     fun parseMarkdownFileWithDefaultStatus() {
         config.setDefaultStatus("published")
 
-        val documentModel = parser!!.processFile(validMarkdownFileWithDefaultStatus!!)
+        val documentModel = parser.processFile(validMarkdownFileWithDefaultStatus)!!
         Assert.assertNotNull(documentModel)
-        Assert.assertEquals("published", documentModel!!.status)
+        Assert.assertEquals("published", documentModel.status)
         Assert.assertEquals("post", documentModel.type)
         Assert.assertEquals(true, documentModel.cached)
     }
@@ -259,9 +259,9 @@ class ParserTest {
         config.setDefaultStatus("published")
         config.setDefaultType("page")
 
-        val documentModel = parser!!.processFile(validMarkdownFileWithDefaultTypeAndStatus!!)
+        val documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus)!!
         Assert.assertNotNull(documentModel)
-        Assert.assertEquals("published", documentModel!!.status)
+        Assert.assertEquals("published", documentModel.status)
         Assert.assertEquals("page", documentModel.type)
     }
 
@@ -270,8 +270,8 @@ class ParserTest {
         config.setDefaultStatus("published")
         config.setDefaultType("page")
 
-        val documentModel = parser!!.processFile(validMarkdownFileWithDefaultTypeAndStatus!!)
-        Assert.assertEquals(false, documentModel!!.cached)
+        val documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus)!!
+        Assert.assertEquals(false, documentModel.cached)
     }
 
     @Test
@@ -279,21 +279,21 @@ class ParserTest {
         config.setDefaultStatus("")
         config.setDefaultType("page")
 
-        val documentModel = parser!!.processFile(invalidMarkdownFileWithoutDefaultStatus!!)
+        val documentModel = parser.processFile(invalidMarkdownFileWithoutDefaultStatus)
         Assert.assertNull(documentModel)
     }
 
     @Test
     fun parseInvalidMarkdownFile() {
-        val documentModel = parser!!.processFile(invalidMDFile!!)
+        val documentModel = parser.processFile(invalidMDFile)
         Assert.assertNull(documentModel)
     }
 
     @Test
     fun sanitizeKeysAndValues() {
-        val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
+        val map = parser.processFile(validaAsciidocWithUnsanitizedHeader)!!
 
-        assertThat(map!!.status).isEqualTo("draft")
+        assertThat(map.status).isEqualTo("draft")
         assertThat(map.title).isEqualTo("Title")
         assertThat(map.type).isEqualTo("post")
         assertThat(map.get("custom")).isEqualTo("custom without bom's")
@@ -304,41 +304,40 @@ class ParserTest {
     @Test
     fun sanitizeTags() {
         config.setProperty(PropertyList.TAG_SANITIZE.key, true)
-        val map = parser!!.processFile(validaAsciidocWithUnsanitizedHeader!!)
+        val map = parser.processFile(validaAsciidocWithUnsanitizedHeader)!!
 
-        assertThat(map!!.tags)
-            .isEqualTo(mutableListOf("jbake", "java", "tag-with-space").toTypedArray())
+        assertThat(map.tags).isEqualTo(mutableListOf("jbake", "java", "tag-with-space").toTypedArray())
     }
 
 
     @Test
     fun parseValidHTMLWithJSONFile() {
-        val documentModel = parser!!.processFile(validHTMLWithJSONFile!!)
-        assertJSONExtracted(documentModel!!.get("jsondata"))
+        val documentModel = parser.processFile(validHTMLWithJSONFile)!!
+        assertJSONExtracted(documentModel.get("jsondata"))
     }
 
     @Test
     fun parseValidAsciiDocWithJSONFile() {
-        val documentModel = parser!!.processFile(validAsciiDocWithJSONFile!!)
-        assertJSONExtracted(documentModel!!.get("jsondata"))
+        val documentModel = parser.processFile(validAsciiDocWithJSONFile)!!
+        assertJSONExtracted(documentModel.get("jsondata"))
     }
 
     @Test
     fun testValidAsciiDocWithADHeaderJSONFile() {
-        val documentModel = parser!!.processFile(validAsciiDocWithADHeaderJSONFile!!)
-        assertJSONExtracted(documentModel!!.get("jsondata"))
+        val documentModel = parser.processFile(validAsciiDocWithADHeaderJSONFile)!!
+        assertJSONExtracted(documentModel.get("jsondata"))
     }
 
     private fun assertJSONExtracted(jsonDataEntry: Any?) {
         assertThat(jsonDataEntry).isInstanceOf(JSONObject::class.java)
         val jsonData = jsonDataEntry as JSONObject
+
         assertThat(jsonData.containsKey("numberValue")).isTrue()
         assertThat(jsonData.get("numberValue")).isInstanceOf(Number::class.java)
         assertThat((jsonData.get("numberValue") as Number).toInt()).isEqualTo(42)
         assertThat(jsonData.containsKey("stringValue")).isTrue()
         assertThat(jsonData.get("stringValue")).isInstanceOf(String::class.java)
-        assertThat(jsonData.get("stringValue") as String?)
-            .isEqualTo("Answer to live, the universe and everything")
+        assertThat(jsonData.get("stringValue") as String?).isEqualTo("Answer to live, the universe and everything")
         assertThat(jsonData.containsKey("nullValue")).isTrue()
         assertThat(jsonData.get("nullValue")).isNull()
         assertThat(jsonData.containsKey("arrayValue")).isTrue()
@@ -346,7 +345,9 @@ class ParserTest {
         assertThat(jsonData.get("arrayValue") as JSONArray?).contains(1L, 2L)
         assertThat(jsonData.containsKey("objectValue")).isTrue()
         assertThat(jsonData.get("objectValue")).isInstanceOf(JSONObject::class.java)
-        assertThat<Any?, Any?>(jsonData.get("objectValue") as JSONObject?)
-            .contains(AbstractMap.SimpleEntry<Any?, Any?>("val1", 1L), AbstractMap.SimpleEntry<Any?, Any?>("val2", 2L))
+        assertThat(jsonData.get("objectValue") as JSONObject?).contains(
+            AbstractMap.SimpleEntry("val1", 1L),
+            AbstractMap.SimpleEntry("val2", 2L)
+        )
     }
 }
