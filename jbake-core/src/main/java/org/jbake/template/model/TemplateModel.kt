@@ -16,33 +16,23 @@ open class TemplateModel : BaseModel {
 
     var config: MutableMap<String, Any>
         get() = get(ModelAttributes.CONFIG) as MutableMap<String, Any>
-        set(configModel) {
-            put(ModelAttributes.CONFIG, configModel)
-        }
+        set(configModel) { put(ModelAttributes.CONFIG, configModel) }
 
     var content: DocumentModel
         get() = get(ModelAttributes.CONTENT) as DocumentModel
-        set(content) {
-            put(ModelAttributes.CONTENT, content)
-        }
+        set(content) { put(ModelAttributes.CONTENT, content) }
 
     var renderer: DelegatingTemplateEngine?
         get() = get(ModelAttributes.RENDERER) as DelegatingTemplateEngine?
-        set(renderingEngine) {
-            put(ModelAttributes.RENDERER, renderingEngine!!)
-        }
+        set(renderingEngine) { put(ModelAttributes.RENDERER, renderingEngine!!) }
 
     var numberOfPages: Int
         get() = get(ModelAttributes.NUMBER_OF_PAGES) as Int? ?: 0
-        set(numberOfPages) {
-            put(ModelAttributes.NUMBER_OF_PAGES, numberOfPages)
-        }
+        set(numberOfPages) { put(ModelAttributes.NUMBER_OF_PAGES, numberOfPages) }
 
     var currentPageNumber: Int
         get() = get(ModelAttributes.CURRENT_PAGE_NUMBERS) as Int? ?: 0
-        set(currentPageNumber) {
-            put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber)
-        }
+        set(currentPageNumber) { put(ModelAttributes.CURRENT_PAGE_NUMBERS, currentPageNumber) }
 
     /**
      * Previous page filename for pagination. Null when on the first page (no previous page exists).
@@ -70,27 +60,19 @@ open class TemplateModel : BaseModel {
 
     var tag: String?
         get() = get(ModelAttributes.TAG) as String?
-        set(tag) {
-            put(ModelAttributes.TAG, tag!!)
-        }
+        set(tag) { put(ModelAttributes.TAG, tag!!) }
 
     var taggedPosts: DocumentList<*>
         get() = get(ModelAttributes.TAGGED_POSTS) as DocumentList<*>
-        set(taggedPosts) {
-            put(ModelAttributes.TAGGED_POSTS, taggedPosts)
-        }
+        set(taggedPosts) { put(ModelAttributes.TAGGED_POSTS, taggedPosts) }
 
     var taggedDocuments: DocumentList<*>
         get() = get(ModelAttributes.TAGGED_DOCUMENTS) as DocumentList<*>
-        set(taggedDocuments) {
-            put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments)
-        }
+        set(taggedDocuments) { put(ModelAttributes.TAGGED_DOCUMENTS, taggedDocuments) }
 
     var version: String?
         get() = get(ModelAttributes.VERSION) as String?
-        set(version) {
-            put(ModelAttributes.VERSION, version!!)
-        }
+        set(version) { put(ModelAttributes.VERSION, version!!) }
 
     val writer: Writer?
         get() = get(ModelAttributes.OUT) as Writer?
@@ -108,17 +90,14 @@ open class TemplateModel : BaseModel {
             val config = model.config
             val configObj = if (config.containsKey("config") && config["config"] is org.jbake.app.configuration.JBakeConfiguration) {
                 config["config"] as org.jbake.app.configuration.JBakeConfiguration
-            } else {
-                // Fallback - this shouldn't happen but handle gracefully
-                throw IllegalStateException("Configuration not found in template model")
             }
+            else throw IllegalStateException("Configuration not found in template model") // Shouldn't happen but handle gracefully.
 
             val content = if (!model.containsKey(ModelAttributes.CONTENT)) null else model.content
 
             val renderer = model.renderer
 
-            val pagination =
-                if (!model.containsKey(ModelAttributes.NUMBER_OF_PAGES)) null
+            val pagination = if (!model.containsKey(ModelAttributes.NUMBER_OF_PAGES)) null
                 else PaginationContext(
                     currentPage = model.currentPageNumber,
                     totalPages = model.numberOfPages,
@@ -126,8 +105,7 @@ open class TemplateModel : BaseModel {
                     nextFilename = model.nextFileName
                 )
 
-            val tag =
-                if (!model.containsKey(ModelAttributes.TAG)) null
+            val tag = if (!model.containsKey(ModelAttributes.TAG)) null
                 else TagContext(
                     name = model.tag ?: "",
                     taggedPosts = model.taggedPosts,
