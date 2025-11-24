@@ -279,6 +279,10 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion><version>3.9.9</version></requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[17,18)</version>
+                                    <message>JBake tests require JDK 17 (build artifacts rely on libraries incompatible with newer JDKs). Please run the build with JDK 17 (set JAVA_HOME or use toolchains).</message>
+                                </requireJavaVersion>
                             </rules>
                         </configuration>
                     </execution>
