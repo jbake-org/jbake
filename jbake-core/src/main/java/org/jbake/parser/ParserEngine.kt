@@ -14,7 +14,6 @@ interface ParserEngine {
     fun parse(config: JBakeConfiguration, file: File): DocumentModel?
 
     /**
-     * @param config      The project configuration
      * @param fileToParse        The file to be parsed
      * @param contentPath unknown
      * @return A model representation of the given file

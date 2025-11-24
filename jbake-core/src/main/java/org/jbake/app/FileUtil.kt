@@ -76,7 +76,6 @@ object FileUtil {
      * configuration as a marker to ignore the directory.
      *
      * @param file the file to test
-     * @param config the jbake configuration
      * @return true if file is directory and not ignored
      */
     fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
@@ -215,7 +214,6 @@ object FileUtil {
      *
      * @param sourceFile the file to calculate relative path for
      * @param rootPath the root path
-     * @param config the jbake configuration
      * @return the relative path to get to the root
      */
     fun getPathToRoot(config: JBakeConfiguration, rootPath: File, sourceFile: File): String {

@@ -14,7 +14,6 @@ import java.io.FileInputStream
  */
 class Init(private val config: JBakeConfiguration) {
     /**
-     * @param config The project configuration
      */
     @Deprecated("use {@link Init#Init(JBakeConfiguration)} instead")
     constructor(config: CompositeConfiguration) : this(DefaultJBakeConfiguration(config))

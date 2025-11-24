@@ -21,13 +21,8 @@ class BakeWatcher {
      * Starts watching the file system for changes to trigger a bake.
      *
      * @param res    Commandline options
-     * @param config Configuration settings
      */
-    @Deprecated(
-        """use {@link BakeWatcher#start(JBakeConfiguration)} instead
-
-      """
-    )
+    @Deprecated("""use {@link BakeWatcher#start(JBakeConfiguration)} instead""")
     fun start(res: LaunchOptions, config: CompositeConfiguration) {
         val configuration: JBakeConfiguration =
             JBakeConfigurationFactory().createDefaultJbakeConfiguration(res.getSource(), config)
@@ -36,8 +31,6 @@ class BakeWatcher {
 
     /**
      * Starts watching the file system for changes to trigger a bake.
-     *
-     * @param config JBakeConfiguration settings
      */
     fun start(config: JBakeConfiguration) {
         try {

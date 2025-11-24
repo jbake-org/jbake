@@ -20,16 +20,11 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
     private val renderers: TemplateEngines
 
     /**
-     * @param config the [CompositeConfiguration] of jbake
      * @param db the [ContentStore]
      * @param destination the destination path
      * @param templatesPath the templates path
      */
-    @Deprecated(
-        """Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
-
-      """
-    )
+    @Deprecated("""Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.""")
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
         : super(config, db, destination, templatesPath)
     {

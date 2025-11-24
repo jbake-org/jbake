@@ -15,7 +15,6 @@ import java.text.MessageFormat
 class Baker {
     /**
      * @param options The given cli options
-     * @param config  The project configuration
      */
     @Deprecated("use {@link Baker#bake(JBakeConfiguration)} instead")
     fun bake(options: LaunchOptions, config: CompositeConfiguration) {

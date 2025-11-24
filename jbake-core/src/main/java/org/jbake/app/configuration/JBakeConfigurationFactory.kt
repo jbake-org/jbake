@@ -105,7 +105,6 @@ class JBakeConfigurationFactory {
      *
      *
      * @param sourceFolder The source folder of the project
-     * @param config A [CompositeConfiguration]
      * @return A configuration by given parameters
      */
     @Deprecated("")

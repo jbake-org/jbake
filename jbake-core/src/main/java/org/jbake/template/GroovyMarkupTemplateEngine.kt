@@ -21,7 +21,6 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     private var templateEngine: MarkupTemplateEngine? = null
 
     /**
-     * @param config the [CompositeConfiguration] of jbake
      * @param db the [ContentStore]
      * @param destination the destination path
      * @param templatesPath the templates path

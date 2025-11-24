@@ -26,13 +26,8 @@ class Asset {
     /**
      * @param source      Source file for the asset
      * @param destination Destination (target) directory for asset file
-     * @param config      Project configuration
      */
-    @Deprecated(
-        """Use {@link #Asset(JBakeConfiguration)} instead.
-      Compatibility constructor.
-      Creates an instance of Asset."""
-    )
+    @Deprecated("""Use {@link #Asset(JBakeConfiguration)} instead. Compatibility constructor.  Creates an instance of Asset.""")
     constructor(source: File, destination: File, config: CompositeConfiguration) {
         this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config)
     }
@@ -42,18 +37,13 @@ class Asset {
         this.config = config
     }
 
-    /**
-     * Copy all files from supplied path.
-     * Copy all files from assets folder to destination folder read from configuration
-     *
-     * @param path The starting path
-     */
+    /** Copy all files from assets folder to destination folder read from configuration */
     @JvmOverloads
-    fun copy(path: File = config.assetFolder) {
+    fun copy(startingPath: File = config.assetFolder) {
         val filter = FileFilter { file ->
             (!config.assetIgnoreHidden || !file.isHidden()) && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config))
         }
-        copy(path, config.destinationFolder, filter)
+        copy(startingPath, config.destinationFolder, filter)
     }
 
     /** Copy one asset file at a time. */

@@ -41,7 +41,6 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     private var templateResolver: FileTemplateResolver? = null
 
     /**
-     * @param config the [CompositeConfiguration] of jbake
      * @param db the [ContentStore]
      * @param destination the destination path
      * @param templatesPath the templates path

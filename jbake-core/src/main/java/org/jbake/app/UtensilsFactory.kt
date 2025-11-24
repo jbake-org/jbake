@@ -9,7 +9,6 @@ import org.jbake.app.configuration.JBakeConfigurationInspector
 object UtensilsFactory {
     /**
      * Create default [Utensils] by a given [JBakeConfiguration]
-     * @param config a [JBakeConfiguration]
      * @return a default [Utensils] instance
      */
     fun createDefaultUtensils(config: JBakeConfiguration): Utensils {

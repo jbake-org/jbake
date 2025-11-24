@@ -33,10 +33,8 @@ class Oven {
      * @param isClearCache Should the cache be cleaned
      * @throws Exception if configuration is not loaded correctly
      */
-    @Deprecated(
-        """Use {@link #Oven(JBakeConfiguration)} instead
-      Delegate c'tor to prevent API break for the moment."""
-    )
+    @Deprecated("""Use {@link #Oven(JBakeConfiguration)} instead
+      Delegate c'tor to prevent API break for the moment.""")
     constructor(
         source: File,
         destination: File,
@@ -46,14 +44,11 @@ class Oven {
     /**
      * @param source       Project source directory
      * @param destination  The destination folder
-     * @param config       Project configuration
      * @param isClearCache Should the cache be cleaned
      * @throws Exception if configuration is not loaded correctly
      */
-    @Deprecated(
-        """Use {@link #Oven(JBakeConfiguration)} instead
-      Creates a new instance of the Oven with references to the source and destination folders."""
-    )
+    @Deprecated("""Use {@link #Oven(JBakeConfiguration)} instead
+      Creates a new instance of the Oven with references to the source and destination folders.""")
     constructor(source: File, destination: File, config: CompositeConfiguration, isClearCache: Boolean) : this(
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config, isClearCache)
     )
@@ -63,8 +58,6 @@ class Oven {
      *
      *
      * It creates default [Utensils] needed to bake sites.
-     *
-     * @param config The project configuration. see [JBakeConfiguration]
      */
     constructor(config: JBakeConfiguration) {
         this.utensils = UtensilsFactory.createDefaultUtensils(config)
@@ -91,12 +84,9 @@ class Oven {
 
     /**
      * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
-     *
      */
-    @Deprecated(
-        """There is no need for this method anymore. Validation is now part of the instantiation.
-      Can be removed with 3.0.0."""
-    )
+    @Deprecated("""There is no need for this method anymore. Validation is now part of the instantiation.
+      Can be removed with 3.0.0.""")
     fun setupPaths() {
         /* nothing to do here */
     }
@@ -114,7 +104,6 @@ class Oven {
 
     /**
      * Sets the Locale for the JVM
-     *
      */
     private fun setLocale() {
         val localeString = this.utensils.configuration.jvmLocale

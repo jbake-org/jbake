@@ -30,13 +30,10 @@ class Crawler {
     /**
      * @param db     Database instance for content
      * @param source Base directory where content directory is located
-     * @param config Project configuration
      */
-    @Deprecated(
-        """Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.
+    @Deprecated("""Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.
       <p>
-      Creates new instance of Crawler."""
-    )
+      Creates new instance of Crawler.""")
     constructor(db: ContentStore, source: File, config: CompositeConfiguration) {
         this.db = db
         this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, config)
@@ -47,7 +44,6 @@ class Crawler {
      * Creates new instance of Crawler.
      *
      * @param db     Database instance for content
-     * @param config Project configuration
      */
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.db = db

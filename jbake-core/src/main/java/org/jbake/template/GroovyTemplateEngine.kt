@@ -19,7 +19,6 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
     private val cachedTemplates: MutableMap<String, Template?> = HashMap()
 
     /**
-     * @param config the [CompositeConfiguration] of jbake
      * @param db the [ContentStore]
      * @param destination the destination path
      * @param templatesPath the templates path

@@ -31,12 +31,9 @@ class Renderer {
      * @param db            The database holding the content
      * @param destination   The destination folder
      * @param templatesPath The templates folder
-     * @param config        Project configuration
      */
-    @Deprecated(
-        """Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
-      Creates a new instance of Renderer with supplied references to folders."""
-    )
+    @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
+      Creates a new instance of Renderer with supplied references to folders.""")
     constructor(db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration) : this(
         db,
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
@@ -51,13 +48,10 @@ class Renderer {
      * @param db              The database holding the content
      * @param destination     The destination folder
      * @param templatesPath   The templates folder
-     * @param config          Project configuration
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
-    @Deprecated(
-        """Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
-      Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use."""
-    )
+    @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
+      Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.""")
     constructor(
         db: ContentStore,
         destination: File,
@@ -78,7 +72,6 @@ class Renderer {
      * Creates a new instance of Renderer with supplied references to folders.
      *
      * @param db     The database holding the content
-     * @param config Project configuration
      */
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.config = config
@@ -90,7 +83,6 @@ class Renderer {
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
      *
      * @param db              The database holding the content
-     * @param config          The application specific configuration
      * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
     constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {
