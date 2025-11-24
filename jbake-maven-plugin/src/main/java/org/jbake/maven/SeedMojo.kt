@@ -54,19 +54,20 @@ class SeedMojo : AbstractMojo() {
             val url = URL(seedUrl)
             val tmpZipFile = File.createTempFile("jbake", ".zip")
 
-            log.info(String.format("Downloading contents from %s into %s", seedUrl, tmpZipFile))
+            log.info("Downloading JBake template from: $seedUrl to temporary file: ${tmpZipFile.absolutePath}")
 
             val fos = FileOutputStream(tmpZipFile)
             val length = IOUtils.copy(url.openStream(), fos)
 
             fos.close()
 
-            log.info(String.format("%d bytes downloaded. Unpacking into %s", length, outputDirectory))
+            log.info("Downloaded $length bytes. Unpacking template to output directory: ${outputDirectory!!.absolutePath}")
 
             unpackZip(tmpZipFile)
+            log.info("JBake template successfully seeded into: ${outputDirectory!!.absolutePath}")
         } catch (e: Exception) {
-            log.info("Oops", e)
-            throw MojoExecutionException("Failure when running: ", e)
+            log.error("Failed to seed JBake template from: $seedUrl to: ${outputDirectory!!.absolutePath} - ${e.message}", e)
+            throw MojoExecutionException("Failed to seed JBake template into ${outputDirectory!!.absolutePath}", e)
         }
     }
 

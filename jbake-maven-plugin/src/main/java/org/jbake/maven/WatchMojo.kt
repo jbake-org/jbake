@@ -19,7 +19,7 @@ open class WatchMojo : GenerateMojo() {
 
         var lastProcessed = System.currentTimeMillis()
 
-        log.info("Now listening for changes on path " + inputDirectory!!.path)
+        log.info("Watching for file changes in directory: ${inputDirectory!!.path}")
         initServer()
 
         var dirWatcher: DirWatcher? = null
@@ -32,16 +32,17 @@ open class WatchMojo : GenerateMojo() {
             (object : Thread() {
                 override fun run() {
                     try {
-                        log.info("Running. Enter a blank line to finish. Anything else forces re-rendering.")
+                        log.info("Watch mode active. Press Enter to stop watching, or type any text and press Enter to force re-render.")
 
                         while (true) {
                             val line = reader.readLine()
                             if (StringUtils.isBlank(line)) break
+                            log.info("Manual re-render triggered by user input")
                             reRender()
                         }
                     }
                     catch (exc: Exception) {
-                        log.info("Ooops", exc)
+                        log.error("Error in input handler thread: ${exc.message}", exc)
                     }
                     finally {
                         done.set(true)
@@ -55,18 +56,18 @@ open class WatchMojo : GenerateMojo() {
                 val result = dirWatcher.processEvents()
 
                 if (null != result && result >= lastProcessed) {
-                    log.info("Refreshing")
+                    log.info("File system change detected, re-rendering site from: ${inputDirectory!!.path}")
                     super.reRender()
                     lastProcessed = System.currentTimeMillis()
                 }
             } while (!done.get())
         }
         catch (exc: Exception) {
-            log.info("Oops", exc)
-            throw MojoExecutionException("Oops", exc)
+            log.error("Watch mode failed: ${exc.message}", exc)
+            throw MojoExecutionException("Failed to watch directory: ${inputDirectory!!.path}", exc)
         }
         finally {
-            log.info("Finishing")
+            log.info("Shutting down watch mode for directory: ${inputDirectory!!.path}")
             dirWatcher?.stop()
             stopServer()
         }

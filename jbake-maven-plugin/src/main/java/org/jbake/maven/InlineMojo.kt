@@ -12,11 +12,10 @@ import spark.Spark
 @Mojo(name = "inline", requiresDirectInvocation = true, requiresProject = false)
 class InlineMojo : WatchMojo() {
 
-    /** Listen Port */
     @Parameter(property = "jbake.listenAddress", defaultValue = "127.0.0.1")
     private val listenAddress: String? = null
 
-    /** Index File */
+    /** Name of the index file (a list of all pages). */
     @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
     private val indexFile: String? = null
 
@@ -30,15 +29,19 @@ class InlineMojo : WatchMojo() {
         }
 
     @Throws(MojoExecutionException::class)
-    override fun stopServer()
-        = Spark.stop()
+    override fun stopServer() {
+        log.info("Stopping embedded web server")
+        Spark.stop()
+    }
 
     @Throws(MojoExecutionException::class)
     override fun initServer() {
+        log.info("Starting embedded web server at http://$listenAddress:${this.port} serving: ${outputDirectory!!.path}")
         Spark.externalStaticFileLocation(outputDirectory!!.path)
         Spark.ipAddress(listenAddress)
         Spark.port(this.port!!)
         Spark.init()
         Spark.awaitInitialization()
+        log.info("Embedded web server ready at http://$listenAddress:${this.port}")
     }
 }
