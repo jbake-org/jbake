@@ -6,11 +6,13 @@ import java.io.File
 
 
 /**
- * A [JBakeConfiguration] factory
+ * A [JBakeConfiguration] factory.
  */
 class JBakeConfigurationFactory {
 
     @JvmField var configUtil: ConfigUtil = ConfigUtil()
+
+    // Formatter line: Keep the parameters vertical to make it clear what overrides are present.
 
     /**
      * Creates a [DefaultJBakeConfiguration] using default.properties and jbake.properties

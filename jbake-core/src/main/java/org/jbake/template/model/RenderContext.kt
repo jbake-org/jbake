@@ -89,18 +89,9 @@ data class RenderContext(
 }
 
 /** Pagination information for paginated content. */
-data class PaginationContext(
-    val currentPage: Int,
-    val totalPages: Int,
-    val previousFilename: String?,
-    val nextFilename: String?
-)
+data class PaginationContext(val currentPage: Int, val totalPages: Int, val previousFilename: String?, val nextFilename: String?)
 
 /** Tag-related context for tag pages. */
-data class TagContext(
-    val name: String,
-    val taggedPosts: DocumentList<*>,
-    val taggedDocuments: DocumentList<*>
-)
+data class TagContext(val name: String, val taggedPosts: DocumentList<*>, val taggedDocuments: DocumentList<*>)
 
 

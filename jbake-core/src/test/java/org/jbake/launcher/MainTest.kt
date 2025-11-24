@@ -181,11 +181,7 @@ internal class MainTest : LoggingTest() {
     }
 
     @Test
-    fun launchJettyWithCmdlineOverridingProperties(
-        @TempDir source: Path,
-        @TempDir output: Path,
-        @TempDir target: Path
-    ) {
+    fun launchJettyWithCmdlineOverridingProperties(@TempDir source: Path, @TempDir output: Path, @TempDir target: Path) {
         val src = newFolder(source, "src/jbake")
         val expectedOutput = newFolder(output, "build/jbake")
         val configTarget = newFolder(target, "target/jbake")
@@ -202,9 +198,7 @@ internal class MainTest : LoggingTest() {
     fun shouldTellUserThatTemplateOptionRequiresInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
-        val exception = assertThrows(JBakeException::class.java) {
-            main.run(args)
-        }
+        val exception = assertThrows(JBakeException::class.java) { main.run(args) }
 
         assertThat(exception.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
         verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
@@ -223,9 +217,7 @@ internal class MainTest : LoggingTest() {
         doThrow(RuntimeException("something went wrong"))
             .`when`(other).run(any(LaunchOptions::class.java), any(JBakeConfiguration::class.java))
 
-        val e = assertThrows(
-            JBakeException::class.java
-        ) { other.run(arrayOf("")) }
+        val e = assertThrows(JBakeException::class.java) { other.run(arrayOf("")) }
 
         assertThat(e.message).isEqualTo("An unexpected error occurred: something went wrong")
         assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.status)
