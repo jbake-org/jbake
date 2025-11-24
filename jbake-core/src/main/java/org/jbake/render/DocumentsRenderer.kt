@@ -29,8 +29,8 @@ class DocumentsRenderer : RenderingTool {
                 val typedDocList = db.getAllContent(document.type)
                 val prev = getPrevDoc(typedDocList, document)
                 val next = getNextDoc(typedDocList, document)
-                document.setPreviousContent(prev)
-                document.setNextContent(next)
+                document.previousContent = prev
+                document.nextContent = next
 
                 renderer.render(document)
                 db.markContentAsRendered(document)

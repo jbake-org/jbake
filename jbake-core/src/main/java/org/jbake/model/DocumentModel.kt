@@ -111,13 +111,6 @@ class DocumentModel : BaseModel() {
             putOrRemoveIfNull(ModelAttributes.PREVIOUS_CONTENT, previousDocumentModel)
         }
 
-    fun setNextContent(nextDocumentModel: DocumentModel?) {
-        nextContent = nextDocumentModel
-    }
-
-    fun setPreviousContent(previousDocumentModel: DocumentModel?) {
-        previousContent = previousDocumentModel
-    }
 
     companion object {
         @JvmStatic
