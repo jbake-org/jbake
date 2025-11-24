@@ -83,32 +83,33 @@ class Main @JvmOverloads constructor(
             return
         }
 
-        if (launchOptions.isBake) {
+        if (launchOptions.isBake)
             baker.bake(config)
-        }
 
-        if (launchOptions.isInit) {
+        if (launchOptions.isInit)
             initStructure(launchOptions.template!!, config)
-        }
 
         if (launchOptions.isRunServer) {
             watcher.start(config)
+
             // TODO: Short term fix until bake, server, init commands no longer share underlying values (such as source/dest).
-            if (launchOptions.isBake) {
-                // Bake and server commands have been run together.
-                if (launchOptions.getDestination() != null) {
-                    // Use the destination provided via the commandline.
-                    runServer(launchOptions.getDestination(), config)
-                } else if (launchOptions.getSource().path != ".") {
-                    // Use the source folder provided via the commandline.
-                    runServer(launchOptions.getSource(), config)
-                } else {
-                    // Use the default DESTINATION_FOLDER value.
-                    runServer(config.destinationFolder!!, config)
-                }
-            } else {
+            if (!launchOptions.isBake) {
                 // Use the default destination folder.
                 runServer(config.destinationFolder!!, config)
+            }
+            else {
+                // Bake and server commands have been run together.
+                when {
+                    launchOptions.getDestination() != null ->
+                        // Use the destination provided via the commandline.
+                        runServer(launchOptions.getDestination(), config)
+                    launchOptions.getSource().path != "." ->
+                        // Use the source folder provided via the commandline.
+                        runServer(launchOptions.getSource(), config)
+                    else ->
+                        // Use the default DESTINATION_FOLDER value.
+                        runServer(config.destinationFolder!!, config)
+                }
             }
         }
     }
