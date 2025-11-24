@@ -70,11 +70,9 @@ class DocumentModel : BaseModel() {
 
     companion object {
         @JvmStatic
-        fun createDefaultDocumentModel(): DocumentModel {
-            val documentModel = DocumentModel()
-            documentModel.cached = true
-            documentModel.rendered = false
-            return documentModel
+        fun createDefaultDocumentModel(): DocumentModel = DocumentModel().apply {
+            cached = true
+            rendered = false
         }
     }
 }

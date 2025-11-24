@@ -118,35 +118,21 @@ class Crawler {
 
         Arrays.sort(contents)
         for (sourceFile in contents) {
-            if (sourceFile.isFile) {
-                val sb = StringBuilder()
-                sb.append("Processing [").append(sourceFile.path).append("]... ")
-                val sha1 = buildHash(sourceFile)
-                val uri = buildDataFileURI(sourceFile)
-                val docType = config.dataFileDocType
-                val status = findDocumentStatus(uri, sha1)
-
-                when (status) {
-                    DocumentStatus.UPDATED -> {
-                        sb.append(" : modified ")
-                        db.deleteContent(uri)
-                    }
-                    DocumentStatus.IDENTICAL -> {
-                        sb.append(" : same ")
-                        logger.info("{}", sb)
-                        continue
-                    }
-                    DocumentStatus.NEW -> {
-                        sb.append(" : new ")
-                    }
-                }
-
-                crawlDataFile(sourceFile, sha1, uri, docType)
-                logger.info("{}", sb)
-            }
             if (sourceFile.isDirectory) {
                 crawlDataFiles(sourceFile)
+                continue
             }
+
+            val sha1 = buildHash(sourceFile)
+            val uri = buildDataFileURI(sourceFile)
+
+            when (findDocumentStatus(uri, sha1)) {
+                DocumentStatus.UPDATED -> { logger.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
+                DocumentStatus.IDENTICAL -> logger.info("SAME:    " + sourceFile.path).also { continue }
+                DocumentStatus.NEW -> logger.info("NEW:     " + sourceFile.path)
+            }
+
+            crawlDataFile(sourceFile, sha1, uri, config.dataFileDocType)
         }
     }
 
@@ -154,8 +140,7 @@ class Crawler {
         return try {
             FileUtil.sha1(sourceFile)
         } catch (_: Exception) {
-            logger.error("unable to build sha1 hash for source file '{}'", sourceFile)
-            ""
+            "".also { logger.error("Unable to build SHA1 hash for source file '$sourceFile'") }
         }
     }
 
@@ -163,13 +148,13 @@ class Crawler {
         val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
 
         val processedUri = if (useNoExtensionUri(uri)) {
-            // convert URI from xxx.html to xxx/index.html
+            // Convert URI from xxx.html to xxx/index.html .
             createNoExtensionUri(uri)
         } else {
             createUri(uri)
         }
 
-        // strip off leading / to enable generating non-root based sites
+        // Strip off leading / to enable generating non-root based sites.
         return processedUri.removePrefix(FileUtil.URI_SEPARATOR_CHAR)
     }
 
