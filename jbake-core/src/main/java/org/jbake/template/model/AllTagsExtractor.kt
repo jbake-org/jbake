@@ -1,10 +1,10 @@
 package org.jbake.template.model
 
-import org.jbake.app.ContentStore
-import org.jbake.template.ModelExtractor
+import org.jbake.template.TypedModelExtractor
 
-class AllTagsExtractor : ModelExtractor<MutableSet<String>> {
-    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): MutableSet<String> {
-        return db.allTags
+class AllTagsExtractor : TypedModelExtractor<MutableSet<String>> {
+
+    override fun extract(context: RenderContext, key: String): MutableSet<String> {
+        return context.db.allTags
     }
 }

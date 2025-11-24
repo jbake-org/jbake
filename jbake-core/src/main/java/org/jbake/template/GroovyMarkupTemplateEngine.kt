@@ -69,12 +69,35 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
         return object : TemplateModel(model) {
 
             override fun get(key: String): Any? {
-                return try {
-                    extractors.extractAndTransform(db, key, model, NoopAdapter())
+                try {
+                    // Pass a plain map to avoid invoking the overridden get and causing recursion.
+                    @Suppress("UNCHECKED_CAST")
+                    val plainMap = (model as Map<String, Any>).toMutableMap()
+                    val extracted = extractors.extractAndTransform(db, key, plainMap, NoopAdapter())
+                    return transformForGroovy(extracted)
+                } catch (e: NoModelExtractorException) {
+                    return model[key]
                 }
-                // super.get() which would recurse
-                catch (e: NoModelExtractorException) { model[key] }
             }
         }
+    }
+
+    /** SafeDate wrapper that prevents NPE when Groovy templates call date.format() on null dates */
+    private class SafeDate(private val date: java.util.Date?) {
+        fun format(pattern: String) = date?.let { java.text.SimpleDateFormat(pattern).format(it) } ?: ""
+        override fun toString() = date?.toString() ?: ""
+    }
+
+    /** Recursively wrap date fields in SafeDate to prevent NPE in Groovy templates */
+    private fun transformForGroovy(value: Any?): Any? = when (value) {
+        null -> null
+        is org.jbake.model.DocumentModel -> HashMap(value).apply { put(org.jbake.model.ModelAttributes.DATE, SafeDate(value.date)) }
+        is org.jbake.model.BaseModel -> HashMap(value).apply { put(org.jbake.model.ModelAttributes.DATE, SafeDate(value[org.jbake.model.ModelAttributes.DATE] as? java.util.Date)) }
+        is Map<*, *> -> {
+            @Suppress("UNCHECKED_CAST")
+            HashMap(value as Map<String, Any?>).apply { put(org.jbake.model.ModelAttributes.DATE, SafeDate(value[org.jbake.model.ModelAttributes.DATE] as? java.util.Date)) }
+        }
+        is Collection<*> -> value.map(::transformForGroovy)
+        else -> value
     }
 }

@@ -11,8 +11,11 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
 import java.io.File
 import java.util.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class DocumentsRenderer : RenderingTool {
+    private val log: Logger = LoggerFactory.getLogger(DocumentsRenderer::class.java)
 
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
@@ -32,6 +35,8 @@ class DocumentsRenderer : RenderingTool {
                 db.markContentAsRendered(document)
                 renderedCount++
             } catch (e: Exception) {
+                // Log full stacktrace to help debugging in tests
+                log.error("Error rendering document {} (type={})", document.name, document.type, e)
                 errors.add(e.message ?: (e.toString() + " " + e.stackTrace.first().toString()))
             }
         }

@@ -1,12 +1,11 @@
 package org.jbake.template.model
 
-import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
-import org.jbake.template.ModelExtractor
+import org.jbake.template.TypedModelExtractor
 
-class PublishedPagesExtractor : ModelExtractor<DocumentList<*>> {
+class PublishedPagesExtractor : TypedModelExtractor<DocumentList<*>> {
 
-    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
-        return db.publishedPages
+    override fun extract(context: RenderContext, key: String): DocumentList<*> {
+        return context.publishedPages
     }
 }

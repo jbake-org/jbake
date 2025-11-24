@@ -46,6 +46,15 @@ class ModelExtractors private constructor() {
     }
 
     /**
+     * Convenience overload to register a TypedModelExtractor by automatically adapting it to the legacy
+     * ModelExtractor interface via ModelExtractorAdapter. This lets new typed extractors be registered
+     * without touching all registration sites.
+     */
+    fun registerEngine(key: String, extractor: TypedModelExtractor<*>) {
+        registerEngine(key, ModelExtractorAdapter(extractor))
+    }
+
+    /**
      * This method is used internally to load markup engines. Markup engines are found using descriptor files on
      * classpath, so adding an engine is as easy as adding a jar on classpath with the descriptor file included.
      */
@@ -127,10 +136,20 @@ class ModelExtractors private constructor() {
          */
         private fun tryLoadEngine(engineClassName: String?): ModelExtractor<*>? {
             return try {
-                val engineClass = Class.forName(engineClassName, false, ModelExtractors::class.java.getClassLoader())
-                    as Class<out ModelExtractor<*>>
-                engineClass.newInstance()
-            } catch (e: Exception) {
+                val cl = ModelExtractors::class.java.getClassLoader()
+                val klass = Class.forName(engineClassName, false, cl)
+
+                // If it's a TypedModelExtractor, instantiate and wrap with adapter
+                if (TypedModelExtractor::class.java.isAssignableFrom(klass)) {
+                    val typedClass = klass as Class<out TypedModelExtractor<*>>
+                    val typedInstance = typedClass.getDeclaredConstructor().newInstance()
+                    return ModelExtractorAdapter(typedInstance)
+                }
+                // Fallback to old ModelExtractor
+                val engineClass = klass as Class<out ModelExtractor<*>>
+                engineClass.getDeclaredConstructor().newInstance()
+            }
+            catch (e: Exception) {
                 when (e) {
                     is ClassNotFoundException,
                     is InstantiationException,

@@ -1,13 +1,10 @@
 package org.jbake.template.model
 
-import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
-import org.jbake.template.ModelExtractor
+import org.jbake.template.TypedModelExtractor
 
-class PublishedCustomExtractor(private val customDocumentType: String)
-        : ModelExtractor<DocumentList<*>>
-{
-    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
-        return db.getPublishedContent(customDocumentType)
+class PublishedCustomExtractor(private val customDocumentType: String) : TypedModelExtractor<DocumentList<*>> {
+    override fun extract(context: RenderContext, key: String): DocumentList<*> {
+        return context.db.getPublishedContent(customDocumentType)
     }
 }

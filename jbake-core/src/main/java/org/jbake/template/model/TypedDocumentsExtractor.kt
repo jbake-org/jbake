@@ -1,17 +1,15 @@
 package org.jbake.template.model
 
-import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.model.DocumentTypeUtils
-import org.jbake.template.ModelExtractor
+import org.jbake.template.TypedModelExtractor
 
-class TypedDocumentsExtractor : ModelExtractor<DocumentList<*>> {
+class TypedDocumentsExtractor : TypedModelExtractor<DocumentList<*>> {
 
-    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
-        // Document types are pluralized in model, so unpluralize.
+    override fun extract(context: RenderContext, key: String): DocumentList<*> {
         try {
             val type = DocumentTypeUtils.unpluralize(key)
-            return db.getAllContent(type)
+            return context.db.getAllContent(type)
         } catch (e: UnsupportedOperationException) {
             return DocumentList<Any>()
         }
