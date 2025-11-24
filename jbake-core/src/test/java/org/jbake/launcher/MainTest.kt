@@ -250,7 +250,7 @@ internal class MainTest : LoggingTest() {
     fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
         `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
         doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
-            .`when`(mockFactory).createDefaultJbakeConfiguration(any(F), any(F), any(F), anyBoolean())
+            .`when`(mockFactory).createDefaultJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())
         val e = assertThrows(JBakeException::class.java) { main.run(arrayOf("-b")) }
         assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
     }
@@ -285,7 +285,7 @@ internal class MainTest : LoggingTest() {
         System.setProperty("user.dir", sourceFolder.path)
         `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
         `when`(
-            mockFactory.createDefaultJbakeConfiguration(any(F), any(F), any(F), anyBoolean())
+            mockFactory.createDefaultJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())
         ).thenReturn(configuration)
     }
 
@@ -296,7 +296,7 @@ internal class MainTest : LoggingTest() {
         System.setProperty("user.dir", sourceFolder.path)
 
         `when`(
-            mockFactory.createJettyJbakeConfiguration(any(F), any(F), any(F), anyBoolean())
+            mockFactory.createJettyJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())
         ).thenReturn(configuration)
 
         `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
@@ -310,4 +310,4 @@ internal class MainTest : LoggingTest() {
     }
 }
 
-private val F = File::class.java
+private val FCJ = File::class.java
