@@ -72,11 +72,12 @@
         <version.freemarker>2.3.34</version.freemarker>
         <version.flexmark>0.64.8</version.flexmark>
         <version.groovy>5.0.2</version.groovy>
+        <version.jcommander>1.85</version.jcommander>
         <version.jetty.server>11.0.26</version.jetty.server>
         <version.json.simple>1.1.1</version.json.simple>
         <version.jade4j>1.3.2</version.jade4j>
         <version.jsoup>1.21.2</version.jsoup>
-        <version.jgit>7.1.0.202411261347-r</version.jgit>
+        <version.jgit>7.4.0.202509020913-r</version.jgit>
         <version.logback>1.5.21</version.logback>
         <version.orientdb>3.2.46</version.orientdb>
         <version.pebble>3.2.2</version.pebble>
@@ -104,11 +105,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-bom</artifactId><version>${version.kotlin}</version><type>pom</type><scope>import</scope></dependency>
-            <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version><type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version>            <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-bom</artifactId><version>${version.groovy}</version>   <type>pom</type><scope>import</scope></dependency>
+
             <!-- Runtime dependencies -->
             <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
             <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-core</artifactId><version>${version.logback}</version></dependency>
-            <dependency><groupId>com.beust</groupId><artifactId>jcommander</artifactId><version>${version.args4j}</version></dependency>
+            <dependency><groupId>org.jcommander</groupId><artifactId>jcommander</artifactId><version>${version.jcommander}</version></dependency>
             <dependency><groupId>com.googlecode.json-simple</groupId><artifactId>json-simple</artifactId><version>${version.json.simple}</version></dependency>
             <dependency><groupId>com.orientechnologies</groupId><artifactId>orientdb-core</artifactId><version>${version.orientdb}</version></dependency>
             <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><version>${version.flexmark}</version></dependency>
@@ -123,9 +126,14 @@
             <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><version>${version.commons.vfs2}</version></dependency>
             <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj-diagram</artifactId><version>${version.asciidoctorj.diagram}</version></dependency>
             <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><version>${version.asciidoctorj}</version></dependency>
+<!--
             <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
             <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
             <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>
+-->
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>
             <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><version>${version.jetty.server}</version></dependency>
             <dependency><groupId>org.eclipse.jgit</groupId><artifactId>org.eclipse.jgit</artifactId><version>${version.jgit}</version></dependency>
             <dependency><groupId>org.freemarker</groupId><artifactId>freemarker</artifactId><version>${version.freemarker}</version></dependency>
