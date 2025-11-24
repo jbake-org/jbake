@@ -41,10 +41,8 @@ object FileUtil {
     /** Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension). */
     val dataFileFilter: FileFilter
         get() = FileFilter { pathname ->
-            "yaml".equals(
-                fileExt(pathname),
-                ignoreCase = true
-            ) || "yml".equals(fileExt(pathname), ignoreCase = true)
+            val ext = fileExt(pathname).lowercase()
+            ext == "yaml" || ext == "yml"
         }
 
     /** Gets the list of files that are not content files based on their extension. */
@@ -92,9 +90,7 @@ object FileUtil {
         return file.isDirectory && file.listFiles(ignoreFile).isEmpty()
     }
 
-    fun isExistingFolder(f: File): Boolean {
-        return f.exists() && f.isDirectory()
-    }
+    fun isExistingFolder(f: File) = f.exists() && f.isDirectory()
 
     @JvmStatic
     @get:Throws(Exception::class)
@@ -122,10 +118,7 @@ object FileUtil {
     // TBD: Could be replaced with Kotlin extension function File.extension.
     fun fileExt(src: File): String = fileExt(src.name)
 
-    fun fileExt(name: String): String {
-        val idx = name.lastIndexOf('.')
-        return if (idx <= 0) "" else name.substring(idx + 1)
-    }
+    fun fileExt(name: String): String = name.substringAfterLast(".", "")
 
     /**
      * Computes the hash of a file or directory.
@@ -134,16 +127,16 @@ object FileUtil {
      * @return A hex string representing the SHA1 hash of the file or directory.
      * @throws Exception if any IOException of SecurityException occured
      */
+    @Throws(IOException::class)
     fun sha1(sourceFile: File): String {
-        val buffer = ByteArray(1024)
-        val complete = MessageDigest.getInstance("SHA-1")
-        val bytes = complete.digest()
-
-        return bytes.joinToString("") { "%02x".format(it) }
+        val digester = MessageDigest.getInstance("SHA-1")
+        updateDigest(digester, sourceFile, ByteArray(1024))
+        return digester.digest().joinToString("") { "%02x".format(it) }
     }
 
     @Throws(IOException::class)
     private fun updateDigest(digest: MessageDigest, sourceFile: File, buffer: ByteArray) {
+
         if (sourceFile.isFile()) {
             FileInputStream(sourceFile).use { fis ->
                 var numRead: Int
@@ -155,8 +148,7 @@ object FileUtil {
             }
         }
         else if (sourceFile.isDirectory()) {
-            val files = sourceFile.listFiles() ?: return
-
+            val files = sourceFile.listFiles()?.sorted() ?: return
             for (file in files) {
                 updateDigest(digest, file, buffer)
             }
@@ -191,7 +183,6 @@ object FileUtil {
      * Given a file inside content it return
      * the relative path to get to the root.
      *
-     *
      * Example: /content and /content/tags/blog will return '../..'
      *
      * @param sourceFile the file to calculate relative path for
@@ -203,41 +194,31 @@ object FileUtil {
         val s = Paths.get(sourceFile.getParentFile().toURI())
         val relativePath = s.relativize(r)
 
-        val sb = StringBuilder()
-
-        sb.append(asPath(relativePath.toString()))
-
-        if (config.uriWithoutExtension) {
-            sb.append("/..")
+        return buildString {
+            append(asPath(relativePath.toString()))
+            if (config.uriWithoutExtension) append("/..")
+            if (isNotEmpty()) append("/") // The calling logic assumes / at end.
         }
-        if (sb.isNotEmpty()) {  // Added as calling logic assumes / at end.
-            sb.append("/")
-        }
-        return sb.toString()
     }
 
-    fun getUriPathToDestinationRoot(config: JBakeConfiguration, sourceFile: File): String {
-        return getPathToRoot(config, config.destinationFolder, sourceFile)
-    }
+    fun getUriPathToDestinationRoot(config: JBakeConfiguration, sourceFile: File)
+        = getPathToRoot(config, config.destinationFolder, sourceFile)
 
     @JvmStatic
-    fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File): String {
-        return getPathToRoot(config, config.contentFolder, sourceFile)
-    }
+    fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File)
+        = getPathToRoot(config, config.contentFolder, sourceFile)
 
     /**
      * Utility method to determine if a given file is located somewhere in the directory provided.
      *
      * @param file used to check if it is located in the provided directory.
-     * @param directory to validate whether or not the provided file resides.
+     * @param directory to validate whether the provided file resides.
      * @return true if the file is somewhere in the provided directory, false if it is not.
      * @throws IOException if the canonical path for either of the input directories can't be determined.
      */
     @JvmStatic
     @Throws(IOException::class)
-    fun isFileInDirectory(file: File, directory: File): Boolean {
-        return (file.exists()
-                && !file.isHidden() && directory.isDirectory()
-                && file.getCanonicalPath().startsWith(directory.getCanonicalPath()))
+    fun isFileInDirectory(file: File, directory: File): Boolean =
+        file.exists() && !file.isHidden && directory.isDirectory() && file.getCanonicalPath().startsWith(directory.getCanonicalPath())
     }
-}
+
