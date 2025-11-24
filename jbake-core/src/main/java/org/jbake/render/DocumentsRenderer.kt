@@ -15,11 +15,7 @@ import java.util.*
 class DocumentsRenderer : RenderingTool {
 
     @Throws(RenderingException::class)
-    override fun render(
-        renderer: Renderer,
-        db: ContentStore,
-        config: JBakeConfiguration
-    ): Int {
+    override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         var renderedCount = 0
         val errors: MutableList<String> = LinkedList<String>()
 
@@ -110,15 +106,8 @@ class DocumentsRenderer : RenderingTool {
     }
 
     @Throws(RenderingException::class)
-    override fun render(
-        renderer: Renderer,
-        db: ContentStore,
-        destination: File,
-        templatesPath: File,
-        config: CompositeConfiguration
-    ): Int {
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
+    override fun render(renderer: Renderer, db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration): Int {
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
         return render(renderer, db, configuration)
     }
 }

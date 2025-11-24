@@ -26,9 +26,7 @@ import java.io.Writer
  * In this case, it is the responsibility of the engine to convert it.
  */
 abstract class AbstractTemplateEngine protected constructor(
-    protected val config: JBakeConfiguration,
-    protected val db: ContentStore
-) {
+    protected val config: JBakeConfiguration, protected val db: ContentStore) {
     @Deprecated("use {@link AbstractTemplateEngine(JBakeConfiguration,ContentStore)} instead")
     protected constructor(config: Configuration, db: ContentStore, destination: File, templatesPath: File) : this(
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), destination, config as CompositeConfiguration),

@@ -18,21 +18,13 @@ class Error404Renderer : RenderingTool {
         try {
             renderer.renderError404(config.error404FileName!!)
             return 1
-        } catch (e: Exception) {
-            throw RenderingException(e)
-        }
+        } catch (e: Exception) { throw RenderingException(e) }
     }
 
     @Throws(RenderingException::class)
-    override fun render(
-        renderer: Renderer,
-        db: ContentStore,
-        destination: File,
-        templatesPath: File,
-        config: CompositeConfiguration,
-    ): Int {
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
+    override fun render(renderer: Renderer, db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration): Int {
+
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
         return render(renderer, db, configuration)
     }
 }

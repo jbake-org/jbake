@@ -22,9 +22,8 @@ interface TypedModelExtractor<T> {
 /**
  * Adapter to bridge between old ModelExtractor and new TypedModelExtractor.
  */
-class ModelExtractorAdapter<T>(
-    private val typedExtractor: TypedModelExtractor<T>
-) : ModelExtractor<T> {
+class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T>) : ModelExtractor<T> {
+
     override fun get(db: org.jbake.app.ContentStore, model: MutableMap<String, Any>, key: String): T? {
         // Try to reconstruct RenderContext from the legacy map
         // This is a temporary bridge during migration

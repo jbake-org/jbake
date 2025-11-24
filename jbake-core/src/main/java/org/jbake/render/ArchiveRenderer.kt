@@ -11,28 +11,20 @@ import java.io.File
 class ArchiveRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
-        if (config.renderArchive) {
-            try {
-                renderer.renderArchive(config.archiveFileName!!)
-                return 1
-            } catch (e: Exception) {
-                throw RenderingException(e)
-            }
+        if (!config.renderArchive) return 0
+
+        try {
+            renderer.renderArchive(config.archiveFileName!!)
+            return 1
         }
-        return 0
+        catch (e: Exception) { throw RenderingException(e) }
     }
 
     @Deprecated("")
     @Throws(RenderingException::class)
-    override fun render(
-        renderer: Renderer,
-        db: ContentStore,
-        destination: File,
-        templatesPath: File,
-        config: CompositeConfiguration,
-    ): Int {
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
+    override fun render(renderer: Renderer, db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration): Int {
+
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
         return render(renderer, db, configuration)
     }
 }

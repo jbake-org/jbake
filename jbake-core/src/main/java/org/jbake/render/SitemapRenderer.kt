@@ -24,15 +24,9 @@ class SitemapRenderer : RenderingTool {
     }
 
     @Throws(RenderingException::class)
-    override fun render(
-        renderer: Renderer,
-        db: ContentStore,
-        destination: File,
-        templatesPath: File,
-        config: CompositeConfiguration,
-    ): Int {
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
+    override fun render(renderer: Renderer, db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration): Int {
+
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
         return render(renderer, db, configuration)
     }
 }

@@ -17,24 +17,17 @@ class JBakeConfigurationFactory {
      *
      * @param sourceFolder The source folder of the project
      * @param isClearCache Whether to clear database cache or not
-     * @return A configuration by given parameters
      * @throws JBakeException if loading the configuration fails
      */
     @Throws(JBakeException::class)
-    fun createDefaultJbakeConfiguration(
-        sourceFolder: File,
-        destination: File,
-        isClearCache: Boolean
-    ): DefaultJBakeConfiguration {
-        return createDefaultJbakeConfiguration(sourceFolder, destination, null as File?, isClearCache)
-    }
+    fun createDefaultJbakeConfiguration(sourceFolder: File, destination: File, isClearCache: Boolean): DefaultJBakeConfiguration
+        = createDefaultJbakeConfiguration(sourceFolder, destination, null as File?, isClearCache)
 
     /**
      * Creates a [DefaultJBakeConfiguration]
      * @param sourceFolder The source folder of the project
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
-     * @return A configuration by given parameters
      * @throws JBakeException if loading the configuration fails
      */
     @Throws(JBakeException::class)
@@ -98,13 +91,8 @@ class JBakeConfigurationFactory {
      */
     @Deprecated("use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
-    fun createJettyJbakeConfiguration(
-        sourceFolder: File,
-        destinationFolder: File,
-        isClearCache: Boolean
-    ): DefaultJBakeConfiguration {
-        return createJettyJbakeConfiguration(sourceFolder, destinationFolder, null as File?, isClearCache)
-    }
+    fun createJettyJbakeConfiguration(sourceFolder: File, destinationFolder: File, isClearCache: Boolean)
+        = createJettyJbakeConfiguration(sourceFolder, destinationFolder, null as File?, isClearCache)
 
     /**
      * Creates a [DefaultJBakeConfiguration] with value site.host replaced

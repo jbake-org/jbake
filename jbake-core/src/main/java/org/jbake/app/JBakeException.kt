@@ -8,11 +8,8 @@ import org.jbake.launcher.SystemExit
  * @param message The error message.
  * @param cause The causing exception or `null` if no cause available.
  */
-class JBakeException(
-    private val exit: SystemExit,
-    message: String?,
-    cause: Throwable? = null
-) : RuntimeException(message, cause) {
+class JBakeException(private val exit: SystemExit, message: String?, cause: Throwable? = null)
+    : RuntimeException(message, cause) {
 
     fun getExit() = exit.status
 }

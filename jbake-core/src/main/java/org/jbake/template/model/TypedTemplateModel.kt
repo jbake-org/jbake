@@ -6,9 +6,8 @@ import org.jbake.app.DocumentList
  * New type-safe template model that wraps RenderContext.
  * This replaces the old HashMap-based approach with proper typed properties.
  */
-class TypedTemplateModel(
-    val context: RenderContext
-) {
+class TypedTemplateModel(val context: RenderContext) {
+
     // Direct accessors to context properties
     val config get() = context.config
     val db get() = context.db
