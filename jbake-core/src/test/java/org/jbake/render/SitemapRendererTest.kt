@@ -7,8 +7,8 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.RenderingException
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 
 class SitemapRendererTest {
     @Test
@@ -16,13 +16,12 @@ class SitemapRendererTest {
     fun returnsZeroWhenConfigDoesNotRenderSitemaps() {
         val renderer = SitemapRenderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderSiteMap).thenReturn(false)
+        val configuration = mock(DefaultJBakeConfiguration::class.java)
+        `when`(configuration.renderSiteMap).thenReturn(false)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
+        val contentStore = mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val mockRenderer = mock(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
@@ -32,16 +31,15 @@ class SitemapRendererTest {
     fun doesNotRenderWhenConfigDoesNotRenderSitemaps() {
         val renderer = SitemapRenderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderSiteMap).thenReturn(false)
+        val configuration = mock(DefaultJBakeConfiguration::class.java)
+        `when`(configuration.renderSiteMap).thenReturn(false)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify(mockRenderer, Mockito.never()).renderSitemap(ArgumentMatchers.anyString())
+        verify(mockRenderer, never()).renderSitemap(anyString())
     }
 
     @Test
@@ -49,13 +47,12 @@ class SitemapRendererTest {
     fun returnsOneWhenConfigRendersSitemaps() {
         val renderer = SitemapRenderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderSiteMap).thenReturn(true)
+        val configuration = mock(DefaultJBakeConfiguration::class.java)
+        `when`(configuration.renderSiteMap).thenReturn(true)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
+        val contentStore = mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -66,36 +63,34 @@ class SitemapRendererTest {
     fun doesRenderWhenConfigDoesRenderSitemaps() {
         val renderer = SitemapRenderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderSiteMap).thenReturn(true)
-        Mockito.`when`(configuration.siteMapFileName).thenReturn("mocksitemap.html")
+        val configuration = mock(DefaultJBakeConfiguration::class.java)
+        `when`(configuration.renderSiteMap).thenReturn(true)
+        `when`(configuration.siteMapFileName).thenReturn("mocksitemap.html")
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify(mockRenderer, Mockito.times(1)).renderSitemap(ArgumentMatchers.anyString())
+        verify(mockRenderer, times(1)).renderSitemap(anyString())
     }
 
     @Test(expected = RenderingException::class)
     fun propogatesRenderingException() {
         val renderer = SitemapRenderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(DefaultJBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderSiteMap).thenReturn(true)
-        Mockito.`when`(configuration.siteMapFileName).thenReturn("mocksitemap.html")
+        val configuration = mock(DefaultJBakeConfiguration::class.java)
+        `when`(configuration.renderSiteMap).thenReturn(true)
+        `when`(configuration.siteMapFileName).thenReturn("mocksitemap.html")
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
-        Mockito.doThrow(RuntimeException()).`when`(mockRenderer).renderSitemap(ArgumentMatchers.anyString())
+        doThrow(RuntimeException()).`when`(mockRenderer).renderSitemap(anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify(mockRenderer, Mockito.never()).renderSitemap(ArgumentMatchers.anyString())
+        verify(mockRenderer, never()).renderSitemap(anyString())
     }
 }
 

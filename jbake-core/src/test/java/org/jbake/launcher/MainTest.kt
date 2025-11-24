@@ -201,10 +201,8 @@ internal class MainTest : LoggingTest() {
         val exception = assertThrows(JBakeException::class.java) { main.run(args) }
 
         assertThat(exception.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
-        verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
-
-        val loggingEvent = captorLoggingEvent.getValue()
-        assertThat(loggingEvent.message).isEqualTo("Error: Missing required argument(s): --init")
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture())
+        assertThat(captorLoggingEvent.value.message).isEqualTo("Error: Missing required argument(s): --init")
     }
 
     @Test
@@ -261,9 +259,7 @@ internal class MainTest : LoggingTest() {
         val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, null, null, false)
         System.setProperty("user.dir", sourceFolder.path)
         `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
-        `when`(
-            mockFactory.createDefaultJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())
-        ).thenReturn(configuration)
+        `when`(mockFactory.createDefaultJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())).thenReturn(configuration)
     }
 
     @Throws(ConfigurationException::class)
@@ -272,10 +268,7 @@ internal class MainTest : LoggingTest() {
             JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, null, false)
         System.setProperty("user.dir", sourceFolder.path)
 
-        `when`(
-            mockFactory.createJettyJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())
-        ).thenReturn(configuration)
-
+        `when`(mockFactory.createJettyJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())).thenReturn(configuration)
         `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
         return configuration
     }

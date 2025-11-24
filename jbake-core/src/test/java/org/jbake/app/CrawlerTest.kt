@@ -42,7 +42,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
             }
         }
 
-        // covers bug #213
+        // Covers bug #213
         val publishedPostsByTag: DocumentList<DocumentModel> =
             db.getPublishedPostsByTag("blog")
         assertEquals(3, publishedPostsByTag.size.toLong())
@@ -51,18 +51,19 @@ class CrawlerTest : ContentStoreIntegrationTest() {
     @Test
     fun crawlDataFiles() {
         val crawler = Crawler(db, config)
-        // manually register data doctype
+
+        // Manually register data doctype.
         addDocumentType(config.dataFileDocType)
         db.updateSchema()
         crawler.crawlDataFiles()
         assertEquals(2, db.getDocumentCount("data"))
 
         val dataFileUtil = DataFileUtil(db, "data")
-        val videos = dataFileUtil.get("videos.yaml")
-        assertFalse(videos!!.isEmpty())
-        assertNotNull(videos["data"])
+        val videosYaml = dataFileUtil.get("videos.yaml")
+        assertFalse(videosYaml.isEmpty())
+        assertNotNull(videosYaml["data"])
 
-        // regression test for issue 747
+        // Regression test for issue #747.
         val authorsFileContents = dataFileUtil.get("authors.yaml")
         assertFalse(authorsFileContents.isEmpty())
         val authorsList = authorsFileContents["authors"]
@@ -77,8 +78,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         config.setUriWithoutExtension(true)
         config.setPrefixForUriWithoutExtension("/blog")
 
-        val crawler = Crawler(db, config)
-        crawler.crawl()
+        Crawler(db, config).crawl()
 
         assertEquals(4, db.getDocumentCount("post"))
         assertEquals(3, db.getDocumentCount("page"))
@@ -88,25 +88,16 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         for (model in documents) {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.file) + "/"
 
-            assertThat<String>(model.noExtensionUri, RegexMatcher.matches(noExtensionUri))
-            assertThat(model.uri, RegexMatcher.matches(noExtensionUri + "index\\.html"))
+            assertThat<String>(model.noExtensionUri, RegexMatcher(noExtensionUri))
+            assertThat(model.uri, RegexMatcher(noExtensionUri + "index\\.html"))
             assertThat(model.rootPath, CoreMatchers.`is`("../../../"))
         }
     }
 
-    private class RegexMatcher(private val regex: String) : BaseMatcher<Any?>() {
-        override fun matches(o: Any): Boolean {
-            return (o as String).matches(regex.toRegex())
-        }
-
+    private class RegexMatcher(private val regex: String) : BaseMatcher<Any>() {
+        override fun matches(o: Any) = (o as String).matches(regex.toRegex())
         override fun describeTo(description: Description) {
             description.appendText("matches regex: $regex")
-        }
-
-        companion object {
-            fun matches(regex: String): RegexMatcher {
-                return RegexMatcher(regex)
-            }
         }
     }
 }

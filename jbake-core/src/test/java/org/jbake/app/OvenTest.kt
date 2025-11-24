@@ -15,15 +15,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
+import org.mockito.Mockito.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
 class OvenTest {
-    @TempDir
-    var root: Path? = null
+
+    @TempDir var root: Path? = null
 
     private lateinit var configuration: DefaultJBakeConfiguration
     private lateinit var sourceFolder: File
@@ -158,10 +158,10 @@ class OvenTest {
     fun shouldInspectConfigurationDuringInstantiationFromUtils() {
         configuration.setSourceFolder(root!!.resolve("none").toFile())
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val crawler = Mockito.mock(Crawler::class.java)
-        val renderer = Mockito.mock(Renderer::class.java)
-        val asset = Mockito.mock(Asset::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val crawler = mock(Crawler::class.java)
+        val renderer = mock(Renderer::class.java)
+        val asset = mock(Asset::class.java)
 
         val utensils = Utensils(
             configuration = configuration,
@@ -184,11 +184,11 @@ class OvenTest {
         configuration.contentFolder = (content)
         configuration.assetFolder = (assets)
 
-        contentStore = Mockito.spy(ContentStore("memory", "documents" + System.currentTimeMillis()))
+        contentStore = spy(ContentStore("memory", "documents" + System.currentTimeMillis()))
 
-        val crawler = Mockito.mock(Crawler::class.java)
-        val renderer = Mockito.mock(Renderer::class.java)
-        val asset = Mockito.mock(Asset::class.java)
+        val crawler = mock(Crawler::class.java)
+        val renderer = mock(Renderer::class.java)
+        val asset = mock(Asset::class.java)
 
         val utensils = Utensils(
             configuration = configuration,
@@ -202,10 +202,10 @@ class OvenTest {
 
         oven.bake()
 
-        Mockito.verify<ContentStore?>(contentStore, Mockito.times(1)).startup()
-        Mockito.verify(renderer, Mockito.atLeastOnce()).renderIndex(ArgumentMatchers.anyString())
-        Mockito.verify(crawler, Mockito.times(1)).crawl()
-        Mockito.verify(asset, Mockito.times(1)).copy()
+        verify(contentStore!!, times(1)).startup()
+        verify(renderer, atLeastOnce()).renderIndex(ArgumentMatchers.anyString())
+        verify(crawler, times(1)).crawl()
+        verify(asset, times(1)).copy()
     }
 
     @Test

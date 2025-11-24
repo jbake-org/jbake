@@ -10,12 +10,8 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
-import java.io.BufferedWriter
+import org.mockito.Mockito.*
 import java.io.File
-import java.io.FileWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -44,10 +40,7 @@ class ConfigUtilTest : LoggingTest() {
     @Test
     fun shouldLoadACustomConfiguration() {
         val customConfigFile = File(sourceFolder.toFile(), "jbake.properties")
-
-        val writer = BufferedWriter(FileWriter(customConfigFile))
-        writer.append("test.property=12345")
-        writer.close()
+        customConfigFile.writeText("test.property=12345")
 
         val configuration = util.loadConfig(sourceFolder.toFile())
 
@@ -61,9 +54,7 @@ class ConfigUtilTest : LoggingTest() {
         `when`(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
         `when`(nonExistentSourceFolder.exists()).thenReturn(false)
 
-        val e = assertThrows(
-            JBakeException::class.java
-        ) { util.loadConfig(nonExistentSourceFolder) }
+        val e = assertThrows(JBakeException::class.java) { util.loadConfig(nonExistentSourceFolder) }
         assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
     }
 
@@ -141,11 +132,8 @@ class ConfigUtilTest : LoggingTest() {
 
         config.getTemplateFileByDocType("none")
 
-        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
-
-        val loggingEvent = captorLoggingEvent.getValue()
-
-        assertThat(loggingEvent.message)
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture())
+        assertThat(captorLoggingEvent.value.message)
             .isEqualTo("Cannot find configuration key '{}' for document type '{}'")
     }
 
@@ -168,8 +156,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val markdownExtensions = config.markdownExtensions
 
-        assertThat(markdownExtensions)
-            .containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS")
+        assertThat(markdownExtensions).containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS")
     }
 
     @Test
@@ -179,19 +166,7 @@ class ConfigUtilTest : LoggingTest() {
 
         val docTypes = config.documentTypes
 
-        assertThat(docTypes).containsExactly(
-            "allcontent",
-            "team",
-            "masterindex",
-            "feed",
-            "error404",
-            "archive",
-            "tag",
-            "tagsindex",
-            "sitemap",
-            "post",
-            "page"
-        )
+        assertThat(docTypes).containsExactly("allcontent", "team", "masterindex", "feed", "error404", "archive", "tag", "tagsindex", "sitemap", "post", "page")
     }
 
     @Test
@@ -247,11 +222,8 @@ class ConfigUtilTest : LoggingTest() {
 
         config.getAsciidoctorOption("template_dirs")
 
-        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
-
-        val loggingEvent = captorLoggingEvent.getValue()
-
-        assertThat(loggingEvent.message).isEqualTo("Cannot find asciidoctor option '{}.{}'")
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture())
+        assertThat(captorLoggingEvent.value.message).isEqualTo("Cannot find asciidoctor option '{}.{}'")
     }
 
     @Test
@@ -347,12 +319,10 @@ class ConfigUtilTest : LoggingTest() {
     fun shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() {
         util.setEncoding("UNSUPPORTED_ENCODING")
             .loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
-        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
-        val loggingEvent = captorLoggingEvent.getValue()
-
-        assertThat(loggingEvent.level).isEqualTo(Level.WARN)
-        assertThat(loggingEvent.getFormattedMessage())
+        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture())
+        assertThat(captorLoggingEvent.value.level).isEqualTo(Level.WARN)
+        assertThat(captorLoggingEvent.value.formattedMessage)
             .isEqualTo("Unsupported encoding 'UNSUPPORTED_ENCODING'. Using default encoding 'UTF-8'")
     }
 

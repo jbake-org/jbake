@@ -11,23 +11,20 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
 import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.assertThrows
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import java.util.function.Function
-import java.util.stream.Collectors
+import org.mockito.Mockito.*
 
 // Helper functions for Kotlin null-safety with Mockito
 fun <T> capture(captor: ArgumentCaptor<T>): T = captor.capture() ?: null as T
 @Suppress("UNCHECKED_CAST")
 fun <T> any(type: Class<T>): T {
-    ArgumentMatchers.any(type)
+    org.mockito.ArgumentMatchers.any(type)
     return null as T
 }
 @Suppress("UNCHECKED_CAST")
 fun <T> anyNullable(type: Class<T>): T {
-    ArgumentMatchers.nullable(type)
+    org.mockito.ArgumentMatchers.nullable(type)
     return null as T
 }
 
@@ -43,16 +40,16 @@ class DocumentsRendererTest {
     fun setUp() {
         documentsRenderer = DocumentsRenderer()
 
-        db = Mockito.mock(ContentStore::class.java)
-        renderer = Mockito.mock(Renderer::class.java)
-        configuration = Mockito.mock(JBakeConfiguration::class.java)
+        db = mock(ContentStore::class.java)
+        renderer = mock(Renderer::class.java)
+        configuration = mock(JBakeConfiguration::class.java)
         emptyTemplateModelList = DocumentList()
         argument = ArgumentCaptor.forClass(DocumentModel::class.java)
     }
 
     @Test
     fun shouldReturnZeroIfNothingHasRendered() {
-        Mockito.`when`(db.unrenderedContent).thenReturn(emptyTemplateModelList)
+        `when`(db.unrenderedContent).thenReturn(emptyTemplateModelList)
 
         val renderResponse = documentsRenderer.render(renderer, db, configuration)
 
@@ -69,8 +66,8 @@ class DocumentsRendererTest {
         templateModelList.add(emptyDocument())
 
         // return given DocumentList for DocumentType 'custom type'
-        Mockito.`when`(db.unrenderedContent).thenReturn(templateModelList)
-        Mockito.`when`(db.getAllContent(any(String::class.java))).thenReturn(templateModelList)
+        `when`(db.unrenderedContent).thenReturn(templateModelList)
+        `when`(db.getAllContent(any(String::class.java))).thenReturn(templateModelList)
 
         // when:
         val renderResponse = documentsRenderer.render(renderer, db, configuration)
@@ -93,18 +90,15 @@ class DocumentsRendererTest {
         templateModelList.add(document2)
 
         // throw an exception for every call of renderer's render method
-        Mockito.doThrow(RuntimeException(fakeExceptionMessage))
+        doThrow(RuntimeException(fakeExceptionMessage))
             .`when`(renderer).render(anyNullable(DocumentModel::class.java))
 
-        Mockito.`when`(db.unrenderedContent).thenReturn(templateModelList)
+        `when`(db.unrenderedContent).thenReturn(templateModelList)
+        `when`(db.getAllContent(any(String::class.java))).thenReturn(templateModelList)
 
         // expect
-        val executable: () -> Unit = {
-            // when
-            documentsRenderer.render(renderer, db, configuration)
-        }
-
-        assertThrows(RenderingException::class.java, executable, fakeExceptionMessage + "\n" + fakeExceptionMessage)
+        val exception = assertThrows<RenderingException> { documentsRenderer.render(renderer, db, configuration) }
+        Assertions.assertThat(exception.message).contains(fakeExceptionMessage)
     }
 
     @Test
@@ -147,15 +141,15 @@ class DocumentsRendererTest {
         postDocs.add(fourthDoc)
         postDocs.add(secondDoc)
 
-        Mockito.`when`(db.unrenderedContent).thenReturn(allDocs)
-        Mockito.`when`(db.getAllContent("page")).thenReturn(pageDocs)
-        Mockito.`when`(db.getAllContent("post")).thenReturn(postDocs)
+        `when`(db.unrenderedContent).thenReturn(allDocs)
+        `when`(db.getAllContent("page")).thenReturn(pageDocs)
+        `when`(db.getAllContent("post")).thenReturn(postDocs)
 
         // when
         val renderResponse = documentsRenderer.render(renderer, db, configuration)
 
         // then
-        Mockito.verify(renderer, Mockito.times(7)).render(capture(argument))
+        verify(renderer, times(7)).render(capture(argument))
         val renderedDocs = asTitleToDocMap(argument.getAllValues())
 
         // page checks
@@ -184,11 +178,7 @@ class DocumentsRendererTest {
     }
 
     private fun asTitleToDocMap(values: MutableList<DocumentModel>): MutableMap<String, MutableMap<String,  Any>> {
-        return values.stream().collect(
-            Collectors.toMap(
-            Function { doc: DocumentModel -> doc.get(ModelAttributes.TITLE).toString() },
-            Function { doc: DocumentModel -> doc })
-            )
+        return values.associateBy { it.get(ModelAttributes.TITLE).toString() }.toMutableMap()
     }
 
     private fun emptyDocument(): DocumentModel {

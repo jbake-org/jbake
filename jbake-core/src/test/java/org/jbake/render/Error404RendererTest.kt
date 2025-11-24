@@ -6,8 +6,8 @@ import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.RenderingException
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 
 class Error404RendererTest {
     @Test
@@ -15,13 +15,12 @@ class Error404RendererTest {
     fun returnsZeroWhenConfigDoesNotRenderError404() {
         val renderer = Error404Renderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderError404).thenReturn(false)
+        val configuration = mock(JBakeConfiguration::class.java)
+        `when`(configuration.renderError404).thenReturn(false)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
+        val contentStore = mock(ContentStore::class.java)
 
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val mockRenderer = mock(Renderer::class.java)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         Assertions.assertThat(renderResponse).isEqualTo(0)
@@ -31,16 +30,15 @@ class Error404RendererTest {
     fun doesNotRenderWhenConfigDoesNotRenderError404() {
         val renderer = Error404Renderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderError404).thenReturn(false)
+        val configuration = mock(JBakeConfiguration::class.java)
+        `when`(configuration.renderError404).thenReturn(false)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify(mockRenderer, Mockito.never()).renderError404(ArgumentMatchers.anyString())
+        verify(mockRenderer, never()).renderError404(anyString())
     }
 
     @Test
@@ -48,18 +46,17 @@ class Error404RendererTest {
     fun returnsOneWhenConfigRendersError404() {
         val renderer = Error404Renderer()
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderError404).thenReturn(true)
+        val configuration = mock(JBakeConfiguration::class.java)
+        `when`(configuration.renderError404).thenReturn(true)
         // ensure a non-null error404 filename so renderer will attempt to render
-        Mockito.`when`(configuration.error404FileName).thenReturn("mock404file.html")
+        `when`(configuration.error404FileName).thenReturn("mock404file.html")
 
         // Debug assertions to ensure stubbing worked
         Assertions.assertThat(configuration.renderError404).isTrue()
         Assertions.assertThat(configuration.error404FileName).isNotNull()
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -71,17 +68,16 @@ class Error404RendererTest {
         val renderer = Error404Renderer()
         val error404file = "mock404file.html"
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderError404).thenReturn(true)
-        Mockito.`when`(configuration.error404FileName).thenReturn(error404file)
+        val configuration = mock(JBakeConfiguration::class.java)
+        `when`(configuration.renderError404).thenReturn(true)
+        `when`(configuration.error404FileName).thenReturn(error404file)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify(mockRenderer, Mockito.times(1)).renderError404(error404file)
+        verify(mockRenderer, times(1)).renderError404(error404file)
     }
 
     @Test(expected = RenderingException::class)
@@ -89,19 +85,18 @@ class Error404RendererTest {
         val renderer = Error404Renderer()
         val error404file = "mock404file.html"
 
-        val configuration: JBakeConfiguration =
-            Mockito.mock(JBakeConfiguration::class.java)
-        Mockito.`when`(configuration.renderError404).thenReturn(true)
-        Mockito.`when`(configuration.error404FileName).thenReturn(error404file)
+        val configuration = mock(JBakeConfiguration::class.java)
+        `when`(configuration.renderError404).thenReturn(true)
+        `when`(configuration.error404FileName).thenReturn(error404file)
 
-        val contentStore = Mockito.mock(ContentStore::class.java)
-        val mockRenderer = Mockito.mock(Renderer::class.java)
+        val contentStore = mock(ContentStore::class.java)
+        val mockRenderer = mock(Renderer::class.java)
 
         /// Use doThrow for void method stubbing
-        Mockito.doThrow(RuntimeException()).`when`(mockRenderer).renderError404(ArgumentMatchers.anyString())
+        doThrow(RuntimeException()).`when`(mockRenderer).renderError404(anyString())
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        Mockito.verify(mockRenderer, Mockito.never()).renderError404(error404file)
+        verify(mockRenderer, never()).renderError404(error404file)
     }
 }
