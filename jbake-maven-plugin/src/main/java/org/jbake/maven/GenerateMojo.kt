@@ -13,9 +13,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import java.io.File
 
-/**
- * Runs jbake on a folder
- */
+/** Runs jbake on a folder. */
 @Mojo(name = "generate", requiresProject = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 open class GenerateMojo : AbstractMojo() {
     @Parameter(defaultValue = $$"${project}")
@@ -43,9 +41,7 @@ open class GenerateMojo : AbstractMojo() {
     @Parameter(property = "jbake.failOnError", defaultValue = "true")
     protected var failOnError: Boolean = false
 
-    /**
-     * Set if cache is present or clear
-     */
+    /** Set if cache is present or clear. */
     @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
     protected var isClearCache: Boolean = false
 

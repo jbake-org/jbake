@@ -14,11 +14,7 @@ import java.io.Writer
 import java.util.*
 
 
-/**
- * Renders pages using the [Freemarker](http://freemarker.org/) template engine.
- *
- * @author Cédric Champeau
- */
+/** Renders pages using the [Freemarker](http://freemarker.org/) template engine. */
 class FreemarkerTemplateEngine : AbstractTemplateEngine {
     lateinit var templateCfg: Configuration
 

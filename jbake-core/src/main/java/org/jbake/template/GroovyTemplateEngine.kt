@@ -14,13 +14,7 @@ import java.io.*
 import javax.xml.parsers.ParserConfigurationException
 
 
-/**
- * Renders documents using a Groovy template engine. Depending on the file extension of the template, the template
- * engine will either be a [SimpleTemplateEngine], or an [XmlTemplateEngine]
- * (.gxml).
- *
- * @author Cédric Champeau
- */
+/** Renders documents using a Groovy template engine - [SimpleTemplateEngine] or [XmlTemplateEngine] (.gxml). */
 class GroovyTemplateEngine : AbstractTemplateEngine {
     private val cachedTemplates: MutableMap<String, Template?> = HashMap()
 

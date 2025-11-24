@@ -13,11 +13,7 @@ import org.jbake.template.model.TemplateModel
 import java.io.IOException
 import java.io.Writer
 
-/**
- * Renders pages using the [Pebble](https://pebbletemplates.io/) template engine.
- *
- * @author Mitchell Bosecke
- */
+/** Renders pages using the [Pebble](https://pebbletemplates.io/) template engine. */
 class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     private var engine: PebbleEngine? = null
 
