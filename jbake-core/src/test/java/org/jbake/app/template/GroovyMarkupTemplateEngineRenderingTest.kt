@@ -75,7 +75,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("paper")) {
             assertThat(output).contains(string)

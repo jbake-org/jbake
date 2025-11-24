@@ -150,17 +150,14 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "second-post.html"
 
-        val sampleFile = File(
-            sourceFolder!!.path + fS + "content"
-                    + fS + "blog" + fS + "2013" + fS + filename
-        )
+        val sampleFile = File(sourceFolder!!.path + fS + "content" + fS + "blog" + fS + "2013" + fS + filename)
         val content = parser.processFile(sampleFile)
         content!!.uri = "/$filename"
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("post")) {
             assertThat(output).contains(string)
@@ -171,15 +168,16 @@ abstract class AbstractTemplateEngineRenderingTest(
     fun renderPage() {
         // setup
         val filename = "about.html"
-
         val sampleFile = File(sourceFolder!!.path + fS + "content" + fS + filename)
+
+        // When
         val content = parser!!.processFile(sampleFile)
         content!!.uri = "/$filename"
         renderer!!.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("page")) {
             assertThat(output).contains(string)
@@ -195,7 +193,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = File(destinationFolder, "index.html")
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("index")) {
             assertThat(output).contains(string)
@@ -208,7 +206,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = File(destinationFolder, "feed.xml")
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("feed")) {
             assertThat(output).contains(string)
@@ -221,7 +219,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = File(destinationFolder, "archive.html")
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("archive")) {
             assertThat(output).contains(string)
@@ -232,7 +230,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     fun renderTags() {
         renderer.renderTags("tags")
 
-        // verify
+        // Then
         val outputFile = File(destinationFolder.toString() + fS + "tags" + fS + "blog.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -263,7 +261,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = File(destinationFolder, "sitemap.xml")
         Assert.assertTrue(outputFile.exists())
 
-        // verify
+        // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("sitemap")) {
             assertThat(output).contains(string)
