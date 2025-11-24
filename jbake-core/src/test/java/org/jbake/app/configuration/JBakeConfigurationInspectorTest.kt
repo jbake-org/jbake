@@ -38,7 +38,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
     @Test
     fun shouldThrowExceptionIfSourceFolderIsNotReadable() {
-        val nonReadableFile = Mockito.mock(File::class.java)
+        val nonReadableFile = Mockito.mock(fileClz)
         `when`(nonReadableFile.exists()).thenReturn(true)
         `when`(nonReadableFile.isDirectory()).thenReturn(true)
         `when`(nonReadableFile.canRead()).thenReturn(false)
@@ -122,7 +122,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
 
         val templateFolder = TestUtils.newFolder(folder.toFile(), templateFolderName)
         val contentFolder = TestUtils.newFolder(folder.toFile(), contentFolderName)
-        val destinationFolder = Mockito.mock(File::class.java)
+        val destinationFolder = Mockito.mock(fileClz)
         `when`(destinationFolder.exists()).thenReturn(true)
 
         val configuration = Mockito.mock(JBakeConfiguration::class.java)

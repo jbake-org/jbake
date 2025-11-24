@@ -54,7 +54,7 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
-        val nonExistentSourceFolder = Mockito.mock(File::class.java)
+        val nonExistentSourceFolder = Mockito.mock(fileClz)
         Mockito.`when`(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
         Mockito.`when`(nonExistentSourceFolder.exists()).thenReturn(false)
 
@@ -74,7 +74,7 @@ class ConfigUtilTest : LoggingTest() {
 
     @Test
     fun shouldThrowAnExceptionIfSourcefolderIsNotADirectory() {
-        val sourceFolder = Mockito.mock(File::class.java)
+        val sourceFolder = Mockito.mock(fileClz)
         Mockito.`when`(sourceFolder.exists()).thenReturn(true)
         Mockito.`when`(sourceFolder.isDirectory()).thenReturn(false)
 
