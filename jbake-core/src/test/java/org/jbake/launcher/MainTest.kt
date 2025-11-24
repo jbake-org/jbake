@@ -10,7 +10,7 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.util.PathConstants.fS
-import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.nullable
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import picocli.CommandLine
 import java.io.ByteArrayOutputStream
@@ -95,7 +95,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-s")
         main.run(args)
 
-        Mockito.verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
+        verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
@@ -106,7 +106,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "--prop-encoding", "latin1")
         main.run(args)
 
-        Mockito.verify<JBakeConfigurationFactory>(mockFactory).setEncoding("latin1")
+        verify<JBakeConfigurationFactory>(mockFactory).setEncoding("latin1")
     }
 
     @Test
@@ -117,7 +117,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b")
         main.run(args)
 
-        Mockito.verify<JBakeConfigurationFactory>(mockFactory).setEncoding("utf-8")
+        verify<JBakeConfigurationFactory>(mockFactory).setEncoding("utf-8")
     }
 
     @Test
@@ -129,7 +129,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "-s")
         main.run(args)
 
-        Mockito.verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
+        verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
@@ -143,7 +143,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-b", "-s", "src/jbake")
         main.run(args)
 
-        Mockito.verify<JettyServer>(mockJetty).run(expectedRunPath, configuration)
+        verify<JettyServer>(mockJetty).run(expectedRunPath, configuration)
     }
 
     @Test
@@ -154,7 +154,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf<String>(build.path, "-s")
         main.run(args)
 
-        Mockito.verify<JettyServer>(mockJetty).run(build.path, configuration)
+        verify<JettyServer>(mockJetty).run(build.path, configuration)
     }
 
 
@@ -168,7 +168,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf("-s", src.path)
         main.run(args)
 
-        Mockito.verify<JettyServer>(mockJetty).run(src.path, configuration)
+        verify<JettyServer>(mockJetty).run(src.path, configuration)
     }
 
     @Test
@@ -180,7 +180,7 @@ internal class MainTest : LoggingTest() {
         val args = arrayOf<String>(src.path, exampleOutput.path, "-s")
         main.run(args)
 
-        Mockito.verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
+        verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
     }
 
     @Test
@@ -192,7 +192,7 @@ internal class MainTest : LoggingTest() {
 
         main.run(stubOptions(args), configuration)
 
-        Mockito.verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
+        verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
     }
 
     @Test
@@ -210,19 +210,19 @@ internal class MainTest : LoggingTest() {
         configuration.destinationFolder = configTarget
         main.run(stubOptions(args), configuration)
 
-        Mockito.verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
+        verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
     @Test
     fun shouldTellUserThatTemplateOptionRequiresInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
-        val exception = Assert.assertThrows(JBakeException::class.java) {
+        val exception = assertThrows(JBakeException::class.java) {
             main.run(args)
         }
 
         assertThat(exception.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
-        Mockito.verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
+        verify(mockAppender, Mockito.times(1)).doAppend(captorLoggingEvent.capture())
 
         val loggingEvent = captorLoggingEvent.getValue()
         assertThat(loggingEvent.message).isEqualTo("Error: Missing required argument(s): --init")
@@ -232,15 +232,13 @@ internal class MainTest : LoggingTest() {
     @Throws(ConfigurationException::class)
     fun shouldThrowJBakeExceptionWithSystemExitCodeOnUnexpectedError(@TempDir source: Path) {
         val other = Mockito.spy<Main>(main)
-        val currentWorkingdir = newFolder(source, "jbake")
-        mockDefaultJbakeConfiguration(currentWorkingdir)
+        val currentWorkingDir = newFolder(source, "jbake")
+        mockDefaultJbakeConfiguration(currentWorkingDir)
 
-        Mockito.doThrow(RuntimeException("something went wrong")).`when`(other).run(
-            any(LaunchOptions::class.java),
-            any(JBakeConfiguration::class.java)
-        )
+        doThrow(RuntimeException("something went wrong"))
+            .`when`(other).run(any(LaunchOptions::class.java), any(JBakeConfiguration::class.java))
 
-        val e = Assert.assertThrows(
+        val e = assertThrows(
             JBakeException::class.java
         ) { other.run(arrayOf("")) }
 
@@ -250,18 +248,10 @@ internal class MainTest : LoggingTest() {
 
     @Test
     fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
-        `when`(mockFactory.setEncoding(anyString()))
-            .thenReturn(mockFactory)
-        Mockito.doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
-            .`when`(mockFactory).createDefaultJbakeConfiguration(
-                any(F),
-                any(F),
-                any(F),
-                anyBoolean()
-            )
-        val e = Assert.assertThrows(
-            JBakeException::class.java
-        ) { main.run(arrayOf("-b")) }
+        `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
+        doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
+            .`when`(mockFactory).createDefaultJbakeConfiguration(any(F), any(F), any(F), anyBoolean())
+        val e = assertThrows(JBakeException::class.java) { main.run(arrayOf("-b")) }
         assertThat(e.getExit()).isEqualTo(SystemExit.CONFIGURATION_ERROR.status)
     }
 
