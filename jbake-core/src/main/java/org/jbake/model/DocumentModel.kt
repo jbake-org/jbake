@@ -99,18 +99,24 @@ class DocumentModel : BaseModel() {
             putOrRemoveIfNull(ModelAttributes.CACHED, cached)
         }
 
-    fun setNextContent(nextDocumentModel: DocumentModel?) {
-        // TBD: This way it won't work, if we want to unset. Let's create a nullable property for this.
-        if (nextDocumentModel != null) {
-            put(ModelAttributes.NEXT_CONTENT, nextDocumentModel)
+    var nextContent: DocumentModel?
+        get() = get(ModelAttributes.NEXT_CONTENT) as DocumentModel?
+        set(nextDocumentModel) {
+            putOrRemoveIfNull(ModelAttributes.NEXT_CONTENT, nextDocumentModel)
         }
+
+    var previousContent: DocumentModel?
+        get() = get(ModelAttributes.PREVIOUS_CONTENT) as DocumentModel?
+        set(previousDocumentModel) {
+            putOrRemoveIfNull(ModelAttributes.PREVIOUS_CONTENT, previousDocumentModel)
+        }
+
+    fun setNextContent(nextDocumentModel: DocumentModel?) {
+        nextContent = nextDocumentModel
     }
 
     fun setPreviousContent(previousDocumentModel: DocumentModel?) {
-        // TBD: This way it won't work, if we want to unset. Let's create a nullable property for this.
-        if (previousDocumentModel != null) {
-            put(ModelAttributes.PREVIOUS_CONTENT, previousDocumentModel)
-        }
+        previousContent = previousDocumentModel
     }
 
     companion object {

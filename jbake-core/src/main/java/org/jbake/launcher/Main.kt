@@ -20,14 +20,7 @@ class Main @JvmOverloads constructor(
     private val jettyServer: JettyServer = JettyServer(),
     private val watcher: BakeWatcher = BakeWatcher()
 ) {
-    var jBakeConfigurationFactory: JBakeConfigurationFactory? = JBakeConfigurationFactory()
-    /**
-     * Optional constructor to externalize dependencies.
-     *
-     * @param baker   A [Baker] instance
-     * @param jettyServer   A [JettyServer] instance
-     * @param watcher A [BakeWatcher] instance
-     */
+    var jBakeConfigurationFactory: JBakeConfigurationFactory = JBakeConfigurationFactory()
 
     @Throws(JBakeException::class)
     fun run(args: Array<String>) {
@@ -39,7 +32,7 @@ class Main @JvmOverloads constructor(
 
             val arguments = parseArguments(args)
             if (arguments.isRunServer) {
-                config = this.jBakeConfigurationFactory!!.setEncoding(arguments.propertiesEncoding)
+                config = this.jBakeConfigurationFactory.setEncoding(arguments.propertiesEncoding)
                     .createJettyJbakeConfiguration(
                         arguments.getSource(),
                         arguments.getDestination(),
@@ -47,7 +40,7 @@ class Main @JvmOverloads constructor(
                         arguments.isClearCache
                     )
             } else {
-                config = this.jBakeConfigurationFactory!!.setEncoding(arguments.propertiesEncoding)
+                config = this.jBakeConfigurationFactory.setEncoding(arguments.propertiesEncoding)
                     .createDefaultJbakeConfiguration(
                         arguments.getSource(),
                         arguments.getDestination(),
@@ -59,6 +52,7 @@ class Main @JvmOverloads constructor(
         } catch (e: JBakeException) {
             throw e
         } catch (mex: CommandLine.MissingParameterException) {
+            logger.error(mex.message)
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, mex.message, mex)
         } catch (e: Throwable) {
             throw JBakeException(SystemExit.ERROR, "An unexpected error occurred: " + e.message, e)
@@ -93,7 +87,7 @@ class Main @JvmOverloads constructor(
             // TODO: Short term fix until bake, server, init commands no longer share underlying values (such as source/dest).
             if (!launchOptions.isBake) {
                 // Use the default destination folder.
-                runServer(config.destinationFolder!!, config)
+                runServer(config.destinationFolder, config)
             }
             else {
                 // Bake and server commands have been run together.
@@ -106,7 +100,7 @@ class Main @JvmOverloads constructor(
                         runServer(launchOptions.getSource(), config)
                     else ->
                         // Use the default DESTINATION_FOLDER value.
-                        runServer(config.destinationFolder!!, config)
+                        runServer(config.destinationFolder, config)
                 }
             }
         }

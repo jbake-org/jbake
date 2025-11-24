@@ -35,8 +35,12 @@ class Asset {
     }
 
     /** Copy all files from assets folder to destination folder read from configuration */
-    @JvmOverloads
-    fun copy(startingPath: File = config.assetFolder) {
+    fun copy() {
+        copy(config.assetFolder)
+    }
+
+    /** Copy all files from assets folder to destination folder read from configuration */
+    fun copy(startingPath: File) {
         val filter = FileFilter { file ->
             (!config.assetIgnoreHidden || !file.isHidden())
                 && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config))

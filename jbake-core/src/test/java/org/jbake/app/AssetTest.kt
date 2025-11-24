@@ -150,12 +150,14 @@ class AssetTest : LoggingTest() {
         val cssFile = File(css, "bootstrap.min.css")
         FileUtils.touch(cssFile)
         cssFile.setReadOnly()
+        css.setReadOnly() // Make directory read-only as well
 
         config.assetFolder = (assets)
         config.destinationFolder = (folder!!.toFile())
         val asset = Asset(config)
         asset.copy()
 
+        css.setWritable(true) // Restore directory permissions first
         cssFile.setWritable(true)
         assertFalse(asset.errors.isEmpty(), "At least one error during copy expected")
     }
