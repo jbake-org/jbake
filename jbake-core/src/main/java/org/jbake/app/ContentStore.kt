@@ -18,17 +18,15 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
 
-/**
- * @author jdlee
- */
 class ContentStore(private val type: String, private val name: String?) {
-    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 
     private lateinit var db: ODatabaseSession
     private lateinit var orient: OrientDB
 
-    var start: Long = -1; private set
-    var limit: Long = -1; private set
+    var paginationOffset: Int = -1
+
+    /** Items per page limit for pagination, like, posts per page. */
+    var paginationLimit: Int = -1
 
 
     fun startup() {
@@ -95,17 +93,9 @@ class ContentStore(private val type: String, private val name: String?) {
         updateSchema()
     }
 
-    fun setStart(start: Int) {
-        this.start = start.toLong()
-    }
-
-    fun setLimit(limit: Int) {
-        this.limit = limit.toLong()
-    }
-
     fun resetPagination() {
-        this.start = -1
-        this.limit = -1
+        this.paginationOffset = -1
+        this.paginationLimit = -1
     }
 
     fun updateSchema() {
@@ -210,7 +200,7 @@ class ContentStore(private val type: String, private val name: String?) {
     private fun getPublishedContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
         var query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType)
         if (applyPaging && hasStartAndLimitBoundary())
-            query += " SKIP $start LIMIT $limit"
+            query += " SKIP $paginationOffset LIMIT $paginationLimit"
         return query(query)
     }
 
@@ -221,12 +211,12 @@ class ContentStore(private val type: String, private val name: String?) {
     fun getAllContent(docType: String?, applyPaging: Boolean): DocumentList<DocumentModel> {
         var query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType)
         if (applyPaging && hasStartAndLimitBoundary())
-            query += " SKIP $start LIMIT $limit"
+            query += " SKIP $paginationOffset LIMIT $paginationLimit"
         return query(query)
     }
 
     private fun hasStartAndLimitBoundary(): Boolean {
-        return (start >= 0) && (limit > -1)
+        return (paginationOffset >= 0) && (paginationLimit > -1)
     }
 
     private val allTagsFromPublishedPosts: DocumentList<DocumentModel>
@@ -404,4 +394,5 @@ class ContentStore(private val type: String, private val name: String?) {
         private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "SELECT count(*) AS count FROM Documents WHERE type='%s'"
     }
 
+    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 }

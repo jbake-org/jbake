@@ -204,7 +204,7 @@ class AssetTest : LoggingTest() {
         val expected = 3
 
         assertTrue(totalFiles == expected) { String.format("Number of files copied must be %d but are %d", expected, totalFiles) }
-S
+
         val pngFile = File(folder.toString() + fSC + "blog" + fSC + "2012/images/custom-image.png")
         assertTrue(pngFile.exists()) { "File " + pngFile.absolutePath + " does not exist" }
 

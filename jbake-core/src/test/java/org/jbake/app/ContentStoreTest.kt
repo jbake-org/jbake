@@ -1,7 +1,7 @@
 package org.jbake.app
 
 import org.assertj.core.api.Assertions.assertThat
-import org.jbake.FakeDocumentBuilder
+import org.jbake.addTestDocument
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentModel.Companion.createDefaultDocumentModel
 import org.jbake.model.DocumentTypes.addDocumentType
@@ -13,21 +13,16 @@ import java.util.*
 import kotlin.Long
 import kotlin.String
 import kotlin.arrayOf
+import kotlin.repeat
 
 class ContentStoreTest : ContentStoreIntegrationTest() {
     @Test
     fun shouldGetCountForPublishedDocuments() {
-        for (i in 0..4) {
-            val builder = FakeDocumentBuilder(DOC_TYPE_POST)
-            builder.withStatus("published")
-                .withRandomSha1()
-                .build()
+        repeat(5) {
+            db.addTestDocument(type = DOC_TYPE_POST, status = "published")
         }
 
-        val builder = FakeDocumentBuilder(DOC_TYPE_POST)
-        builder.withStatus("draft")
-            .withRandomSha1()
-            .build()
+        db.addTestDocument(type = DOC_TYPE_POST, status = "draft")
 
         assertEquals(6, db.getDocumentCount(DOC_TYPE_POST))
         assertEquals(5, db.getPublishedCount(DOC_TYPE_POST))

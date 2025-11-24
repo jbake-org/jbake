@@ -87,10 +87,7 @@ class ConfigUtil {
 
     private fun displayLegacyConfigFileWarningIfRequired() {
         log.warn("You have defined a part of your JBake configuration in {}", LEGACY_CONFIG_FILE)
-        log.warn(
-            "Usage of this file is being deprecated, please rename this file to: {} to remove this warning",
-            CONFIG_FILE
-        )
+        log.warn("Usage of this file is being deprecated, please rename this file to: {} to remove this warning", CONFIG_FILE)
     }
 
     /**

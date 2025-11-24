@@ -208,13 +208,13 @@ class Renderer {
         }
 
         try {
-            db.setLimit(postsPerPage)
+            db.paginationLimit = postsPerPage
             var pageStart = 0
             var page = 1
             while (pageStart < totalPosts) {
                 var fileName = indexFile
 
-                db.setStart(pageStart)
+                db.paginationOffset = pageStart
                 model.currentPageNumber = page
                 model.previousFilename = pagingHelper.getPreviousFileName(page)
                 model.nextFileName = pagingHelper.getNextFileName(page)
