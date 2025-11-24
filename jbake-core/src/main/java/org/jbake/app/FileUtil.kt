@@ -50,8 +50,7 @@ object FileUtil {
     /** Gets the list of files that are not content files based on their extension. */
     fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
         return FileFilter { pathname ->
-            //Accept if input  is a non-hidden file with NOT-registered extension
-            //or if a non-hidden and not-ignored directory
+            // Accept if input  is a non-hidden file with NOT-registered extension or if a non-hidden and not-ignored directory.
             (!pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
                 && !Engines.recognizedExtensions.contains(fileExt(pathname)))
                 || (directoryOnlyIfNotIgnored(pathname, config)))
@@ -70,15 +69,15 @@ object FileUtil {
         }
 
     /**
-     * Ignores directory (and children) if it contains a file named in the
-     * configuration as a marker to ignore the directory.
+     * Ignores directory (and children) if it contains a file named in the configuration as a marker to ignore the directory.
      *
-     * @param file the file to test
+     * @param dir the file to test
      * @return true if file is directory and not ignored
      */
-    fun directoryOnlyIfNotIgnored(file: File, config: JBakeConfiguration): Boolean {
+    fun directoryOnlyIfNotIgnored(dir: File, config: JBakeConfiguration): Boolean {
         val ignoreFile = FilenameFilter { _, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
-        return file.isDirectory && file.listFiles(ignoreFile).isEmpty()
+        return dir.isDirectory && dir.listFiles(ignoreFile).isEmpty()
+        // TODO: Use dir.resolve(config.ignoreFileName).toFile().exists() from Java NIO
     }
 
     /**
@@ -107,17 +106,15 @@ object FileUtil {
          * @throws Exception when application is not able to work out where is JBake running from
          */
         get() {
-            val codePath =
-                FileUtil::class.java.getProtectionDomain().codeSource.location.path
+            val codePath = FileUtil::class.java.getProtectionDomain().codeSource.location.path
             val decodedPath = URLDecoder.decode(codePath, "UTF-8")
             val codeFile = File(decodedPath)
-            if (!codeFile.exists()) {
+            if (!codeFile.exists())
                 throw Exception("Cannot locate running location of JBake!")
-            }
+
             val codeFolder = codeFile.getParentFile().getParentFile()
-            if (!codeFolder.exists()) {
+            if (!codeFolder.exists())
                 throw Exception("Cannot locate running location of JBake!")
-            }
 
             return codeFolder
         }
@@ -152,17 +149,16 @@ object FileUtil {
                 var numRead: Int
                 do {
                     numRead = fis.read(buffer)
-                    if (numRead > 0) {
+                    if (numRead > 0)
                         digest.update(buffer, 0, numRead)
-                    }
                 } while (numRead != -1)
             }
-        } else if (sourceFile.isDirectory()) {
-            val files = sourceFile.listFiles()
-            if (files != null) {
-                for (file in files) {
-                    updateDigest(digest, file, buffer)
-                }
+        }
+        else if (sourceFile.isDirectory()) {
+            val files = sourceFile.listFiles() ?: return
+
+            for (file in files) {
+                updateDigest(digest, file, buffer)
             }
         }
     }
