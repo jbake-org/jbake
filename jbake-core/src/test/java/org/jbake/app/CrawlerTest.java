@@ -1,34 +1,31 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.record.OTrackedMap;
-import org.apache.commons.io.FilenameUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
-import org.jbake.model.DocumentTypes;
-import org.jbake.util.DataFileUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
+import org.apache.commons.io.FilenameUtils;
+import org.jbake.model.DocumentModel;
+import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
+import org.jbake.util.DataFileUtil;
+import org.junit.jupiter.api.Test;
 
-public class CrawlerTest extends ContentStoreIntegrationTest {
+import com.orientechnologies.orient.core.db.record.OTrackedMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class CrawlerTest extends ContentStoreIntegrationTest {
 
     @Test
-    public void crawl() {
+    void crawl() {
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
-        Assert.assertEquals(3, db.getDocumentCount("page"));
+        assertEquals(4, db.getDocumentCount("post"));
+        assertEquals(3, db.getDocumentCount("page"));
 
         DocumentList<DocumentModel> results = db.getPublishedPosts();
 
@@ -52,26 +49,26 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         // covers bug #213
         DocumentList<DocumentModel> publishedPostsByTag = db.getPublishedPostsByTag("blog");
-        Assert.assertEquals(3, publishedPostsByTag.size());
+        assertEquals(3, publishedPostsByTag.size());
     }
 
     @Test
-    public void crawlDataFiles() {
+    void crawlDataFiles() {
         Crawler crawler = new Crawler(db, config);
         // manually register data doctype
         DocumentTypes.addDocumentType(config.getDataFileDocType());
         db.updateSchema();
         crawler.crawlDataFiles();
-        Assert.assertEquals(2, db.getDocumentCount("data"));
+        assertEquals(2, db.getDocumentCount("data"));
 
         DataFileUtil dataFileUtil = new DataFileUtil(db, "data");
         Map<String, Object> videos = dataFileUtil.get("videos.yaml");
-        Assert.assertFalse(videos.isEmpty());
-        Assert.assertNotNull(videos.get("data"));
+        assertFalse(videos.isEmpty());
+        assertNotNull(videos.get("data"));
 
         // regression test for issue 747
         Map<String, Object> authorsFileContents = dataFileUtil.get("authors.yaml");
-        Assert.assertFalse(authorsFileContents.isEmpty());
+        assertFalse(authorsFileContents.isEmpty());
         Object authorsList = authorsFileContents.get("authors");
         assertThat(authorsList).isNotInstanceOf(OTrackedMap.class);
         assertThat(authorsList).isInstanceOf(HashMap.class);
@@ -80,7 +77,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
     }
 
     @Test
-    public void renderWithPrettyUrls() {
+    void renderWithPrettyUrls() {
 
         config.setUriWithoutExtension(true);
         config.setPrefixForUriWithoutExtension("/blog");
@@ -88,40 +85,17 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
-        Assert.assertEquals(3, db.getDocumentCount("page"));
+        assertEquals(4, db.getDocumentCount("post"));
+        assertEquals(3, db.getDocumentCount("page"));
 
         DocumentList<DocumentModel> documents = db.getPublishedPosts();
 
         for (DocumentModel model : documents) {
             String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.getFile()) + "/";
 
-            Assert.assertThat(model.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
-            Assert.assertThat(model.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-            Assert.assertThat(model.getRootPath(), is("../../../"));
-        }
-    }
-
-    private static class RegexMatcher extends BaseMatcher<Object> {
-        private final String regex;
-
-        public RegexMatcher(String regex) {
-            this.regex = regex;
-        }
-
-        public static RegexMatcher matches(String regex) {
-            return new RegexMatcher(regex);
-        }
-
-        @Override
-        public boolean matches(Object o) {
-            return ((String) o).matches(regex);
-
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("matches regex: " + regex);
+            assertThat(model.getNoExtensionUri()).matches(noExtensionUri);
+            assertThat(model.getUri()).matches(noExtensionUri + "index\\.html");
+            assertThat(model.getRootPath()).isEqualTo("../../../");
         }
     }
 }

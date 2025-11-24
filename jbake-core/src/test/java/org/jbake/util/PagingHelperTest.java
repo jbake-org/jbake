@@ -1,64 +1,66 @@
 package org.jbake.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class PagingHelperTest {
+class PagingHelperTest {
+
     @Test
-    public void getNumberOfPages() throws Exception {
+    void getNumberOfPages() throws Exception {
         int expected = 3;
         int total = 5;
         int perPage = 2;
 
-        PagingHelper helper = new PagingHelper(total,perPage);
+        PagingHelper helper = new PagingHelper(total, perPage);
 
-        Assert.assertEquals( expected, helper.getNumberOfPages() );
+        assertEquals(expected, helper.getNumberOfPages());
     }
 
     @Test
-    public void shouldReturnRootIndexPage() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    void shouldReturnRootIndexPage() throws Exception {
+        PagingHelper helper = new PagingHelper(5, 2);
 
         String previousFileName = helper.getPreviousFileName(2);
 
-        Assert.assertThat("", is( previousFileName) );
+        assertThat(previousFileName).isEmpty();
     }
 
     @Test
-    public void shouldReturnPreviousFileName() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    void shouldReturnPreviousFileName() throws Exception {
+        PagingHelper helper = new PagingHelper(5, 2);
 
         String previousFileName = helper.getPreviousFileName(3);
 
-        Assert.assertThat("2/", is( previousFileName) );
+        assertThat(previousFileName).isEqualTo("2/");
     }
 
     @Test
-    public void shouldReturnNullIfNoPreviousPageAvailable() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    void shouldReturnNullIfNoPreviousPageAvailable() throws Exception {
+        PagingHelper helper = new PagingHelper(5, 2);
 
         String previousFileName = helper.getPreviousFileName(1);
 
-        Assert.assertNull( previousFileName );
+        assertNull(previousFileName);
     }
 
     @Test
-    public void shouldReturnNullIfNextPageNotAvailable() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    void shouldReturnNullIfNextPageNotAvailable() throws Exception {
+        PagingHelper helper = new PagingHelper(5, 2);
 
         String nextFileName = helper.getNextFileName(3);
 
-        Assert.assertNull( nextFileName );
+        assertNull(nextFileName);
     }
 
     @Test
-    public void shouldReturnNextFileName() throws Exception {
-        PagingHelper helper = new PagingHelper(5,2);
+    void shouldReturnNextFileName() throws Exception {
+        PagingHelper helper = new PagingHelper(5, 2);
 
         String nextFileName = helper.getNextFileName(2);
 
-        Assert.assertThat("3/", is( nextFileName) );
+        assertThat(nextFileName).isEqualTo("3/");
     }
 }

@@ -1,6 +1,13 @@
 package org.jbake.app;
 
-import ch.qos.logback.classic.spi.LoggingEvent;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.jbake.TestUtils;
@@ -10,20 +17,19 @@ import org.jbake.app.configuration.PropertyList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
+import ch.qos.logback.classic.spi.LoggingEvent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 
-public class AssetTest extends LoggingTest {
+class AssetTest extends LoggingTest {
 
     public Path folder;
     private DefaultJBakeConfiguration config;
@@ -31,7 +37,7 @@ public class AssetTest extends LoggingTest {
 
 
     @BeforeEach
-    public void setup(@TempDir Path folder) throws Exception {
+    void setup(@TempDir Path folder) throws Exception {
         fixtureDir = new File(this.getClass().getResource("/fixture").getFile());
         this.folder = folder;
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(fixtureDir);
@@ -41,7 +47,7 @@ public class AssetTest extends LoggingTest {
 
 
     @Test
-    public void testCopy() throws Exception {
+    void testCopy() throws Exception {
         Asset asset = new Asset(config);
         asset.copy();
         File cssFile = new File(folder.toString() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
@@ -55,7 +61,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void testCopySingleFile() throws Exception {
+    void testCopySingleFile() throws Exception {
         Asset asset = new Asset(config);
         String cssSubPath = File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css";
         String contentImgPath = File.separatorChar + "blog" + File.separatorChar + "2013" + File.separatorChar
@@ -77,7 +83,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void shouldSkipCopyingSingleFileIfDirectory() throws IOException {
+    void shouldSkipCopyingSingleFileIfDirectory() throws IOException {
 
         Asset asset = new Asset(config);
 
@@ -91,7 +97,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void shouldLogSkipCopyingSingleFileIfDirectory() throws IOException {
+    void shouldLogSkipCopyingSingleFileIfDirectory() throws IOException {
 
         Asset asset = new Asset(config);
         File emptyDir = new File(folder.toFile(),"emptyDir");
@@ -107,7 +113,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void testCopyCustomFolder() throws Exception {
+    void testCopyCustomFolder() throws Exception {
         config.setAssetFolder(new File(config.getSourceFolder(), "/media"));
         Asset asset = new Asset(config);
         asset.copy();
@@ -119,7 +125,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void testCopyIgnore() throws Exception {
+    void testCopyIgnore() throws Exception {
         File assetFolder = new File(folder.toFile(), "ignoredAssets");
         assetFolder.mkdirs();
         FileUtils.copyDirectory(new File(this.getClass().getResource("/fixture/ignorables").getFile()), assetFolder);
@@ -138,43 +144,57 @@ public class AssetTest extends LoggingTest {
     }
 
 
-    /**
-     * Primary intention is to extend test cases to increase coverage.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testWriteProtected() throws Exception {
-        File assets = new File(config.getSourceFolder(), "assets");
-        File css = new File(folder.toFile(),"css");
-        css.mkdir();
-        final File cssFile = new File(css, "bootstrap.min.css");
+    @DisabledOnOs(OS.WINDOWS)
+    void testWriteProtectedNotWindows() throws Exception {
+        File assets = config.getSourceFolder().toPath().resolve("assets").toFile();
+        Path css = folder.resolve("css");
+        Files.createDirectory(css);
+
+        File cssFile = css.resolve("bootstrap.min.css").toFile();
         FileUtils.touch(cssFile);
-        cssFile.setReadOnly();
+
+        Files.setPosixFilePermissions(css, PosixFilePermissions.fromString("r-xr-xr-x"));
 
         config.setAssetFolder(assets);
         config.setDestinationFolder(folder.toFile());
         Asset asset = new Asset(config);
+
         asset.copy();
 
-        cssFile.setWritable(true);
         Assertions.assertFalse(asset.getErrors().isEmpty(), "At least one error during copy expected");
     }
 
-    /**
-     * Primary intention is to extend test cases to increase coverage.
-     *
-     * @throws Exception
-     */
     @Test
-    public void testUnlistable() throws Exception {
+    @EnabledOnOs(OS.WINDOWS)
+    void testWriteProtectedOnWindows() throws Exception {
+        File assets = config.getSourceFolder().toPath().resolve("assets").toFile();
+        Path css = folder.resolve("css");
+        Files.createDirectory(css);
+
+        File cssFile = css.resolve("bootstrap.min.css").toFile();
+        FileUtils.touch(cssFile);
+
+        Files.setAttribute(cssFile.toPath(), "dos:readonly", true);
+
+        config.setAssetFolder(assets);
+        config.setDestinationFolder(folder.toFile());
+        Asset asset = new Asset(config);
+
+        asset.copy();
+
+        Assertions.assertFalse(asset.getErrors().isEmpty(), "At least one error during copy expected");
+    }
+
+    @Test
+    void testUnlistable() throws Exception {
         config.setAssetFolder(new File(config.getSourceFolder(), "non-exsitent"));
         Asset asset = new Asset(config);
         asset.copy();
     }
 
     @Test
-    public void testJBakeIgnoredFolder() {
+    void testJBakeIgnoredFolder() {
         URL assetsUrl = this.getClass().getResource("/fixture/assets");
         File assets = new File(assetsUrl.getFile());
         Asset asset = new Asset(config);
@@ -195,7 +215,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void testFooIgnoredFolder() {
+    void testFooIgnoredFolder() {
         config.setProperty(PropertyList.IGNORE_FILE.getKey(), ".fooignore");
 
         URL assetsUrl = this.getClass().getResource("/fixture/assets");
@@ -218,7 +238,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void testCopyAssetsFromContent() {
+    void testCopyAssetsFromContent() {
         URL contentUrl = this.getClass().getResource("/fixture/content");
         File contents = new File(contentUrl.getFile());
         Asset asset = new Asset(config);
@@ -242,7 +262,7 @@ public class AssetTest extends LoggingTest {
     }
 
     @Test
-    public void testIsFileAsset() {
+    void testIsFileAsset() {
         File cssAsset = new File(config.getAssetFolder().getAbsolutePath() + File.separatorChar + "css" + File.separatorChar + "bootstrap.min.css");
         Assertions.assertTrue(cssAsset.exists());
         File contentFile = new File(config.getContentFolder().getAbsolutePath() + File.separatorChar + "about.html");
@@ -259,7 +279,6 @@ public class AssetTest extends LoggingTest {
         FileFilter filesOnly = FileFilterUtils.fileFileFilter();
         FileFilter dirsOnly = FileFilterUtils.directoryFileFilter();
         File[] files = path.listFiles(filesOnly);
-        System.out.println(files);
         total += files.length;
         for (File file : path.listFiles(dirsOnly)) {
             total += countFiles(file);

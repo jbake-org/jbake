@@ -5,9 +5,10 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -16,10 +17,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class IndexRendererTest {
+class IndexRendererTest {
 
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderIndices() throws RenderingException {
+    void returnsZeroWhenConfigDoesNotRenderIndices() throws RenderingException {
         IndexRenderer renderer = new IndexRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -34,7 +35,7 @@ public class IndexRendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderIndices() throws Exception {
+    void doesNotRenderWhenConfigDoesNotRenderIndices() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -49,7 +50,7 @@ public class IndexRendererTest {
     }
 
     @Test
-    public void returnsOneWhenConfigRendersIndices() throws RenderingException {
+    void returnsOneWhenConfigRendersIndices() throws RenderingException {
         IndexRenderer renderer = new IndexRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -65,8 +66,8 @@ public class IndexRendererTest {
     }
 
 
-    @Test(expected = RenderingException.class)
-    public void propagatesRenderingException() throws Exception {
+    @Test
+    void propagatesRenderingException() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -78,9 +79,8 @@ public class IndexRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderIndex(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
-
-        verify(mockRenderer, never()).renderIndex(anyString());
+        assertThatThrownBy(() -> renderer.render(mockRenderer, contentStore, configuration))
+            .isInstanceOf(RenderingException.class);
     }
 
 
@@ -88,7 +88,7 @@ public class IndexRendererTest {
      * @see <a href="https://github.com/jbake-org/jbake/issues/332">Issue 332</a>
      */
     @Test
-    public void shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() throws Exception {
+    void shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() throws Exception {
         IndexRenderer renderer = new IndexRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -104,7 +104,7 @@ public class IndexRendererTest {
     }
 
     @Test
-    public void shouldRenderPaginatedIndex() throws Exception {
+    void shouldRenderPaginatedIndex() throws Exception {
 
         IndexRenderer renderer = new IndexRenderer();
 
@@ -119,7 +119,6 @@ public class IndexRendererTest {
         renderer.render(mockRenderer, contentStore, configuration);
 
         verify(mockRenderer, times(1)).renderIndexPaging(anyString());
-
     }
 }
 

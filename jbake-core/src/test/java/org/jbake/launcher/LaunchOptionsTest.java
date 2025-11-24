@@ -1,7 +1,8 @@
 package org.jbake.launcher;
 
 import org.jbake.app.configuration.ConfigUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import picocli.CommandLine;
 import picocli.CommandLine.MissingParameterException;
 
@@ -10,17 +11,17 @@ import java.io.File;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class LaunchOptionsTest {
+class LaunchOptionsTest {
 
     @Test
-    public void showHelp() {
+    void showHelp() {
         String[] args = {"-h"};
         LaunchOptions res = parseArgs(args);
         assertThat(res.isHelpNeeded()).isTrue();
     }
 
     @Test
-    public void runServer() {
+    void runServer() {
         String[] args = {"-s"};
         LaunchOptions res = parseArgs(args);
 
@@ -28,7 +29,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void runServerWithFolder() {
+    void runServerWithFolder() {
         String[] args = {"-s", "/tmp"};
         LaunchOptions res = parseArgs(args);
 
@@ -37,7 +38,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void init() {
+    void init() {
         String[] args = {"-i"};
         LaunchOptions res = parseArgs(args);
 
@@ -46,7 +47,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void initWithTemplate() {
+    void initWithTemplate() {
         String[] args = {"-i", "-t", "foo"};
         LaunchOptions res = parseArgs(args);
 
@@ -55,7 +56,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void initWithSourceDirectory() {
+    void initWithSourceDirectory() {
         String[] args = {"-i", "/tmp"};
         LaunchOptions res = parseArgs(args);
 
@@ -64,7 +65,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void initWithTemplateAndSourceDirectory() {
+    void initWithTemplateAndSourceDirectory() {
         String[] args = {"-i", "-t", "foo", "/tmp"};
         LaunchOptions res = parseArgs(args);
 
@@ -74,7 +75,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
+    void shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
         String[] args = {"-t", "groovy-mte"};
 
         assertThatExceptionOfType(MissingParameterException.class).isThrownBy(()-> {
@@ -83,7 +84,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void bake() {
+    void bake() {
         String[] args = {"-b"};
         LaunchOptions res = parseArgs(args);
 
@@ -91,7 +92,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void listConfig() throws Exception {
+    void listConfig() throws Exception {
         String[] args = {"-ls"};
         LaunchOptions res = parseArgs(args);
 
@@ -99,7 +100,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void listConfigLongOption() throws Exception {
+    void listConfigLongOption() throws Exception {
         String[] args = {"--list-settings"};
         LaunchOptions res = parseArgs(args);
 
@@ -107,7 +108,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void customPropertiesEncoding() throws Exception {
+    void customPropertiesEncoding() throws Exception {
         String[] args = {"--prop-encoding", "utf-16"};
         LaunchOptions res = parseArgs(args);
 
@@ -115,7 +116,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void defaultEncodingIsUtf8() throws Exception {
+    void defaultEncodingIsUtf8() throws Exception {
         String[] args = {};
         LaunchOptions res = parseArgs(args);
 
@@ -123,7 +124,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void bakeNoArgs() {
+    void bakeNoArgs() {
         String[] args = {};
         LaunchOptions res = parseArgs(args);
 
@@ -137,7 +138,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void bakeWithArgs() {
+    void bakeWithArgs() {
         String[] args = {"/tmp/source", "/tmp/destination"};
         LaunchOptions res = parseArgs(args);
 
@@ -150,7 +151,7 @@ public class LaunchOptionsTest {
     }
 
     @Test
-    public void configArg() {
+    void configArg() {
         String[] args = {"-c", "foo"};
         LaunchOptions res = parseArgs(args);
         assertThat(res.getConfig().getAbsoluteFile().toString()).isEqualTo(System.getProperty("user.dir")+ File.separator + "foo");

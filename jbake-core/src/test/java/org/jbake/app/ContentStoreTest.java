@@ -1,24 +1,24 @@
 package org.jbake.app;
 
-import org.jbake.FakeDocumentBuilder;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.jbake.model.ModelAttributes.Status;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
+import org.jbake.FakeDocumentBuilder;
+import org.jbake.model.DocumentModel;
+import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes.Status;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ContentStoreTest extends ContentStoreIntegrationTest {
+class ContentStoreTest extends ContentStoreIntegrationTest {
 
-    public static final String DOC_TYPE_POST = "post";
+    private static final String DOC_TYPE_POST = "post";
 
     @Test
-    public void shouldGetCountForPublishedDocuments() throws Exception {
+    void shouldGetCountForPublishedDocuments() throws Exception {
 
         for (int i = 0; i < 5; i++) {
             FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
@@ -37,7 +37,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
     }
 
     @Test
-    public void testStoreTypeWithSpecialCharacters() {
+    void testStoreTypeWithSpecialCharacters() {
         final String typeWithHyphen = "type-with-hyphen";
 
         DocumentTypes.addDocumentType(typeWithHyphen);

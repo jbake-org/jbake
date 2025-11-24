@@ -1,3 +1,6 @@
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     id 'java'
     id 'jacoco'
@@ -15,26 +18,22 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "ch.qos.logback:logback-core:$logbackVersion"
 
-    testImplementation "org.junit-pioneer:junit-pioneer:$junitPioneer"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
-    // compatibility for Junit 4 test
-    testCompileOnly "junit:junit:$junit4Version"
-    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit5Version"
+    testImplementation(platform("org.junit:junit-bom:$junit5Version"))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
 
     testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
-    testImplementation "org.itsallcode:junit5-system-extensions:$junit5SystemExtVersion"
 }
 
-tasks.withType(JavaCompile) {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+tasks.withType(JavaCompile).configureEach {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 //set jvm for all Test tasks (like test and smokeTest)
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
 
     def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false', '-Djna.nosys=true']
 
@@ -45,30 +44,73 @@ tasks.withType(Test) {
     if (JavaVersion.current().java9Compatible) {
         args << '-XX:MaxDirectMemorySize=2g'
     }
-    jvmArgs args
+    jvmArgs = args
 }
 
-task javadocJar(type: Jar) {
+tasks.register("javadocJar", Jar) {
     archiveClassifier.set('javadoc')
     from javadoc
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
+tasks.register("sourcesJar", Jar) {
+
+    it.archiveClassifier.set('sources')
     from sourceSets.main.allSource
 }
 
-tasks.withType(AbstractArchiveTask) {
+tasks.withType(AbstractArchiveTask).configureEach {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
+
+tasks.register("commitBuildAndDate", Exec) {
+    group = "build"
+    description = "determine build date and time from last commit"
+
+    executable "git"
+    args "show", "-s", "--format=%cI", "HEAD"
+
+    standardOutput = new ByteArrayOutputStream()
+
+    ext.commitDate = {
+        def zonedDateTime = ZonedDateTime.parse(standardOutput.toString().trim())
+        return zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'"))
+    }
+
+    ext.date = {
+        def zonedDateTime = ZonedDateTime.parse(standardOutput.toString().trim())
+        return zonedDateTime.format(DateTimeFormatter.ofPattern('yyyy-MM-dd'))
+    }
+
+    ext.time = {
+        def zonedDateTime = ZonedDateTime.parse(standardOutput.toString().trim())
+        return zonedDateTime.format(DateTimeFormatter.ofPattern('HH:mm:ss.SSSZ'))
+    }
+}
+
+tasks.register("commitHash", Exec) {
+    group = "build"
+    description = "determine build commit hash for last commit"
+
+    executable "git"
+    args "show", "-s", "--format=%h", "HEAD"
+
+    standardOutput = new ByteArrayOutputStream()
+
+    ext.abbreviated = {
+        return standardOutput.toString().trim()
+    }
+}
+
+processResources.dependsOn(tasks.commitBuildAndDate)
+processResources.dependsOn(tasks.commitHash)
 
 test {
     useJUnitPlatform()
 
     testLogging {
         events "passed", "skipped", "failed"
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     jacoco {
@@ -89,7 +131,7 @@ jacocoTestReport {
 
 jacocoTestReport.dependsOn test
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     reports {
         xml.required.set false
         html.required.set true

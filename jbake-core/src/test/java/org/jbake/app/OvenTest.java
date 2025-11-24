@@ -1,5 +1,11 @@
 package org.jbake.app;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
+
 import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
@@ -11,17 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Locale;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -31,17 +26,17 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class OvenTest {
+class OvenTest {
 
     @TempDir
-    Path root;
+    private Path root;
 
     private DefaultJBakeConfiguration configuration;
     private File sourceFolder;
     private ContentStore contentStore;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         DocumentTypes.resetDocumentTypes();
         File output = root.resolve("output").toFile();
@@ -53,7 +48,7 @@ public class OvenTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         if (contentStore != null && contentStore.isActive()) {
             contentStore.close();
             contentStore.shutdown();
@@ -61,7 +56,7 @@ public class OvenTest {
     }
 
     @Test
-    public void bakeWithAbsolutePaths() {
+    void bakeWithAbsolutePaths() {
         configuration.setTemplateFolder(new File(sourceFolder, "groovyMarkupTemplates"));
         configuration.setContentFolder(new File(sourceFolder, "content"));
         configuration.setAssetFolder(new File(sourceFolder, "assets"));
@@ -73,7 +68,7 @@ public class OvenTest {
     }
 
     @Test
-    public void shouldBakeWithRelativeCustomPaths() throws Exception {
+    void shouldBakeWithRelativeCustomPaths() throws Exception {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative");
         configuration = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         File assetFolder = new File(configuration.getDestinationFolder(), "css");
@@ -93,7 +88,7 @@ public class OvenTest {
     }
 
     @Test
-    public void shouldBakeWithAbsoluteCustomPaths() throws Exception {
+    void shouldBakeWithAbsoluteCustomPaths() throws Exception {
 
         // given
         Path source = root.resolve("source");
@@ -140,14 +135,14 @@ public class OvenTest {
 
 
     @Test
-    public void shouldThrowExceptionIfSourceFolderDoesNotExist() {
+    void shouldThrowExceptionIfSourceFolderDoesNotExist() {
         configuration.setSourceFolder(root.resolve("none").toFile());
 
         assertThrows(JBakeException.class, () -> new Oven(configuration));
     }
 
     @Test
-    public void shouldInstantiateNeededUtensils() throws Exception {
+    void shouldInstantiateNeededUtensils() throws Exception {
 
         File template = TestUtils.newFolder(root.toFile(), "template");
         File content = TestUtils.newFolder(root.toFile(), "content");
@@ -167,7 +162,7 @@ public class OvenTest {
     }
 
     @Test()
-    public void shouldInspectConfigurationDuringInstantiationFromUtils() {
+    void shouldInspectConfigurationDuringInstantiationFromUtils() {
         configuration.setSourceFolder(root.resolve("none").toFile());
 
         Utensils utensils = new Utensils();
@@ -177,7 +172,7 @@ public class OvenTest {
     }
 
     @Test
-    public void shouldCrawlRenderAndCopyAssets() throws Exception {
+    void shouldCrawlRenderAndCopyAssets() throws Exception {
         File template = TestUtils.newFolder(root.toFile(), "template");
         File content = TestUtils.newFolder(root.toFile(), "content");
         File assets = TestUtils.newFolder(root.toFile(), "assets");
@@ -210,23 +205,23 @@ public class OvenTest {
     }
 
     @Test
-    public void localeConfiguration() throws Exception {
+    void localeConfiguration() throws Exception {
         String language = configuration.getJvmLocale();
 
         final Oven oven = new Oven(configuration);
         oven.bake();
 
-        assertThat(Locale.getDefault(), is(new Locale(language)));
+        assertThat(Locale.getDefault()).isEqualTo(new Locale(language));
     }
 
     @Test
-    public void noLocaleConfiguration() throws Exception {
+    void noLocaleConfiguration() throws Exception {
         configuration.setProperty(PropertyList.JVM_LOCALE.getKey(), null);
 
         String language = Locale.getDefault().getLanguage();
         final Oven oven = new Oven(configuration);
         oven.bake();
 
-        assertThat(Locale.getDefault(), is(new Locale(language)));
+        assertThat(Locale.getDefault()).isEqualTo(new Locale(language));
     }
 }

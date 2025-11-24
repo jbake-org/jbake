@@ -34,49 +34,49 @@ import static spark.Spark.stop;
 @Mojo(name = "inline", requiresDirectInvocation = true, requiresProject = false)
 public class InlineMojo extends WatchMojo {
 
-  /**
-   * Listen Port
-   */
-  @Parameter(property = "jbake.listenAddress", defaultValue = "127.0.0.1")
-  private String listenAddress;
+    /**
+     * Listen Port
+     */
+    @Parameter(property = "jbake.listenAddress", defaultValue = "127.0.0.1")
+    private String listenAddress;
 
-  /**
-   * Index File
-   */
-  @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
-  private String indexFile;
+    /**
+     * Index File
+     */
+    @Parameter(property = "jbake.indexFile", defaultValue = "index.html")
+    private String indexFile;
 
-  /**
-   * Listen Port
-   */
-  @Parameter(property = "jbake.port")
-  private Integer port;
+    /**
+     * Listen Port
+     */
+    @Parameter(property = "jbake.port")
+    private Integer port;
 
-  private int getPort() {
-    if (this.port == null) {
-      try {
-        return createConfiguration().getServerPort();
-      } catch (JBakeException e) {
-        // ignore since default will be returned
-      }
-    } else {
-      return this.port;
+    private int getPort() {
+        if (this.port == null) {
+            try {
+                return createConfiguration().getServerPort();
+            } catch (JBakeException e) {
+                // ignore since default will be returned
+            }
+        } else {
+            return this.port;
+        }
+        return 8820;
     }
-    return 8820;
-  }
 
-  protected void stopServer() throws MojoExecutionException {
-    stop();
-  }
+    protected void stopServer() throws MojoExecutionException {
+        stop();
+    }
 
-  protected void initServer() throws MojoExecutionException {
-    externalStaticFileLocation(outputDirectory.getPath());
+    protected void initServer() throws MojoExecutionException {
+        externalStaticFileLocation(outputDirectory.getPath());
 
-    ipAddress(listenAddress);
-    port(getPort());
+        ipAddress(listenAddress);
+        port(getPort());
 
-    init();
+        init();
 
-    awaitInitialization();
-  }
+        awaitInitialization();
+    }
 }

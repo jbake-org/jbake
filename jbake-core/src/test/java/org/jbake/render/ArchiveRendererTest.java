@@ -5,9 +5,10 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -16,10 +17,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ArchiveRendererTest {
+class ArchiveRendererTest {
 
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderArchives() throws RenderingException {
+    void returnsZeroWhenConfigDoesNotRenderArchives() throws RenderingException {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -34,7 +35,7 @@ public class ArchiveRendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderArchives() throws Exception {
+    void doesNotRenderWhenConfigDoesNotRenderArchives() throws Exception {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -49,7 +50,7 @@ public class ArchiveRendererTest {
     }
 
     @Test
-    public void returnsOneWhenConfigRendersArchives() throws RenderingException {
+    void returnsOneWhenConfigRendersArchives() throws RenderingException {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -65,7 +66,7 @@ public class ArchiveRendererTest {
     }
 
     @Test
-    public void doesRenderWhenConfigDoesRenderArchives() throws Exception {
+    void doesRenderWhenConfigDoesRenderArchives() throws Exception {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -80,8 +81,8 @@ public class ArchiveRendererTest {
         verify(mockRenderer, times(1)).renderArchive(anyString());
     }
 
-    @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    @Test
+    void propagatesRenderingException() throws Exception {
         ArchiveRenderer renderer = new ArchiveRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -93,11 +94,9 @@ public class ArchiveRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderArchive(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
+        assertThatThrownBy(() -> renderer.render(mockRenderer, contentStore, configuration))
+            .isInstanceOf(RenderingException.class);
 
         verify(mockRenderer, never()).renderArchive("random string");
     }
-
 }
-
-

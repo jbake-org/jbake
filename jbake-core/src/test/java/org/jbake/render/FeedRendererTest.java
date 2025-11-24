@@ -5,9 +5,10 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -16,10 +17,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class FeedRendererTest {
+class FeedRendererTest {
 
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderFeeds() throws RenderingException {
+    void returnsZeroWhenConfigDoesNotRenderFeeds() throws RenderingException {
         FeedRenderer renderer = new FeedRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -34,7 +35,7 @@ public class FeedRendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderFeeds() throws Exception {
+    void doesNotRenderWhenConfigDoesNotRenderFeeds() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -49,7 +50,7 @@ public class FeedRendererTest {
     }
 
     @Test
-    public void returnsOneWhenConfigRendersFeeds() throws RenderingException {
+    void returnsOneWhenConfigRendersFeeds() throws RenderingException {
         FeedRenderer renderer = new FeedRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -65,7 +66,7 @@ public class FeedRendererTest {
     }
 
     @Test
-    public void doesRenderWhenConfigDoesRenderFeeds() throws Exception {
+    void doesRenderWhenConfigDoesRenderFeeds() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
         when(configuration.getRenderFeed()).thenReturn(true);
@@ -79,8 +80,8 @@ public class FeedRendererTest {
         verify(mockRenderer, times(1)).renderFeed(anyString());
     }
 
-    @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    @Test
+    void propagatesRenderingException() throws Exception {
         FeedRenderer renderer = new FeedRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -92,7 +93,8 @@ public class FeedRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderFeed(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
+        assertThatThrownBy(() -> renderer.render(mockRenderer, contentStore, configuration))
+            .isInstanceOf(RenderingException.class);
 
         verify(mockRenderer, never()).renderFeed("random string");
     }

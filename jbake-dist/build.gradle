@@ -39,17 +39,18 @@ dependencies {
 }
 
 task smokeTest(type: Test, dependsOn: installDist) {
-    group 'Verification'
-    description 'Runs the integration tests.'
+    group = 'Verification'
+    description = 'Runs the integration tests.'
     setTestClassesDirs sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
     shouldRunAfter test
 }
 
 smokeTest {
+    useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 }
 

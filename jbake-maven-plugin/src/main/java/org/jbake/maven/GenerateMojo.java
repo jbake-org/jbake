@@ -16,6 +16,8 @@ package org.jbake.maven;
  * limitations under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -28,8 +30,6 @@ import org.jbake.app.Oven;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
-
-import java.io.File;
 
 /**
  * Runs jbake on a folder

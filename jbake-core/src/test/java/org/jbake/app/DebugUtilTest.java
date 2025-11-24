@@ -1,19 +1,20 @@
 package org.jbake.app;
 
-import org.jbake.util.DebugUtil;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-public class DebugUtilTest {
+import org.jbake.util.DebugUtil;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class DebugUtilTest {
 
     @Test
-    public void printMap() throws UnsupportedEncodingException {
+    void printMap() throws UnsupportedEncodingException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream ps = new PrintStream(baos, true, "UTF-8")) {
             HashMap<String, Object> map = new HashMap<String, Object>();
@@ -28,10 +29,10 @@ public class DebugUtilTest {
         String printed = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         System.out.println(printed);
 
-        Assert.assertTrue(printed.contains("stringKey :: stringVal"));
-        Assert.assertTrue(printed.contains("null :: forNullKey"));
-        Assert.assertTrue(printed.contains("forNullVal :: null"));
-        Assert.assertTrue(printed.contains("forCharset :: UTF-8"));
-        Assert.assertTrue(printed.contains("forNonSerializableVal :: java.lang.Exception: nonSerializableVal"));
+        assertTrue(printed.contains("stringKey :: stringVal"));
+        assertTrue(printed.contains("null :: forNullKey"));
+        assertTrue(printed.contains("forNullVal :: null"));
+        assertTrue(printed.contains("forCharset :: UTF-8"));
+        assertTrue(printed.contains("forNonSerializableVal :: java.lang.Exception: nonSerializableVal"));
     }
 }

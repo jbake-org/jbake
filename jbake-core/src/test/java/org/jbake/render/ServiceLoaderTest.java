@@ -1,7 +1,5 @@
 package org.jbake.render;
 
-import org.junit.Test;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -10,16 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
-public class ServiceLoaderTest {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ServiceLoaderTest {
 
     @Test
-    public void testLoadRenderer() throws Exception {
+    void testLoadRenderer() throws Exception {
 
         URL serviceDescription = ClassLoader.getSystemClassLoader().getResource("META-INF/services/org.jbake.render.RenderingTool");
         File services = new File(serviceDescription.toURI());
-        assertTrue("Service definitions File exists", services.exists());
+        assertTrue(services.exists(), "Service definitions File exists");
 
         FileReader fileReader = new FileReader(services);
         BufferedReader reader = new BufferedReader(fileReader);
@@ -32,7 +32,7 @@ public class ServiceLoaderTest {
         }
 
         while ((serviceProvider = reader.readLine()) != null) {
-            assertTrue("Rendering tool " + serviceProvider + " loaded", renderingToolClasses.contains(serviceProvider));
+            assertTrue(renderingToolClasses.contains(serviceProvider), "Rendering tool " + serviceProvider + " loaded");
         }
     }
 }

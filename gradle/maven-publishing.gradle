@@ -69,19 +69,17 @@ publishing {
 
 jar {
     manifest {
-        attributes(
-            'Built-By': System.properties['user.name'],
-            'Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString(),
-            'Build-Date': buildDate,
-            'Build-Time': buildTime,
-            'Specification-Title': project.name,
-            'Specification-Version': project.version,
-            'Specification-Vendor': project.name,
-            'Implementation-Title': project.name,
-            'Implementation-Version': project.version,
-            'Implementation-Vendor': project.name
-        )
+        attributes.putIfAbsent('Built-By', System.properties['user.name'])
+        attributes.putIfAbsent('Created-By', "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})")
+        attributes.putIfAbsent('Specification-Title', project.name)
+        attributes.putIfAbsent('Specification-Version', project.version)
+        attributes.putIfAbsent('Specification-Vendor', project.name)
+        attributes.putIfAbsent('Implementation-Title', project.name)
+        attributes.putIfAbsent('Implementation-Version', project.version)
+        attributes.putIfAbsent('Implementation-Vendor', project.name)
+    }
+    doFirst {
+        manifest.attributes.putIfAbsent('Build-Date',commitBuildAndDate.date())
+        manifest.attributes.putIfAbsent('Build-Time',commitBuildAndDate.time())
     }
 }
-
-

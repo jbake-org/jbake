@@ -1,17 +1,18 @@
 package org.jbake.render;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -20,10 +21,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class TagsRendererTest {
+class TagsRendererTest {
 
     @Test
-    public void returnsZeroWhenConfigDoesNotRenderTags() throws RenderingException {
+    void returnsZeroWhenConfigDoesNotRenderTags() throws RenderingException {
         TagsRenderer renderer = new TagsRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -38,7 +39,7 @@ public class TagsRendererTest {
     }
 
     @Test
-    public void doesNotRenderWhenConfigDoesNotRenderTags() throws Exception {
+    void doesNotRenderWhenConfigDoesNotRenderTags() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -53,7 +54,7 @@ public class TagsRendererTest {
     }
 
     @Test
-    public void returnsOneWhenConfigRendersIndices() throws Exception {
+    void returnsOneWhenConfigRendersIndices() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -74,7 +75,7 @@ public class TagsRendererTest {
     }
 
     @Test
-    public void doesRenderWhenConfigDoesRenderIndices() throws Exception {
+    void doesRenderWhenConfigDoesRenderIndices() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -92,8 +93,8 @@ public class TagsRendererTest {
         verify(mockRenderer, times(1)).renderTags(anyString());
     }
 
-    @Test(expected = RenderingException.class)
-    public void propogatesRenderingException() throws Exception {
+    @Test
+    void propagatesRenderingException() throws Exception {
         TagsRenderer renderer = new TagsRenderer();
 
         JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
@@ -105,9 +106,8 @@ public class TagsRendererTest {
 
         doThrow(new Exception()).when(mockRenderer).renderTags(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
-
-        verify(mockRenderer, never()).renderTags(anyString());
+        assertThatThrownBy(() -> renderer.render(mockRenderer, contentStore, configuration))
+            .isInstanceOf(RenderingException.class);
     }
 }
 

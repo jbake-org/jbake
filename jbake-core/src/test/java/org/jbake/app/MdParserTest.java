@@ -1,19 +1,21 @@
 package org.jbake.app;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Path;
+
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentModel;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.PrintWriter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests basic Markdown syntax and the extensions supported by the Markdown
@@ -22,12 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Jonathan Bullock <jonbullock@gmail.com>
  * @author Kevin S. Clarke <ksclarke@gmail.com>
  */
-public class MdParserTest {
+class MdParserTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    private Path folder;
 
-    public DefaultJBakeConfiguration config;
+    private DefaultJBakeConfiguration config;
 
     private File validMdFileBasic;
 
@@ -73,52 +75,52 @@ public class MdParserTest {
 
     private String invalidHeader = "title=Title\n~~~~~~";
 
-    @Before
-    public void createSampleFile() throws Exception {
+    @BeforeEach
+    void createSampleFile() throws Exception {
 
         File configFile = TestUtils.getTestResourcesAsSourceFolder();
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(configFile);
 
-        validMdFileBasic = folder.newFile("validBasic.md");
+        validMdFileBasic = folder.resolve("validBasic.md").toFile();
         PrintWriter out = new PrintWriter(validMdFileBasic);
         out.println(validHeader);
         out.println("# This is a test");
         out.close();
 
-        invalidMdFileBasic = folder.newFile("invalidBasic.md");
+        invalidMdFileBasic = folder.resolve("invalidBasic.md").toFile();
         out = new PrintWriter(invalidMdFileBasic);
         out.println(invalidHeader);
         out.println("# This is a test");
         out.close();
 
-        mdFileHardWraps = folder.newFile("hardWraps.md");
+        mdFileHardWraps = folder.resolve("hardWraps.md").toFile();
         out = new PrintWriter(mdFileHardWraps);
         out.println(validHeader);
         out.println("First line");
         out.println("Second line");
         out.close();
 
-        mdFileAbbreviations = folder.newFile("abbreviations.md");
+        mdFileAbbreviations = folder.resolve("abbreviations.md").toFile();
         out = new PrintWriter(mdFileAbbreviations);
         out.println(validHeader);
         out.println("*[HTML]: Hyper Text Markup Language");
         out.println("HTML");
         out.close();
 
-        mdFileAutolinks = folder.newFile("autolinks.md");
+        mdFileAutolinks = folder.resolve("autolinks.md").toFile();
         out = new PrintWriter(mdFileAutolinks);
         out.println(validHeader);
         out.println("http://github.com");
         out.close();
 
-        mdFileDefinitions = folder.newFile("definitions.md");
+        mdFileDefinitions = folder.resolve("definitions.md").toFile();
         out = new PrintWriter(mdFileDefinitions);
         out.println(validHeader);
         out.println("Apple");
         out.println(":   Pomaceous fruit");
         out.close();
 
-        mdFileFencedCodeBlocks = folder.newFile("fencedCodeBlocks.md");
+        mdFileFencedCodeBlocks = folder.resolve("fencedCodeBlocks.md").toFile();
         out = new PrintWriter(mdFileFencedCodeBlocks);
         out.println(validHeader);
         out.println("```");
@@ -128,43 +130,43 @@ public class MdParserTest {
         out.println("```");
         out.close();
 
-        mdFileQuotes = folder.newFile("quotes.md");
+        mdFileQuotes = folder.resolve("quotes.md").toFile();
         out = new PrintWriter(mdFileQuotes);
         out.println(validHeader);
         out.println("\"quotes\"");
         out.close();
 
-        mdFileSmarts = folder.newFile("smarts.md");
+        mdFileSmarts = folder.resolve("smarts.md").toFile();
         out = new PrintWriter(mdFileSmarts);
         out.println(validHeader);
         out.println("...");
         out.close();
 
-        mdFileSmartypants = folder.newFile("smartypants.md");
+        mdFileSmartypants = folder.resolve("smartypants.md").toFile();
         out = new PrintWriter(mdFileSmartypants);
         out.println(validHeader);
         out.println("\"...\"");
         out.close();
 
-        mdFileSuppressAllHTML = folder.newFile("suppressAllHTML.md");
+        mdFileSuppressAllHTML = folder.resolve("suppressAllHTML.md").toFile();
         out = new PrintWriter(mdFileSuppressAllHTML);
         out.println(validHeader);
         out.println("<div>!</div><em>!</em>");
         out.close();
 
-        mdFileSuppressHTMLBlocks = folder.newFile("suppressHTMLBlocks.md");
+        mdFileSuppressHTMLBlocks = folder.resolve("suppressHTMLBlocks.md").toFile();
         out = new PrintWriter(mdFileSuppressHTMLBlocks);
         out.println(validHeader);
         out.println("<div>!</div><em>!</em>");
         out.close();
 
-        mdFileSuppressInlineHTML = folder.newFile("suppressInlineHTML.md");
+        mdFileSuppressInlineHTML = folder.resolve("suppressInlineHTML.md").toFile();
         out = new PrintWriter(mdFileSuppressInlineHTML);
         out.println(validHeader);
         out.println("This is the first paragraph. <span> with </span> inline html");
         out.close();
 
-        mdFileTables = folder.newFile("tables.md");
+        mdFileTables = folder.resolve("tables.md").toFile();
         out = new PrintWriter(mdFileTables);
         out.println(validHeader);
         out.println("First Header|Second Header");
@@ -173,19 +175,19 @@ public class MdParserTest {
         out.println("Content Cell|Content Cell");
         out.close();
 
-        mdFileWikilinks = folder.newFile("wikilinks.md");
+        mdFileWikilinks = folder.resolve("wikilinks.md").toFile();
         out = new PrintWriter(mdFileWikilinks);
         out.println(validHeader);
         out.println("[[Wiki-style links]]");
         out.close();
 
-        mdFileAtxheaderspace = folder.newFile("atxheaderspace.md");
+        mdFileAtxheaderspace = folder.resolve("atxheaderspace.md").toFile();
         out = new PrintWriter(mdFileAtxheaderspace);
         out.println(validHeader);
         out.println("#Test");
         out.close();
 
-        mdFileForcelistitempara = folder.newFile("forcelistitempara.md");
+        mdFileForcelistitempara = folder.resolve("forcelistitempara.md").toFile();
         out = new PrintWriter(mdFileForcelistitempara);
         out.println(validHeader);
         out.println("1. Item 1");
@@ -196,7 +198,7 @@ public class MdParserTest {
         out.println("    Item 1 paragraph 1 continuation");
         out.close();
 
-        mdFileRelaxedhrules = folder.newFile("releaxedhrules.md");
+        mdFileRelaxedhrules = folder.resolve("releaxedhrules.md").toFile();
         out = new PrintWriter(mdFileRelaxedhrules);
         out.println(validHeader);
         out.println("Hello World");
@@ -215,7 +217,7 @@ public class MdParserTest {
         out.println("***");
         out.close();
 
-        mdTasklistitems = folder.newFile("tasklistsitem.md");
+        mdTasklistitems = folder.resolve("tasklistsitem.md").toFile();
         out = new PrintWriter(mdTasklistitems);
         out.println(validHeader);
         out.println("* loose bullet item 3");
@@ -223,7 +225,7 @@ public class MdParserTest {
         out.println("* [x] closed task item");
         out.close();
 
-        mdExtanchorlinks = folder.newFile("mdExtanchorlinks.md");
+        mdExtanchorlinks = folder.resolve("mdExtanchorlinks.md").toFile();
         out = new PrintWriter(mdExtanchorlinks);
         out.println(validHeader);
         out.println("# header & some *formatting* ~~chars~~");
@@ -231,59 +233,59 @@ public class MdParserTest {
     }
 
     @Test
-    public void parseValidMarkdownFileBasic() {
+    void parseValidMarkdownFileBasic() {
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(validMdFileBasic);
-        Assert.assertNotNull(documentModel);
-        Assert.assertEquals("draft", documentModel.getStatus());
-        Assert.assertEquals("post", documentModel.getType());
-        Assert.assertEquals("<h1>This is a test</h1>\n", documentModel.getBody());
+        assertNotNull(documentModel);
+        assertEquals("draft", documentModel.getStatus());
+        assertEquals("post", documentModel.getType());
+        assertEquals("<h1>This is a test</h1>\n", documentModel.getBody());
     }
 
     @Test
-    public void parseInvalidMarkdownFileBasic() {
+    void parseInvalidMarkdownFileBasic() {
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(invalidMdFileBasic);
-        Assert.assertNull(documentModel);
+        assertNull(documentModel);
     }
 
     @Test
-    public void parseValidMdFileHardWraps() {
+    void parseValidMdFileHardWraps() {
         config.setMarkdownExtensions("HARDWRAPS");
 
         // Test with HARDWRAPS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileHardWraps);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>First line<br />\nSecond line</p>\n");
 
         // Test without HARDWRAPS
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileHardWraps);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>First line Second line</p>");
     }
 
     @Test
-    public void parseWithInvalidExtension() {
+    void parseWithInvalidExtension() {
         config.setMarkdownExtensions("HARDWRAPS,UNDEFINED_EXTENSION");
 
         // Test with HARDWRAPS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileHardWraps);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>First line<br />\nSecond line</p>\n");
     }
 
     @Test
-    public void parseValidMdFileAbbreviations() {
+    void parseValidMdFileAbbreviations() {
         config.setMarkdownExtensions("ABBREVIATIONS");
 
         // Test with ABBREVIATIONS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileAbbreviations);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<p><abbr title=\"Hyper Text Markup Language\">HTML</abbr></p>"
         );
@@ -292,19 +294,19 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileAbbreviations);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>*[HTML]: Hyper Text Markup Language HTML</p>");
     }
 
     @Test
-    public void parseValidMdFileAutolinks() {
+    void parseValidMdFileAutolinks() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("AUTOLINKS");
 
         // Test with AUTOLINKS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileAutolinks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<p><a href=\"http://github.com\">http://github.com</a></p>"
         );
@@ -313,19 +315,19 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileAutolinks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>http://github.com</p>");
     }
 
     @Test
-    public void parseValidMdFileDefinitions() {
+    void parseValidMdFileDefinitions() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("DEFINITIONS");
 
         // Test with DEFINITIONS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileDefinitions);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit</dd>\n</dl>"
         );
@@ -334,19 +336,19 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileDefinitions);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>Apple :   Pomaceous fruit</p>");
     }
 
     @Test
-    public void parseValidMdFileFencedCodeBlocks() {
+    void parseValidMdFileFencedCodeBlocks() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("FENCED_CODE_BLOCKS");
 
         // Test with FENCED_CODE_BLOCKS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileFencedCodeBlocks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<pre><code>function test() {\n  console.log(&quot;!&quot;);\n}\n</code></pre>"
         );
@@ -355,135 +357,135 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileFencedCodeBlocks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<p><code>function test() { console.log(&quot;!&quot;); }</code></p>"
         );
     }
 
     @Test
-    public void parseValidMdFileQuotes() {
+    void parseValidMdFileQuotes() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("QUOTES");
 
         // Test with QUOTES
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileQuotes);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>&ldquo;quotes&rdquo;</p>");
 
         // Test without QUOTES
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileQuotes);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>&quot;quotes&quot;</p>");
     }
 
     @Test
-    public void parseValidMdFileSmarts() {
+    void parseValidMdFileSmarts() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("SMARTS");
 
         // Test with SMARTS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileSmarts);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>&hellip;</p>");
 
         // Test without SMARTS
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileSmarts);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>...</p>");
     }
 
     @Test
-    public void parseValidMdFileSmartypants() {
+    void parseValidMdFileSmartypants() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("SMARTYPANTS");
 
         // Test with SMARTYPANTS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileSmartypants);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>&ldquo;&hellip;&rdquo;</p>");
 
         // Test without SMARTYPANTS
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileSmartypants);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>&quot;...&quot;</p>");
     }
 
     @Test
-    public void parseValidMdFileSuppressAllHTML() {
+    void parseValidMdFileSuppressAllHTML() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("SUPPRESS_ALL_HTML");
 
         // Test with SUPPRESS_ALL_HTML
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileSuppressAllHTML);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("");
 
         // Test without SUPPRESS_ALL_HTML
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileSuppressAllHTML);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<div>!</div><em>!</em>");
     }
 
     @Test
-    public void parseValidMdFileSuppressHTMLBlocks() {
+    void parseValidMdFileSuppressHTMLBlocks() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("SUPPRESS_HTML_BLOCKS");
 
         // Test with SUPPRESS_HTML_BLOCKS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileSuppressHTMLBlocks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("");
 
         // Test without SUPPRESS_HTML_BLOCKS
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileSuppressHTMLBlocks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<div>!</div><em>!</em>");
     }
 
     @Test
-    public void parseValidMdFileSuppressInlineHTML() {
+    void parseValidMdFileSuppressInlineHTML() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("SUPPRESS_INLINE_HTML");
 
         // Test with SUPPRESS_INLINE_HTML
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileSuppressInlineHTML);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>This is the first paragraph.  with  inline html</p>");
 
         // Test without SUPPRESS_INLINE_HTML
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileSuppressInlineHTML);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>This is the first paragraph. <span> with </span> inline html</p>");
     }
 
     @Test
-    public void parseValidMdFileTables() {
+    void parseValidMdFileTables() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("TABLES");
 
         // Test with TABLES
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileTables);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<table>\n" +
                     "<thead>\n" +
@@ -500,21 +502,21 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileTables);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<p>First Header|Second Header -------------|------------- Content Cell|Content Cell Content Cell|Content Cell</p>"
         );
     }
 
     @Test
-    public void parseValidMdFileWikilinks() {
+    void parseValidMdFileWikilinks() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("WIKILINKS");
 
         // Test with WIKILINKS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileWikilinks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<p><a href=\"Wiki-style-links\">Wiki-style links</a></p>"
         );
@@ -523,38 +525,38 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileWikilinks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>[[Wiki-style links]]</p>");
     }
 
     @Test
-    public void parseValidMdFileAtxheaderspace() {
+    void parseValidMdFileAtxheaderspace() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("ATXHEADERSPACE");
 
         // Test with ATXHEADERSPACE
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileAtxheaderspace);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<p>#Test</p>");
 
         // Test without ATXHEADERSPACE
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileAtxheaderspace);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<h1>Test</h1>");
     }
 
     @Test
-    public void parseValidMdFileForcelistitempara() {
+    void parseValidMdFileForcelistitempara() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("FORCELISTITEMPARA");
 
         // Test with FORCELISTITEMPARA
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileForcelistitempara);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<ol>\n" +
                     "<li>\n" +
@@ -567,7 +569,7 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileForcelistitempara);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<ol>\n" +
                     "<li>Item 1 Item 1 lazy continuation\n" +
@@ -578,14 +580,14 @@ public class MdParserTest {
     }
 
     @Test
-    public void parseValidMdFileRelaxedhrules() {
+    void parseValidMdFileRelaxedhrules() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("RELAXEDHRULES");
 
         // Test with RELAXEDHRULES
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdFileRelaxedhrules);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<h2>Hello World</h2>\n" +
                     "<hr />\n" +
@@ -604,7 +606,7 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdFileRelaxedhrules);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<h2>Hello World</h2>\n" +
                     "<hr />\n" +
@@ -617,14 +619,14 @@ public class MdParserTest {
     }
 
     @Test
-    public void parseValidMdFileTasklistitems() {
+    void parseValidMdFileTasklistitems() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("TASKLISTITEMS");
 
         // Test with TASKLISTITEMS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdTasklistitems);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<ul>\n" +
                     "<li>loose bullet item 3</li>\n" +
@@ -637,7 +639,7 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdTasklistitems);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
                 "<ul>\n" +
                     "<li>loose bullet item 3</li>\n" +
@@ -647,14 +649,14 @@ public class MdParserTest {
     }
 
     @Test
-    public void parseValidMdFileExtanchorlinks() {
+    void parseValidMdFileExtanchorlinks() {
         config.setMarkdownExtensions("");
         config.setMarkdownExtensions("EXTANCHORLINKS");
 
         // Test with EXTANCHORLINKS
         Parser parser = new Parser(config);
         DocumentModel documentModel = parser.processFile(mdExtanchorlinks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains(
             "<h1><a href=\"#header-some-formatting-chars\" id=\"header-some-formatting-chars\"></a>header &amp; some <em>formatting</em> ~~chars~~</h1>"
         );
@@ -663,9 +665,8 @@ public class MdParserTest {
         config.setMarkdownExtensions("");
         parser = new Parser(config);
         documentModel = parser.processFile(mdExtanchorlinks);
-        Assert.assertNotNull(documentModel);
+        assertNotNull(documentModel);
         assertThat(documentModel.getBody()).contains("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>");
     }
-
 
 }

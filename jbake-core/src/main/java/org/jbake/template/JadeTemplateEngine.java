@@ -11,7 +11,7 @@ import de.neuland.jade4j.template.FileTemplateLoader;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.model.TemplateModel;
@@ -105,7 +105,7 @@ public class JadeTemplateEngine extends AbstractTemplateEngine {
         }
 
         public String escape(String s) {
-            return StringEscapeUtils.escapeHtml(s);
+            return StringEscapeUtils.escapeHtml4(s);
         }
     }
 }

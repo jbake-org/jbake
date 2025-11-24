@@ -14,7 +14,7 @@ public class DocumentModel extends BaseModel {
     }
 
     public String getBody() {
-        return (String) get(ModelAttributes.BODY);
+        return get(ModelAttributes.BODY).toString();
     }
 
     public void setBody(String body) {
