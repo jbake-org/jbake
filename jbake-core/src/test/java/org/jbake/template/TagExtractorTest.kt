@@ -76,4 +76,30 @@ class TagExtractorTest {
         val tm = list.first() as TemplateModel
         assertThat(tm.uri).isEqualTo("tags/news")
     }
+
+    @Test
+    fun `tags extractor trims trailing slash in tagPath`() {
+        val cfg = mockConfig("tags/", ".html")
+        val db = mockDbWithTags("blog")
+        val context = RenderContext(config = cfg, db = db)
+
+        val extractor = TagsExtractor()
+        val list = extractor.extract(context, "tags")
+
+        val tm = list.first() as TemplateModel
+        assertThat(tm.uri).isEqualTo("tags/blog.html")
+    }
+
+    @Test
+    fun `tags extractor handles null tagPath (defaults to no prefix)`() {
+        val cfg = mockConfig(null, ".html")
+        val db = mockDbWithTags("blog")
+        val context = RenderContext(config = cfg, db = db)
+
+        val extractor = TagsExtractor()
+        val list = extractor.extract(context, "tags")
+
+        val tm = list.first() as TemplateModel
+        assertThat(tm.uri).isEqualTo("blog.html")
+    }
 }

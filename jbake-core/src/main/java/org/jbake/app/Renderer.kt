@@ -7,6 +7,7 @@ import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
+import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.PagingHelper
 import org.jbake.util.PathConstants.fS
@@ -95,7 +96,7 @@ class Renderer {
      * @param outputFile The output file
      * @param templateName The template to use
      */
-    fun renderWithContext(context: org.jbake.template.model.RenderContext, outputFile: File, templateName: String) {
+    fun renderWithContext(context: RenderContext, outputFile: File, templateName: String) {
         try {
             createWriter(outputFile).use { out ->
                 // For now, convert to legacy model for compatibility
@@ -166,7 +167,7 @@ class Renderer {
     }
 
     private fun render(renderConfig: RenderingConfig) {
-        val outputFile = renderConfig.path ?: throw Exception("No output file for rendering")
+        val outputFile = renderConfig.path
         try {
             createWriter(outputFile).use { out ->
                 renderingEngine.renderDocument(
@@ -302,6 +303,9 @@ class Renderer {
                     renderer = renderingEngine
                     this.tag = tag
                     content = map
+                    // Provide configuration to template model so typed extractors can access it
+                    this.config = this@Renderer.config.asHashMap()
+                    this.put("jbake_config", config)
                 }
 
                 render(
@@ -332,6 +336,9 @@ class Renderer {
                 val model = TemplateModel().apply {
                     renderer = renderingEngine
                     content = map
+                    // Provide configuration to template model so typed extractors can access it
+                    this.config = this@Renderer.config.asHashMap()
+                    this.put("jbake_config", config)
                 }
 
                 render(ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")))
