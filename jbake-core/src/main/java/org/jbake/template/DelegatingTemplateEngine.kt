@@ -40,13 +40,7 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
             while (it.hasNext()) {
                 val k = it.next()
                 val v = config.get(k)
-                if (v != null) {
-                    // keep dotted key for new code
-                    m[k] = v
-                    // also provide underscore variant for templates expecting keys from asHashMap()
-                    val underscored = k.replace('.', '_')
-                    if (!m.containsKey(underscored)) m[underscored] = v
-                }
+                if (v != null) m[k] = v
             }
             m
         }
