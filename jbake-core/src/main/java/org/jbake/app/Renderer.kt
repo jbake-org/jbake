@@ -324,9 +324,7 @@ class Renderer {
 
         if (config.renderTagsIndex) {
             try {
-                // Add an index file at root folder of tags.
-                // This will prevent directory listing and also provide an option to
-                // display all tags page.
+                // Add an index file at root folder of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
                 val path = File(config.destinationFolder, tagPath + fS + "index" + ext)
                 val map = buildSimpleModel(ModelAttributes.TAGS).apply {
@@ -348,28 +346,18 @@ class Renderer {
         }
 
         if (errors.isNotEmpty()) {
-            val message = buildString {
-                append("Failed to render tags. Cause(s):")
-                for (error in errors) {
-                    append("\n").append(error.message)
-                }
-            }
+            val message = "Failed to render tags. Cause(s):" + errors.map { "\n" + it.message }.joinToString()
             throw Exception(message, errors[0])
         }
         return renderedCount
     }
 
-    /**
-     * Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags.
-     *
-     * @param type
-     * @return a basic [DocumentModel]
-     */
+    /** Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags. */
     private fun buildSimpleModel(type: String): DocumentModel {
         val content = DocumentModel()
         content.type = type
         content.rootPath = ""
-        // add any more keys here that need to have a default value to prevent need to perform null check in templates
+        // Add any more keys here that need to have a default value to prevent need to perform null check in templates.
         return content
     }
 
@@ -377,11 +365,8 @@ class Renderer {
 
         // TODO Possibly nullable.
         val path: File
-
         val name: String
-
         val template: String
-
         val model: TemplateModel
     }
 
@@ -418,7 +403,7 @@ class Renderer {
         constructor(filename: String, allInOneName: String) : super(
                 File(config.destinationFolder, fS + filename),
                  allInOneName,
-            findTemplateName(allInOneName)
+                findTemplateName(allInOneName)
              )
         {
           this.content = buildSimpleModel(allInOneName)
