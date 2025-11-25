@@ -37,17 +37,16 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         model.config = run {
             // Use configuration's asHashMap which provides underscore-style keys and defaults similar to legacy behavior.
             val base: MutableMap<String, Any> = config.asHashMap()
+
             // Also expose dotted-key aliases for code that prefers dotted keys
-            val m: MutableMap<String, Any> = HashMap()
-            m.putAll(base)
-            for ((key, value) in base.entries)
-                key.replace('_', '.').let { if (!m.containsKey(it)) m[it] = value }
+            val m: MutableMap<String, Any> = HashMap(base)
+            base.forEach { (k, v) -> m.putIfAbsent(k.replace('_', '.'), v) }
             m
         }
         // Also keep a reference to the original configuration object so typed extractors can access
         // the configuration with its original dotted keys. ModelExtractorAdapter will prefer this
         // when reconstructing a RenderContext.
-        model.put("jbake_config", config)
+        model["jbake_config"] = config
 
         // if default template exists we will use it
         val templateFolder = config.templateFolder

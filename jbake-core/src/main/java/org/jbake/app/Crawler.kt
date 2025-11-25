@@ -50,11 +50,11 @@ class Crawler {
     fun crawl() {
         crawl(config.contentFolder)
 
-        logger.info("Content detected:")
+        log.info("Content detected:")
         for (docType in DocumentTypes.documentTypes) {
             val count = db.getDocumentCount(docType)
             if (count > 0) {
-                logger.info("Parsed {} files of type: {}", count, docType)
+                log.info("Parsed {} files of type: {}", count, docType)
             }
         }
     }
@@ -62,11 +62,11 @@ class Crawler {
     fun crawlDataFiles() {
         crawlDataFiles(config.dataFolder)
 
-        logger.info("Data files detected:")
+        log.info("Data files detected:")
         val docType = config.dataFileDocType
         val count = db.getDocumentCount(docType)
         if (count > 0) {
-            logger.info("Parsed {} files", count)
+            log.info("Parsed {} files", count)
         }
     }
 
@@ -101,7 +101,7 @@ class Crawler {
             }
         }
 
-        logger.info("{}", message)
+        log.info("{}", message)
 
         if (status != DocumentStatus.IDENTICAL) {
             processSourceFile(sourceFile, sha1, uri)
@@ -127,9 +127,9 @@ class Crawler {
             val uri = buildDataFileURI(sourceFile)
 
             when (findDocumentStatus(uri, sha1)) {
-                DocumentStatus.UPDATED -> { logger.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
-                DocumentStatus.IDENTICAL -> logger.info("SAME:    " + sourceFile.path).also { continue }
-                DocumentStatus.NEW -> logger.info("NEW:     " + sourceFile.path)
+                DocumentStatus.UPDATED -> { log.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
+                DocumentStatus.IDENTICAL -> log.info("SAME:    " + sourceFile.path).also { continue }
+                DocumentStatus.NEW -> log.info("NEW:     " + sourceFile.path)
             }
 
             crawlDataFile(sourceFile, sha1, uri, config.dataFileDocType)
@@ -140,7 +140,7 @@ class Crawler {
         return try {
             FileUtil.sha1(sourceFile)
         } catch (_: Exception) {
-            "".also { logger.error("Unable to build SHA1 hash for source file '$sourceFile'") }
+            "".also { log.error("Unable to build SHA1 hash for source file '$sourceFile'") }
         }
     }
 
@@ -203,7 +203,7 @@ class Crawler {
     private fun crawlDataFile(sourceFile: File, sha1: String, uri: String, documentType: String) {
         try {
             val document = parser.processFile(sourceFile) ?: run {
-                logger.warn("{} couldn't be parsed so it has been ignored!", sourceFile)
+                log.warn("{} couldn't be parsed so it has been ignored!", sourceFile)
                 return
             }
 
@@ -221,12 +221,12 @@ class Crawler {
 
     private fun processSourceFile(sourceFile: File, sha1: String, uri: String) {
         val document = parser.processFile(sourceFile) ?: run {
-            logger.warn("{} has an invalid header, it has been ignored!", sourceFile)
+            log.warn("{} has an invalid header, it has been ignored!", sourceFile)
             return
         }
 
         if (!DocumentTypes.contains(document.type)) {
-            logger.warn(
+            log.warn(
                 "{} has an unknown document type '{}' and has been ignored!",
                 sourceFile,
                 document.type
@@ -280,7 +280,5 @@ class Crawler {
             else DocumentStatus.IDENTICAL
     }
 
-    companion object {
-        private val logger: Logger = LoggerFactory.getLogger(Crawler::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(Crawler::class.java)
 }

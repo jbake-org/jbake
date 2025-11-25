@@ -36,7 +36,7 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
             val newTag = TemplateModel()
             newTag.name = tag
 
-            val uri = if (!effectiveTagPath.isNullOrEmpty())
+            val uri = if (effectiveTagPath.isNotEmpty())
                 effectiveTagPath + FileUtil.URI_SEPARATOR_CHAR + tag + effectiveOutputExt
             else tag + effectiveOutputExt
 
@@ -48,5 +48,5 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
         return dl
     }
 
-    private val logger: Logger = LoggerFactory.getLogger(TagsExtractor::class.java)
+    private val log: Logger = LoggerFactory.getLogger(TagsExtractor::class.java)
 }

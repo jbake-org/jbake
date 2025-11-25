@@ -89,20 +89,16 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                 // and dotted keys are available. Prefer values from configuration.asHashMap().
                 if (key == ModelAttributes.CONFIG) {
                     val merged: MutableMap<String, Any> = HashMap()
-                    try {
-                        // base from configuration (underscore-style keys)
-                        merged.putAll(config.asHashMap())
-                    } catch (e: Exception) {
-                        // ignore
-                    }
-                    // overlay any values present in the eager model's config
+
+                    // Base from configuration (underscore-style keys)
+                    runCatching { merged.putAll(config.asHashMap()) }
+
+                    // Overlay any values present in the eager model's config
+                    @Suppress("UNCHECKED_CAST")
                     val eagerMap = eagerModel.toMap() as MutableMap<String, Any>
                     val cfgAny = eagerMap[ModelAttributes.CONFIG]
-                    if (cfgAny is Map<*, *>) {
-                        for ((k, v) in cfgAny.entries) {
-                            if (k is String && v != null) merged[k] = v as Any
-                        }
-                    }
+                    if (cfgAny is Map<*, *>)
+                        (cfgAny as? Map<String, Any>)?.let { merged.putAll(it) }
                     return wrapper.wrap(merged)
                 }
 

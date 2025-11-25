@@ -29,18 +29,7 @@ class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T
     private val log = org.slf4j.LoggerFactory.getLogger(ModelExtractorAdapter::class.java)
 
     override fun get(db: org.jbake.app.ContentStore, model: MutableMap<String, Any>, key: String): T? {
-        val rawType = model["config"]?.let { it::class } ?: "<null>"
-        log.info("ModelExtractorAdapter.get invoked for key='{}' with config raw type: {}", key, rawType)
-        log.info("ModelExtractorAdapter: contains jbake_config = {}", model.containsKey("jbake_config"))
-        if (log.isDebugEnabled()) {
-            try {
-                val k = model.keys.joinToString(",")
-                log.debug("Incoming model keys: {}", k)
-                log.debug("Contains jbake_config: {}", model.containsKey("jbake_config"))
-            } catch (e: Exception) {
-                log.debug("Failed to inspect model keys: {}", e.message)
-            }
-        }
+
         // Try to reconstruct RenderContext from the legacy map.
         // The legacy model may contain either a JBakeConfiguration instance or a plain Map<String,Any>.
         // If a plain map is present, wrap it into a CompositeConfiguration + DefaultJBakeConfiguration.
@@ -52,17 +41,12 @@ class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T
             is Map<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
                 val rawMap = raw as Map<String, Any>
-                val normalizedMap: MutableMap<String, Any> = HashMap()
-                for ((k, v) in rawMap.entries) {
-                    normalizedMap[k] = v
-                    if (k.contains("_")) {
-                        val dotted = k.replace('_', '.')
-                        if (!normalizedMap.containsKey(dotted)) {
-                            normalizedMap[dotted] = v
-                        }
-                    }
-                }
-                // expose normalizedMap to typed extractors via custom data
+
+                val normalizedMap: MutableMap<String, Any> = HashMap(rawMap)
+                for ((k, v) in rawMap.entries)
+                    k.replace('_', '.').let { if (!normalizedMap.containsKey(it)) normalizedMap[it] = v }
+
+                // Expose normalizedMap to typed extractors via custom data.
                 extraData["__raw_config_map"] = normalizedMap
                 val cc = CompositeConfiguration()
                 cc.addConfiguration(MapConfiguration(normalizedMap))

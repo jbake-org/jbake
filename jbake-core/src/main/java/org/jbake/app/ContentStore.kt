@@ -59,30 +59,30 @@ class ContentStore(private val type: String, private val name: String?) {
         try {
             // Try to open existing database
             db = orient.open(name, adminUser, adminPass)
-            logger.debug("Opened existing database: {}", name)
+            log.debug("Opened existing database: {}", name)
         }
         catch (e: Exception) {
             // Database doesn't exist or credentials don't work - recreate it properly
-            logger.info("Database '{}' not accessible with admin/admin, creating fresh database", name)
+            log.info("Database '{}' not accessible with admin/admin, creating fresh database", name)
 
             try {
                 // Drop existing database if it exists but is inaccessible
                 if (orient.exists(name)) {
-                    logger.warn("Dropping existing database '{}' due to authentication failure", name)
+                    log.warn("Dropping existing database '{}' due to authentication failure", name)
                     orient.drop(name)
                 }
             } catch (dropEx: Exception) {
-                logger.warn("Failed to drop database: {}", dropEx.message)
+                log.warn("Failed to drop database: {}", dropEx.message)
             }
 
             try {
                 // Create database with explicit admin user using SQL command
                 // This ensures the database is created with known admin/admin credentials
                 orient.execute("CREATE DATABASE $name ${dbType.name} USERS ($adminUser IDENTIFIED BY '$adminPass' ROLE admin)")
-                logger.info("Created database '{}' with admin user", name)
+                log.info("Created database '{}' with admin user", name)
             } catch (createEx: Exception) {
                 // If SQL create fails, try the API method
-                logger.warn("SQL CREATE DATABASE failed, trying API method: {}", createEx.message)
+                log.warn("SQL CREATE DATABASE failed, trying API method: {}", createEx.message)
                 orient.create(name, dbType)
             }
 
@@ -295,7 +295,7 @@ class ContentStore(private val type: String, private val name: String?) {
         }
 
     private fun createDocType(schema: OSchema) {
-        logger.debug("Create document class")
+        log.debug("Create document class")
 
         val page = schema.createClass(Schema.DOCUMENTS)
         page.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
@@ -394,5 +394,5 @@ class ContentStore(private val type: String, private val name: String?) {
         private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "SELECT count(*) AS count FROM Documents WHERE type='%s'"
     }
 
-    private val logger: Logger = LoggerFactory.getLogger(ContentStore::class.java)
+    private val log: Logger = LoggerFactory.getLogger(ContentStore::class.java)
 }

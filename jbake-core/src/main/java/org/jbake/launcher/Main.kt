@@ -23,38 +23,31 @@ class Main @JvmOverloads constructor(
     var jBakeConfigurationFactory: JBakeConfigurationFactory = JBakeConfigurationFactory()
 
     @Throws(JBakeException::class)
-    fun run(args: Array<String>) {
+    fun run(arguments: Array<String>) {
         try {
             SLF4JBridgeHandler.removeHandlersForRootLogger()
             SLF4JBridgeHandler.install()
 
             val config: JBakeConfiguration
 
-            val arguments = parseArguments(args)
-            if (arguments.isRunServer) {
-                config = this.jBakeConfigurationFactory.setEncoding(arguments.propertiesEncoding)
-                    .createJettyJbakeConfiguration(
-                        arguments.getSource(),
-                        arguments.getDestination(),
-                        arguments.getConfig(),
-                        arguments.isClearCache
-                    )
+            val args: LaunchOptions = parseArguments(arguments)
+            if (args.isRunServer) {
+                config = this.jBakeConfigurationFactory
+                    .setEncoding(args.propertiesEncoding)
+                    .createJettyJbakeConfiguration(args.getSource(), args.getDestination(), args.getConfig(), args.isClearCache)
             } else {
-                config = this.jBakeConfigurationFactory.setEncoding(arguments.propertiesEncoding)
-                    .createDefaultJbakeConfiguration(
-                        arguments.getSource(),
-                        arguments.getDestination(),
-                        arguments.getConfig(),
-                        arguments.isClearCache
-                    )
+                config = this.jBakeConfigurationFactory
+                    .setEncoding(args.propertiesEncoding)
+                    .createDefaultJbakeConfiguration(args.getSource(), args.getDestination(), args.getConfig(), args.isClearCache)
             }
-            run(arguments, config)
-        } catch (e: JBakeException) {
-            throw e
-        } catch (mex: CommandLine.MissingParameterException) {
-            logger.error(mex.message)
+            run(args, config)
+        }
+        catch (e: JBakeException) { throw e }
+        catch (mex: CommandLine.MissingParameterException) {
+            log.error(mex.message)
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, mex.message, mex)
-        } catch (e: Throwable) {
+        }
+        catch (e: Throwable) {
             throw JBakeException(SystemExit.ERROR, "An unexpected error occurred: " + e.message, e)
         }
     }
@@ -65,7 +58,6 @@ class Main @JvmOverloads constructor(
 
         if (launchOptions.isHelpNeeded) {
             printUsage(launchOptions)
-            // Help was requested, so we are done here.
             return
         }
 
@@ -127,25 +119,22 @@ class Main @JvmOverloads constructor(
     companion object {
         private const val USAGE_PREFIX = "Usage: jbake"
         private const val ALT_USAGE_PREFIX = "   or  jbake"
-        private val logger: Logger = LoggerFactory.getLogger("jbake")
 
-        /**
-         * Runs the app with the given arguments.
-         */
+        /** Runs the app with the given arguments. */
         @JvmStatic
         fun main(args: Array<String>) {
             try {
                 Main().run(args)
             } catch (e: JBakeException) {
-                logger.error(e.message)
-                logger.trace(e.message, e)
+                log.error(e.message)
+                log.trace(e.message, e)
                 if (e.cause is CommandLine.MissingParameterException) printUsage()
                 exitProcess(e.getExit())
             }
         }
 
-        fun printUsage() {
-            CommandLine.usage(LaunchOptions(), System.out)
-        }
+        fun printUsage() = CommandLine.usage(LaunchOptions(), System.out)
+
+        private val log: Logger = LoggerFactory.getLogger("jbake")
     }
 }

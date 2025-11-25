@@ -21,7 +21,6 @@ import java.util.*
  * Render output to a file.
  */
 class Renderer {
-    private val logger: Logger = LoggerFactory.getLogger(Renderer::class.java)
     private val config: JBakeConfiguration
     private val renderingEngine: DelegatingTemplateEngine
     private val db: ContentStore
@@ -103,9 +102,9 @@ class Renderer {
                 val legacyModel = TemplateModel.fromContext(context)
                 renderingEngine.renderDocument(legacyModel, templateName, out)
             }
-            logger.info("Rendering [{}]... done!", outputFile)
+            log.info("Rendering [{}]... done!", outputFile)
         } catch (e: Exception) {
-            logger.error("Rendering [{}]... failed!", outputFile, e)
+            log.error("Rendering [{}]... failed!", outputFile, e)
             throw Exception("Failed to render file " + outputFile.absolutePath + ". Cause: " + e.message, e)
         }
     }
@@ -149,9 +148,9 @@ class Renderer {
             createWriter(outputFile).use { out ->
                 renderingEngine.renderDocument(model, findTemplateName(docType), out)
             }
-            logger.info("Rendering [{}]... done!", outputFile)
+            log.info("Rendering [{}]... done!", outputFile)
         } catch (e: Exception) {
-            logger.error("Rendering [{}]... failed!", outputFile, e)
+            log.error("Rendering [{}]... failed!", outputFile, e)
             throw Exception("Failed to render file " + outputFile.absolutePath + ". Cause: " + e.message, e)
         }
     }
@@ -175,9 +174,9 @@ class Renderer {
                     renderConfig.template, out
                 )
             }
-            logger.info("Rendering {} [{}]... done!", renderConfig.name, outputFile)
+            log.info("Rendering {} [{}]... done!", renderConfig.name, outputFile)
         } catch (e: Exception) {
-            logger.error("Rendering {} [{}]... failed!", renderConfig.name, outputFile, e)
+            log.error("Rendering {} [{}]... failed!", renderConfig.name, outputFile, e)
             throw Exception("Failed to render " + renderConfig.name, e)
         }
     }
@@ -427,8 +426,6 @@ class Renderer {
 
         /**
          * Constructor added due to known use of a allInOneName which is used for name, template and content
-         *
-         * @param allInOneName
          */
         constructor(allInOneName: String) : this(
             File(config.destinationFolder.path + fS + allInOneName + (config.outputExtension ?: "")),
@@ -459,4 +456,6 @@ class Renderer {
         private const val ARCHIVE_TEMPLATE_NAME = "archive"
         private const val ERROR404_TEMPLATE_NAME = "error404"
     }
+
+    private val log: Logger = LoggerFactory.getLogger(Renderer::class.java)
 }

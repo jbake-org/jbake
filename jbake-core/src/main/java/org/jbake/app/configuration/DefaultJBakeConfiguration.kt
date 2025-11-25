@@ -93,7 +93,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
                 else -> value
             }
         }
-        logger.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.key, optionKey)
+        log.warn("Cannot find asciidoctor option '{}.{}'", PropertyList.ASCIIDOCTOR_OPTION.key, optionKey)
         return emptyList<String>()
     }
 
@@ -329,7 +329,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         if (templateFileName != null && templateFileName.isNotEmpty()) {
             return templateFileName
         }
-        logger.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, doctype)
+        log.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, doctype)
         return null
     }
 
@@ -530,5 +530,5 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         private const val DOCTYPE_TEMPLATE_PREFIX = "template."
     }
 
-    private val logger: Logger = LoggerFactory.getLogger(DefaultJBakeConfiguration::class.java)
+    private val log: Logger = LoggerFactory.getLogger(DefaultJBakeConfiguration::class.java)
 }

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
  * Delegate responsible for watching the file system for changes.
  */
 class BakeWatcher {
-    private val logger: Logger = LoggerFactory.getLogger(BakeWatcher::class.java)
 
     /**
      * Starts watching the file system for changes to trigger a bake.
@@ -38,7 +37,7 @@ class BakeWatcher {
             val assetPath = fsMan.resolveFile(config.assetFolder.toURI())
             val dataPath = fsMan.resolveFile(config.dataFolder.toURI())
 
-            logger.info(
+            log.info(
                 "Watching for (content, data, template, asset) changes in [{}]",
                 config.sourceFolder!!.path
             )
@@ -50,7 +49,9 @@ class BakeWatcher {
             monitor.addFile(dataPath)
             monitor.start()
         } catch (e: FileSystemException) {
-            logger.error("Problems watching filesystem changes", e)
+            log.error("Problems watching filesystem changes", e)
         }
     }
+
+    private val log: Logger = LoggerFactory.getLogger(BakeWatcher::class.java)
 }
