@@ -85,9 +85,30 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                     return bw.wrap(DataFileUtil(db, config.dataFileDocType))
                 }
 
-                val adapter = object : TemplateEngineAdapter<freemarker.template.TemplateModel> {
+                // Provide a merged config map to templates so both legacy underscore keys (feed_file)
+                // and dotted keys are available. Prefer values from configuration.asHashMap().
+                if (key == ModelAttributes.CONFIG) {
+                    val merged: MutableMap<String, Any> = HashMap()
+                    try {
+                        // base from configuration (underscore-style keys)
+                        merged.putAll(config.asHashMap())
+                    } catch (e: Exception) {
+                        // ignore
+                    }
+                    // overlay any values present in the eager model's config
+                    val eagerMap = eagerModel.toMap() as MutableMap<String, Any>
+                    val cfgAny = eagerMap[ModelAttributes.CONFIG]
+                    if (cfgAny is Map<*, *>) {
+                        for ((k, v) in cfgAny.entries) {
+                            if (k is String && v != null) merged[k] = v as Any
+                        }
+                    }
+                    return wrapper.wrap(merged)
+                }
 
-                    override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
+                 val adapter = object : TemplateEngineAdapter<freemarker.template.TemplateModel> {
+
+                     override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
                         return when (key) {
                             ModelAttributes.ALLTAGS -> SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
 
@@ -99,9 +120,22 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                     }
                 }
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
-                val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
-                return extractors.extractAndTransform(db, key, map, adapterTyped)
-            }
+                try {
+                    System.err.println("LAZYMODEL: eagerModel keys = " + map.keys.joinToString(","))
+                    if (map.containsKey("config")) {
+                        val cfg = map["config"]
+                        if (cfg is Map<*, *>) {
+                            System.err.println("LAZYMODEL: config keys = " + cfg.keys.joinToString(","))
+                        } else {
+                            System.err.println("LAZYMODEL: config is not a Map, class=" + (cfg?.javaClass?.name ?: "null"))
+                        }
+                    }
+                } catch (e: Exception) {
+                    // ignore
+                }
+                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
+                 return extractors.extractAndTransform(db, key, map, adapterTyped)
+             }
             catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)
             }
