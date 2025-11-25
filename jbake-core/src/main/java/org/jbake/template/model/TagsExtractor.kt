@@ -23,9 +23,10 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
                 }
             }
         }
-        // Fallback to sensible defaults if configuration reconstruction failed
-        val effectiveTagPath = if (tagPath.isNotEmpty()) tagPath else ("tags")
-        val effectiveOutputExt = if (!cfg.outputExtension.isNullOrEmpty()) cfg.outputExtension!! else ".html"
+        // If tagPath is empty (either explicitly set to empty or absent) we should not add a prefix.
+        val effectiveTagPath = tagPath // may be empty string meaning no prefix
+        // If outputExtension is null, treat it as empty (no extension). Preserve empty string if explicitly set.
+        val effectiveOutputExt = cfg.outputExtension ?: ""
 
         val dl = DocumentList<TemplateModel>()
 
@@ -33,7 +34,7 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
             val newTag = TemplateModel()
             newTag.name = tag
 
-            val uri = if (effectiveTagPath.isNotEmpty()) {
+            val uri = if (!effectiveTagPath.isNullOrEmpty()) {
                 effectiveTagPath + FileUtil.URI_SEPARATOR_CHAR + tag + effectiveOutputExt
             } else {
                 tag + effectiveOutputExt
