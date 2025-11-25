@@ -11,8 +11,10 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
     override fun extract(context: RenderContext, key: String): DocumentList<*> {
         val cfg = context.config
         val rawTagPath = cfg.tagPathName ?: ""
+
         // Normalize tagPath: remove any trailing slashes to avoid // when concatenated
         var tagPath = rawTagPath.trimEnd(FileUtil.URI_SEPARATOR_CHAR[0])
+
         // If configuration reconstruction failed and tagPath is empty, look into customData for a raw config map
         if (tagPath.isEmpty()) {
             val rawMap = context.customData["__raw_config_map"] as? Map<*, *>
@@ -34,20 +36,14 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
             val newTag = TemplateModel()
             newTag.name = tag
 
-            val uri = if (!effectiveTagPath.isNullOrEmpty()) {
+            val uri = if (!effectiveTagPath.isNullOrEmpty())
                 effectiveTagPath + FileUtil.URI_SEPARATOR_CHAR + tag + effectiveOutputExt
-            } else {
-                tag + effectiveOutputExt
-            }
+            else tag + effectiveOutputExt
 
             newTag.uri = uri
             newTag.taggedPosts = context.db.getPublishedPostsByTag(tag)
             newTag.taggedDocuments = context.db.getPublishedDocumentsByTag(tag)
             dl.push(newTag)
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("TagsExtractor: rawTagPath='{}', normalized='{}', tag='{}', uri='{}'", rawTagPath, tagPath, tag, uri)
-            }
         }
         return dl
     }

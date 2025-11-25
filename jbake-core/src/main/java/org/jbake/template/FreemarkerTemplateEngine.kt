@@ -111,31 +111,16 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                      override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
                         return when (key) {
                             ModelAttributes.ALLTAGS -> SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
-
                             ModelAttributes.PUBLISHED_DATE -> SimpleDate(extractedValue as Date?, TemplateDateModel.UNKNOWN)
-
                             // All other cases, as far as I know, are document collections
                             else -> SimpleSequence(extractedValue as MutableCollection<*>?, wrapper)
                         }
                     }
                 }
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
-                try {
-                    System.err.println("LAZYMODEL: eagerModel keys = " + map.keys.joinToString(","))
-                    if (map.containsKey("config")) {
-                        val cfg = map["config"]
-                        if (cfg is Map<*, *>) {
-                            System.err.println("LAZYMODEL: config keys = " + cfg.keys.joinToString(","))
-                        } else {
-                            System.err.println("LAZYMODEL: config is not a Map, class=" + (cfg?.javaClass?.name ?: "null"))
-                        }
-                    }
-                } catch (e: Exception) {
-                    // ignore
-                }
-                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
-                 return extractors.extractAndTransform(db, key, map, adapterTyped)
-             }
+                val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
+                return extractors.extractAndTransform(db, key, map, adapterTyped)
+            }
             catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)
             }

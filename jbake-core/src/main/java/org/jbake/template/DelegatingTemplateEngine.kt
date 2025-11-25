@@ -37,24 +37,11 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         model.config = run {
             // Use configuration's asHashMap which provides underscore-style keys and defaults similar to legacy behavior.
             val base: MutableMap<String, Any> = config.asHashMap()
-            runCatching { System.err.println("DELEGATING: base.asHashMap.size=${base.size} contains feed_file=${base.containsKey("feed_file")}") }
-             // Also expose dotted-key aliases for code that prefers dotted keys
-             val m: MutableMap<String, Any> = HashMap()
-             m.putAll(base)
-             for ((k, v) in base.entries) {
-                 val dotted = k.replace('_', '.')
-                 if (!m.containsKey(dotted)) m[dotted] = v
-             }
-            try {
-                System.err.println("DELEGATING: final.model.config.size=${m.size} contains feed_file=${m.containsKey("feed_file")} keys=" + m.keys.sorted().joinToString("\n"))
-            } catch (e: Exception) { }
-            if (log.isDebugEnabled()) {
-                try {
-                    log.debug("DelegatingTemplateEngine: model.config keys = {}", m.keys.sorted().joinToString("\n"))
-                } catch (e: Exception) { log.debug("Failed to log model.config keys: {}", e.message) }
-            }
-            // diagnostic: print keys to stderr so they're visible in test output even when logging isn't debug
-            runCatching { System.err.println("DelegatingTemplateEngine CONFIG KEYS: " + m.keys.sorted().joinToString("\n")) }
+            // Also expose dotted-key aliases for code that prefers dotted keys
+            val m: MutableMap<String, Any> = HashMap()
+            m.putAll(base)
+            for ((key, value) in base.entries)
+                key.replace('_', '.').let { if (!m.containsKey(it)) m[it] = value }
             m
         }
         // Also keep a reference to the original configuration object so typed extractors can access
