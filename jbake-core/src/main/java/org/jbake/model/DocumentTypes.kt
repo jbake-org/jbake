@@ -4,8 +4,8 @@ import org.jbake.parser.Engines
 
 /**
  *
- * Utility class used to determine the list of document types. Currently only supports "page", "post", "index",
- * "archive" and "feed".
+ * Utility class used to determine the list of document types.
+ * Currently supports: "page", "post", "index", "archive" and "feed".
  *
  * Additional document types are added at runtime based on the types found in the configuration.
  */

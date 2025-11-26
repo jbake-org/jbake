@@ -27,7 +27,7 @@ class Baker {
 
     fun bake(config: JBakeConfiguration) {
         val oven = Oven(config)
-        oven.bake()
+        oven.bakeEverything()
 
         val errors = oven.errors
         if (!errors.isEmpty()) {

@@ -35,7 +35,7 @@ class BakeWatcher {
             val dataPath = fsMan.resolveFile(config.dataFolder.toURI())
 
             log.info("Watching for (content, data, template, asset) changes in [{}]", config.sourceFolder!!.path)
-            val monitor = DefaultFileMonitor(CustomFSChangeListener(config))
+            val monitor = DefaultFileMonitor(CustomFileSystemChangeListener(config))
             monitor.isRecursive = true
             monitor.addFile(listenPath)
             monitor.addFile(templateListenPath)

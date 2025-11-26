@@ -55,7 +55,7 @@ class OvenTest {
         configuration.assetFolder = (File(sourceFolder, "assets"))
 
         val oven = Oven(configuration)
-        oven.bake()
+        oven.bakeEverything()
 
         assertThat(oven.errors).isEmpty()
     }
@@ -69,7 +69,7 @@ class OvenTest {
 
 
         val oven = Oven(configuration)
-        oven.bake()
+        oven.bakeEverything()
 
         assertThat(oven.errors).isEmpty()
         assertThat(configuration.destinationFolder).isNotEmptyDirectory()
@@ -114,7 +114,7 @@ class OvenTest {
 
 
         val oven = Oven(configuration)
-        oven.bake()
+        oven.bakeEverything()
 
         assertThat(oven.errors).isEmpty()
         assertThat(configuration.destinationFolder).isNotEmptyDirectory()
@@ -193,7 +193,7 @@ class OvenTest {
 
         val oven = Oven(utensils)
 
-        oven.bake()
+        oven.bakeEverything()
 
         verify(contentStore!!, times(1)).startup()
         verify(renderer, atLeastOnce()).renderIndex(ArgumentMatchers.anyString())
@@ -205,7 +205,7 @@ class OvenTest {
         val language = configuration.jvmLocale
 
         val oven = Oven(configuration)
-        oven.bake()
+        oven.bakeEverything()
 
         MatcherAssert.assertThat(Locale.getDefault(), Is.`is`(Locale(language)))
     }
@@ -215,7 +215,7 @@ class OvenTest {
 
         val language = Locale.getDefault().language
         val oven = Oven(configuration)
-        oven.bake()
+        oven.bakeEverything()
 
         MatcherAssert.assertThat(Locale.getDefault(), Is.`is`(Locale(language)))
     }

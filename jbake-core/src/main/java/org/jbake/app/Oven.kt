@@ -99,65 +99,52 @@ class Oven {
     }
 
     /**
-     * Sets the Locale for the JVM
+     * Bake a single file. If the file is an asset, only copy that file. Otherwise, run a full bake.
      */
-    private fun setLocale() {
-        val localeString = this.utensils.configuration.jvmLocale
-        val locale = localeString?.let { LocaleUtils.toLocale(it) } ?: Locale.getDefault()
-        Locale.setDefault(locale)
-    }
+    fun bakeSingleFile(fileToBake: File) {
 
-    /**
-     * Responsible for incremental baking, typically a single file at a time.
-     *
-     * @param fileToBake The file to bake
-     */
-    fun bake(fileToBake: File) {
-        val asset = utensils.asset
-        if (asset.isAssetFile(fileToBake)) {
-            log.info("Baking a change to an asset [" + fileToBake.path + "]")
-            asset.copySingleFile(fileToBake)
+        if (!utensils.asset.isAssetFile(fileToBake)) {
+            log.info("Not an asset, running a full bake...")
+            bakeEverything()
             return
         }
 
-        log.info("Playing it safe and running a full bake...")
-        bake()
+        log.info("Baking a change to an asset [" + fileToBake.path + "]")
+        utensils.asset.copySingleFile(fileToBake)
     }
 
     /**
      * All the good stuff happens in here...
      */
-    fun bake() {
-        val contentStore = utensils.contentStore
-        val config = utensils.configuration
-        val crawler = utensils.crawler
-        val asset = utensils.asset
-        setLocale()
+    fun bakeEverything() {
+        val newLocale = utensils.configuration.jvmLocale?.let { LocaleUtils.toLocale(it) }
+        Locale.setDefault(newLocale ?: Locale.getDefault())
 
         try {
             val start = Date().time
             log.info("Baking has started at $start. Starting ContentStore...")
 
-            contentStore.startup()
+            utensils.contentStore.startup()
 
+            val config = utensils.configuration
             updateDocTypesFromConfiguration()
-            contentStore.updateSchema()
-            contentStore.updateAndClearCacheIfNeeded(config.clearCache, config.templateFolder)
+            utensils.contentStore.updateSchema()
+            utensils.contentStore.updateAndClearCacheIfNeeded(config.clearCache, config.templateFolder)
 
-            // process source content
-            crawler.crawl()
+            // Process source content.
+            utensils.crawler.crawl()
 
-            // process data files
-            crawler.crawlDataFiles()
+            // Process data files.
+            utensils.crawler.crawlDataFiles()
 
-            // render content
+            // Render content.
             renderContent()
 
-            // copy assets
-            asset.copy()
-            asset.copyAssetsFromContent(config.contentFolder)
+            // Copy assets.
+            utensils.asset.copy()
+            utensils.asset.copyAssetsFromContent(config.contentFolder)
 
-            errors.addAll(asset.errors)
+            errors.addAll(utensils.asset.errors)
 
             log.info("Baking finished!")
             val end = Date().time
@@ -165,9 +152,10 @@ class Oven {
             if (!errors.isEmpty()) {
                 log.error("Failed to bake {} item(s)!", errors.size)
             }
-        } finally {
-            contentStore.close()
-            contentStore.shutdown()
+        }
+        finally {
+            utensils.contentStore.close()
+            utensils.contentStore.shutdown()
         }
     }
 
@@ -176,36 +164,27 @@ class Oven {
      * in order to register new document types.
      */
     private fun updateDocTypesFromConfiguration() {
-        resetDocumentTypesAndExtractors()
-        val config = utensils.configuration
+        DocumentTypes.resetDocumentTypes()
+        ModelExtractors.instance.reset()
 
-        val listener = ModelExtractorsDocumentTypeListener()
-        DocumentTypes.addListener(listener)
+        DocumentTypes.addListener(ModelExtractorsDocumentTypeListener())
 
-        for (docType in config.documentTypes) {
+        for (docType in utensils.configuration.documentTypes) {
             DocumentTypes.addDocumentType(docType)
         }
 
-        // needs manually setting as this isn't defined in same way as document types for content files
-        DocumentTypes.addDocumentType(config.dataFileDocType)
-    }
-
-    private fun resetDocumentTypesAndExtractors() {
-        DocumentTypes.resetDocumentTypes()
-        ModelExtractors.instance.reset()
+        // Needs to be set manually as this isn't defined in same way as document types for content files.
+        DocumentTypes.addDocumentType(utensils.configuration.dataFileDocType)
     }
 
     /**
      * Load [RenderingTool] instances and delegate rendering of documents to them
      */
     private fun renderContent() {
-        val config = utensils.configuration
-        val renderer = utensils.renderer
-        val contentStore = utensils.contentStore
 
         for (tool in ServiceLoader.load(RenderingTool::class.java)) {
             try {
-                renderedCount += tool.render(renderer, contentStore, config)
+                renderedCount += tool.render(utensils.renderer, utensils.contentStore, utensils.configuration)
             } catch (e: RenderingException) {
                 errors.add(e)
             }

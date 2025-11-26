@@ -9,7 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 
-class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListener {
+class CustomFileSystemChangeListener(private val config: JBakeConfiguration) : FileListener {
 
     override fun fileCreated(event: FileChangeEvent) {
         log.info("File created event detected: {}", event.fileObject.url)
@@ -28,8 +28,8 @@ class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListe
 
     private fun exec(file: FileObject) {
         val oven = Oven(config)
-        oven.bake(File(file.name.path))
+        oven.bakeSingleFile(File(file.name.path))
     }
 
-    private val log: Logger = LoggerFactory.getLogger(CustomFSChangeListener::class.java)
+    private val log: Logger = LoggerFactory.getLogger(CustomFileSystemChangeListener::class.java)
 }

@@ -157,8 +157,7 @@ object FileUtil {
      *
      * @return The result of file.getPath() with all path Separators beeing a "/", or `null`
      */
-    fun asPath(file: File): String? =
-        // If path == null, return null.
+    fun asPath(file: File): String =
         if (separator == URI_SEPARATOR_CHAR) file.path
         // On Windows we have to replace the backslash.
         else file.path.replace(separator, URI_SEPARATOR_CHAR)
