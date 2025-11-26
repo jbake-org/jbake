@@ -43,5 +43,5 @@ jobs:
               with:
                   check_name: 'Maven Tests'
                   files: |
-                      **/target/surefire-reports/*
-                      **/target/failsafe-reports/*
+                      **/target/surefire-reports/*.xml
+                      **/target/failsafe-reports/*.xml
