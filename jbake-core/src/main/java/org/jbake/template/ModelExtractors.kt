@@ -124,15 +124,14 @@ class ModelExtractors private constructor() {
     companion object {
         private const val PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties"
 
-        private val log: Logger = LoggerFactory.getLogger(ModelExtractors::class.java)
-
-        val instance: ModelExtractors = ModelExtractors()
+        val instance = ModelExtractors()
 
         /**
-         * This method is used to search for a specific class, telling if loading the engine would succeed. This is
-         * typically used to avoid loading optional modules.
+         * This method is used to search for a specific class, telling if loading the engine would succeed.
+         * This is typically used to avoid loading optional modules.
          *
-         * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
+         * @param engineClassName Engine class, used both as a hint to find it and to create the engine itself.
+         * @return null if the engine is not available, an instance of the engine otherwise
          */
         private fun tryLoadEngine(engineClassName: String?): ModelExtractor<*>? {
             return try {
@@ -153,11 +152,12 @@ class ModelExtractors private constructor() {
                 when (e) {
                     is ClassNotFoundException,
                     is InstantiationException,
-                    is IllegalAccessException,
-                    is NoClassDefFoundError -> null /* a dependency of the engine may not be found on classpath */
+                    is IllegalAccessException -> null /* A dependency of the engine may not be found on classpath. */
                     else -> throw e
                 }
             }
         }
     }
+
+    private val log: Logger = LoggerFactory.getLogger(ModelExtractors::class.java)
 }
