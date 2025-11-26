@@ -50,10 +50,8 @@ class Oven {
     )
 
     /**
-     * Create an Oven instance by a [JBakeConfiguration]
-     *
-     *
-     * It creates default [Utensils] needed to bake sites.
+     * Create an Oven instance by a [JBakeConfiguration] It creates default [Utensils] needed to bake sites.
+     * TODO: Refactor - weird that this one creates default utensils, while the other ctor takes utensils with .configuration.
      */
     constructor(config: JBakeConfiguration) {
         this.utensils = UtensilsFactory.createDefaultUtensils(config)
@@ -69,23 +67,12 @@ class Oven {
         this.utensils = utensils
     }
 
-    @get:Deprecated("")
-    @set:Deprecated("")
-    var config: CompositeConfiguration
+    /** Shorthand for utensils.configuration.compositeConfiguration */
+    val config: CompositeConfiguration
+        // BAD - defies the purpose of Utensils being an abstraction layer.
         get() = (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration
-        // TODO: do we want to use this. Else, config could be final
-        set(config) {
-            (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration = config
-        }
-
-    /**
-     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
-     */
-    @Deprecated("""There is no need for this method anymore. Validation is now part of the instantiation.
-      Can be removed with 3.0.0.""")
-    fun setupPaths() {
-        /* nothing to do here */
-    }
+        // Put back if anyone complains.
+        //set(config) { (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration = config }
 
     /**
      * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
