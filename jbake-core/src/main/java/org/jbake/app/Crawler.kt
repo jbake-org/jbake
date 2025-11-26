@@ -1,9 +1,7 @@
 package org.jbake.app
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.io.FilenameUtils
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentStatus
 import org.jbake.model.DocumentTypes
@@ -12,7 +10,6 @@ import org.jbake.util.HtmlUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -21,20 +18,11 @@ import java.util.*
  * Crawls a file system looking for content.
  */
 class Crawler {
+
     private val db: ContentStore
     private val config: JBakeConfiguration
     private val parser: Parser
 
-    /**
-     * @param contentDir Base directory where content directory is located.
-     */
-    @Deprecated("""Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.""")
-
-    constructor(db: ContentStore, contentDir: File, config: CompositeConfiguration) {
-        this.db = db
-        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(contentDir, config)
-        this.parser = Parser(this.config)
-    }
 
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.db = db
@@ -45,21 +33,10 @@ class Crawler {
     fun crawlContentDirectory() {
         crawlDirectory(config.contentFolder)
 
-        log.info("Content detected:")
         for (docType in DocumentTypes.documentTypes) {
             val count = db.getDocumentCount(docType)
-            if (count > 0) {
-                log.info("Parsed {} files of type: {}", count, docType)
-            }
+            if (count > 0) log.info("Parsed {} files of type: {}", count, docType)
         }
-    }
-
-    fun crawlDataFiles() {
-        crawlDataFiles(config.dataFolder)
-
-        log.info("Data files detected:")
-        val count = db.getDocumentCount(config.dataFileDocType)
-        if (count > 0) log.info("Parsed {} files", count)
     }
 
     /**
@@ -101,23 +78,26 @@ class Crawler {
     /**
      * Crawl all files and folders looking for data files.
      */
+    fun crawlDataFiles() {
+        crawlDataFiles(config.dataFolder)
+
+        val count = db.getDocumentCount(config.dataFileDocType)
+        if (count > 0) log.info("Parsed {} files", count)
+    }
+
     private fun crawlDataFiles(startFromDirectory: File) {
         val contents = startFromDirectory.listFiles(FileUtil.dataFileFilter) ?: return
 
-        Arrays.sort(contents)
-        for (sourceFile in contents) {
+        for (sourceFile in contents.sorted()) {
             if (sourceFile.isDirectory) {
                 crawlDataFiles(sourceFile)
                 continue
             }
 
-            val sha1 = try {
-                FileUtil.sha1(sourceFile)
-            }
-            catch (_: Exception) {
-                "".also { log.error("Unable to build SHA1 hash for source file '$sourceFile'") }
-            }
-            val uri = buildDataFileURI(sourceFile)
+            val sha1 = runCatching { FileUtil.sha1(sourceFile) }
+                .getOrElse { log.error("Unable to build SHA1 hash for source file '$sourceFile'"); "" }
+
+            val uri = buildDataFileUri(sourceFile)
 
             when (findDocumentStatus(uri, sha1)) {
                 DocumentStatus.UPDATED -> { log.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
@@ -132,47 +112,37 @@ class Crawler {
     private fun buildURI(sourceFile: File): String {
         val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
 
-        val processedUri = if (useNoExtensionUri(uri)) {
+        val processedUri =
             // Convert URI from xxx.html to xxx/index.html .
-            createNoExtensionUri(uri)
-        } else {
-            createUri(uri)
-        }
+            if (useNoExtensionUri(uri))
+                createNoExtensionUri(uri)
+            else createUri(uri)
 
         // Strip off leading / to enable generating non-root based sites.
         return processedUri.removePrefix(FileUtil.URI_SEPARATOR_CHAR)
     }
 
-    private fun buildDataFileURI(sourceFile: File): String {
-        val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.dataFolder), "")
-        // strip off leading /
-        return uri.removePrefix(FileUtil.URI_SEPARATOR_CHAR)
+    private fun buildDataFileUri(sourceFile: File): String {
+        return FileUtil.asPath(sourceFile)
+            .replace(FileUtil.asPath(config.dataFolder), "")
+            .removePrefix(FileUtil.URI_SEPARATOR_CHAR)
     }
 
-    // TODO: Refactor - parametrize the following two methods into one.
-    // commons-codec's URLCodec could be used when we add that dependency.
+    // TODO: Refactor - parametrize the following two methods into one. commons-codec's URLCodec could be used when we add that dependency.
     private fun createUri(uri: String): String {
-        try {
-            return (FileUtil.URI_SEPARATOR_CHAR
-                    + FilenameUtils.getPath(uri)
-                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
-                    + config.outputExtension)
-        } catch (e: UnsupportedEncodingException) {
-            throw RuntimeException("Missing UTF-8 encoding??", e) // Won't happen unless JDK is broken.
-        }
+        return (FileUtil.URI_SEPARATOR_CHAR
+                + FilenameUtils.getPath(uri)
+                + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                + config.outputExtension)
     }
 
     private fun createNoExtensionUri(uri: String): String {
-        try {
-            return (FileUtil.URI_SEPARATOR_CHAR
-                    + FilenameUtils.getPath(uri)
-                    + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
-                    + FileUtil.URI_SEPARATOR_CHAR
-                    + "index"
-                    + config.outputExtension)
-        } catch (e: UnsupportedEncodingException) {
-            throw RuntimeException("Missing UTF-8 encoding??", e) // Won't happen unless JDK is broken.
-        }
+        return (FileUtil.URI_SEPARATOR_CHAR
+                + FilenameUtils.getPath(uri)
+                + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
+                + FileUtil.URI_SEPARATOR_CHAR
+                + "index"
+                + config.outputExtension)
     }
 
     private fun useNoExtensionUri(uri: String): Boolean {
@@ -180,8 +150,8 @@ class Crawler {
         val noExtensionUriPrefix = config.prefixForUriWithoutExtension
 
         return noExtensionUri
-                && (noExtensionUriPrefix != null)
-                && (noExtensionUriPrefix.isNotEmpty())
+                && noExtensionUriPrefix != null
+                && noExtensionUriPrefix.isNotEmpty()
                 && uri.startsWith(noExtensionUriPrefix)
     }
 
@@ -211,26 +181,21 @@ class Crawler {
         }
 
         if (!DocumentTypes.contains(document.type)) {
-            log.warn(
-                "{} has an unknown document type '{}' and has been ignored!",
-                sourceFile,
-                document.type
-            )
+            log.warn("{} has an unknown document type '{}' and has been ignored!", sourceFile, document.type)
             return
         }
 
         addAdditionalDocumentAttributes(document, sourceFile, sha1, uri)
 
-        if (config.imgPathUpdate) {
-            // Prevent image source url's from breaking
+        // Prevent image source URL's from breaking.
+        if (config.imgPathUpdate)
             HtmlUtil.fixImageSourceUrls(document, config)
-        }
 
         db.addDocument(document)
     }
 
     private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String, uri: String) {
-        document.rootPath = getPathToRoot(sourceFile)
+        document.rootPath = FileUtil.getUriPathToContentRoot(config, sourceFile)
         document.sha1 = sha1
         document.rendered = false
         document.file = sourceFile.path
@@ -239,19 +204,13 @@ class Crawler {
         document.cached = true
 
         if (document.status == ModelAttributes.Status.PUBLISHED_DATE
-            && (document.date != null)
-            && Date().after(document.date)
-        ) {
+                && document.date != null
+                && Date().after(document.date)
+        )
             document.status = ModelAttributes.Status.PUBLISHED
-        }
 
-        if (config.uriWithoutExtension) {
+        if (config.uriWithoutExtension)
             document.noExtensionUri = uri.replace("/index.html", "/")
-        }
-    }
-
-    private fun getPathToRoot(sourceFile: File): String {
-        return FileUtil.getUriPathToContentRoot(config, sourceFile)
     }
 
     private fun findDocumentStatus(uri: String, sha1: String): DocumentStatus {
