@@ -40,3 +40,6 @@ jobs:
 
             - name: Publish Test Results
               uses: EnricoMi/publish-unit-test-result-action@v2.21.0
+              with:
+                  files: '**/target/surefire-reports/*.xml, **/target/failsafe-reports/*.xml'
+                  check_name: 'Maven Tests'
