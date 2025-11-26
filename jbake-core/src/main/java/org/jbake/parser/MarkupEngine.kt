@@ -3,7 +3,9 @@ package org.jbake.parser
 import org.apache.commons.io.IOUtils
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.jbake.model.ModelAttributes
+import org.jbake.model.ModelAttributes.CACHED
+import org.jbake.model.ModelAttributes.DATE
+import org.jbake.model.ModelAttributes.TAGS
 import org.json.simple.JSONValue
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -11,7 +13,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.text.DateFormat
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -206,33 +207,29 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     fun storeHeaderValue(inputKey: String, inputValue: String, content: DocumentModel) {
-        val key = sanitize(inputKey)
+        val key = sanitize(inputKey).lowercase()
         val value = sanitize(inputValue)
 
         when {
-            key.equals(ModelAttributes.DATE, ignoreCase = true) -> {
+            key == DATE -> {
                 val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
-                try {
-                    content.date = (df.parse(value))
-                }
-                catch (e: ParseException) { log.error("unable to parse date {}", value) }
+                runCatching { content.date = (df.parse(value)) }
+                    .onFailure { e -> log.error("Unable to parse date {} with format {}", value, configuration?.dateFormat, e) }
             }
-            key.equals(ModelAttributes.TAGS, ignoreCase = true) -> content.tags = (getTags(value))
-            key.equals(ModelAttributes.CACHED, ignoreCase = true) -> content.cached = (value.toBoolean())
-            isJson(value) ->
-                content[key] = JSONValue.parse(value)
-            else ->
-                content[key] = value
+            key == TAGS            -> content.tags = (getTags(value))
+            key == CACHED          -> content.cached = (value.toBoolean())
+            isJson(value)    -> content[key] = JSONValue.parse(value)
+            else                   -> content[key] = value
         }
     }
 
-    private fun sanitize(part: String)= part.trim { it <= ' ' }
+    private fun sanitize(part: String) = part.trim { it <= ' ' }
 
     private fun getTags(tagsPart: String): Array<String>
         = tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
     private fun isJson(part: String)
-        = part.startsWith("{") && part.endsWith("}")
+        = part.trim().startsWith("{") && part.endsWith("}")
 
 
     /** Process the body of the file. */
@@ -246,7 +243,6 @@ abstract class MarkupEngine : ParserEngine {
 
         context.body = body
     }
-
 
     private val UTF_8_BOM = "\uFEFF"
     private val log: Logger = LoggerFactory.getLogger(MarkupEngine::class.java)
