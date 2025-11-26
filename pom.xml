@@ -96,7 +96,7 @@
         <version.mockito>5.20.0</version.mockito>
 
         <!-- Build dependencies versions -->
-        <version.jacoco.maven.plugin>0.8.12</version.jacoco.maven.plugin>
+        <version.jacoco.maven.plugin>0.8.14</version.jacoco.maven.plugin>
         <version.maven>3.9.9</version.maven>
         <version.maven.annotations>3.9.0</version.maven.annotations>
         <version.spark>2.9.4</version.spark>
