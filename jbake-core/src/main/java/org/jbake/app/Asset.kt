@@ -21,12 +21,9 @@ class Asset {
 
     private val config: JBakeConfiguration
 
-    /**
-     * @param source      Source file for the asset
-     */
     @Deprecated("""Use {@link #Asset(JBakeConfiguration)} instead. Compatibility constructor.  Creates an instance of Asset.""")
-    constructor(source: File, destination: File, config: CompositeConfiguration) {
-        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config)
+    constructor(assetSource: File, destination: File, config: CompositeConfiguration) {
+        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(assetSource, destination, config)
     }
 
     /** Creates an instance of Asset. */

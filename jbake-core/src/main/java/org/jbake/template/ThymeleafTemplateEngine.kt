@@ -18,20 +18,15 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
 /**
- *
  * A template engine which renders pages using Thymeleaf.
- *
  *
  * This template engine is not recommended for large sites because the whole model
  * is loaded into memory due to Thymeleaf internal limitations.
  *
- *
  * The default rendering mode is "HTML", but it is possible to use another mode
  * for each document type, by adding a key in the configuration, for example:
  *
- * `
- * template.feed.thymeleaf.mode=XML
-` *
+ * `template.feed.thymeleaf.mode=XML`
  */
 class ThymeleafTemplateEngine : AbstractTemplateEngine {
     private val lock = ReentrantLock()
@@ -39,9 +34,6 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
     private val context: Context
     private var templateResolver: FileTemplateResolver? = null
 
-    /**
-     * @param templatesPath the templates path
-     */
     @Deprecated("""Use {@link #ThymeleafTemplateEngine(JBakeConfiguration, ContentStore)} instead """)
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
         : super(config, db, destination, templatesPath)

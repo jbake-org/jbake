@@ -18,9 +18,6 @@ import javax.xml.parsers.ParserConfigurationException
 class GroovyTemplateEngine : AbstractTemplateEngine {
     private val cachedTemplates: MutableMap<String, Template?> = HashMap()
 
-    /**
-     * @param templatesPath the templates path
-     */
     @Deprecated("Use {@link #GroovyTemplateEngine(JBakeConfiguration, ContentStore)} instead")
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
         : super(config, db, destination, templatesPath)

@@ -24,9 +24,6 @@ class Renderer {
     private val renderingEngine: DelegatingTemplateEngine
     private val db: ContentStore
 
-    /**
-     * @param templatesPath The templates folder
-     */
     @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
       Creates a new instance of Renderer with supplied references to folders.""")
     constructor(db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration) : this(
@@ -39,10 +36,6 @@ class Renderer {
     }
 
     // TODO: Should all content be made available to all templates via this class?
-    /**
-     * @param templatesPath   The templates folder
-     * @param renderingEngine The instance of DelegatingTemplateEngine to use
-     */
     @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
       Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.""")
     constructor(
@@ -256,48 +249,47 @@ class Renderer {
     /**
      * Render an XML feed file using the supplied content.
      *
-     * @param feedFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    fun renderFeed(feedFile: String) {
-        render(DefaultRenderingConfig(feedFile, FEED_TEMPLATE_NAME))
+    fun renderFeed(outputFeedFile: String) {
+        render(DefaultRenderingConfig(outputFeedFile, FEED_TEMPLATE_NAME))
     }
 
     /**
      * Render an archive file using the supplied content.
      *
-     * @param archiveFile The name of the output file
+     * @param outputArchiveFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    fun renderArchive(archiveFile: String) {
-        render(DefaultRenderingConfig(archiveFile, ARCHIVE_TEMPLATE_NAME))
+    fun renderArchive(outputArchiveFile: String) {
+        render(DefaultRenderingConfig(outputArchiveFile, ARCHIVE_TEMPLATE_NAME))
     }
 
     /**
      * Render an 404 file using the predefined template.
      *
-     * @param errorFile      The name of the output file
-     * @throws Exception    if default rendering configuration is not loaded correctly
+     * @param outputFile The name of the output file
+     * @throws Exception If default rendering configuration is not loaded correctly.
      */
-    fun renderError404(errorFile: String) {
-        render(DefaultRenderingConfig(errorFile, ERROR404_TEMPLATE_NAME))
+    fun renderError404(outputFile: String) {
+        render(DefaultRenderingConfig(outputFile, ERROR404_TEMPLATE_NAME))
     }
 
     /**
      * Render tag files using the supplied content.
      *
-     * @param tagPath The output path
+     * @param outputTagFile The output path
      * @return Number of rendered tags
      * @throws Exception if cannot render tags correctly
      */
-    fun renderTags(tagPath: String): Int {
+    fun renderTags(outputTagFile: String): Int {
         var renderedCount = 0
         val errors: MutableList<Throwable> = LinkedList<Throwable>()
 
         for (tag in db.allTags) {
             try {
                 val ext = config.outputExtension ?: ""
-                val path = config.destinationFolder.resolve(tagPath).resolve(tag + ext)
+                val path = config.destinationFolder.resolve(outputTagFile).resolve(tag + ext)
                 val map = buildSimpleModel(ModelAttributes.TAG).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
@@ -310,26 +302,19 @@ class Renderer {
                     this.put("jbake_config", config)
                 }
 
-                render(
-                    ModelRenderingConfig(
-                        path,
-                        ModelAttributes.TAG,
-                        model,
-                        findTemplateName(ModelAttributes.TAG)
-                    )
-                )
+                val renderConfig = ModelRenderingConfig(path, ModelAttributes.TAG, model, findTemplateName(ModelAttributes.TAG))
+                render(renderConfig)
 
                 renderedCount++
-            } catch (e: Exception) {
-                errors.add(e)
             }
+            catch (e: Exception) { errors.add(e) }
         }
 
         if (config.renderTagsIndex) {
             try {
                 // Add an index file at root folder of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
-                val path = config.destinationFolder.resolve(tagPath).resolve("index$ext")
+                val path = config.destinationFolder.resolve(outputTagFile).resolve("index$ext")
                 val map = buildSimpleModel(ModelAttributes.TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
@@ -343,9 +328,8 @@ class Renderer {
 
                 render(ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")))
                 renderedCount++
-            } catch (e: Exception) {
-                errors.add(e)
             }
+            catch (e: Exception) { errors.add(e) }
         }
 
         if (errors.isNotEmpty()) {
@@ -403,12 +387,11 @@ class Renderer {
             this.content = buildSimpleModel(allInOneName)
         }
 
-        constructor(filename: String, allInOneName: String) : super(
-                config.destinationFolder.resolve(filename),
-                 allInOneName,
-                findTemplateName(allInOneName)
-             )
-        {
+        constructor(outputFile: String, allInOneName: String) : super(
+            path = config.destinationFolder.resolve(outputFile),
+            name = allInOneName,
+            template = findTemplateName(allInOneName)
+        ){
           this.content = buildSimpleModel(allInOneName)
         }
 

@@ -34,10 +34,7 @@ class BakeWatcher {
             val assetPath = fsMan.resolveFile(config.assetFolder.toURI())
             val dataPath = fsMan.resolveFile(config.dataFolder.toURI())
 
-            log.info(
-                "Watching for (content, data, template, asset) changes in [{}]",
-                config.sourceFolder!!.path
-            )
+            log.info("Watching for (content, data, template, asset) changes in [{}]", config.sourceFolder!!.path)
             val monitor = DefaultFileMonitor(CustomFSChangeListener(config))
             monitor.isRecursive = true
             monitor.addFile(listenPath)
@@ -45,9 +42,8 @@ class BakeWatcher {
             monitor.addFile(assetPath)
             monitor.addFile(dataPath)
             monitor.start()
-        } catch (e: FileSystemException) {
-            log.error("Problems watching filesystem changes", e)
         }
+        catch (e: FileSystemException) { log.error("Problems watching filesystem changes", e) }
     }
 
     private val log: Logger = LoggerFactory.getLogger(BakeWatcher::class.java)
