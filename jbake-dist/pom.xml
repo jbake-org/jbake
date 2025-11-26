@@ -99,7 +99,7 @@
                     <archive>
                         <manifest>
                             <mainClass>${main.class}</mainClass>
-                            <addClassPath>true</addClassPath>
+                            <addClasspath>true</addClasspath>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>

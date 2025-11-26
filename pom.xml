@@ -190,7 +190,7 @@
                     <archive>
                         <manifest>
                             <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
-                            <addClassPath>true</addClassPath>
+                            <addClasspath>true</addClasspath>
                             <mainClass>org.jbake.app.JBake</mainClass>
                         </manifest>
                         <manifestEntries>
