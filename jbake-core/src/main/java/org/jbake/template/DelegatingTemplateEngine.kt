@@ -17,9 +17,6 @@ import java.io.Writer
 class DelegatingTemplateEngine : AbstractTemplateEngine {
     private val renderers: TemplateEngines
 
-    /**
-     * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
-     */
     @Deprecated("""Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.""")
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
         : super(config, db, destination, templatesPath)

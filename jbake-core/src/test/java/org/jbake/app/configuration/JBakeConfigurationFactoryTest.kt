@@ -20,8 +20,7 @@ class JBakeConfigurationFactoryTest {
         val templateFolder = TestUtils.newFolder(root, "templates")
         val assetFolder = TestUtils.newFolder(root, "assets")
 
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
         assertThat(configuration.sourceFolder).isEqualTo(sourceFolder)
         assertThat(configuration.destinationFolder).isEqualTo(destinationFolder)
@@ -46,8 +45,7 @@ class JBakeConfigurationFactoryTest {
         pw.write("content.folder=content/custom\n")
         pw.close()
 
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
         assertThat(configuration.templateFolderName).isEqualTo("templates/custom")
         assertThat(configuration.assetFolderName).isEqualTo("assets/custom")
@@ -68,8 +66,7 @@ class JBakeConfigurationFactoryTest {
         val destinationFolder = TestUtils.newFolder(root, "output")
         val siteHost = "http://www.jbake.org"
 
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
 
         assertThat(configuration.siteHost).isEqualTo(siteHost)
     }
@@ -79,8 +76,7 @@ class JBakeConfigurationFactoryTest {
         val destinationFolder = TestUtils.newFolder(root, "output")
         val siteHost = "http://localhost:8820/"
 
-        val configuration: JBakeConfiguration =
-            JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true)
 
         assertThat(configuration.siteHost).isEqualTo(siteHost)
     }
