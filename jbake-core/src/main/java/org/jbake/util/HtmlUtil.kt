@@ -13,28 +13,25 @@ object HtmlUtil {
      * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
      */
     @JvmStatic
-    fun fixImageSourceUrls(documentModel: DocumentModel, configuration: JBakeConfiguration) {
-        val htmlContent = documentModel.body
-        val prependSiteHost = configuration.imgPathPrependHost
-        val siteHost: String = configuration.siteHost ?: error("siteHost must not be null")
-        val uri = getDocumentUri(documentModel)
+    fun fixImageSourceUrls(documentModel: DocumentModel, conf: JBakeConfiguration) {
 
-        val document = Jsoup.parseBodyFragment(htmlContent)
-        val allImgs = document.getElementsByTag("img")
-
-        for (img in allImgs) {
-            transformImageSource(img, uri, siteHost, prependSiteHost)
+        val document = Jsoup.parseBodyFragment(documentModel.body)
+        val allImgElements = document.getElementsByTag("img")
+        for (img in allImgElements) {
+            transformImageSource(img, getDocumentUri(documentModel), conf.siteHost ?: error("siteHost must not be null"), conf.imgPathPrependHost)
         }
 
-        //Use body().html() to prevent adding <body></body> from parsed fragment.
-        documentModel.body = (document.body().html())
+        // Use body().html() to prevent adding <body></body> from parsed fragment.
+        documentModel.body = document.body().html()
     }
 
     private fun getDocumentUri(documentModel: DocumentModel): String {
-        var uri = documentModel.noExtensionUri?.let { removeTrailingSlash(it) } ?: documentModel.uri
+        var uri = documentModel.noExtensionUri?.let { it.trimEnd('/') } ?: documentModel.uri
 
+        // Remove filename.
         if (uri.contains("/"))
-            uri = removeFilename(uri)
+            uri = uri.take(uri.lastIndexOf('/') + 1)
+
         return uri
     }
 
@@ -45,20 +42,16 @@ object HtmlUtil {
         if (source.startsWith("http://") || source.startsWith("https://"))
             return
 
-        if (isRelative(source))
+        val isRelative = !source.startsWith("/")
+        if (isRelative)
             source = uri + source.replaceFirst("\\./".toRegex(), "")
 
         if (prependSiteHost) {
-            val prefix = if (!siteHost.endsWith("/") && isRelative(source)) "$siteHost/" else siteHost
+            val prefix = if (!siteHost.endsWith("/") && isRelative) "$siteHost/" else siteHost
             source = prefix + source
         }
 
         img.attr("src", source)
     }
 
-    private fun removeFilename(uri: String) = uri.take(uri.lastIndexOf('/') + 1)
-
-    private fun removeTrailingSlash(uri: String) = uri.trimEnd('/')
-
-    private fun isRelative(source: String) = !source.startsWith("/")
 }
