@@ -74,10 +74,6 @@ class JBakeConfigurationFactory {
     )
         = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration).apply { destinationFolder = destination }
 
-    /**
-     * Creates a [DefaultJBakeConfiguration]
-     */
-    @Deprecated("")
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(sourceFolder: File, config: CompositeConfiguration)
         = DefaultJBakeConfiguration(sourceFolder, config)

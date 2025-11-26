@@ -28,4 +28,3 @@ class FeedRenderer : RenderingTool {
         return render(renderer, db, configuration)
     }
 }
-
