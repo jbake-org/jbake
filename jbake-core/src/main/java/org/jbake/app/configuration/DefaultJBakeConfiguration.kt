@@ -358,7 +358,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.URI_NO_EXTENSION.key, withoutExtension)
     }
 
-    override val version: String?
+    override val jbakeVersion: String?
         get() = getAsString(PropertyList.VERSION.key)
 
     fun setDestinationFolderName(folderName: String?) {

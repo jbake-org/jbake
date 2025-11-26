@@ -212,14 +212,10 @@ interface JBakeConfiguration {
      */
     val imgPathUpdate: Boolean
 
-    /** Version of JBake. */
-    val version: String?
+    val jbakeVersion: String?
 
     /**
      * Set a property value for the given key
-     *
-     * @param key   the key for the property
-     * @param value the value of the property
      */
     fun setProperty(key: String, value: Any?)
 

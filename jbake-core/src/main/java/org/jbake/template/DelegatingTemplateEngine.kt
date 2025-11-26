@@ -18,7 +18,7 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
     private val renderers: TemplateEngines
 
     /**
-     * @param templatesPath the templates path
+     * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
      */
     @Deprecated("""Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.""")
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
@@ -33,7 +33,7 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
 
     @Throws(RenderingException::class)
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
-        model.version = (config.version)
+        model.version = (config.jbakeVersion)
         model.config = run {
             // Use configuration's asHashMap which provides underscore-style keys and defaults similar to legacy behavior.
             val base: MutableMap<String, Any> = config.asHashMap()

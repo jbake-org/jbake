@@ -2,8 +2,8 @@ package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.parser.Engines
-import org.jbake.util.PathConstants.fS
 import java.io.*
+import java.io.File.separator
 import java.net.URLDecoder
 import java.nio.file.Paths
 import java.security.MessageDigest
@@ -156,46 +156,30 @@ object FileUtil {
     }
 
     /**
-     * platform independent file.getPath()
+     * Platform-independent file.getPath(). Needed to transform Windows path separators into slashes.
      *
      * @param file the file to transform, or `null`
      * @return The result of file.getPath() with all path Separators beeing a "/", or `null`
-     * Needed to transform Windows path separators into slashes.
      */
-    fun asPath(file: File): String {
-        // If (file == null) return null.
-        return asPath(file.path)
-    }
+    fun asPath(file: File) =         // If path == null, return null. On Windows we have to replace the backslash.
+        if (separator == URI_SEPARATOR_CHAR) file.path
+        else file.path.replace(separator, URI_SEPARATOR_CHAR)
 
     /**
-     * platform independent file.getPath()
-     *
-     * @param path the path to transform, or `null`
-     * @return The result will have all platform path separators replaced by "/".
-     */
-    fun asPath(path: String): String {
-        // If path == null, return null. On Windows we have to replace the backslash.
-        return if (fS == URI_SEPARATOR_CHAR) path
-            else path.replace(fS, URI_SEPARATOR_CHAR)
-    }
-
-    /**
-     * Given a file inside content it return
-     * the relative path to get to the root.
+     * Given a file inside content it return the relative path to get to the root.
      *
      * Example: /content and /content/tags/blog will return '../..'
      *
      * @param sourceFile the file to calculate relative path for
-     * @param rootPath the root path
      * @return the relative path to get to the root
      */
     fun getPathToRoot(config: JBakeConfiguration, rootPath: File, sourceFile: File): String {
-        val r = Paths.get(rootPath.toURI())
-        val s = Paths.get(sourceFile.getParentFile().toURI())
-        val relativePath = s.relativize(r)
+        val root = Paths.get(rootPath.toURI())
+        val source = Paths.get(sourceFile.getParentFile().toURI())
+        val relativePath = source.relativize(root)
 
         return buildString {
-            append(asPath(relativePath.toString()))
+            append(asPath(relativePath.toFile()))
             if (config.uriWithoutExtension) append("/..")
             if (isNotEmpty()) append("/") // The calling logic assumes / at end.
         }
@@ -211,8 +195,6 @@ object FileUtil {
     /**
      * Utility method to determine if a given file is located somewhere in the directory provided.
      *
-     * @param file used to check if it is located in the provided directory.
-     * @param directory to validate whether the provided file resides.
      * @return true if the file is somewhere in the provided directory, false if it is not.
      * @throws IOException if the canonical path for either of the input directories can't be determined.
      */
@@ -220,5 +202,5 @@ object FileUtil {
     @Throws(IOException::class)
     fun isFileInDirectory(file: File, directory: File): Boolean =
         file.exists() && !file.isHidden && directory.isDirectory() && file.getCanonicalPath().startsWith(directory.getCanonicalPath())
-    }
 
+}

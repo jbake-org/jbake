@@ -53,7 +53,7 @@ class Main @JvmOverloads constructor(
     }
 
     fun run(launchOptions: LaunchOptions, config: JBakeConfiguration) {
-        println("JBake " + config.version + " (" + config.buildTimeStamp + " " + config.abbreviatedGitHash + "#) [http://jbake.org]")
+        println("JBake " + config.jbakeVersion + " (" + config.buildTimeStamp + " " + config.abbreviatedGitHash + "#) [http://jbake.org]")
         println()
 
         if (launchOptions.isHelpNeeded) {
