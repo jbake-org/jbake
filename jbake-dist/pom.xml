@@ -52,7 +52,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.0</version>
+                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
                 <executions>
                     <execution><phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals><configuration><sources><source>src/smoke-test/java</source></sources></configuration></execution>
                     <execution><id>add-test-resource</id><phase>generate-test-resources</phase><goals><goal>add-test-resource</goal></goals><configuration><resources><resource><directory>src/smoke-test/resources</directory></resource></resources></configuration></execution>
@@ -77,7 +77,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.5.1</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
