@@ -162,25 +162,18 @@ class AsciidoctorEngine : MarkupEngine() {
             .safe(SafeMode.UNSAFE)
             .baseDir(context.file.parentFile)
 
-        val optionsSubset: MutableList<String> = config.asciidoctorOptionKeys
-        for (optionKey in optionsSubset) {
+        for (optionKey in config.asciidoctorOptionKeys) {
             val optionValue = config.getAsciidoctorOption(optionKey)
 
             // Handle special gem path and requires options
             when {
-                optionKey == OPT_GEM_PATH && optionValue != null -> gemPath = optionValue.toString()
-                optionKey == OPT_REQUIRES && optionValue != null -> {
-                    val requiresList = optionValue.toString().split(",")
-                        .map { it.trim() }
-                        .filter { it.isNotEmpty() }
-                    requires = requiresList
-                }
+                optionKey == OPT_GEM_PATH -> gemPath = optionValue?.toString()
+                optionKey == OPT_REQUIRES -> requires = (optionValue ?: "").toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 optionKey == "template_dirs" -> {
-                    val dirs = getAsList(optionValue)
-                    if (dirs.isNotEmpty())
-                        optionsBuilder.templateDirs(*dirs.map { File(it) }.toTypedArray())
+                    if (getAsList(optionValue).isNotEmpty())
+                        optionsBuilder.templateDirs(*getAsList(optionValue).map { File(it) }.toTypedArray())
                 }
-                optionValue != null -> optionsBuilder.option(optionKey, optionValue)
+                else -> optionValue?.let { optionsBuilder.option(optionKey, it) }
             }
         }
 
