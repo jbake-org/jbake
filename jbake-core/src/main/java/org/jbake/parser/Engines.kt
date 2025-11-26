@@ -118,8 +118,7 @@ class Engines private constructor() {
             val engine = tryLoadEngine(className) ?: return
 
             for (extension in extensions) {
-                if (extension != null)
-                    register(extension, engine)
+                register(extension, engine)
             }
 
             if (engine is ErrorEngine)
