@@ -23,9 +23,7 @@ class InitTest {
     @Before
     fun setup() {
         rootPath = TestUtils.testResourcesAsSourceFolder
-        if (!rootPath.exists()) {
-            throw Exception("Cannot find base path for test!")
-        }
+        if (!rootPath.exists()) throw Exception("Cannot find base path for test!")
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         // Override base template config option.
         config.setExampleProject("freemarker", "test.zip")

@@ -54,12 +54,12 @@ open class GenerateMojo : AbstractMojo() {
     protected fun reRender() {
         try {
             log.info("Starting JBake generation from: ${inputDirectory!!.path} to: ${outputDirectory!!.path}")
+
             // TODO: At some point, reuse Oven
             val oven = Oven(createConfiguration())
             oven.bake()
-            if (failOnError && !oven.errors.isEmpty()) {
-                throw MojoFailureException("Baked with " + oven.errors.size + " errors. Check output above for details!")
-            }
+            if (failOnError && !oven.errors.isEmpty()) throw MojoFailureException("Baked with " + oven.errors.size + " errors. Check output above for details!")
+
             log.info("JBake generation completed successfully")
         } catch (e: Exception) {
             log.error("JBake generation failed for input: ${inputDirectory!!.path}, output: ${outputDirectory!!.path} - ${e.message}", e)

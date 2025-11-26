@@ -45,9 +45,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         addListener(listener)
 
         templateFolder = File(sourceFolder, templateDir)
-        if (!templateFolder.exists()) {
-            throw Exception("Cannot find template folder!")
-        }
+        if (!templateFolder.exists()) throw Exception("Cannot find template folder!")
 
         destinationFolder = folder.root
         config.destinationFolder = (destinationFolder)
