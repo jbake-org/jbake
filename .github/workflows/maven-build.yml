@@ -28,18 +28,20 @@ jobs:
                       ${{ runner.os }}-m2-
 
             - name: Run Maven tests
-              run: mvn -B clean test
+              run: mvn -B clean install
 
             - name: Upload test reports
               if: always()
               uses: actions/upload-artifact@v4
               with:
                   path: |
-                      **/target/surefire-reports/*.xml
-                      **/target/failsafe-reports/*.xml
+                      **/target/surefire-reports/*
+                      **/target/failsafe-reports/*
 
             - name: Publish Test Results
               uses: EnricoMi/publish-unit-test-result-action@v2.21.0
               with:
-                  files: '**/target/surefire-reports/*.xml, **/target/failsafe-reports/*.xml'
                   check_name: 'Maven Tests'
+                  files: |
+                      **/target/surefire-reports/*
+                      **/target/failsafe-reports/*
