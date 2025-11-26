@@ -45,10 +45,11 @@ object DBUtil {
      * @param entry Entry input to be converted
      * @return input entry as String[]
      */
+    @Suppress("UNCHECKED_CAST")
     fun toStringArray(entry: Any): Array<String> = when (entry) {
-        is Array<*> -> entry as? Array<String> ?: emptyArray()
-        is OTrackedList<*> -> (entry as? OTrackedList<String>)?.toTypedArray() ?: emptyArray()
-        is ArrayList<*> -> (entry as? ArrayList<String>)?.toTypedArray() ?: emptyArray()
+        is Array<*> -> entry as Array<String>
+        is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray()
+        is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
         else -> arrayOf()
     }
 }

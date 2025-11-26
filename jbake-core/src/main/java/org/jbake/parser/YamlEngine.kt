@@ -23,6 +23,7 @@ class YamlEngine : MarkupEngine() {
                 when (val result = yaml.load<Any>(inputStream)) {
                     is MutableList<*> -> model.put("data", result)
                     is MutableMap<*, *> -> {
+                        @Suppress("UNCHECKED_CAST")
                         val map = result as? Map<String, Any> ?: emptyMap()
                         model.putAll(map)
                     }

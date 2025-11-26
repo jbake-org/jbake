@@ -14,6 +14,7 @@ open class TemplateModel : BaseModel {
         putAll(model)
     }
 
+    @Suppress("UNCHECKED_CAST")
     var config: MutableMap<String, Any>
         get() = get(ModelAttributes.CONFIG) as MutableMap<String, Any>
         set(configModel) { put(ModelAttributes.CONFIG, configModel) }
@@ -80,6 +81,7 @@ open class TemplateModel : BaseModel {
     companion object {
 
         /** Create TemplateModel from a type-safe RenderContext. This is the new preferred way to create template models. */
+        @Suppress("DEPRECATION")
         fun fromContext(context: RenderContext) = TemplateModel().apply { putAll(context.toLegacyMap()) }
 
         /**

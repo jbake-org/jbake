@@ -15,10 +15,15 @@ class DataFileUtil(private val db: ContentStore, private val defaultDocType: Str
             log.warn("Unable to locate content for ref: {}", ref)
         }
         else {
-            if (docs.size == 1)
-                result = docs[0] as? MutableMap<String, Any> ?: mutableMapOf()
-            else
+            if (docs.size != 1)
                 log.warn("Located multiple hits for ref: {}", ref)
+            else {
+                val doc = docs[0]
+                result = if (doc is MutableMap<*, *>) {
+                    @Suppress("UNCHECKED_CAST")
+                    doc as? MutableMap<String, Any> ?: mutableMapOf()
+                } else mutableMapOf()
+            }
         }
         return result
     }

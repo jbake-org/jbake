@@ -324,7 +324,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsString(PropertyList.TEMPLATE_ENCODING.key)
 
     override fun getTemplateByDocType(doctype: String): String? {
-        val templateKey: String = DOCTYPE_TEMPLATE_PREFIX + (doctype ?: "") + DOCTYPE_FILE_POSTFIX
+        val templateKey: String = DOCTYPE_TEMPLATE_PREFIX + doctype + DOCTYPE_FILE_POSTFIX
         val templateFileName = getAsString(templateKey)
         if (templateFileName != null && templateFileName.isNotEmpty()) {
             return templateFileName
@@ -388,10 +388,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     override fun asHashMap(): MutableMap<String, Any> {
         val configModel = HashMap<String, Any>()
-        val configKeys = this.keys ?: return configModel
+        val configKeys = this.keys
         while (configKeys.hasNext()) {
-            val keyNullable = configKeys.next()
-            val key = keyNullable ?: continue
+            val key = configKeys.next()
 
             val valueObject =
                 if (key == PropertyList.PAGINATE_INDEX.key) this.paginateIndex
@@ -484,13 +483,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
                 val configuration = compositeConfiguration.getConfiguration(i)
 
                 if (configuration !is SystemConfiguration) {
-                    val it = configuration.keys
-                    while (it.hasNext()) {
-                        val key = it.next()
-                        val property = PropertyList.getPropertyByKey(key)
-                        if (property != null && !jbakeKeys.contains(property)) {
+                    val keys = configuration.keys
+                    while (keys.hasNext()) {
+                        val property = PropertyList.getPropertyByKey(keys.next())
+                        if (!jbakeKeys.contains(property))
                             jbakeKeys.add(property)
-                        }
                     }
                 }
             }
