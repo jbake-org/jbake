@@ -19,7 +19,6 @@ class FeedRenderer : RenderingTool {
             return 1
         }
         catch (e: Exception) { throw RenderingException(e) }
-        return 0
     }
 
     @Throws(RenderingException::class)
@@ -29,3 +28,4 @@ class FeedRenderer : RenderingTool {
         return render(renderer, db, configuration)
     }
 }
+
