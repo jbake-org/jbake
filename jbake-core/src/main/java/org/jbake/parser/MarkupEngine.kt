@@ -60,9 +60,9 @@ abstract class MarkupEngine : ParserEngine {
         val hasHeader = hasDocumentHeader(fileContent)
         val context = ParserContext(file, fileContent, config, hasHeader)
 
-        // read header from file
+        // Read header from file.
         processDefaultHeader(context)
-        // then read engine specific headers
+        // Then read engine specific headers.
         processHeader(context)
 
         setModelDefaultsIfNotSetInHeader(context)
@@ -92,10 +92,10 @@ abstract class MarkupEngine : ParserEngine {
     private fun getFileContent(file: File, encoding: String): MutableList<String> {
         try {
             FileInputStream(file).use { `is` ->
-                log.debug("read file '{}' with encoding '{}'", file, encoding)
+                log.trace("Read file '{}' with encoding '{}'", file, encoding)
                 val lines = IOUtils.readLines(`is`, encoding)
                 if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines[0])) {
-                    log.warn("remove BOM from file '{}' read with encoding '{}'", file, encoding)
+                    log.warn("Removed BOM from file '{}' read with encoding '{}'", file, encoding)
                     lines[0] = lines[0].replace(UTF_8_BOM, "")
                 }
                 return lines
