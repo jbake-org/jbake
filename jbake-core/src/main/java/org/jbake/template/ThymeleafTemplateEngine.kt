@@ -117,17 +117,9 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
 
                     override fun adapt(key: String, extractedValue: Any): LazyContextVariable<*> {
                         return when (key) {
-                            ModelAttributes.ALLTAGS -> object : LazyContextVariable<MutableSet<*>>() {
-                                override fun loadValue() = extractedValue as MutableSet<*>?
-                            }
-
-                            ModelAttributes.PUBLISHED_DATE -> object : LazyContextVariable<Date>() {
-                                override fun loadValue() = extractedValue as Date?
-                            }
-
-                            else -> object : LazyContextVariable<Any>() {
-                                override fun loadValue(): Any = extractedValue
-                            }
+                            ModelAttributes.ALLTAGS -> object : LazyContextVariable<MutableSet<*>>() { override fun loadValue() = extractedValue as MutableSet<*>? }
+                            ModelAttributes.PUBLISHED_DATE -> object : LazyContextVariable<Date>() { override fun loadValue() = extractedValue as Date? }
+                            else -> object : LazyContextVariable<Any>() { override fun loadValue(): Any = extractedValue }
                         }
                     }
                 }
