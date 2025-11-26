@@ -63,24 +63,22 @@ class Asset {
     }
 
     /**
-     * Determine if a given file is an asset file.
-     * @param path to the file to validate.
      * @return true if the path provided points to a file in the asset folder.
      */
-    fun isAssetFile(path: File): Boolean {
+    fun isAssetFile(fileToValidate: File): Boolean {
         try {
-            if (!FileUtil.directoryOnlyIfNotIgnored(path.parentFile, config))
+            if (!FileUtil.directoryOnlyIfNotIgnored(fileToValidate.parentFile, config))
                 return false
 
-            if (FileUtil.isFileInDirectory(path, config.assetFolder))
+            if (FileUtil.isFileInDirectory(fileToValidate, config.assetFolder))
                 return true
 
-            if (FileUtil.isFileInDirectory(path, config.contentFolder)
-                && FileUtil.getNotContentFileFilter(config).accept(path))
+            if (FileUtil.isFileInDirectory(fileToValidate, config.contentFolder)
+                    && FileUtil.getNotContentFileFilter(config).accept(fileToValidate))
                 return true
-
-        } catch (ioe: IOException) {
-            log.error("Unable to determine the path to asset file {}", path.path, ioe)
+        }
+        catch (ioe: IOException) {
+            log.error("Unable to determine the path to asset file {}", fileToValidate.path, ioe)
         }
         return false
     }
@@ -88,10 +86,10 @@ class Asset {
     /**
      * Responsible for copying any asset files that exist within the content directory.
      *
-     * @param path of the content directory
+     * @param contentDirectory Path of the content directory
      */
-    fun copyAssetsFromContent(path: File) {
-        copy(path, config.destinationFolder, FileUtil.getNotContentFileFilter(config))
+    fun copyAssetsFromContent(contentDirectoryPath: File) {
+        copy(contentDirectoryPath, config.destinationFolder, FileUtil.getNotContentFileFilter(config))
     }
 
 
