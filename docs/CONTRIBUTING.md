@@ -227,3 +227,11 @@ If you have questions about these guidelines or need clarification, please open 
 
 Thank you for contributing to JBake!
 
+# Next steps
+
+- Migrate the templating engines to their latest versions
+- Continue refactoring the central map into type-safe models
+- Reduce the warnings from the Kotlin compiler
+- Rebrand to KBake?
+- Set up publising as per https://github.com/OndraZizka/csv-cruncher
+- Publish a new release 4.0.0 under ch.zizka.kbake groupId
