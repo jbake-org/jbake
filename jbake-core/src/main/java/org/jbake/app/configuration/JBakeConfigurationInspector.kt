@@ -8,6 +8,14 @@ import org.slf4j.LoggerFactory
 import java.io.File
 
 class JBakeConfigurationInspector(private val configuration: JBakeConfiguration) {
+
+
+    /**
+     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
+     * Creates destination folder if it does not exist.
+     *
+     * @throws JBakeException If template or contents folder don't exist
+     */
     @Throws(JBakeException::class)
     fun inspect() {
         ensureSource()

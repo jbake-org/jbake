@@ -60,10 +60,10 @@ class Oven {
     /**
      * Create an Oven instance with given [Utensils]
      *
-     * @param utensils All Utensils necessary to bake
+     * @param utensils All Utensils necessary to bake.
      */
     constructor(utensils: Utensils) {
-        checkConfiguration(utensils.configuration)
+        JBakeConfigurationInspector(utensils.configuration).inspect()
         this.utensils = utensils
     }
 
@@ -73,17 +73,6 @@ class Oven {
         get() = (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration
         // Put back if anyone complains.
         //set(config) { (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration = config }
-
-    /**
-     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
-     * Creates destination folder if it does not exist.
-     *
-     * @throws JBakeException If template or contents folder don't exist
-     */
-    private fun checkConfiguration(configuration: JBakeConfiguration) {
-        val inspector = JBakeConfigurationInspector(configuration)
-        inspector.inspect()
-    }
 
     /**
      * Bake a single file. If the file is an asset, only copy that file. Otherwise, run a full bake.
@@ -134,11 +123,10 @@ class Oven {
             errors.addAll(utensils.asset.errors)
 
             log.info("Baking finished!")
-            val end = Date().time
-            log.info("Baked {} items in {}ms", renderedCount, end - start)
-            if (!errors.isEmpty()) {
+            log.info("Baked {} items in {}ms", renderedCount, Date().time - start)
+
+            if (!errors.isEmpty())
                 log.error("Failed to bake {} item(s)!", errors.size)
-            }
         }
         finally {
             utensils.contentStore.close()
@@ -172,9 +160,8 @@ class Oven {
         for (tool in ServiceLoader.load(RenderingTool::class.java)) {
             try {
                 renderedCount += tool.render(utensils.renderer, utensils.contentStore, utensils.configuration)
-            } catch (e: RenderingException) {
-                errors.add(e)
             }
+            catch (e: RenderingException) { errors.add(e) }
         }
     }
 
