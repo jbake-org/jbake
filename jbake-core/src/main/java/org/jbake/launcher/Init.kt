@@ -24,9 +24,7 @@ class Init(private val config: JBakeConfiguration) {
      * @throws Exception              if required folder structure can't be achieved without content overwriting.
      */
     fun run(outputFolder: File, templateLocationFolder: File, templateType: String) {
-        if (!outputFolder.canWrite()) {
-            throw Exception("Output folder is not writeable!")
-        }
+        if (!outputFolder.canWrite()) throw Exception("Output folder is not writeable!")
 
         val contents = outputFolder.listFiles()
         var safe = true
