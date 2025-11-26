@@ -21,13 +21,13 @@ import java.io.File
 import java.nio.charset.Charset
 import java.util.*
 
-/**
- * @author jdlee
- */
 abstract class AbstractTemplateEngineRenderingTest(
+
     protected val templateDir: String? = null,
     protected val templateExtension: String? = null,
-) : ContentStoreIntegrationTest() {
+)
+    : ContentStoreIntegrationTest()
+{
     protected val outputStrings: MutableMap<String, MutableList<String>> = HashMap()
 
     protected lateinit var destinationFolder: File
@@ -169,7 +169,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // When
         val content = parser.processFile(sampleFile)
         content!!.uri = filename
-        renderer!!.render(content)
+        renderer.render(content)
         val outputFile = File(destinationFolder, filename)
         assertTrue(outputFile.exists())
 

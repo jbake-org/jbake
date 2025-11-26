@@ -38,11 +38,10 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun initPugConfiguration() {
-        // pug4j 2.x FileTemplateLoader requires explicit extension parameter "jade"
-        // Without this, it defaults to "pug" and won't find .jade templates correctly
+        // pug4j 2.x only supports .pug extension (not .jade)
         val templatePathStr = config.templateFolder.absolutePath
         val charset = java.nio.charset.Charset.forName(config.templateEncoding ?: "UTF-8")
-        val loader = FileTemplateLoader(templatePathStr, charset, "jade")
+        val loader = FileTemplateLoader(templatePathStr, charset, "pug")
 
         pugConfiguration.templateLoader = loader
         pugConfiguration.mode = Pug4J.Mode.XHTML
@@ -66,7 +65,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     fun renderTemplate(template: PugTemplate, model: TemplateModel, writer: Writer) {
         val pugModel = wrap(model)
         pugModel.putAll(pugConfiguration.sharedVariables)
-        template.process(pugModel, writer)
+        template.process(pugModel, writer, pugConfiguration)
     }
 
     private fun wrap(model: TemplateModel): PugModel {
