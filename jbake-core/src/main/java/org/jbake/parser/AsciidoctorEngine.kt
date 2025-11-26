@@ -10,7 +10,10 @@ import java.text.SimpleDateFormat
 
 /**
  * Renders documents in the asciidoc format using the Asciidoctor engine.
+ *
+ * TODO: Migrate to AsciidoctorJ 3.x and remove deprecated API usage.
  */
+@Suppress("UNCHECKED_CAST")
 class AsciidoctorEngine : MarkupEngine() {
 
     @Volatile
@@ -23,12 +26,16 @@ class AsciidoctorEngine : MarkupEngine() {
         synchronized(engineLock) {
             engine?.let { return it }
             log.info("Initializing Asciidoctor engine...")
+
             val newEngine =
+                // AsciidoctorJ deprecated Options.map(), but there is no alternative as of 2025. See: https://github.com/asciidoctor/asciidoctorj/issues/728
+                @Suppress("DEPRECATION")
                 if (options.map().containsKey(OPT_GEM_PATH))
                     AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
                 else
                     Asciidoctor.Factory.create()
 
+            @Suppress("DEPRECATION")
             if (options.map().containsKey(OPT_REQUIRES)) {
                 val requires: Array<String> =
                     options.map()[OPT_REQUIRES].toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }.toTypedArray()
@@ -44,11 +51,16 @@ class AsciidoctorEngine : MarkupEngine() {
     override fun processHeader(context: ParserContext) {
         val options = getAsciiDocOptionsAndAttributes(context)
         val asciidoctor = getEngine(options)
+        @Suppress("DEPRECATION")
         val header = asciidoctor.readDocumentHeader(context.file)
         val documentModel = context.documentModel
+
+        @Suppress("DEPRECATION")
         if (header.documentTitle != null) {
             documentModel.title = (header.documentTitle.combined)
         }
+
+        @Suppress("DEPRECATION")
         val attributes = header.attributes
         for (attribute in attributes.entries) {
             val key: String = attribute.key!!
@@ -117,6 +129,7 @@ class AsciidoctorEngine : MarkupEngine() {
     private fun getAsciiDocOptionsAndAttributes(context: ParserContext): Options {
         val config = context.config
         val asciidoctorAttributes: MutableList<String> = config.asciidoctorAttributes
+        @Suppress("DEPRECATION")
         val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String>())
         if (config.exportAsciidoctorAttributes) {
             val prefix = config.attributesExportPrefixForAsciidoctor
@@ -125,12 +138,14 @@ class AsciidoctorEngine : MarkupEngine() {
             while (it.hasNext()) {
                 val key = it.next()
                 if (!key.startsWith("asciidoctor")) {
+                    @Suppress("DEPRECATION")
                     attributes.attribute(prefix + key.replace(".", "_"), config.get(key))
                 }
             }
         }
 
         val optionsSubset: MutableList<String> = config.asciidoctorOptionKeys
+        @Suppress("DEPRECATION")
         val options = OptionsBuilder.options().attributes(attributes.get()).get()
         for (optionKey in optionsSubset) {
             val optionValue = config.getAsciidoctorOption(optionKey)
@@ -147,6 +162,7 @@ class AsciidoctorEngine : MarkupEngine() {
         return options
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun getAsList(asciidoctorOption: Any?): MutableList<String> {
         val values: MutableList<String> = ArrayList()
 
@@ -162,10 +178,10 @@ class AsciidoctorEngine : MarkupEngine() {
         const val JBAKE_PREFIX: String = "jbake-"
         const val REVDATE_KEY: String = "revdate"
 
-        /* comma separated file paths to additional gems */
+        /** Comma-separated file paths to additional gems */
         private const val OPT_GEM_PATH = "gemPath"
 
-        /* comma separated gem names */
+        /** Comma-separated gem names */
         private const val OPT_REQUIRES = "requires"
     }
 }
