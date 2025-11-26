@@ -85,7 +85,7 @@ class SeedMojo : AbstractMojo() {
             }
 
             val fileName = stripLeadingPath(ze.getName())
-            val newFile = File(outputDirectory.toString() + PathConstants.fS + fileName)
+            val newFile = File(outputDirectory, fileName!!)
 
             File(newFile.getParent()).mkdirs()
 

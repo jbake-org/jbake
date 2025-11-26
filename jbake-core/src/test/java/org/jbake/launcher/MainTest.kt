@@ -9,7 +9,7 @@ import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
-import org.jbake.util.PathConstants.fS
+import org.jbake.util.PathUtils
 import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -28,22 +28,10 @@ import java.io.File
 import java.io.PrintStream
 import java.nio.file.Path
 
-// Helper functions for Kotlin null-safety with Mockito
-@Suppress("UNCHECKED_CAST")
-private fun <T> any(type: Class<T>): T {
-    ArgumentMatchers.any(type)
-    return null as T
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun anyString(): String {
-    ArgumentMatchers.anyString()
-    return ""
-}
-
 
 @ExtendWith(MockitoExtension::class)
 internal class MainTest : LoggingTest() {
+
     private val standardOut: PrintStream? = System.out
     private val outputStreamCaptor = ByteArrayOutputStream()
     private lateinit var main: Main
@@ -54,12 +42,11 @@ internal class MainTest : LoggingTest() {
     @Mock private lateinit var mockConfigUtil: ConfigUtil
     @Mock private lateinit var mockFactory: JBakeConfigurationFactory
 
-    private var workingdir: String? = null
+    private var originalWorkDir: String = PathUtils.SYSPROP_USER_DIR
 
     @BeforeEach
     fun setUp() {
         this.main = Main(mockBaker, mockJetty, mockWatcher)
-        workingdir = System.getProperty("user.dir")
         mockFactory.configUtil = mockConfigUtil
         main.jBakeConfigurationFactory = mockFactory
         System.setOut(PrintStream(outputStreamCaptor))
@@ -67,7 +54,7 @@ internal class MainTest : LoggingTest() {
 
     @AfterEach
     fun tearDown() {
-        System.setProperty("user.dir", workingdir)
+        System.setProperty("user.dir", originalWorkDir)
         System.setOut(standardOut)
     }
 
@@ -121,7 +108,7 @@ internal class MainTest : LoggingTest() {
     @Throws(ConfigurationException::class)
     fun launchBakeAndJettyWithCustomDirForJetty(@TempDir source: Path) {
         val sourceFolder = newFolder(source, "src/jbake")
-        val expectedRunPath = "src" + fS + "jbake" + fS + "output"
+        val expectedRunPath = File("src").resolve("jbake").resolve("output").path
         val output = newFolder(source, expectedRunPath)
         val configuration = mockJettyConfiguration(sourceFolder, output)
 
@@ -274,6 +261,7 @@ internal class MainTest : LoggingTest() {
     }
 
     private fun newFolder(path: Path, name: String): File {
+        // TODO Shorten
         val sourceFolder = path.resolve(name).toFile()
         sourceFolder.mkdirs()
         return sourceFolder
@@ -281,3 +269,16 @@ internal class MainTest : LoggingTest() {
 }
 
 private val FCJ = File::class.java
+
+// Helper functions for Kotlin null-safety with Mockito
+@Suppress("UNCHECKED_CAST")
+private fun <T> any(type: Class<T>): T {
+    ArgumentMatchers.any(type)
+    return null as T
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun anyString(): String {
+    ArgumentMatchers.anyString()
+    return ""
+}

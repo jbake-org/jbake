@@ -3,7 +3,7 @@ package org.jbake.launcher
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.jbake.app.configuration.ConfigUtil
-import org.jbake.util.PathConstants.fS
+import org.jbake.util.PathUtils.SYSPROP_USER_DIR
 import org.junit.Test
 import picocli.CommandLine
 import java.io.File
@@ -129,11 +129,9 @@ class LaunchOptionsTest {
         assertThat(res.isRunServer).isFalse()
         assertThat(res.isInit).isFalse()
         assertThat(res.isBake).isFalse()
-        assertThat(res.getSource().path).isEqualTo(System.getProperty("user.dir"))
-        assertThat(res.getDestination().path)
-            .isEqualTo(System.getProperty("user.dir") + fS + "output")
-        assertThat(res.getConfig().path)
-            .isEqualTo(System.getProperty("user.dir") + fS + ConfigUtil.CONFIG_FILE)
+        assertThat(res.getSource().path).isEqualTo(SYSPROP_USER_DIR)
+        assertThat(res.getDestination().path).isEqualTo(File(SYSPROP_USER_DIR, "output").path)
+        assertThat(res.getConfig().path).isEqualTo(File(SYSPROP_USER_DIR, ConfigUtil.CONFIG_FILE).path)
     }
 
     @Test
@@ -153,8 +151,7 @@ class LaunchOptionsTest {
     fun configArg() {
         val args = arrayOf("-c", "foo")
         val res = parseArgs(args)
-        assertThat(res.getConfig().getAbsoluteFile().toString())
-            .isEqualTo(System.getProperty("user.dir") + fS + "foo")
+        assertThat(res.getConfig().getAbsoluteFile().toString()).isEqualTo(File(SYSPROP_USER_DIR, "foo").getAbsoluteFile().toString())
     }
 
     private fun parseArgs(args: Array<String>): LaunchOptions {

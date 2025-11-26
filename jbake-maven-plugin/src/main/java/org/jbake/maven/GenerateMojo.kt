@@ -16,12 +16,11 @@ import java.io.File
 /** Runs jbake on a folder. */
 @Mojo(name = "generate", requiresProject = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 open class GenerateMojo : AbstractMojo() {
+
     @Parameter(defaultValue = $$"${project}")
     protected var project: MavenProject? = null
 
-    /**
-     * Location of the Output Directory.
-     */
+    /** Location of the Output Directory. */
     @Parameter(
         property = "jbake.outputDirectory",
         defaultValue = $$"${project.build.directory}/${project.build.finalName}",
@@ -29,15 +28,11 @@ open class GenerateMojo : AbstractMojo() {
     )
     protected var outputDirectory: File? = null
 
-    /**
-     * Location of the Output Directory.
-     */
+    /** Location of the Output Directory. */
     @Parameter(property = "jbake.inputDirectory", defaultValue = $$"${project.basedir}/src/main/jbake", required = true)
     protected var inputDirectory: File? = null
 
-    /**
-     * Breaks the build when `true` and errors occur during baking in JBake oven.
-     */
+    /** Breaks the build when `true` and errors occur during baking in JBake oven. */
     @Parameter(property = "jbake.failOnError", defaultValue = "true")
     protected var failOnError: Boolean = false
 
@@ -75,11 +70,7 @@ open class GenerateMojo : AbstractMojo() {
 
     @Throws(JBakeException::class)
     protected fun createConfiguration(): JBakeConfiguration {
-        val jBakeConfiguration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(
-                inputDirectory,
-                outputDirectory, // Required
-                isClearCache,
-            )
+        val jBakeConfiguration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(inputDirectory, outputDirectory, isClearCache)
         jBakeConfiguration.addConfiguration(this.project!!.properties)
         return jBakeConfiguration
     }

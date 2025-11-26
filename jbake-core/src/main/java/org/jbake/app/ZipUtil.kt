@@ -21,7 +21,7 @@ object ZipUtil {
         val buffer = ByteArray(1024)
 
         while ((zis.getNextEntry().also { entry = it }) != null) {
-            val outputFile = File(extractToDir.getCanonicalPath() + File.separatorChar + entry!!.getName())
+            val outputFile = extractToDir.toPath().resolve(entry!!.getName()).toFile()
             val outputParent = File(outputFile.getParent())
             outputParent.mkdirs()
 

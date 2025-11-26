@@ -54,9 +54,9 @@ class Asset {
         }
 
         try {
-            val targetPath = (config.destinationFolder.getCanonicalPath() + File.separatorChar) + assetSubPath(asset)
-            log.info("Copying single asset file to [{}]", targetPath)
-            copyFile(asset, File(targetPath))
+            val targetFile = config.destinationFolder.toPath().resolve(assetSubPath(asset)).toFile()
+            log.info("Copying single asset file to [{}]", targetFile.path)
+            copyFile(asset, targetFile)
         } catch (io: IOException) {
             log.error("Failed to copy the asset file.", io)
         }
@@ -97,12 +97,27 @@ class Asset {
 
     @Throws(IOException::class)
     private fun assetSubPath(asset: File): String {
-        // First, strip asset folder from file path
-        var targetFolder =
-            asset.getCanonicalPath().replace(config.assetFolder.getCanonicalPath() + File.separatorChar, "")
-        // And just to be sure, let's also remove the content folder, as some assets are copied from here.
-        targetFolder = targetFolder.replace(config.contentFolder.getCanonicalPath() + File.separatorChar, "")
-        return targetFolder
+        val assetPath = asset.toPath()
+        val assetFolderPath = config.assetFolder.toPath()
+        val contentFolderPath = config.contentFolder.toPath()
+
+        // Try to get relative path from asset folder
+        val relativePath = try {
+            if (assetPath.startsWith(assetFolderPath)) {
+                assetFolderPath.relativize(assetPath)
+            } else if (assetPath.startsWith(contentFolderPath)) {
+                // Asset is in content folder, strip that path
+                contentFolderPath.relativize(assetPath)
+            } else {
+                // Fallback to the file name
+                assetPath.fileName ?: assetPath
+            }
+        } catch (e: Exception) {
+            // On error, just return the last component
+            assetPath.fileName ?: assetPath
+        }
+
+        return relativePath.toString()
     }
 
     private fun copy(sourceFolder: File, targetFolder: File, filter: FileFilter) {

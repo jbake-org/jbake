@@ -64,7 +64,7 @@ class OvenTest {
     @Test
     fun shouldBakeWithRelativeCustomPaths() {
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
-        configuration = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
+        configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
         val assetFolder = File(configuration.destinationFolder, "css")
         val aboutFile = File(configuration.destinationFolder, "about.html")
         val blogSubFolder = File(configuration.destinationFolder, "blog")

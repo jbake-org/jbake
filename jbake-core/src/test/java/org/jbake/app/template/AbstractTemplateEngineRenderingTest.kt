@@ -12,7 +12,6 @@ import org.jbake.model.DocumentTypes.documentTypes
 import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
-import org.jbake.util.PathConstants.fS
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -150,9 +149,9 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "second-post.html"
 
-        val sampleFile = File(sourceFolder!!.path + fS + "content" + fS + "blog" + fS + "2013" + fS + filename)
+        val sampleFile = sourceFolder!!.resolve("content").resolve("blog").resolve("2013").resolve(filename)
         val content = parser.processFile(sampleFile)
-        content!!.uri = "/$filename"
+        content!!.uri = filename
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
@@ -168,11 +167,11 @@ abstract class AbstractTemplateEngineRenderingTest(
     fun renderPage() {
         // setup
         val filename = "about.html"
-        val sampleFile = File(sourceFolder!!.path + fS + "content" + fS + filename)
+        val sampleFile = sourceFolder!!.resolve("content").resolve(filename)
 
         // When
-        val content = parser!!.processFile(sampleFile)
-        content!!.uri = "/$filename"
+        val content = parser.processFile(sampleFile)
+        content!!.uri = filename
         renderer!!.render(content)
         val outputFile = File(destinationFolder, filename)
         Assert.assertTrue(outputFile.exists())
@@ -231,7 +230,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         renderer.renderTags("tags")
 
         // Then
-        val outputFile = File(destinationFolder.toString() + fS + "tags" + fS + "blog.html")
+        val outputFile = destinationFolder.resolve("tags").resolve("blog.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags")) {
@@ -244,7 +243,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         config.setRenderTagsIndex(true)
 
         renderer.renderTags("tags")
-        val outputFile = File(destinationFolder.toString() + fS + "tags" + fS + "index.html")
+        val outputFile = destinationFolder.resolve("tags").resolve("index.html")
         Assert.assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags-index")) {

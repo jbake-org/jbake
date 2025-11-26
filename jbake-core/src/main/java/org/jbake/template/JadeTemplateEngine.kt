@@ -14,6 +14,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
+import org.jbake.util.PathUtils
 import java.io.File
 import java.io.IOException
 import java.io.Writer
@@ -39,8 +40,8 @@ class JadeTemplateEngine : AbstractTemplateEngine {
     }
 
     private fun initJadeConfiguration() {
-        val loader: TemplateLoader =
-            FileTemplateLoader(config.templateFolder.path + File.separatorChar, config.templateEncoding)
+        // Use PathUtil.dirPrefix to provide a proper directory prefix string (ensures trailing separator)
+        val loader: TemplateLoader = FileTemplateLoader(PathUtils.ensureTrailingSeparatorForDirectory(config.templateFolder), config.templateEncoding)
         jadeConfiguration.templateLoader = loader
         jadeConfiguration.mode = Jade4J.Mode.XHTML
         jadeConfiguration.isPrettyPrint = true

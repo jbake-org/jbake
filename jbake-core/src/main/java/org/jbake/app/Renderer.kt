@@ -10,7 +10,6 @@ import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.PagingHelper
-import org.jbake.util.PathConstants.fS
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.*
@@ -117,41 +116,45 @@ class Renderer {
      */
     fun render(content: DocumentModel) {
         val docType = content.type
-        var outputFilename = (config.destinationFolder.path + File.separatorChar) + content.uri
-        if (outputFilename.lastIndexOf('.') > outputFilename.lastIndexOf(File.separatorChar)) {
-            outputFilename = outputFilename.take(outputFilename.lastIndexOf('.'))
+        val contentUri = content.uri ?: ""
+        var outputFile = config.destinationFolder.resolve(contentUri)
+
+        // Not all URIs have extensions. Only trim extension if it exists
+        if (outputFile.extension.isNotEmpty()) {
+            outputFile = outputFile.resolveSibling(outputFile.nameWithoutExtension)
         }
 
         // delete existing versions if they exist in case status has changed either way
         val outputExtension = config.getOutputExtensionByDocType(docType)
-        val draftFile = File(outputFilename, config.draftSuffix + outputExtension)
+        val draftFile = outputFile.resolveSibling(outputFile.name + config.draftSuffix + outputExtension)
         if (draftFile.exists()) {
             Files.delete(draftFile.toPath())
         }
 
-        val publishedFile = File(outputFilename + outputExtension)
+        val publishedFile = outputFile.resolveSibling(outputFile.name + outputExtension)
         if (publishedFile.exists()) {
             Files.delete(publishedFile.toPath())
         }
 
-        if (content.status == ModelAttributes.Status.DRAFT) {
-            outputFilename += config.draftSuffix
+        val finalOutputFile = if (content.status == ModelAttributes.Status.DRAFT) {
+            outputFile.resolveSibling(outputFile.name + config.draftSuffix + outputExtension)
+        } else {
+            publishedFile
         }
 
-        val outputFile = File(outputFilename + outputExtension)
         val model = TemplateModel().apply {
             this.content = content
             this.renderer = renderingEngine
         }
 
         try {
-            createWriter(outputFile).use { out ->
+            createWriter(finalOutputFile).use { out ->
                 renderingEngine.renderDocument(model, findTemplateName(docType), out)
             }
-            log.info("Rendering [{}]... done!", outputFile)
+            log.info("Rendering [{}]... done!", finalOutputFile)
         } catch (e: Exception) {
-            log.error("Rendering [{}]... failed!", outputFile, e)
-            throw Exception("Failed to render file " + outputFile.absolutePath + ". Cause: " + e.message, e)
+            log.error("Rendering [{}]... failed!", finalOutputFile, e)
+            throw Exception("Failed to render file " + finalOutputFile.absolutePath + ". Cause: " + e.message, e)
         }
     }
 
@@ -294,7 +297,7 @@ class Renderer {
         for (tag in db.allTags) {
             try {
                 val ext = config.outputExtension ?: ""
-                val path = File(config.destinationFolder, tagPath + fS + tag + ext)
+                val path = config.destinationFolder.resolve(tagPath).resolve(tag + ext)
                 val map = buildSimpleModel(ModelAttributes.TAG).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
@@ -326,7 +329,7 @@ class Renderer {
             try {
                 // Add an index file at root folder of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
-                val path = File(config.destinationFolder, tagPath + fS + "index" + ext)
+                val path = config.destinationFolder.resolve(tagPath).resolve("index$ext")
                 val map = buildSimpleModel(ModelAttributes.TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
@@ -381,7 +384,7 @@ class Renderer {
         override val model: TemplateModel
 
         constructor(fileName: String, model: TemplateModel, templateType: String)
-                : super(File(config.destinationFolder, fileName), fileName, findTemplateName(templateType))
+                : super(config.destinationFolder.resolve(fileName), fileName, findTemplateName(templateType))
         {
             this.model = model
         }
@@ -401,7 +404,7 @@ class Renderer {
         }
 
         constructor(filename: String, allInOneName: String) : super(
-                File(config.destinationFolder, fS + filename),
+                config.destinationFolder.resolve(filename),
                  allInOneName,
                 findTemplateName(allInOneName)
              )
@@ -413,7 +416,7 @@ class Renderer {
          * Constructor added due to known use of a allInOneName which is used for name, template and content
          */
         constructor(allInOneName: String) : this(
-            File(config.destinationFolder.path + fS + allInOneName + (config.outputExtension ?: "")),
+            config.destinationFolder.resolve(allInOneName + (config.outputExtension ?: "")),
             allInOneName
         )
 

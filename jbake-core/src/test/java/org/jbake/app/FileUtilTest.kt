@@ -25,10 +25,10 @@ class FileUtilTest {
     @Test
     fun testIsFileInDirectory() {
         val fixtureDir = File(this.javaClass.getResource("/fixture").file)
-        val jbakeFile = File(fixtureDir.getCanonicalPath() + File.separatorChar + "jbake.properties")
+        val jbakeFile = File(fixtureDir, "jbake.properties")
         assertTrue("jbake.properties expected to be in /fixture directory", isFileInDirectory(jbakeFile, fixtureDir))
 
-        val contentFile = File(fixtureDir.getCanonicalPath() + File.separatorChar + "content" + File.separatorChar + "projects.html")
+        val contentFile = File(File(fixtureDir, "content"), "projects.html")
         assertTrue("projects.html expected to be nested in the /fixture directory", isFileInDirectory(contentFile, fixtureDir))
 
         val contentDir = contentFile.getParentFile()

@@ -59,12 +59,12 @@ class RendererTest {
 
         val content = DocumentModel()
         content.type = "page"
-        content.uri = "/$FOLDER/$FILENAME"
+        content.uri = "$FOLDER/$FILENAME"
         content.status = "published"
 
         renderer.render(content)
 
-        val outputFile = File(outputPath.absolutePath + File.separatorChar + FOLDER + File.separatorChar + FILENAME)
+        val outputFile = outputPath.resolve(FOLDER).resolve(FILENAME)
         assertThat(outputFile).isFile()
     }
 }

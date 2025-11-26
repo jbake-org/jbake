@@ -2,7 +2,6 @@ package org.jbake.app.template
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions.assertThat
-import org.jbake.util.PathConstants.fS
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -23,7 +22,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
 
         renderer.renderIndexPaging("index.html")
 
-        val outputFile = File(destinationFolder, 2.toString() + fS + "index.html")
+        val outputFile = File(File(destinationFolder, "2"), "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in getOutputStrings("index")) {
