@@ -32,8 +32,11 @@ jobs:
 
             - name: Upload test reports
               if: always()
-              uses: actions/upload-test-results@v2
+              uses: actions/upload-artifact@v4
               with:
                   files: |
                       **/target/surefire-reports/*.xml
                       **/target/failsafe-reports/*.xml
+
+            - name: Publish Test Results
+              uses: EnricoMi/publish-unit-test-result-action@v2.21.0
