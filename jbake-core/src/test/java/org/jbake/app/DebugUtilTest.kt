@@ -1,7 +1,7 @@
 package org.jbake.app
 
 import org.jbake.util.DebugUtil.printMap
-import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
@@ -26,11 +26,11 @@ class DebugUtilTest {
         val printed = String(baos.toByteArray(), StandardCharsets.UTF_8)
         println(printed)
 
-        Assert.assertTrue(printed.contains("stringKey :: stringVal"))
+        assertTrue(printed.contains("stringKey :: stringVal"))
         /// Removed, as I see no reason to support null keys.
         //Assert.assertTrue(printed.contains("null :: forNullKey"))
-        Assert.assertTrue(printed.contains("forNullVal :: null"))
-        Assert.assertTrue(printed.contains("forCharset :: UTF-8"))
-        Assert.assertTrue(printed.contains("forNonSerializableVal :: java.lang.Exception: nonSerializableVal"))
+        assertTrue(printed.contains("forNullVal :: null"))
+        assertTrue(printed.contains("forCharset :: UTF-8"))
+        assertTrue(printed.contains("forNonSerializableVal :: java.lang.Exception: nonSerializableVal"))
     }
 }

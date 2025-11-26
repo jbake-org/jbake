@@ -7,7 +7,7 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
-import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -205,26 +205,26 @@ class ParserTest {
 
     @Test fun parseValidHTMLFile() {
         val documentModel = parser.processFile(validHTMLFile)!!
-        Assert.assertNotNull(documentModel)
-        Assert.assertEquals("draft", documentModel.status)
-        Assert.assertEquals("post", documentModel.type)
-        Assert.assertEquals("This is a Title = This is a valid Title", documentModel.title)
-        Assert.assertNotNull(documentModel.date)
+        assertNotNull(documentModel)
+        assertEquals("draft", documentModel.status)
+        assertEquals("post", documentModel.type)
+        assertEquals("This is a Title = This is a valid Title", documentModel.title)
+        assertNotNull(documentModel.date)
         val cal = Calendar.getInstance()
         cal.setTime(documentModel.date)
-        Assert.assertEquals(8, cal.get(Calendar.MONTH).toLong())
-        Assert.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH).toLong())
-        Assert.assertEquals(2013, cal.get(Calendar.YEAR).toLong())
+        assertEquals(8, cal.get(Calendar.MONTH).toLong())
+        assertEquals(2, cal.get(Calendar.DAY_OF_MONTH).toLong())
+        assertEquals(2013, cal.get(Calendar.YEAR).toLong())
     }
 
     @Test fun parseInvalidHTMLFile() {
         val documentModel = parser.processFile(invalidHTMLFile)
-        Assert.assertNull(documentModel)
+        assertNull(documentModel)
     }
 
     @Test fun parseInvalidExtension() {
         val documentModel = parser.processFile(invalidExtensionFile)
-        Assert.assertNull(documentModel)
+        assertNull(documentModel)
     }
 
 
@@ -232,9 +232,9 @@ class ParserTest {
         config.headerSeparator = customHeaderSeparator
 
         val documentModel = parser.processFile(validMarkdownFileWithCustomHeader)!!
-        Assert.assertNotNull(documentModel)
-        Assert.assertEquals("draft", documentModel.status)
-        Assert.assertEquals("post", documentModel.type)
+        assertNotNull(documentModel)
+        assertEquals("draft", documentModel.status)
+        assertEquals("post", documentModel.type)
         assertThat(documentModel.body).contains("<p>A paragraph</p>")
     }
 
@@ -242,10 +242,10 @@ class ParserTest {
         config.setDefaultStatus("published")
 
         val documentModel = parser.processFile(validMarkdownFileWithDefaultStatus)!!
-        Assert.assertNotNull(documentModel)
-        Assert.assertEquals("published", documentModel.status)
-        Assert.assertEquals("post", documentModel.type)
-        Assert.assertEquals(true, documentModel.cached)
+        assertNotNull(documentModel)
+        assertEquals("published", documentModel.status)
+        assertEquals("post", documentModel.type)
+        assertEquals(true, documentModel.cached)
     }
 
     @Test fun parseMarkdownFileWithDefaultTypeAndStatus() {
@@ -253,9 +253,9 @@ class ParserTest {
         config.setDefaultType("page")
 
         val documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus)!!
-        Assert.assertNotNull(documentModel)
-        Assert.assertEquals("published", documentModel.status)
-        Assert.assertEquals("page", documentModel.type)
+        assertNotNull(documentModel)
+        assertEquals("published", documentModel.status)
+        assertEquals("page", documentModel.type)
     }
 
     @Test fun parseMarkdownFileWithDisabledCache() {
@@ -263,7 +263,7 @@ class ParserTest {
         config.setDefaultType("page")
 
         val documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus)!!
-        Assert.assertEquals(false, documentModel.cached)
+        assertEquals(false, documentModel.cached)
     }
 
     @Test fun parseInvalidMarkdownFileWithoutDefaultStatus() {
@@ -271,12 +271,12 @@ class ParserTest {
         config.setDefaultType("page")
 
         val documentModel = parser.processFile(invalidMarkdownFileWithoutDefaultStatus)
-        Assert.assertNull(documentModel)
+        assertNull(documentModel)
     }
 
     @Test fun parseInvalidMarkdownFile() {
         val documentModel = parser.processFile(invalidMDFile)
-        Assert.assertNull(documentModel)
+        assertNull(documentModel)
     }
 
     @Test fun sanitizeKeysAndValues() {

@@ -13,7 +13,8 @@ import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
 import org.junit.After
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -70,7 +71,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         addDocumentType("paper")
         db.updateSchema()
 
-        Assert.assertEquals(".html", config.outputExtension)
+        assertEquals(".html", config.outputExtension)
 
         val crawler = Crawler(db, config)
         crawler.crawl()
@@ -153,7 +154,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         content!!.uri = filename
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -172,7 +173,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         content!!.uri = filename
         renderer!!.render(content)
         val outputFile = File(destinationFolder, filename)
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -187,7 +188,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         //validate
         val outputFile = File(destinationFolder, "index.html")
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -199,7 +200,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     @Test fun renderFeed() {
         renderer.renderFeed("feed.xml")
         val outputFile = File(destinationFolder, "feed.xml")
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -211,7 +212,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     @Test fun renderArchive() {
         renderer.renderArchive("archive.html")
         val outputFile = File(destinationFolder, "archive.html")
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -225,7 +226,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val outputFile = destinationFolder.resolve("tags").resolve("blog.html")
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags")) {
             assertThat(output).contains(string)
@@ -237,7 +238,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         renderer.renderTags("tags")
         val outputFile = destinationFolder.resolve("tags").resolve("index.html")
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getOutputStrings("tags-index")) {
             assertThat(output).contains(string)
@@ -250,7 +251,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         renderer.renderSitemap("sitemap.xml")
         val outputFile = File(destinationFolder, "sitemap.xml")
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())

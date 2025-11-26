@@ -5,6 +5,8 @@ import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.junit.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.util.*
@@ -41,12 +43,12 @@ abstract class ContentStoreIntegrationTest {
         @BeforeClass @JvmStatic
         fun setUpClass() {
             sourceFolder = TestUtils.testResourcesAsSourceFolder
-            Assert.assertTrue("Cannot find sample data structure!", sourceFolder!!.exists())
+            assertTrue("Cannot find sample data structure!", sourceFolder!!.exists())
 
             config = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
             config.setSourceFolder(sourceFolder)
 
-            Assert.assertEquals(".html", config.outputExtension)
+            assertEquals(".html", config.outputExtension)
             config.databaseStore = (storageType.toString())
 
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed

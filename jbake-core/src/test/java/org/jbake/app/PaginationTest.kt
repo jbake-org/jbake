@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jbake.addTestDocument
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes.documentTypes
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.*
@@ -47,6 +47,6 @@ class PaginationTest : ContentStoreIntegrationTest() {
             pageCount++
             paginationOffset += 2
         }
-        Assert.assertEquals(4, pageCount.toLong())
+        assertEquals(4, pageCount.toLong())
     }
 }

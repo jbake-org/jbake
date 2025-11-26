@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
 import org.jbake.app.Renderer
-import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 import java.nio.charset.Charset
@@ -71,7 +71,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
         content!!.uri = filename
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
-        Assert.assertTrue(outputFile.exists())
+        assertTrue(outputFile.exists())
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
