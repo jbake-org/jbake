@@ -36,11 +36,12 @@ class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T
         // We'll accumulate extra custom data to pass to RenderContext (e.g., normalized config map)
         val extraData: MutableMap<String, Any> = HashMap()
 
+        @Suppress("DEPRECATION")
         val configObj: org.jbake.app.configuration.JBakeConfiguration = when (val raw = model["config"]) {
             is org.jbake.app.configuration.JBakeConfiguration -> raw
             is Map<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
-                val rawMap = raw as Map<String, Any>
+                val rawMap = raw as? Map<String, Any> ?: emptyMap()
 
                 val normalizedMap: MutableMap<String, Any> = HashMap(rawMap)
                 for ((k, v) in rawMap.entries)
@@ -50,18 +51,15 @@ class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T
                 extraData["__raw_config_map"] = normalizedMap
                 val cc = CompositeConfiguration()
                 cc.addConfiguration(MapConfiguration(normalizedMap))
-                @Suppress("DEPRECATION")
                 DefaultJBakeConfiguration(cc)
             }
             null -> {
                 val cc = CompositeConfiguration()
-                @Suppress("DEPRECATION")
                 DefaultJBakeConfiguration(cc)
             }
             else -> {
                 log.warn("Unsupported config type in model: {}. Falling back to empty configuration.", raw::class)
                 val cc = CompositeConfiguration()
-                @Suppress("DEPRECATION")
                 DefaultJBakeConfiguration(cc)
             }
         }

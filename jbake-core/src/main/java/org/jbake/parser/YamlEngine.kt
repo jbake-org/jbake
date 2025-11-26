@@ -22,7 +22,10 @@ class YamlEngine : MarkupEngine() {
 
                 when (val result = yaml.load<Any>(inputStream)) {
                     is MutableList<*> -> model.put("data", result)
-                    is MutableMap<*, *> -> model.putAll(result as Map<String, Any>)
+                    is MutableMap<*, *> -> {
+                        val map = result as? Map<String, Any> ?: emptyMap()
+                        model.putAll(map)
+                    }
                     else -> log.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
                 }
             }

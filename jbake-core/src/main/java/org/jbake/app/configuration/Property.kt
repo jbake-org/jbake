@@ -7,18 +7,14 @@ class Property @JvmOverloads constructor(
     @JvmField val description: String?,
     @JvmField val group: Group = Group.DEFAULT
 ) : Comparable<Property> {
-    override fun toString(): String {
-        return this.key
-    }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) {
-            return true
-        }
-        if (o == null || javaClass != o.javaClass) {
-            return false
-        }
-        val property = o as Property
+    override fun toString() = this.key
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+
+        val property = other as Property
         return key == property.key &&
                 description == property.description && group == property.group
     }

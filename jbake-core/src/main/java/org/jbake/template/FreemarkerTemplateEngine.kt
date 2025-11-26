@@ -95,8 +95,8 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
 
                     // Overlay any values present in the eager model's config
                     @Suppress("UNCHECKED_CAST")
-                    val eagerMap = eagerModel.toMap() as MutableMap<String, Any>
-                    val cfgAny = eagerMap[ModelAttributes.CONFIG]
+                    val map = eagerModel.toMap() as? MutableMap<String, Any> ?: mutableMapOf()
+                    val cfgAny = map[ModelAttributes.CONFIG]
                     if (cfgAny is Map<*, *>)
                         (cfgAny as? Map<String, Any>)?.let { merged.putAll(it) }
                     return wrapper.wrap(merged)

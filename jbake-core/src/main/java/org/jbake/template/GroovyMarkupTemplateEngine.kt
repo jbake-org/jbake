@@ -5,6 +5,7 @@ import groovy.text.markup.TemplateConfiguration
 import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.ModelAttributes.DATE
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import java.io.File
@@ -72,7 +73,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
                 try {
                     // Pass a plain map to avoid invoking the overridden get and causing recursion.
                     @Suppress("UNCHECKED_CAST")
-                    val plainMap = (model as Map<String, Any>).toMutableMap()
+                    val plainMap = (model as? Map<String, Any>)?.toMutableMap() ?: return null
                     val extracted = extractors.extractAndTransform(db, key, plainMap, NoopAdapter())
                     return transformForGroovy(extracted)
                 } catch (e: NoModelExtractorException) {
@@ -91,11 +92,12 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     /** Recursively wrap date fields in SafeDate to prevent NPE in Groovy templates */
     private fun transformForGroovy(value: Any?): Any? = when (value) {
         null -> null
-        is org.jbake.model.DocumentModel -> HashMap(value).apply { put(org.jbake.model.ModelAttributes.DATE, SafeDate(value.date)) }
-        is org.jbake.model.BaseModel -> HashMap(value).apply { put(org.jbake.model.ModelAttributes.DATE, SafeDate(value[org.jbake.model.ModelAttributes.DATE] as? java.util.Date)) }
+        is org.jbake.model.DocumentModel -> HashMap(value).apply { put(DATE, SafeDate(value.date)) }
+        is org.jbake.model.BaseModel -> HashMap(value).apply { put(DATE, SafeDate(value[DATE] as? java.util.Date)) }
         is Map<*, *> -> {
             @Suppress("UNCHECKED_CAST")
-            HashMap(value as Map<String, Any?>).apply { put(org.jbake.model.ModelAttributes.DATE, SafeDate(value[org.jbake.model.ModelAttributes.DATE] as? java.util.Date)) }
+            val map = value as? Map<String, Any?> ?: return value
+            HashMap(map).apply { put(DATE, SafeDate(map[DATE] as? java.util.Date)) }
         }
         is Collection<*> -> value.map(::transformForGroovy)
         else -> value

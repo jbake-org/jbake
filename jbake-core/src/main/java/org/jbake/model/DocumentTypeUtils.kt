@@ -2,7 +2,7 @@ package org.jbake.model
 
 object DocumentTypeUtils {
     fun unpluralize(pluralized: String): String {
-        require(!((pluralized == null) || (pluralized.isEmpty()))) { "pluralized string should not be null or length should be bigger than zero" }
+        require(!(pluralized.isEmpty())) { "pluralized string should not be null or length should be bigger than zero" }
         val documentTypes = DocumentTypes.documentTypes
 
         val unpluralizedDoctype = pluralized.dropLast(1)

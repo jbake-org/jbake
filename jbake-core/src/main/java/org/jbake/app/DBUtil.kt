@@ -46,9 +46,9 @@ object DBUtil {
      * @return input entry as String[]
      */
     fun toStringArray(entry: Any): Array<String> = when (entry) {
-        is Array<*> -> entry as Array<String>
-        is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray()
-        is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
+        is Array<*> -> entry as? Array<String> ?: emptyArray()
+        is OTrackedList<*> -> (entry as? OTrackedList<String>)?.toTypedArray() ?: emptyArray()
+        is ArrayList<*> -> (entry as? ArrayList<String>)?.toTypedArray() ?: emptyArray()
         else -> arrayOf()
     }
 }
