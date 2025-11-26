@@ -115,8 +115,9 @@
                         <program>
                             <mainClass>${main.class}</mainClass>
                             <name>${app.name}</name>
+                            <!-- See https://www.mojohaus.org/appassembler/appassembler-maven-plugin/usage-daemon-jvmsettings.html -->
                             <jvmSettings>
-                                <maxMemory>512m</maxMemory>
+                                <maxMemorySize>512m</maxMemorySize>
                                 <extraArguments>
                                     <extraArgument>-XX:MaxDirectMemorySize=512m</extraArgument>
                                     <extraArgument>-Djna.nosys=true</extraArgument>
