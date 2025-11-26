@@ -76,7 +76,7 @@
         <version.jcommander>1.85</version.jcommander>
         <version.jetty.server>11.0.26</version.jetty.server>
         <version.json.simple>1.1.1</version.json.simple>
-        <version.jade4j>1.3.2</version.jade4j>
+        <version.pug4j>2.4.0</version.pug4j>
         <version.jsoup>1.21.2</version.jsoup>
         <version.jgit>7.4.0.202509020913-r</version.jgit>
         <version.logback>1.5.21</version.logback>
@@ -119,7 +119,7 @@
             <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${version.flexmark}</version></dependency>
             <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId><version>${version.commons.beanutils}</version></dependency>
             <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId><version>${version.commons.io}</version></dependency>
-            <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><version>${version.jade4j}</version></dependency>
+            <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId><version>${version.pug4j}</version></dependency>
             <dependency><groupId>info.picocli</groupId><artifactId>picocli</artifactId><version>${version.picocli}</version></dependency>
             <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><version>${version.pebble}</version></dependency>
             <dependency><groupId>org.apache.commons</groupId><artifactId>commons-configuration2</artifactId><version>${version.commons.configuration}</version></dependency>

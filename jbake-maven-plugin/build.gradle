@@ -62,7 +62,7 @@ dependencies {
     implementation "org.apache.groovy:groovy-dateutil:$groovyVersion"
     implementation "org.freemarker:freemarker:$freemarkerVersion"
     implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
-    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    implementation "de.neuland-bfi:pug4j:$pug4jVersion"
     implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
     implementation "io.pebbletemplates:pebble:$pebbleVersion"
