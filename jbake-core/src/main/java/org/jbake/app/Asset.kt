@@ -99,21 +99,18 @@ class Asset {
         val assetFolderPath = config.assetFolder.toPath()
         val contentFolderPath = config.contentFolder.toPath()
 
-        // Try to get relative path from asset folder
+        // Try to get relative path from asset folder.
         val relativePath = try {
-            if (assetPath.startsWith(assetFolderPath)) {
-                assetFolderPath.relativize(assetPath)
-            } else if (assetPath.startsWith(contentFolderPath)) {
+            when {
+                assetPath.startsWith(assetFolderPath) -> assetFolderPath.relativize(assetPath)
                 // Asset is in content folder, strip that path
-                contentFolderPath.relativize(assetPath)
-            } else {
+                assetPath.startsWith(contentFolderPath) -> contentFolderPath.relativize(assetPath)
                 // Fallback to the file name
-                assetPath.fileName ?: assetPath
+                else -> assetPath.fileName ?: assetPath
             }
-        } catch (e: Exception) {
-            // On error, just return the last component
-            assetPath.fileName ?: assetPath
         }
+        // On error, just return the last component.
+        catch (e: Exception) { assetPath.fileName ?: assetPath }
 
         return relativePath.toString()
     }
@@ -124,11 +121,8 @@ class Asset {
             Arrays.sort(assets)
             for (asset in assets) {
                 val target = File(targetFolder, asset.getName())
-                if (asset.isFile()) {
-                    copyFile(asset, target)
-                } else if (asset.isDirectory()) {
-                    copy(asset, target, filter)
-                }
+                if (asset.isFile()) copyFile(asset, target)
+                else if (asset.isDirectory()) copy(asset, target, filter)
             }
         }
     }
