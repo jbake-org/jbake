@@ -32,6 +32,7 @@
         <dependency><groupId>com.sparkjava</groupId><artifactId>spark-core</artifactId><version>${version.spark}</version></dependency>
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><version>${version.flexmark}</version></dependency>
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${version.flexmark}</version></dependency>
+        <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><version>${version.jade4j}</version></dependency>
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId><version>${version.pug4j}</version></dependency>
         <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><version>${version.pebble}</version></dependency>
         <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><version>${version.asciidoctorj}</version></dependency>

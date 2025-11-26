@@ -1,76 +1,79 @@
 package org.jbake.template
 
-import de.neuland.jade4j.Jade4J
-import de.neuland.jade4j.JadeConfiguration
-import de.neuland.jade4j.filter.CDATAFilter
-import de.neuland.jade4j.filter.CssFilter
-import de.neuland.jade4j.filter.JsFilter
-import de.neuland.jade4j.model.JadeModel
-import de.neuland.jade4j.template.FileTemplateLoader
-import de.neuland.jade4j.template.JadeTemplate
-import de.neuland.jade4j.template.TemplateLoader
+import de.neuland.pug4j.Pug4J
+import de.neuland.pug4j.PugConfiguration
+import de.neuland.pug4j.filter.CDATAFilter
+import de.neuland.pug4j.filter.CssFilter
+import de.neuland.pug4j.filter.JsFilter
+import de.neuland.pug4j.model.PugModel
+import de.neuland.pug4j.template.FileTemplateLoader
+import de.neuland.pug4j.template.PugTemplate
 import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
-import org.jbake.util.PathUtils
 import java.io.File
 import java.io.IOException
 import java.io.Writer
+import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- *  Legacy. Jade is now Pug. Use PugTemplateEngine instead and migrate your templates.
- */
-class JadeTemplateEngine : AbstractTemplateEngine {
 
-    private val jadeConfiguration = JadeConfiguration()
+/**
+ * Renders pages using the [Pug](https://pugjs.org/) template language (formerly known as Jade).
+ * Migrated to pug4j 2.x which uses de.neuland.pug4j package names.
+ */
+class PugTemplateEngine : AbstractTemplateEngine {
+
+    private val pugConfiguration = PugConfiguration()
 
     @Deprecated("")
     constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath) {
-        initJadeConfiguration()
+            : super(config, db, destination, templatesPath) {
+        initPugConfiguration()
     }
 
     constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
-        initJadeConfiguration()
+        initPugConfiguration()
     }
 
-    private fun initJadeConfiguration() {
-        // Use PathUtil.dirPrefix to provide a proper directory prefix string (ensures trailing separator)
-        val loader: TemplateLoader = FileTemplateLoader(PathUtils.ensureTrailingSeparatorForDirectory(config.templateFolder), config.templateEncoding)
-        jadeConfiguration.templateLoader = loader
-        jadeConfiguration.mode = Jade4J.Mode.XHTML
-        jadeConfiguration.isPrettyPrint = true
-        jadeConfiguration.setFilter(FILTER_CDATA, CDATAFilter())
-        jadeConfiguration.setFilter(FILTER_SCRIPT, JsFilter())
-        jadeConfiguration.setFilter(FILTER_STYLE, CssFilter())
-        jadeConfiguration.sharedVariables["formatter"] = FormatHelper()
+    private fun initPugConfiguration() {
+        // pug4j 2.x only supports .pug extension (not .jade)
+        val templatePathStr = config.templateFolder.absolutePath
+        val charset = Charset.forName(config.templateEncoding ?: "UTF-8")
+        val loader = FileTemplateLoader(templatePathStr, charset, "pug")
+
+        pugConfiguration.templateLoader = loader
+        pugConfiguration.mode = Pug4J.Mode.XHTML
+        pugConfiguration.isPrettyPrint = true
+        pugConfiguration.setFilter(FILTER_CDATA, CDATAFilter())
+        pugConfiguration.setFilter(FILTER_SCRIPT, JsFilter())
+        pugConfiguration.setFilter(FILTER_STYLE, CssFilter())
+        pugConfiguration.sharedVariables["formatter"] = FormatHelper()
     }
 
     @Throws(RenderingException::class)
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
-            val template = jadeConfiguration.getTemplate(templateName)
-
+            val template = pugConfiguration.getTemplate(templateName)
             renderTemplate(template, model, writer)
         } catch (e: IOException) {
             throw RenderingException(e)
         }
     }
 
-    fun renderTemplate(template: JadeTemplate, model: TemplateModel, writer: Writer) {
-        val jadeModel = wrap(model)
-        jadeModel.putAll(jadeConfiguration.sharedVariables)
-        template.process(jadeModel, writer)
+    fun renderTemplate(template: PugTemplate, model: TemplateModel, writer: Writer) {
+        val pugModel = wrap(model)
+        pugModel.putAll(pugConfiguration.sharedVariables)
+        template.process(pugModel, writer, pugConfiguration)
     }
 
-    private fun wrap(model: TemplateModel): JadeModel {
-        return object : JadeModel(model) {
+    private fun wrap(model: TemplateModel): PugModel {
+        return object : PugModel(model) {
             override fun get(key: String): Any? {
-                // First check if it's in the JadeModel map itself (e.g., shared variables like formatter)
+                // First check if it's in the PugModel map itself (e.g., shared variables like formatter)
                 super.get(key)?.let { return it }
 
                 return try {
@@ -91,7 +94,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
             return formatters.getOrPut(pattern) { SimpleDateFormat(pattern) }.format(date)
         }
 
-        // Provide an HTML-escaping helper method accessible from Jade/JEXL as formatter.escape(...)
+        // Provide an HTML-escaping helper method accessible from Pug/Jade templates as formatter.escape(...)
         fun escape(input: Any?): String {
             val s = input?.toString() ?: ""
             return buildString(s.length) {

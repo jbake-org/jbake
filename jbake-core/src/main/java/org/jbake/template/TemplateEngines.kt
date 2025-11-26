@@ -9,23 +9,21 @@ import java.lang.reflect.Constructor
 import java.util.*
 
 /**
- *
- *
  * A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath.
  * New rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath (recommanded).
  *
- * The descriptor file must be found in *META-INF* directory and named *org.jbake.parser.TemplateEngines.properties*. The format of the file is easy:
+ * The descriptor file must be found in *META-INF* directory and named [org.jbake.parser.TemplateEngines.properties]. The format of the file is easy:
  *
  *   ```
  *   org.jbake.parser.FreeMarkerRenderer=ftl
  *   org.jbake.parser.GroovyRenderer=groovy,gsp
  *   ```
  *
- * where the key is the class of the engine (must extend [AbstractTemplateEngine] and have a 4-arg constructor
- * and the value is a comma-separated list of file extensions that this engine is capable of proceeding.
+ * ...where
+ *   - the key is the class of the engine (must extend [AbstractTemplateEngine] and have a 4-arg constructor,
+ *   - the value is a comma-separated list of file extensions that this engine is capable of proceeding.
  *
  * Rendering engines are singletons, so are typically used to initialize the underlying template engines.
- *
  *
  * This class loads the engines only if they are found on classpath. If not, the engine is not registered.
  * This allows JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit for embedding.
@@ -62,6 +60,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
                 for (entry in props.entries) {
                     val className = entry.key as String
                     val extensions = (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }
+                    log.info("Registering template engine: {} for extensions: {}", className, extensions)
                     registerEngine(config, db, className, extensions)
                 }
             }
@@ -84,7 +83,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
          *
          * @param engineClassName engine class, used both as a hint to find it and to create the engine itself.  @return null if the engine is not available, an instance of the engine otherwise
          */
-        private fun tryLoadEngine(config: JBakeConfiguration, db: ContentStore?, engineClassName: String): AbstractTemplateEngine? {
+        private fun tryLoadEngine(config: JBakeConfiguration, db: ContentStore, engineClassName: String): AbstractTemplateEngine? {
             try {
                 val engineClass = Class.forName(engineClassName, false, TemplateEngines::class.java.getClassLoader()) as Class<out AbstractTemplateEngine>
                 val ctor: Constructor<out AbstractTemplateEngine> = engineClass.getConstructor(JBakeConfiguration::class.java, ContentStore::class.java)
@@ -92,7 +91,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
             }
             catch (e: Throwable) {
                 // Not all engines might be necessary, therefore only emit class loading issue with level warn.
-                log.debug("Template engine not available: {}", engineClassName)
+                log.debug("Template engine not available: $engineClassName", e)
                 return null
             }
         }
