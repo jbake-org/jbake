@@ -7,31 +7,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 
-/**
- * Parses a File for content.
- */
-class Parser
-/**
- * Creates a new instance of Parser.
- *
- * @param config Project configuration
- */(private val config: JBakeConfiguration) {
-    /**
-     * Process the file by parsing the contents.
-     *
-     * @param file File input for parsing
-     * @return The contents of the file
-     */
-    fun processFile(file: File): DocumentModel? {
-        val engine = Engines.get(FileUtil.fileExt(file)) ?: run {
-            log.error("Unable to find suitable markup engine for {}", file)
+class Parser(private val config: JBakeConfiguration) {
+
+    fun processFile(inputFile: File): DocumentModel? {
+        val engine = Engines.get(FileUtil.fileExt(inputFile)) ?: run {
+            log.error("Unable to find suitable markup engine for {}", inputFile)
             return null
         }
-
-        return engine.parse(config, file)
+        return engine.parse(config, inputFile)
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(Parser::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(Parser::class.java)
 }

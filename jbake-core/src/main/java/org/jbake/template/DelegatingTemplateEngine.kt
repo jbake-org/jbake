@@ -43,15 +43,15 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
             base.forEach { (k, v) -> m.putIfAbsent(k.replace('_', '.'), v) }
             m
         }
-        // Also keep a reference to the original configuration object so typed extractors can access
-        // the configuration with its original dotted keys. ModelExtractorAdapter will prefer this
-        // when reconstructing a RenderContext.
+        // Also keep a reference to the original configuration object so typed extractors can access the configuration with its original dotted keys.
+        // ModelExtractorAdapter will prefer this when reconstructing a RenderContext.
         model["jbake_config"] = config
 
-        // if default template exists we will use it
+        // If default template exists we will use it.
         val templateFolder = config.templateFolder
         var templateFile = File(templateFolder, templateName)
         var theTemplateName = templateName
+
         if (!templateFile.exists()) {
             log.info("Default template: {} was not found, searching for others...", templateName)
             // if default template does not exist then check if any alternative engine templates exist
@@ -65,16 +65,13 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
                 }
             }
         }
+
         val ext = FileUtil.fileExt(theTemplateName)
         val engine = renderers.getEngine(ext)
-        if (engine != null) {
+        if (engine != null)
             engine.renderDocument(model, theTemplateName, writer)
-        } else {
-            log.error("Warning - No template engine found for template: {}", theTemplateName)
-        }
+        else log.error("Warning - No template engine found for template: {}", theTemplateName)
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(DelegatingTemplateEngine::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(DelegatingTemplateEngine::class.java)
 }

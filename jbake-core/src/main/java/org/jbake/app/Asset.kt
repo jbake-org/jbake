@@ -140,7 +140,5 @@ class Asset {
         }
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(Asset::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(Asset::class.java)
 }

@@ -62,8 +62,5 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
     }
 
-
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(JBakeConfigurationInspector::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(JBakeConfigurationInspector::class.java)
 }

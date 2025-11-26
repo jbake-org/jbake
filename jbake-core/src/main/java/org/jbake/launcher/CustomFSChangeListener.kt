@@ -31,7 +31,5 @@ class CustomFSChangeListener(private val config: JBakeConfiguration) : FileListe
         oven.bake(File(file.name.path))
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(CustomFSChangeListener::class.java)
-    }
+    private val log: Logger = LoggerFactory.getLogger(CustomFSChangeListener::class.java)
 }

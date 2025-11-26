@@ -72,9 +72,6 @@ class YamlEngine : MarkupEngine() {
         return key.startsWith(JBAKE_PREFIX)
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(YamlEngine::class.java)
-
-        const val JBAKE_PREFIX: String = "jbake-"
-    }
+    val JBAKE_PREFIX: String = "jbake-"
+    private val log: Logger = LoggerFactory.getLogger(YamlEngine::class.java)
 }

@@ -174,7 +174,6 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(AsciidoctorEngine::class.java)
         const val JBAKE_PREFIX: String = "jbake-"
         const val REVDATE_KEY: String = "revdate"
 
@@ -184,4 +183,6 @@ class AsciidoctorEngine : MarkupEngine() {
         /** Comma-separated gem names */
         private const val OPT_REQUIRES = "requires"
     }
+
+    private val log: Logger = LoggerFactory.getLogger(AsciidoctorEngine::class.java)
 }

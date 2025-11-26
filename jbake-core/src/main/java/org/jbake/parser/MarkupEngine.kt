@@ -1,9 +1,6 @@
 package org.jbake.parser
 
-import org.apache.commons.configuration2.CompositeConfiguration
-import org.apache.commons.configuration2.Configuration
 import org.apache.commons.io.IOUtils
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
@@ -19,9 +16,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Base class for markup engine wrappers. A markup engine is responsible for rendering
- * markup in a source file and exporting the result into the [contents][ParserContext.getDocumentModel] map.
- *
+ * Base class for markup engine wrappers. A markup engine is responsible for rendering markup in a source file
+ * and exporting the result into the [contents][ParserContext.documentModel] map.
  *
  * This specific engine does nothing, meaning that the body is rendered as raw contents.
  */
@@ -34,27 +30,19 @@ abstract class MarkupEngine : ParserEngine {
      *
      * @return true if this markup engine has enough context to process this document. false otherwise
      */
-    fun validate(context: ParserContext): Boolean {
-        return true
-    }
+    fun validate(context: ParserContext) = true
 
     /**
      * Processes the document header. Usually subclasses will parse the document body and look for
      * specific header metadata and export it into [contents][ParserContext.getDocumentModel] map.
      */
-    open fun processHeader(context: ParserContext) {
-    }
+    open fun processHeader(context: ParserContext) {}
 
     /**
      * Processes the body of the document. Usually subclasses will parse the document body and render it,
      * exporting the result using the [ParserContext.setBody] method.
      */
-    open fun processBody(parserContext: ParserContext) {
-    }
-
-    override fun parse(config: Configuration, fileToParse: File, contentPath: String): MutableMap<String, Any> {
-        return parse(DefaultJBakeConfiguration((config as CompositeConfiguration)), fileToParse)!!
-    }
+    open fun processBody(parserContext: ParserContext) {}
 
     /**
      * Parse given file to extract as much infos as possible
@@ -122,16 +110,14 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     private fun sanitizeTags(context: ParserContext) {
-        if (context.tags != null) {
-            val tags = context.tags as Array<String>
-            for (i in tags.indices) {
-                tags[i] = sanitize(tags[i])
-                if (context.config.sanitizeTag) {
-                    tags[i] = tags[i].replace(" ", "-")
-                }
+        val tags = context.tags
+        for (i in tags.indices) {
+            tags[i] = sanitize(tags[i])
+            if (context.config.sanitizeTag) {
+                tags[i] = tags[i].replace(" ", "-")
             }
-            context.setTags(tags)
         }
+        context.setTags(tags)
     }
 
     private fun setModelDefaultsIfNotSetInHeader(context: ParserContext) {
@@ -264,8 +250,7 @@ abstract class MarkupEngine : ParserEngine {
         context.body = body
     }
 
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(MarkupEngine::class.java)
-        private const val UTF_8_BOM = "\uFEFF"
-    }
+
+    private val UTF_8_BOM = "\uFEFF"
+    private val log: Logger = LoggerFactory.getLogger(MarkupEngine::class.java)
 }

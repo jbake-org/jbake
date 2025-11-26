@@ -47,7 +47,6 @@ class Engines private constructor() {
     }
 
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(Engines::class.java)
         private val INSTANCE: Engines = Engines()
 
         init {
@@ -124,5 +123,7 @@ class Engines private constructor() {
             if (engine is ErrorEngine)
                 log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
         }
+
+        private val log: Logger = LoggerFactory.getLogger(Engines::class.java)
     }
 }
