@@ -55,23 +55,22 @@ open class GenerateMojo : AbstractMojo() {
         try {
             log.info("Starting JBake generation from: ${inputDirectory!!.path} to: ${outputDirectory!!.path}")
 
-            // TODO: At some point, reuse Oven
             val oven = Oven(createConfiguration())
-            oven.bake()
-            if (failOnError && !oven.errors.isEmpty()) throw MojoFailureException("Baked with " + oven.errors.size + " errors. Check output above for details!")
+            oven.bakeEverything()
+            if (failOnError && !oven.errors.isEmpty())
+                throw MojoFailureException("Baked with " + oven.errors.size + " errors. Check output above for details!")
 
             log.info("JBake generation completed successfully")
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             log.error("JBake generation failed for input: ${inputDirectory!!.path}, output: ${outputDirectory!!.path} - ${e.message}", e)
-
             throw MojoExecutionException("Failed to generate site from ${inputDirectory!!.path}", e)
         }
     }
 
     @Throws(JBakeException::class)
-    protected fun createConfiguration(): JBakeConfiguration {
-        val jBakeConfiguration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(inputDirectory!!, outputDirectory!!, isClearCache)
-        jBakeConfiguration.addConfiguration(this.project!!.properties)
-        return jBakeConfiguration
-    }
+    protected fun createConfiguration(): JBakeConfiguration =
+        JBakeConfigurationFactory()
+            .createDefaultJbakeConfiguration(inputDirectory!!, outputDirectory!!, isClearCache)
+            .apply { addConfiguration(project!!.properties) }
 }
