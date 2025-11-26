@@ -62,8 +62,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Runtime dependencies versions (synced from gradle.properties) -->
-        <version.asciidoctorj>2.5.13</version.asciidoctorj>
-        <version.asciidoctorj.diagram>2.3.1</version.asciidoctorj.diagram>
+        <version.asciidoctorj>3.0.1</version.asciidoctorj>
+        <version.asciidoctorj.diagram>3.0.1</version.asciidoctorj.diagram>
         <version.args4j>2.37</version.args4j>
         <version.commons.io>2.21.0</version.commons.io>
         <version.commons.configuration>2.12.0</version.commons.configuration>

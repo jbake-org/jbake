@@ -59,19 +59,14 @@ class Crawler {
             .getOrElse { log.error("Unable to build SHA1 hash for source file '$sourceFile'"); "" }
 
         val uri = buildURI(sourceFile)
-        val status = findDocumentStatus(uri, sha1)
 
-        val message = buildString {
-            append("Processing [").append(sourceFile.path).append("]... ")
-            when (status) {
-                DocumentStatus.UPDATED -> { log.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
-                DocumentStatus.IDENTICAL -> log.info("SAME:    " + sourceFile.path)
-                DocumentStatus.NEW -> log.info("NEW:     " + sourceFile.path)
-            }
+        when (findDocumentStatus(uri, sha1)) {
+            DocumentStatus.UPDATED -> { log.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
+            DocumentStatus.IDENTICAL -> log.info("SAME:    " + sourceFile.path)
+            DocumentStatus.NEW -> log.info("NEW:     " + sourceFile.path)
         }
-        log.info(message)
 
-        if (status != DocumentStatus.IDENTICAL)
+        if (findDocumentStatus(uri, sha1) != DocumentStatus.IDENTICAL)
             processSourceFile(sourceFile, sha1, uri)
     }
 

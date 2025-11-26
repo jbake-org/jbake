@@ -1,17 +1,20 @@
 package org.jbake.parser
 
-import org.asciidoctor.*
+import org.asciidoctor.Asciidoctor
+import org.asciidoctor.Attributes
+import org.asciidoctor.Options
+import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciidoctorJRuby
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
 /**
  * Renders documents in the asciidoc format using the Asciidoctor engine.
- *
- * TODO: Migrate to AsciidoctorJ 3.x and remove deprecated API usage.
+ * Migrated to AsciidoctorJ 3.x API.
  */
 @Suppress("UNCHECKED_CAST")
 class AsciidoctorEngine : MarkupEngine() {
@@ -20,6 +23,10 @@ class AsciidoctorEngine : MarkupEngine() {
     private var engine: Asciidoctor? = null
     private val engineLock = Any()
 
+    // Cache for gemPath and requires options
+    private var gemPath: String? = null
+    private var requires: List<String>? = null
+
     private fun getEngine(options: Options): Asciidoctor {
         engine?.let { return it }
 
@@ -27,20 +34,13 @@ class AsciidoctorEngine : MarkupEngine() {
             engine?.let { return it }
             log.info("Initializing Asciidoctor engine...")
 
-            val newEngine =
-                // AsciidoctorJ deprecated Options.map(), but there is no alternative as of 2025. See: https://github.com/asciidoctor/asciidoctorj/issues/728
-                @Suppress("DEPRECATION")
-                if (options.map().containsKey(OPT_GEM_PATH))
-                    AsciidoctorJRuby.Factory.create(options.map()[OPT_GEM_PATH].toString())
-                else
-                    Asciidoctor.Factory.create()
-
-            @Suppress("DEPRECATION")
-            if (options.map().containsKey(OPT_REQUIRES)) {
-                val requires: Array<String> =
-                    options.map()[OPT_REQUIRES].toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }.toTypedArray()
-                requires.forEach { newEngine.requireLibrary(it) }
+            val newEngine = if (gemPath != null) {
+                AsciidoctorJRuby.Factory.create(gemPath)
+            } else {
+                Asciidoctor.Factory.create()
             }
+
+            requires?.forEach { newEngine.requireLibrary(it) }
 
             log.info("Asciidoctor engine initialized.")
             engine = newEngine
@@ -49,31 +49,39 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     override fun processHeader(context: ParserContext) {
-        val options = getAsciiDocOptionsAndAttributes(context)
-        val asciidoctor = getEngine(options)
-        @Suppress("DEPRECATION")
-        val header = asciidoctor.readDocumentHeader(context.file)
+        val attributes = buildAttributes(context)
+        val asciidoctor = getEngine(buildOptions(context, attributes))
+
+        // In AsciidoctorJ 3.x, use loadFile with header_only option to get document header
+        val headerOptions = Options.builder()
+            .backend("html5")
+            .safe(SafeMode.UNSAFE)
+            .option("parse_header_only", true)
+            .attributes(attributes)
+            .baseDir(context.file.parentFile)
+            .build()
+
+        val document = asciidoctor.loadFile(context.file, headerOptions)
         val documentModel = context.documentModel
 
-        @Suppress("DEPRECATION")
-        if (header.documentTitle != null) {
-            documentModel.title = (header.documentTitle.combined)
+        // Get title from document
+        val title = document.doctitle
+        if (title != null && title.isNotEmpty()) {
+            documentModel.title = title
         }
 
-        @Suppress("DEPRECATION")
-        val attributes = header.attributes
-        for (attribute in attributes.entries) {
-            val key: String = attribute.key!!
-            val value = attribute.value
+        // Get attributes from document
+        val docAttributes = document.attributes
+        for ((key, value) in docAttributes) {
+            val keyStr = key.toString()
 
-            if (hasJBakePrefix(key)) {
-                val pKey = key.substring(6)
-                if (canCastToString(value))
+            if (keyStr.startsWith(JBAKE_PREFIX)) {
+                val pKey = keyStr.substring(6)
+                if (value is String)
                     storeHeaderValue(pKey, value as String, documentModel)
                 else documentModel[pKey] = value
             }
-
-            if (hasRevdate(key) && canCastToString(value)) {
+            if (keyStr == REVDATE_KEY && value is String) {
                 val dateFormat: String = context.config.dateFormat!!
                 val df: DateFormat = SimpleDateFormat(dateFormat)
                 try {
@@ -82,31 +90,16 @@ class AsciidoctorEngine : MarkupEngine() {
                     log.error("Unable to parse revdate. Expected {}", dateFormat, e)
                 }
             }
-
-            if (key == "jbake-tags") {
-                if (canCastToString(value))
+            if (keyStr == "jbake-tags") {
+                if (value is String)
                     context.setTags((value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
                 else log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
             }
-            else documentModel[key] = attributes[key]!!
+            else documentModel[keyStr] = value
         }
     }
 
-    private fun canCastToString(value: Any?): Boolean {
-        return value is String
-    }
-
-    private fun getValueClassName(value: Any?): String? {
-        return if (value == null) "null" else value.javaClass.getCanonicalName()
-    }
-
-    private fun hasRevdate(key: String): Boolean {
-        return key == REVDATE_KEY
-    }
-
-    private fun hasJBakePrefix(key: String): Boolean {
-        return key.startsWith(JBAKE_PREFIX)
-    }
+    private fun getValueClassName(value: Any?) = value?.javaClass?.getCanonicalName() ?: "null"
 
     // TODO: write tests with options and attributes
     override fun processBody(parserContext: ParserContext) {
@@ -121,45 +114,77 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     private fun processAsciiDoc(context: ParserContext) {
-        val options = getAsciiDocOptionsAndAttributes(context)
+        val attributes = buildAttributes(context)
+        val options = buildOptions(context, attributes)
         val asciidoctor = getEngine(options)
         context.body = (asciidoctor.convert(context.body, options))
     }
 
-    private fun getAsciiDocOptionsAndAttributes(context: ParserContext): Options {
+    private fun buildAttributes(context: ParserContext): Attributes {
         val config = context.config
         val asciidoctorAttributes: MutableList<String> = config.asciidoctorAttributes
-        @Suppress("DEPRECATION")
-        val attributes = AttributesBuilder.attributes(asciidoctorAttributes.toTypedArray<String>())
+
+        // Build attributes using new API
+        val attributesBuilder = Attributes.builder()
+
+        // Add configured attributes
+        for (attr in asciidoctorAttributes) {
+            val parts = attr.split("=", limit = 2)
+            if (parts.size == 2) {
+                attributesBuilder.attribute(parts[0].trim(), parts[1].trim())
+            } else {
+                attributesBuilder.attribute(attr.trim(), "")
+            }
+        }
+
         if (config.exportAsciidoctorAttributes) {
-            val prefix = config.attributesExportPrefixForAsciidoctor
+            val prefix = config.attributesExportPrefixForAsciidoctor ?: ""
 
             val it: MutableIterator<String> = config.keys
             while (it.hasNext()) {
                 val key = it.next()
                 if (!key.startsWith("asciidoctor")) {
-                    @Suppress("DEPRECATION")
-                    attributes.attribute(prefix + key.replace(".", "_"), config.get(key))
+                    attributesBuilder.attribute(prefix + key.replace(".", "_"), config.get(key))
                 }
             }
         }
 
+        return attributesBuilder.build()
+    }
+
+    private fun buildOptions(context: ParserContext, attributes: Attributes): Options {
+        val config = context.config
+
+        // Build options using new API
+        val optionsBuilder = Options.builder()
+            .attributes(attributes)
+            .backend("html5")
+            .safe(SafeMode.UNSAFE)
+            .baseDir(context.file.parentFile)
+
         val optionsSubset: MutableList<String> = config.asciidoctorOptionKeys
-        @Suppress("DEPRECATION")
-        val options = OptionsBuilder.options().attributes(attributes.get()).get()
         for (optionKey in optionsSubset) {
             val optionValue = config.getAsciidoctorOption(optionKey)
-            if (optionKey == Options.TEMPLATE_DIRS) {
-                val dirs = getAsList(optionValue)
-                if (!dirs.isEmpty()) {
-                    options.setTemplateDirs(dirs.toString())
+
+            // Handle special gem path and requires options
+            when {
+                optionKey == OPT_GEM_PATH && optionValue != null -> gemPath = optionValue.toString()
+                optionKey == OPT_REQUIRES && optionValue != null -> {
+                    val requiresList = optionValue.toString().split(",")
+                        .map { it.trim() }
+                        .filter { it.isNotEmpty() }
+                    requires = requiresList
                 }
+                optionKey == "template_dirs" -> {
+                    val dirs = getAsList(optionValue)
+                    if (dirs.isNotEmpty())
+                        optionsBuilder.templateDirs(*dirs.map { File(it) }.toTypedArray())
+                }
+                optionValue != null -> optionsBuilder.option(optionKey, optionValue)
             }
-            else options.setOption(optionKey, optionValue)
         }
-        options.setBaseDir(context.file.getParentFile().absolutePath)
-        options.setSafe(SafeMode.UNSAFE)
-        return options
+
+        return optionsBuilder.build()
     }
 
     @Suppress("UNCHECKED_CAST")
