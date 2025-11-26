@@ -9,7 +9,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.DateFormat
-import java.text.ParseException
 import java.text.SimpleDateFormat
 
 /**
@@ -71,31 +70,29 @@ class AsciidoctorEngine : MarkupEngine() {
         }
 
         // Get attributes from document
-        val docAttributes = document.attributes
-        for ((key, value) in docAttributes) {
+        for ((key, value) in document.attributes) {
             val keyStr = key.toString()
 
-            if (keyStr.startsWith(JBAKE_PREFIX)) {
-                val pKey = keyStr.substring(6)
-                if (value is String)
-                    storeHeaderValue(pKey, value as String, documentModel)
-                else documentModel[pKey] = value
-            }
-            if (keyStr == REVDATE_KEY && value is String) {
-                val dateFormat: String = context.config.dateFormat!!
-                val df: DateFormat = SimpleDateFormat(dateFormat)
-                try {
-                    context.date = (df.parse(value as String))
-                } catch (e: ParseException) {
-                    log.error("Unable to parse revdate. Expected {}", dateFormat, e)
+            when {
+                keyStr.startsWith(JBAKE_PREFIX) -> {
+                    val pKey = keyStr.substring(6)
+                    if (value is String)
+                        storeHeaderValue(pKey, value, documentModel)
+                    else documentModel[pKey] = value
                 }
+                keyStr == REVDATE_KEY && value is String -> {
+                    val dateFormat: String = context.config.dateFormat!!
+                    val df: DateFormat = SimpleDateFormat(dateFormat)
+                    runCatching { context.date = (df.parse(value)) }
+                        .onFailure { log.error("Unable to parse revdate. Expected {}", dateFormat, it) }
+                }
+                keyStr == "jbake-tags" -> {
+                    if (value is String)
+                        context.setTags(value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+                    else log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
+                }
+                else -> documentModel[keyStr] = value
             }
-            if (keyStr == "jbake-tags") {
-                if (value is String)
-                    context.setTags((value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
-                else log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
-            }
-            else documentModel[keyStr] = value
         }
     }
 
