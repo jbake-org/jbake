@@ -14,8 +14,7 @@ interface ParserEngine {
     fun parse(config: JBakeConfiguration, file: File): DocumentModel?
 
     /**
-     * @param fileToParse        The file to be parsed
-     * @return A model representation of the given file
+     * @return A model representation of the given file.
      */
     @Deprecated("use {@link #parse(JBakeConfiguration, File)} instead")
     fun parse(config: Configuration, fileToParse: File, contentPath: String): MutableMap<String,  Any>
