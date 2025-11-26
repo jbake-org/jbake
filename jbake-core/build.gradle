@@ -78,3 +78,7 @@ repositories {
 kotlin {
     jvmToolchain(21)
 }
+
+test {
+    systemProperty 'jbake.buildOutputDir', sourceSets.main.output.classesDirs.asPath.split(':')[0]
+}

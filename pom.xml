@@ -162,7 +162,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version>
                 <configuration>
-                    <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine>
+                    <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g -Djbake.buildOutputDir=${project.build.outputDirectory}</argLine>
                 </configuration>
             </plugin>
 
@@ -191,6 +191,7 @@
                         <manifest>
                             <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                             <addClassPath>true</addClassPath>
+                            <mainClass>org.jbake.app.JBake</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Built-By>${user.name}</Built-By>

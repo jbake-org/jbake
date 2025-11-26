@@ -24,26 +24,19 @@ object FileUtil {
         }
     }
 
+    /** Filters files based on their file extension. */
     @get:Deprecated("use {@link #getFileFilter(JBakeConfiguration)} instead")
     val fileFilter: FileFilter
-        /**
-         * Filters files based on their file extension.
-         */
         get() = FileFilter { pathname ->
             // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
             val fileWithExtension = pathname.isFile() && Engines.recognizedExtensions.contains(fileExt(pathname))
 
-            !pathname.isHidden()
-                && fileWithExtension
-                || directoryOnlyIfNotIgnored(pathname)
+            !pathname.isHidden() && fileWithExtension || directoryOnlyIfNotIgnored(pathname)
         }
 
     /** Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension). */
     val dataFileFilter: FileFilter
-        get() = FileFilter { pathname ->
-            val ext = fileExt(pathname).lowercase()
-            ext == "yaml" || ext == "yml"
-        }
+        get() = FileFilter { pathname -> fileExt(pathname).lowercase().let { it == "yaml" || it == "yml" } }
 
     /** Gets the list of files that are not content files based on their extension. */
     fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
@@ -102,6 +95,13 @@ object FileUtil {
          * @throws Exception when application is not able to work out where is JBake running from
          */
         get() {
+            // Check for system property first (set by build tools during tests)
+            val classesPath = System.getProperty("jbake.buildOutputDir")
+            if (classesPath != null) {
+                val classesDir = File(classesPath)
+                if (classesDir.exists()) return classesDir
+            }
+
             val codePath = FileUtil::class.java.getProtectionDomain().codeSource.location.path
             val decodedPath = URLDecoder.decode(codePath, "UTF-8")
             val codeFile = File(decodedPath)
