@@ -187,10 +187,10 @@ interface JBakeConfiguration {
 
     fun getTemplateFileByDocType(doctype: String): File?
 
-    /** the template folder. */
+    /** The template folder. */
     val templateFolder: File
 
-    /** name of folder where template files are looked for. */
+    /** Name of folder where template files are looked for. */
     val templateFolderName: String?
 
     /** Locale used for Thymeleaf template rendering. */
@@ -200,14 +200,13 @@ interface JBakeConfiguration {
     val uriWithoutExtension: Boolean
 
     /**
-     * Flag indicating if image paths should be prepended with [.getSiteHost] value - only has an effect if
-     * [.getImgPathUpdate] is set to true
+     * Flag indicating if image paths should be prepended with [.getSiteHost] value - only has an effect if [imgPathUpdate] is set to true.
      */
     val imgPathPrependHost: Boolean
 
     /**
-     * Flag indicating if image paths in content should be updated with absolute path (using URI value of content file),
-     * see [.getImgPathUpdate] which allows you to control the absolute path used
+     * Flag indicating if image paths in the content should be updated with absolute path (using URI value of content file),
+     * See [imgPathPrependHost] which allows you to control the absolute path used.
      */
     val imgPathUpdate: Boolean
 
