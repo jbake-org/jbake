@@ -34,7 +34,7 @@ jobs:
               if: always()
               uses: actions/upload-artifact@v4
               with:
-                  files: |
+                  path: |
                       **/target/surefire-reports/*.xml
                       **/target/failsafe-reports/*.xml
 
