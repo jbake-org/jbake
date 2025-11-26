@@ -15,8 +15,7 @@ class TypedModelExtractorAdapterTest {
         ModelExtractors.instance.reset()
     }
 
-    @Test
-    fun `typed extractor should be usable via adapter and extractAndTransform`() {
+    @Test fun `typed extractor should be usable via adapter and extractAndTransform`() {
         val key = "typed_test_key"
 
         // Register a simple typed extractor that ignores context and returns a string

@@ -26,8 +26,7 @@ class Error404RendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun doesNotRenderWhenConfigDoesNotRenderError404() {
+    @Test fun doesNotRenderWhenConfigDoesNotRenderError404() {
         val renderer = Error404Renderer()
 
         val configuration = mock(JBakeConfiguration::class.java)
@@ -63,8 +62,7 @@ class Error404RendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(1)
     }
 
-    @Test
-    fun doesRenderWhenConfigDoesNotRenderError404() {
+    @Test fun doesRenderWhenConfigDoesNotRenderError404() {
         val renderer = Error404Renderer()
         val error404file = "mock404file.html"
 

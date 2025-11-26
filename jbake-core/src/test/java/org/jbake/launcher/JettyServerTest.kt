@@ -22,8 +22,7 @@ internal class JettyServerTest {
 
     @Mock lateinit var jBakeConfiguration: JBakeConfiguration
 
-    @Test
-    fun shouldRunWithCustomPortAndContext(@TempDir output: Path) {
+    @Test fun shouldRunWithCustomPortAndContext(@TempDir output: Path) {
         val out = output.resolve("build/jbake").toFile()
         out.mkdirs()
 

@@ -128,8 +128,7 @@ class AsciidocParserTest {
     }
 
 
-    @Test
-    fun parseAsciidocFileWithPrettifyAttribute() {
+    @Test fun parseAsciidocFileWithPrettifyAttribute() {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
         val map = parser.processFile(asciidocWithSource)
         assertNotNull(map)
@@ -144,8 +143,7 @@ class AsciidocParserTest {
         println(map.body)
     }
 
-    @Test
-    fun parseAsciidocFileWithCustomAttribute() {
+    @Test fun parseAsciidocFileWithCustomAttribute() {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify,testattribute=I Love Jbake")
         val map = parser.processFile(asciidocWithSource)
         assertNotNull(map)
@@ -158,8 +156,7 @@ class AsciidocParserTest {
         println(map.body)
     }
 
-    @Test
-    fun parseValidAsciiDocFile() {
+    @Test fun parseValidAsciiDocFile() {
         val map = parser.processFile(validAsciidocFile)
         assertNotNull(map)
         assertEquals("draft", map!!.status)
@@ -169,14 +166,12 @@ class AsciidocParserTest {
             .contains("<p>JBake now supports AsciiDoc.</p>")
     }
 
-    @Test
-    fun parseInvalidAsciiDocFile() {
+    @Test fun parseInvalidAsciiDocFile() {
         val map = parser.processFile(invalidAsciiDocFile!!)
         assertNull(map)
     }
 
-    @Test
-    fun parseValidAsciiDocFileWithoutHeader() {
+    @Test fun parseValidAsciiDocFileWithoutHeader() {
         val map = parser.processFile(validAsciiDocFileWithoutHeader!!)
         assertNotNull(map)
         assertEquals("Hello: AsciiDoc!", map!!.get("title"))
@@ -187,14 +182,12 @@ class AsciidocParserTest {
             .contains("<p>JBake now supports AsciiDoc.</p>")
     }
 
-    @Test
-    fun parseInvalidAsciiDocFileWithoutHeader() {
+    @Test fun parseInvalidAsciiDocFileWithoutHeader() {
         val map = parser.processFile(invalidAsciiDocFileWithoutHeader)
         assertNull(map)
     }
 
-    @Test
-    fun parseValidAsciiDocFileWithExampleHeaderInContent() {
+    @Test fun parseValidAsciiDocFileWithExampleHeaderInContent() {
         val map = parser.processFile(validAsciiDocFileWithHeaderInContent)
         assertNotNull(map)
         assertEquals("published", map!!.status)
@@ -210,8 +203,7 @@ class AsciidocParserTest {
             .contains("tags=tag1, tag2")
     }
 
-    @Test
-    fun parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() {
+    @Test fun parseValidAsciiDocFileWithoutJBakeMetaDataUsingDefaultTypeAndStatus() {
         config.setDefaultStatus("published")
         config.setDefaultType("page")
         val parser = Parser(config)

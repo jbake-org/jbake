@@ -26,8 +26,7 @@ class ArchiveRendererTest {
         assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun doesNotRenderWhenConfigDoesNotRenderArchives() {
+    @Test fun doesNotRenderWhenConfigDoesNotRenderArchives() {
         val renderer = ArchiveRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -59,8 +58,7 @@ class ArchiveRendererTest {
         assertThat(renderResponse).isEqualTo(1)
     }
 
-    @Test
-    fun doesRenderWhenConfigDoesRenderArchives() {
+    @Test fun doesRenderWhenConfigDoesRenderArchives() {
         val renderer = ArchiveRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)

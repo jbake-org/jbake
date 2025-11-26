@@ -12,8 +12,7 @@ import org.junit.Test
 
 class CrawlerTest : ContentStoreIntegrationTest() {
 
-    @Test
-    fun crawl() {
+    @Test fun crawl() {
         val crawler = Crawler(db, config)
         crawler.crawl()
 
@@ -40,8 +39,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         assertEquals(3, publishedPostsByTag.size.toLong())
     }
 
-    @Test
-    fun crawlDataFiles() {
+    @Test fun crawlDataFiles() {
         val crawler = Crawler(db, config)
 
         // Manually register data doctype.
@@ -65,8 +63,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         assertThat(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
     }
 
-    @Test
-    fun renderWithPrettyUrls() {
+    @Test fun renderWithPrettyUrls() {
         config.setUriWithoutExtension(true)
         config.setPrefixForUriWithoutExtension("/blog")
 

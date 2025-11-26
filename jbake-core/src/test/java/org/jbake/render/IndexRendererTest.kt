@@ -27,8 +27,7 @@ class IndexRendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun doesNotRenderWhenConfigDoesNotRenderIndices() {
+    @Test fun doesNotRenderWhenConfigDoesNotRenderIndices() {
         val renderer = IndexRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -82,8 +81,7 @@ class IndexRendererTest {
     /**
      * @see [Issue 332](https://github.com/jbake-org/jbake/issues/332)
      */
-    @Test
-    fun shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() {
+    @Test fun shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() {
         val renderer = IndexRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -98,8 +96,7 @@ class IndexRendererTest {
         verify(mockRenderer, times(1)).renderIndex(anyString())
     }
 
-    @Test
-    fun shouldRenderPaginatedIndex() {
+    @Test fun shouldRenderPaginatedIndex() {
         val renderer = IndexRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)

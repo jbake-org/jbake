@@ -17,8 +17,7 @@ class ModelExtractorsTest {
         ModelExtractors.instance.reset()
     }
 
-    @Test
-    fun shouldLoadExtractorsOnInstantiation() {
+    @Test fun shouldLoadExtractorsOnInstantiation() {
         ModelExtractors.instance
         val expectedKeys: Array<String> = arrayOf(
             "pages", "posts", "indexs", "archives", "feeds", "published_posts", "published_pages",
@@ -29,8 +28,7 @@ class ModelExtractorsTest {
         }
     }
 
-    @Test
-    fun shouldRegisterExtractorsOnlyForCustomTypes() {
+    @Test fun shouldRegisterExtractorsOnlyForCustomTypes() {
         val knownDocumentType = "alltag"
         addDocumentType(knownDocumentType)
 
@@ -39,8 +37,7 @@ class ModelExtractorsTest {
         assertThat(ModelExtractors.instance.containsKey("published_alltags")).isFalse()
     }
 
-    @Test
-    fun shouldRegisterExtractorsForCustomType() {
+    @Test fun shouldRegisterExtractorsForCustomType() {
         // A document type is known.
         val newDocumentType = "project"
         addDocumentType(newDocumentType)
@@ -55,16 +52,14 @@ class ModelExtractorsTest {
         assertThat(ModelExtractors.instance.containsKey("published_projects")).isTrue()
     }
 
-    @Test
-    fun shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
+    @Test fun shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
         thrown.expect(UnsupportedOperationException::class.java)
 
         val unknownDocumentType = "unknown"
         ModelExtractors.instance.registerExtractorsForCustomTypes(unknownDocumentType)
     }
 
-    @Test
-    fun shouldResetToNonCustomizedExtractors() {
+    @Test fun shouldResetToNonCustomizedExtractors() {
         // Given: A document type is known.
         val newDocumentType = "project"
         addDocumentType(newDocumentType)

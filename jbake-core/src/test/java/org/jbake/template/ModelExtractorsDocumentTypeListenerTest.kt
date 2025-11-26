@@ -5,8 +5,7 @@ import org.jbake.model.DocumentTypes.addDocumentType
 import org.junit.Test
 
 class ModelExtractorsDocumentTypeListenerTest {
-    @Test
-    fun shouldRegisterExtractorsForCustomType() {
+    @Test fun shouldRegisterExtractorsForCustomType() {
         // Given: "A document type is known."
         val newDocumentType = "project"
         addDocumentType(newDocumentType)

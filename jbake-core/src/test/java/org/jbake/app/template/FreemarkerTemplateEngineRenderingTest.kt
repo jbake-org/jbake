@@ -9,8 +9,7 @@ import java.io.File
 import java.nio.charset.Charset
 
 class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("freemarkerTemplates", "ftl") {
-    @Test
-    fun renderPaginatedIndex() {
+    @Test fun renderPaginatedIndex() {
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 
@@ -32,8 +31,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         assertThat(output).contains("Post Url: blog%2F2013%2Fsecond-post.html")
     }
 
-    @Test
-    fun shouldFallbackToRenderSingleIndexIfNoPostArePresent() {
+    @Test fun shouldFallbackToRenderSingleIndexIfNoPostArePresent() {
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 

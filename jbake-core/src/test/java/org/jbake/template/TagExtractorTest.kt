@@ -34,8 +34,7 @@ class TagExtractorTest {
         return cfg
     }
 
-    @Test
-    fun `tags extractor constructs URIs when tagPath and extension present`() {
+    @Test fun `tags extractor constructs URIs when tagPath and extension present`() {
         val cfg = mockConfig("tags", ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -51,8 +50,7 @@ class TagExtractorTest {
         assertThat(tm.uri).isEqualTo("tags/blog.html")
     }
 
-    @Test
-    fun `tags extractor constructs URIs when tagPath empty`() {
+    @Test fun `tags extractor constructs URIs when tagPath empty`() {
         val cfg = mockConfig("", ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -64,8 +62,7 @@ class TagExtractorTest {
         assertThat(tm.uri).isEqualTo("blog.html")
     }
 
-    @Test
-    fun `tags extractor constructs URIs when extension is null`() {
+    @Test fun `tags extractor constructs URIs when extension is null`() {
         val cfg = mockConfig("tags", null)
         val db = mockDbWithTags("news")
         val context = RenderContext(config = cfg, db = db)
@@ -77,8 +74,7 @@ class TagExtractorTest {
         assertThat(tm.uri).isEqualTo("tags/news")
     }
 
-    @Test
-    fun `tags extractor trims trailing slash in tagPath`() {
+    @Test fun `tags extractor trims trailing slash in tagPath`() {
         val cfg = mockConfig("tags/", ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -90,8 +86,7 @@ class TagExtractorTest {
         assertThat(tm.uri).isEqualTo("tags/blog.html")
     }
 
-    @Test
-    fun `tags extractor handles null tagPath (defaults to no prefix)`() {
+    @Test fun `tags extractor handles null tagPath (defaults to no prefix)`() {
         val cfg = mockConfig(null, ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)

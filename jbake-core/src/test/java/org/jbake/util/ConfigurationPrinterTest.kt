@@ -8,8 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
 internal class ConfigurationPrinterTest {
-    @Test
-    fun shouldPrintHeader() {
+    @Test fun shouldPrintHeader() {
         val configuration =
             JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
         val data = ByteArrayOutputStream()
@@ -25,8 +24,7 @@ internal class ConfigurationPrinterTest {
     }
 
 
-    @Test
-    fun shouldPrintKeyAndValue() {
+    @Test fun shouldPrintKeyAndValue() {
         val configuration =
             JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
         val data = ByteArrayOutputStream()

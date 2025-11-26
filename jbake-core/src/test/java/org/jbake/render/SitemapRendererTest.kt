@@ -27,8 +27,7 @@ class SitemapRendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun doesNotRenderWhenConfigDoesNotRenderSitemaps() {
+    @Test fun doesNotRenderWhenConfigDoesNotRenderSitemaps() {
         val renderer = SitemapRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -59,8 +58,7 @@ class SitemapRendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(1)
     }
 
-    @Test
-    fun doesRenderWhenConfigDoesRenderSitemaps() {
+    @Test fun doesRenderWhenConfigDoesRenderSitemaps() {
         val renderer = SitemapRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)

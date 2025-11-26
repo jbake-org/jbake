@@ -14,16 +14,14 @@ import java.io.File
 
 class FileUtilTest {
 
-    @Test
-    fun testGetRunningLocation() {
+    @Test fun testGetRunningLocation() {
         val path = runningLocation
         val pathA = File("build/classes").absolutePath
         val pathB = File("target/classes").absolutePath
         assertTrue("Running location should be $pathA or $pathB, was: ${path.path}", path.path == pathA || path.path == pathB)
     }
 
-    @Test
-    fun testIsFileInDirectory() {
+    @Test fun testIsFileInDirectory() {
         val fixtureDir = File(this.javaClass.getResource("/fixture").file)
         val jbakeFile = File(fixtureDir, "jbake.properties")
         assertTrue("jbake.properties expected to be in /fixture directory", isFileInDirectory(jbakeFile, fixtureDir))
@@ -35,8 +33,7 @@ class FileUtilTest {
         assertFalse("jbake.properties file should not be in the /fixture/content directory", isFileInDirectory(jbakeFile, contentDir))
     }
 
-    @Test
-    fun testGetContentRoothPath() {
+    @Test fun testGetContentRoothPath() {
         val source = TestUtils.testResourcesAsSourceFolder
         val util = ConfigUtil()
         val config = util.loadConfig(source) as DefaultJBakeConfiguration

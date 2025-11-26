@@ -58,8 +58,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
         )
     }
 
-    @Test
-    fun renderCustomTypePaper() {
+    @Test fun renderCustomTypePaper() {
         // setup
         val crawler = Crawler(db, config)
         crawler.crawl()

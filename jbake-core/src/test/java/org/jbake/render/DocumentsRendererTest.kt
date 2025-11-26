@@ -47,8 +47,7 @@ class DocumentsRendererTest {
         argument = ArgumentCaptor.forClass(DocumentModel::class.java)
     }
 
-    @Test
-    fun shouldReturnZeroIfNothingHasRendered() {
+    @Test fun shouldReturnZeroIfNothingHasRendered() {
         `when`(db.unrenderedContent).thenReturn(emptyTemplateModelList)
 
         val renderResponse = documentsRenderer.render(renderer, db, configuration)
@@ -56,8 +55,7 @@ class DocumentsRendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun shouldReturnCountOfProcessedDocuments() {
+    @Test fun shouldReturnCountOfProcessedDocuments() {
         // given:
         addDocumentType("customType")
 
@@ -76,8 +74,7 @@ class DocumentsRendererTest {
         Assertions.assertThat(renderResponse).isEqualTo(2)
     }
 
-    @Test
-    fun shouldThrowAnExceptionWithCollectedErrorMessages() {
+    @Test fun shouldThrowAnExceptionWithCollectedErrorMessages() {
         val fakeExceptionMessage = "fake exception"
 
         // given
@@ -101,8 +98,7 @@ class DocumentsRendererTest {
         Assertions.assertThat(exception.message).contains(fakeExceptionMessage)
     }
 
-    @Test
-    fun shouldContainPostNavigation() {
+    @Test fun shouldContainPostNavigation() {
         // given
         addDocumentType("customType")
 

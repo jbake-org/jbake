@@ -9,23 +9,20 @@ import picocli.CommandLine
 import java.io.File
 
 class LaunchOptionsTest {
-    @Test
-    fun showHelp() {
+    @Test fun showHelp() {
         val args = arrayOf("-h")
         val res = parseArgs(args)
         assertThat(res.isHelpNeeded).isTrue()
     }
 
-    @Test
-    fun runServer() {
+    @Test fun runServer() {
         val args = arrayOf("-s")
         val res = parseArgs(args)
 
         assertThat(res.isRunServer).isTrue()
     }
 
-    @Test
-    fun runServerWithFolder() {
+    @Test fun runServerWithFolder() {
         val args = arrayOf("-s", "/tmp")
         val res = parseArgs(args)
 
@@ -33,8 +30,7 @@ class LaunchOptionsTest {
         assertThat(res.getSource()).isEqualTo(File("/tmp"))
     }
 
-    @Test
-    fun init() {
+    @Test fun init() {
         val args = arrayOf("-i")
         val res = parseArgs(args)
 
@@ -42,8 +38,7 @@ class LaunchOptionsTest {
         assertThat(res.template).isEqualTo("freemarker")
     }
 
-    @Test
-    fun initWithTemplate() {
+    @Test fun initWithTemplate() {
         val args = arrayOf("-i", "-t", "foo")
         val res = parseArgs(args)
 
@@ -51,8 +46,7 @@ class LaunchOptionsTest {
         assertThat(res.template).isEqualTo("foo")
     }
 
-    @Test
-    fun initWithSourceDirectory() {
+    @Test fun initWithSourceDirectory() {
         val args = arrayOf("-i", "/tmp")
         val res = parseArgs(args)
 
@@ -60,8 +54,7 @@ class LaunchOptionsTest {
         assertThat(res.sourceValue).isEqualTo("/tmp")
     }
 
-    @Test
-    fun initWithTemplateAndSourceDirectory() {
+    @Test fun initWithTemplateAndSourceDirectory() {
         val args = arrayOf("-i", "-t", "foo", "/tmp")
         val res = parseArgs(args)
 
@@ -70,8 +63,7 @@ class LaunchOptionsTest {
         assertThat(res.sourceValue).isEqualTo("/tmp")
     }
 
-    @Test
-    fun shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
+    @Test fun shouldThrowAnExceptionCallingTemplateWithoutInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
         assertThatExceptionOfType(CommandLine.MissingParameterException::class.java)
@@ -80,48 +72,42 @@ class LaunchOptionsTest {
             }.withMessage("Error: Missing required argument(s): --init")
     }
 
-    @Test
-    fun bake() {
+    @Test fun bake() {
         val args = arrayOf("-b")
         val res = parseArgs(args)
 
         assertThat(res.isBake).isTrue()
     }
 
-    @Test
-    fun listConfig() {
+    @Test fun listConfig() {
         val args = arrayOf("-ls")
         val res = parseArgs(args)
 
         assertThat(res.isListConfig).isTrue()
     }
 
-    @Test
-    fun listConfigLongOption() {
+    @Test fun listConfigLongOption() {
         val args = arrayOf("--list-settings")
         val res = parseArgs(args)
 
         assertThat(res.isListConfig).isTrue()
     }
 
-    @Test
-    fun customPropertiesEncoding() {
+    @Test fun customPropertiesEncoding() {
         val args = arrayOf("--prop-encoding", "utf-16")
         val res = parseArgs(args)
 
         assertThat(res.propertiesEncoding).isEqualTo("utf-16")
     }
 
-    @Test
-    fun defaultEncodingIsUtf8() {
+    @Test fun defaultEncodingIsUtf8() {
         val args = arrayOf<String>()
         val res = parseArgs(args)
 
         assertThat(res.propertiesEncoding).isEqualTo("utf-8")
     }
 
-    @Test
-    fun bakeNoArgs() {
+    @Test fun bakeNoArgs() {
         val args = arrayOf<String>()
         val res = parseArgs(args)
 
@@ -134,8 +120,7 @@ class LaunchOptionsTest {
         assertThat(res.getConfig().path).isEqualTo(File(SYSPROP_USER_DIR, ConfigUtil.CONFIG_FILE).path)
     }
 
-    @Test
-    fun bakeWithArgs() {
+    @Test fun bakeWithArgs() {
         val args = arrayOf("/tmp/source", "/tmp/destination")
         val res = parseArgs(args)
 
@@ -147,8 +132,7 @@ class LaunchOptionsTest {
         assertThat(res.getDestination()).isEqualTo(File("/tmp/destination"))
     }
 
-    @Test
-    fun configArg() {
+    @Test fun configArg() {
         val args = arrayOf("-c", "foo")
         val res = parseArgs(args)
         assertThat(res.getConfig().getAbsoluteFile().toString()).isEqualTo(File(SYSPROP_USER_DIR, "foo").getAbsoluteFile().toString())

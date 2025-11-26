@@ -21,8 +21,7 @@ class PaginationTest : ContentStoreIntegrationTest() {
         config.setPostsPerPage(1)
     }
 
-    @Test
-    fun testPagination() {
+    @Test fun testPagination() {
         val TOTAL_POSTS = 5
         val cal = Calendar.getInstance(Locale.ENGLISH)
 

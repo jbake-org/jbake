@@ -31,8 +31,7 @@ class InitTest {
         config.setExampleProject("freemarker", "test.zip")
     }
 
-    @Test
-    fun initOK() {
+    @Test fun initOK() {
         val init = Init(config)
         val initPath = folder.newFolder("init")
         init.run(initPath, rootPath, "freemarker")

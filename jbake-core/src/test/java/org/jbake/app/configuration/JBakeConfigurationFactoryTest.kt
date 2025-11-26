@@ -14,8 +14,7 @@ class JBakeConfigurationFactoryTest {
     @TempDir
     var root: File? = null
 
-    @Test
-    fun shouldReturnDefaultConfigurationWithDefaultFolders() {
+    @Test fun shouldReturnDefaultConfigurationWithDefaultFolders() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val templateFolder = TestUtils.newFolder(root, "templates")
@@ -31,8 +30,7 @@ class JBakeConfigurationFactoryTest {
         assertThat(configuration.clearCache).isEqualTo(true)
     }
 
-    @Test
-    fun shouldReturnDefaultConfigurationWithCustomFolders() {
+    @Test fun shouldReturnDefaultConfigurationWithCustomFolders() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output/custom")
         val templateFolder = TestUtils.newFolder(root, "templates/custom")
@@ -65,8 +63,7 @@ class JBakeConfigurationFactoryTest {
     }
 
 
-    @Test
-    fun shouldReturnADefaultConfigurationWithSitehost() {
+    @Test fun shouldReturnADefaultConfigurationWithSitehost() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val siteHost = "http://www.jbake.org"
@@ -77,8 +74,7 @@ class JBakeConfigurationFactoryTest {
         assertThat(configuration.siteHost).isEqualTo(siteHost)
     }
 
-    @Test
-    fun shouldReturnAJettyConfiguration() {
+    @Test fun shouldReturnAJettyConfiguration() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val siteHost = "http://localhost:8820/"
@@ -89,8 +85,7 @@ class JBakeConfigurationFactoryTest {
         assertThat(configuration.siteHost).isEqualTo(siteHost)
     }
 
-    @Test
-    fun shouldUseDefaultEncodingUTF8() {
+    @Test fun shouldUseDefaultEncodingUTF8() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val factory = JBakeConfigurationFactory()
@@ -99,8 +94,7 @@ class JBakeConfigurationFactoryTest {
         assertThat(factory.configUtil.encoding).isEqualTo("UTF-8")
     }
 
-    @Test
-    fun shouldUseCustomEncoding() {
+    @Test fun shouldUseCustomEncoding() {
         val util = Mockito.spy(ConfigUtil::class.java)
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
@@ -113,8 +107,7 @@ class JBakeConfigurationFactoryTest {
         Mockito.verify(util).loadConfig(sourceFolder, null)
     }
 
-    @Test
-    fun shouldBeAbleToAddCustomProperties() {
+    @Test fun shouldBeAbleToAddCustomProperties() {
         val sourceFolder = root!!
         val destinationFolder = TestUtils.newFolder(root, "output")
         val config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)

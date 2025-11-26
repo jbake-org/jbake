@@ -8,8 +8,7 @@ import java.io.FileReader
 import java.util.*
 
 class ServiceLoaderTest {
-    @Test
-    fun testLoadRenderer() {
+    @Test fun testLoadRenderer() {
         val serviceDescription =
             ClassLoader.getSystemClassLoader().getResource("META-INF/services/org.jbake.render.RenderingTool")
         val services = File(serviceDescription!!.toURI())

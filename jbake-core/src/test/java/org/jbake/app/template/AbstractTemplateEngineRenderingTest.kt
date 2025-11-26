@@ -144,8 +144,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         Locale.setDefault(currentLocale)
     }
 
-    @Test
-    fun renderPost() {
+    @Test fun renderPost() {
         // setup
         val filename = "second-post.html"
 
@@ -163,8 +162,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderPage() {
+    @Test fun renderPage() {
         // setup
         val filename = "about.html"
         val sampleFile = sourceFolder!!.resolve("content").resolve(filename)
@@ -183,8 +181,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderIndex() {
+    @Test fun renderIndex() {
         //exec
         renderer.renderIndex("index.html")
 
@@ -199,8 +196,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderFeed() {
+    @Test fun renderFeed() {
         renderer.renderFeed("feed.xml")
         val outputFile = File(destinationFolder, "feed.xml")
         Assert.assertTrue(outputFile.exists())
@@ -212,8 +208,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderArchive() {
+    @Test fun renderArchive() {
         renderer.renderArchive("archive.html")
         val outputFile = File(destinationFolder, "archive.html")
         Assert.assertTrue(outputFile.exists())
@@ -225,8 +220,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderTags() {
+    @Test fun renderTags() {
         renderer.renderTags("tags")
 
         // Then
@@ -238,8 +232,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderTagsIndex() {
+    @Test fun renderTagsIndex() {
         config.setRenderTagsIndex(true)
 
         renderer.renderTags("tags")
@@ -251,8 +244,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 
-    @Test
-    fun renderSitemap() {
+    @Test fun renderSitemap() {
         addDocumentType("paper")
         db.updateSchema()
 
@@ -272,8 +264,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         return outputStrings[type] ?: mutableListOf()
     }
 
-    @Test
-    fun checkDbTemplateModelIsPopulated() {
+    @Test fun checkDbTemplateModelIsPopulated() {
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 

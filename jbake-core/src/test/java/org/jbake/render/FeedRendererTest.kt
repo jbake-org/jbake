@@ -28,8 +28,7 @@ class FeedRendererTest {
         assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun doesNotRenderWhenConfigDoesNotRenderFeeds() {
+    @Test fun doesNotRenderWhenConfigDoesNotRenderFeeds() {
         val renderer = FeedRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -60,8 +59,7 @@ class FeedRendererTest {
         assertThat(renderResponse).isEqualTo(1)
     }
 
-    @Test
-    fun doesRenderWhenConfigDoesRenderFeeds() {
+    @Test fun doesRenderWhenConfigDoesRenderFeeds() {
         val renderer = FeedRenderer()
         val configuration = mock(DefaultJBakeConfiguration::class.java)
         `when`(configuration.renderFeed).thenReturn(true)

@@ -16,8 +16,7 @@ import kotlin.arrayOf
 import kotlin.repeat
 
 class ContentStoreTest : ContentStoreIntegrationTest() {
-    @Test
-    fun shouldGetCountForPublishedDocuments() {
+    @Test fun shouldGetCountForPublishedDocuments() {
         repeat(5) {
             db.addTestDocument(type = DOC_TYPE_POST, status = "published")
         }
@@ -28,8 +27,7 @@ class ContentStoreTest : ContentStoreIntegrationTest() {
         assertEquals(5, db.getPublishedCount(DOC_TYPE_POST))
     }
 
-    @Test
-    fun testStoreTypeWithSpecialCharacters() {
+    @Test fun testStoreTypeWithSpecialCharacters() {
         val typeWithHyphen = "type-with-hyphen"
 
         addDocumentType(typeWithHyphen)

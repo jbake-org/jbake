@@ -21,8 +21,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
     }
 
 
-    @Test
-    fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
+    @Test fun shouldThrowExceptionIfSourceFolderDoesNotExist() {
         val nonExistentFile = File(folder.toFile(), "nofolder")
         val configuration = mock(JBakeConfiguration::class.java)
         `when`(configuration.sourceFolder).thenReturn(nonExistentFile)
@@ -35,8 +34,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
             .isEqualTo("Error: Source folder must exist: " + nonExistentFile.absolutePath)
     }
 
-    @Test
-    fun shouldThrowExceptionIfSourceFolderIsNotReadable() {
+    @Test fun shouldThrowExceptionIfSourceFolderIsNotReadable() {
         val nonReadableFile = mock(File::class.java)
         `when`(nonReadableFile.exists()).thenReturn(true)
         `when`(nonReadableFile.isDirectory()).thenReturn(true)
@@ -53,8 +51,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
             .isEqualTo("Error: Source folder is not readable: " + nonReadableFile.absolutePath)
     }
 
-    @Test
-    fun shouldThrowExceptionIfTemplateFolderDoesNotExist() {
+    @Test fun shouldThrowExceptionIfTemplateFolderDoesNotExist() {
         val templateFolderName = "template/custom"
         val expectedFolder = File(folder.toFile(), templateFolderName)
         val configuration = mock(JBakeConfiguration::class.java)
@@ -69,8 +66,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
             .isEqualTo("Error: Required folder cannot be found! Expected to find [template.folder] at: " + expectedFolder.absolutePath)
     }
 
-    @Test
-    fun shouldThrowExceptionIfContentFolderDoesNotExist() {
+    @Test fun shouldThrowExceptionIfContentFolderDoesNotExist() {
         val contentFolderName = "content"
         val templateFolderName = "template"
         val templateFolder = newFolder(folder.toFile(), templateFolderName)
@@ -90,8 +86,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
             .isEqualTo("Error: Required folder cannot be found! Expected to find [content.folder] at: " + contentFolder.absolutePath)
     }
 
-    @Test
-    fun shouldCreateDestinationFolderIfNotExists() {
+    @Test fun shouldCreateDestinationFolderIfNotExists() {
         val contentFolderName = "content"
         val templateFolderName = "template"
         val destinationFolderName = "output"
@@ -114,8 +109,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         assertThat(destinationFolder).exists()
     }
 
-    @Test
-    fun shouldThrowExceptionIfDestinationFolderNotWritable() {
+    @Test fun shouldThrowExceptionIfDestinationFolderNotWritable() {
         val contentFolderName = "content"
         val templateFolderName = "template"
 
@@ -137,8 +131,7 @@ class JBakeConfigurationInspectorTest : LoggingTest() {
         assertThat(e.message).contains("Error: Destination folder is not writable:")
     }
 
-    @Test
-    fun shouldLogWarningIfAssetFolderDoesNotExist() {
+    @Test fun shouldLogWarningIfAssetFolderDoesNotExist() {
         val contentFolderName = "content"
         val templateFolderName = "template"
         val destinationFolderName = "output"

@@ -27,8 +27,7 @@ class TagsRendererTest {
         assertThat(renderResponse).isEqualTo(0)
     }
 
-    @Test
-    fun doesNotRenderWhenConfigDoesNotRenderTags() {
+    @Test fun doesNotRenderWhenConfigDoesNotRenderTags() {
         val renderer = TagsRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -42,8 +41,7 @@ class TagsRendererTest {
         verify(mockRenderer, never()).renderTags(anyString())
     }
 
-    @Test
-    fun returnsOneWhenConfigRendersIndices() {
+    @Test fun returnsOneWhenConfigRendersIndices() {
         val renderer = TagsRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)
@@ -63,8 +61,7 @@ class TagsRendererTest {
         assertThat(renderResponse).isEqualTo(1)
     }
 
-    @Test
-    fun doesRenderWhenConfigDoesRenderIndices() {
+    @Test fun doesRenderWhenConfigDoesRenderIndices() {
         val renderer = TagsRenderer()
 
         val configuration = mock(DefaultJBakeConfiguration::class.java)

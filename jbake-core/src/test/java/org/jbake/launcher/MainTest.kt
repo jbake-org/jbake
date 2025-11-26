@@ -58,8 +58,7 @@ internal class MainTest : LoggingTest() {
         System.setOut(standardOut)
     }
 
-    @Test
-    fun launchJetty(@TempDir source: Path) {
+    @Test fun launchJetty(@TempDir source: Path) {
         val currentWorkingdir = newFolder(source, "src/jbake")
         val expectedOutput = File(currentWorkingdir, "output")
         val configuration = mockJettyConfiguration(currentWorkingdir, expectedOutput)
@@ -70,8 +69,7 @@ internal class MainTest : LoggingTest() {
         verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
-    @Test
-    fun launchBakeWithCustomPropertiesEncoding(@TempDir source: Path) {
+    @Test fun launchBakeWithCustomPropertiesEncoding(@TempDir source: Path) {
         val currentWorkingdir = newFolder(source, "jbake")
         mockDefaultJbakeConfiguration(currentWorkingdir)
 
@@ -81,8 +79,7 @@ internal class MainTest : LoggingTest() {
         verify<JBakeConfigurationFactory>(mockFactory).setEncoding("latin1")
     }
 
-    @Test
-    fun launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir source: Path) {
+    @Test fun launchBakeWithDefaultUtf8PropertiesEncoding(@TempDir source: Path) {
         val currentWorkingdir = newFolder(source, "jbake")
         mockDefaultJbakeConfiguration(currentWorkingdir)
 
@@ -92,8 +89,7 @@ internal class MainTest : LoggingTest() {
         verify<JBakeConfigurationFactory>(mockFactory).setEncoding("utf-8")
     }
 
-    @Test
-    fun launchBakeAndJetty(@TempDir source: Path) {
+    @Test fun launchBakeAndJetty(@TempDir source: Path) {
         val sourceFolder = newFolder(source, "src/jbake")
         val expectedOutput = newFolder(sourceFolder.toPath(), "output")
         val configuration = mockJettyConfiguration(sourceFolder, expectedOutput)
@@ -118,8 +114,7 @@ internal class MainTest : LoggingTest() {
         verify<JettyServer>(mockJetty).run(expectedRunPath, configuration)
     }
 
-    @Test
-    fun launchJettyWithCustomServerSourceDir(@TempDir output: Path) {
+    @Test fun launchJettyWithCustomServerSourceDir(@TempDir output: Path) {
         val build = newFolder(output, "build/jbake")
         val configuration = mockJettyConfiguration(build, build)
 
@@ -132,8 +127,7 @@ internal class MainTest : LoggingTest() {
 
     // ATTENTION
     // There ist no extra argument for -s option. you can call jbake -s /customsource or jbake /customsource -s
-    @Test
-    fun launchJettyWithCustomDestinationDir(@TempDir source: Path) {
+    @Test fun launchJettyWithCustomDestinationDir(@TempDir source: Path) {
         val src = newFolder(source, "src/jbake")
         val configuration = mockJettyConfiguration(src, src)
 
@@ -143,8 +137,7 @@ internal class MainTest : LoggingTest() {
         verify<JettyServer>(mockJetty).run(src.path, configuration)
     }
 
-    @Test
-    fun launchJettyWithCustomSrcAndDestDir(@TempDir source: Path, @TempDir output: Path) {
+    @Test fun launchJettyWithCustomSrcAndDestDir(@TempDir source: Path, @TempDir output: Path) {
         val src = newFolder(source, "src/jbake")
         val exampleOutput = output.resolve("build/jbake").toFile()
         val configuration = mockJettyConfiguration(src, exampleOutput)
@@ -155,8 +148,7 @@ internal class MainTest : LoggingTest() {
         verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
     }
 
-    @Test
-    fun launchJettyWithCustomDestViaConfig(@TempDir output: Path) {
+    @Test fun launchJettyWithCustomDestViaConfig(@TempDir output: Path) {
         val args = arrayOf("-s")
         val exampleOutput = output.resolve("build/jbake").toFile()
         val configuration = stubConfig()
@@ -167,8 +159,7 @@ internal class MainTest : LoggingTest() {
         verify<JettyServer>(mockJetty).run(exampleOutput.path, configuration)
     }
 
-    @Test
-    fun launchJettyWithCmdlineOverridingProperties(@TempDir source: Path, @TempDir output: Path, @TempDir target: Path) {
+    @Test fun launchJettyWithCmdlineOverridingProperties(@TempDir source: Path, @TempDir output: Path, @TempDir target: Path) {
         val src = newFolder(source, "src/jbake")
         val expectedOutput = newFolder(output, "build/jbake")
         val configTarget = newFolder(target, "target/jbake")
@@ -181,8 +172,7 @@ internal class MainTest : LoggingTest() {
         verify<JettyServer>(mockJetty).run(expectedOutput.path, configuration)
     }
 
-    @Test
-    fun shouldTellUserThatTemplateOptionRequiresInitOption() {
+    @Test fun shouldTellUserThatTemplateOptionRequiresInitOption() {
         val args = arrayOf("-t", "groovy-mte")
 
         val exception = assertThrows(JBakeException::class.java) { main.run(args) }
@@ -208,8 +198,7 @@ internal class MainTest : LoggingTest() {
         assertThat(e.getExit()).isEqualTo(SystemExit.ERROR.status)
     }
 
-    @Test
-    fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
+    @Test fun shouldThrowAJBakeExceptionWithConfigurationErrorIfLoadThrowsAnCompositeException() {
         `when`(mockFactory.setEncoding(anyString())).thenReturn(mockFactory)
         doThrow(JBakeException(SystemExit.CONFIGURATION_ERROR, "something went wrong"))
             .`when`(mockFactory).createDefaultJbakeConfiguration(any(FCJ), any(FCJ), any(FCJ), anyBoolean())

@@ -45,8 +45,7 @@ class RendererTest {
      *
      * @throws Exception
      */
-    @Test
-    fun testRenderFileWorksWhenPathHasDotInButFileDoesNot() {
+    @Test fun testRenderFileWorksWhenPathHasDotInButFileDoesNot() {
         Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows)
         val FOLDER = "real.path"
 

@@ -25,20 +25,17 @@ class ConfigUtilTest : LoggingTest() {
         this.util = ConfigUtil()
     }
 
-    @Test
-    fun shouldLoadSiteHost() {
+    @Test fun shouldLoadSiteHost() {
         val config = util.loadConfig(TestUtils.testResourcesAsSourceFolder)
         assertThat(config.siteHost).isEqualTo("http://www.jbake.org")
     }
 
-    @Test
-    fun shouldLoadADefaultConfiguration() {
+    @Test fun shouldLoadADefaultConfiguration() {
         val config = util.loadConfig(TestUtils.testResourcesAsSourceFolder)
         assertDefaultPropertiesPresent(config)
     }
 
-    @Test
-    fun shouldLoadACustomConfiguration() {
+    @Test fun shouldLoadACustomConfiguration() {
         val customConfigFile = File(sourceFolder.toFile(), "jbake.properties")
         customConfigFile.writeText("test.property=12345")
 
@@ -48,8 +45,7 @@ class ConfigUtilTest : LoggingTest() {
         assertDefaultPropertiesPresent(configuration)
     }
 
-    @Test
-    fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
+    @Test fun shouldThrowAnExceptionIfSourcefolderDoesNotExist() {
         val nonExistentSourceFolder = mock(File::class.java)
         `when`(nonExistentSourceFolder.absolutePath).thenReturn("/tmp/nonexistent")
         `when`(nonExistentSourceFolder.exists()).thenReturn(false)
@@ -58,16 +54,14 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(e.message).isEqualTo("The given source folder '/tmp/nonexistent' does not exist.")
     }
 
-    @Test
-    fun shouldAddSourcefolderToConfiguration() {
+    @Test fun shouldAddSourcefolderToConfiguration() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder)
 
         assertThat(config.sourceFolder).isEqualTo(sourceFolder)
     }
 
-    @Test
-    fun shouldThrowAnExceptionIfSourcefolderIsNotADirectory() {
+    @Test fun shouldThrowAnExceptionIfSourcefolderIsNotADirectory() {
         val sourceFolder = mock(File::class.java)
         `when`(sourceFolder.exists()).thenReturn(true)
         `when`(sourceFolder.isDirectory()).thenReturn(false)
@@ -76,8 +70,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(e.message).isEqualTo("The given source folder is not a directory.")
     }
 
-    @Test
-    fun shouldReturnDestinationFolderFromConfiguration() {
+    @Test fun shouldReturnDestinationFolderFromConfiguration() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val expectedDestinationFolder = File(sourceFolder, "output")
         val config = util.loadConfig(sourceFolder)
@@ -85,8 +78,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(config.destinationFolder).isEqualTo(expectedDestinationFolder)
     }
 
-    @Test
-    fun shouldReturnAssetFolderFromConfiguration() {
+    @Test fun shouldReturnAssetFolderFromConfiguration() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val expectedDestinationFolder = File(sourceFolder, "assets")
         val config = util.loadConfig(sourceFolder)
@@ -94,8 +86,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(config.assetFolder).isEqualTo(expectedDestinationFolder)
     }
 
-    @Test
-    fun shouldReturnTemplateFolderFromConfiguration() {
+    @Test fun shouldReturnTemplateFolderFromConfiguration() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val expectedDestinationFolder = File(sourceFolder, "templates")
         val config = util.loadConfig(sourceFolder)
@@ -103,8 +94,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(config.templateFolder).isEqualTo(expectedDestinationFolder)
     }
 
-    @Test
-    fun shouldReturnContentFolderFromConfiguration() {
+    @Test fun shouldReturnContentFolderFromConfiguration() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val expectedDestinationFolder = File(sourceFolder, "content")
         val config = util.loadConfig(sourceFolder)
@@ -112,8 +102,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(config.contentFolder).isEqualTo(expectedDestinationFolder)
     }
 
-    @Test
-    fun shouldGetTemplateFileDoctype() {
+    @Test fun shouldGetTemplateFileDoctype() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val expectedTemplateFile = File(sourceFolder, "templates/index.ftl")
         val config = util.loadConfig(sourceFolder)
@@ -125,8 +114,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(templateFile2).isEqualTo("special/team.tpl")
     }
 
-    @Test
-    fun shouldLogWarningIfDocumentTypeNotFound() {
+    @Test fun shouldLogWarningIfDocumentTypeNotFound() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder)
 
@@ -137,8 +125,7 @@ class ConfigUtilTest : LoggingTest() {
             .isEqualTo("Cannot find configuration key '{}' for document type '{}'")
     }
 
-    @Test
-    fun shouldGetTemplateOutputExtension() {
+    @Test fun shouldGetTemplateOutputExtension() {
         val docType = "masterindex"
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
@@ -149,8 +136,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(extension).isEqualTo(".xhtml")
     }
 
-    @Test
-    fun shouldGetMarkdownExtensionsAsList() {
+    @Test fun shouldGetMarkdownExtensionsAsList() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
@@ -159,8 +145,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(markdownExtensions).containsExactly("HARDWRAPS", "AUTOLINKS", "FENCED_CODE_BLOCKS", "DEFINITIONS")
     }
 
-    @Test
-    fun shouldReturnConfiguredDocTypes() {
+    @Test fun shouldReturnConfiguredDocTypes() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
@@ -169,8 +154,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(docTypes).containsExactly("allcontent", "team", "masterindex", "feed", "error404", "archive", "tag", "tagsindex", "sitemap", "post", "page")
     }
 
-    @Test
-    fun shouldReturnAListOfAsciidoctorOptionsKeys() {
+    @Test fun shouldReturnAListOfAsciidoctorOptionsKeys() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
@@ -181,8 +165,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(options).contains("requires", "template_dirs")
     }
 
-    @Test
-    fun shouldReturnAnAsciidoctorOption() {
+    @Test fun shouldReturnAnAsciidoctorOption() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
@@ -193,8 +176,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(option).contains("asciidoctor-diagram")
     }
 
-    @Test
-    fun shouldReturnAnAsciidoctorOptionWithAListValue() {
+    @Test fun shouldReturnAnAsciidoctorOptionWithAListValue() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
@@ -205,8 +187,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(option).contains("src/template1", "src/template2")
     }
 
-    @Test
-    fun shouldReturnEmptyListIfOptionNotAvailable() {
+    @Test fun shouldReturnEmptyListIfOptionNotAvailable() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
@@ -215,8 +196,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(options).isEmpty()
     }
 
-    @Test
-    fun shouldLogAWarningIfAsciidocOptionCouldNotBeFound() {
+    @Test fun shouldLogAWarningIfAsciidocOptionCouldNotBeFound() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
@@ -226,8 +206,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(captorLoggingEvent.value.message).isEqualTo("Cannot find asciidoctor option '{}.{}'")
     }
 
-    @Test
-    fun shouldHandleNonExistingFiles() {
+    @Test fun shouldHandleNonExistingFiles() {
         val source = TestUtils.testResourcesAsSourceFolder
         val expectedTemplateFolder = File(source, "templates")
         val expectedAssetFolder = File(source, "assets")
@@ -249,8 +228,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(destinationFolder).isEqualTo(expectedDestinationFolder)
     }
 
-    @Test
-    fun shouldSetCustomFoldersWithAbsolutePaths() {
+    @Test fun shouldSetCustomFoldersWithAbsolutePaths() {
         // given
         val source = sourceFolder.resolve("source")
         val theme = sourceFolder.resolve("theme")
@@ -295,8 +273,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(contentFolder).isEqualTo(expectedContentFolder.toFile())
     }
 
-    @Test
-    fun shouldUseUtf8EncodingAsDefault() {
+    @Test fun shouldUseUtf8EncodingAsDefault() {
         val unicodeString = "中文属性使用默认Properties编码"
         val config = util.loadConfig(TestUtils.testResourcesAsSourceFolder)
 
@@ -305,8 +282,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(siteAbout).inUnicode().startsWith(unicodeString)
     }
 
-    @Test
-    fun shouldBePossibleToSetCustomEncoding() {
+    @Test fun shouldBePossibleToSetCustomEncoding() {
         val expected = "Latin1 encoded file äöü"
         val config =
             util.setEncoding("ISO8859_1").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
@@ -315,8 +291,7 @@ class ConfigUtilTest : LoggingTest() {
         assertThat(siteAbout).contains(expected)
     }
 
-    @Test
-    fun shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() {
+    @Test fun shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() {
         util.setEncoding("UNSUPPORTED_ENCODING")
             .loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"))
 
@@ -327,8 +302,7 @@ class ConfigUtilTest : LoggingTest() {
     }
 
 
-    @Test
-    fun shouldReturnIgnoreFileFromConfiguration() {
+    @Test fun shouldReturnIgnoreFileFromConfiguration() {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder)
 
