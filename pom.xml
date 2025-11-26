@@ -126,11 +126,6 @@
             <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><version>${version.commons.vfs2}</version></dependency>
             <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj-diagram</artifactId><version>${version.asciidoctorj.diagram}</version></dependency>
             <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><version>${version.asciidoctorj}</version></dependency>
-<!--
-            <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
-            <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
-            <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>
--->
             <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
             <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
             <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>
