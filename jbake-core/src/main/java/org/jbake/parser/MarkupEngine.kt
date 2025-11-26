@@ -168,9 +168,9 @@ abstract class MarkupEngine : ParserEngine {
         }
 
         for (line in contents) {
-            if (hasHeaderSeparator(line)) { log.debug("Header separator found"); break }
-            if (isTypeProperty(line)) { log.debug("Type property found"); typeFound = true }
-            if (isStatusProperty(line)) { log.debug("Status property found"); statusFound = true }
+            if (hasHeaderSeparator(line)) { log.trace("Header separator found"); break }
+            if (isTypeProperty(line)) { log.trace("Type property found"); typeFound = true }
+            if (isStatusProperty(line)) { log.trace("Status property found"); statusFound = true }
             if (!line.isEmpty() && !line.contains("=")) {
                 log.error("Property found without assignment [{}]", line)
                 headerValid = false
