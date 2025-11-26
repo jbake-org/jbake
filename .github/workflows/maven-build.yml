@@ -29,3 +29,11 @@ jobs:
 
             - name: Run Maven tests
               run: mvn -B clean test
+
+            - name: Upload test reports
+              if: always()
+              uses: actions/upload-test-results@v2
+              with:
+                  files: |
+                      **/target/surefire-reports/*.xml
+                      **/target/failsafe-reports/*.xml
