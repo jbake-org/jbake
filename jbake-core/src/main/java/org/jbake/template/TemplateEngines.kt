@@ -11,25 +11,24 @@ import java.util.*
 /**
  *
  *
- * A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath. New
- * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath
- * (recommanded).
+ * A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath.
+ * New rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath (recommanded).
  *
- * The descriptor file must be found in *META-INF* directory and named
- * *org.jbake.parser.TemplateEngines.properties*. The format of the file is easy:
- * `org.jbake.parser.FreeMarkerRenderer=ftl<br></br> org.jbake.parser.GroovyRenderer=groovy,gsp<br></br> `
+ * The descriptor file must be found in *META-INF* directory and named *org.jbake.parser.TemplateEngines.properties*. The format of the file is easy:
  *
- * where the key is the class of the engine (must extend [AbstractTemplateEngine] and have
- * a 4-arg constructor and the value is a comma-separated list of file extensions that this engine is capable
- * of proceeding.
+ *   ```
+ *   org.jbake.parser.FreeMarkerRenderer=ftl
+ *   org.jbake.parser.GroovyRenderer=groovy,gsp
+ *   ```
+ *
+ * where the key is the class of the engine (must extend [AbstractTemplateEngine] and have a 4-arg constructor
+ * and the value is a comma-separated list of file extensions that this engine is capable of proceeding.
  *
  * Rendering engines are singletons, so are typically used to initialize the underlying template engines.
  *
  *
- * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
- * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit
- * for embedding.
- *
+ * This class loads the engines only if they are found on classpath. If not, the engine is not registered.
+ * This allows JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit for embedding.
  */
 class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     private val engines: MutableMap<String, AbstractTemplateEngine> = HashMap<String, AbstractTemplateEngine>()
@@ -62,8 +61,8 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
                 val props = Properties().apply { load(url.openStream()) }
                 for (entry in props.entries) {
                     val className = entry.key as String
-                    val extensions = (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    registerEngine(config, db, className, *extensions)
+                    val extensions = (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }
+                    registerEngine(config, db, className, extensions)
                 }
             }
         } catch (e: IOException) {
@@ -71,7 +70,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
         }
     }
 
-    private fun registerEngine(config: JBakeConfiguration, db: ContentStore, className: String, vararg extensions: String) {
+    private fun registerEngine(config: JBakeConfiguration, db: ContentStore, className: String, extensions: List<String>) {
 
         val engine: AbstractTemplateEngine = tryLoadEngine(config, db, className) ?: return
 
