@@ -72,7 +72,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         assertEquals(".html", config.outputExtension)
 
         val crawler = Crawler(db, config)
-        crawler.crawl()
+        crawler.crawlContentDirectory()
         parser = Parser(config)
         renderer = Renderer(db, config)
 

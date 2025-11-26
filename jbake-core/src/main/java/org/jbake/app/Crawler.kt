@@ -26,29 +26,24 @@ class Crawler {
     private val parser: Parser
 
     /**
-     * @param source Base directory where content directory is located
+     * @param contentDir Base directory where content directory is located.
      */
-    @Deprecated("""Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.
-      <p>
-      Creates new instance of Crawler.""")
-    constructor(db: ContentStore, source: File, config: CompositeConfiguration) {
+    @Deprecated("""Use {@link #Crawler(ContentStore, JBakeConfiguration)} instead.""")
+
+    constructor(db: ContentStore, contentDir: File, config: CompositeConfiguration) {
         this.db = db
-        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, config)
+        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(contentDir, config)
         this.parser = Parser(this.config)
     }
 
-    /**
-     * Creates new instance of Crawler.
-     *
-     */
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.db = db
         this.config = config
-        this.parser = Parser(config)
+        this.parser = Parser(this.config)
     }
 
-    fun crawl() {
-        crawl(config.contentFolder)
+    fun crawlContentDirectory() {
+        crawlDirectory(config.contentFolder)
 
         log.info("Content detected:")
         for (docType in DocumentTypes.documentTypes) {
@@ -63,47 +58,44 @@ class Crawler {
         crawlDataFiles(config.dataFolder)
 
         log.info("Data files detected:")
-        val docType = config.dataFileDocType
-        val count = db.getDocumentCount(docType)
-        if (count > 0) {
-            log.info("Parsed {} files", count)
-        }
+        val count = db.getDocumentCount(config.dataFileDocType)
+        if (count > 0) log.info("Parsed {} files", count)
     }
 
     /**
      * Crawl all files and folders looking for content.
      */
-    private fun crawl(startFromDirectory: File) {
+    private fun crawlDirectory(startFromDirectory: File) {
         val contents = startFromDirectory.listFiles(FileUtil.getFileFilter(config)) ?: return
 
         Arrays.sort(contents)
         for (sourceFile in contents) {
             when {
                 sourceFile.isFile -> crawlFile(sourceFile)
-                sourceFile.isDirectory -> crawl(sourceFile)
+                sourceFile.isDirectory -> crawlDirectory(sourceFile)
             }
         }
     }
 
     private fun crawlFile(sourceFile: File) {
-        val sha1 = buildHash(sourceFile)
+        val sha1 = runCatching { FileUtil.sha1(sourceFile) }
+            .getOrElse { log.error("Unable to build SHA1 hash for source file '$sourceFile'"); "" }
+
         val uri = buildURI(sourceFile)
         val status = findDocumentStatus(uri, sha1)
 
         val message = buildString {
             append("Processing [").append(sourceFile.path).append("]... ")
             when (status) {
-                DocumentStatus.UPDATED -> { append(" : modified "); db.deleteContent(uri) }
-                DocumentStatus.IDENTICAL -> append(" : same ")
-                DocumentStatus.NEW -> append(" : new ")
+                DocumentStatus.UPDATED -> { log.info("MODIFIED:" + sourceFile.path); db.deleteContent(uri) }
+                DocumentStatus.IDENTICAL -> log.info("SAME:    " + sourceFile.path)
+                DocumentStatus.NEW -> log.info("NEW:     " + sourceFile.path)
             }
         }
+        log.info(message)
 
-        log.info("{}", message)
-
-        if (status != DocumentStatus.IDENTICAL) {
+        if (status != DocumentStatus.IDENTICAL)
             processSourceFile(sourceFile, sha1, uri)
-        }
     }
 
     /**
@@ -119,7 +111,12 @@ class Crawler {
                 continue
             }
 
-            val sha1 = buildHash(sourceFile)
+            val sha1 = try {
+                FileUtil.sha1(sourceFile)
+            }
+            catch (_: Exception) {
+                "".also { log.error("Unable to build SHA1 hash for source file '$sourceFile'") }
+            }
             val uri = buildDataFileURI(sourceFile)
 
             when (findDocumentStatus(uri, sha1)) {
@@ -129,14 +126,6 @@ class Crawler {
             }
 
             crawlDataFile(sourceFile, sha1, uri, config.dataFileDocType)
-        }
-    }
-
-    private fun buildHash(sourceFile: File): String {
-        return try {
-            FileUtil.sha1(sourceFile)
-        } catch (_: Exception) {
-            "".also { log.error("Unable to build SHA1 hash for source file '$sourceFile'") }
         }
     }
 

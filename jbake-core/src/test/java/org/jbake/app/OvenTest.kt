@@ -197,7 +197,7 @@ class OvenTest {
 
         verify(contentStore!!, times(1)).startup()
         verify(renderer, atLeastOnce()).renderIndex(ArgumentMatchers.anyString())
-        verify(crawler, times(1)).crawl()
+        verify(crawler, times(1)).crawlContentDirectory()
         verify(asset, times(1)).copy()
     }
 

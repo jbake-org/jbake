@@ -61,7 +61,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
     @Test fun renderCustomTypePaper() {
         // setup
         val crawler = Crawler(db, config)
-        crawler.crawl()
+        crawler.crawlContentDirectory()
         val parser = Parser(config)
         val renderer = Renderer(db, config)
         val filename = "published-paper.html"

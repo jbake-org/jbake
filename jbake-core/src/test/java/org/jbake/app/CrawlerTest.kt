@@ -12,9 +12,9 @@ import org.junit.Test
 
 class CrawlerTest : ContentStoreIntegrationTest() {
 
-    @Test fun crawl() {
+    @Test fun crawlContentDirectory() {
         val crawler = Crawler(db, config)
-        crawler.crawl()
+        crawler.crawlContentDirectory()
 
         assertEquals(4, db.getDocumentCount("post"))
         assertEquals(3, db.getDocumentCount("page"))
@@ -45,6 +45,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         // Manually register data doctype.
         addDocumentType(config.dataFileDocType)
         db.updateSchema()
+
         crawler.crawlDataFiles()
         assertEquals(2, db.getDocumentCount("data"))
 
@@ -67,7 +68,7 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         config.setUriWithoutExtension(true)
         config.setPrefixForUriWithoutExtension("/blog")
 
-        Crawler(db, config).crawl()
+        Crawler(db, config).crawlContentDirectory()
 
         assertEquals(4, db.getDocumentCount("post"))
         assertEquals(3, db.getDocumentCount("page"))

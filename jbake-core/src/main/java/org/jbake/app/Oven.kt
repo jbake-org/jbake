@@ -15,6 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
+import java.util.ServiceLoader.load
 
 /**
  * All the baking happens in the Oven!
@@ -108,13 +109,18 @@ class Oven {
             utensils.contentStore.updateAndClearCacheIfNeeded(config.clearCache, config.templateFolder)
 
             // Process source content.
-            utensils.crawler.crawl()
+            utensils.crawler.crawlContentDirectory()
 
             // Process data files.
             utensils.crawler.crawlDataFiles()
 
             // Render content.
-            renderContent()
+            for (tool in load(RenderingTool::class.java)) {
+                try {
+                    renderedCount += tool.render(utensils.renderer, utensils.contentStore, utensils.configuration)
+                }
+                catch (e: RenderingException) { errors.add(e) }
+            }
 
             // Copy assets.
             utensils.asset.copy()
@@ -150,19 +156,6 @@ class Oven {
 
         // Needs to be set manually as this isn't defined in same way as document types for content files.
         DocumentTypes.addDocumentType(utensils.configuration.dataFileDocType)
-    }
-
-    /**
-     * Load [RenderingTool] instances and delegate rendering of documents to them
-     */
-    private fun renderContent() {
-
-        for (tool in ServiceLoader.load(RenderingTool::class.java)) {
-            try {
-                renderedCount += tool.render(utensils.renderer, utensils.contentStore, utensils.configuration)
-            }
-            catch (e: RenderingException) { errors.add(e) }
-        }
     }
 
 }
