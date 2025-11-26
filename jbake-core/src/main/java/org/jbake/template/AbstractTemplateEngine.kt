@@ -25,11 +25,17 @@ import java.io.Writer
  * provided by the first argument of [.renderDocument].
  * In this case, it is the responsibility of the engine to convert it.
  */
-abstract class AbstractTemplateEngine protected constructor(
-    protected val config: JBakeConfiguration, protected val db: ContentStore) {
+abstract class AbstractTemplateEngine
+        protected constructor(protected val config: JBakeConfiguration, protected val db: ContentStore)
+{
+
     @Deprecated("use {@link AbstractTemplateEngine(JBakeConfiguration,ContentStore)} instead")
     protected constructor(config: Configuration, db: ContentStore, destination: File, templatesPath: File) : this(
-        JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), destination, config as CompositeConfiguration),
+        JBakeConfigurationFactory().createDefaultJbakeConfiguration(
+            templatesPath.getParentFile(),
+            destination,
+            config as CompositeConfiguration
+        ),
         db
     )
 
