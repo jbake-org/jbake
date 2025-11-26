@@ -59,10 +59,8 @@ class YamlEngine : MarkupEngine() {
     }
 
     /**
-     * This method implements the contract allowing use of Yaml files as content files. As such there is
-     * no body for Yaml files so this method just sets an empty String as the body.
-     *
-     * @param parserContext the parser context
+     * This method implements the contract allowing use of Yaml files as content files.
+     * As such there is no body for Yaml files so this method just sets an empty String as the body.
      */
     override fun processBody(parserContext: ParserContext) {
         parserContext.body = ""

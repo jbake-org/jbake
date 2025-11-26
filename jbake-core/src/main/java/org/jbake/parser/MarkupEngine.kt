@@ -56,7 +56,7 @@ abstract class MarkupEngine : ParserEngine {
 
         if (fileContent.isEmpty()) return null
 
-        val hasHeader = hasHeader(fileContent)
+        val hasHeader = hasDocumentHeader(fileContent)
         val context = ParserContext(file, fileContent, config, hasHeader)
 
         // read header from file
@@ -140,11 +140,8 @@ abstract class MarkupEngine : ParserEngine {
 
     /**
      * Checks if the file has a meta-data header.
-     *
-     * @param contents Contents of file
-     * @return true if header exists, false if not
      */
-    private fun hasHeader(contents: MutableList<String>): Boolean {
+    private fun hasDocumentHeader(contents: MutableList<String>): Boolean {
         var headerValid = true
         var statusFound = false
         var typeFound = false

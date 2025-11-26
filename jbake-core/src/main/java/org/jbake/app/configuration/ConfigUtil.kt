@@ -90,35 +90,14 @@ class ConfigUtil {
         log.warn("Usage of this file is being deprecated, please rename this file to: {} to remove this warning", CONFIG_FILE)
     }
 
-    /**
-     * Load a configuration.
-     *
-     * @param source the source directory of the project
-     * @param propertiesFile the properties file for the project
-     * @return the configuration
-     * @throws JBakeException if unable to configure
-     */
     @Throws(JBakeException::class)
-    fun loadConfig(source: File, propertiesFile: File?): JBakeConfiguration {
+    fun loadConfig(source: File, propertiesFile: File? = null): JBakeConfiguration {
         try {
             val configuration = load(source, propertiesFile)
             return DefaultJBakeConfiguration(source, configuration)
         } catch (e: ConfigurationException) {
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, e.message, e)
         }
-    }
-
-    /**
-     * Load a configuration.
-     *
-     * @param source the source directory of the project
-     * @return the configuration
-     * @throws ConfigurationException if unable to configure
-     */
-    @Deprecated("use {@link #loadConfig(File, File)} instead")
-    @Throws(ConfigurationException::class)
-    fun loadConfig(source: File): JBakeConfiguration {
-        return loadConfig(source, null)
     }
 
     fun setEncoding(encoding: String): ConfigUtil {

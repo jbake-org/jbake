@@ -1,6 +1,7 @@
 package org.jbake.app
 
 import org.apache.commons.configuration2.CompositeConfiguration
+import org.codehaus.groovy.ast.tools.GeneralUtils.param
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
@@ -66,8 +67,6 @@ class Renderer {
 
     /**
      * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
-     *
-     * @param renderingEngine The instance of DelegatingTemplateEngine to use
      */
     constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {
         this.config = config
@@ -82,10 +81,6 @@ class Renderer {
     /**
      * Render using the new type-safe RenderContext.
      * This is the preferred method for new code.
-     *
-     * @param context The rendering context
-     * @param outputFile The output file
-     * @param templateName The template to use
      */
     fun renderWithContext(context: RenderContext, outputFile: File, templateName: String) {
         try {
@@ -109,7 +104,7 @@ class Renderer {
      */
     fun render(content: DocumentModel) {
         val docType = content.type
-        val contentUri = content.uri ?: ""
+        val contentUri = content.uri
         var outputFile = config.destinationFolder.resolve(contentUri)
 
         // Not all URIs have extensions. Only trim extension if it exists
@@ -165,10 +160,7 @@ class Renderer {
         val outputFile = renderConfig.path
         try {
             createWriter(outputFile).use { out ->
-                renderingEngine.renderDocument(
-                    renderConfig.model,
-                    renderConfig.template, out
-                )
+                renderingEngine.renderDocument(renderConfig.model, renderConfig.template, out)
             }
             log.info("Rendering {} [{}]... done!", renderConfig.name, outputFile)
         } catch (e: Exception) {
@@ -180,11 +172,10 @@ class Renderer {
     /**
      * Render an index file using the supplied content.
      *
-     * @param indexFile The name of the output file
      * @throws Exception if IOException or SecurityException are raised
      */
-    fun renderIndex(indexFile: String) {
-        render(DefaultRenderingConfig(indexFile, MASTERINDEX_TEMPLATE_NAME))
+    fun renderIndex(outputIndexFile: String) {
+        render(DefaultRenderingConfig(outputIndexFile, MASTERINDEX_TEMPLATE_NAME))
     }
 
     fun renderIndexPaging(indexFile: String) {
@@ -236,11 +227,10 @@ class Renderer {
     /**
      * Render an XML sitemap file using the supplied content.
      *
-     * @param sitemapFile configuration for site map
      * @throws Exception if can't create correct default rendering config
      * @see [About Sitemaps](https://support.google.com/webmasters/answer/156184?hl=en&ref_topic=8476)
-     *
      * @see [Sitemap protocol](http://www.sitemaps.org/)
+     * @param sitemapFile configuration for site map
      */
     fun renderSitemap(sitemapFile: String) {
         render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
@@ -258,7 +248,6 @@ class Renderer {
     /**
      * Render an archive file using the supplied content.
      *
-     * @param outputArchiveFile The name of the output file
      * @throws Exception if default rendering configuration is not loaded correctly
      */
     fun renderArchive(outputArchiveFile: String) {
@@ -268,7 +257,6 @@ class Renderer {
     /**
      * Render an 404 file using the predefined template.
      *
-     * @param outputFile The name of the output file
      * @throws Exception If default rendering configuration is not loaded correctly.
      */
     fun renderError404(outputFile: String) {
@@ -278,9 +266,7 @@ class Renderer {
     /**
      * Render tag files using the supplied content.
      *
-     * @param outputTagFile The output path
      * @return Number of rendered tags
-     * @throws Exception if cannot render tags correctly
      */
     fun renderTags(outputTagFile: String): Int {
         var renderedCount = 0

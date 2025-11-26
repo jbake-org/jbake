@@ -18,15 +18,12 @@ class Init(private val config: JBakeConfiguration) {
     /**
      * Performs checks on output folder before extracting template file.
      *
-     * @param outputFolder            Target directory for extracting template file.
-     * @param templateLocationFolder  Source location for template file.
-     * @param templateType            Type of the template to be used.
-     * @throws Exception              if required folder structure can't be achieved without content overwriting.
+     * @throws Exception if required folder structure can't be achieved without content overwriting.
      */
-    fun run(outputFolder: File, templateLocationFolder: File, templateType: String) {
-        if (!outputFolder.canWrite()) throw Exception("Output folder is not writeable!")
+    fun run(outputDir: File, templateDir: File, templateType: String) {
+        if (!outputDir.canWrite()) throw Exception("Output folder is not writeable!")
 
-        val contents = outputFolder.listFiles()
+        val contents = outputDir.listFiles()
         var safe = true
         if (contents != null) {
             for (content in contents) {
@@ -37,15 +34,15 @@ class Init(private val config: JBakeConfiguration) {
             }
         }
 
-        if (!safe) throw Exception(String.format("Output folder '%s' already contains structure!", outputFolder.absolutePath))
+        if (!safe) throw Exception(String.format("Output folder '%s' already contains structure!", outputDir.absolutePath))
 
         if (config.getExampleProjectByType(templateType) == null)
             throw Exception("Cannot locate example project type: $templateType")
 
-        val templateFile = File(templateLocationFolder, config.getExampleProjectByType(templateType))
+        val templateFile = File(templateDir, config.getExampleProjectByType(templateType))
         if (!templateFile.exists())
             throw Exception("Cannot find example project file: " + templateFile.path)
 
-        ZipUtil.extract(FileInputStream(templateFile), outputFolder)
+        ZipUtil.extract(FileInputStream(templateFile), outputDir)
     }
 }

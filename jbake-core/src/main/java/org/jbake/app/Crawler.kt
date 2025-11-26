@@ -72,11 +72,9 @@ class Crawler {
 
     /**
      * Crawl all files and folders looking for content.
-     *
-     * @param path Folder to start from
      */
-    private fun crawl(path: File) {
-        val contents = path.listFiles(FileUtil.getFileFilter(config)) ?: return
+    private fun crawl(startFromDirectory: File) {
+        val contents = startFromDirectory.listFiles(FileUtil.getFileFilter(config)) ?: return
 
         Arrays.sort(contents)
         for (sourceFile in contents) {
@@ -110,11 +108,9 @@ class Crawler {
 
     /**
      * Crawl all files and folders looking for data files.
-     *
-     * @param path Folder to start from
      */
-    private fun crawlDataFiles(path: File) {
-        val contents = path.listFiles(FileUtil.dataFileFilter) ?: return
+    private fun crawlDataFiles(startFromDirectory: File) {
+        val contents = startFromDirectory.listFiles(FileUtil.dataFileFilter) ?: return
 
         Arrays.sort(contents)
         for (sourceFile in contents) {

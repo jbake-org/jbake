@@ -89,7 +89,6 @@ interface JBakeConfiguration {
     /**
      * Get name for example project name by given template type
      *
-     * @param templateType a template type
      * @return example project name
      */
     fun getExampleProjectByType(templateType: String): String?
@@ -220,10 +219,9 @@ interface JBakeConfiguration {
     fun setProperty(key: String, value: Any?)
 
     /**
-     * @param type the documents type
-     * @return the thymeleaf render mode ( defaults to [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE] )
+     * @return The thymeleaf render mode. Default: [DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE]
      */
-    fun getThymeleafModeByType(type: String): String
+    fun getThymeleafModeByType(documentsType: String): String
 
     val serverContextPath: String
 

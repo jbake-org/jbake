@@ -62,7 +62,6 @@ object FileUtil {
     /**
      * Ignores directory (and children) if it contains a file named in the configuration as a marker to ignore the directory.
      *
-     * @param dir the file to test
      * @return true if file is directory and not ignored
      */
     fun directoryOnlyIfNotIgnored(dir: File, config: JBakeConfiguration): Boolean {
@@ -74,7 +73,6 @@ object FileUtil {
     /**
      * Ignores directory (and children) if it contains a file named ".jbakeignore".
      *
-     * @param file the file to test
      * @return true if file is directory and not ignored
      */
     @Deprecated("use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead")
@@ -123,7 +121,6 @@ object FileUtil {
     /**
      * Computes the hash of a file or directory.
      *
-     * @param sourceFile the original file or directory
      * @return A hex string representing the SHA1 hash of the file or directory.
      * @throws Exception if any IOException of SecurityException occured
      */
@@ -158,16 +155,16 @@ object FileUtil {
     /**
      * Platform-independent file.getPath(). Needed to transform Windows path separators into slashes.
      *
-     * @param file the file to transform, or `null`
      * @return The result of file.getPath() with all path Separators beeing a "/", or `null`
      */
-    fun asPath(file: File) =         // If path == null, return null. On Windows we have to replace the backslash.
+    fun asPath(file: File): String? =
+        // If path == null, return null.
         if (separator == URI_SEPARATOR_CHAR) file.path
+        // On Windows we have to replace the backslash.
         else file.path.replace(separator, URI_SEPARATOR_CHAR)
 
     /**
      * Given a file inside content it return the relative path to get to the root.
-     *
      * Example: /content and /content/tags/blog will return '../..'
      *
      * @param sourceFile the file to calculate relative path for

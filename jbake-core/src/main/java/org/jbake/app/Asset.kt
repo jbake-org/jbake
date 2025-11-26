@@ -82,8 +82,6 @@ class Asset {
 
     /**
      * Responsible for copying any asset files that exist within the content directory.
-     *
-     * @param contentDirectory Path of the content directory
      */
     fun copyAssetsFromContent(contentDirectoryPath: File) {
         copy(contentDirectoryPath, config.destinationFolder, FileUtil.getNotContentFileFilter(config))

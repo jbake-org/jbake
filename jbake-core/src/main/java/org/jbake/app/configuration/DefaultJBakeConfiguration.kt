@@ -375,8 +375,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         compositeConfiguration.setProperty(key, value)
     }
 
-    override fun getThymeleafModeByType(type: String): String {
-        val key = "template_" + type + "_thymeleaf_mode"
+    override fun getThymeleafModeByType(documentsType: String): String {
+        val key = "template_" + documentsType + "_thymeleaf_mode"
         return getAsString(key, DEFAULT_TYHMELEAF_TEMPLATE_MODE)!!
     }
 
