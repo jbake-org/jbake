@@ -16,11 +16,10 @@ import org.slf4j.LoggerFactory
 
 @ExtendWith(MockitoExtension::class)
 abstract class LoggingTest {
-    @Mock
-    protected lateinit var mockAppender: Appender<ILoggingEvent>
 
-    @Captor
-    protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent> = ArgumentCaptor.captor()
+    @Mock protected lateinit var mockAppender: Appender<ILoggingEvent>
+
+    @Captor protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent> = ArgumentCaptor.captor()
 
     protected lateinit var root: Logger
 

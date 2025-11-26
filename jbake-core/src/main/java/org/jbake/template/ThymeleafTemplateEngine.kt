@@ -7,6 +7,7 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
+import org.jbake.util.PathUtils
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import org.thymeleaf.context.LazyContextVariable
@@ -58,7 +59,8 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
 
         val resolver = FileTemplateResolver()
         templateResolver = resolver
-        resolver.prefix = config.templateFolder!!.absolutePath + File.separatorChar
+        // Use PathUtil.dirPrefix to provide prefix string with trailing separator if needed
+        resolver.prefix = PathUtils.ensureTrailingSeparatorForDirectory(config.templateFolder)
         resolver.characterEncoding = config.templateEncoding
         resolver.setTemplateMode(DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE)
 

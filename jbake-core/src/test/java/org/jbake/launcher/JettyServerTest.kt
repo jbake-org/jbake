@@ -19,8 +19,8 @@ import java.util.concurrent.Executors
 
 @ExtendWith(MockitoExtension::class)
 internal class JettyServerTest {
-    @Mock
-    var jBakeConfiguration: JBakeConfiguration? = null
+
+    @Mock lateinit var jBakeConfiguration: JBakeConfiguration
 
     @Test
     fun shouldRunWithCustomPortAndContext(@TempDir output: Path) {
@@ -29,14 +29,14 @@ internal class JettyServerTest {
 
         val source = TestUtils.testResourcesAsSourceFolder
         val port = this.randoport
-        Mockito.`when`(jBakeConfiguration!!.serverPort).thenReturn(port)
-        Mockito.`when`(jBakeConfiguration!!.serverHostname).thenReturn("localhost")
-        Mockito.`when`(jBakeConfiguration!!.serverContextPath).thenReturn("/foo")
+        Mockito.`when`(jBakeConfiguration.serverPort).thenReturn(port)
+        Mockito.`when`(jBakeConfiguration.serverHostname).thenReturn("localhost")
+        Mockito.`when`(jBakeConfiguration.serverContextPath).thenReturn("/foo")
 
         val executorService = Executors.newSingleThreadExecutor()
 
         JettyServer().use { server ->
-            executorService.execute { server.run(source.absolutePath, jBakeConfiguration!!) }
+            executorService.execute { server.run(source.absolutePath, jBakeConfiguration) }
             while (!server.isStarted) {
                 println("waiting until jetty is running")
                 Thread.sleep(100)

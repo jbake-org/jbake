@@ -26,11 +26,9 @@ class RendererTest {
     private lateinit var config: DefaultJBakeConfiguration
     private lateinit var outputPath: File
 
-    @Mock
-    private val db: ContentStore? = null
+    @Mock private lateinit var db: ContentStore
 
-    @Mock
-    private val renderingEngine: DelegatingTemplateEngine? = null
+    @Mock private lateinit var renderingEngine: DelegatingTemplateEngine
 
     @Before
     fun setup() {
@@ -55,7 +53,7 @@ class RendererTest {
         val FILENAME = "about"
         config.setOutputExtension("")
         config.templateFolder = (folder.newFolder("templates"))
-        val renderer = Renderer(db!!, config, renderingEngine!!)
+        val renderer = Renderer(db, config, renderingEngine)
 
         val content = DocumentModel()
         content.type = "page"
