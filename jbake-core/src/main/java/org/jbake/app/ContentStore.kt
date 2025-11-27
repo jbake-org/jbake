@@ -116,7 +116,7 @@ class ContentStore(private val type: String, private val name: String?) {
         if (::orient.isInitialized) {
             orient.close()
         }
-        DBUtil.closeDataStore()
+        DbUtils.closeDataStore()
     }
 
     fun shutdown() {

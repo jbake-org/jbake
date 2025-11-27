@@ -18,6 +18,7 @@ abstract class ContentStoreIntegrationTest {
         db.drop()
     }
 
+    // TBD: Not used anywhere else??
     internal enum class StorageType {
         MEMORY, PLOCAL;
 
@@ -31,33 +32,31 @@ abstract class ContentStoreIntegrationTest {
         internal lateinit var db: ContentStore
         internal lateinit var config: DefaultJBakeConfiguration
         internal var storageType: StorageType = StorageType.MEMORY
-        internal var sourceFolder: File? = null
+        internal lateinit var sourceFolder: File
 
         fun setUpClass() {
             // Create temp folder
             folder = Files.createTempDirectory("jbake-test").toFile()
 
             sourceFolder = TestUtils.testResourcesAsSourceFolder
-            if (!sourceFolder!!.exists()) {
-                throw AssertionError("Cannot find sample data structure!")
-            }
+            if (!sourceFolder.exists()) throw AssertionError("Cannot find sample data structure!")
 
-            config = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
+            config = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
             config.setSourceFolder(sourceFolder)
 
             config.outputExtension shouldBe ".html"
-            config.databaseStore = (storageType.toString())
+            config.databaseStore = storageType.toString() // TBD: Not used anywhere else??
 
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
-            var dbPath: String = File(folder, "documents" + System.currentTimeMillis()).name
+            var dbPath: String = File(folder, "documents" + (System.currentTimeMillis() - 1764000000000)).name
 
-            // setting the database path with a colon creates an invalid url for OrientDB.
-            // only one colon is expected. there is no documentation about proper url path for windows available :(
-            if (SystemUtils.IS_OS_WINDOWS) {
+            // Setting the database path with a colon is invalid for OrientDB URL on Windows.
+            // Only one colon is expected. There is no documentation available about proper URL :(
+            if (SystemUtils.IS_OS_WINDOWS)
                 dbPath = dbPath.replace(":", "")
-            }
+
             config.databasePath = (dbPath)
-            db = DBUtil.createDataStore(config)
+            db = DbUtils.createDataStore(config)
         }
 
         fun cleanUpClass() {

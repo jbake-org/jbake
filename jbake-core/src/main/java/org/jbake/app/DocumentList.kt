@@ -15,7 +15,7 @@ class DocumentList<T> : LinkedList<T>() {
             val list = DocumentList<DocumentModel>()
             while (docs.hasNext()) {
                 val next = docs.next()
-                list.add(DBUtil.documentToModel(next))
+                list.add(DbUtils.documentToModel(next))
             }
             docs.close()
             return list

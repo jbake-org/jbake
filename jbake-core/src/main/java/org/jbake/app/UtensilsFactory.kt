@@ -15,7 +15,7 @@ object UtensilsFactory {
         val inspector = JBakeConfigurationInspector(config)
         inspector.inspect()
 
-        val contentStore = DBUtil.createDataStore(config)
+        val contentStore = DbUtils.createDataStore(config)
         return Utensils(
             configuration = config,
             contentStore = contentStore,

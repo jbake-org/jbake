@@ -1,6 +1,6 @@
 package org.jbake.model
 
-import org.jbake.app.DBUtil
+import org.jbake.app.DbUtils
 import java.util.*
 
 /**
@@ -28,7 +28,7 @@ class TypedDocumentModel : TypedBaseModel() {
     var tags: Array<String>
         get() {
             val entry = get(ModelAttributes.TAGS) ?: return emptyArray()
-            return DBUtil.toStringArray(entry)
+            return DbUtils.toStringArray(entry)
         }
         set(value) { set(ModelAttributes.TAGS, value) }
 

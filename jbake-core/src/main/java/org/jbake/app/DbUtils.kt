@@ -5,7 +5,7 @@ import com.orientechnologies.orient.core.sql.executor.OResult
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 
-object DBUtil {
+object DbUtils {
     private var contentStore: ContentStore? = null
 
     @Deprecated("")

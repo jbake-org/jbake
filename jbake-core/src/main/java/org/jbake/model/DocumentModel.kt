@@ -1,6 +1,6 @@
 package org.jbake.model
 
-import org.jbake.app.DBUtil
+import org.jbake.app.DbUtils
 import java.util.*
 
 class DocumentModel : BaseModel() {
@@ -22,7 +22,7 @@ class DocumentModel : BaseModel() {
         set(type) { put(ModelAttributes.TYPE, type) }
 
     var tags: Array<String>
-        get() = DBUtil.toStringArray(get(ModelAttributes.TAGS) ?: emptyArray<String>())
+        get() = DbUtils.toStringArray(get(ModelAttributes.TAGS) ?: emptyArray<String>())
         set(tags) { put(ModelAttributes.TAGS, tags) }
 
     var sha1: String?
