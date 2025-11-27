@@ -318,7 +318,7 @@ class Renderer {
         }
 
         if (errors.isNotEmpty()) {
-            val message = "Failed to render tags. Cause(s):" + errors.map { "\n" + it.message }.joinToString()
+            val message = "Failed to render tags. Cause(s):" + errors.joinToString { "\n" + it.message }
             throw Exception(message, errors[0])
         }
         return renderedCount
