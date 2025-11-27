@@ -9,6 +9,7 @@ import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.template.RenderingException
 
 class IndexRendererTest : StringSpec({
         fun returnsZeroWhenConfigDoesNotRenderIndices() {
@@ -67,7 +68,7 @@ class IndexRendererTest : StringSpec({
 
         every { mockRenderer.renderIndex(any()) } throws RuntimeException()
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<RenderingException> {
             renderer.render(mockRenderer, contentStore, configuration)
         }
 

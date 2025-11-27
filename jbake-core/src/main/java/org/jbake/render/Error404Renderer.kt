@@ -18,7 +18,8 @@ class Error404Renderer : RenderingTool {
         try {
             renderer.renderError404(config.error404FileName!!)
             return 1
-        } catch (e: Exception) { throw RenderingException(e) }
+        }
+        catch (e: Exception) { throw RenderingException(e) }
     }
 
     @Throws(RenderingException::class)

@@ -188,6 +188,25 @@ object FileUtil {
     fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File)
         = getPathToRoot(config, config.contentFolder, sourceFile)
 
+    @JvmStatic
+    fun getUriPathToSourceRoot(config: JBakeConfiguration, sourceFile: File): String {
+        val contentRoot = Paths.get(config.contentFolder.toURI())
+        val sourceParent = Paths.get(sourceFile.parentFile.toURI())
+
+        val relative = try {
+            contentRoot.relativize(sourceParent)
+        } catch (e: Exception) {
+            return ""
+        }
+
+        val relString = asPath(relative.toFile())
+        val segments = if (relString.isEmpty()) 0 else relString.split(URI_SEPARATOR_CHAR).filter { it.isNotEmpty() }.size
+
+        return buildString {
+            repeat(segments + 1) { append("../") }
+        }
+    }
+
     /**
      * Utility method to determine if a given file is located somewhere in the directory provided.
      *

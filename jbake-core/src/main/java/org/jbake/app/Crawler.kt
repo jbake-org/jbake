@@ -190,7 +190,7 @@ class Crawler {
     }
 
     private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String, uri: String) {
-        document.rootPath = FileUtil.getUriPathToContentRoot(config, sourceFile)
+        document.rootPath = FileUtil.getUriPathToSourceRoot(config, sourceFile)
         document.sha1 = sha1
         document.rendered = false
         document.file = sourceFile.path

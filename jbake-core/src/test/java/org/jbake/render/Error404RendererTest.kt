@@ -9,6 +9,7 @@ import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.template.RenderingException
 
 class Error404RendererTest : StringSpec({
 
@@ -87,7 +88,7 @@ class Error404RendererTest : StringSpec({
 
         every { mockRenderer.renderError404(any()) } throws RuntimeException()
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<RenderingException> {
             renderer.render(mockRenderer, contentStore, configuration)
         }
     }

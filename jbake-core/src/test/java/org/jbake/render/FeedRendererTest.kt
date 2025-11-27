@@ -9,6 +9,7 @@ import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.template.RenderingException
 
 class FeedRendererTest : StringSpec({
 
@@ -81,7 +82,7 @@ class FeedRendererTest : StringSpec({
 
         every { mockRenderer.renderFeed(any()) } throws RuntimeException()
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<RenderingException> {
             renderer.render(mockRenderer, contentStore, configuration)
         }
 
