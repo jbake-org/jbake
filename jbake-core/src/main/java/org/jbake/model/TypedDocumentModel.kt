@@ -76,6 +76,7 @@ class TypedDocumentModel : TypedBaseModel() {
      */
     fun copy(): TypedDocumentModel {
         val copy = TypedDocumentModel()
+        @Suppress("DEPRECATION")
         copy.putAll(toMap())
         return copy
     }
@@ -88,9 +89,8 @@ class TypedDocumentModel : TypedBaseModel() {
         fun fromLegacy(legacy: DocumentModel): TypedDocumentModel {
             val typed = TypedDocumentModel()
             // Copy all properties from the HashMap
-            for ((key, value) in legacy) {
+            for ((key, value) in legacy)
                 typed[key] = value
-            }
             return typed
         }
 
@@ -100,6 +100,7 @@ class TypedDocumentModel : TypedBaseModel() {
          */
         fun toLegacy(typed: TypedDocumentModel): DocumentModel {
             val legacy = DocumentModel()
+            @Suppress("DEPRECATION")
             legacy.putAll(typed.toMap())
             return legacy
         }

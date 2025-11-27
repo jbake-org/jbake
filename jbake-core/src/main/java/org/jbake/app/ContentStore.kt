@@ -334,7 +334,7 @@ class ContentStore(private val type: String, private val name: String?) {
         var templateSignatureChanged = false
 
         val docs = this.signaturesForTemplates
-        var currentTemplatesSignature = try { FileUtil.sha1(templateFolder) }
+        val currentTemplatesSignature = try { FileUtil.sha1(templateFolder) }
             catch (e: Exception) { "" }
 
         if (!docs.isEmpty()) {

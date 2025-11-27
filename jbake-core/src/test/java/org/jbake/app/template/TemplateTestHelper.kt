@@ -32,7 +32,7 @@ class TemplateTestHelper(
         ContentStoreIntegrationTest.setUpClass()
         db = ContentStoreIntegrationTest.db
         config = ContentStoreIntegrationTest.config
-        sourceFolder = ContentStoreIntegrationTest.sourceFolder!!
+        sourceFolder = ContentStoreIntegrationTest.sourceFolder
     }
 
     fun setupTest() {

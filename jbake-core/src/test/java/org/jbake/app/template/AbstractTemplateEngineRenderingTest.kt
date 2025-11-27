@@ -137,7 +137,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "second-post.html"
 
-        val sampleFile = sourceFolder!!.resolve("content").resolve("blog").resolve("2013").resolve(filename)
+        val sampleFile = sourceFolder.resolve("content").resolve("blog").resolve("2013").resolve(filename)
         val content = parser.processFile(sampleFile)
         content!!.uri = filename
         renderer.render(content)
@@ -154,7 +154,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     protected fun testRenderPage() {
         // setup
         val filename = "about.html"
-        val sampleFile = sourceFolder!!.resolve("content").resolve(filename)
+        val sampleFile = sourceFolder.resolve("content").resolve(filename)
 
         // When
         val content = parser.processFile(sampleFile)
