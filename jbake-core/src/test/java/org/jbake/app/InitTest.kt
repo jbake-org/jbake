@@ -11,9 +11,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
-import java.io.IOException
 
 class InitTest {
+
     @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
 
@@ -37,34 +37,28 @@ class InitTest {
         assertThat(testFile).exists()
     }
 
-    @Test
-    @Throws(IOException::class)
-    fun initFailDestinationContainsContent() {
+    @Test fun initFailDestinationContainsContent() {
         val init = Init(config)
         val initPath = folder.newFolder("init")
         val contentFolder = File(initPath.path, config.contentFolderName)
         contentFolder.mkdir()
         try {
             init.run(initPath, rootPath, "freemarker")
-            fail<Any?>("Shouldn't be able to initialise folder with content folder within it!")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            fail("Shouldn't be able to initialise folder with content folder within it!")
+        } catch (e: Exception) {/* Expected. */ }
+
         val testFile = File(initPath, "testfile.txt")
         assertThat(testFile).doesNotExist()
     }
 
-    @Test
-    @Throws(IOException::class)
-    fun initFailInvalidTemplateType() {
+    @Test fun initFailInvalidTemplateType() {
         val init = Init(config)
         val initPath = folder.newFolder("init")
         try {
             init.run(initPath, rootPath, "invalid")
-            fail<Any?>("Shouldn't be able to initialise folder with invalid template type")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            fail("Shouldn't be able to initialise folder with invalid template type")
+        } catch (e: Exception) { /* Expected. */ }
+
         val testFile = File(initPath, "testfile.txt")
         assertThat(testFile).doesNotExist()
     }

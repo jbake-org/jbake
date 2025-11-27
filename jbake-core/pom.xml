@@ -31,6 +31,8 @@
         <!-- API Dependencies -->
         <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId></dependency>
         <dependency><groupId>org.apache.commons</groupId><artifactId>commons-configuration2</artifactId></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>2.0.17</version></dependency>
+        <!-- Templating engines -->
         <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><optional>true</optional></dependency>
         <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><optional>true</optional></dependency>
         <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId><optional>true</optional></dependency>
@@ -42,7 +44,6 @@
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><optional>true</optional></dependency>
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><optional>true</optional></dependency>
         <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><optional>true</optional></dependency>
-        <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>2.0.17</version></dependency>
 
 
         <!-- Implementation Dependencies -->
@@ -58,17 +59,16 @@
         <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
 
         <!-- Test Dependencies -->
-        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>junit</groupId><artifactId>junit</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><scope>test</scope></dependency>
-        <!-- Logging for tests -->
-        <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version><scope>test</scope></dependency>
+        <dependency><scope>test</scope><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
+        <dependency><scope>test</scope><groupId>junit</groupId><artifactId>junit</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId></dependency>
     </dependencies>
 
     <build>
