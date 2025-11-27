@@ -10,22 +10,21 @@ import java.io.IOException
 import java.util.*
 
 /**
- *
  * A singleton class giving access to model extractors. Model extractors are loaded based on classpath. New
  * rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath (recommanded).
  *
  * The descriptor file must be found in *META-INF* directory and named
  * *org.jbake.template.ModelExtractors.properties*. The format of the file is easy:
- * `org.jbake.template.model.AllPosts=all_posts<br></br> org.jbake.template.model.AllContent=all_content<br></br> `
  *
- * where the key is the class of the extractor (must implement [ModelExtractor]  and the value is the key
- * by which values are to be accessed in model.
+ *   ```
+ *   org.jbake.template.model.AllPosts=all_posts
+ *   org.jbake.template.model.AllContent=all_content
+ *   ```
+ * ...where the key is the class of the extractor (must implement [ModelExtractor]  and the value is the key by which values are to be accessed in model.
  *
  *
- * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
- * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit
- * for embedding.
- * @author Cédric Champeau
+ * This class loads the engines only if they are found on classpath. If not, the engine is not registered.
+ * This allows JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit for embedding.
  */
 class ModelExtractors private constructor() {
     private val extractors: MutableMap<String, ModelExtractor<*>> = TreeMap<String, ModelExtractor<*>>()
@@ -107,7 +106,7 @@ class ModelExtractors private constructor() {
     fun containsKey(key: Any?): Boolean = extractors.containsKey(key)
 
     /**
-     *  A @[Set] of all known keys a @[ModelExtractor] is registered with
+     *  A @[Set] of all known keys a @[ModelExtractor] is registered with,
      * @see java.util.Map.keySet
      */
     fun keySet(): MutableSet<String> = extractors.keys

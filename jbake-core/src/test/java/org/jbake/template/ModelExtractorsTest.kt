@@ -18,10 +18,8 @@ class ModelExtractorsTest {
     }
 
     @Test fun shouldLoadExtractorsOnInstantiation() {
-        ModelExtractors.instance
-        val expectedKeys: Array<String> = arrayOf(
-            "pages", "posts", "indexs", "archives", "feeds", "published_posts", "published_pages",
-            "published_content", "published_date", "all_content", "alltags", "db", "tag_posts", "tags", "tagged_documents")
+        val expectedKeys = "pages,posts,indexs,archives,feeds,published_posts,published_pages," +
+            "published_content,published_date,all_content,alltags,db,tag_posts,tags,tagged_documents".split(",")
 
         for (aKey in expectedKeys) {
             assertThat(ModelExtractors.instance.containsKey(aKey)).isTrue()
