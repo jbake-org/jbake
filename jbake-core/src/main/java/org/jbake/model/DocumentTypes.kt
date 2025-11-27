@@ -42,6 +42,9 @@ object DocumentTypes {
         LISTENERS.add(listener)
     }
 
+    /** Clears registered listeners. Tests call this when they need a clean listener state between cases instead of relying on resetDocumentTypes to do so. */
+    @JvmStatic fun clearListenersForTests() = LISTENERS.clear()
+
     @JvmStatic
     val documentTypes: Array<String>
         /**

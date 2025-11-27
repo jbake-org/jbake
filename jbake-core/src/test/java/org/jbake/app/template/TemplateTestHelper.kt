@@ -42,6 +42,7 @@ class TemplateTestHelper(
         Locale.setDefault(Locale.ENGLISH)
 
         val listener = ModelExtractorsDocumentTypeListener()
+        DocumentTypes.clearListenersForTests()
         DocumentTypes.addListener(listener)
 
         templateFolder = File(sourceFolder, templateDir)
@@ -81,6 +82,7 @@ class TemplateTestHelper(
     fun teardownTest() {
         db.drop()
         DocumentTypes.resetDocumentTypes()
+        DocumentTypes.clearListenersForTests()
         ModelExtractors.instance.reset()
         Locale.setDefault(currentLocale)
     }
@@ -150,4 +152,3 @@ class TemplateTestHelper(
         return expectedInOutput[type] ?: mutableListOf()
     }
 }
-

@@ -19,7 +19,7 @@ class ArchiveRendererTest : StringSpec({
         every { configuration.renderArchive } returns false
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 0
@@ -32,7 +32,7 @@ class ArchiveRendererTest : StringSpec({
         every { configuration.renderArchive } returns false
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
@@ -48,7 +48,7 @@ class ArchiveRendererTest : StringSpec({
 
         val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -63,7 +63,7 @@ class ArchiveRendererTest : StringSpec({
         every { configuration.archiveFileName } returns "mockarchive.html"
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 

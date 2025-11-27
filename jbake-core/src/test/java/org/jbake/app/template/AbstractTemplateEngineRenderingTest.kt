@@ -1,6 +1,5 @@
 package org.jbake.app.template
 
-import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -10,6 +9,7 @@ import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
 import org.jbake.app.Renderer
+import org.jbake.model.DocumentTypes
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.DocumentTypes.addListener
 import org.jbake.model.DocumentTypes.documentTypes
@@ -21,7 +21,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 abstract class AbstractTemplateEngineRenderingTest(
-    protected val templateDir: String? = null,
+    protected val templateDir: String,
     protected val templateExtension: String? = null,
 ) : ContentStoreIntegrationTest() {
 
@@ -38,6 +38,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         Locale.setDefault(Locale.ENGLISH)
 
         val listener = ModelExtractorsDocumentTypeListener()
+        DocumentTypes.clearListenersForTests()
         addListener(listener)
 
         templateFolder = File(sourceFolder, templateDir)
@@ -275,4 +276,3 @@ abstract class AbstractTemplateEngineRenderingTest(
         }
     }
 }
-

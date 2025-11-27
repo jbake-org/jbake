@@ -39,7 +39,7 @@ class MainTest : StringSpec({
         mockFactory = mockk(relaxed = true)
 
         main = Main(mockBaker, mockJetty, mockWatcher)
-        every { mockFactory.configUtil } returns mockConfigUtil
+        mockFactory.configUtil = mockConfigUtil
         main.jBakeConfigurationFactory = mockFactory
         System.setOut(PrintStream(outputStreamCaptor))
     }
@@ -52,17 +52,20 @@ class MainTest : StringSpec({
 
     "launchJetty" {
         val currentWorkingdir = File(folder, "src/jbake").apply { mkdirs() }
-        val expectedOutput = File(currentWorkingdir, "output")
+        val expectedOutputDir = File(currentWorkingdir, "output")
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
         every { mockFactory.createJettyJbakeConfiguration(any<File>(), any(), any(), any()) } returns configuration
         every { mockFactory.setEncoding(any()) } returns mockFactory
         System.setProperty("user.dir", currentWorkingdir.path)
 
+        // Ensure the configuration returns the expected destination folder when server runs.
+        every { configuration.destinationFolder } returns expectedOutputDir
+
         val args = arrayOf("-s")
         main.run(args)
 
-        verify { mockJetty.run(expectedOutput.path, configuration) }
+        verify { mockJetty.run(expectedOutputDir.path, configuration) }
     }
 
     "launchBakeWithCustomPropertiesEncoding" {
@@ -116,10 +119,13 @@ class MainTest : StringSpec({
         every { mockFactory.createDefaultJbakeConfiguration(any<File>(), any<File>(), any<File>(), any()) } returns configuration
         System.setProperty("user.dir", src.path)
 
+        // Ensure ConfigurationPrinter has at least one Property to print the group header
+        every { configuration.jbakeProperties } returns mutableListOf(org.jbake.app.configuration.Property("site.host", "Site host"))
+        every { configuration.get("site.host") } returns "http://www.jbake.org"
+
         val args = arrayOf("-ls")
         main.run(args)
 
-        outputStreamCaptor.toString() shouldContain "DEFAULT - Settings"
+        outputStreamCaptor.toString() shouldContain "DEFAULT - Settings" // Why??
     }
 })
-

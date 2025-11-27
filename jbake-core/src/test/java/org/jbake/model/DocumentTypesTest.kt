@@ -1,15 +1,21 @@
 package org.jbake.model
 
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
+import io.mockk.mockk
+import io.mockk.verify
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.DocumentTypes.addListener
 import org.jbake.model.DocumentTypes.contains
 import org.jbake.model.DocumentTypes.documentTypes
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.shouldBe
-import io.mockk.*
 
 class DocumentTypesTest : StringSpec({
+    beforeTest {
+        DocumentTypes.resetDocumentTypes()
+        DocumentTypes.clearListenersForTests()
+    }
+
     "shouldReturnDefaultDocumentTypes" {
         val knownDocumentTypes = documentTypes
         val expectedDocumentType = listOf("page", "post", "masterindex", "archive", "feed")

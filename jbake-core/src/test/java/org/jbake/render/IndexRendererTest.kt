@@ -19,7 +19,7 @@ class IndexRendererTest : StringSpec({
 
         val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 0
@@ -32,7 +32,7 @@ class IndexRendererTest : StringSpec({
         every { configuration.renderIndex } returns false
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
@@ -47,7 +47,7 @@ class IndexRendererTest : StringSpec({
 
         val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -86,7 +86,7 @@ class IndexRendererTest : StringSpec({
         every { configuration.indexFileName } returns "mockindex.html"
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
@@ -102,7 +102,7 @@ class IndexRendererTest : StringSpec({
         every { configuration.indexFileName } returns "mockindex.html"
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 

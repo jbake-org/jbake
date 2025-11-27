@@ -32,7 +32,7 @@ class SitemapRendererTest : StringSpec({
         every { configuration.renderSiteMap } returns false
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
@@ -47,7 +47,7 @@ class SitemapRendererTest : StringSpec({
 
         val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -62,7 +62,7 @@ class SitemapRendererTest : StringSpec({
         every { configuration.siteMapFileName } returns "mocksitemap.html"
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 

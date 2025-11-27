@@ -1,5 +1,10 @@
 package org.jbake.template
 
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.configuration.JBakeConfiguration
@@ -7,11 +12,6 @@ import org.jbake.model.DocumentModel
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TagsExtractor
 import org.jbake.template.model.TemplateModel
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldBe
-import io.mockk.*
-import org.mockito.Mockito.`when`
 
 class TagExtractorTest : StringSpec({
     fun mockDbWithTags(vararg tags: String): ContentStore {
@@ -21,8 +21,8 @@ class TagExtractorTest : StringSpec({
 
         // For each tag return empty lists for posts/documents (not needed for this test beyond existence)
         for (t in tags) {
-            `when`(db.getPublishedPostsByTag(t)).thenReturn(DocumentList<DocumentModel>())
-            `when`(db.getPublishedDocumentsByTag(t)).thenReturn(DocumentList<DocumentModel>())
+            every { db.getPublishedPostsByTag(t) } returns DocumentList<DocumentModel>()
+            every { db.getPublishedDocumentsByTag(t) } returns DocumentList<DocumentModel>()
         }
         return db
     }
@@ -57,7 +57,8 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.first() as TemplateModel
+        val tm = list.firstOrNull { (it as TemplateModel).name == "blog" } as TemplateModel?
+        tm.shouldNotBeNull()
         tm.uri shouldBe "blog.html"
     }
 
@@ -69,7 +70,8 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.first() as TemplateModel
+        val tm = list.firstOrNull { (it as TemplateModel).name == "news" } as TemplateModel?
+        tm.shouldNotBeNull()
         tm.uri shouldBe "tags/news"
     }
 
@@ -81,7 +83,8 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.first() as TemplateModel
+        val tm = list.firstOrNull { (it as TemplateModel).name == "blog" } as TemplateModel?
+        tm.shouldNotBeNull()
         tm.uri shouldBe "tags/blog.html"
     }
 
@@ -93,7 +96,8 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.first() as TemplateModel
+        val tm = list.firstOrNull { (it as TemplateModel).name == "blog" } as TemplateModel?
+        tm.shouldNotBeNull()
         tm.uri shouldBe "blog.html"
     }
 })

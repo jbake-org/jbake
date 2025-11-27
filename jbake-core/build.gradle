@@ -61,6 +61,7 @@ dependencies {
     testImplementation "info.picocli:picocli:$picocli"
     testImplementation "io.kotest:kotest-framework-engine:$kotestVersion"
     testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotestVersion"
     testImplementation "io.mockk:mockk:1.14.6"
     testImplementation "io.pebbletemplates:pebble:$pebbleVersion"
     testImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
@@ -86,5 +87,6 @@ kotlin {
 }
 
 test {
+    useJUnitPlatform()
     systemProperty 'jbake.buildOutputDir', sourceSets.main.output.classesDirs.asPath.split(':')[0]
 }

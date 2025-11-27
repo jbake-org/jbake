@@ -20,7 +20,7 @@ class FeedRendererTest : StringSpec({
 
         val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 0
@@ -33,7 +33,7 @@ class FeedRendererTest : StringSpec({
         every { configuration.renderFeed } returns false
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
@@ -48,7 +48,7 @@ class FeedRendererTest : StringSpec({
 
         val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
@@ -62,7 +62,7 @@ class FeedRendererTest : StringSpec({
         every { configuration.feedFileName } returns "mockfeedfile.xml"
 
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 

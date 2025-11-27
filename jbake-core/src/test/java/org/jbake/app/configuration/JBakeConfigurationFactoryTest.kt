@@ -7,13 +7,23 @@ import io.mockk.verify
 import org.jbake.TestUtils
 import java.io.File
 import java.io.FileWriter
+import java.nio.file.Files
 import java.util.*
 
 class JBakeConfigurationFactoryTest : StringSpec({
-    var root: File? = null
+
+    lateinit var root: File
+
+    beforeTest {
+        root = Files.createTempDirectory("jbake-test").toFile()
+    }
+
+    afterTest {
+        root.deleteRecursively()
+    }
 
     "shouldReturnDefaultConfigurationWithDefaultFolders" {
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output")
         val templateFolder = TestUtils.newFolder(root, "templates")
         val assetFolder = TestUtils.newFolder(root, "assets")
@@ -28,7 +38,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
     }
 
     "shouldReturnDefaultConfigurationWithCustomFolders" {
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output/custom")
         val templateFolder = TestUtils.newFolder(root, "templates/custom")
         val assetFolder = TestUtils.newFolder(root, "assets/custom")
@@ -60,7 +70,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
 
 
     "shouldReturnADefaultConfigurationWithSitehost" {
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output")
         val siteHost = "http://www.jbake.org"
 
@@ -70,7 +80,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
     }
 
     "shouldReturnAJettyConfiguration" {
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output")
         val siteHost = "http://localhost:8820/"
 
@@ -80,7 +90,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
     }
 
     "shouldUseDefaultEncodingUTF8" {
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output")
         val factory = JBakeConfigurationFactory()
         factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
@@ -90,7 +100,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
 
     "shouldUseCustomEncoding" {
         val util = spyk(ConfigUtil())
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output")
         val factory = JBakeConfigurationFactory()
         factory.configUtil = util
@@ -102,7 +112,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
     }
 
     "shouldBeAbleToAddCustomProperties" {
-        val sourceFolder = root!!
+        val sourceFolder = root
         val destinationFolder = TestUtils.newFolder(root, "output")
         val config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
         val properties = Properties()

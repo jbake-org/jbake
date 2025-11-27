@@ -321,14 +321,14 @@ class MdParserTest : StringSpec({
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileFencedCodeBlocks)
         documentModel.shouldNotBeNull()
-        documentModel.body shouldContain "<pre><code>function test( {\n  console.log(&quot;!&quot;);\n}\n</code></pre>"
+        documentModel.body shouldContain "<pre><code>function test() {\n  console.log(&quot;!&quot;);\n}\n</code></pre>"
 
         // Test without FENCED_CODE_BLOCKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileFencedCodeBlocks)
         documentModel.shouldNotBeNull()
-        documentModel.body shouldContain "<p><code>function test( { console.log(&quot;!&quot;); }</code></p>"
+        documentModel.body shouldContain "<p><code>function test() { console.log(&quot;!&quot;); }</code></p>"
     }
 
     "parseValidMdFileQuotes" {

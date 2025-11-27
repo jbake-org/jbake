@@ -28,11 +28,12 @@ abstract class ContentStoreIntegrationTest {
     }
 
     companion object {
-        internal lateinit var folder: File
-        internal lateinit var db: ContentStore
-        internal lateinit var config: DefaultJBakeConfiguration
-        internal var storageType: StorageType = StorageType.MEMORY
-        internal lateinit var sourceFolder: File
+        // Aligned declarations: variable name, colon, type, and optional initializer line up for readability
+        internal lateinit var folder       : File
+        internal lateinit var db           : ContentStore
+        internal lateinit var config       : DefaultJBakeConfiguration
+        internal var          storageType  : StorageType = StorageType.MEMORY
+        internal lateinit var sourceFolder : File
 
         fun setUpClass() {
             // Create temp folder
@@ -45,17 +46,17 @@ abstract class ContentStoreIntegrationTest {
             config.setSourceFolder(sourceFolder)
 
             config.outputExtension shouldBe ".html"
-            config.databaseStore = storageType.toString() // TBD: Not used anywhere else??
+            config.databaseStore   = storageType.toString() // TBD: Not used anywhere else??
 
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
-            var dbPath: String = File(folder, "documents" + (System.currentTimeMillis() - 1764000000000)).name
+            var dbPath : String = File(folder, "documents" + (System.currentTimeMillis() - 1764000000000)).name
 
             // Setting the database path with a colon is invalid for OrientDB URL on Windows.
             // Only one colon is expected. There is no documentation available about proper URL :(
             if (SystemUtils.IS_OS_WINDOWS)
                 dbPath = dbPath.replace(":", "")
 
-            config.databasePath = (dbPath)
+            config.databasePath = dbPath
             db = DbUtils.createDataStore(config)
         }
 
