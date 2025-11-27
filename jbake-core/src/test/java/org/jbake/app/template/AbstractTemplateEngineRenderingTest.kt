@@ -49,16 +49,11 @@ abstract class AbstractTemplateEngineRenderingTest(
         config.templateFolder = (templateFolder)
 
         for (docType in documentTypes) {
-            val templateFile: File? = config.getTemplateFileByDocType(docType)
-
-            if (templateFile != null) {
-                val fileName = templateFile.getName()
-                val fileBaseName = fileName.take(fileName.lastIndexOf("."))
-                config.setTemplateFileNameForDocType(
-                    docType,
-                    "$fileBaseName.$templateExtension"
-                )
-            }
+            val templateFile: File = config.getTemplateFileByDocType(docType)
+                ?: continue
+            val fileName = templateFile.getName()
+            val fileBaseName = fileName.take(fileName.lastIndexOf("."))
+            config.setTemplateFileNameForDocType(docType, "$fileBaseName.$templateExtension")
         }
 
         config.setTemplateFileNameForDocType("paper", "paper.$templateExtension")
