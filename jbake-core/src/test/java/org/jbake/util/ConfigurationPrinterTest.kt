@@ -1,14 +1,15 @@
 package org.jbake.util
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.string.shouldContain
 import org.jbake.TestUtils
 import org.jbake.app.configuration.JBakeConfigurationFactory
-import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-internal class ConfigurationPrinterTest {
-    @Test fun shouldPrintHeader() {
+internal class ConfigurationPrinterTest : StringSpec({
+
+    "shouldPrintHeader" {
         val configuration =
             JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
         val data = ByteArrayOutputStream()
@@ -17,14 +18,15 @@ internal class ConfigurationPrinterTest {
 
         printer.print()
 
-        assertThat(data.toString()).contains("DEFAULT - Settings")
-        assertThat(data.toString()).contains("CUSTOM - Settings")
-        assertThat(data.toString()).contains("Key")
-        assertThat(data.toString()).contains("Value")
+        val output = data.toString()
+        output shouldContain "DEFAULT - Settings"
+        output shouldContain "CUSTOM - Settings"
+        output shouldContain "Key"
+        output shouldContain "Value"
     }
 
 
-    @Test fun shouldPrintKeyAndValue() {
+    "shouldPrintKeyAndValue" {
         val configuration =
             JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
         val data = ByteArrayOutputStream()
@@ -33,7 +35,8 @@ internal class ConfigurationPrinterTest {
 
         printer.print()
 
-        assertThat(data.toString()).contains("site.host")
-        assertThat(data.toString()).contains("http://www.jbake.org")
+        val output = data.toString()
+        output shouldContain "site.host"
+        output shouldContain "http://www.jbake.org"
     }
-}
+})

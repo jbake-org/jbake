@@ -1,6 +1,8 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.file.shouldBeAFile
+import io.mockk.mockk
 import org.jbake.TestUtils
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
@@ -8,50 +10,39 @@ import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.template.DelegatingTemplateEngine
-import org.junit.Assume
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
 import java.io.File
+import java.nio.file.Files
 
-@RunWith(MockitoJUnitRunner::class)
-class RendererTest {
+class RendererTest : StringSpec({
+    lateinit var folder: File
+    lateinit var config: DefaultJBakeConfiguration
+    lateinit var outputPath: File
+    lateinit var db: ContentStore
+    lateinit var renderingEngine: DelegatingTemplateEngine
 
-    @Rule @JvmField
-    var folder: TemporaryFolder = TemporaryFolder()
-    private lateinit var config: DefaultJBakeConfiguration
-    private lateinit var outputPath: File
+    beforeTest {
+        folder = Files.createTempDirectory("jbake-test").toFile()
+        db = mockk(relaxed = true)
+        renderingEngine = mockk(relaxed = true)
 
-    @Mock private lateinit var db: ContentStore
-
-    @Mock private lateinit var renderingEngine: DelegatingTemplateEngine
-
-    @Before
-    fun setup() {
         val sourcePath = TestUtils.testResourcesAsSourceFolder
         if (!sourcePath.exists())
             throw Exception("Cannot find base path for test!")
-        outputPath = folder.newFolder("output")
+        outputPath = File(folder, "output").apply { mkdirs() }
         config = ConfigUtil().loadConfig(sourcePath) as DefaultJBakeConfiguration
-        config.destinationFolder = (outputPath)
+        config.destinationFolder = outputPath
     }
 
-    /**
-     * See issue #300
-     *
-     * @throws Exception
-     */
-    @Test fun testRenderFileWorksWhenPathHasDotInButFileDoesNot() {
-        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows)
-        val FOLDER = "real.path"
+    afterTest {
+        folder.deleteRecursively()
+    }
 
+    "testRenderFileWorksWhenPathHasDotInButFileDoesNot".config(enabled = !TestUtils.isWindows) {
+        val FOLDER = "real.path"
         val FILENAME = "about"
+
         config.setOutputExtension("")
-        config.templateFolder = (folder.newFolder("templates"))
+        config.templateFolder = File(folder, "templates").apply { mkdirs() }
         val renderer = Renderer(db, config, renderingEngine)
 
         val content = DocumentModel()
@@ -62,6 +53,6 @@ class RendererTest {
         renderer.render(content)
 
         val outputFile = outputPath.resolve(FOLDER).resolve(FILENAME)
-        assertThat(outputFile).isFile()
+        outputFile.shouldBeAFile()
     }
-}
+})

@@ -1,7 +1,11 @@
 package org.jbake.app.template
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.apache.commons.io.FileUtils
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
@@ -12,22 +16,15 @@ import org.jbake.model.DocumentTypes.documentTypes
 import org.jbake.model.DocumentTypes.resetDocumentTypes
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
 import java.io.File
 import java.nio.charset.Charset
 import java.util.*
 
 abstract class AbstractTemplateEngineRenderingTest(
-
     protected val templateDir: String? = null,
     protected val templateExtension: String? = null,
-)
-    : ContentStoreIntegrationTest()
-{
+) : ContentStoreIntegrationTest() {
+
     protected val expectedInOutput: MutableMap<String, MutableList<String>> = HashMap()
 
     protected lateinit var destinationFolder: File
@@ -36,8 +33,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     protected lateinit var currentLocale: Locale
     private lateinit var parser: Parser
 
-    @Before
-    fun setup() {
+    protected fun setup() {
         currentLocale = Locale.getDefault()
         Locale.setDefault(Locale.ENGLISH)
 
@@ -47,10 +43,9 @@ abstract class AbstractTemplateEngineRenderingTest(
         templateFolder = File(sourceFolder, templateDir)
         if (!templateFolder.exists()) throw Exception("Cannot find template folder!")
 
-        destinationFolder = folder.root
+        destinationFolder = folder
         config.destinationFolder = (destinationFolder)
         config.templateFolder = (templateFolder)
-
 
         for (docType in documentTypes) {
             val templateFile: File? = config.getTemplateFileByDocType(docType)
@@ -69,7 +64,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         addDocumentType("paper")
         db.updateSchema()
 
-        assertEquals(".html", config.outputExtension)
+        config.outputExtension shouldBe ".html"
 
         val crawler = Crawler(db, config)
         crawler.crawlContentDirectory()
@@ -136,14 +131,13 @@ abstract class AbstractTemplateEngineRenderingTest(
         )
     }
 
-    @After
-    fun cleanup() {
+    protected fun cleanup() {
         resetDocumentTypes()
         ModelExtractors.instance.reset()
         Locale.setDefault(currentLocale)
     }
 
-    @Test fun renderPost() {
+    protected fun testRenderPost() {
         // setup
         val filename = "second-post.html"
 
@@ -152,16 +146,16 @@ abstract class AbstractTemplateEngineRenderingTest(
         content!!.uri = filename
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("post")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 
-    @Test fun renderPage() {
+    protected fun testRenderPage() {
         // setup
         val filename = "about.html"
         val sampleFile = sourceFolder!!.resolve("content").resolve(filename)
@@ -171,99 +165,99 @@ abstract class AbstractTemplateEngineRenderingTest(
         content!!.uri = filename
         renderer.render(content)
         val outputFile = File(destinationFolder, filename)
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("page")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 
-    @Test fun renderIndex() {
+    protected fun testRenderIndex() {
         //exec
         renderer.renderIndex("index.html")
 
         //validate
         val outputFile = File(destinationFolder, "index.html")
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (expectedSnippet in getExpectedInOutput("index")) {
-            assertThat(output).contains(expectedSnippet)
+            output shouldContain expectedSnippet
         }
     }
 
-    @Test fun renderFeed() {
+    protected fun testRenderFeed() {
         renderer.renderFeed("feed.xml")
         val outputFile = File(destinationFolder, "feed.xml")
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("feed")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 
-    @Test fun renderArchive() {
+    protected fun testRenderArchive() {
         renderer.renderArchive("archive.html")
         val outputFile = File(destinationFolder, "archive.html")
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("archive")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 
-    @Test fun renderTags() {
+    protected fun testRenderTags() {
         renderer.renderTags("tags")
 
         // Then
         val outputFile = destinationFolder.resolve("tags").resolve("blog.html")
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("tags")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 
-    @Test fun renderTagsIndex() {
+    protected fun testRenderTagsIndex() {
         config.setRenderTagsIndex(true)
 
         renderer.renderTags("tags")
         val outputFile = destinationFolder.resolve("tags").resolve("index.html")
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("tags-index")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 
-    @Test fun renderSitemap() {
+    protected fun testRenderSitemap() {
         addDocumentType("paper")
         db.updateSchema()
 
         renderer.renderSitemap("sitemap.xml")
         val outputFile = File(destinationFolder, "sitemap.xml")
-        assertTrue(outputFile.exists())
+        outputFile.shouldExist()
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (snippet in getExpectedInOutput("sitemap")) {
-            assertThat(output).contains(snippet)
+            output shouldContain snippet
         }
-        assertThat(output).doesNotContain("draft-paper.html")
+        output shouldNotContain "draft-paper.html"
     }
 
     protected fun getExpectedInOutput(type: String): MutableList<String> {
         return expectedInOutput[type] ?: mutableListOf()
     }
 
-    @Test fun checkDbTemplateModelIsPopulated() {
+    protected fun testCheckDbTemplateModelIsPopulated() {
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 
@@ -277,7 +271,8 @@ abstract class AbstractTemplateEngineRenderingTest(
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in getExpectedInOutput("dbSpan")) {
-            assertThat(output).contains(string)
+            output shouldContain string
         }
     }
 }
+

@@ -19,7 +19,7 @@ class ProjectWebsiteTest {
     private lateinit var projectFolder = projectFolder = folder.newFolder("project")
     private lateinit var outputFolder = File(projectFolder, "output")
     private lateinit val jbakeExecutable =
-        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) "build\\install\\jbake\\bin\\jbake.bat" else "build/install/jbake/bin/jbake".let { File(it).absolutePath }
+        if (SystemUtils.is_Os_WINDOWS) "build\\install\\jbake\\bin\\jbake.bat" else "build/install/jbake/bin/jbake".let { File(it).absolutePath }
     private lateinit var runner = BinaryRunner(projectFolder)
 
     @Before

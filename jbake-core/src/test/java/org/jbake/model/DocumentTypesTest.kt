@@ -1,30 +1,31 @@
 package org.jbake.model
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.DocumentTypes.addListener
 import org.jbake.model.DocumentTypes.contains
 import org.jbake.model.DocumentTypes.documentTypes
-import org.junit.Test
-import org.mockito.Mockito
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
+import io.mockk.*
 
-class DocumentTypesTest {
-    @Test fun shouldReturnDefaultDocumentTypes() {
+class DocumentTypesTest : StringSpec({
+    "shouldReturnDefaultDocumentTypes" {
         val knownDocumentTypes = documentTypes
-        val expectedDocumentType: Array<String> = arrayOf("page", "post", "masterindex", "archive", "feed")
+        val expectedDocumentType = listOf("page", "post", "masterindex", "archive", "feed")
 
-        assertThat(knownDocumentTypes).contains(*expectedDocumentType)
+        for (type in expectedDocumentType) {
+            knownDocumentTypes shouldContain type
+        }
     }
 
-    @Test fun shouldAddNewDocumentType() {
+    "shouldAddNewDocumentType" {
         val newDocumentType = "newDocumentType"
-
         addDocumentType(newDocumentType)
-
-        assertThat(documentTypes).contains(newDocumentType)
+        documentTypes shouldContain newDocumentType
     }
 
-    @Test fun shouldAddDocumentTypeOnlyOnce() {
+    "shouldAddDocumentTypeOnlyOnce" {
         // A document type is already known.
         val knownDocumentType = "known"
         addDocumentType(knownDocumentType)
@@ -33,32 +34,30 @@ class DocumentTypesTest {
         addDocumentType(knownDocumentType)
 
         // Only one document type could be found in the list.
-        assertThat(documentTypes).containsOnlyOnce(knownDocumentType)
+        documentTypes.count { it == knownDocumentType } shouldBe 1
     }
 
-    @Test fun shouldTellIfDocumentTypeIsKnown() {
+    "shouldTellIfDocumentTypeIsKnown" {
         val knownDocumentType = "known"
         addDocumentType(knownDocumentType)
-
-        assertThat(contains(knownDocumentType)).isTrue()
+        contains(knownDocumentType) shouldBe true
     }
 
-    @Test fun shouldTellIfDocumentTypeIsUnknown() {
+    "shouldTellIfDocumentTypeIsUnknown" {
         val unknownType = "unknown"
-
-        assertThat(contains(unknownType)).isFalse()
+        contains(unknownType) shouldBe false
     }
 
-    @Test fun shouldNotifyListenersWhenNewDocumentTypeIsAdded() {
+    "shouldNotifyListenersWhenNewDocumentTypeIsAdded" {
         // A DocumentTypeListener is added
         val newDocumentType = "newDocumentType"
-        val listener = Mockito.mock(DocumentTypeListener::class.java)
+        val listener = mockk<DocumentTypeListener>(relaxed = true)
         addListener(listener)
 
         // a new document type added
         addDocumentType(newDocumentType)
 
         // the listener was called with new document type
-        Mockito.verify(listener).added(newDocumentType)
+        verify { listener.added(newDocumentType) }
     }
-}
+})

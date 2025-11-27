@@ -1,37 +1,37 @@
 package org.jbake.template
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import org.jbake.model.DocumentTypes.addDocumentType
-import org.junit.After
-import org.junit.Test
-import org.junit.jupiter.api.assertThrows
 
-class ModelExtractorsTest {
+class ModelExtractorsTest : StringSpec({
 
-    @After
-    fun tearDown() {
+    afterTest {
         ModelExtractors.instance.reset()
     }
 
-    @Test fun shouldLoadExtractorsOnInstantiation() {
+    "shouldLoadExtractorsOnInstantiation" {
         val expectedKeys = ("pages,posts,indexs,archives,feeds,published_posts,published_pages," +
             "published_content,published_date,all_content,alltags,db,tag_posts,tags,tagged_documents").split(",")
 
         for (aKey in expectedKeys) {
-            assertThat(ModelExtractors.instance.containsKey(aKey)).isTrue()
+            ModelExtractors.instance.containsKey(aKey).shouldBeTrue()
         }
     }
 
-    @Test fun shouldRegisterExtractorsOnlyForCustomTypes() {
+    "shouldRegisterExtractorsOnlyForCustomTypes" {
         val knownDocumentType = "alltag"
         addDocumentType(knownDocumentType)
 
         ModelExtractors.instance.registerExtractorsForCustomTypes(knownDocumentType)
 
-        assertThat(ModelExtractors.instance.containsKey("published_alltags")).isFalse()
+        ModelExtractors.instance.containsKey("published_alltags").shouldBeFalse()
     }
 
-    @Test fun shouldRegisterExtractorsForCustomType() {
+    "shouldRegisterExtractorsForCustomType" {
         // A document type is known.
         val newDocumentType = "project"
         addDocumentType(newDocumentType)
@@ -40,20 +40,20 @@ class ModelExtractorsTest {
         ModelExtractors.instance.registerExtractorsForCustomTypes(newDocumentType)
 
         // Then an extractor is registered by pluralized type as key.
-        assertThat(ModelExtractors.instance.containsKey("projects")).isTrue()
+        ModelExtractors.instance.containsKey("projects").shouldBeTrue()
 
         // And an extractor for published types is registered.
-        assertThat(ModelExtractors.instance.containsKey("published_projects")).isTrue()
+        ModelExtractors.instance.containsKey("published_projects").shouldBeTrue()
     }
 
-    @Test fun shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
+    "shouldThrowAnExceptionIfDocumentTypeIsUnknown" {
         val unknownDocumentType = "unknown"
-        assertThrows<UnsupportedOperationException> {
+        shouldThrow<UnsupportedOperationException> {
             ModelExtractors.instance.registerExtractorsForCustomTypes(unknownDocumentType)
         }
     }
 
-    @Test fun shouldResetToNonCustomizedExtractors() {
+    "shouldResetToNonCustomizedExtractors" {
         // Given: A document type is known.
         val newDocumentType = "project"
         addDocumentType(newDocumentType)
@@ -62,12 +62,13 @@ class ModelExtractorsTest {
         ModelExtractors.instance.registerExtractorsForCustomTypes(newDocumentType)
 
         // Expect: 18 extractors.
-        assertThat(ModelExtractors.instance.keySet().size).isEqualTo(18)
+        ModelExtractors.instance.keySet().size shouldBe 18
 
         // When: reset.
         ModelExtractors.instance.reset()
 
         // Then: 16 extractors.
-        assertThat(ModelExtractors.instance.keySet().size).isEqualTo(16)
+        ModelExtractors.instance.keySet().size shouldBe 16
     }
-}
+})
+

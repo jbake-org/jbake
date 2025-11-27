@@ -1,6 +1,25 @@
 package org.jbake.app.template
 
+import io.kotest.core.spec.style.StringSpec
 
-class JadeTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("jadeTemplates", "jade")
+class JadeTemplateEngineRenderingTest : StringSpec({
+    lateinit var helper: TemplateTestHelper
 
-class PugTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("pugTemplates", "pug")
+    beforeSpec {
+        helper = TemplateTestHelper("jadeTemplates", "jade")
+        helper.setupClass()
+    }
+
+    beforeTest {
+        helper.setupTest()
+    }
+
+    afterTest {
+        helper.teardownTest()
+    }
+
+    afterSpec {
+        helper.teardownClass()
+    }
+})
+

@@ -1,19 +1,19 @@
 package org.jbake.render
 
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.util.*
 
-class ServiceLoaderTest {
+class ServiceLoaderTest : StringSpec({
 
-    @Test fun testLoadRenderer() {
+    "testLoadRenderer" {
         val serviceDescription =
             ClassLoader.getSystemClassLoader().getResource("META-INF/services/org.jbake.render.RenderingTool")
         val services = File(serviceDescription!!.toURI())
-        assertTrue("Service definitions File exists", services.exists())
+        services.exists() shouldBe true
 
         val fileReader = FileReader(services)
         val reader = BufferedReader(fileReader)
@@ -26,7 +26,7 @@ class ServiceLoaderTest {
         }
 
         while ((reader.readLine().also { serviceProvider = it }) != null) {
-            assertTrue("Rendering tool $serviceProvider loaded", renderingToolClasses.contains(serviceProvider))
+            renderingToolClasses.contains(serviceProvider) shouldBe true
         }
     }
-}
+})

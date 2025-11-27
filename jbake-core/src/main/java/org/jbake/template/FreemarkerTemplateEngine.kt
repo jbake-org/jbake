@@ -98,6 +98,7 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                     val map = eagerModel.toMap() as? MutableMap<String, Any> ?: mutableMapOf()
                     val cfgAny = map[ModelAttributes.CONFIG]
                     if (cfgAny is Map<*, *>)
+                        @Suppress("UNCHECKED_CAST")
                         (cfgAny as? Map<String, Any>)?.let { merged.putAll(it) }
                     return wrapper.wrap(merged)
                 }
@@ -113,7 +114,9 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
                         }
                     }
                 }
+                @Suppress("UNCHECKED_CAST")
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
+                @Suppress("UNCHECKED_CAST")
                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
                 return extractors.extractAndTransform(db, key, map, adapterTyped)
             }

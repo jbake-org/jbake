@@ -85,6 +85,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
          */
         private fun tryLoadEngine(config: JBakeConfiguration, db: ContentStore, engineClassName: String): AbstractTemplateEngine? {
             try {
+                @Suppress("UNCHECKED_CAST")
                 val engineClass = Class.forName(engineClassName, false, TemplateEngines::class.java.getClassLoader()) as Class<out AbstractTemplateEngine>
                 val ctor: Constructor<out AbstractTemplateEngine> = engineClass.getConstructor(JBakeConfiguration::class.java, ContentStore::class.java)
                 return ctor.newInstance(config, db)

@@ -1,24 +1,20 @@
 package org.jbake.app
 
-import org.apache.commons.vfs2.util.Os
+import io.kotest.matchers.shouldBe
+import org.apache.commons.lang3.SystemUtils
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.junit.*
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.rules.TemporaryFolder
 import java.io.File
+import java.nio.file.Files
 import java.util.*
 
 abstract class ContentStoreIntegrationTest {
-    @Before
-    fun setUp() {
+    protected fun setUp() {
         db.startup()
     }
 
-    @After
-    fun tearDown() {
+    protected fun tearDown() {
         db.drop()
     }
 
@@ -31,42 +27,43 @@ abstract class ContentStoreIntegrationTest {
     }
 
     companion object {
-        @ClassRule @JvmField
-        var folder: TemporaryFolder = TemporaryFolder()
-
+        internal lateinit var folder: File
         internal lateinit var db: ContentStore
         internal lateinit var config: DefaultJBakeConfiguration
         internal var storageType: StorageType = StorageType.MEMORY
         internal var sourceFolder: File? = null
 
-
-        @BeforeClass @JvmStatic
         fun setUpClass() {
+            // Create temp folder
+            folder = Files.createTempDirectory("jbake-test").toFile()
+
             sourceFolder = TestUtils.testResourcesAsSourceFolder
-            assertTrue("Cannot find sample data structure!", sourceFolder!!.exists())
+            if (!sourceFolder!!.exists()) {Migr
+                throw AssertionError("Cannot find sample data structure!")
+            }
 
             config = ConfigUtil().loadConfig(sourceFolder!!) as DefaultJBakeConfiguration
             config.setSourceFolder(sourceFolder)
 
-            assertEquals(".html", config.outputExtension)
+            config.outputExtension shouldBe ".html"
             config.databaseStore = (storageType.toString())
 
             // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
-            var dbPath: String = folder.newFolder("documents" + System.currentTimeMillis()).getName()
+            var dbPath: String = File(folder, "documents" + System.currentTimeMillis()).name
 
             // setting the database path with a colon creates an invalid url for OrientDB.
             // only one colon is expected. there is no documentation about proper url path for windows available :(
-            if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
+            if (SystemUtils.IS_OS_WINDOWS) {
                 dbPath = dbPath.replace(":", "")
             }
             config.databasePath = (dbPath)
             db = DBUtil.createDataStore(config)
         }
 
-        @AfterClass @JvmStatic
         fun cleanUpClass() {
             db.close()
             db.shutdown()
+            folder.deleteRecursively()
         }
     }
 }

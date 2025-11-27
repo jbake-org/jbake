@@ -139,11 +139,13 @@ class ModelExtractors private constructor() {
 
                 // If it's a TypedModelExtractor, instantiate and wrap with adapter
                 if (TypedModelExtractor::class.java.isAssignableFrom(klass)) {
+                    @Suppress("UNCHECKED_CAST")
                     val typedClass = klass as Class<out TypedModelExtractor<*>>
                     val typedInstance = typedClass.getDeclaredConstructor().newInstance()
                     return ModelExtractorAdapter(typedInstance)
                 }
                 // Fallback to old ModelExtractor
+                @Suppress("UNCHECKED_CAST")
                 val engineClass = klass as Class<out ModelExtractor<*>>
                 engineClass.getDeclaredConstructor().newInstance()
             }

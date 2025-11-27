@@ -1,72 +1,71 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.io.PrintWriter
 import java.util.*
 
-class ParserTest {
-    @Rule @JvmField
-    var folder: TemporaryFolder = TemporaryFolder()
+class ParserTest : StringSpec({
+    lateinit var folder: File
 
-    private lateinit var config: DefaultJBakeConfiguration
-    private lateinit var parser: Parser
-    private lateinit var rootPath: File
+    lateinit var config: DefaultJBakeConfiguration
+    lateinit var parser: Parser
+    lateinit var rootPath: File
 
-    private lateinit var validHTMLFile: File
-    private lateinit var invalidHTMLFile: File
-    private lateinit var validMarkdownFileWithCustomHeader: File
-    private lateinit var validMarkdownFileWithDefaultStatus: File
-    private lateinit var validMarkdownFileWithDefaultTypeAndStatus: File
-    private lateinit var invalidMarkdownFileWithoutDefaultStatus: File
-    private lateinit var invalidMDFile: File
-    private lateinit var invalidExtensionFile: File
-    private lateinit var validHTMLWithJSONFile: File
-    private lateinit var validAsciiDocWithJSONFile: File
-    private lateinit var validAsciiDocWithADHeaderJSONFile: File
-    private lateinit var validaAsciidocWithUnsanitizedHeader: File
+    lateinit var validHTMLFile: File
+    lateinit var invalidHTMLFile: File
+    lateinit var validMarkdownFileWithCustomHeader: File
+    lateinit var validMarkdownFileWithDefaultStatus: File
+    lateinit var validMarkdownFileWithDefaultTypeAndStatus: File
+    lateinit var invalidMarkdownFileWithoutDefaultStatus: File
+    lateinit var invalidMDFile: File
+    lateinit var invalidExtensionFile: File
+    lateinit var validHTMLWithJSONFile: File
+    lateinit var validAsciiDocWithJSONFile: File
+    lateinit var validAsciiDocWithADHeaderJSONFile: File
+    lateinit var validaAsciidocWithUnsanitizedHeader: File
 
-    private val validHeader =
+    val validHeader =
         "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~"
-    private val invalidHeader = "title=This is a Title\n~~~~~~"
-    private val sampleJsonData =
+    val invalidHeader = "title=This is a Title\n~~~~~~"
+    val sampleJsonData =
         "{\"numberValue\": 42, \"stringValue\": \"Answer to live, the universe and everything\", \"nullValue\": null, \"arrayValue\": [1, 2], \"objectValue\": {\"val1\": 1, \"val2\": 2}}"
 
-    private val unsanitizedKeys =
+    val unsanitizedKeys =
         " title= Title \n status= draft \n   type= post   \ndate=2020-02-30\ncustom=custom without bom's\ntags= jbake, java    , tag with space   \n~~~~~~"
 
-    private var customHeaderSeparator: String? = null
+    var customHeaderSeparator: String? = null
 
 
-    @Before
-    fun createSampleFile() {
+    beforeTest {
+        folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         rootPath = TestUtils.testResourcesAsSourceFolder
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
 
-        validHTMLFile = folder.newFile("valid.html")
+        validHTMLFile = File(folder, "valid.html").apply { createNewFile() }
         var out = PrintWriter(validHTMLFile)
         out.println(validHeader)
         out.println("<p>This is a test.</p>")
         out.close()
 
-        invalidHTMLFile = folder.newFile("invalid.html")
+        invalidHTMLFile = File(folder, "invalid.html").apply { createNewFile() }
         out = PrintWriter(invalidHTMLFile)
         out.println(invalidHeader)
         out.close()
 
-        validMarkdownFileWithCustomHeader = folder.newFile("validMdCustomHeader.md")
+        validMarkdownFileWithCustomHeader = File(folder, "validMdCustomHeader.md").apply { createNewFile() }
 
         customHeaderSeparator = "---------------------------------------"
         out = PrintWriter(validMarkdownFileWithCustomHeader)
@@ -83,7 +82,7 @@ class ParserTest {
         out.println("* List")
         out.close()
 
-        validMarkdownFileWithDefaultStatus = folder.newFile("validMdDefaultStatus.md")
+        validMarkdownFileWithDefaultStatus = File(folder, "validMdDefaultStatus.md").apply { createNewFile() }
 
         out = PrintWriter(validMarkdownFileWithDefaultStatus)
         out.println("title=Custom Header separator")
@@ -98,7 +97,7 @@ class ParserTest {
         out.println("* List")
         out.close()
 
-        validMarkdownFileWithDefaultTypeAndStatus = folder.newFile("validMdDefaultTypeAndStatus.md")
+        validMarkdownFileWithDefaultTypeAndStatus = File(folder, "validMdDefaultTypeAndStatus.md").apply { createNewFile() }
 
         out = PrintWriter(validMarkdownFileWithDefaultTypeAndStatus)
         out.println("title=Custom Header separator")
@@ -113,7 +112,7 @@ class ParserTest {
         out.println("* List")
         out.close()
 
-        invalidMarkdownFileWithoutDefaultStatus = folder.newFile("invalidMdWithoutDefaultStatus.md")
+        invalidMarkdownFileWithoutDefaultStatus = File(folder, "invalidMdWithoutDefaultStatus.md").apply { createNewFile() }
 
         out = PrintWriter(invalidMarkdownFileWithoutDefaultStatus)
         out.println("title=Custom Header separator")
@@ -128,7 +127,7 @@ class ParserTest {
         out.println("* List")
         out.close()
 
-        invalidMDFile = folder.newFile("invalidMd.md")
+        invalidMDFile = File(folder, "invalidMd.md").apply { createNewFile() }
 
         out = PrintWriter(invalidMDFile)
         out.println(invalidHeader)
@@ -141,12 +140,12 @@ class ParserTest {
         out.println("* List")
         out.close()
 
-        invalidExtensionFile = folder.newFile("invalid.invalid")
+        invalidExtensionFile = File(folder, "invalid.invalid").apply { createNewFile() }
         out = PrintWriter(invalidExtensionFile)
         out.println("invalid content")
         out.close()
 
-        validHTMLWithJSONFile = folder.newFile("validHTMLWithJSONFile.html")
+        validHTMLWithJSONFile = File(folder, "validHTMLWithJSONFile.html").apply { createNewFile() }
         out = PrintWriter(validHTMLWithJSONFile)
         out.println("title=This is a Title = This is a valid Title")
         out.println("status=draft")
@@ -158,7 +157,7 @@ class ParserTest {
         out.println("Sample Body")
         out.close()
 
-        validAsciiDocWithJSONFile = folder.newFile("validAsciiDocWithJSONFile.ad")
+        validAsciiDocWithJSONFile = File(folder, "validAsciiDocWithJSONFile.ad").apply { createNewFile() }
         out = PrintWriter(validAsciiDocWithJSONFile)
         out.println("title=This is a Title = This is a valid Title")
         out.println("status=draft")
@@ -173,7 +172,7 @@ class ParserTest {
         out.println("JBake now supports AsciiDoc.")
         out.close()
 
-        validAsciiDocWithADHeaderJSONFile = folder.newFile("validAsciiDocWithADHeaderJSONFile.ad")
+        validAsciiDocWithADHeaderJSONFile = File(folder, "validAsciiDocWithADHeaderJSONFile.ad").apply { createNewFile() }
         out = PrintWriter(validAsciiDocWithADHeaderJSONFile)
         out.println("= Hello: AsciiDoc!")
         out.println("Test User <user@test.org>")
@@ -186,7 +185,7 @@ class ParserTest {
         out.println("JBake now supports AsciiDoc.")
         out.close()
 
-        validaAsciidocWithUnsanitizedHeader = folder.newFile("validAsciidocWithUnsanitizedHeader.adoc")
+        validaAsciidocWithUnsanitizedHeader = File(folder, "validAsciidocWithUnsanitizedHeader.adoc").apply { createNewFile() }
         out = PrintWriter(validaAsciidocWithUnsanitizedHeader, "UTF-8")
         // Simulating a \uFEFF Byte order Marker in utf-8
         out.print("\uFEFF")
@@ -203,135 +202,143 @@ class ParserTest {
         out.close()
     }
 
-    @Test fun parseValidHTMLFile() {
+    "parseValidHTMLFile" {
         val documentModel = parser.processFile(validHTMLFile)!!
-        assertNotNull(documentModel)
-        assertEquals("draft", documentModel.status)
-        assertEquals("post", documentModel.type)
-        assertEquals("This is a Title = This is a valid Title", documentModel.title)
-        assertNotNull(documentModel.date)
+        documentModel.shouldNotBeNull()
+        documentModel.status shouldBe "draft"
+        documentModel.type shouldBe "post"
+        documentModel.title shouldBe "This is a Title = This is a valid Title"
+        documentModel.date.shouldNotBeNull()
         val cal = Calendar.getInstance()
         cal.setTime(documentModel.date)
-        assertEquals(8, cal.get(Calendar.MONTH).toLong())
-        assertEquals(2, cal.get(Calendar.DAY_OF_MONTH).toLong())
-        assertEquals(2013, cal.get(Calendar.YEAR).toLong())
+        cal.get(Calendar.MONTH) shouldBe 8
+        cal.get(Calendar.DAY_OF_MONTH) shouldBe 2
+        cal.get(Calendar.YEAR) shouldBe 2013
     }
 
-    @Test fun parseInvalidHTMLFile() {
+    "parseInvalidHTMLFile" {
         val documentModel = parser.processFile(invalidHTMLFile)
-        assertNull(documentModel)
+        documentModel.shouldBeNull()
     }
 
-    @Test fun parseInvalidExtension() {
+    "parseInvalidExtension" {
         val documentModel = parser.processFile(invalidExtensionFile)
-        assertNull(documentModel)
+        documentModel.shouldBeNull()
     }
 
 
-    @Test fun parseMarkdownFileWithCustomHeaderSeparator() {
+    "parseMarkdownFileWithCustomHeaderSeparator" {
         config.headerSeparator = customHeaderSeparator
 
         val documentModel = parser.processFile(validMarkdownFileWithCustomHeader)!!
-        assertNotNull(documentModel)
-        assertEquals("draft", documentModel.status)
-        assertEquals("post", documentModel.type)
-        assertThat(documentModel.body).contains("<p>A paragraph</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.status shouldBe "draft"
+        documentModel.type shouldBe "post"
+        documentModel.body shouldContain "<p>A paragraph</p>"
     }
 
-    @Test fun parseMarkdownFileWithDefaultStatus() {
+    "parseMarkdownFileWithDefaultStatus" {
         config.setDefaultStatus("published")
 
         val documentModel = parser.processFile(validMarkdownFileWithDefaultStatus)!!
-        assertNotNull(documentModel)
-        assertEquals("published", documentModel.status)
-        assertEquals("post", documentModel.type)
-        assertEquals(true, documentModel.cached)
+        documentModel.shouldNotBeNull()
+        documentModel.status shouldBe "published"
+        documentModel.type shouldBe "post"
+        documentModel.cached shouldBe true
     }
 
-    @Test fun parseMarkdownFileWithDefaultTypeAndStatus() {
+    "parseMarkdownFileWithDefaultTypeAndStatus" {
         config.setDefaultStatus("published")
         config.setDefaultType("page")
 
         val documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus)!!
-        assertNotNull(documentModel)
-        assertEquals("published", documentModel.status)
-        assertEquals("page", documentModel.type)
+        documentModel.shouldNotBeNull()
+        documentModel.status shouldBe "published"
+        documentModel.type shouldBe "page"
     }
 
-    @Test fun parseMarkdownFileWithDisabledCache() {
+    "parseMarkdownFileWithDisabledCache" {
         config.setDefaultStatus("published")
         config.setDefaultType("page")
 
         val documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus)!!
-        assertEquals(false, documentModel.cached)
+        documentModel.cached shouldBe false
     }
 
-    @Test fun parseInvalidMarkdownFileWithoutDefaultStatus() {
+    "parseInvalidMarkdownFileWithoutDefaultStatus" {
         config.setDefaultStatus("")
         config.setDefaultType("page")
 
         val documentModel = parser.processFile(invalidMarkdownFileWithoutDefaultStatus)
-        assertNull(documentModel)
+        documentModel.shouldBeNull()
     }
 
-    @Test fun parseInvalidMarkdownFile() {
+    "parseInvalidMarkdownFile" {
         val documentModel = parser.processFile(invalidMDFile)
-        assertNull(documentModel)
+        documentModel.shouldBeNull()
     }
 
-    @Test fun sanitizeKeysAndValues() {
+    "sanitizeKeysAndValues" {
         val map = parser.processFile(validaAsciidocWithUnsanitizedHeader)!!
 
-        assertThat(map.status).isEqualTo("draft")
-        assertThat(map.title).isEqualTo("Title")
-        assertThat(map.type).isEqualTo("post")
-        assertThat(map.get("custom")).isEqualTo("custom without bom's")
-        assertThat(map.tags).isEqualTo(mutableListOf("jbake", "java", "tag with space").toTypedArray())
+        map.status shouldBe "draft"
+        map.title shouldBe "Title"
+        map.type shouldBe "post"
+        map["custom"] shouldBe "custom without bom's"
+        map.tags shouldBe listOf("jbake", "java", "tag with space")
     }
 
-    @Test fun sanitizeTags() {
+    "sanitizeTags" {
         config.setProperty(PropertyList.TAG_SANITIZE.key, true)
         val map = parser.processFile(validaAsciidocWithUnsanitizedHeader)!!
 
-        assertThat(map.tags).isEqualTo(mutableListOf("jbake", "java", "tag-with-space").toTypedArray())
+        map.tags shouldBe listOf("jbake", "java", "tag-with-space")
     }
 
 
-    @Test fun parseValidHTMLWithJSONFile() {
+    "parseValidHTMLWithJSONFile" {
         val documentModel = parser.processFile(validHTMLWithJSONFile)!!
-        assertJSONExtracted(documentModel.get("jsondata"))
+        ParserTest.assertJSONExtracted(documentModel["jsondata"])
     }
 
-    @Test fun parseValidAsciiDocWithJSONFile() {
+    "parseValidAsciiDocWithJSONFile" {
         val documentModel = parser.processFile(validAsciiDocWithJSONFile)!!
-        assertJSONExtracted(documentModel.get("jsondata"))
+        ParserTest.assertJSONExtracted(documentModel["jsondata"])
     }
 
-    @Test fun testValidAsciiDocWithADHeaderJSONFile() {
+    "testValidAsciiDocWithADHeaderJSONFile" {
         val documentModel = parser.processFile(validAsciiDocWithADHeaderJSONFile)!!
-        assertJSONExtracted(documentModel.get("jsondata"))
+        ParserTest.assertJSONExtracted(documentModel["jsondata"])
     }
 
-    private fun assertJSONExtracted(jsonDataEntry: Any?) {
-        assertThat(jsonDataEntry).isInstanceOf(JSONObject::class.java)
-        val jsonData = jsonDataEntry as JSONObject
+    afterTest {
+        folder.deleteRecursively()
+    }
+}) {
+    companion object {
+        fun assertJSONExtracted(jsonDataEntry: Any?) {
+            jsonDataEntry.shouldNotBeNull()
+            jsonDataEntry.shouldBeInstanceOf<JSONObject>()
+            val jsonData = jsonDataEntry as JSONObject
 
-        assertThat(jsonData.containsKey("numberValue")).isTrue()
-        assertThat(jsonData.get("numberValue")).isInstanceOf(Number::class.java)
-        assertThat((jsonData.get("numberValue") as Number).toInt()).isEqualTo(42)
-        assertThat(jsonData.containsKey("stringValue")).isTrue()
-        assertThat(jsonData.get("stringValue")).isInstanceOf(String::class.java)
-        assertThat(jsonData.get("stringValue") as String?).isEqualTo("Answer to live, the universe and everything")
-        assertThat(jsonData.containsKey("nullValue")).isTrue()
-        assertThat(jsonData.get("nullValue")).isNull()
-        assertThat(jsonData.containsKey("arrayValue")).isTrue()
-        assertThat(jsonData.get("arrayValue")).isInstanceOf(JSONArray::class.java)
-        assertThat(jsonData.get("arrayValue") as JSONArray?).contains(1L, 2L)
-        assertThat(jsonData.containsKey("objectValue")).isTrue()
-        assertThat(jsonData.get("objectValue")).isInstanceOf(JSONObject::class.java)
-        assertThat(jsonData.get("objectValue") as JSONObject?).contains(
-            AbstractMap.SimpleEntry("val1", 1L),
-            AbstractMap.SimpleEntry("val2", 2L)
-        )
+            jsonData.containsKey("numberValue") shouldBe true
+            jsonData["numberValue"].shouldBeInstanceOf<Number>()
+            (jsonData["numberValue"] as Number).toInt() shouldBe 42
+            jsonData.containsKey("stringValue") shouldBe true
+            jsonData["stringValue"].shouldBeInstanceOf<String>()
+            jsonData["stringValue"] shouldBe "Answer to live, the universe and everything"
+            jsonData.containsKey("nullValue") shouldBe true
+            jsonData["nullValue"] shouldBe null
+            jsonData.containsKey("arrayValue") shouldBe true
+            jsonData["arrayValue"].shouldBeInstanceOf<JSONArray>()
+            val arrayValue = jsonData["arrayValue"] as JSONArray
+            arrayValue.contains(1L) shouldBe true
+            arrayValue.contains(2L) shouldBe true
+            jsonData.containsKey("objectValue") shouldBe true
+            jsonData["objectValue"].shouldBeInstanceOf<JSONObject>()
+            val objectValue = jsonData["objectValue"] as JSONObject
+            objectValue["val1"] shouldBe 1L
+            objectValue["val2"] shouldBe 2L
+        }
     }
 }

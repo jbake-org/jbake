@@ -95,6 +95,8 @@
         <version.junit.pioneer>2.3.0</version.junit.pioneer>
         <version.assertj>3.27.6</version.assertj>
         <version.mockito>5.20.0</version.mockito>
+        <version.mockk>1.14.6</version.mockk>
+        <version.kotest>6.0.5</version.kotest>
 
         <!-- Build dependencies versions -->
         <version.jacoco.maven.plugin>0.8.14</version.jacoco.maven.plugin>
@@ -148,6 +150,10 @@
             <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><version>${version.junit.pioneer}</version></dependency>
             <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><version>${version.mockito}</version></dependency>
             <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><version>${version.mockito}</version></dependency>
+            <dependency><groupId>io.mockk</groupId><artifactId>mockk</artifactId><version>${version.mockk}</version></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId><version>${version.kotest}</version></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId><version>${version.kotest}</version></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-property</artifactId><version>${version.kotest}</version></dependency>
             <!-- Maven Plugin dependencies -->
             <dependency><groupId>org.apache.maven</groupId><artifactId>maven-core</artifactId><version>${version.maven}</version></dependency>
             <dependency><groupId>org.apache.maven.plugin-tools</groupId><artifactId>maven-plugin-annotations</artifactId><version>${version.maven.annotations}</version></dependency>

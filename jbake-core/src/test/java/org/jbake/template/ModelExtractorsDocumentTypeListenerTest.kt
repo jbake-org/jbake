@@ -1,11 +1,12 @@
 package org.jbake.template
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.model.DocumentTypes.addDocumentType
-import org.junit.Test
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.booleans.shouldBeTrue
 
-class ModelExtractorsDocumentTypeListenerTest {
-    @Test fun shouldRegisterExtractorsForCustomType() {
+class ModelExtractorsDocumentTypeListenerTest : StringSpec({
+    "shouldRegisterExtractorsForCustomType" {
         // Given: "A document type is known."
         val newDocumentType = "project"
         addDocumentType(newDocumentType)
@@ -15,9 +16,9 @@ class ModelExtractorsDocumentTypeListenerTest {
         listener.added(newDocumentType)
 
         // Then: "an extractor is registered by pluralized type as key."
-        assertThat(ModelExtractors.instance.containsKey("projects")).isTrue()
+        ModelExtractors.instance.containsKey("projects") shouldBe true
 
         // And: "an extractor for published types is registered."
-        assertThat(ModelExtractors.instance.containsKey("published_projects")).isTrue()
+        ModelExtractors.instance.containsKey("published_projects") shouldBe true
     }
-}
+})

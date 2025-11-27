@@ -9,10 +9,10 @@ import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
-import java.io.File
-import java.util.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.util.*
 
 class DocumentsRenderer : RenderingTool {
     private val log: Logger = LoggerFactory.getLogger(DocumentsRenderer::class.java)
@@ -55,7 +55,7 @@ class DocumentsRenderer : RenderingTool {
 
     private fun getNextDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
         var typedListIndex = typedList.indexOf(doc)
-        if (typedList.getFirst() == doc) {
+        if (typedList.first() == doc) {
             // initial doc in typed list so there is no next
             return null
         }
@@ -74,7 +74,7 @@ class DocumentsRenderer : RenderingTool {
 
     private fun getPrevDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
         var typedListIndex = typedList.indexOf(doc)
-        if (typedList.getLast() == doc) {
+        if (typedList.last() == doc) {
             // last doc in typed list so there is no previous
             return null
         }

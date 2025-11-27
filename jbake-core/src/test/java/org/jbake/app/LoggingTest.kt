@@ -5,34 +5,25 @@ import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.spi.LoggingEvent
 import ch.qos.logback.core.Appender
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
+import io.mockk.mockk
+import io.mockk.slot
 import org.slf4j.LoggerFactory
 
-@ExtendWith(MockitoExtension::class)
 abstract class LoggingTest {
 
-    @Mock protected lateinit var mockAppender: Appender<ILoggingEvent>
-
-    @Captor protected var captorLoggingEvent: ArgumentCaptor<LoggingEvent> = ArgumentCaptor.captor()
-
+    protected lateinit var mockAppender: Appender<ILoggingEvent>
+    protected val captorLoggingEvent = slot<LoggingEvent>()
     protected lateinit var root: Logger
 
-    @BeforeEach
-    fun setupBase() {
+    protected fun setupBase() {
+        mockAppender = mockk(relaxed = true)
         root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
 
         root.addAppender(mockAppender)
         root.level = Level.INFO
     }
 
-    @AfterEach
-    fun teardownBase() {
+    protected fun teardownBase() {
         root.detachAppender(mockAppender)
     }
 }

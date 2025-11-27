@@ -69,6 +69,10 @@
         <dependency><scope>test</scope><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-property</artifactId></dependency>
     </dependencies>
 
     <build>

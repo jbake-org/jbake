@@ -1,20 +1,20 @@
 package org.jbake.app.configuration
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.configuration.PropertyList.getPropertyByKey
-import org.junit.Test
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
-class PropertyListTest {
-    @Test fun getPropertyByKey() {
+class PropertyListTest : StringSpec({
+    "getPropertyByKey" {
         val property = getPropertyByKey("archive.file")
 
-        assertThat(property).isEqualTo(PropertyList.ARCHIVE_FILE)
+        property shouldBe PropertyList.ARCHIVE_FILE
     }
 
-    @Test fun getCustomProperty() {
+    "getCustomProperty" {
         val property = getPropertyByKey("unknown.option")
 
-        assertThat(property.key).isEqualTo("unknown.option")
-        assertThat(property.group).isEqualTo(Property.Group.CUSTOM)
+        property.key shouldBe "unknown.option"
+        property.group shouldBe Property.Group.CUSTOM
     }
-}
+})

@@ -1,22 +1,21 @@
 package org.jbake.util
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.junit.Before
-import org.junit.Test
 
-class HtmlUtilTest {
-    private lateinit var config: DefaultJBakeConfiguration
+class HtmlUtilTest : StringSpec({
+    lateinit var config: DefaultJBakeConfiguration
 
-    @Before
-    fun setUp() {
+    beforeTest {
         config = ConfigUtil().loadConfig(TestUtils.testResourcesAsSourceFolder) as DefaultJBakeConfiguration
     }
 
-    @Test fun shouldNotAddBodyHTMLElement() {
+    "shouldNotAddBodyHTMLElement" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -26,11 +25,11 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).doesNotContain("<body>")
-        assertThat(body).doesNotContain("</body>")
+        body shouldNotContain "<body>"
+        body shouldNotContain "</body>"
     }
 
-    @Test fun shouldNotAddSiteHost() {
+    "shouldNotAddSiteHost" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -41,10 +40,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"blog/2017/05/first.jpg\"")
+        body shouldContain "src=\"blog/2017/05/first.jpg\""
     }
 
-    @Test fun shouldAddSiteHostWithRelativeImageToDocument() {
+    "shouldAddSiteHostWithRelativeImageToDocument" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -55,10 +54,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\"")
+        body shouldContain "src=\"http://www.jbake.org/blog/2017/05/img/deeper/underground.jpg\""
     }
 
-    @Test fun shouldAddContentPath() {
+    "shouldAddContentPath" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -69,10 +68,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        body shouldContain "src=\"http://www.jbake.org/blog/2017/05/first.jpg\""
     }
 
-    @Test fun shouldAddContentPathForCurrentDirectory() {
+    "shouldAddContentPathForCurrentDirectory" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -83,10 +82,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        body shouldContain "src=\"http://www.jbake.org/blog/2017/05/first.jpg\""
     }
 
-    @Test fun shouldNotAddRootPath() {
+    "shouldNotAddRootPath" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -96,10 +95,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        body shouldContain "src=\"http://www.jbake.org/blog/2017/05/first.jpg\""
     }
 
-    @Test fun shouldNotAddRootPathForNoExtension() {
+    "shouldNotAddRootPathForNoExtension" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -110,10 +109,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        body shouldContain "src=\"http://www.jbake.org/blog/2017/05/first.jpg\""
     }
 
-    @Test fun shouldAddContentPathForNoExtension() {
+    "shouldAddContentPathForNoExtension" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -124,10 +123,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://www.jbake.org/blog/2017/05/first.jpg\"")
+        body shouldContain "src=\"http://www.jbake.org/blog/2017/05/first.jpg\""
     }
 
-    @Test fun shouldNotChangeForHTTP() {
+    "shouldNotChangeForHTTP" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -138,10 +137,10 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"http://example.com/first.jpg\"")
+        body shouldContain "src=\"http://example.com/first.jpg\""
     }
 
-    @Test fun shouldNotChangeForHTTPS() {
+    "shouldNotChangeForHTTPS" {
         val fileContent = DocumentModel()
         fileContent.rootPath = "../../../"
         fileContent.uri = "blog/2017/05/first_post.html"
@@ -152,6 +151,6 @@ class HtmlUtilTest {
 
         val body = fileContent.body
 
-        assertThat(body).contains("src=\"https://example.com/first.jpg\"")
+        body shouldContain "src=\"https://example.com/first.jpg\""
     }
-}
+})

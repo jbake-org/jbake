@@ -1,6 +1,5 @@
 package org.jbake.template
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.configuration.JBakeConfiguration
@@ -8,16 +7,17 @@ import org.jbake.model.DocumentModel
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TagsExtractor
 import org.jbake.template.model.TemplateModel
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.*
 import org.mockito.Mockito.`when`
 
-class TagExtractorTest {
-
-    private fun mockDbWithTags(vararg tags: String): ContentStore {
-        val db = mock(ContentStore::class.java)
+class TagExtractorTest : StringSpec({
+    fun mockDbWithTags(vararg tags: String): ContentStore {
+        val db = mockk<ContentStore>()
         val tagSet = tags.toMutableSet()
-        `when`(db.allTags).thenReturn(tagSet)
+        every { db.allTags } returns tagSet
 
         // For each tag return empty lists for posts/documents (not needed for this test beyond existence)
         for (t in tags) {
@@ -26,15 +26,14 @@ class TagExtractorTest {
         }
         return db
     }
-
-    private fun mockConfig(tagPath: String?, outputExtension: String?): JBakeConfiguration {
-        val cfg = mock(JBakeConfiguration::class.java)
-        `when`(cfg.tagPathName).thenReturn(tagPath)
-        `when`(cfg.outputExtension).thenReturn(outputExtension)
+    fun mockConfig(tagPath: String?, outputExtension: String?): JBakeConfiguration {
+        val cfg = mockk<JBakeConfiguration>()
+        every { cfg.tagPathName } returns tagPath
+        every { cfg.outputExtension } returns outputExtension
         return cfg
     }
 
-    @Test fun `tags extractor constructs URIs when tagPath and extension present`() {
+    "tags extractor constructs URIs when tagPath and extension present" {
         val cfg = mockConfig("tags", ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -42,15 +41,15 @@ class TagExtractorTest {
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        assertThat(list).isNotNull()
-        assertThat(list.size).isEqualTo(1)
+        list.shouldNotBeNull()
+        list.size shouldBe 1
 
         val tm = list.first() as TemplateModel
-        assertThat(tm.name).isEqualTo("blog")
-        assertThat(tm.uri).isEqualTo("tags/blog.html")
+        tm.name shouldBe "blog"
+        tm.uri shouldBe "tags/blog.html"
     }
 
-    @Test fun `tags extractor constructs URIs when tagPath empty`() {
+    "tags extractor constructs URIs when tagPath empty" {
         val cfg = mockConfig("", ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -59,10 +58,10 @@ class TagExtractorTest {
         val list = extractor.extract(context, "tags")
 
         val tm = list.first() as TemplateModel
-        assertThat(tm.uri).isEqualTo("blog.html")
+        tm.uri shouldBe "blog.html"
     }
 
-    @Test fun `tags extractor constructs URIs when extension is null`() {
+    "tags extractor constructs URIs when extension is null" {
         val cfg = mockConfig("tags", null)
         val db = mockDbWithTags("news")
         val context = RenderContext(config = cfg, db = db)
@@ -71,10 +70,10 @@ class TagExtractorTest {
         val list = extractor.extract(context, "tags")
 
         val tm = list.first() as TemplateModel
-        assertThat(tm.uri).isEqualTo("tags/news")
+        tm.uri shouldBe "tags/news"
     }
 
-    @Test fun `tags extractor trims trailing slash in tagPath`() {
+    "tags extractor trims trailing slash in tagPath" {
         val cfg = mockConfig("tags/", ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -83,10 +82,10 @@ class TagExtractorTest {
         val list = extractor.extract(context, "tags")
 
         val tm = list.first() as TemplateModel
-        assertThat(tm.uri).isEqualTo("tags/blog.html")
+        tm.uri shouldBe "tags/blog.html"
     }
 
-    @Test fun `tags extractor handles null tagPath (defaults to no prefix)`() {
+    "tags extractor handles null tagPath (defaults to no prefix)" {
         val cfg = mockConfig(null, ".html")
         val db = mockDbWithTags("blog")
         val context = RenderContext(config = cfg, db = db)
@@ -95,6 +94,6 @@ class TagExtractorTest {
         val list = extractor.extract(context, "tags")
 
         val tm = list.first() as TemplateModel
-        assertThat(tm.uri).isEqualTo("blog.html")
+        tm.uri shouldBe "blog.html"
     }
-}
+})

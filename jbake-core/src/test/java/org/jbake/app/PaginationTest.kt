@@ -1,18 +1,29 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.comparables.shouldBeGreaterThan
+import io.kotest.matchers.ints.shouldBeLessThanOrEqual
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import org.jbake.addTestDocument
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes.documentTypes
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
 import java.util.*
 
-class PaginationTest : ContentStoreIntegrationTest() {
+class PaginationTest : StringSpec({
 
-    @Before
-    fun setUpOwn() {
+    lateinit var db: ContentStore
+    lateinit var config: org.jbake.app.configuration.DefaultJBakeConfiguration
+
+    beforeSpec {
+        ContentStoreIntegrationTest.setUpClass()
+        db = ContentStoreIntegrationTest.db
+        config = ContentStoreIntegrationTest.config
+    }
+
+    beforeTest {
+        db.startup()
+
         for (docType in documentTypes) {
             val fileBaseName = if (docType == "masterindex") "index" else docType
             config.setTemplateFileNameForDocType(docType, "$fileBaseName.ftl")
@@ -21,7 +32,15 @@ class PaginationTest : ContentStoreIntegrationTest() {
         config.setPostsPerPage(1)
     }
 
-    @Test fun testPagination() {
+    afterTest {
+        db.drop()
+    }
+
+    afterSpec {
+        ContentStoreIntegrationTest.cleanUpClass()
+    }
+
+    "testPagination" {
         val TOTAL_POSTS = 5
         val cal = Calendar.getInstance(Locale.ENGLISH)
 
@@ -39,14 +58,20 @@ class PaginationTest : ContentStoreIntegrationTest() {
             db.paginationOffset = paginationOffset
             val posts: DocumentList<DocumentModel> = db.getPublishedPosts(true)
 
-            assertThat(posts.size).isLessThanOrEqualTo(2)
+            posts.size shouldBeLessThanOrEqual 2
 
-            if (posts.size > 1)
-                assertThat(posts[0].date).isAfter(posts[1].date)
+            if (posts.size > 1) {
+                val date0 = posts[0].date
+                val date1 = posts[1].date
+                date0.shouldNotBeNull()
+                date1.shouldNotBeNull()
+                date0 shouldBeGreaterThan date1
+            }
 
             pageCount++
             paginationOffset += 2
         }
-        assertEquals(4, pageCount.toLong())
+        pageCount.toLong() shouldBe 4
     }
-}
+})
+

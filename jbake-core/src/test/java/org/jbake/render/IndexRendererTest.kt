@@ -1,116 +1,111 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.RenderingException
-import org.junit.Test
-import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito.*
 
-class IndexRendererTest {
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsZeroWhenConfigDoesNotRenderIndices() {
+class IndexRendererTest : StringSpec({
+        fun returnsZeroWhenConfigDoesNotRenderIndices() {
         val renderer = IndexRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderIndex).thenReturn(false)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderIndex } returns false
 
-        val contentStore = mock(ContentStore::class.java)
+        val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mock(Renderer::class.java)
+        val mockRenderer = mockk<Renderer>()
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        Assertions.assertThat(renderResponse).isEqualTo(0)
+        renderResponse shouldBe 0
     }
 
-    @Test fun doesNotRenderWhenConfigDoesNotRenderIndices() {
+    "doesNotRenderWhenConfigDoesNotRenderIndices" {
         val renderer = IndexRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderIndex).thenReturn(false)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderIndex } returns false
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, never()).renderIndex(anyString())
+        verify(exactly = 0) { mockRenderer.renderIndex(any()) }
     }
 
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsOneWhenConfigRendersIndices() {
+        fun returnsOneWhenConfigRendersIndices() {
         val renderer = IndexRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderIndex).thenReturn(true)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderIndex } returns true
 
-        val contentStore = mock(ContentStore::class.java)
+        val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mock(Renderer::class.java)
+        val mockRenderer = mockk<Renderer>()
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        Assertions.assertThat(renderResponse).isEqualTo(1)
+        renderResponse shouldBe 1
     }
 
 
-    @Test(expected = RenderingException::class)
     fun propagatesRenderingException() {
         val renderer = IndexRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderIndex).thenReturn(true)
-        `when`(configuration.indexFileName).thenReturn("mockindex.html")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderIndex } returns true
+        every { configuration.indexFileName } returns "mockindex.html"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
-        doThrow(RuntimeException()).`when`(mockRenderer).renderIndex(anyString())
+        every { mockRenderer.renderIndex(any()) } throws RuntimeException()
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        shouldThrow<RuntimeException> {
+            renderer.render(mockRenderer, contentStore, configuration)
+        }
 
-        verify(mockRenderer, never()).renderIndex(anyString())
+        verify(exactly = 0) { mockRenderer.renderIndex(any()) }
     }
 
 
     /**
      * @see [Issue 332](https://github.com/jbake-org/jbake/issues/332)
      */
-    @Test fun shouldFallbackToStandardIndexRenderingIfPropertyIsMissing() {
+    "shouldFallbackToStandardIndexRenderingIfPropertyIsMissing" {
         val renderer = IndexRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderIndex).thenReturn(true)
-        `when`(configuration.indexFileName).thenReturn("mockindex.html")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderIndex } returns true
+        every { configuration.indexFileName } returns "mockindex.html"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, times(1)).renderIndex(anyString())
+        verify(exactly = 1) { mockRenderer.renderIndex(any()) }
     }
 
-    @Test fun shouldRenderPaginatedIndex() {
+    "shouldRenderPaginatedIndex" {
         val renderer = IndexRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderIndex).thenReturn(true)
-        `when`(configuration.paginateIndex).thenReturn(true)
-        `when`(configuration.indexFileName).thenReturn("mockindex.html")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderIndex } returns true
+        every { configuration.paginateIndex } returns true
+        every { configuration.indexFileName } returns "mockindex.html"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, times(1)).renderIndexPaging(anyString())
+        verify(exactly = 1) { mockRenderer.renderIndexPaging(any()) }
     }
-}
-
-
+})

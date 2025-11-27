@@ -1,100 +1,95 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.RenderingException
-import org.junit.Test
-import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito.*
 
-class Error404RendererTest {
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsZeroWhenConfigDoesNotRenderError404() {
+class Error404RendererTest : StringSpec({
+
+    "returnsZeroWhenConfigDoesNotRenderError404" {
         val renderer = Error404Renderer()
 
-        val configuration = mock(JBakeConfiguration::class.java)
-        `when`(configuration.renderError404).thenReturn(false)
+        val configuration = mockk<JBakeConfiguration>()
+        every { configuration.renderError404 } returns false
 
-        val contentStore = mock(ContentStore::class.java)
-
-        val mockRenderer = mock(Renderer::class.java)
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
-
-        Assertions.assertThat(renderResponse).isEqualTo(0)
-    }
-
-    @Test fun doesNotRenderWhenConfigDoesNotRenderError404() {
-        val renderer = Error404Renderer()
-
-        val configuration = mock(JBakeConfiguration::class.java)
-        `when`(configuration.renderError404).thenReturn(false)
-
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
-
-        renderer.render(mockRenderer, contentStore, configuration)
-
-        verify(mockRenderer, never()).renderError404(anyString())
-    }
-
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsOneWhenConfigRendersError404() {
-        val renderer = Error404Renderer()
-
-        val configuration = mock(JBakeConfiguration::class.java)
-        `when`(configuration.renderError404).thenReturn(true)
-        // ensure a non-null error404 filename so renderer will attempt to render
-        `when`(configuration.error404FileName).thenReturn("mock404file.html")
-
-        // Debug assertions to ensure stubbing worked
-        Assertions.assertThat(configuration.renderError404).isTrue()
-        Assertions.assertThat(configuration.error404FileName).isNotNull()
-
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        Assertions.assertThat(renderResponse).isEqualTo(1)
+        renderResponse shouldBe 0
     }
 
-    @Test fun doesRenderWhenConfigDoesNotRenderError404() {
+    "doesNotRenderWhenConfigDoesNotRenderError404" {
         val renderer = Error404Renderer()
-        val error404file = "mock404file.html"
 
-        val configuration = mock(JBakeConfiguration::class.java)
-        `when`(configuration.renderError404).thenReturn(true)
-        `when`(configuration.error404FileName).thenReturn(error404file)
+        val configuration = mockk<JBakeConfiguration>()
+        every { configuration.renderError404 } returns false
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, times(1)).renderError404(error404file)
+        verify(exactly = 0) { mockRenderer.renderError404(any()) }
     }
 
-    @Test(expected = RenderingException::class)
-    fun propogatesRenderingException() {
+    "returnsOneWhenConfigRendersError404" {
+        val renderer = Error404Renderer()
+
+        val configuration = mockk<JBakeConfiguration>()
+        every { configuration.renderError404 } returns true
+        every { configuration.error404FileName } returns "mock404file.html"
+
+        configuration.renderError404 shouldBe true
+        configuration.error404FileName shouldBe "mock404file.html"
+
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
+
+        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+
+        renderResponse shouldBe 1
+    }
+
+    "doesRenderWhenConfigDoesRenderError404" {
         val renderer = Error404Renderer()
         val error404file = "mock404file.html"
 
-        val configuration = mock(JBakeConfiguration::class.java)
-        `when`(configuration.renderError404).thenReturn(true)
-        `when`(configuration.error404FileName).thenReturn(error404file)
+        val configuration = mockk<JBakeConfiguration>()
+        every { configuration.renderError404 } returns true
+        every { configuration.error404FileName } returns error404file
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
-
-        /// Use doThrow for void method stubbing
-        doThrow(RuntimeException()).`when`(mockRenderer).renderError404(anyString())
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, never()).renderError404(error404file)
+        verify(exactly = 1) { mockRenderer.renderError404(error404file) }
     }
-}
+
+    "propogatesRenderingException" {
+        val renderer = Error404Renderer()
+        val error404file = "mock404file.html"
+
+        val configuration = mockk<JBakeConfiguration>()
+        every { configuration.renderError404 } returns true
+        every { configuration.error404FileName } returns error404file
+
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
+
+        every { mockRenderer.renderError404(any()) } throws RuntimeException()
+
+        shouldThrow<RuntimeException> {
+            renderer.render(mockRenderer, contentStore, configuration)
+        }
+    }
+})
+

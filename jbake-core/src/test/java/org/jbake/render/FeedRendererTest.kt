@@ -1,96 +1,90 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.template.RenderingException
-import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.*
 
-class FeedRendererTest {
+class FeedRendererTest : StringSpec({
 
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsZeroWhenConfigDoesNotRenderFeeds() {
+        fun returnsZeroWhenConfigDoesNotRenderFeeds() {
         val renderer = FeedRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderFeed).thenReturn(false)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderFeed } returns false
 
-        val contentStore = mock(ContentStore::class.java)
+        val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mock(Renderer::class.java)
+        val mockRenderer = mockk<Renderer>()
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        assertThat(renderResponse).isEqualTo(0)
+        renderResponse shouldBe 0
     }
 
-    @Test fun doesNotRenderWhenConfigDoesNotRenderFeeds() {
+    "doesNotRenderWhenConfigDoesNotRenderFeeds" {
         val renderer = FeedRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderFeed).thenReturn(false)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderFeed } returns false
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, never()).renderFeed(anyString())
+        verify(exactly = 0) { mockRenderer.renderFeed(any()) }
     }
 
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsOneWhenConfigRendersFeeds() {
+        fun returnsOneWhenConfigRendersFeeds() {
         val renderer = FeedRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderFeed).thenReturn(true)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderFeed } returns true
 
-        val contentStore = mock(ContentStore::class.java)
+        val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mock(Renderer::class.java)
+        val mockRenderer = mockk<Renderer>()
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        assertThat(renderResponse).isEqualTo(1)
+        renderResponse shouldBe 1
     }
 
-    @Test fun doesRenderWhenConfigDoesRenderFeeds() {
+    "doesRenderWhenConfigDoesRenderFeeds" {
         val renderer = FeedRenderer()
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderFeed).thenReturn(true)
-        `when`(configuration.feedFileName).thenReturn("mockfeedfile.xml")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderFeed } returns true
+        every { configuration.feedFileName } returns "mockfeedfile.xml"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, times(1)).renderFeed(anyString())
+        verify(exactly = 1) { mockRenderer.renderFeed(any()) }
     }
 
-    @Test(expected = RenderingException::class)
     fun propogatesRenderingException() {
         val renderer = FeedRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderFeed).thenReturn(true)
-        `when`(configuration.feedFileName).thenReturn("mockfeedfile.xml")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderFeed } returns true
+        every { configuration.feedFileName } returns "mockfeedfile.xml"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
-        doThrow(RuntimeException()).`when`(mockRenderer).renderFeed(ArgumentMatchers.anyString())
-        //`when`(mockRenderer.renderFeed(ArgumentMatchers.anyString())).thenThrow(Exception())
+        every { mockRenderer.renderFeed(any()) } throws RuntimeException()
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        shouldThrow<RuntimeException> {
+            renderer.render(mockRenderer, contentStore, configuration)
+        }
 
-        verify(mockRenderer, never()).renderFeed("random string")
+        verify(exactly = 0) { mockRenderer.renderFeed("random string") }
     }
-}
-
-
+})

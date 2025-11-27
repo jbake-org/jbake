@@ -1,17 +1,14 @@
 package org.jbake.app
 
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.string.shouldContain
 import org.jbake.util.DebugUtil.printMap
-import org.junit.Assert.assertTrue
-import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import java.io.UnsupportedEncodingException
 import java.nio.charset.StandardCharsets
 
-class DebugUtilTest {
-    @Test
-    @Throws(UnsupportedEncodingException::class)
-    fun printMap() {
+class DebugUtilTest : StringSpec({
+    "printMap" {
         val map = HashMap<String, Any?>()
         map["stringKey"] = "stringVal"
         map["forNullVal"] = null
@@ -26,11 +23,9 @@ class DebugUtilTest {
         val printed = String(baos.toByteArray(), StandardCharsets.UTF_8)
         println(printed)
 
-        assertTrue(printed.contains("stringKey :: stringVal"))
-        /// Removed, as I see no reason to support null keys.
-        //Assert.assertTrue(printed.contains("null :: forNullKey"))
-        assertTrue(printed.contains("forNullVal :: null"))
-        assertTrue(printed.contains("forCharset :: UTF-8"))
-        assertTrue(printed.contains("forNonSerializableVal :: java.lang.Exception: nonSerializableVal"))
+        printed shouldContain "stringKey :: stringVal"
+        printed shouldContain "forNullVal :: null"
+        printed shouldContain "forCharset :: UTF-8"
+        printed shouldContain "forNonSerializableVal :: java.lang.Exception: nonSerializableVal"
     }
-}
+})

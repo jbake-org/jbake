@@ -4,6 +4,7 @@ plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
+    id 'io.kotest'
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
@@ -53,18 +54,21 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     // Test dependencies need access to optional compile dependencies
-    testImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
-    testImplementation "info.picocli:picocli:$picocli"
-    testImplementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
-    testImplementation "org.freemarker:freemarker:$freemarkerVersion"
-    testImplementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    testImplementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    testImplementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     testImplementation "de.neuland-bfi:jade4j:$jade4jVersion"
     testImplementation "de.neuland-bfi:pug4j:$pug4jVersion"
-    testImplementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
-    testImplementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    testImplementation "info.picocli:picocli:$picocli"
+    testImplementation "io.kotest:kotest-framework-engine:$kotestVersion"
+    testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+    testImplementation "io.mockk:mockk:1.14.6"
     testImplementation "io.pebbletemplates:pebble:$pebbleVersion"
-    testImplementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    testImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    testImplementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
     testImplementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+    testImplementation "org.freemarker:freemarker:$freemarkerVersion"
+    testImplementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    testImplementation "org.yaml:snakeyaml:$snakeYamlVersion"
 }
 
 processResources {

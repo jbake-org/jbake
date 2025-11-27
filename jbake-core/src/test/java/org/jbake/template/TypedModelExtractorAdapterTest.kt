@@ -1,28 +1,25 @@
 package org.jbake.template
 
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 import org.apache.commons.configuration2.CompositeConfiguration
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
-import org.junit.After
-import org.junit.Test
+import org.jbake.template.model.RenderContext
 
-class TypedModelExtractorAdapterTest {
+class TypedModelExtractorAdapterTest : StringSpec({
 
-    @After
-    fun tearDown() {
+    afterTest {
         ModelExtractors.instance.reset()
     }
 
-    @Test fun `typed extractor should be usable via adapter and extractAndTransform`() {
+    "typed extractor should be usable via adapter and extractAndTransform" {
         val key = "typed_test_key"
 
         // Register a simple typed extractor that ignores context and returns a string
         val typed = object : TypedModelExtractor<String> {
-            override fun extract(context: org.jbake.template.model.RenderContext, key: String): String {
-                return "hello-typed"
-            }
+            override fun extract(context: RenderContext, key: String) = "hello-typed"
         }
 
         ModelExtractors.instance.registerEngine(key, typed)
@@ -36,7 +33,6 @@ class TypedModelExtractorAdapterTest {
 
         val adapted: Any? = ModelExtractors.instance.extractAndTransform(db, key, model, NoopAdapter())
 
-        assertThat(adapted).isEqualTo("hello-typed")
+        adapted shouldBe "hello-typed"
     }
-}
-
+})

@@ -1,117 +1,110 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.io.PrintWriter
 
-/**
- * Tests basic Markdown syntax and the extensions supported by the Markdown
- * processor (Pegdown).
- * @author Kevin S. Clarke <ksclarke></ksclarke>@gmail.com>
- */
-class MdParserTest {
-    @Rule @JvmField
-    var folder: TemporaryFolder = TemporaryFolder()
+class MdParserTest : StringSpec({
+    lateinit var folder: File
 
     lateinit var config: DefaultJBakeConfiguration
 
-    private lateinit var validMdFileBasic: File
+    lateinit var validMdFileBasic: File
 
-    private lateinit var invalidMdFileBasic: File
+    lateinit var invalidMdFileBasic: File
 
-    private lateinit var mdFileHardWraps: File
+    lateinit var mdFileHardWraps: File
 
-    private lateinit var mdFileAbbreviations: File
+    lateinit var mdFileAbbreviations: File
 
-    private lateinit var mdFileAutolinks: File
+    lateinit var mdFileAutolinks: File
 
-    private lateinit var mdFileDefinitions: File
+    lateinit var mdFileDefinitions: File
 
-    private lateinit var mdFileFencedCodeBlocks: File
+    lateinit var mdFileFencedCodeBlocks: File
 
-    private lateinit var mdFileQuotes: File
+    lateinit var mdFileQuotes: File
 
-    private lateinit var mdFileSmarts: File
+    lateinit var mdFileSmarts: File
 
-    private lateinit var mdFileSmartypants: File
+    lateinit var mdFileSmartypants: File
 
-    private lateinit var mdFileSuppressAllHTML: File
+    lateinit var mdFileSuppressAllHTML: File
 
-    private lateinit var mdFileSuppressHTMLBlocks: File
+    lateinit var mdFileSuppressHTMLBlocks: File
 
-    private lateinit var mdFileSuppressInlineHTML: File
+    lateinit var mdFileSuppressInlineHTML: File
 
-    private lateinit var mdFileTables: File
+    lateinit var mdFileTables: File
 
-    private lateinit var mdFileWikilinks: File
+    lateinit var mdFileWikilinks: File
 
-    private lateinit var mdFileAtxheaderspace: File
+    lateinit var mdFileAtxheaderspace: File
 
-    private lateinit var mdFileForcelistitempara: File
+    lateinit var mdFileForcelistitempara: File
 
-    private lateinit var mdFileRelaxedhrules: File
+    lateinit var mdFileRelaxedhrules: File
 
-    private lateinit var mdTasklistitems: File
+    lateinit var mdTasklistitems: File
 
-    private lateinit var mdExtanchorlinks: File
+    lateinit var mdExtanchorlinks: File
 
-    private val validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~"
+    val validHeader = "title=Title\nstatus=draft\ntype=post\n~~~~~~"
 
-    private val invalidHeader = "title=Title\n~~~~~~"
+    val invalidHeader = "title=Title\n~~~~~~"
 
-    @Before
-    fun createSampleFile() {
+    beforeTest {
+        folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         val configFile = TestUtils.testResourcesAsSourceFolder
         config = ConfigUtil().loadConfig(configFile) as DefaultJBakeConfiguration
 
-        validMdFileBasic = folder.newFile("validBasic.md")
+        validMdFileBasic = File(folder, "validBasic.md").apply { createNewFile() }
         var out = PrintWriter(validMdFileBasic)
         out.println(validHeader)
         out.println("# This is a test")
         out.close()
 
-        invalidMdFileBasic = folder.newFile("invalidBasic.md")
+        invalidMdFileBasic = File(folder, "invalidBasic.md").apply { createNewFile() }
         out = PrintWriter(invalidMdFileBasic)
         out.println(invalidHeader)
         out.println("# This is a test")
         out.close()
 
-        mdFileHardWraps = folder.newFile("hardWraps.md")
+        mdFileHardWraps = File(folder, "hardWraps.md").apply { createNewFile() }
         out = PrintWriter(mdFileHardWraps)
         out.println(validHeader)
         out.println("First line")
         out.println("Second line")
         out.close()
 
-        mdFileAbbreviations = folder.newFile("abbreviations.md")
+        mdFileAbbreviations = File(folder, "abbreviations.md").apply { createNewFile() }
         out = PrintWriter(mdFileAbbreviations)
         out.println(validHeader)
         out.println("*[HTML]: Hyper Text Markup Language")
         out.println("HTML")
         out.close()
 
-        mdFileAutolinks = folder.newFile("autolinks.md")
+        mdFileAutolinks = File(folder, "autolinks.md").apply { createNewFile() }
         out = PrintWriter(mdFileAutolinks)
         out.println(validHeader)
         out.println("http://github.com")
         out.close()
 
-        mdFileDefinitions = folder.newFile("definitions.md")
+        mdFileDefinitions = File(folder, "definitions.md").apply { createNewFile() }
         out = PrintWriter(mdFileDefinitions)
         out.println(validHeader)
         out.println("Apple")
         out.println(":   Pomaceous fruit")
         out.close()
 
-        mdFileFencedCodeBlocks = folder.newFile("fencedCodeBlocks.md")
+        mdFileFencedCodeBlocks = File(folder, "fencedCodeBlocks.md").apply { createNewFile() }
         out = PrintWriter(mdFileFencedCodeBlocks)
         out.println(validHeader)
         out.println("```")
@@ -121,43 +114,43 @@ class MdParserTest {
         out.println("```")
         out.close()
 
-        mdFileQuotes = folder.newFile("quotes.md")
+        mdFileQuotes = File(folder, "quotes.md").apply { createNewFile() }
         out = PrintWriter(mdFileQuotes)
         out.println(validHeader)
         out.println("\"quotes\"")
         out.close()
 
-        mdFileSmarts = folder.newFile("smarts.md")
+        mdFileSmarts = File(folder, "smarts.md").apply { createNewFile() }
         out = PrintWriter(mdFileSmarts)
         out.println(validHeader)
         out.println("...")
         out.close()
 
-        mdFileSmartypants = folder.newFile("smartypants.md")
+        mdFileSmartypants = File(folder, "smartypants.md").apply { createNewFile() }
         out = PrintWriter(mdFileSmartypants)
         out.println(validHeader)
         out.println("\"...\"")
         out.close()
 
-        mdFileSuppressAllHTML = folder.newFile("suppressAllHTML.md")
+        mdFileSuppressAllHTML = File(folder, "suppressAllHTML.md").apply { createNewFile() }
         out = PrintWriter(mdFileSuppressAllHTML)
         out.println(validHeader)
         out.println("<div>!</div><em>!</em>")
         out.close()
 
-        mdFileSuppressHTMLBlocks = folder.newFile("suppressHTMLBlocks.md")
+        mdFileSuppressHTMLBlocks = File(folder, "suppressHTMLBlocks.md").apply { createNewFile() }
         out = PrintWriter(mdFileSuppressHTMLBlocks)
         out.println(validHeader)
         out.println("<div>!</div><em>!</em>")
         out.close()
 
-        mdFileSuppressInlineHTML = folder.newFile("suppressInlineHTML.md")
+        mdFileSuppressInlineHTML = File(folder, "suppressInlineHTML.md").apply { createNewFile() }
         out = PrintWriter(mdFileSuppressInlineHTML)
         out.println(validHeader)
         out.println("This is the first paragraph. <span> with </span> inline html")
         out.close()
 
-        mdFileTables = folder.newFile("tables.md")
+        mdFileTables = File(folder, "tables.md").apply { createNewFile() }
         out = PrintWriter(mdFileTables)
         out.println(validHeader)
         out.println("First Header|Second Header")
@@ -166,19 +159,19 @@ class MdParserTest {
         out.println("Content Cell|Content Cell")
         out.close()
 
-        mdFileWikilinks = folder.newFile("wikilinks.md")
+        mdFileWikilinks = File(folder, "wikilinks.md").apply { createNewFile() }
         out = PrintWriter(mdFileWikilinks)
         out.println(validHeader)
         out.println("[[Wiki-style links]]")
         out.close()
 
-        mdFileAtxheaderspace = folder.newFile("atxheaderspace.md")
+        mdFileAtxheaderspace = File(folder, "atxheaderspace.md").apply { createNewFile() }
         out = PrintWriter(mdFileAtxheaderspace)
         out.println(validHeader)
         out.println("#Test")
         out.close()
 
-        mdFileForcelistitempara = folder.newFile("forcelistitempara.md")
+        mdFileForcelistitempara = File(folder, "forcelistitempara.md").apply { createNewFile() }
         out = PrintWriter(mdFileForcelistitempara)
         out.println(validHeader)
         out.println("1. Item 1")
@@ -189,7 +182,7 @@ class MdParserTest {
         out.println("    Item 1 paragraph 1 continuation")
         out.close()
 
-        mdFileRelaxedhrules = folder.newFile("releaxedhrules.md")
+        mdFileRelaxedhrules = File(folder, "releaxedhrules.md").apply { createNewFile() }
         out = PrintWriter(mdFileRelaxedhrules)
         out.println(validHeader)
         out.println("Hello World")
@@ -208,7 +201,7 @@ class MdParserTest {
         out.println("***")
         out.close()
 
-        mdTasklistitems = folder.newFile("tasklistsitem.md")
+        mdTasklistitems = File(folder, "tasklistsitem.md").apply { createNewFile() }
         out = PrintWriter(mdTasklistitems)
         out.println(validHeader)
         out.println("* loose bullet item 3")
@@ -216,250 +209,246 @@ class MdParserTest {
         out.println("* [x] closed task item")
         out.close()
 
-        mdExtanchorlinks = folder.newFile("mdExtanchorlinks.md")
+        mdExtanchorlinks = File(folder, "mdExtanchorlinks.md").apply { createNewFile() }
         out = PrintWriter(mdExtanchorlinks)
         out.println(validHeader)
         out.println("# header & some *formatting* ~~chars~~")
         out.close()
     }
 
-    @Test fun parseValidMarkdownFileBasic() {
+    "parseValidMarkdownFileBasic" {
         val parser = Parser(config)
         val documentModel = parser.processFile(validMdFileBasic)
-        assertNotNull(documentModel)
-        assertEquals("draft", documentModel!!.status)
-        assertEquals("post", documentModel.type)
-        assertEquals("<h1>This is a test</h1>\n", documentModel.body)
+        documentModel.shouldNotBeNull()
+        documentModel.status shouldBe "draft"
+        documentModel.type shouldBe "post"
+        documentModel.body shouldBe "<h1>This is a test</h1>\n"
     }
 
-    @Test fun parseInvalidMarkdownFileBasic() {
+    "parseInvalidMarkdownFileBasic" {
         val parser = Parser(config)
         val documentModel = parser.processFile(invalidMdFileBasic)
-        assertNull(documentModel)
+        documentModel.shouldBeNull()
     }
 
-    @Test fun parseValidMdFileHardWraps() {
+    "parseValidMdFileHardWraps" {
         config.setMarkdownExtensions("HARDWRAPS")
 
         // Test with HARDWRAPS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileHardWraps)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>First line<br />\nSecond line</p>\n")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>First line<br />\nSecond line</p>\n"
 
         // Test without HARDWRAPS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileHardWraps)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>First line Second line</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>First line Second line</p>"
     }
 
-    @Test fun parseWithInvalidExtension() {
+    "parseWithInvalidExtension" {
         config.setMarkdownExtensions("HARDWRAPS,UNDEFINED_EXTENSION")
 
         // Test with HARDWRAPS
         val parser = Parser(config)
         val documentModel = parser.processFile(mdFileHardWraps)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>First line<br />\nSecond line</p>\n")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>First line<br />\nSecond line</p>\n"
     }
 
-    @Test fun parseValidMdFileAbbreviations() {
+    "parseValidMdFileAbbreviations" {
         config.setMarkdownExtensions("ABBREVIATIONS")
 
         // Test with ABBREVIATIONS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileAbbreviations)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p><abbr title=\"Hyper Text Markup Language\">HTML</abbr></p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p><abbr title=\"Hyper Text Markup Language\">HTML</abbr></p>"
 
         // Test without ABBREVIATIONS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileAbbreviations)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>*[HTML]: Hyper Text Markup Language HTML</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>*[HTML]: Hyper Text Markup Language HTML</p>"
     }
 
-    @Test fun parseValidMdFileAutolinks() {
+    "parseValidMdFileAutolinks" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("AUTOLINKS")
 
         // Test with AUTOLINKS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileAutolinks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p><a href=\"http://github.com\">http://github.com</a></p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p><a href=\"http://github.com\">http://github.com</a></p>"
 
         // Test without AUTOLINKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileAutolinks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>http://github.com</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>http://github.com</p>"
     }
 
-    @Test fun parseValidMdFileDefinitions() {
+    "parseValidMdFileDefinitions" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("DEFINITIONS")
 
         // Test with DEFINITIONS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileDefinitions)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<dl>\n<dt>Apple</dt>\n<dd>Pomaceous fruit</dd>\n</dl>"
-        )
+
 
         // Test without DEFNITIONS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileDefinitions)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>Apple :   Pomaceous fruit</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>Apple :   Pomaceous fruit</p>"
     }
 
-    @Test fun parseValidMdFileFencedCodeBlocks() {
+    "parseValidMdFileFencedCodeBlocks" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("FENCED_CODE_BLOCKS")
 
         // Test with FENCED_CODE_BLOCKS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileFencedCodeBlocks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
-            "<pre><code>function test() {\n  console.log(&quot;!&quot;);\n}\n</code></pre>"
-        )
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<pre><code>function test( {\n  console.log(&quot;!&quot;);\n}\n</code></pre>"
 
         // Test without FENCED_CODE_BLOCKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileFencedCodeBlocks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
-            "<p><code>function test() { console.log(&quot;!&quot;); }</code></p>"
-        )
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p><code>function test( { console.log(&quot;!&quot;); }</code></p>"
     }
 
-    @Test fun parseValidMdFileQuotes() {
+    "parseValidMdFileQuotes" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("QUOTES")
 
         // Test with QUOTES
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileQuotes)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>&ldquo;quotes&rdquo;</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>&ldquo;quotes&rdquo;</p>"
 
         // Test without QUOTES
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileQuotes)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>&quot;quotes&quot;</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>&quot;quotes&quot;</p>"
     }
 
-    @Test fun parseValidMdFileSmarts() {
+    "parseValidMdFileSmarts" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("SMARTS")
 
         // Test with SMARTS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileSmarts)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>&hellip;</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>&hellip;</p>"
 
         // Test without SMARTS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileSmarts)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>...</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>...</p>"
     }
 
-    @Test fun parseValidMdFileSmartypants() {
+    "parseValidMdFileSmartypants" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("SMARTYPANTS")
 
         // Test with SMARTYPANTS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileSmartypants)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>&ldquo;&hellip;&rdquo;</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>&ldquo;&hellip;&rdquo;</p>"
 
         // Test without SMARTYPANTS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileSmartypants)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>&quot;...&quot;</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>&quot;...&quot;</p>"
     }
 
-    @Test fun parseValidMdFileSuppressAllHTML() {
+    "parseValidMdFileSuppressAllHTML" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("SUPPRESS_ALL_HTML")
 
         // Test with SUPPRESS_ALL_HTML
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileSuppressAllHTML)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain ""
 
         // Test without SUPPRESS_ALL_HTML
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileSuppressAllHTML)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<div>!</div><em>!</em>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<div>!</div><em>!</em>"
     }
 
-    @Test fun parseValidMdFileSuppressHTMLBlocks() {
+    "parseValidMdFileSuppressHTMLBlocks" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("SUPPRESS_HTML_BLOCKS")
 
         // Test with SUPPRESS_HTML_BLOCKS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileSuppressHTMLBlocks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain ""
 
         // Test without SUPPRESS_HTML_BLOCKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileSuppressHTMLBlocks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<div>!</div><em>!</em>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<div>!</div><em>!</em>"
     }
 
-    @Test fun parseValidMdFileSuppressInlineHTML() {
+    "parseValidMdFileSuppressInlineHTML" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("SUPPRESS_INLINE_HTML")
 
         // Test with SUPPRESS_INLINE_HTML
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileSuppressInlineHTML)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>This is the first paragraph.  with  inline html</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>This is the first paragraph.  with  inline html</p>"
 
         // Test without SUPPRESS_INLINE_HTML
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileSuppressInlineHTML)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body)
+        documentModel.shouldNotBeNull()
+        documentModel.body
             .contains("<p>This is the first paragraph. <span> with </span> inline html</p>")
     }
 
-    @Test fun parseValidMdFileTables() {
+    "parseValidMdFileTables" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("TABLES")
 
         // Test with TABLES
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileTables)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<table>\n" +
                     "<thead>\n" +
                     "<tr><th>First Header</th><th>Second Header</th></tr>\n" +
@@ -469,96 +458,96 @@ class MdParserTest {
                     "<tr><td>Content Cell</td><td>Content Cell</td></tr>\n" +
                     "</tbody>\n" +
                     "</table>"
-        )
+
 
         // Test without TABLES
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileTables)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<p>First Header|Second Header -------------|------------- Content Cell|Content Cell Content Cell|Content Cell</p>"
-        )
+
     }
 
-    @Test fun parseValidMdFileWikilinks() {
+    "parseValidMdFileWikilinks" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("WIKILINKS")
 
         // Test with WIKILINKS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileWikilinks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<p><a href=\"Wiki-style-links\">Wiki-style links</a></p>"
-        )
+
 
         // Test without WIKILINKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileWikilinks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>[[Wiki-style links]]</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>[[Wiki-style links]]</p>"
     }
 
-    @Test fun parseValidMdFileAtxheaderspace() {
+    "parseValidMdFileAtxheaderspace" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("ATXHEADERSPACE")
 
         // Test with ATXHEADERSPACE
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileAtxheaderspace)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<p>#Test</p>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<p>#Test</p>"
 
         // Test without ATXHEADERSPACE
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileAtxheaderspace)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<h1>Test</h1>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<h1>Test</h1>"
     }
 
-    @Test fun parseValidMdFileForcelistitempara() {
+    "parseValidMdFileForcelistitempara" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("FORCELISTITEMPARA")
 
         // Test with FORCELISTITEMPARA
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileForcelistitempara)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<ol>\n" +
                     "<li>\n" +
                     "<p>Item 1 Item 1 lazy continuation</p>\n" +
                     "<p>Item 1 paragraph 1 Item 1 paragraph 1 lazy continuation Item 1 paragraph 1 continuation</p>\n" +
                     "</li>\n" +
                     "</ol>"
-        )
+
 
         // Test without FORCELISTITEMPARA
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileForcelistitempara)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<ol>\n" +
                     "<li>Item 1 Item 1 lazy continuation\n" +
                     "<p>Item 1 paragraph 1 Item 1 paragraph 1 lazy continuation Item 1 paragraph 1 continuation</p>\n" +
                     "</li>\n" +
                     "</ol>"
-        )
+
     }
 
-    @Test fun parseValidMdFileRelaxedhrules() {
+    "parseValidMdFileRelaxedhrules" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("RELAXEDHRULES")
 
         // Test with RELAXEDHRULES
         var parser = Parser(config)
         var documentModel = parser.processFile(mdFileRelaxedhrules)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<h2>Hello World</h2>\n" +
                     "<hr />\n" +
                     "<hr />\n" +
@@ -570,14 +559,14 @@ class MdParserTest {
                     "<hr />\n" +
                     "<hr />\n" +
                     "<hr />"
-        )
+
 
         // Test without RELAXEDHRULES
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdFileRelaxedhrules)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<h2>Hello World</h2>\n" +
                     "<hr />\n" +
                     "<hr />\n" +
@@ -585,56 +574,61 @@ class MdParserTest {
                     "<hr />\n" +
                     "<h2>Hello World ___</h2>\n" +
                     "<hr />"
-        )
+
     }
 
-    @Test fun parseValidMdFileTasklistitems() {
+    "parseValidMdFileTasklistitems" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("TASKLISTITEMS")
 
         // Test with TASKLISTITEMS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdTasklistitems)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<ul>\n" +
                     "<li>loose bullet item 3</li>\n" +
                     "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;open task item</li>\n" +
                     "<li class=\"task-list-item\"><input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"checked\" disabled=\"disabled\" readonly=\"readonly\" />&nbsp;closed task item</li>\n" +
                     "</ul>"
-        )
+
 
         // Test without TASKLISTITEMS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdTasklistitems)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<ul>\n" +
                     "<li>loose bullet item 3</li>\n" +
                     "<li>[ ] open task item</li>\n" +
                     "<li>[x] closed task item</li>\n" +
                     "</ul>"
-        )
+
     }
 
-    @Test fun parseValidMdFileExtanchorlinks() {
+    "parseValidMdFileExtanchorlinks" {
         config.setMarkdownExtensions("")
         config.setMarkdownExtensions("EXTANCHORLINKS")
 
         // Test with EXTANCHORLINKS
         var parser = Parser(config)
         var documentModel = parser.processFile(mdExtanchorlinks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains(
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain
             "<h1><a href=\"#header-some-formatting-chars\" id=\"header-some-formatting-chars\"></a>header &amp; some <em>formatting</em> ~~chars~~</h1>"
-        )
+
 
         // Test without EXTANCHORLINKS
         config.setMarkdownExtensions("")
         parser = Parser(config)
         documentModel = parser.processFile(mdExtanchorlinks)
-        assertNotNull(documentModel)
-        assertThat(documentModel!!.body).contains("<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>")
+        documentModel.shouldNotBeNull()
+        documentModel.body shouldContain "<h1>header &amp; some <em>formatting</em> ~~chars~~</h1>"
     }
-}
+
+
+    afterTest {
+        folder.deleteRecursively()
+    }
+})

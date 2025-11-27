@@ -1,45 +1,71 @@
 package org.jbake.app
 
 import com.orientechnologies.orient.core.db.record.OTrackedMap
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.matchers.types.shouldNotBeInstanceOf
 import org.apache.commons.io.FilenameUtils
-import org.assertj.core.api.Assertions.assertThat
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
-import org.junit.Assert.*
-import org.junit.Test
 
-class CrawlerTest : ContentStoreIntegrationTest() {
+class CrawlerTest : StringSpec({
 
-    @Test fun crawlContentDirectory() {
+    lateinit var db: ContentStore
+    lateinit var config: org.jbake.app.configuration.DefaultJBakeConfiguration
+
+    beforeSpec {
+        ContentStoreIntegrationTest.setUpClass()
+        db = ContentStoreIntegrationTest.db
+        config = ContentStoreIntegrationTest.config
+    }
+
+    beforeTest {
+        db.startup()
+    }
+
+    afterTest {
+        db.drop()
+    }
+
+    afterSpec {
+        ContentStoreIntegrationTest.cleanUpClass()
+    }
+
+    "crawlContentDirectory" {
         val crawler = Crawler(db, config)
         crawler.crawlContentDirectory()
 
-        assertEquals(4, db.getDocumentCount("post"))
-        assertEquals(3, db.getDocumentCount("page"))
+        db.getDocumentCount("post") shouldBe 4
+        db.getDocumentCount("page") shouldBe 3
 
         val results: DocumentList<DocumentModel> = db.publishedPosts
 
-        assertThat(results.size).isEqualTo(3)
+        results.size shouldBe 3
 
-        for (content in results)
-            assertThat(content).containsKey(ModelAttributes.ROOTPATH).containsValue("../../../")
+        for (content in results) {
+            content.containsKey(ModelAttributes.ROOTPATH) shouldBe true
+            content.containsValue("../../../") shouldBe true
+        }
 
         val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
 
-        assertThat(allPosts.size).isEqualTo(4)
+        allPosts.size shouldBe 4
 
         allPosts.filter { it.title == "Draft Post" }
-            .forEach { assertThat(it).containsKey(ModelAttributes.DATE) }
+            .forEach { it.containsKey(ModelAttributes.DATE) shouldBe true }
 
         // Covers bug #213
         val publishedPostsByTag: DocumentList<DocumentModel> =
             db.getPublishedPostsByTag("blog")
-        assertEquals(3, publishedPostsByTag.size.toLong())
+        publishedPostsByTag.size.toLong() shouldBe 3
     }
 
-    @Test fun crawlDataFiles() {
+    "crawlDataFiles" {
         val crawler = Crawler(db, config)
 
         // Manually register data doctype.
@@ -47,40 +73,42 @@ class CrawlerTest : ContentStoreIntegrationTest() {
         db.updateSchema()
 
         crawler.crawlDataFiles()
-        assertEquals(2, db.getDocumentCount("data"))
+        db.getDocumentCount("data") shouldBe 2
 
         val dataFileUtil = DataFileUtil(db, "data")
         val videosYaml = dataFileUtil.get("videos.yaml")
-        assertFalse(videosYaml.isEmpty())
-        assertNotNull(videosYaml["data"])
+        videosYaml.isEmpty().shouldBeFalse()
+        videosYaml["data"].shouldNotBeNull()
 
         // Regression test for issue #747.
         val authorsFileContents = dataFileUtil.get("authors.yaml")
-        assertFalse(authorsFileContents.isEmpty())
+        authorsFileContents.isEmpty().shouldBeFalse()
         val authorsList = authorsFileContents["authors"]
-        assertThat(authorsList).isNotInstanceOf(OTrackedMap::class.java)
-        assertThat(authorsList).isInstanceOf(HashMap::class.java)
-        val authors = authorsList as HashMap<String, MutableMap<String,  Any>>
-        assertThat(authors.get("Joe Bloggs")!!["last_name"]).isEqualTo("Bloggs")
+        authorsList.shouldNotBeInstanceOf<OTrackedMap<*>>()
+        authorsList.shouldBeInstanceOf<HashMap<*, *>>()
+        @Suppress("UNCHECKED_CAST")
+        val authors = authorsList as HashMap<String, MutableMap<String, Any>>
+        authors["Joe Bloggs"]!!["last_name"] shouldBe "Bloggs"
     }
 
-    @Test fun renderWithPrettyUrls() {
+    "renderWithPrettyUrls" {
         config.setUriWithoutExtension(true)
         config.setPrefixForUriWithoutExtension("/blog")
 
         Crawler(db, config).crawlContentDirectory()
 
-        assertEquals(4, db.getDocumentCount("post"))
-        assertEquals(3, db.getDocumentCount("page"))
+        db.getDocumentCount("post") shouldBe 4
+        db.getDocumentCount("page") shouldBe 3
 
         val documents: DocumentList<DocumentModel> = db.publishedPosts
 
         for (model in documents) {
             val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.file) + "/"
 
-            assertThat(model.noExtensionUri).matches(noExtensionUri)
-            assertThat(model.uri).matches(noExtensionUri + "index\\.html")
-            assertThat(model.rootPath).isEqualTo("../../../")
+            model.noExtensionUri!!.matches(noExtensionUri.toRegex()) shouldBe true
+            model.uri!!.matches((noExtensionUri + "index\\.html").toRegex()) shouldBe true
+            model.rootPath shouldBe "../../../"
         }
     }
-}
+})
+

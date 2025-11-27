@@ -367,6 +367,7 @@ class ContentStore(private val type: String, private val name: String?) {
     fun addDocument(document: DocumentModel) {
         val element = db.newElement(Schema.DOCUMENTS)
         document.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
+        @Suppress("DEPRECATION")
         element.save<ORecord?>()
     }
 

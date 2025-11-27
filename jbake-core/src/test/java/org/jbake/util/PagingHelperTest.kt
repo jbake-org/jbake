@@ -1,46 +1,46 @@
 package org.jbake.util
 
-import org.hamcrest.core.Is
-import org.junit.Assert.*
-import org.junit.Test
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 
-class PagingHelperTest {
-    @Test fun getNumberOfPages() {
+class PagingHelperTest : StringSpec({
+    "getNumberOfPages" {
         val expected = 3
         val total = 5
         val perPage = 2
 
         val helper = PagingHelper(total.toLong(), perPage)
-        assertEquals(expected.toLong(), helper.numberOfPages.toLong())
+        helper.numberOfPages.toLong() shouldBe expected.toLong()
     }
 
-    @Test fun shouldReturnRootIndexPage() {
+    "shouldReturnRootIndexPage" {
         val helper = PagingHelper(5, 2)
         val previousFileName = helper.getPreviousFileName(2)
-        assertThat("", Is.`is`(previousFileName))
+        previousFileName shouldBe ""
     }
 
-    @Test fun shouldReturnPreviousFileName() {
+    "shouldReturnPreviousFileName" {
         val helper = PagingHelper(5, 2)
         val previousFileName = helper.getPreviousFileName(3)
-        assertThat("2/", Is.`is`(previousFileName))
+        previousFileName shouldBe "2/"
     }
 
-    @Test fun shouldReturnNullIfNoPreviousPageAvailable() {
+    "shouldReturnNullIfNoPreviousPageAvailable" {
         val helper = PagingHelper(5, 2)
         val previousFileName = helper.getPreviousFileName(1)
-        assertNull(previousFileName)
+        previousFileName.shouldBeNull()
     }
 
-    @Test fun shouldReturnNullIfNextPageNotAvailable() {
+    "shouldReturnNullIfNextPageNotAvailable" {
         val helper = PagingHelper(5, 2)
         val nextFileName = helper.getNextFileName(3)
-        assertNull(nextFileName)
+        nextFileName.shouldBeNull()
     }
 
-    @Test fun shouldReturnNextFileName() {
+    "shouldReturnNextFileName" {
         val helper = PagingHelper(5, 2)
         val nextFileName = helper.getNextFileName(2)
-        assertThat("3/", Is.`is`(nextFileName))
+        nextFileName shouldBe "3/"
     }
-}
+})

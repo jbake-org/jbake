@@ -1,65 +1,73 @@
 package org.jbake.app
 
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.fail
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.file.shouldNotExist
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.launcher.Init
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import java.io.File
+import java.nio.file.Files
 
-class InitTest {
+class InitTest : StringSpec({
 
-    @Rule @JvmField
-    var folder: TemporaryFolder = TemporaryFolder()
+    lateinit var config: DefaultJBakeConfiguration
+    lateinit var rootPath: File
+    lateinit var tempDir: File
 
-    private lateinit var config: DefaultJBakeConfiguration
-    private lateinit var rootPath: File
-
-    @Before
-    fun setup() {
+    beforeTest {
         rootPath = TestUtils.testResourcesAsSourceFolder
         if (!rootPath.exists()) throw Exception("Cannot find base path for test!")
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         // Override base template config option.
         config.setExampleProject("freemarker", "test.zip")
+
+        // Create temp directory for each test
+        tempDir = Files.createTempDirectory("jbake-init-test").toFile()
     }
 
-    @Test fun initOK() {
+    afterTest {
+        // Clean up temp directory
+        tempDir.deleteRecursively()
+    }
+
+    "initOK" {
         val init = Init(config)
-        val initPath = folder.newFolder("init")
+        val initPath = File(tempDir, "init")
+        initPath.mkdir()
         init.run(initPath, rootPath, "freemarker")
         val testFile = File(initPath, "testfile.txt")
-        assertThat(testFile).exists()
+        testFile.shouldExist()
     }
 
-    @Test fun initFailDestinationContainsContent() {
+    "initFailDestinationContainsContent" {
         val init = Init(config)
-        val initPath = folder.newFolder("init")
-        val contentFolder = File(initPath.path, config.contentFolderName)
+        val initPath = File(tempDir, "init")
+        initPath.mkdir()
+        val contentFolder = File(initPath.path, config.contentFolderName ?: "content")
         contentFolder.mkdir()
-        try {
+
+        shouldThrow<Exception> {
             init.run(initPath, rootPath, "freemarker")
-            fail("Shouldn't be able to initialise folder with content folder within it!")
-        } catch (e: Exception) {/* Expected. */ }
+        }
 
         val testFile = File(initPath, "testfile.txt")
-        assertThat(testFile).doesNotExist()
+        testFile.shouldNotExist()
     }
 
-    @Test fun initFailInvalidTemplateType() {
+    "initFailInvalidTemplateType" {
         val init = Init(config)
-        val initPath = folder.newFolder("init")
-        try {
+        val initPath = File(tempDir, "init")
+        initPath.mkdir()
+
+        shouldThrow<Exception> {
             init.run(initPath, rootPath, "invalid")
-            fail("Shouldn't be able to initialise folder with invalid template type")
-        } catch (e: Exception) { /* Expected. */ }
+        }
 
         val testFile = File(initPath, "testfile.txt")
-        assertThat(testFile).doesNotExist()
+        testFile.shouldNotExist()
     }
-}
+})
+

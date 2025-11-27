@@ -1,95 +1,92 @@
 package org.jbake.render
 
-import org.assertj.core.api.Assertions.assertThat
+import org.jbake.render.ArchiveRenderer
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.template.RenderingException
-import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.*
 
-class ArchiveRendererTest {
+class ArchiveRendererTest : StringSpec({
 
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsZeroWhenConfigDoesNotRenderArchives() {
+        fun returnsZeroWhenConfigDoesNotRenderArchives() {
         val renderer = ArchiveRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderArchive).thenReturn(false)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderArchive } returns false
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        assertThat(renderResponse).isEqualTo(0)
+        renderResponse shouldBe 0
     }
 
-    @Test fun doesNotRenderWhenConfigDoesNotRenderArchives() {
+    "doesNotRenderWhenConfigDoesNotRenderArchives" {
         val renderer = ArchiveRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderArchive).thenReturn(false)
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderArchive } returns false
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, never()).renderArchive(anyString())
+        verify(exactly = 0) { mockRenderer.renderArchive(any()) }
     }
 
-    @Test
-    @Throws(RenderingException::class)
-    fun returnsOneWhenConfigRendersArchives() {
+        fun returnsOneWhenConfigRendersArchives() {
         val renderer = ArchiveRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderArchive).thenReturn(true)
-        `when`(configuration.archiveFileName).thenReturn("archive.html")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderArchive } returns true
+        every { configuration.archiveFileName } returns "archive.html"
 
-        val contentStore = mock(ContentStore::class.java)
+        val contentStore = mockk<ContentStore>()
 
-        val mockRenderer = mock(Renderer::class.java)
+        val mockRenderer = mockk<Renderer>()
 
         val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
 
-        assertThat(renderResponse).isEqualTo(1)
+        renderResponse shouldBe 1
     }
 
-    @Test fun doesRenderWhenConfigDoesRenderArchives() {
+    "doesRenderWhenConfigDoesRenderArchives" {
         val renderer = ArchiveRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderArchive).thenReturn(true)
-        `when`(configuration.archiveFileName).thenReturn("mockarchive.html")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderArchive } returns true
+        every { configuration.archiveFileName } returns "mockarchive.html"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(mockRenderer, times(1)).renderArchive(anyString())
+        verify(exactly = 1) { mockRenderer.renderArchive(any()) }
     }
 
-    @Test(expected = RenderingException::class)
     fun propogatesRenderingException() {
         val renderer = ArchiveRenderer()
 
-        val configuration = mock(DefaultJBakeConfiguration::class.java)
-        `when`(configuration.renderArchive).thenReturn(true)
-        `when`(configuration.archiveFileName).thenReturn("mockarchive.html")
+        val configuration = mockk<DefaultJBakeConfiguration>()
+        every { configuration.renderArchive } returns true
+        every { configuration.archiveFileName } returns "mockarchive.html"
 
-        val contentStore = mock(ContentStore::class.java)
-        val mockRenderer = mock(Renderer::class.java)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>(relaxed = true)
 
-        doThrow(RuntimeException()).`when`(mockRenderer).renderArchive(anyString())
+        every { mockRenderer.renderArchive(any()) } throws RuntimeException()
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        shouldThrow<RuntimeException> {
+            renderer.render(mockRenderer, contentStore, configuration)
+        }
 
-        verify(mockRenderer, never()).renderArchive("random string")
+        verify(exactly = 0) { mockRenderer.renderArchive("random string") }
     }
-}
-
-
+})

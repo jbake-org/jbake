@@ -1,36 +1,39 @@
 package org.jbake.launcher
 
-import org.assertj.core.api.Assertions
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import org.jbake.TestUtils
 import org.jbake.app.configuration.JBakeConfiguration
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.jupiter.MockitoExtension
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.ServerSocket
 import java.net.URL
-import java.nio.file.Path
 import java.util.concurrent.Executors
 
-@ExtendWith(MockitoExtension::class)
-internal class JettyServerTest {
+class JettyServerTest : StringSpec({
 
-    @Mock lateinit var jBakeConfiguration: JBakeConfiguration
+    lateinit var jBakeConfiguration: JBakeConfiguration
 
-    @Test fun shouldRunWithCustomPortAndContext(@TempDir output: Path) {
-        val out = output.resolve("build/jbake").toFile()
+    beforeTest {
+        jBakeConfiguration = mockk(relaxed = true)
+    }
+
+    "shouldRunWithCustomPortAndContext" {
+        val tempDir = java.io.File.createTempFile("jbake", "test").apply {
+            delete()
+            mkdirs()
+        }
+        val out = java.io.File(tempDir, "build/jbake")
         out.mkdirs()
 
         val source = TestUtils.testResourcesAsSourceFolder
-        val port = this.randoport
-        Mockito.`when`(jBakeConfiguration.serverPort).thenReturn(port)
-        Mockito.`when`(jBakeConfiguration.serverHostname).thenReturn("localhost")
-        Mockito.`when`(jBakeConfiguration.serverContextPath).thenReturn("/foo")
+        val port = JettyServerTest.getRandoPort()
+        every { jBakeConfiguration.serverPort } returns port
+        every { jBakeConfiguration.serverHostname } returns "localhost"
+        every { jBakeConfiguration.serverContextPath } returns "/foo"
 
         val executorService = Executors.newSingleThreadExecutor()
 
@@ -41,20 +44,20 @@ internal class JettyServerTest {
                 Thread.sleep(100)
             }
 
-            val url = URL("http://localhost:$port/foo/content/about.html")
-            val con = url.openConnection() as HttpURLConnection
-            con.setRequestMethod("GET")
+            val conn = URL("http://localhost:$port/foo/content/about.html").openConnection() as HttpURLConnection
+            conn.setRequestMethod("GET")
 
-            val `in` = BufferedReader(InputStreamReader(con.getInputStream()))
-            Assertions.assertThat(`in`.readLine()).isEqualTo("title=About")
+            BufferedReader(InputStreamReader(conn.getInputStream())).readLine() shouldBe "title=About"
         }
-    }
 
-    @get:Throws(Exception::class)
-    private val randoport: Int
-        get() {
+        tempDir.deleteRecursively()
+    }
+}) {
+    companion object {
+        fun getRandoPort(): Int {
             ServerSocket(0).use { socket ->
-                return socket.getLocalPort()
+                return socket.localPort
             }
         }
+    }
 }
