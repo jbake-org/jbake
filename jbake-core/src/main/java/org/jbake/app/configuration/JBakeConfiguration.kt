@@ -22,7 +22,7 @@ interface JBakeConfiguration {
     val asciidoctorAttributes: MutableList<String>
 
     /** Get an asciidoctor option by its key. */
-    fun getAsciidoctorOption(optionKey: String): Any?
+    fun getAsciidoctorOption(optionKey: String): Any
 
     /** Get a list of asciidoctor options. */
     val asciidoctorOptionKeys: MutableList<String>

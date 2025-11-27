@@ -72,7 +72,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val asciidoctorAttributes: MutableList<String>
         get() = getAsList(PropertyList.ASCIIDOCTOR_ATTRIBUTES.key)
 
-    override fun getAsciidoctorOption(optionKey: String): Any? {
+    override fun getAsciidoctorOption(optionKey: String): Any {
         val subConfig = compositeConfiguration.subset(PropertyList.ASCIIDOCTOR_OPTION.key)
 
         if (subConfig.containsKey(optionKey)) {

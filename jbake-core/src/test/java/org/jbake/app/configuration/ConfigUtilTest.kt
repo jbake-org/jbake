@@ -193,7 +193,7 @@ class ConfigUtilTest : StringSpec({
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
-
+        @Suppress("UNCHECKED_CAST")
         val option = config.getAsciidoctorOption("template_dirs") as Collection<String>
 
         option shouldContain "src/template1"
@@ -203,9 +203,8 @@ class ConfigUtilTest : StringSpec({
     "shouldReturnEmptyListIfOptionNotAvailable" {
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
-
+        @Suppress("UNCHECKED_CAST")
         val options = config.getAsciidoctorOption("template_dirs") as Collection<String>
-
         options.isEmpty() shouldBe true
     }
 
@@ -214,6 +213,7 @@ class ConfigUtilTest : StringSpec({
         val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
 
         // Should return empty list for non-existent option
+        @Suppress("UNCHECKED_CAST")
         val result = config.getAsciidoctorOption("template_dirs") as Collection<String>
         result.isEmpty() shouldBe true
     }

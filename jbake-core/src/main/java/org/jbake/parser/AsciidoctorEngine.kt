@@ -164,13 +164,13 @@ class AsciidoctorEngine : MarkupEngine() {
 
             // Handle special gem path and requires options
             when {
-                optionKey == OPT_GEM_PATH -> gemPath = optionValue?.toString()
-                optionKey == OPT_REQUIRES -> requires = (optionValue ?: "").toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                optionKey == OPT_GEM_PATH -> gemPath = optionValue.toString()
+                optionKey == OPT_REQUIRES -> requires = optionValue.toString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
                 optionKey == "template_dirs" -> {
                     if (getAsList(optionValue).isNotEmpty())
                         optionsBuilder.templateDirs(*getAsList(optionValue).map { File(it) }.toTypedArray())
                 }
-                else -> optionValue?.let { optionsBuilder.option(optionKey, it) }
+                else -> optionValue.let { optionsBuilder.option(optionKey, it) }
             }
         }
 

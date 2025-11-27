@@ -38,7 +38,7 @@ abstract class ContentStoreIntegrationTest {
             folder = Files.createTempDirectory("jbake-test").toFile()
 
             sourceFolder = TestUtils.testResourcesAsSourceFolder
-            if (!sourceFolder!!.exists()) {Migr
+            if (!sourceFolder!!.exists()) {
                 throw AssertionError("Cannot find sample data structure!")
             }
 
