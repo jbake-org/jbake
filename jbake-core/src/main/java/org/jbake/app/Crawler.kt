@@ -1,6 +1,7 @@
 package org.jbake.app
 
 import org.apache.commons.io.FilenameUtils
+import org.jbake.app.FileUtil.URI_SEPARATOR_CHAR
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentStatus
@@ -114,28 +115,28 @@ class Crawler {
             else createUri(uri)
 
         // Strip off leading / to enable generating non-root based sites.
-        return processedUri.removePrefix(FileUtil.URI_SEPARATOR_CHAR)
+        return processedUri.removePrefix(URI_SEPARATOR_CHAR)
     }
 
     private fun buildDataFileUri(sourceFile: File): String {
         return FileUtil.asPath(sourceFile)
             .replace(FileUtil.asPath(config.dataFolder), "")
-            .removePrefix(FileUtil.URI_SEPARATOR_CHAR)
+            .removePrefix(URI_SEPARATOR_CHAR)
     }
 
     // TODO: Refactor - parametrize the following two methods into one. commons-codec's URLCodec could be used when we add that dependency.
     private fun createUri(uri: String): String {
-        return (FileUtil.URI_SEPARATOR_CHAR
+        return (URI_SEPARATOR_CHAR
                 + FilenameUtils.getPath(uri)
                 + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
                 + config.outputExtension)
     }
 
     private fun createNoExtensionUri(uri: String): String {
-        return (FileUtil.URI_SEPARATOR_CHAR
+        return (URI_SEPARATOR_CHAR
                 + FilenameUtils.getPath(uri)
                 + URLEncoder.encode(FilenameUtils.getBaseName(uri), StandardCharsets.UTF_8.name())
-                + FileUtil.URI_SEPARATOR_CHAR
+                + URI_SEPARATOR_CHAR
                 + "index"
                 + config.outputExtension)
     }

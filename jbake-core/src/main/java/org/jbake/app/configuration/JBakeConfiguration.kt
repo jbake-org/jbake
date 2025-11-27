@@ -104,7 +104,7 @@ interface JBakeConfiguration {
     val headerSeparator: String?
 
     /** Filename to use to ignore a directory in addition to ".jbakeignore". */
-    val ignoreFileName: String?
+    val ignoreDirMarkerFileName: String?
 
     /** Output filename for index, is only used when [.getRenderIndex] is true. */
     val indexFileName: String?

@@ -210,7 +210,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val feedFileName: String
         get() = getAsString(PropertyList.FEED_FILE.key) ?: "feed.xml"
 
-    override val ignoreFileName: String?
+    override val ignoreDirMarkerFileName: String?
         get() = getAsString(PropertyList.IGNORE_FILE.key)
 
     override val indexFileName: String?

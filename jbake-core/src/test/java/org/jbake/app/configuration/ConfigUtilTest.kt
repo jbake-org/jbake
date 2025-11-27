@@ -316,6 +316,6 @@ class ConfigUtilTest : StringSpec({
         val sourceFolder = TestUtils.testResourcesAsSourceFolder
         val config = util.loadConfig(sourceFolder)
 
-        config.ignoreFileName shouldBe ".jbakeignore"
+        config.ignoreDirMarkerFileName shouldBe ".jbakeignore"
     }
 })

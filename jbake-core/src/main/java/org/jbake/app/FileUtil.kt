@@ -8,10 +8,8 @@ import java.net.URLDecoder
 import java.nio.file.Paths
 import java.security.MessageDigest
 
-/**
- * Provides File related functions
- */
 object FileUtil {
+
     const val URI_SEPARATOR_CHAR: String = "/"
 
     /** Filters files based on their file extension. */
@@ -24,61 +22,31 @@ object FileUtil {
         }
     }
 
-    /** Filters files based on their file extension. */
-    @get:Deprecated("use {@link #getFileFilter(JBakeConfiguration)} instead")
-    val fileFilter: FileFilter
-        get() = FileFilter { pathname ->
-            // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
-            val fileWithExtension = pathname.isFile() && Engines.recognizedExtensions.contains(fileExt(pathname))
-
-            !pathname.isHidden() && fileWithExtension || directoryOnlyIfNotIgnored(pathname)
-        }
-
     /** Filters files based on their file extension - only find data files (i.e. files with .yaml or .yml extension). */
     val dataFileFilter: FileFilter
         get() = FileFilter { pathname -> fileExt(pathname).lowercase().let { it == "yaml" || it == "yml" } }
 
     /** Gets the list of files that are not content files based on their extension. */
     fun getNotContentFileFilter(config: JBakeConfiguration): FileFilter {
-        return FileFilter { pathname ->
+        return FileFilter { file: File ->
             // Accept if input  is a non-hidden file with NOT-registered extension or if a non-hidden and not-ignored directory.
-            (!pathname.isHidden() && (pathname.isFile() //extension should not be from registered content extensions
-                && !Engines.recognizedExtensions.contains(fileExt(pathname)))
-                || (directoryOnlyIfNotIgnored(pathname, config)))
+            !file.isHidden()
+                // Extension should not be from registered content extensions
+                && (file.isFile() && !Engines.recognizedExtensions.contains(fileExt(file)))
+                || (directoryOnlyIfNotIgnored(file, config))
         }
     }
 
-    @get:Deprecated("use {@link #getNotContentFileFilter(JBakeConfiguration)} instead")
-    /** Gets the list of files that are not content files based on their extension. */
-    val notContentFileFilter: FileFilter
-        get() = FileFilter { pathname ->
-            // Accept if input is a non-hidden file with NOT-registered extension, or if a non-hidden and not-ignored directory.
-            (!pathname.isHidden() && (pathname.isFile() // Extension should not be from registered content extensions.
-                && !Engines.recognizedExtensions
-                .contains(fileExt(pathname)))
-                || (directoryOnlyIfNotIgnored(pathname)))
-        }
-
     /**
-     * Ignores directory (and children) if it contains a file named in the configuration as a marker to ignore the directory.
-     *
-     * @return true if file is directory and not ignored
+     * @return true if the directory contains a marker file to ignore the directory.
      */
     fun directoryOnlyIfNotIgnored(dir: File, config: JBakeConfiguration): Boolean {
-        val ignoreFile = FilenameFilter { _, name -> name.equals(config.ignoreFileName, ignoreCase = true) }
-        return dir.isDirectory && dir.listFiles(ignoreFile).isEmpty()
-        // TODO: Use dir.resolve(config.ignoreFileName).toFile().exists() from Java NIO
+        return directoryOnlyIfNotIgnored(dir, config.ignoreDirMarkerFileName ?: ".jbakeignore")
     }
 
-    /**
-     * Ignores directory (and children) if it contains a file named ".jbakeignore".
-     *
-     * @return true if file is directory and not ignored
-     */
-    @Deprecated("use {@link #directoryOnlyIfNotIgnored(File, JBakeConfiguration)} instead")
-    fun directoryOnlyIfNotIgnored(file: File): Boolean {
-        val ignoreFile = FilenameFilter { _, name -> name.equals(".jbakeignore", ignoreCase = true) }
-        return file.isDirectory && file.listFiles(ignoreFile).isEmpty()
+    fun directoryOnlyIfNotIgnored(dir: File, ignoreMarkerFileName: String): Boolean {
+        val ignoreFile = FilenameFilter { _, name -> name.equals(ignoreMarkerFileName, ignoreCase = true) }
+        return dir.isDirectory && dir.listFiles(ignoreFile).isEmpty()
     }
 
     fun isExistingFolder(f: File) = f.exists() && f.isDirectory()
