@@ -1,0 +1,5 @@
+urlset(xmlns='http://www.sitemaps.org/schemas/sitemap/0.9', xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance', xsi:schemalocation='http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd')
+    for content in published_content
+        url
+            loc #{config.site_host}#{content.uri}
+            lastmod #{formatter.format(content.date, 'yyyy-MM-dd')}
