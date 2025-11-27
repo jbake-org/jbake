@@ -3,14 +3,10 @@ package org.jbake.template
 import org.assertj.core.api.Assertions.assertThat
 import org.jbake.model.DocumentTypes.addDocumentType
 import org.junit.After
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
+import org.junit.jupiter.api.assertThrows
 
 class ModelExtractorsTest {
-
-    @Rule @JvmField
-    var thrown: ExpectedException = ExpectedException.none()
 
     @After
     fun tearDown() {
@@ -18,8 +14,8 @@ class ModelExtractorsTest {
     }
 
     @Test fun shouldLoadExtractorsOnInstantiation() {
-        val expectedKeys = "pages,posts,indexs,archives,feeds,published_posts,published_pages," +
-            "published_content,published_date,all_content,alltags,db,tag_posts,tags,tagged_documents".split(",")
+        val expectedKeys = ("pages,posts,indexs,archives,feeds,published_posts,published_pages," +
+            "published_content,published_date,all_content,alltags,db,tag_posts,tags,tagged_documents").split(",")
 
         for (aKey in expectedKeys) {
             assertThat(ModelExtractors.instance.containsKey(aKey)).isTrue()
@@ -51,10 +47,10 @@ class ModelExtractorsTest {
     }
 
     @Test fun shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
-        thrown.expect(UnsupportedOperationException::class.java)
-
         val unknownDocumentType = "unknown"
-        ModelExtractors.instance.registerExtractorsForCustomTypes(unknownDocumentType)
+        assertThrows<UnsupportedOperationException> {
+            ModelExtractors.instance.registerExtractorsForCustomTypes(unknownDocumentType)
+        }
     }
 
     @Test fun shouldResetToNonCustomizedExtractors() {
