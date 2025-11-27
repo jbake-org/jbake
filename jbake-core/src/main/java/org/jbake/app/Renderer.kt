@@ -1,7 +1,6 @@
 package org.jbake.app
 
 import org.apache.commons.configuration2.CompositeConfiguration
-import org.codehaus.groovy.ast.tools.GeneralUtils.param
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory

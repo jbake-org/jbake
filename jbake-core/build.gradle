@@ -1,3 +1,4 @@
+//file:noinspection GroovyAssignabilityCheck
 import java.time.format.DateTimeFormatter
 
 plugins {
