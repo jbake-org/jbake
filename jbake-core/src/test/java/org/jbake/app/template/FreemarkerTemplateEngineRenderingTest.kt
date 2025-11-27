@@ -13,7 +13,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 
-        outputStrings["index"] = mutableListOf(
+        expectedInOutput["index"] = mutableListOf(
             "\">Previous</a>",
             "3/\">Next</a>",
             "2 of 3"
@@ -24,7 +24,7 @@ class FreemarkerTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTes
         val outputFile = File(File(destinationFolder, "2"), "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
-        for (string in getOutputStrings("index")) {
+        for (string in getExpectedInOutput("index")) {
             assertThat(output).contains(string)
         }
 

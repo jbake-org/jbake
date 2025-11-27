@@ -114,4 +114,6 @@ class JadeTemplateEngine : AbstractTemplateEngine {
         private const val FILTER_STYLE = "css"
         private const val FILTER_SCRIPT = "js"
     }
+
+    private val log = org.slf4j.LoggerFactory.getLogger(JadeTemplateEngine::class.java)
 }

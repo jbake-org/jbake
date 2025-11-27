@@ -12,7 +12,7 @@ import java.nio.charset.Charset
 
 class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingTest("groovyMarkupTemplates", "tpl") {
     init {
-        outputStrings["post"] = mutableListOf<String>(
+        expectedInOutput["post"] = mutableListOf<String>(
             "<h2>Second Post</h2>",
             "<p class=\"post-date\">28",
             "2013</p>",
@@ -20,35 +20,35 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
             "<h5>Published Posts</h5>",
             "blog/2012/first-post.html"
         )
-        outputStrings["page"] = mutableListOf<String>(
+        expectedInOutput["page"] = mutableListOf<String>(
             "<h4>About</h4>",
             "All about stuff!",
             "<h5>Published Pages</h5>",
             "/projects.html"
         )
-        outputStrings["index"] = mutableListOf<String>(
+        expectedInOutput["index"] = mutableListOf<String>(
             "<h4><a href=\"blog/2012/first-post.html\">First Post</a></h4>",
             "<h4><a href=\"blog/2013/second-post.html\">Second Post</a></h4>"
         )
-        outputStrings["feed"] = mutableListOf<String>(
+        expectedInOutput["feed"] = mutableListOf<String>(
             "<description>My corner of the Internet</description>",
             "<title>Second Post</title>",
             "<title>First Post</title>"
         )
-        outputStrings["archive"] = mutableListOf<String>(
+        expectedInOutput["archive"] = mutableListOf<String>(
             "<a href=\"blog/2013/second-post.html\">Second Post</a></h4>",
             "<a href=\"blog/2012/first-post.html\">First Post</a></h4>"
         )
-        outputStrings["tags"] = mutableListOf<String>(
+        expectedInOutput["tags"] = mutableListOf<String>(
             "<a href=\"blog/2013/second-post.html\">Second Post</a></h4>",
             "<a href=\"blog/2012/first-post.html\">First Post</a></h4>"
         )
-        outputStrings["sitemap"] = mutableListOf<String>(
+        expectedInOutput["sitemap"] = mutableListOf<String>(
             "blog/2013/second-post.html",
             "blog/2012/first-post.html",
             "papers/published-fixture.groovyMarkupTemplates.paper.html"
         )
-        outputStrings["paper"] = mutableListOf<String>(
+        expectedInOutput["paper"] = mutableListOf<String>(
             "<h2>Published Paper</h2>",
             "<p class=\"post-date\">24",
             "2014</p>",
@@ -75,7 +75,7 @@ class GroovyMarkupTemplateEngineRenderingTest : AbstractTemplateEngineRenderingT
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("paper")) {
+        for (string in getExpectedInOutput("paper")) {
             assertThat(output).contains(string)
         }
     }

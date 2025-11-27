@@ -56,6 +56,7 @@ class PugTemplateEngine : AbstractTemplateEngine {
 
     @Throws(RenderingException::class)
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+        log.debug("Rendering document with template: $templateName")
         try {
             val template = pugConfiguration.getTemplate(templateName)
             renderTemplate(template, model, writer)
@@ -117,4 +118,6 @@ class PugTemplateEngine : AbstractTemplateEngine {
         private const val FILTER_STYLE = "css"
         private const val FILTER_SCRIPT = "js"
     }
+
+    private val log = org.slf4j.LoggerFactory.getLogger(PugTemplateEngine::class.java)
 }

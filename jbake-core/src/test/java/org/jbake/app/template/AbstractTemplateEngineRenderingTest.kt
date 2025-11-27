@@ -28,7 +28,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 )
     : ContentStoreIntegrationTest()
 {
-    protected val outputStrings: MutableMap<String, MutableList<String>> = HashMap()
+    protected val expectedInOutput: MutableMap<String, MutableList<String>> = HashMap()
 
     protected lateinit var destinationFolder: File
     protected lateinit var templateFolder: File
@@ -80,7 +80,7 @@ abstract class AbstractTemplateEngineRenderingTest(
     }
 
     private fun setupExpectedOutputStrings() {
-        outputStrings["post"] = mutableListOf(
+        expectedInOutput["post"] = mutableListOf(
             "<h2>Second Post</h2>",
             "<p class=\"post-date\">28",
             "2013</p>",
@@ -89,47 +89,47 @@ abstract class AbstractTemplateEngineRenderingTest(
             "blog/2012/first-post.html"
         )
 
-        outputStrings["page"] = mutableListOf(
+        expectedInOutput["page"] = mutableListOf(
             "<h4>About</h4>",
             "All about stuff!",
             "<h5>Published Pages</h5>",
             "/projects.html"
         )
 
-        outputStrings["index"] = mutableListOf(
+        expectedInOutput["index"] = mutableListOf(
             "<a href=\"blog/2016/another-post.html\"",
             ">Another Post</a>",
             "<a href=\"blog/2013/second-post.html\"",
             ">Second Post</a>"
         )
 
-        outputStrings["feed"] = mutableListOf(
+        expectedInOutput["feed"] = mutableListOf(
             "<description>My corner of the Internet</description>",
             "<title>Second Post</title>",
             "<title>First Post</title>"
         )
 
-        outputStrings["archive"] = mutableListOf(
+        expectedInOutput["archive"] = mutableListOf(
             "<a href=\"blog/2013/second-post.html\"",
             ">Second Post</a>",
             "<a href=\"blog/2012/first-post.html\"",
             ">First Post</a>"
         )
 
-        outputStrings["tags"] = mutableListOf(
+        expectedInOutput["tags"] = mutableListOf(
             "<a href=\"blog/2013/second-post.html\"",
             ">Second Post</a>",
             "<a href=\"blog/2012/first-post.html\"",
             ">First Post</a>"
         )
 
-        outputStrings["tags-index"] = mutableListOf(
+        expectedInOutput["tags-index"] = mutableListOf(
             "<h1>Tags</h1>",
             "<h2><a href=\"../tags/blog.html\">blog</a>",
             "3</h2>"
         )
 
-        outputStrings["sitemap"] = mutableListOf(
+        expectedInOutput["sitemap"] = mutableListOf(
             "blog/2013/second-post.html",
             "blog/2012/first-post.html",
             "papers/published-paper.html"
@@ -156,7 +156,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("post")) {
+        for (string in getExpectedInOutput("post")) {
             assertThat(output).contains(string)
         }
     }
@@ -175,7 +175,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("page")) {
+        for (string in getExpectedInOutput("page")) {
             assertThat(output).contains(string)
         }
     }
@@ -190,8 +190,8 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("index")) {
-            assertThat(output).contains(string)
+        for (expectedSnippet in getExpectedInOutput("index")) {
+            assertThat(output).contains(expectedSnippet)
         }
     }
 
@@ -202,7 +202,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("feed")) {
+        for (string in getExpectedInOutput("feed")) {
             assertThat(output).contains(string)
         }
     }
@@ -214,7 +214,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("archive")) {
+        for (string in getExpectedInOutput("archive")) {
             assertThat(output).contains(string)
         }
     }
@@ -226,7 +226,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = destinationFolder.resolve("tags").resolve("blog.html")
         assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("tags")) {
+        for (string in getExpectedInOutput("tags")) {
             assertThat(output).contains(string)
         }
     }
@@ -238,7 +238,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = destinationFolder.resolve("tags").resolve("index.html")
         assertTrue(outputFile.exists())
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("tags-index")) {
+        for (string in getExpectedInOutput("tags-index")) {
             assertThat(output).contains(string)
         }
     }
@@ -253,21 +253,21 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         // Then
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
-        for (string in getOutputStrings("sitemap")) {
-            assertThat(output).contains(string)
+        for (snippet in getExpectedInOutput("sitemap")) {
+            assertThat(output).contains(snippet)
         }
         assertThat(output).doesNotContain("draft-paper.html")
     }
 
-    protected fun getOutputStrings(type: String): MutableList<String> {
-        return outputStrings[type] ?: mutableListOf()
+    protected fun getExpectedInOutput(type: String): MutableList<String> {
+        return expectedInOutput[type] ?: mutableListOf()
     }
 
     @Test fun checkDbTemplateModelIsPopulated() {
         config.setPaginateIndex(true)
         config.setPostsPerPage(1)
 
-        outputStrings["dbSpan"] = mutableListOf("<span>3</span>")
+        expectedInOutput["dbSpan"] = mutableListOf("<span>3</span>")
 
         db.deleteAllByDocType("post")
 
@@ -276,7 +276,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         val outputFile = File(destinationFolder, "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
-        for (string in getOutputStrings("dbSpan")) {
+        for (string in getExpectedInOutput("dbSpan")) {
             assertThat(output).contains(string)
         }
     }
