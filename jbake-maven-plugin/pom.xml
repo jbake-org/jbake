@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jbake</groupId>
+        <artifactId>jbake-base</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jbake-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <name>jbake-maven-plugin</name>
+    <description>JBake Maven Plugin</description>
+
+    <licenses><license><name>Apache License, Version 2.0</name><url>https://www.apache.org/licenses/LICENSE-2.0.txt</url></license></licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Project Dependencies -->
+        <dependency><groupId>org.jbake</groupId><artifactId>jbake-core</artifactId><version>${project.version}</version></dependency>
+
+        <!-- Maven Plugin Dependencies -->
+        <dependency><groupId>org.apache.maven</groupId><artifactId>maven-core</artifactId><version>${version.maven}</version><scope>provided</scope></dependency>
+        <dependency><groupId>org.apache.maven.plugin-tools</groupId><artifactId>maven-plugin-annotations</artifactId><version>${version.maven.annotations}</version><scope>provided</scope></dependency>
+
+        <!-- Implementation Dependencies - Include all optional dependencies by default -->
+        <dependency><groupId>com.sparkjava</groupId><artifactId>spark-core</artifactId><version>${version.spark}</version></dependency>
+        <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><version>${version.flexmark}</version></dependency>
+        <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${version.flexmark}</version></dependency>
+        <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><version>${version.jade4j}</version></dependency>
+        <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId><version>${version.pug4j}</version></dependency>
+        <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><version>${version.pebble}</version></dependency>
+        <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><version>${version.asciidoctorj}</version></dependency>
+        <!--<dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
+        <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
+        <dependency><groupId>org.codehaus.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>-->
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>
+        <dependency><groupId>org.freemarker</groupId><artifactId>freemarker</artifactId><version>${version.freemarker}</version></dependency>
+        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId><version>${version.kotlin}</version></dependency>
+        <dependency><groupId>org.thymeleaf</groupId><artifactId>thymeleaf</artifactId><version>${version.thymeleaf}</version></dependency>
+        <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><version>${version.snakeyaml}</version></dependency>
+
+        <!-- Test Dependencies -->
+        <dependency><groupId>junit</groupId><artifactId>junit</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><scope>test</scope></dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+                <executions>
+                    <execution><phase>generate-sources</phase><goals><goal>add-source</goal></goals><configuration><sources><source>src/main/java</source></sources></configuration></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-plugin-plugin</artifactId><version>3.15.2</version>
+                <executions>
+                    <execution><id>default-descriptor</id><goals><goal>descriptor</goal></goals></execution>
+                    <execution><id>help-goal</id><goals><goal>helpmojo</goal></goals></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-invoker-plugin</artifactId><version>3.9.1</version>
+                <configuration>
+                    <debug>true</debug>
+                    <skipInvocation>false</skipInvocation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

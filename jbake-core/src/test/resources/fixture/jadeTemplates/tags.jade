@@ -10,6 +10,6 @@ block content
                 h4
                     | #{formatter.format(post.date, 'dd MMMM')}
                     | &nbsp;-&nbsp;
-                    a(href='#{post.uri}') #{post.title}
+                    a(href=post.uri) #{post.title}
                 - var last_month = formatter.format(post.date, 'MMMM yyyy')
     hr

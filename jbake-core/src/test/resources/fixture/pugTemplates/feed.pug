@@ -1,0 +1,17 @@
+rss(version='2.0', xmlns:atom='http://www.w3.org/2005/Atom')
+    channel
+        title JonathanBullock.com
+        link http://jonathanbullock.com/
+        atom:link(href='http://jonathanbullock.com/feed.xml', rel='self', type='application/rss+xml')
+            description My corner of the Internet
+            language en-gb
+            pubdate #{formatter.format(published_date, 'EEE, d MMM yyyy HH:mm:ss Z')}
+            lastbuilddate #{formatter.format(published_date, 'EEE, d MMM yyyy HH:mm:ss Z')}
+            for post in posts
+                item
+                    title #{post.title}
+                    link http://jonathanbullock.com#{post.uri}
+                    pubdate #{formatter.format(post.date, 'EEE, d MMM yyyy HH:mm:ss Z')}
+                    guid(ispermalink='false') #{post.uri}
+                    description
+                        | #{formatter.escape(post.body)}

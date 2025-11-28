@@ -1,28 +1,46 @@
 plugins {
-    id 'de.benediktritter.maven-plugin-development' version "$mavenPluginDevVersion"
     id "org.jbake.convention.java-common"
+    id 'org.jetbrains.kotlin.jvm'
+    id 'maven-publish'
 }
 
 group = "org.jbake"
 
-mavenPlugin {
-    helpMojoPackage = 'org.jbake.maven'
-}
-
-apply from: "$rootDir/gradle/maven-publishing.gradle"
 apply from: "$rootDir/gradle/signing.gradle"
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            from components.java
+
+            artifact javadocJar
+            artifact sourcesJar
+
             pom {
                 name = "jbake-maven-plugin"
+                description = "Maven plugin for JBake"
+                url = project.website
+                packaging = 'maven-plugin'
 
                 licenses {
                     license {
                         name = 'Apache License, Version 2.0'
                         url  = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
+                }
+
+                developers {
+                    developer {
+                        id = 'jonbullock'
+                        name = 'Jonathan Bullock'
+                        email = 'jonbullock@gmail.com'
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:${project.vcs}.git"
+                    developerConnection = "scm:git:${project.vcs}.git"
+                    url = project.vcs
                 }
             }
         }
@@ -39,14 +57,21 @@ dependencies {
 
     // Include all optional dependencies by default
     implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
-    implementation "org.codehaus.groovy:groovy:$groovyVersion"
-    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
-    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+    implementation "org.apache.groovy:groovy:$groovyVersion"
+    implementation "org.apache.groovy:groovy-templates:$groovyVersion"
+    implementation "org.apache.groovy:groovy-dateutil:$groovyVersion"
     implementation "org.freemarker:freemarker:$freemarkerVersion"
     implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
-    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    implementation "de.neuland-bfi:pug4j:$pug4jVersion"
     implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
     implementation "io.pebbletemplates:pebble:$pebbleVersion"
     implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(21)
 }

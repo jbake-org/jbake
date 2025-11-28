@@ -6,7 +6,7 @@ block content
             each post, index in posts
                 if index < 3
                     h4
-                        a(href='#{post.uri}') #{post.title}
+                        a(href="#{post.uri}") #{post.title}
                     p #{formatter.format(post.date, 'dd MMMM yyyy')} - #{post.body.substring(0, 150)}...
 
             a(href='/archive.html') Archive

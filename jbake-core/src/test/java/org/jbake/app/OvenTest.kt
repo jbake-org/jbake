@@ -1,0 +1,225 @@
+package org.jbake.app
+
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.file.shouldBeAFile
+import io.kotest.matchers.longs.shouldBeGreaterThan
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
+import org.apache.commons.io.FileUtils
+import org.jbake.TestUtils
+import org.jbake.app.configuration.ConfigUtil
+import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.configuration.PropertyList
+import org.jbake.model.DocumentTypes.resetDocumentTypes
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.*
+
+class OvenTest : StringSpec({
+
+    lateinit var root: Path
+    lateinit var configuration: DefaultJBakeConfiguration
+    lateinit var sourceFolder: File
+    var contentStore: ContentStore? = null
+
+    beforeTest {
+        root = Files.createTempDirectory("jbake-test")
+        // reset values to known state otherwise previous test case runs can affect the success of this test case
+        resetDocumentTypes()
+        val output = root.resolve("output").toFile()
+        sourceFolder = TestUtils.testResourcesAsSourceFolder
+        configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        configuration.destinationFolder = (output)
+        configuration.templateFolder = (File(sourceFolder, "groovyMarkupTemplates"))
+        configuration.setProperty("template.paper.file", "paper.tpl")
+    }
+
+    afterTest {
+        if (contentStore != null && contentStore!!.isActive) {
+            contentStore!!.close()
+            contentStore!!.shutdown()
+        }
+    }
+
+    "bakeWithAbsolutePaths" {
+        configuration.templateFolder = (File(sourceFolder, "groovyMarkupTemplates"))
+        configuration.contentFolder = (File(sourceFolder, "content"))
+        configuration.assetFolder = (File(sourceFolder, "assets"))
+
+        val oven = Oven(configuration)
+        oven.bakeEverything()
+
+        oven.errors.isEmpty()
+    }
+
+    "shouldBakeWithRelativeCustomPaths" {
+        sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
+        configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val assetFolder = File(configuration.destinationFolder, "css")
+        val aboutFile = File(configuration.destinationFolder, "about.html")
+        val blogSubFolder = File(configuration.destinationFolder, "blog")
+
+
+        val oven = Oven(configuration)
+        oven.bakeEverything()
+
+        oven.errors.isEmpty() shouldBe true
+        configuration.destinationFolder.exists() shouldBe true
+        configuration.destinationFolder.list()?.isNotEmpty() shouldBe true
+        assetFolder.exists() shouldBe true
+        assetFolder.list()?.isNotEmpty() shouldBe true
+        aboutFile.shouldBeAFile()
+        aboutFile.length() shouldBeGreaterThan 0
+        blogSubFolder.exists() shouldBe true
+        blogSubFolder.list()?.isNotEmpty() shouldBe true
+    }
+
+    "shouldBakeWithAbsoluteCustomPaths" {
+        // given
+
+        val source = root.resolve("source")
+        val theme = root.resolve("theme")
+        val destination = root.resolve("destination")
+
+        val originalSource = TestUtils.testResourcesAsSourceFolder
+        FileUtils.copyDirectory(originalSource, source.toFile())
+        val originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme")
+        FileUtils.copyDirectory(originalTheme, theme.toFile())
+
+        val expectedTemplateFolder = theme.resolve("templates")
+        val expectedAssetFolder = theme.resolve("assets")
+        val expectedDestination = destination.resolve("output")
+
+        val properties = source.resolve("jbake.properties")
+
+
+        val fw = Files.newBufferedWriter(properties)
+
+        fw.write(PropertyList.ASSET_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedAssetFolder))
+        fw.newLine()
+        fw.write(PropertyList.TEMPLATE_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedTemplateFolder))
+        fw.newLine()
+        fw.write(PropertyList.DESTINATION_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedDestination))
+        fw.close()
+
+        configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
+        val assetFolder = File(configuration.destinationFolder, "css")
+        val aboutFile = File(configuration.destinationFolder, "about.html")
+        val blogSubFolder = File(configuration.destinationFolder, "blog")
+
+
+        val oven = Oven(configuration)
+        oven.bakeEverything()
+
+        oven.errors.isEmpty() shouldBe true
+        configuration.destinationFolder.exists() shouldBe true
+        configuration.destinationFolder.list()?.isNotEmpty() shouldBe true
+        assetFolder.exists() shouldBe true
+        assetFolder.list()?.isNotEmpty() shouldBe true
+        aboutFile.shouldBeAFile()
+        aboutFile.length() shouldBeGreaterThan 0
+        blogSubFolder.exists() shouldBe true
+        blogSubFolder.list()?.isNotEmpty() shouldBe true
+    }
+
+
+    "shouldThrowExceptionIfSourceFolderDoesNotExist" {
+        configuration.setSourceFolder(root.resolve("none").toFile())
+
+        shouldThrow<JBakeException> { Oven(configuration) }
+    }
+
+    "shouldInstantiateNeededUtensils" {
+        val template = TestUtils.newFolder(root.toFile(), "template")
+        val content = TestUtils.newFolder(root.toFile(), "content")
+        val assets = TestUtils.newFolder(root.toFile(), "assets")
+
+        configuration.templateFolder = (template)
+        configuration.contentFolder = (content)
+        configuration.assetFolder = (assets)
+
+        val oven = Oven(configuration)
+
+        oven.utensils.contentStore.shouldNotBeNull()
+        oven.utensils.crawler.shouldNotBeNull()
+        oven.utensils.renderer.shouldNotBeNull()
+        oven.utensils.asset.shouldNotBeNull()
+        oven.utensils.configuration shouldBe configuration
+    }
+
+    "shouldInspectConfigurationDuringInstantiationFromUtils" {
+        configuration.setSourceFolder(root.resolve("none").toFile())
+
+        val contentStore = mockk<ContentStore>()
+        val crawler = mockk<Crawler>()
+        val renderer = mockk<Renderer>()
+        val asset = mockk<Asset>()
+
+        val utensils = Utensils(
+            configuration = configuration,
+            contentStore = contentStore,
+            crawler = crawler,
+            renderer = renderer,
+            asset = asset
+        )
+
+        shouldThrow<JBakeException> { Oven(utensils) }
+    }
+
+    "shouldCrawlRenderAndCopyAssets" {
+        val template = TestUtils.newFolder(root.toFile(), "template")
+        val content = TestUtils.newFolder(root.toFile(), "content")
+        val assets = TestUtils.newFolder(root.toFile(), "assets")
+
+        configuration.templateFolder = (template)
+        configuration.contentFolder = (content)
+        configuration.assetFolder = (assets)
+
+        contentStore = spyk(ContentStore("memory", "documents" + System.currentTimeMillis()))
+
+        val crawler = mockk<Crawler>(relaxed = true)
+        val renderer = mockk<Renderer>(relaxed = true)
+        val asset = mockk<Asset>(relaxed = true)
+
+        val utensils = Utensils(
+            configuration = configuration,
+            contentStore = contentStore!!,
+            renderer = renderer,
+            crawler = crawler,
+            asset = asset
+        )
+
+        val oven = Oven(utensils)
+
+        oven.bakeEverything()
+
+        verify(exactly = 1) { contentStore!!.startup() }
+        verify(atLeast = 1) { renderer.renderIndex(any()) }
+        verify(exactly = 1) { crawler.crawlContentDirectory() }
+        verify(exactly = 1) { asset.copy() }
+    }
+
+    "localeConfiguration" {
+        val language = configuration.jvmLocale
+
+        val oven = Oven(configuration)
+        oven.bakeEverything()
+
+        Locale.getDefault() shouldBe Locale(language)
+    }
+
+    "noLocaleConfiguration" {
+        configuration.setProperty(PropertyList.JVM_LOCALE.key, null)
+
+        val language = Locale.getDefault().language
+        val oven = Oven(configuration)
+        oven.bakeEverything()
+
+        Locale.getDefault().language shouldBe language
+    }
+})

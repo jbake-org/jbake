@@ -1,9 +1,11 @@
+//file:noinspection GroovyAssignabilityCheck
 import java.time.format.DateTimeFormatter
 
 plugins {
     id "org.jbake.convention.java-common"
     id 'java-library'
-    id 'nebula.optional-base' version "$optionalBaseVersion"
+    id 'org.jetbrains.kotlin.jvm'
+    id 'io.kotest'
 }
 
 apply from: "$rootDir/gradle/maven-publishing.gradle"
@@ -16,13 +18,7 @@ publishing {
         mavenJava(MavenPublication) {
             pom {
                 name = "jbake-core"
-
-                licenses {
-                    license {
-                        name = 'The MIT License (MIT)'
-                        url = 'http://opensource.org/licenses/MIT'
-                    }
-                }
+                licenses { license { name = 'The MIT License (MIT)'; url = 'http://opensource.org/licenses/MIT' } }
             }
         }
     }
@@ -33,28 +29,48 @@ dependencies {
     api "commons-io:commons-io:$commonsIoVersion"
     api "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
     implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
-    implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version", optional
+    compileOnly "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
-    api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
-    api "org.codehaus.groovy:groovy:$groovyVersion", optional
-    api "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
-    api "org.codehaus.groovy:groovy-dateutil:$groovyVersion", optional
-    api "org.freemarker:freemarker:$freemarkerVersion", optional
-    api "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
-    api "de.neuland-bfi:jade4j:$jade4jVersion", optional
-    api "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
-    api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
-    api "io.pebbletemplates:pebble:$pebbleVersion", optional
+    compileOnly "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    implementation "org.apache.groovy:groovy:$groovyVersion"
+    implementation "org.apache.groovy:groovy-templates:$groovyVersion"
+    implementation "org.apache.groovy:groovy-dateutil:$groovyVersion"
+    compileOnly "org.freemarker:freemarker:$freemarkerVersion"
+    compileOnly "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    compileOnly "de.neuland-bfi:jade4j:$jade4jVersion"
+    compileOnly "de.neuland-bfi:pug4j:$pug4jVersion"
+    compileOnly "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    compileOnly "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    compileOnly "io.pebbletemplates:pebble:$pebbleVersion"
     implementation "org.jsoup:jsoup:$jsoupVersion"
-    implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
+    compileOnly "org.yaml:snakeyaml:$snakeYamlVersion"
 
     // cli specific dependencies
-    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
-    implementation "info.picocli:picocli:$picocli", optional
+    compileOnly "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+    compileOnly "info.picocli:picocli:$picocli"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // Test dependencies need access to optional compile dependencies
+    testImplementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    testImplementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    testImplementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    testImplementation "de.neuland-bfi:pug4j:$pug4jVersion"
+    testImplementation "info.picocli:picocli:$picocli"
+    testImplementation "io.kotest:kotest-framework-engine:$kotestVersion"
+    testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotestVersion"
+    testImplementation "io.mockk:mockk:1.14.6"
+    testImplementation "io.pebbletemplates:pebble:$pebbleVersion"
+    testImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    testImplementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    testImplementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+    testImplementation "org.freemarker:freemarker:$freemarkerVersion"
+    testImplementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    testImplementation "org.yaml:snakeyaml:$snakeYamlVersion"
 }
 
 processResources {
@@ -63,4 +79,15 @@ processResources {
             timestamp: grgit.head().dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss'['VV']'")),
             gitHash: grgit.head().abbreviatedId
     }
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(21)
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'jbake.buildOutputDir', sourceSets.main.output.classesDirs.asPath.split(':')[0]
 }

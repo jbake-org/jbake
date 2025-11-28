@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jbake</groupId>
+        <artifactId>jbake-base</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jbake-core</artifactId>
+    <packaging>jar</packaging>
+    <name>jbake-core</name>
+    <description>The core library of JBake</description>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- API Dependencies -->
+        <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId></dependency>
+        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-configuration2</artifactId></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>2.0.17</version></dependency>
+        <!-- Templating engines -->
+        <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-dateutil</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.freemarker</groupId><artifactId>freemarker</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.thymeleaf</groupId><artifactId>thymeleaf</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><optional>true</optional></dependency>
+
+
+        <!-- Implementation Dependencies -->
+        <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId></dependency>
+        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-lang3</artifactId></dependency>
+        <dependency><groupId>com.googlecode.json-simple</groupId><artifactId>json-simple</artifactId><exclusions><exclusion><groupId>junit</groupId><artifactId>junit</artifactId></exclusion></exclusions></dependency>
+        <dependency><groupId>com.orientechnologies</groupId><artifactId>orientdb-core</artifactId></dependency>
+        <dependency><groupId>org.jsoup</groupId><artifactId>jsoup</artifactId></dependency>
+        <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>info.picocli</groupId><artifactId>picocli</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
+
+        <!-- Test Dependencies -->
+        <dependency><scope>test</scope><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
+        <dependency><scope>test</scope><groupId>junit</groupId><artifactId>junit</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk-jvm</artifactId><version>${version.mockk}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-property-jvm</artifactId><version>${version.kotest}</version></dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+                <executions>
+                    <execution><phase>generate-sources</phase><goals><goal>add-source</goal></goals><configuration><sources><source>src/main/java</source></sources></configuration></execution>
+                    <execution><id>add-test-source</id><phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals><configuration><sources><source>src/test/java</source></sources></configuration></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version>
+            </plugin>
+
+            <!-- Add kotlin-maven-plugin at module level so it compiles with module dependencies on classpath -->
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
+                <executions>
+                    <execution>
+                        <id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>17</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                <!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>kotlin-test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>17</jvmTarget>
+                            <sourceDirs>
+                                <testSourceDir>${project.basedir}/src/test/java</testSourceDir>
+                                <!--<testSourceDir>${project.basedir}/src/test/kotlin</testSourceDir>-->
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${version.java}</jvmTarget>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>

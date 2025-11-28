@@ -10,4 +10,4 @@ block content
     h5 Published Posts
 
     for post in published_posts
-        a(href="#{config.site_host}/#{post.uri}") #{post.title}
+        a(href=config.site_host + '/' + post.uri) #{post.title}

@@ -1,3 +1,29 @@
 plugins {
-    id 'groovy-gradle-plugin'
+    id 'groovy'
+    id 'java-gradle-plugin'
 }
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+}
+
+gradlePlugin {
+    plugins {
+        javaCommonConvention {
+            id = 'org.jbake.convention.java-common'
+            implementationClass = 'org.jbake.convention.JavaCommonConventionPlugin'
+        }
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+

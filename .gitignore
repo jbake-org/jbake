@@ -2,6 +2,7 @@
 .project
 /.settings
 /target
+**/target
 /bin
 /dist
 /.idea

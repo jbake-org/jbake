@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jbake</groupId>
+        <artifactId>jbake-base</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jbake-dist</artifactId>
+    <packaging>jar</packaging>
+    <name>jbake-dist</name>
+    <description>The binary distribution package that bundles JBake cli</description>
+
+    <licenses>
+        <license>
+            <name>The MIT License (MIT)</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <main.class>org.jbake.launcher.Main</main.class>
+        <app.name>jbake</app.name>
+    </properties>
+
+    <dependencies>
+        <!-- Project Dependencies -->
+        <dependency><groupId>org.jbake</groupId><artifactId>jbake-core</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj-diagram</artifactId><exclusions><exclusion><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId></exclusion></exclusions></dependency>
+        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
+
+        <!-- Test Dependencies -->
+        <dependency><groupId>org.eclipse.jgit</groupId><artifactId>org.eclipse.jgit</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>junit</groupId><artifactId>junit</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><scope>test</scope></dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+                <executions>
+                    <execution><phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals><configuration><sources><source>src/smoke-test/java</source></sources></configuration></execution>
+                    <execution><id>add-test-resource</id><phase>generate-test-resources</phase><goals><goal>add-test-resource</goal></goals><configuration><resources><resource><directory>src/smoke-test/resources</directory></resource></resources></configuration></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-assembly-plugin</artifactId><version>3.7.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>single</goal></goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/distribution.xml</descriptor>
+                            </descriptors>
+                            <finalName>${app.name}-${project.version}</finalName>
+                            <appendAssemblyId>true</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${main.class}</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId><version>2.1.0</version>
+                <executions><execution><phase>package</phase><goals><goal>assemble</goal></goals></execution></executions>
+                <configuration>
+                    <assembleDirectory>${project.build.directory}/appassembler</assembleDirectory>
+                    <programs>
+                        <program>
+                            <mainClass>${main.class}</mainClass>
+                            <name>${app.name}</name>
+                            <!-- See https://www.mojohaus.org/appassembler/appassembler-maven-plugin/usage-daemon-jvmsettings.html -->
+                            <jvmSettings>
+                                <maxMemorySize>512m</maxMemorySize>
+                                <extraArguments>
+                                    <extraArgument>-XX:MaxDirectMemorySize=512m</extraArgument>
+                                    <extraArgument>-Djna.nosys=true</extraArgument>
+                                </extraArguments>
+                            </jvmSettings>
+                        </program>
+                    </programs>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId><version>3.5.4</version>
+                <configuration>
+                    <includes>
+                        <include>**/*SmokeTest.java</include>
+                        <include>**/*SmokeTest.kt</include>
+                        <include>**/*IT.java</include>
+                        <include>**/*IT.kt</include>
+                    </includes>
+                    <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine>
+                </configuration>
+                <executions>
+                    <execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

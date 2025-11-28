@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 http://maven.apache.org/xsd/assembly-2.2.0.xsd">
+
+    <id>bin</id>
+
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <!-- Include the executable jar -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>${project.build.finalName}.jar</include>
+            </includes>
+        </fileSet>
+
+        <!-- Optionally include resources -->
+        <fileSet>
+            <directory>${project.basedir}/src/main/resources</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <useDefaultExcludes>false</useDefaultExcludes>
+        </fileSet>
+
+        <!-- Optionally include README or scripts -->
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>README*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+</assembly>

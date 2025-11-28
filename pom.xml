@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.jbake</groupId>
+    <artifactId>jbake-base</artifactId>
+    <version>2.7.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>jbake-base</name>
+    <description>JBake is a Java based open source static site/blog generator for developers.</description>
+    <url>http://jbake.org</url>
+    <inceptionYear>2012</inceptionYear>
+
+    <licenses><license><name>The MIT License (MIT)</name><url>http://opensource.org/licenses/MIT</url></license></licenses>
+
+    <scm>
+        <url>https://github.com/jbake-org/jbake/</url>
+        <connection>scm:git:git@github.com:jbake-org/jbake.git</connection>
+        <developerConnection>scm:git:https://github.com/jbake-org/jbake.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/jbake-org/jbake/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer><id>jonbullock</id><name>Jonathan Bullock</name><email>jonbullock@gmail.com</email><url>http://jonathanbullock.com</url><timezone>Europe/London</timezone></developer>
+        <developer><id>ancho</id><name>Frank Becker</name><email>frank@calmdevelopment.de</email><timezone>Europe/Berlin</timezone></developer>
+        <developer><id>manikmagar</id><name>Manik Magar</name><url>https://manik.magar.me/</url><timezone>America/New_York</timezone></developer>
+        <developer><id>aldrinleal</id><name>Aldrin Leal</name><timezone>America/Bogota</timezone></developer>
+    </developers>
+
+    <mailingLists>
+        <mailingList>
+            <name>jbake-dev</name>
+            <subscribe>jbake-dev@googlegroups.com</subscribe>
+            <unsubscribe>jbake-dev+unsubscribe@googlegroups.com</unsubscribe>
+            <archive>http://groups.google.com/group/jbake-dev</archive>
+        </mailingList>
+        <mailingList>
+            <name>jbake-user</name>
+            <subscribe>jbake-user@googlegroups.com</subscribe>
+            <unsubscribe>jbake-user+unsubscribe@googlegroups.com</unsubscribe>
+            <archive>http://groups.google.com/group/jbake-user</archive>
+        </mailingList>
+    </mailingLists>
+
+    <modules>
+        <module>jbake-core</module>
+        <module>jbake-dist</module>
+        <module>jbake-maven-plugin</module>
+    </modules>
+
+    <properties>
+        <version.java>17</version.java>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Runtime dependencies versions (synced from gradle.properties) -->
+        <version.asciidoctorj>3.0.1</version.asciidoctorj>
+        <version.asciidoctorj.diagram>3.0.1</version.asciidoctorj.diagram>
+        <version.args4j>2.37</version.args4j>
+        <version.commons.io>2.21.0</version.commons.io>
+        <version.commons.configuration>2.12.0</version.commons.configuration>
+        <version.commons.beanutils>1.11.0</version.commons.beanutils>
+        <version.commons.lang>3.20.0</version.commons.lang>
+        <version.commons.vfs2>2.10.0</version.commons.vfs2>
+        <version.freemarker>2.3.34</version.freemarker>
+        <version.flexmark>0.64.8</version.flexmark>
+        <version.groovy>5.0.2</version.groovy>
+        <version.jcommander>1.85</version.jcommander>
+        <version.jetty.server>11.0.26</version.jetty.server>
+        <version.json.simple>1.1.1</version.json.simple>
+        <version.jade4j>1.3.2</version.jade4j>
+        <version.pug4j>2.4.0</version.pug4j>
+        <version.jsoup>1.21.2</version.jsoup>
+        <version.jgit>7.4.0.202509020913-r</version.jgit>
+        <version.logback>1.5.21</version.logback>
+        <version.orientdb>3.2.46</version.orientdb>
+        <version.pebble>4.0.0</version.pebble>
+        <version.slf4j>2.0.17</version.slf4j>
+        <version.snakeyaml>2.5</version.snakeyaml>
+        <version.thymeleaf>3.1.3.RELEASE</version.thymeleaf>
+        <version.picocli>4.7.7</version.picocli>
+
+        <!-- Testing dependencies versions (synced) -->
+        <version.junit4>4.13.2</version.junit4>
+        <version.junit5>6.0.1</version.junit5>
+        <version.junit5.system.ext>1.2.2</version.junit5.system.ext>
+        <version.junit.pioneer>2.3.0</version.junit.pioneer>
+        <version.assertj>3.27.6</version.assertj>
+        <version.mockito>5.20.0</version.mockito>
+        <version.mockk>1.14.6</version.mockk>
+        <version.kotest>6.0.5</version.kotest>
+
+        <!-- Build dependencies versions -->
+        <version.jacoco.maven.plugin>0.8.14</version.jacoco.maven.plugin>
+        <version.maven>3.9.9</version.maven>
+        <version.maven.annotations>3.9.0</version.maven.annotations>
+        <version.spark>2.9.4</version.spark>
+        <version.kotlin>2.2.21</version.kotlin>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-bom</artifactId><version>${version.kotlin}</version><type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version>            <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-bom</artifactId><version>${version.groovy}</version>   <type>pom</type><scope>import</scope></dependency>
+
+            <!-- Runtime dependencies -->
+            <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
+            <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-core</artifactId><version>${version.logback}</version></dependency>
+            <dependency><groupId>org.jcommander</groupId><artifactId>jcommander</artifactId><version>${version.jcommander}</version></dependency>
+            <dependency><groupId>com.googlecode.json-simple</groupId><artifactId>json-simple</artifactId><version>${version.json.simple}</version></dependency>
+            <dependency><groupId>com.orientechnologies</groupId><artifactId>orientdb-core</artifactId><version>${version.orientdb}</version></dependency>
+            <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><version>${version.flexmark}</version></dependency>
+            <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${version.flexmark}</version></dependency>
+            <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId><version>${version.commons.beanutils}</version></dependency>
+            <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId><version>${version.commons.io}</version></dependency>
+            <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><version>${version.jade4j}</version></dependency>
+            <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId><version>${version.pug4j}</version></dependency>
+            <dependency><groupId>info.picocli</groupId><artifactId>picocli</artifactId><version>${version.picocli}</version></dependency>
+            <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><version>${version.pebble}</version></dependency>
+            <dependency><groupId>org.apache.commons</groupId><artifactId>commons-configuration2</artifactId><version>${version.commons.configuration}</version></dependency>
+            <dependency><groupId>org.apache.commons</groupId><artifactId>commons-lang3</artifactId><version>${version.commons.lang}</version></dependency>
+            <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><version>${version.commons.vfs2}</version></dependency>
+            <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj-diagram</artifactId><version>${version.asciidoctorj.diagram}</version></dependency>
+            <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><version>${version.asciidoctorj}</version></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-dateutil</artifactId><version>${version.groovy}</version></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId><version>${version.groovy}</version></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><version>${version.groovy}</version></dependency>
+            <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><version>${version.jetty.server}</version></dependency>
+            <dependency><groupId>org.eclipse.jgit</groupId><artifactId>org.eclipse.jgit</artifactId><version>${version.jgit}</version></dependency>
+            <dependency><groupId>org.freemarker</groupId><artifactId>freemarker</artifactId><version>${version.freemarker}</version></dependency>
+            <dependency><groupId>org.jsoup</groupId><artifactId>jsoup</artifactId><version>${version.jsoup}</version></dependency>
+            <dependency><groupId>org.slf4j</groupId><artifactId>jcl-over-slf4j</artifactId><version>${version.slf4j}</version></dependency>
+            <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>${version.slf4j}</version></dependency>
+            <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId><version>${version.slf4j}</version></dependency>
+            <dependency><groupId>org.thymeleaf</groupId><artifactId>thymeleaf</artifactId><version>${version.thymeleaf}</version></dependency>
+            <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><version>${version.snakeyaml}</version></dependency>
+            <!-- Testing dependencies -->
+            <dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>${version.junit4}</version></dependency>
+            <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>${version.assertj}</version></dependency>
+            <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><version>${version.junit5.system.ext}</version></dependency>
+            <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><version>${version.junit.pioneer}</version></dependency>
+            <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><version>${version.mockito}</version></dependency>
+            <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><version>${version.mockito}</version></dependency>
+            <dependency><groupId>io.mockk</groupId><artifactId>mockk</artifactId><version>${version.mockk}</version></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId><version>${version.kotest}</version></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId><version>${version.kotest}</version></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-property</artifactId><version>${version.kotest}</version></dependency>
+            <!-- Maven Plugin dependencies -->
+            <dependency><groupId>org.apache.maven</groupId><artifactId>maven-core</artifactId><version>${version.maven}</version></dependency>
+            <dependency><groupId>org.apache.maven.plugin-tools</groupId><artifactId>maven-plugin-annotations</artifactId><version>${version.maven.annotations}</version></dependency>
+            <dependency><groupId>com.sparkjava</groupId><artifactId>spark-core</artifactId><version>${version.spark}</version></dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version>
+                <configuration>
+                    <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g -Djbake.buildOutputDir=${project.build.outputDirectory}</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${version.jacoco.maven.plugin}</version>
+                <executions>
+                    <execution><goals><goal>prepare-agent</goal></goals></execution>
+                    <execution><id>report</id><phase>test</phase><goals><goal>report</goal></goals></execution>
+                </executions>
+                <configuration>
+                    <excludes><exclude>**/*OrientSqlTokenManager*</exclude></excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-checkstyle-plugin</artifactId><version>3.6.0</version>
+                <configuration>
+                    <configLocation>config/checkstyle/checkstyle.xml</configLocation>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>org.jbake.app.JBake</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Built-By>${user.name}</Built-By>
+                            <Specification-Title>${project.name}</Specification-Title>
+                            <Specification-Version>${project.version}</Specification-Version>
+                            <Specification-Vendor>${project.name}</Specification-Vendor>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Vendor>${project.name}</Implementation-Vendor>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-source-plugin</artifactId><version>3.3.1</version>
+                <executions><execution><id>attach-sources</id><goals><goal>jar-no-fork</goal></goals></execution></executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-javadoc-plugin</artifactId><version>3.12.0</version>
+                <executions><execution><id>attach-javadocs</id><goals><goal>jar</goal></goals></execution></executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
+                <executions>
+                    <execution>
+                        <id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>${version.java}</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                <!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>kotlin-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals><goal>test-compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>${version.java}</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                                <!--<sourceDir>${project.basedir}/src/test/kotlin</sourceDir>-->
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${version.java}</jvmTarget>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.1</version>
+                <executions>
+                    <execution><id>compile-after-kotlin</id><phase>compile</phase><goals><goal>compile</goal></goals></execution>
+                    <execution><id>testCompile-after-kotlin</id><phase>test-compile</phase><goals><goal>testCompile</goal></goals></execution>
+                </executions>
+                <configuration>
+                    <source>${version.java}</source>
+                    <excludes><exclude>**/*.kt</exclude></excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId><version>3.1.4</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version>
+                <executions>
+                    <execution><id>sign-artifacts</id><phase>none</phase><goals><goal>sign</goal></goals></execution>
+                </executions>
+                <configuration>
+                    <gpgArguments><arg>--pinentry-mode</arg><arg>loopback</arg></gpgArguments>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><version>3.6.2</version><executions>
+                    <execution>
+                        <id>enforce-maven</id><goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion><version>3.9.9</version></requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[17,18)</version>
+                                    <message>JBake tests require JDK 17 (build artifacts rely on libraries incompatible with newer JDKs). Please run the build with JDK 17 (set JAVA_HOME or use toolchains).</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <snapshotRepository><id>ossrh</id><url>https://s01.oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
+        <repository><id>ossrh</id><url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url></repository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version><executions>
+                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
