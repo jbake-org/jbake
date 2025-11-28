@@ -12,7 +12,7 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.template.RenderingException
 
 class IndexRendererTest : StringSpec({
-        fun returnsZeroWhenConfigDoesNotRenderIndices() {
+    "returnsZeroWhenConfigDoesNotRenderIndices" {
         val renderer = IndexRenderer()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -40,7 +40,7 @@ class IndexRendererTest : StringSpec({
         verify(exactly = 0) { mockRenderer.renderIndex(any()) }
     }
 
-        fun returnsOneWhenConfigRendersIndices() {
+    "returnsOneWhenConfigRendersIndices" {
         val renderer = IndexRenderer()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -55,8 +55,7 @@ class IndexRendererTest : StringSpec({
         renderResponse shouldBe 1
     }
 
-
-    fun propagatesRenderingException() {
+    "propagatesRenderingException" {
         val renderer = IndexRenderer()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -72,7 +71,8 @@ class IndexRendererTest : StringSpec({
             renderer.render(mockRenderer, contentStore, configuration)
         }
 
-        verify(exactly = 0) { mockRenderer.renderIndex(any()) }
+        // renderIndex is expected to have been invoked once and that invocation throws; verify that it was invoked
+        verify(exactly = 1) { mockRenderer.renderIndex(any()) }
     }
 
 

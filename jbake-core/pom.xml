@@ -69,10 +69,10 @@
         <dependency><scope>test</scope><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-property</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk-jvm</artifactId><version>${version.mockk}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-property-jvm</artifactId><version>${version.kotest}</version></dependency>
     </dependencies>
 
     <build>
@@ -107,7 +107,7 @@
                             <jvmTarget>17</jvmTarget>
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                                <!--<sourceDir>${project.basedir}/src/main/kotlin</sourceDir>-->
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -117,7 +117,7 @@
                             <jvmTarget>17</jvmTarget>
                             <sourceDirs>
                                 <testSourceDir>${project.basedir}/src/test/java</testSourceDir>
-                                <testSourceDir>${project.basedir}/src/test/kotlin</testSourceDir>
+                                <!--<testSourceDir>${project.basedir}/src/test/kotlin</testSourceDir>-->
                             </sourceDirs>
                         </configuration>
                     </execution>
