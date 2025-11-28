@@ -45,6 +45,7 @@ class IndexRendererTest : StringSpec({
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderIndex } returns true
+        every { configuration.indexFileName } returns "mockindex.html"
 
         val contentStore = mockk<ContentStore>()
 
