@@ -12,7 +12,7 @@ import java.io.File
 import java.io.PrintWriter
 
 class MdParserTest : StringSpec({
-    lateinit var folder: File
+    lateinit var tempDir: File
 
     lateinit var config: DefaultJBakeConfiguration
 
@@ -61,50 +61,50 @@ class MdParserTest : StringSpec({
     val invalidHeader = "title=Title\n~~~~~~"
 
     beforeTest {
-        folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
+        tempDir = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         val configFile = TestUtils.testResourcesAsSourceDir
         config = ConfigUtil().loadConfig(configFile) as DefaultJBakeConfiguration
 
-        validMdFileBasic = File(folder, "validBasic.md").apply { createNewFile() }
+        validMdFileBasic = File(tempDir, "validBasic.md").apply { createNewFile() }
         var out = PrintWriter(validMdFileBasic)
         out.println(validHeader)
         out.println("# This is a test")
         out.close()
 
-        invalidMdFileBasic = File(folder, "invalidBasic.md").apply { createNewFile() }
+        invalidMdFileBasic = File(tempDir, "invalidBasic.md").apply { createNewFile() }
         out = PrintWriter(invalidMdFileBasic)
         out.println(invalidHeader)
         out.println("# This is a test")
         out.close()
 
-        mdFileHardWraps = File(folder, "hardWraps.md").apply { createNewFile() }
+        mdFileHardWraps = File(tempDir, "hardWraps.md").apply { createNewFile() }
         out = PrintWriter(mdFileHardWraps)
         out.println(validHeader)
         out.println("First line")
         out.println("Second line")
         out.close()
 
-        mdFileAbbreviations = File(folder, "abbreviations.md").apply { createNewFile() }
+        mdFileAbbreviations = File(tempDir, "abbreviations.md").apply { createNewFile() }
         out = PrintWriter(mdFileAbbreviations)
         out.println(validHeader)
         out.println("*[HTML]: Hyper Text Markup Language")
         out.println("HTML")
         out.close()
 
-        mdFileAutolinks = File(folder, "autolinks.md").apply { createNewFile() }
+        mdFileAutolinks = File(tempDir, "autolinks.md").apply { createNewFile() }
         out = PrintWriter(mdFileAutolinks)
         out.println(validHeader)
         out.println("http://github.com")
         out.close()
 
-        mdFileDefinitions = File(folder, "definitions.md").apply { createNewFile() }
+        mdFileDefinitions = File(tempDir, "definitions.md").apply { createNewFile() }
         out = PrintWriter(mdFileDefinitions)
         out.println(validHeader)
         out.println("Apple")
         out.println(":   Pomaceous fruit")
         out.close()
 
-        mdFileFencedCodeBlocks = File(folder, "fencedCodeBlocks.md").apply { createNewFile() }
+        mdFileFencedCodeBlocks = File(tempDir, "fencedCodeBlocks.md").apply { createNewFile() }
         out = PrintWriter(mdFileFencedCodeBlocks)
         out.println(validHeader)
         out.println("```")
@@ -114,43 +114,43 @@ class MdParserTest : StringSpec({
         out.println("```")
         out.close()
 
-        mdFileQuotes = File(folder, "quotes.md").apply { createNewFile() }
+        mdFileQuotes = File(tempDir, "quotes.md").apply { createNewFile() }
         out = PrintWriter(mdFileQuotes)
         out.println(validHeader)
         out.println("\"quotes\"")
         out.close()
 
-        mdFileSmarts = File(folder, "smarts.md").apply { createNewFile() }
+        mdFileSmarts = File(tempDir, "smarts.md").apply { createNewFile() }
         out = PrintWriter(mdFileSmarts)
         out.println(validHeader)
         out.println("...")
         out.close()
 
-        mdFileSmartypants = File(folder, "smartypants.md").apply { createNewFile() }
+        mdFileSmartypants = File(tempDir, "smartypants.md").apply { createNewFile() }
         out = PrintWriter(mdFileSmartypants)
         out.println(validHeader)
         out.println("\"...\"")
         out.close()
 
-        mdFileSuppressAllHTML = File(folder, "suppressAllHTML.md").apply { createNewFile() }
+        mdFileSuppressAllHTML = File(tempDir, "suppressAllHTML.md").apply { createNewFile() }
         out = PrintWriter(mdFileSuppressAllHTML)
         out.println(validHeader)
         out.println("<div>!</div><em>!</em>")
         out.close()
 
-        mdFileSuppressHTMLBlocks = File(folder, "suppressHTMLBlocks.md").apply { createNewFile() }
+        mdFileSuppressHTMLBlocks = File(tempDir, "suppressHTMLBlocks.md").apply { createNewFile() }
         out = PrintWriter(mdFileSuppressHTMLBlocks)
         out.println(validHeader)
         out.println("<div>!</div><em>!</em>")
         out.close()
 
-        mdFileSuppressInlineHTML = File(folder, "suppressInlineHTML.md").apply { createNewFile() }
+        mdFileSuppressInlineHTML = File(tempDir, "suppressInlineHTML.md").apply { createNewFile() }
         out = PrintWriter(mdFileSuppressInlineHTML)
         out.println(validHeader)
         out.println("This is the first paragraph. <span> with </span> inline html")
         out.close()
 
-        mdFileTables = File(folder, "tables.md").apply { createNewFile() }
+        mdFileTables = File(tempDir, "tables.md").apply { createNewFile() }
         out = PrintWriter(mdFileTables)
         out.println(validHeader)
         out.println("First Header|Second Header")
@@ -159,19 +159,19 @@ class MdParserTest : StringSpec({
         out.println("Content Cell|Content Cell")
         out.close()
 
-        mdFileWikilinks = File(folder, "wikilinks.md").apply { createNewFile() }
+        mdFileWikilinks = File(tempDir, "wikilinks.md").apply { createNewFile() }
         out = PrintWriter(mdFileWikilinks)
         out.println(validHeader)
         out.println("[[Wiki-style links]]")
         out.close()
 
-        mdFileAtxheaderspace = File(folder, "atxheaderspace.md").apply { createNewFile() }
+        mdFileAtxheaderspace = File(tempDir, "atxheaderspace.md").apply { createNewFile() }
         out = PrintWriter(mdFileAtxheaderspace)
         out.println(validHeader)
         out.println("#Test")
         out.close()
 
-        mdFileForcelistitempara = File(folder, "forcelistitempara.md").apply { createNewFile() }
+        mdFileForcelistitempara = File(tempDir, "forcelistitempara.md").apply { createNewFile() }
         out = PrintWriter(mdFileForcelistitempara)
         out.println(validHeader)
         out.println("1. Item 1")
@@ -182,7 +182,7 @@ class MdParserTest : StringSpec({
         out.println("    Item 1 paragraph 1 continuation")
         out.close()
 
-        mdFileRelaxedhrules = File(folder, "releaxedhrules.md").apply { createNewFile() }
+        mdFileRelaxedhrules = File(tempDir, "releaxedhrules.md").apply { createNewFile() }
         out = PrintWriter(mdFileRelaxedhrules)
         out.println(validHeader)
         out.println("Hello World")
@@ -201,7 +201,7 @@ class MdParserTest : StringSpec({
         out.println("***")
         out.close()
 
-        mdTasklistitems = File(folder, "tasklistsitem.md").apply { createNewFile() }
+        mdTasklistitems = File(tempDir, "tasklistsitem.md").apply { createNewFile() }
         out = PrintWriter(mdTasklistitems)
         out.println(validHeader)
         out.println("* loose bullet item 3")
@@ -209,7 +209,7 @@ class MdParserTest : StringSpec({
         out.println("* [x] closed task item")
         out.close()
 
-        mdExtanchorlinks = File(folder, "mdExtanchorlinks.md").apply { createNewFile() }
+        mdExtanchorlinks = File(tempDir, "mdExtanchorlinks.md").apply { createNewFile() }
         out = PrintWriter(mdExtanchorlinks)
         out.println(validHeader)
         out.println("# header & some *formatting* ~~chars~~")
@@ -629,6 +629,6 @@ class MdParserTest : StringSpec({
 
 
     afterTest {
-        folder.deleteRecursively()
+        tempDir.deleteRecursively()
     }
 })

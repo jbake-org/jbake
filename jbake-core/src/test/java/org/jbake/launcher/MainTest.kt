@@ -15,7 +15,7 @@ import java.io.PrintStream
 import java.nio.file.Files
 
 class MainTest : StringSpec({
-    lateinit var folder: File
+    lateinit var tempDir: File
     lateinit var standardOut: PrintStream
     lateinit var outputStreamCaptor: ByteArrayOutputStream
     lateinit var main: Main
@@ -27,7 +27,7 @@ class MainTest : StringSpec({
     lateinit var originalWorkDir: String
 
     beforeTest {
-        folder = Files.createTempDirectory("jbake-test").toFile()
+        tempDir = Files.createTempDirectory("jbake-test").toFile()
         standardOut = System.out
         outputStreamCaptor = ByteArrayOutputStream()
         originalWorkDir = PathUtils.SYSPROP_USER_DIR
@@ -47,11 +47,11 @@ class MainTest : StringSpec({
     afterTest {
         System.setProperty("user.dir", originalWorkDir)
         System.setOut(standardOut)
-        folder.deleteRecursively()
+        tempDir.deleteRecursively()
     }
 
     "launchJetty" {
-        val currentWorkingdir = File(folder, "src/jbake").apply { mkdirs() }
+        val currentWorkingdir = File(tempDir, "src/jbake").apply { mkdirs() }
         val expectedOutputDir = File(currentWorkingdir, "output")
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
@@ -69,7 +69,7 @@ class MainTest : StringSpec({
     }
 
     "launchBakeWithCustomPropertiesEncoding" {
-        val currentWorkingdir = File(folder, "jbake").apply { mkdirs() }
+        val currentWorkingdir = File(tempDir, "jbake").apply { mkdirs() }
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
         every { mockFactory.setEncoding(any<String>()) } returns mockFactory
@@ -83,7 +83,7 @@ class MainTest : StringSpec({
     }
 
     "launchBakeWithDefaultUtf8PropertiesEncoding" {
-        val currentWorkingdir = File(folder, "jbake").apply { mkdirs() }
+        val currentWorkingdir = File(tempDir, "jbake").apply { mkdirs() }
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
         every { mockFactory.setEncoding(any<String>()) } returns mockFactory
@@ -97,7 +97,7 @@ class MainTest : StringSpec({
     }
 
     "launchBakeAndJetty" {
-        val currentWorkingdir = File(folder, "src/jbake").apply { mkdirs() }
+        val currentWorkingdir = File(tempDir, "src/jbake").apply { mkdirs() }
         val expectedOutput = File(currentWorkingdir, "output")
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
@@ -112,7 +112,7 @@ class MainTest : StringSpec({
     }
 
     "shouldListCurrentSettings" {
-        val src = File(folder, "src/jbake").apply { mkdirs() }
+        val src = File(tempDir, "src/jbake").apply { mkdirs() }
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
         every { mockFactory.setEncoding(any()) } returns mockFactory

@@ -58,7 +58,7 @@ class ConfigUtilTest : StringSpec({
         every { nonExistentSourceDir.exists() } returns false
 
         val e = shouldThrow<JBakeException> { util.loadConfig(nonExistentSourceDir) }
-        e.message shouldBe "The given source folder '/tmp/nonexistent' does not exist."
+        e.message shouldBe "The given source dir '/tmp/nonexistent' does not exist."
     }
 
     "shouldAddSourcefolderToConfiguration" {
@@ -75,7 +75,7 @@ class ConfigUtilTest : StringSpec({
         every { sourceDir.absolutePath } returns "/tmp/notadir"
 
         val e = shouldThrow<JBakeException> { util.loadConfig(sourceDir) }
-        e.message shouldBe "The given source folder is not a directory."
+        e.message shouldBe "The given source dir is not a directory."
     }
 
     "shouldReturnDestinationDirFromConfiguration" {

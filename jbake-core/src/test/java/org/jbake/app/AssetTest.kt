@@ -13,29 +13,29 @@ import java.nio.file.Files
 
 class AssetTest : StringSpec({
 
-    lateinit var folder: File
+    lateinit var tempDir: File
     lateinit var config: DefaultJBakeConfiguration
     lateinit var fixtureDir: File
 
     beforeTest {
         fixtureDir = File(AssetTest::class.java.getResource("/fixture")!!.file)
-        folder = Files.createTempDirectory("jbake-test").toFile()
+        tempDir = Files.createTempDirectory("jbake-test").toFile()
         config = ConfigUtil().loadConfig(fixtureDir) as DefaultJBakeConfiguration
-        config.destinationDir = folder
+        config.destinationDir = tempDir
         config.outputExtension shouldBe ".html"
     }
 
     afterTest {
-        folder.deleteRecursively()
+        tempDir.deleteRecursively()
     }
 
     "testCopy" {
         val asset = Asset(config)
         asset.copy()
 
-        File(folder, "css/bootstrap.min.css").exists() shouldBe true
-        File(folder, "img/glyphicons-halflings.png").exists() shouldBe true
-        File(folder, "js/bootstrap.min.js").exists() shouldBe true
+        File(tempDir, "css/bootstrap.min.css").exists() shouldBe true
+        File(tempDir, "img/glyphicons-halflings.png").exists() shouldBe true
+        File(tempDir, "js/bootstrap.min.js").exists() shouldBe true
         asset.errors.isEmpty() shouldBe true
     }
 
@@ -43,13 +43,13 @@ class AssetTest : StringSpec({
         val asset = Asset(config)
 
         // Copy single asset file
-        val cssTarget = File(folder, "css/bootstrap.min.css")
+        val cssTarget = File(tempDir, "css/bootstrap.min.css")
         cssTarget.exists() shouldBe false
         asset.copySingleFile(File(fixtureDir, "assets/css/bootstrap.min.css"))
         cssTarget.exists() shouldBe true
 
         // Copy single content file
-        val imgTarget = File(folder, "blog/2013/images/custom-image.jpg")
+        val imgTarget = File(tempDir, "blog/2013/images/custom-image.jpg")
         imgTarget.exists() shouldBe false
         asset.copySingleFile(File(fixtureDir, "content/blog/2013/images/custom-image.jpg"))
         imgTarget.exists() shouldBe true
@@ -57,7 +57,7 @@ class AssetTest : StringSpec({
 
     "shouldSkipCopyingSingleFileIfDirectory" {
         val asset = Asset(config)
-        val emptyDir = File(folder, "emptyDir").apply { mkdir() }
+        val emptyDir = File(tempDir, "emptyDir").apply { mkdir() }
 
         asset.copySingleFile(emptyDir)
 
@@ -67,7 +67,7 @@ class AssetTest : StringSpec({
     "shouldLogSkipCopyingSingleFileIfDirectory" {
         // This test requires LoggingTest setup - skipping for now or implement MockK logging
         val asset = Asset(config)
-        File(folder, "emptyDir").apply { mkdir() }.let { asset.copySingleFile(it) }
+        File(tempDir, "emptyDir").apply { mkdir() }.let { asset.copySingleFile(it) }
         // TODO: verify logging with MockK appender
     }
 
@@ -75,11 +75,11 @@ class AssetTest : StringSpec({
         config.assetDir = File(config.sourceDir, "/media")
         Asset(config).copy()
 
-        File(folder, "favicon.ico").exists() shouldBe true
+        File(tempDir, "favicon.ico").exists() shouldBe true
     }
 
     "testCopyIgnore" {
-        val assetDir = File(folder, "ignoredAssets").apply { mkdirs() }
+        val assetDir = File(tempDir, "ignoredAssets").apply { mkdirs() }
         FileUtils.copyDirectory(File(AssetTest::class.java.getResource("/fixture/ignorables")!!.file), assetDir)
         config.assetDir = assetDir
         config.assetIgnoreHidden = true
@@ -88,13 +88,13 @@ class AssetTest : StringSpec({
         val asset = Asset(config)
         asset.copy(assetDir)
 
-        File(folder, "test.txt").exists() shouldBe true
-        File(folder, ".test.txt").exists() shouldBe false
+        File(tempDir, "test.txt").exists() shouldBe true
+        File(tempDir, ".test.txt").exists() shouldBe false
         asset.errors.isEmpty() shouldBe true
     }
 
     "testWriteProtected" {
-        val css = File(folder, "css").apply { mkdir() }
+        val css = File(tempDir, "css").apply { mkdir() }
         val cssFile = File(css, "bootstrap.min.css").apply {
             FileUtils.touch(this)
             setReadOnly()
@@ -102,7 +102,7 @@ class AssetTest : StringSpec({
         css.setReadOnly()
 
         config.assetDir = File(config.sourceDir, "assets")
-        config.destinationDir = folder
+        config.destinationDir = tempDir
         val asset = Asset(config)
         asset.copy()
 
@@ -121,11 +121,11 @@ class AssetTest : StringSpec({
         val asset = Asset(config)
         asset.copy(assets)
 
-        File(folder, "css/bootstrap.min.css").exists() shouldBe true
-        File(folder, "img/glyphicons-halflings.png").exists() shouldBe true
-        File(folder, "js/bootstrap.min.js").exists() shouldBe true
-        File(folder, "ignorablefolder").exists() shouldBe false
-        File(folder, "fooignorablefolder").exists() shouldBe true
+        File(tempDir, "css/bootstrap.min.css").exists() shouldBe true
+        File(tempDir, "img/glyphicons-halflings.png").exists() shouldBe true
+        File(tempDir, "js/bootstrap.min.js").exists() shouldBe true
+        File(tempDir, "ignorablefolder").exists() shouldBe false
+        File(tempDir, "fooignorablefolder").exists() shouldBe true
         asset.errors.isEmpty() shouldBe true
     }
 
@@ -135,11 +135,11 @@ class AssetTest : StringSpec({
         val asset = Asset(config)
         asset.copy(assets)
 
-        File(folder, "css/bootstrap.min.css").exists() shouldBe true
-        File(folder, "img/glyphicons-halflings.png").exists() shouldBe true
-        File(folder, "js/bootstrap.min.js").exists() shouldBe true
-        File(folder, "ignorablefolder").exists() shouldBe true
-        File(folder, "fooignorablefolder").exists() shouldBe false
+        File(tempDir, "css/bootstrap.min.css").exists() shouldBe true
+        File(tempDir, "img/glyphicons-halflings.png").exists() shouldBe true
+        File(tempDir, "js/bootstrap.min.js").exists() shouldBe true
+        File(tempDir, "ignorablefolder").exists() shouldBe true
+        File(tempDir, "fooignorablefolder").exists() shouldBe false
         asset.errors.isEmpty() shouldBe true
     }
 
@@ -148,10 +148,10 @@ class AssetTest : StringSpec({
         val asset = Asset(config)
         asset.copyAssetsFromContent(contents)
 
-        countFiles(folder) shouldBe 3
-        File(folder, "blog/2012/images/custom-image.png").exists() shouldBe true
-        File(folder, "blog/2013/images/custom-image.jpg").exists() shouldBe true
-        File(folder, "blog/2012/sample.json").exists() shouldBe true
+        countFiles(tempDir) shouldBe 3
+        File(tempDir, "blog/2012/images/custom-image.png").exists() shouldBe true
+        File(tempDir, "blog/2013/images/custom-image.jpg").exists() shouldBe true
+        File(tempDir, "blog/2012/sample.json").exists() shouldBe true
         asset.errors.isEmpty() shouldBe true
     }
 

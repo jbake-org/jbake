@@ -27,12 +27,12 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     @Throws(JBakeException::class)
     private fun ensureSource() {
-        val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not configured.")
+        val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source dir is not configured.")
         if (!FileUtil.isExistingDirectory(source))
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.absolutePath)
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source dir must exist: " + source.absolutePath)
 
         if (!configuration.sourceDir!!.canRead())
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.absolutePath)
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source dir is not readable: " + source.absolutePath)
     }
 
     private fun ensureTemplateDir() {
@@ -53,7 +53,7 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
         if (!destination.canWrite()) {
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
-                "Error: Destination folder is not writable: " + destination.absolutePath
+                "Error: Destination dir is not writable: " + destination.absolutePath
             )
         }
     }
@@ -61,13 +61,13 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     private fun checkAssetDir() {
         val path = configuration.assetDir
         if (!path.exists()) {
-            log.warn("No asset folder '{}' was found!", path.absolutePath)
+            log.warn("No asset dir '{}' was found!", path.absolutePath)
         }
     }
 
     private fun checkRequiredDirExists(folderName: String?, path: File) {
         if (!FileUtil.isExistingDirectory(path))
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required dir cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
     }
 
     private val log: Logger = LoggerFactory.getLogger(JBakeConfigurationInspector::class.java)

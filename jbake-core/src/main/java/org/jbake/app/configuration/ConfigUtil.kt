@@ -27,10 +27,10 @@ class ConfigUtil {
         if (!source.exists())
             throw JBakeException(
                 SystemExit.CONFIGURATION_ERROR,
-                "The given source folder '" + source.absolutePath + "' does not exist."
+                "The given source dir '" + source.absolutePath + "' does not exist."
             )
         if (!source.isDirectory)
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "The given source folder is not a directory.")
+            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "The given source dir is not a directory.")
 
         val legacyConfigFile = File(source, LEGACY_CONFIG_FILE)
         val customConfigFile = propertiesFile ?: File(source, CONFIG_FILE)

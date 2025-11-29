@@ -141,7 +141,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsString(PropertyList.CONTENT_FOLDER.key)
 
     override var dataDir: File
-        get() = getAsDir(DATA_FOLDER_KEY) ?: error("Data folder must be configured")
+        get() = getAsDir(DATA_FOLDER_KEY) ?: error("Data dir must be configured")
         set(value) { setProperty(DATA_FOLDER_KEY, value) }
 
     override var dataDirName: String?
@@ -178,7 +178,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     override var destinationDir: File
-        get() = getAsDir(DESTINATION_FOLDER_KEY) ?: error("Destination folder must be configured")
+        get() = getAsDir(DESTINATION_FOLDER_KEY) ?: error("Destination dir must be configured")
         set(value) = setProperty(DESTINATION_FOLDER_KEY, value)
 
     override val documentTypes: MutableList<String>
@@ -310,7 +310,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsString(PropertyList.SITEMAP_FILE.key)
 
     override val sourceDir: File
-        get() = getAsDir(SOURCE_FOLDER_KEY) ?: error("Source folder must be configured")
+        get() = getAsDir(SOURCE_FOLDER_KEY) ?: error("Source dir must be configured")
 
     fun setSourceDir(sourceDir: File?) {
         setProperty(SOURCE_FOLDER_KEY, sourceDir)
@@ -342,7 +342,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     override var templateDir: File
-        get() = getAsDir(TEMPLATE_FOLDER_KEY) ?: error("Template folder must be configured")
+        get() = getAsDir(TEMPLATE_FOLDER_KEY) ?: error("Template dir must be configured")
         set(value) = setProperty(TEMPLATE_FOLDER_KEY, value)
 
     override val templateDirName: String?

@@ -19,7 +19,7 @@ object PropertyList {
     @JvmField val DB_PATH: Property = Property("db.path", "database path for persistent storage")
     @JvmField val DEFAULT_STATUS: Property = Property("default.status", "default document status")
     @JvmField val DEFAULT_TYPE: Property = Property("default.type", "default document type")
-    @JvmField val DESTINATION_FOLDER: Property = Property("destination.folder", "path to destination folder by default")
+    @JvmField val DESTINATION_FOLDER: Property = Property("destination.folder", "path to destination dir by default")
     @JvmField val DRAFT_SUFFIX: Property = Property("draft.suffix", "draft content suffix")
     @JvmField val ERROR404_FILE: Property = Property("error404.file", "filename to use for 404 error")
     @JvmField val FEED_FILE: Property = Property("feed.file", "filename to use for feed")
@@ -69,7 +69,7 @@ object PropertyList {
     @JvmField val MARKDOWN_MAX_PARSINGTIME: Property = Property("markdown.maxParsingTimeInMillis", "millis to parse single markdown page. See PegDown Parse configuration for details")
     @JvmField val THYMELEAF_LOCALE: Property = Property("thymeleaf.locale", "default thymeleafe locale")
     @JvmField val URI_NO_EXTENSION: Property = Property("uri.noExtension", "enable extension-less URI option?")
-    @JvmField val URI_NO_EXTENSION_PREFIX: Property = Property("uri.noExtension.prefix", "Set to a prefix path (starting with a slash) for which to generate extension-less URI's (i.e. a folder with index.html in)")
+    @JvmField val URI_NO_EXTENSION_PREFIX: Property = Property("uri.noExtension.prefix", "Set to a prefix path (starting with a slash) for which to generate extension-less URI's (i.e. a dir with index.html in)")
     @JvmField val VERSION: Property = Property("version", "jbake application version")
 
     @JvmStatic

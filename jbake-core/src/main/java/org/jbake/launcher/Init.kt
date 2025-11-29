@@ -21,7 +21,7 @@ class Init(private val config: JBakeConfiguration) {
      * @throws Exception if required directory structure can't be achieved without content overwriting.
      */
     fun run(outputDir: File, templateDir: File, templateType: String) {
-        if (!outputDir.canWrite()) throw Exception("Output folder is not writeable!")
+        if (!outputDir.canWrite()) throw Exception("Output dir is not writeable!")
 
         val contents = outputDir.listFiles()
         var safe = true
@@ -34,7 +34,7 @@ class Init(private val config: JBakeConfiguration) {
             }
         }
 
-        if (!safe) throw Exception(String.format("Output folder '%s' already contains structure!", outputDir.absolutePath))
+        if (!safe) throw Exception(String.format("Output dir '%s' already contains structure!", outputDir.absolutePath))
 
         if (config.getExampleProjectByType(templateType) == null)
             throw Exception("Cannot locate example project type: $templateType")

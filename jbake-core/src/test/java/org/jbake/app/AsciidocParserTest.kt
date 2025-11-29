@@ -114,7 +114,7 @@ class AsciidocParserTest : StringSpec({
         map.type shouldBe type
     }
 
-    lateinit var folder: File
+    lateinit var tempDir: File
     lateinit var rootPath: File
     lateinit var config: DefaultJBakeConfiguration
     lateinit var parser: Parser
@@ -128,10 +128,10 @@ class AsciidocParserTest : StringSpec({
     lateinit var validAsciiDocFileWithoutJBakeMetaData: File
 
     fun createTestFile(name: String, content: String) =
-        File(folder, name).apply { createNewFile(); writeText(content) }
+        File(tempDir, name).apply { createNewFile(); writeText(content) }
 
     beforeTest {
-        folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
+        tempDir = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         rootPath = TestUtils.testResourcesAsSourceDir
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
@@ -209,6 +209,6 @@ class AsciidocParserTest : StringSpec({
 
 
     afterTest {
-        folder.deleteRecursively()
+        tempDir.deleteRecursively()
     }
 })

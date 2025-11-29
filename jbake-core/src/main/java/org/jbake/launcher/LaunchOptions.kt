@@ -12,12 +12,12 @@ import java.io.File
 class LaunchOptions {
 
     @CommandLine.Parameters(index = "0", arity = "0..1",
-        description = ["source folder of site content (with templates and assets), if not supplied will default to current directory"],
+        description = ["source dir of site content (with templates and assets), if not supplied will default to current directory"],
     )
     var sourceValue: String? = null
 
     @CommandLine.Parameters(index = "1", arity = "0..1",
-        description = ["destination folder for output, if not supplied will default to a folder called \"output\" in the current directory"],
+        description = ["destination dir for output, if not supplied will default to a dir called \"output\" in the current directory"],
     )
     var destinationValue: String? = null
 
@@ -30,7 +30,7 @@ class LaunchOptions {
 
     @CommandLine.Option(
         names = ["-s", "--server"],
-        description = ["runs HTTP server to serve out baked site, if no <value> is supplied will default to a folder called \"output\" in the current directory"]
+        description = ["runs HTTP server to serve out baked site, if no <value> is supplied will default to a dir called \"output\" in the current directory"]
     )
     var isRunServer: Boolean = false
 
@@ -42,7 +42,7 @@ class LaunchOptions {
 
     @CommandLine.Option(
         names = ["-c", "--config"],
-        description = ["use specified file for configuration (defaults to " + ConfigUtil.CONFIG_FILE + " in the source folder if not supplied)"]
+        description = ["use specified file for configuration (defaults to " + ConfigUtil.CONFIG_FILE + " in the source dir if not supplied)"]
     )
     var configValue: String? = null
 
@@ -87,7 +87,7 @@ class LaunchOptions {
         @CommandLine.Option(
             names = ["-i", "--init"],
             paramLabel = "<target>",
-            description = ["initialises required folder structure with default templates (defaults to current directory if <source> is not supplied)"],
+            description = ["initialises required dir structure with default templates (defaults to current directory if <source> is not supplied)"],
             required = true
         )
         var init = false

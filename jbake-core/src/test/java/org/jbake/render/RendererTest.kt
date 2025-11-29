@@ -14,27 +14,27 @@ import java.io.File
 import java.nio.file.Files
 
 class RendererTest : StringSpec({
-    lateinit var folder: File
+    lateinit var tempDir: File
     lateinit var config: DefaultJBakeConfiguration
     lateinit var outputPath: File
     lateinit var db: ContentStore
     lateinit var renderingEngine: DelegatingTemplateEngine
 
     beforeTest {
-        folder = Files.createTempDirectory("jbake-test").toFile()
+        tempDir = Files.createTempDirectory("jbake-test").toFile()
         db = mockk(relaxed = true)
         renderingEngine = mockk(relaxed = true)
 
         val sourcePath = TestUtils.testResourcesAsSourceDir
         if (!sourcePath.exists())
             throw Exception("Cannot find base path for test!")
-        outputPath = File(folder, "output").apply { mkdirs() }
+        outputPath = File(tempDir, "output").apply { mkdirs() }
         config = ConfigUtil().loadConfig(sourcePath) as DefaultJBakeConfiguration
         config.destinationDir = outputPath
     }
 
     afterTest {
-        folder.deleteRecursively()
+        tempDir.deleteRecursively()
     }
 
     "testRenderFileWorksWhenPathHasDotInButFileDoesNot".config(enabled = !TestUtils.isWindows) {
@@ -42,7 +42,7 @@ class RendererTest : StringSpec({
         val FILENAME = "about"
 
         config.setOutputExtension("")
-        config.templateDir = File(folder, "templates").apply { mkdirs() }
+        config.templateDir = File(tempDir, "templates").apply { mkdirs() }
         val renderer = Renderer(db, config, renderingEngine)
 
         val content = DocumentModel()

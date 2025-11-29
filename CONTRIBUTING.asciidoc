@@ -73,7 +73,7 @@ following testing libraries available to you when writing your tests:
 
 Any resources, such as templates, that your tests require should be placed within `/src/test/resources`.
 
-To execute the tests from the command line you can execute the following command from the root folder in the repository:
+To execute the tests from the command line you can execute the following command from the root dir in the repository:
 
  $ ./gradlew test
 

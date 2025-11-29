@@ -108,7 +108,7 @@ class Main @JvmOverloads constructor(
             val outputDir = config.sourceDir ?: File(".")
 
             init.run(outputDir, templateDir, type)
-            println("Base folder structure successfully created.")
+            println("Base dir structure successfully created.")
         } catch (e: Exception) {
             val msg = "Failed to initialise structure: " + e.message
             throw JBakeException(SystemExit.INIT_ERROR, msg, e)
