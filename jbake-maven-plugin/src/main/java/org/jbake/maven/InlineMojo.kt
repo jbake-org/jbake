@@ -7,7 +7,7 @@ import org.jbake.app.JBakeException
 import spark.Spark
 
 /**
- * Runs jbake on a folder while watching and serving a folder with it
+ * Runs jbake on a directory while watching and serving a directory with it
  */
 @Mojo(name = "inline", requiresDirectInvocation = true, requiresProject = false)
 class InlineMojo : WatchMojo() {

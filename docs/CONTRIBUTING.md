@@ -67,7 +67,7 @@ if (!schema.existsClass(Schema.DOCUMENTS))
     createDocType(schema)
 
 if (!needed)
-    clearCache = updateTemplateSignatureIfChanged(templateFolder)
+    clearCache = updateTemplateSignatureIfChanged(templateDir)
 ```
 
 **Not:**
@@ -172,7 +172,7 @@ Prefer property access over getter methods when using Kotlin code:
 
 ```kotlin
 // ✅ Preferred
-config.contentFolder
+config.contentDir
 config.destinationFolder
 
 // ❌ Avoid (Java-style)

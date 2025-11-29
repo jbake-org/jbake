@@ -21,7 +21,7 @@ class AssetTest : StringSpec({
         fixtureDir = File(AssetTest::class.java.getResource("/fixture")!!.file)
         folder = Files.createTempDirectory("jbake-test").toFile()
         config = ConfigUtil().loadConfig(fixtureDir) as DefaultJBakeConfiguration
-        config.destinationFolder = folder
+        config.destinationDir = folder
         config.outputExtension shouldBe ".html"
     }
 
@@ -72,21 +72,21 @@ class AssetTest : StringSpec({
     }
 
     "testCopyCustomFolder" {
-        config.assetFolder = File(config.sourceFolder, "/media")
+        config.assetDir = File(config.sourceDir, "/media")
         Asset(config).copy()
 
         File(folder, "favicon.ico").exists() shouldBe true
     }
 
     "testCopyIgnore" {
-        val assetFolder = File(folder, "ignoredAssets").apply { mkdirs() }
-        FileUtils.copyDirectory(File(AssetTest::class.java.getResource("/fixture/ignorables")!!.file), assetFolder)
-        config.assetFolder = assetFolder
+        val assetDir = File(folder, "ignoredAssets").apply { mkdirs() }
+        FileUtils.copyDirectory(File(AssetTest::class.java.getResource("/fixture/ignorables")!!.file), assetDir)
+        config.assetDir = assetDir
         config.assetIgnoreHidden = true
-        TestUtils.hideAssets(assetFolder)
+        TestUtils.hideAssets(assetDir)
 
         val asset = Asset(config)
-        asset.copy(assetFolder)
+        asset.copy(assetDir)
 
         File(folder, "test.txt").exists() shouldBe true
         File(folder, ".test.txt").exists() shouldBe false
@@ -101,8 +101,8 @@ class AssetTest : StringSpec({
         }
         css.setReadOnly()
 
-        config.assetFolder = File(config.sourceFolder, "assets")
-        config.destinationFolder = folder
+        config.assetDir = File(config.sourceDir, "assets")
+        config.destinationDir = folder
         val asset = Asset(config)
         asset.copy()
 
@@ -112,7 +112,7 @@ class AssetTest : StringSpec({
     }
 
     "testUnlistable" {
-        config.assetFolder = File(config.sourceFolder, "non-existent")
+        config.assetDir = File(config.sourceDir, "non-existent")
         Asset(config).copy()
     }
 
@@ -156,8 +156,8 @@ class AssetTest : StringSpec({
     }
 
     "testIsFileAsset" {
-        val cssAsset = File(config.assetFolder, "css/bootstrap.min.css")
-        val contentFile = File(config.contentFolder, "about.html")
+        val cssAsset = File(config.assetDir, "css/bootstrap.min.css")
+        val contentFile = File(config.contentDir, "about.html")
         val asset = Asset(config)
 
         cssAsset.exists() shouldBe true

@@ -46,8 +46,8 @@ class InitTest : StringSpec({
         val init = Init(config)
         val initPath = File(tempDir, "init")
         initPath.mkdir()
-        val contentFolder = File(initPath.path, config.contentFolderName ?: "content")
-        contentFolder.mkdir()
+        val contentDir = File(initPath.path, config.contentDirName ?: "content")
+        contentDir.mkdir()
 
         shouldThrow<Exception> {
             init.run(initPath, rootPath, "freemarker")

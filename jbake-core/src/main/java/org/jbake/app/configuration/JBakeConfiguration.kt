@@ -27,11 +27,11 @@ interface JBakeConfiguration {
     /** Get a list of asciidoctor options. */
     val asciidoctorOptionKeys: MutableList<String>
 
-    /** the folder where assets are stored, they are copied directly in output folder and not processed. */
-    val assetFolder: File
+    /** the directory where assets are stored, they are copied directly in output directory and not processed. */
+    val assetDir: File
 
-    /** name of folder for assets. */
-    val assetFolderName: String?
+    /** name of directory for assets. */
+    val assetDirName: String?
 
     /** Flag indicating if hidden asset resources should be ignored. */
     val assetIgnoreHidden: Boolean
@@ -45,17 +45,17 @@ interface JBakeConfiguration {
     /** Flag indicating to flash the database cache. */
     val clearCache: Boolean
 
-    /** the content folder. */
-    val contentFolder: File
+    /** the content directory. */
+    val contentDir: File
 
     /** name of Folder where content (that's to say files to be transformed) resides in. */
-    val contentFolderName: String?
+    val contentDirName: String?
 
-    /** the data folder. */
-    val dataFolder: File
+    /** the data directory. */
+    val dataDir: File
 
     /** name of Folder where data files reside in. */
-    val dataFolderName: String?
+    val dataDirName: String?
 
     /** docType for data files. */
     val dataFileDocType: String
@@ -75,8 +75,8 @@ interface JBakeConfiguration {
     /** Default type to use (in order to avoid putting it in all files). */
     val defaultType: String?
 
-    /** The destination folder to render and copy files to. */
-    var destinationFolder: File
+    /** The destination directory to render and copy files to. */
+    var destinationDir: File
 
     val documentTypes: MutableList<String>
 
@@ -172,10 +172,10 @@ interface JBakeConfiguration {
     val siteMapFileName: String?
 
     /**
-     * the source folder of the project
+     * the source directory of the project
      * /// TODO: This is nullable - see Main.kt around line 140.
      */
-    val sourceFolder: File?
+    val sourceDir: File?
 
     /** Tags output path, used only when [.getRenderTags] is true. */
     val tagPathName: String?
@@ -187,11 +187,11 @@ interface JBakeConfiguration {
 
     fun getTemplateFileByDocType(doctype: String): File?
 
-    /** The template folder. */
-    val templateFolder: File
+    /** The template directory. */
+    val templateDir: File
 
-    /** Name of folder where template files are looked for. */
-    val templateFolderName: String?
+    /** Name of directory where template files are looked for. */
+    val templateDirName: String?
 
     /** Locale used for Thymeleaf template rendering. */
     val thymeleafLocale: String?

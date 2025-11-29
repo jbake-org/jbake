@@ -30,10 +30,10 @@ object TestUtils {
         return File(resource.file)
     }
 
-    fun newFolder(base: File?, folderName: String): File {
-        val templateFolder = File(base, folderName)
-        templateFolder.mkdir()
-        return templateFolder
+    fun newDir(base: File?, folderName: String): File {
+        val templateDir = File(base, folderName)
+        templateDir.mkdir()
+        return templateDir
     }
 
     fun escapeBackSlashes(path: Path)

@@ -17,30 +17,30 @@ class JBakeConfigurationFactory {
     /**
      * Creates a [DefaultJBakeConfiguration] using default.properties and jbake.properties
      *
-     * @param sourceFolder The source folder of the project
+     * @param sourceDir The source directory of the project
      * @param isClearCache Whether to clear database cache or not
      * @throws JBakeException if loading the configuration fails
      */
     @Throws(JBakeException::class)
-    fun createDefaultJbakeConfiguration(sourceFolder: File, destination: File, isClearCache: Boolean): DefaultJBakeConfiguration
-        = createDefaultJbakeConfiguration(sourceFolder, destination, null as File?, isClearCache)
+    fun createDefaultJbakeConfiguration(sourceDir: File, destination: File, isClearCache: Boolean): DefaultJBakeConfiguration
+        = createDefaultJbakeConfiguration(sourceDir, destination, null as File?, isClearCache)
 
     /**
      * Creates a [DefaultJBakeConfiguration]
-     * @param sourceFolder The source folder of the project
+     * @param sourceDir The source directory of the project
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
      * @throws JBakeException if loading the configuration fails
      */
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
-        sourceFolder: File,
+        sourceDir: File,
         destination: File,
         propertiesFile: File?,
         isClearCache: Boolean,
     ): DefaultJBakeConfiguration {
-        val configuration = this.configUtil.loadConfig(sourceFolder, propertiesFile) as DefaultJBakeConfiguration
-        configuration.destinationFolder = destination
+        val configuration = this.configUtil.loadConfig(sourceDir, propertiesFile) as DefaultJBakeConfiguration
+        configuration.destinationDir = destination
         configuration.clearCache = isClearCache
         return configuration
     }
@@ -52,13 +52,13 @@ class JBakeConfigurationFactory {
     @Deprecated("use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
-        sourceFolder: File,
+        sourceDir: File,
         destination: File,
         compositeConfiguration: CompositeConfiguration,
         isClearCache: Boolean
     )
-        = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration).apply {
-            destinationFolder = destination
+        = DefaultJBakeConfiguration(sourceDir, compositeConfiguration).apply {
+            destinationDir = destination
             clearCache = isClearCache
         }
 
@@ -68,48 +68,48 @@ class JBakeConfigurationFactory {
     @Deprecated("use {@link #createDefaultJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
     fun createDefaultJbakeConfiguration(
-        sourceFolder: File,
+        sourceDir: File,
         destination: File,
         compositeConfiguration: CompositeConfiguration
     )
-        = DefaultJBakeConfiguration(sourceFolder, compositeConfiguration).apply { destinationFolder = destination }
+        = DefaultJBakeConfiguration(sourceDir, compositeConfiguration).apply { destinationDir = destination }
 
     @Throws(JBakeException::class)
-    fun createDefaultJbakeConfiguration(sourceFolder: File, config: CompositeConfiguration)
-        = DefaultJBakeConfiguration(sourceFolder, config)
+    fun createDefaultJbakeConfiguration(sourceDir: File, config: CompositeConfiguration)
+        = DefaultJBakeConfiguration(sourceDir, config)
 
     /**
      * Creates a [DefaultJBakeConfiguration] with value site.host replaced
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param destinationFolder The destination folder to render and copy files to
+     * @param destinationDir The destination directory to render and copy files to
      * @param isClearCache Whether to clear database cache or not
      * @throws JBakeException if loading the configuration fails
      */
     @Deprecated("use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead")
     @Throws(JBakeException::class)
-    fun createJettyJbakeConfiguration(sourceFolder: File, destinationFolder: File, isClearCache: Boolean)
-        = createJettyJbakeConfiguration(sourceFolder, destinationFolder, null as File?, isClearCache)
+    fun createJettyJbakeConfiguration(sourceDir: File, destinationDir: File, isClearCache: Boolean)
+        = createJettyJbakeConfiguration(sourceDir, destinationDir, null as File?, isClearCache)
 
     /**
      * Creates a [DefaultJBakeConfiguration] with value site.host replaced
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param destinationFolder The destination folder to render and copy files to
+     * @param destinationFolder The destination directory to render and copy files to
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
      */
     @Throws(JBakeException::class)
     fun createJettyJbakeConfiguration(
-        sourceFolder: File,
+        sourceDir: File,
         destinationFolder: File?,
         propertiesFile: File?,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
-        val conf = this.configUtil.loadConfig(sourceFolder, propertiesFile) as DefaultJBakeConfiguration
-        conf.destinationFolder = destinationFolder ?: File("./output")
+        val conf = this.configUtil.loadConfig(sourceDir, propertiesFile) as DefaultJBakeConfiguration
+        conf.destinationDir = destinationFolder ?: File("./output")
         conf.clearCache = isClearCache
         conf.siteHost = "http://" + conf.serverHostname + ":" + conf.serverPort + conf.serverContextPath
         return conf

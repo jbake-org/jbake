@@ -52,7 +52,7 @@ class ThymeleafTemplateEngine : AbstractTemplateEngine {
         val resolver = FileTemplateResolver()
         templateResolver = resolver
         // Use PathUtil.dirPrefix to provide prefix string with trailing separator if needed
-        resolver.prefix = PathUtils.ensureTrailingSeparatorForDirectory(config.templateFolder)
+        resolver.prefix = PathUtils.ensureTrailingSeparatorForDirectory(config.templateDir)
         resolver.characterEncoding = config.templateEncoding
         resolver.setTemplateMode(DefaultJBakeConfiguration.DEFAULT_TYHMELEAF_TEMPLATE_MODE)
 

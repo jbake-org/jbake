@@ -59,8 +59,8 @@ class MainTest : StringSpec({
         every { mockFactory.setEncoding(any()) } returns mockFactory
         System.setProperty("user.dir", currentWorkingdir.path)
 
-        // Ensure the configuration returns the expected destination folder when server runs.
-        every { configuration.destinationFolder } returns expectedOutputDir
+        // Ensure the configuration returns the expected destination directory when server runs.
+        every { configuration.destinationDir } returns expectedOutputDir
 
         val args = arrayOf("-s")
         main.run(args)

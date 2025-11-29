@@ -27,8 +27,8 @@ abstract class AbstractTemplateEngineRenderingTest(
 
     protected val expectedInOutput: MutableMap<String, MutableList<String>> = HashMap()
 
-    protected lateinit var destinationFolder: File
-    protected lateinit var templateFolder: File
+    protected lateinit var destinationDir_: File
+    protected lateinit var templateDir_: File
     protected lateinit var renderer: Renderer
     protected lateinit var currentLocale: Locale
     private lateinit var parser: Parser
@@ -41,12 +41,12 @@ abstract class AbstractTemplateEngineRenderingTest(
         DocumentTypes.clearListenersForTests()
         addListener(listener)
 
-        templateFolder = File(sourceFolder, templateDir)
-        if (!templateFolder.exists()) throw Exception("Cannot find template folder!")
+        templateDir_ = File(sourceDir, templateDir)
+        if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
 
-        destinationFolder = folder
-        config.destinationFolder = (destinationFolder)
-        config.templateFolder = (templateFolder)
+        destinationDir_ = tempDir
+        config.destinationDir = (destinationDir_)
+        config.templateDir = (templateDir_)
 
         for (docType in documentTypes) {
             val templateFile: File = config.getTemplateFileByDocType(docType)
@@ -137,11 +137,11 @@ abstract class AbstractTemplateEngineRenderingTest(
         // setup
         val filename = "second-post.html"
 
-        val sampleFile = sourceFolder.resolve("content").resolve("blog").resolve("2013").resolve(filename)
+        val sampleFile = sourceDir.resolve("content").resolve("blog").resolve("2013").resolve(filename)
         val content = parser.processFile(sampleFile)
         content!!.uri = filename
         renderer.render(content)
-        val outputFile = File(destinationFolder, filename)
+        val outputFile = File(destinationDir_, filename)
         outputFile.shouldExist()
 
         // Then
@@ -154,13 +154,13 @@ abstract class AbstractTemplateEngineRenderingTest(
     protected fun testRenderPage() {
         // setup
         val filename = "about.html"
-        val sampleFile = sourceFolder.resolve("content").resolve(filename)
+        val sampleFile = sourceDir.resolve("content").resolve(filename)
 
         // When
         val content = parser.processFile(sampleFile)
         content!!.uri = filename
         renderer.render(content)
-        val outputFile = File(destinationFolder, filename)
+        val outputFile = File(destinationDir_, filename)
         outputFile.shouldExist()
 
         // Then
@@ -175,7 +175,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         renderer.renderIndex("index.html")
 
         //validate
-        val outputFile = File(destinationFolder, "index.html")
+        val outputFile = File(destinationDir_, "index.html")
         outputFile.shouldExist()
 
         // Then
@@ -187,7 +187,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
     protected fun testRenderFeed() {
         renderer.renderFeed("feed.xml")
-        val outputFile = File(destinationFolder, "feed.xml")
+        val outputFile = File(destinationDir_, "feed.xml")
         outputFile.shouldExist()
 
         // Then
@@ -199,7 +199,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
     protected fun testRenderArchive() {
         renderer.renderArchive("archive.html")
-        val outputFile = File(destinationFolder, "archive.html")
+        val outputFile = File(destinationDir_, "archive.html")
         outputFile.shouldExist()
 
         // Then
@@ -213,7 +213,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         renderer.renderTags("tags")
 
         // Then
-        val outputFile = destinationFolder.resolve("tags").resolve("blog.html")
+        val outputFile = destinationDir_.resolve("tags").resolve("blog.html")
         outputFile.shouldExist()
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("tags")) {
@@ -225,7 +225,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         config.setRenderTagsIndex(true)
 
         renderer.renderTags("tags")
-        val outputFile = destinationFolder.resolve("tags").resolve("index.html")
+        val outputFile = destinationDir_.resolve("tags").resolve("index.html")
         outputFile.shouldExist()
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
         for (string in getExpectedInOutput("tags-index")) {
@@ -238,7 +238,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         db.updateSchema()
 
         renderer.renderSitemap("sitemap.xml")
-        val outputFile = File(destinationFolder, "sitemap.xml")
+        val outputFile = File(destinationDir_, "sitemap.xml")
         outputFile.shouldExist()
 
         // Then
@@ -263,7 +263,7 @@ abstract class AbstractTemplateEngineRenderingTest(
 
         renderer.renderIndexPaging("index.html")
 
-        val outputFile = File(destinationFolder, "index.html")
+        val outputFile = File(destinationDir_, "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in getExpectedInOutput("dbSpan")) {

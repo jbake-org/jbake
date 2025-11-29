@@ -9,7 +9,7 @@ import java.io.InputStreamReader
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Runs jbake on a folder while watching for changes
+ * Runs jbake on a directory while watching for changes
  */
 @Mojo(name = "watch", requiresDirectInvocation = true, requiresProject = false)
 open class WatchMojo : GenerateMojo() {

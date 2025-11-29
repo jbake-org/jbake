@@ -11,10 +11,10 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
 
     /**
-     * Checks source path contains required sub-folders (i.e. templates) and setups up variables for them.
-     * Creates destination folder if it does not exist.
+     * Checks source path contains required sub-directorys (i.e. templates) and setups up variables for them.
+     * Creates destination directory if it does not exist.
      *
-     * @throws JBakeException If template or contents folder don't exist
+     * @throws JBakeException If template or contents directory don't exist
      */
     @Throws(JBakeException::class)
     fun inspect() {
@@ -27,26 +27,26 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     @Throws(JBakeException::class)
     private fun ensureSource() {
-        val source = configuration.sourceFolder ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not configured.")
+        val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not configured.")
         if (!FileUtil.isExistingFolder(source))
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.absolutePath)
 
-        if (!configuration.sourceFolder!!.canRead())
+        if (!configuration.sourceDir!!.canRead())
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.absolutePath)
     }
 
     private fun ensureTemplateFolder() {
-        val path = configuration.templateFolder
+        val path = configuration.templateDir
         checkRequiredFolderExists(PropertyList.TEMPLATE_FOLDER.key, path)
     }
 
     private fun ensureContentFolder() {
-        val path = configuration.contentFolder
+        val path = configuration.contentDir
         checkRequiredFolderExists(PropertyList.CONTENT_FOLDER.key, path)
     }
 
     private fun ensureDestination() {
-        val destination = configuration.destinationFolder
+        val destination = configuration.destinationDir
         if (!destination.exists()) {
             destination.mkdirs()
         }
@@ -59,7 +59,7 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     }
 
     private fun checkAssetFolder() {
-        val path = configuration.assetFolder
+        val path = configuration.assetDir
         if (!path.exists()) {
             log.warn("No asset folder '{}' was found!", path.absolutePath)
         }

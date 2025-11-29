@@ -13,7 +13,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import java.io.File
 
-/** Runs jbake on a folder. */
+/** Runs jbake on a directory. */
 @Mojo(name = "generate", requiresProject = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 open class GenerateMojo : AbstractMojo() {
 

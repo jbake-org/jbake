@@ -22,7 +22,7 @@ class BuiltInProjectsTest {
     @Rule @JvmField
     var folder: TemporaryFolder = TemporaryFolder()
     private lateinit var projectFolder: File
-    private lateinit var templateFolder: File
+    private lateinit var templateDir: File
     private lateinit var outputFolder: File
     private lateinit var jbakeExecutable: String
     private lateinit var runner: BinaryRunner
@@ -34,7 +34,7 @@ class BuiltInProjectsTest {
             if (SystemUtils.IS_OS_WINDOWS) File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
             else File("build/install/jbake/bin/jbake").absolutePath
         projectFolder = folder.newFolder("project")
-        templateFolder = File(projectFolder, "templates")
+        templateDir = File(projectFolder, "templates")
         outputFolder = File(projectFolder, "output")
         runner = BinaryRunner(projectFolder)
     }
@@ -51,7 +51,7 @@ class BuiltInProjectsTest {
         val process = runner.runWithArguments(jbakeExecutable, "-i", "-t", projectName)
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
         Assertions.assertThat(File(projectFolder, "jbake.properties")).exists()
-        Assertions.assertThat(File(templateFolder, String.format("index.%s", extension))).exists()
+        Assertions.assertThat(File(templateDir, String.format("index.%s", extension))).exists()
         process.destroy()
     }
 

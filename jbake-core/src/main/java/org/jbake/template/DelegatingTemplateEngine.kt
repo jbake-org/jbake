@@ -45,8 +45,8 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         model["jbake_config"] = config
 
         // If default template exists we will use it.
-        val templateFolder = config.templateFolder
-        var templateFile = File(templateFolder, templateName)
+        val templateDir = config.templateDir
+        var templateFile = File(templateDir, templateName)
         var theTemplateName = templateName
 
         if (!templateFile.exists()) {
@@ -54,7 +54,7 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
             // if default template does not exist then check if any alternative engine templates exist
             val templateNameWithoutExt = templateName.dropLast(4)
             for (extension in renderers.recognizedExtensions) {
-                templateFile = File(templateFolder, "$templateNameWithoutExt.$extension")
+                templateFile = File(templateDir, "$templateNameWithoutExt.$extension")
                 if (templateFile.exists()) {
                     log.info("Found alternative template file: {} using this instead", templateFile.getName())
                     theTemplateName = templateFile.getName()

@@ -107,7 +107,7 @@ class Oven {
             val config = utensils.configuration
             updateDocTypesFromConfiguration()
             utensils.contentStore.updateSchema()
-            utensils.contentStore.updateAndClearCacheIfNeeded(config.clearCache, config.templateFolder)
+            utensils.contentStore.updateAndClearCacheIfNeeded(config.clearCache, config.templateDir)
 
             // Process source content.
             utensils.crawler.crawlContentDirectory()
@@ -125,7 +125,7 @@ class Oven {
 
             // Copy assets.
             utensils.asset.copy()
-            utensils.asset.copyAssetsFromContent(config.contentFolder)
+            utensils.asset.copyAssetsFromContent(config.contentDir)
 
             errors.addAll(utensils.asset.errors)
 

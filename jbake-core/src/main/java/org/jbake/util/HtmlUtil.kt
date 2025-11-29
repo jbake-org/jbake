@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element
 object HtmlUtil {
 
     /**
-     * Image paths are specified as w.r.t. assets folder. This function prefix site host to all img src except the ones that starts with http://, https://.
+     * Image paths are specified as w.r.t. assets directory. This function prefix site host to all img src except the ones that starts with http://, https://.
      *
      * If image path starts with "./", i.e. relative to the source file, then it first replace that with output file directory and the add site host.
      */

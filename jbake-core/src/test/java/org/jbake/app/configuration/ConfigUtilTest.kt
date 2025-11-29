@@ -5,7 +5,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.matchers.string.shouldContain as stringContain
 import io.mockk.every
 import io.mockk.mockk
 import org.apache.commons.io.FileUtils
@@ -14,18 +13,19 @@ import org.jbake.app.JBakeException
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import io.kotest.matchers.string.shouldContain as stringContain
 
 class ConfigUtilTest : StringSpec({
-    lateinit var sourceFolder: Path
+    lateinit var sourceDir: Path
     lateinit var util: ConfigUtil
 
     beforeTest {
-        sourceFolder = Files.createTempDirectory("jbake-test")
+        sourceDir = Files.createTempDirectory("jbake-test")
         util = ConfigUtil()
     }
 
     afterTest {
-        sourceFolder.toFile().deleteRecursively()
+        sourceDir.toFile().deleteRecursively()
     }
 
     "shouldLoadSiteHost" {
@@ -36,20 +36,20 @@ class ConfigUtilTest : StringSpec({
     "shouldLoadADefaultConfiguration" {
         val config = util.loadConfig(TestUtils.testResourcesAsSourceFolder)
         // Check some default properties are present
-        config.destinationFolder shouldNotBe null
-        config.assetFolder shouldNotBe null
-        config.templateFolder shouldNotBe null
+        config.destinationDir shouldNotBe null
+        config.assetDir shouldNotBe null
+        config.templateDir shouldNotBe null
     }
 
     "shouldLoadACustomConfiguration" {
-        val customConfigFile = File(sourceFolder.toFile(), "jbake.properties")
+        val customConfigFile = File(sourceDir.toFile(), "jbake.properties")
         customConfigFile.writeText("test.property=12345")
 
-        val configuration = util.loadConfig(sourceFolder.toFile())
+        val configuration = util.loadConfig(sourceDir.toFile())
 
         configuration.get("test.property") shouldBe "12345"
         // Check default properties still present
-        configuration.destinationFolder shouldNotBe null
+        configuration.destinationDir shouldNotBe null
     }
 
     "shouldThrowAnExceptionIfSourcefolderDoesNotExist" {
@@ -62,58 +62,58 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldAddSourcefolderToConfiguration" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir)
 
-        config.sourceFolder shouldBe sourceFolder
+        config.sourceDir shouldBe sourceDir
     }
 
     "shouldThrowAnExceptionIfSourcefolderIsNotADirectory" {
-        val sourceFolder = mockk<File>()
-        every { sourceFolder.exists() } returns true
-        every { sourceFolder.isDirectory() } returns false
-        every { sourceFolder.absolutePath } returns "/tmp/notadir"
+        val sourceDir = mockk<File>()
+        every { sourceDir.exists() } returns true
+        every { sourceDir.isDirectory() } returns false
+        every { sourceDir.absolutePath } returns "/tmp/notadir"
 
-        val e = shouldThrow<JBakeException> { util.loadConfig(sourceFolder) }
+        val e = shouldThrow<JBakeException> { util.loadConfig(sourceDir) }
         e.message shouldBe "The given source folder is not a directory."
     }
 
     "shouldReturnDestinationFolderFromConfiguration" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val expectedDestinationFolder = File(sourceFolder, "output")
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val expectedDestinationDir = File(sourceDir, "output")
+        val config = util.loadConfig(sourceDir)
 
-        config.destinationFolder shouldBe expectedDestinationFolder
+        config.destinationDir shouldBe expectedDestinationDir
     }
 
     "shouldReturnAssetFolderFromConfiguration" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val expectedDestinationFolder = File(sourceFolder, "assets")
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val expectedDestinationFolder = File(sourceDir, "assets")
+        val config = util.loadConfig(sourceDir)
 
-        config.assetFolder shouldBe expectedDestinationFolder
+        config.assetDir shouldBe expectedDestinationFolder
     }
 
     "shouldReturnTemplateFolderFromConfiguration" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val expectedDestinationFolder = File(sourceFolder, "templates")
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val expectedDestinationFolder = File(sourceDir, "templates")
+        val config = util.loadConfig(sourceDir)
 
-        config.templateFolder shouldBe expectedDestinationFolder
+        config.templateDir shouldBe expectedDestinationFolder
     }
 
     "shouldReturnContentFolderFromConfiguration" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val expectedDestinationFolder = File(sourceFolder, "content")
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val expectedDestinationFolder = File(sourceDir, "content")
+        val config = util.loadConfig(sourceDir)
 
-        config.contentFolder shouldBe expectedDestinationFolder
+        config.contentDir shouldBe expectedDestinationFolder
     }
 
     "shouldGetTemplateFileDoctype" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val expectedTemplateFile = File(sourceFolder, "templates/index.ftl")
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val expectedTemplateFile = File(sourceDir, "templates/index.ftl")
+        val config = util.loadConfig(sourceDir)
 
         val templateFile = config.getTemplateFileByDocType("masterindex")
         templateFile shouldBe expectedTemplateFile
@@ -123,8 +123,8 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldLogWarningIfDocumentTypeNotFound" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir)
 
         // Should return null for unknown document type
         val result = config.getTemplateFileByDocType("none")
@@ -133,8 +133,8 @@ class ConfigUtilTest : StringSpec({
 
     "shouldGetTemplateOutputExtension" {
         val docType = "masterindex"
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
         config.setTemplateExtensionForDocType(docType, ".xhtml")
 
         val extension = config.getOutputExtensionByDocType(docType)
@@ -143,8 +143,8 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldGetMarkdownExtensionsAsList" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
 
         val markdownExtensions = config.markdownExtensions
 
@@ -155,8 +155,8 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldReturnConfiguredDocTypes" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
 
         val docTypes = config.documentTypes
 
@@ -166,8 +166,8 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldReturnAListOfAsciidoctorOptionsKeys" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
 
@@ -178,8 +178,8 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldReturnAnAsciidoctorOption" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
 
@@ -189,8 +189,8 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldReturnAnAsciidoctorOptionWithAListValue" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
         @Suppress("UNCHECKED_CAST")
@@ -201,16 +201,16 @@ class ConfigUtilTest : StringSpec({
     }
 
     "shouldReturnEmptyListIfOptionNotAvailable" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
         @Suppress("UNCHECKED_CAST")
         val options = config.getAsciidoctorOption("template_dirs") as Collection<String>
         options.isEmpty() shouldBe true
     }
 
     "shouldLogAWarningIfAsciidocOptionCouldNotBeFound" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder) as DefaultJBakeConfiguration
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir) as DefaultJBakeConfiguration
 
         // Should return empty list for non-existent option
         @Suppress("UNCHECKED_CAST")
@@ -226,25 +226,25 @@ class ConfigUtilTest : StringSpec({
         val expectedDestinationFolder = File(source, "output")
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 
-        config.setupDefaultTemplateFolder()
-        config.setupDefaultAssetFolder()
-        config.setupDefaultContentFolder()
-        config.setupDefaultDestinationFolder()
+        config.setupDefaultTemplateDir()
+        config.setupDefaultAssetDir()
+        config.setupDefaultContentDir()
+        config.setupDefaultDestinationDir()
 
-        val assetFolder = config.assetFolder
-        val contentFolder = config.contentFolder
-        val destinationFolder = config.destinationFolder
-        config.templateFolder shouldBe expectedTemplateFolder
-        assetFolder shouldBe expectedAssetFolder
-        contentFolder shouldBe expectedContentFolder
+        val assetDir = config.assetDir
+        val contentDir = config.contentDir
+        val destinationFolder = config.destinationDir
+        config.templateDir shouldBe expectedTemplateFolder
+        assetDir shouldBe expectedAssetFolder
+        contentDir shouldBe expectedContentFolder
         destinationFolder shouldBe expectedDestinationFolder
     }
 
     "shouldSetCustomFoldersWithAbsolutePaths" {
         // given
-        val source = sourceFolder.resolve("source")
-        val theme = sourceFolder.resolve("theme")
-        val destination = sourceFolder.resolve("destination")
+        val source = sourceDir.resolve("source")
+        val theme = sourceDir.resolve("theme")
+        val destination = sourceDir.resolve("destination")
 
         val originalSource = TestUtils.testResourcesAsSourceFolder
         FileUtils.copyDirectory(originalSource, source.toFile())
@@ -269,20 +269,20 @@ class ConfigUtilTest : StringSpec({
         // when
         val config = util.loadConfig(source.toFile()) as DefaultJBakeConfiguration
 
-        val templateFolder = config.templateFolder
-        val assetFolder = config.assetFolder
-        val contentFolder = config.contentFolder
-        val destinationFolder = config.destinationFolder
+        val templateDir = config.templateDir
+        val assetDir = config.assetDir
+        val contentDir = config.contentDir
+        val destinationFolder = config.destinationDir
 
         // then
-        config.templateFolderName shouldBe expectedTemplateFolder.toString()
-        templateFolder shouldBe expectedTemplateFolder.toFile()
+        config.templateDirName shouldBe expectedTemplateFolder.toString()
+        templateDir shouldBe expectedTemplateFolder.toFile()
 
-        config.assetFolderName shouldBe expectedAssetFolder.toString()
-        assetFolder shouldBe expectedAssetFolder.toFile()
+        config.assetDirName shouldBe expectedAssetFolder.toString()
+        assetDir shouldBe expectedAssetFolder.toFile()
 
         destinationFolder shouldBe expectedDestination.toFile()
-        contentFolder shouldBe expectedContentFolder.toFile()
+        contentDir shouldBe expectedContentFolder.toFile()
     }
 
     "shouldUseUtf8EncodingAsDefault" {
@@ -313,8 +313,8 @@ class ConfigUtilTest : StringSpec({
 
 
     "shouldReturnIgnoreFileFromConfiguration" {
-        val sourceFolder = TestUtils.testResourcesAsSourceFolder
-        val config = util.loadConfig(sourceFolder)
+        val sourceDir = TestUtils.testResourcesAsSourceFolder
+        val config = util.loadConfig(sourceDir)
 
         config.ignoreDirMarkerFileName shouldBe ".jbakeignore"
     }

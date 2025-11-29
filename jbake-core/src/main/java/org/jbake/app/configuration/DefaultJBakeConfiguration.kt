@@ -22,7 +22,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     var compositeConfiguration: CompositeConfiguration
 
     /**
-     * Some deprecated implementations just need access to the configuration without access to the source folder
+     * Some deprecated implementations just need access to the configuration without access to the source directory
      *
      * @param configuration The project configuration
      */
@@ -31,9 +31,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         this.compositeConfiguration = configuration
     }
 
-    constructor(sourceFolder: File?, configuration: CompositeConfiguration) {
+    constructor(sourceDir: File?, configuration: CompositeConfiguration) {
         this.compositeConfiguration = configuration
-        setSourceFolder(sourceFolder)
+        setSourceDir(sourceDir)
         setupPaths()
     }
 
@@ -48,7 +48,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return compositeConfiguration.getBoolean(key, false)
     }
 
-    private fun getAsFolder(key: String): File? {
+    private fun getAsDir(key: String): File? {
         return get(key) as File?
     }
 
@@ -112,11 +112,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         }
 
     // Implement interface properties that previously existed as getX() functions
-    override var assetFolder: File
-        get() = getAsFolder(ASSET_FOLDER_KEY) ?: error("Asset folder must be configured")
+    override var assetDir: File
+        get() = getAsDir(ASSET_FOLDER_KEY) ?: error("Asset directory must be configured")
         set(value) { setProperty(ASSET_FOLDER_KEY, value) }
 
-    override val assetFolderName: String?
+    override val assetDirName: String?
         get() = getAsString(PropertyList.ASSET_FOLDER.key)
 
     override var assetIgnoreHidden: Boolean
@@ -133,18 +133,18 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsBoolean(PropertyList.CLEAR_CACHE.key)
         set(value) = setProperty(PropertyList.CLEAR_CACHE.key, value)
 
-    override var contentFolder: File
-        get() = getAsFolder(CONTENT_FOLDER_KEY) ?: error("Content folder must be configured")
+    override var contentDir: File
+        get() = getAsDir(CONTENT_FOLDER_KEY) ?: error("Content directory must be configured")
         set(value) = setProperty(CONTENT_FOLDER_KEY, value)
 
-    override val contentFolderName: String?
+    override val contentDirName: String?
         get() = getAsString(PropertyList.CONTENT_FOLDER.key)
 
-    override var dataFolder: File
-        get() = getAsFolder(DATA_FOLDER_KEY) ?: error("Data folder must be configured")
+    override var dataDir: File
+        get() = getAsDir(DATA_FOLDER_KEY) ?: error("Data folder must be configured")
         set(value) { setProperty(DATA_FOLDER_KEY, value) }
 
-    override var dataFolderName: String?
+    override var dataDirName: String?
         get() = getAsString(PropertyList.DATA_FOLDER.key)
         set(value) { setProperty(PropertyList.DATA_FOLDER.key, value) }
 
@@ -177,8 +177,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         setProperty(PropertyList.DEFAULT_TYPE.key, type)
     }
 
-    override var destinationFolder: File
-        get() = getAsFolder(DESTINATION_FOLDER_KEY) ?: error("Destination folder must be configured")
+    override var destinationDir: File
+        get() = getAsDir(DESTINATION_FOLDER_KEY) ?: error("Destination folder must be configured")
         set(value) = setProperty(DESTINATION_FOLDER_KEY, value)
 
     override val documentTypes: MutableList<String>
@@ -309,11 +309,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val siteMapFileName: String?
         get() = getAsString(PropertyList.SITEMAP_FILE.key)
 
-    override val sourceFolder: File
-        get() = getAsFolder(SOURCE_FOLDER_KEY) ?: error("Source folder must be configured")
+    override val sourceDir: File
+        get() = getAsDir(SOURCE_FOLDER_KEY) ?: error("Source folder must be configured")
 
-    fun setSourceFolder(sourceFolder: File?) {
-        setProperty(SOURCE_FOLDER_KEY, sourceFolder)
+    fun setSourceDir(sourceDir: File?) {
+        setProperty(SOURCE_FOLDER_KEY, sourceDir)
         setupPaths()
     }
 
@@ -336,16 +336,16 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override fun getTemplateFileByDocType(doctype: String): File? {
         val templateFileName = getTemplateByDocType(doctype)
         if (!templateFileName.isNullOrEmpty()) {
-            return File(templateFolder, templateFileName)
+            return File(templateDir, templateFileName)
         }
         return null
     }
 
-    override var templateFolder: File
-        get() = getAsFolder(TEMPLATE_FOLDER_KEY) ?: error("Template folder must be configured")
+    override var templateDir: File
+        get() = getAsDir(TEMPLATE_FOLDER_KEY) ?: error("Template folder must be configured")
         set(value) = setProperty(TEMPLATE_FOLDER_KEY, value)
 
-    override val templateFolderName: String?
+    override val templateDirName: String?
         get() = getAsString(TEMPLATE_FOLDER.key)
 
     override val thymeleafLocale: String?
@@ -361,9 +361,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val jbakeVersion: String?
         get() = getAsString(PropertyList.VERSION.key)
 
-    fun setDestinationFolderName(folderName: String?) {
+    fun setDestinationDirName(folderName: String?) {
         setProperty(PropertyList.DESTINATION_FOLDER.key, folderName)
-        setupDefaultDestinationFolder()
+        setupDefaultDestinationDir()
     }
 
     fun setExampleProject(type: String, fileName: String?) {
@@ -415,52 +415,50 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     internal fun setupPaths() {
-        setupDefaultDestinationFolder()
-        setupDefaultAssetFolder()
-        setupDefaultTemplateFolder()
-        setupDefaultContentFolder()
-        setupDefaultDataFolder()
+        setupDefaultDestinationDir()
+        setupDefaultAssetDir()
+        setupDefaultTemplateDir()
+        setupDefaultContentDir()
+        setupDefaultDataDir()
     }
 
-    internal fun setupDefaultDestinationFolder() {
+    internal fun setupDefaultDestinationDir() {
         val destinationPath = getAsString(PropertyList.DESTINATION_FOLDER.key) ?: ""
 
         val destination = File(destinationPath)
-        destinationFolder =
+        destinationDir =
             if (destination.isAbsolute) destination
-            else File(sourceFolder, destinationPath)
+            else File(sourceDir, destinationPath)
     }
 
     /// TODO This is weird logic, review
-    internal fun setupDefaultAssetFolder() {
-        val assetFolderTmp = getAsString(PropertyList.ASSET_FOLDER.key) ?: ""
+    internal fun setupDefaultAssetDir() {
+        val assetDirTmp = getAsString(PropertyList.ASSET_FOLDER.key) ?: ""
 
-        val asset = File(assetFolderTmp)
-        assetFolder =
+        val asset = File(assetDirTmp)
+        assetDir =
             if (asset.isAbsolute) asset
-            else sourceFolder.resolve( asset)
+            else sourceDir.resolve( asset)
     }
 
-    internal fun setupDefaultTemplateFolder() {
-        var templateDir = File(getAsString(TEMPLATE_FOLDER.key) ?: "")
+    internal fun setupDefaultTemplateDir() {
+        val templateDirPath = File(getAsString(TEMPLATE_FOLDER.key) ?: "")
 
-        templateDir =
-            if (templateDir.isAbsolute) templateDir
-            else sourceFolder.resolve(templateDir)
-
-        templateFolder = templateDir
+        this.templateDir =
+            if (templateDirPath.isAbsolute) templateDirPath
+            else sourceDir.resolve(templateDirPath)
     }
 
-    internal fun setupDefaultDataFolder() {
+    internal fun setupDefaultDataDir() {
         val data = File(getAsString(PropertyList.DATA_FOLDER.key) ?: "")
 
-        dataFolder =
+        dataDir =
             if (data.isAbsolute) data
-            else sourceFolder.resolve(data)
+            else sourceDir.resolve(data)
     }
 
-    internal fun setupDefaultContentFolder() {
-        contentFolder = File(sourceFolder, contentFolderName ?: "")
+    internal fun setupDefaultContentDir() {
+        contentDir = File(sourceDir, contentDirName ?: "")
     }
 
     override var headerSeparator: String?
@@ -515,11 +513,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     companion object {
         const val DEFAULT_TYHMELEAF_TEMPLATE_MODE: String = "HTML"
-        private const val SOURCE_FOLDER_KEY = "sourceFolder"
+        private const val SOURCE_FOLDER_KEY = "sourceDir"
         private const val DESTINATION_FOLDER_KEY = "destinationFolder"
-        private const val ASSET_FOLDER_KEY = "assetFolder"
-        private const val TEMPLATE_FOLDER_KEY = "templateFolder"
-        private const val CONTENT_FOLDER_KEY = "contentFolder"
+        private const val ASSET_FOLDER_KEY = "assetDir"
+        private const val TEMPLATE_FOLDER_KEY = "templateDir"
+        private const val CONTENT_FOLDER_KEY = "contentDir"
         private const val DATA_FOLDER_KEY = "dataFolder"
         private val TEMPLATE_DOC_PATTERN: Pattern = "template\\.([a-zA-Z0-9-_]+)\\.file".toRegex().toPattern()
         private const val DOCTYPE_FILE_POSTFIX = ".file"

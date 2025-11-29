@@ -23,7 +23,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
 
     private fun initializeTemplateEngine() {
         val loader: Loader<*> = FileLoader()
-        loader.setPrefix(config.templateFolder.absolutePath)
+        loader.setPrefix(config.templateDir.absolutePath)
 
         /** Turn off the auto-escaper because I believe that we can assume all data is safe considering it is all statically generated. */
         val escaper = EscaperExtension()

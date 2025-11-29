@@ -30,7 +30,7 @@ class RendererTest : StringSpec({
             throw Exception("Cannot find base path for test!")
         outputPath = File(folder, "output").apply { mkdirs() }
         config = ConfigUtil().loadConfig(sourcePath) as DefaultJBakeConfiguration
-        config.destinationFolder = outputPath
+        config.destinationDir = outputPath
     }
 
     afterTest {
@@ -42,7 +42,7 @@ class RendererTest : StringSpec({
         val FILENAME = "about"
 
         config.setOutputExtension("")
-        config.templateFolder = File(folder, "templates").apply { mkdirs() }
+        config.templateDir = File(folder, "templates").apply { mkdirs() }
         val renderer = Renderer(db, config, renderingEngine)
 
         val content = DocumentModel()

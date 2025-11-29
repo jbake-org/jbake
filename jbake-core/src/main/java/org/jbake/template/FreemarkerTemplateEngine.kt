@@ -36,7 +36,7 @@ class FreemarkerTemplateEngine : AbstractTemplateEngine {
         templateCfg.setTimeZone(config.freemarkerTimeZone)
         templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
         try {
-            templateCfg.setDirectoryForTemplateLoading(config.templateFolder)
+            templateCfg.setDirectoryForTemplateLoading(config.templateDir)
         } catch (e: IOException) {
             e.printStackTrace()
         }

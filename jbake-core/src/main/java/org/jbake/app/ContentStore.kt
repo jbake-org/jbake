@@ -318,11 +318,11 @@ class ContentStore(private val type: String, private val name: String?) {
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1)
     }
 
-    fun updateAndClearCacheIfNeeded(needed: Boolean, templateFolder: File) {
+    fun updateAndClearCacheIfNeeded(needed: Boolean, templateDir: File) {
         var clearCache = needed
 
         if (!needed)
-            clearCache = updateTemplateSignatureIfChanged(templateFolder)
+            clearCache = updateTemplateSignatureIfChanged(templateDir)
 
         if (clearCache) {
             deleteAllDocumentTypes()
@@ -330,11 +330,11 @@ class ContentStore(private val type: String, private val name: String?) {
         }
     }
 
-    private fun updateTemplateSignatureIfChanged(templateFolder: File): Boolean {
+    private fun updateTemplateSignatureIfChanged(templateDir: File): Boolean {
         var templateSignatureChanged = false
 
         val docs = this.signaturesForTemplates
-        val currentTemplatesSignature = try { FileUtil.sha1(templateFolder) }
+        val currentTemplatesSignature = try { FileUtil.sha1(templateDir) }
             catch (e: Exception) { "" }
 
         if (!docs.isEmpty()) {

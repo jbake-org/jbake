@@ -8,7 +8,7 @@ object PathUtils {
         get() = System.getProperty("user.dir")
 
     /**
-     * Return the folder path string ensuring it ends with a platform separator.
+     * Return the directory path string ensuring it ends with a platform separator.
      * Template engines expect a directory-like prefix; centralizing this avoids scattered concatenations.
      */
     fun ensureTrailingSeparatorForDirectory(directory: File)

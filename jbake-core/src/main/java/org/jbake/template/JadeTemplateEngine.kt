@@ -40,7 +40,7 @@ class JadeTemplateEngine : AbstractTemplateEngine {
 
     private fun initJadeConfiguration() {
         // Use PathUtil.dirPrefix to provide a proper directory prefix string (ensures trailing separator)
-        val loader: TemplateLoader = FileTemplateLoader(PathUtils.ensureTrailingSeparatorForDirectory(config.templateFolder), config.templateEncoding)
+        val loader: TemplateLoader = FileTemplateLoader(PathUtils.ensureTrailingSeparatorForDirectory(config.templateDir), config.templateEncoding)
         jadeConfiguration.templateLoader = loader
         jadeConfiguration.mode = Jade4J.Mode.XHTML
         jadeConfiguration.isPrettyPrint = true

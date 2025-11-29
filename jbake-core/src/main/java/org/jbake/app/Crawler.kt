@@ -32,7 +32,7 @@ class Crawler {
     }
 
     fun crawlContentDirectory() {
-        crawlDirectory(config.contentFolder)
+        crawlDirectory(config.contentDir)
 
         for (docType in DocumentTypes.documentTypes) {
             val count = db.getDocumentCount(docType)
@@ -41,7 +41,7 @@ class Crawler {
     }
 
     /**
-     * Crawl all files and folders looking for content.
+     * Crawl all files and directorys looking for content.
      */
     private fun crawlDirectory(startFromDirectory: File) {
         val contents = startFromDirectory.listFiles(FileUtil.getFileFilter(config)) ?: return
@@ -72,10 +72,10 @@ class Crawler {
     }
 
     /**
-     * Crawl all files and folders looking for data files.
+     * Crawl all files and directorys looking for data files.
      */
     fun crawlDataFiles() {
-        crawlDataFiles(config.dataFolder)
+        crawlDataFiles(config.dataDir)
 
         val count = db.getDocumentCount(config.dataFileDocType)
         if (count > 0) log.info("Parsed {} files", count)
@@ -106,7 +106,7 @@ class Crawler {
     }
 
     private fun buildURI(sourceFile: File): String {
-        val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentFolder), "")
+        val uri = FileUtil.asPath(sourceFile).replace(FileUtil.asPath(config.contentDir), "")
 
         val processedUri =
             // Convert URI from xxx.html to xxx/index.html .
@@ -120,7 +120,7 @@ class Crawler {
 
     private fun buildDataFileUri(sourceFile: File): String {
         return FileUtil.asPath(sourceFile)
-            .replace(FileUtil.asPath(config.dataFolder), "")
+            .replace(FileUtil.asPath(config.dataDir), "")
             .removePrefix(URI_SEPARATOR_CHAR)
     }
 

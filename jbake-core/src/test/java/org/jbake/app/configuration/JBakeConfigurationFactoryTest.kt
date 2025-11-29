@@ -23,29 +23,29 @@ class JBakeConfigurationFactoryTest : StringSpec({
     }
 
     "shouldReturnDefaultConfigurationWithDefaultFolders" {
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output")
-        val templateFolder = TestUtils.newFolder(root, "templates")
-        val assetFolder = TestUtils.newFolder(root, "assets")
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output")
+        val templateDir = TestUtils.newDir(root, "templates")
+        val assetDir = TestUtils.newDir(root, "assets")
 
-        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceDir, destinationFolder, true)
 
-        configuration.sourceFolder shouldBe sourceFolder
-        configuration.destinationFolder shouldBe destinationFolder
-        configuration.templateFolder shouldBe templateFolder
-        configuration.assetFolder shouldBe assetFolder
+        configuration.sourceDir shouldBe sourceDir
+        configuration.destinationDir shouldBe destinationFolder
+        configuration.templateDir shouldBe templateDir
+        configuration.assetDir shouldBe assetDir
         configuration.clearCache shouldBe true
     }
 
     "shouldReturnDefaultConfigurationWithCustomFolders" {
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output/custom")
-        val templateFolder = TestUtils.newFolder(root, "templates/custom")
-        val assetFolder = TestUtils.newFolder(root, "assets/custom")
-        val contentFolder = TestUtils.newFolder(root, "content/custom")
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output/custom")
+        val templateDir = TestUtils.newDir(root, "templates/custom")
+        val assetDir = TestUtils.newDir(root, "assets/custom")
+        val contentDir = TestUtils.newDir(root, "content/custom")
 
 
-        val properties = File(sourceFolder, "jbake.properties")
+        val properties = File(sourceDir, "jbake.properties")
 
         val pw = FileWriter(properties)
         pw.write("template.folder=templates/custom\n")
@@ -53,68 +53,68 @@ class JBakeConfigurationFactoryTest : StringSpec({
         pw.write("content.folder=content/custom\n")
         pw.close()
 
-        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceDir, destinationFolder, true)
 
-        configuration.templateFolderName shouldBe "templates/custom"
-        configuration.assetFolderName shouldBe "assets/custom"
-        configuration.contentFolderName shouldBe "content/custom"
+        configuration.templateDirName shouldBe "templates/custom"
+        configuration.assetDirName shouldBe "assets/custom"
+        configuration.contentDirName shouldBe "content/custom"
 
-        configuration.sourceFolder shouldBe sourceFolder
-        configuration.destinationFolder shouldBe destinationFolder
-        configuration.templateFolder shouldBe templateFolder
-        configuration.assetFolder shouldBe assetFolder
-        configuration.contentFolder shouldBe contentFolder
+        configuration.sourceDir shouldBe sourceDir
+        configuration.destinationDir shouldBe destinationFolder
+        configuration.templateDir shouldBe templateDir
+        configuration.assetDir shouldBe assetDir
+        configuration.contentDir shouldBe contentDir
 
         configuration.clearCache shouldBe true
     }
 
 
     "shouldReturnADefaultConfigurationWithSitehost" {
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output")
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output")
         val siteHost = "http://www.jbake.org"
 
-        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceDir, destinationFolder, true)
 
         configuration.siteHost shouldBe siteHost
     }
 
     "shouldReturnAJettyConfiguration" {
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output")
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output")
         val siteHost = "http://localhost:8820/"
 
-        val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceDir, destinationFolder, true)
 
         configuration.siteHost shouldBe siteHost
     }
 
     "shouldUseDefaultEncodingUTF8" {
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output")
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output")
         val factory = JBakeConfigurationFactory()
-        factory.createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        factory.createDefaultJbakeConfiguration(sourceDir, destinationFolder, true)
 
         factory.configUtil.encoding shouldBe "UTF-8"
     }
 
     "shouldUseCustomEncoding" {
         val util = spyk(ConfigUtil())
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output")
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output")
         val factory = JBakeConfigurationFactory()
         factory.configUtil = util
         factory.setEncoding("latin1")
-            .createDefaultJbakeConfiguration(sourceFolder, destinationFolder, null as File?, true)
+            .createDefaultJbakeConfiguration(sourceDir, destinationFolder, null as File?, true)
 
         factory.configUtil.encoding shouldBe "latin1"
-        verify { util.loadConfig(sourceFolder, null) }
+        verify { util.loadConfig(sourceDir, null) }
     }
 
     "shouldBeAbleToAddCustomProperties" {
-        val sourceFolder = root
-        val destinationFolder = TestUtils.newFolder(root, "output")
-        val config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceFolder, destinationFolder, true)
+        val sourceDir = root
+        val destinationFolder = TestUtils.newDir(root, "output")
+        val config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(sourceDir, destinationFolder, true)
         val properties = Properties()
         properties.setProperty("custom.key", "custom value")
         properties.setProperty("custom.key2", "custom value 2")

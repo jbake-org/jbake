@@ -38,13 +38,13 @@ class FileUtilTest : StringSpec({
         val util = ConfigUtil()
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 
-        var path = getUriPathToContentRoot(config, File(config.contentFolder, "index.html"))
+        var path = getUriPathToContentRoot(config, File(config.contentDir, "index.html"))
         path shouldBe ""
 
-        path = getUriPathToContentRoot(config, File(config.contentFolder, "/blog/index.html"))
+        path = getUriPathToContentRoot(config, File(config.contentDir, "/blog/index.html"))
         path shouldBe "../"
 
-        path = getUriPathToContentRoot(config, File(config.contentFolder, "/blog/level2/index.html"))
+        path = getUriPathToContentRoot(config, File(config.contentDir, "/blog/level2/index.html"))
         path shouldBe "../../"
     }
 })

@@ -45,7 +45,7 @@ class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
     private fun initializeTemplateEngine() {
         templateEngine = MarkupTemplateEngine(
             MarkupTemplateEngine::class.java.getClassLoader(),
-            config.templateFolder,
+            config.templateDir,
             templateConfiguration
         )
     }

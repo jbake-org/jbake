@@ -20,19 +20,19 @@ class TemplateTestHelper(
     val expectedInOutput: MutableMap<String, MutableList<String>> = HashMap()
 
     lateinit var destinationFolder: File
-    lateinit var templateFolder: File
+    lateinit var templateDir_: File
     lateinit var renderer: Renderer
     lateinit var db: ContentStore
     lateinit var config: DefaultJBakeConfiguration
     private lateinit var currentLocale: Locale
     private lateinit var parser: Parser
-    private lateinit var sourceFolder: File
+    private lateinit var sourceDir: File
 
     fun setupClass() {
         ContentStoreIntegrationTest.setUpClass()
         db = ContentStoreIntegrationTest.db
         config = ContentStoreIntegrationTest.config
-        sourceFolder = ContentStoreIntegrationTest.sourceFolder
+        sourceDir = ContentStoreIntegrationTest.sourceDir
     }
 
     fun setupTest() {
@@ -45,12 +45,12 @@ class TemplateTestHelper(
         DocumentTypes.clearListenersForTests()
         DocumentTypes.addListener(listener)
 
-        templateFolder = File(sourceFolder, templateDir)
-        if (!templateFolder.exists()) throw Exception("Cannot find template folder!")
+        templateDir_ = File(sourceDir, templateDir)
+        if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
 
-        destinationFolder = ContentStoreIntegrationTest.folder
-        config.destinationFolder = destinationFolder
-        config.templateFolder = templateFolder
+        destinationFolder = ContentStoreIntegrationTest.tempDir
+        config.destinationDir = destinationFolder
+        config.templateDir = templateDir_
 
         for (docType in DocumentTypes.documentTypes) {
             val templateFile: File? = config.getTemplateFileByDocType(docType)

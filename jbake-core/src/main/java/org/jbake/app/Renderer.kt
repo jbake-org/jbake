@@ -31,8 +31,8 @@ class Renderer {
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
     ) {
         val configuration = (this.config as DefaultJBakeConfiguration)
-        configuration.destinationFolder = destination
-        configuration.templateFolder = templatesPath
+        configuration.destinationDir = destination
+        configuration.templateDir = templatesPath
     }
 
     // TODO: Should all content be made available to all templates via this class?
@@ -50,12 +50,12 @@ class Renderer {
         renderingEngine
     ) {
         val configuration = (this.config as DefaultJBakeConfiguration)
-        configuration.destinationFolder = destination
-        configuration.templateFolder = templatesPath
+        configuration.destinationDir = destination
+        configuration.templateDir = templatesPath
     }
 
     /**
-     * Creates a new instance of Renderer with supplied references to folders.
+     * Creates a new instance of Renderer with supplied references to directorys.
      *
      */
     constructor(db: ContentStore, config: JBakeConfiguration) {
@@ -65,7 +65,7 @@ class Renderer {
     }
 
     /**
-     * Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.
+     * Creates a new instance of Renderer with supplied references to directorys and the instance of DelegatingTemplateEngine to use.
      */
     constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {
         this.config = config
@@ -104,7 +104,7 @@ class Renderer {
     fun render(content: DocumentModel) {
         val docType = content.type
         val contentUri = content.uri
-        var outputFile = config.destinationFolder.resolve(contentUri)
+        var outputFile = config.destinationDir.resolve(contentUri)
 
         // Not all URIs have extensions. Only trim extension if it exists
         if (outputFile.extension.isNotEmpty()) {
@@ -274,7 +274,7 @@ class Renderer {
         for (tag in db.allTags) {
             try {
                 val ext = config.outputExtension ?: ""
-                val path = config.destinationFolder.resolve(outputTagFile).resolve(tag + ext)
+                val path = config.destinationDir.resolve(outputTagFile).resolve(tag + ext)
                 val map = buildSimpleModel(ModelAttributes.TAG).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
@@ -297,9 +297,9 @@ class Renderer {
 
         if (config.renderTagsIndex) {
             try {
-                // Add an index file at root folder of tags. This will prevent directory listing and also provide an option to display all tags page.
+                // Add an index file at root directory of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
-                val path = config.destinationFolder.resolve(outputTagFile).resolve("index$ext")
+                val path = config.destinationDir.resolve(outputTagFile).resolve("index$ext")
                 val map = buildSimpleModel(ModelAttributes.TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
@@ -353,7 +353,7 @@ class Renderer {
         override val model: TemplateModel
 
         constructor(fileName: String, model: TemplateModel, templateType: String)
-                : super(config.destinationFolder.resolve(fileName), fileName, findTemplateName(templateType))
+                : super(config.destinationDir.resolve(fileName), fileName, findTemplateName(templateType))
         {
             this.model = model
         }
@@ -373,7 +373,7 @@ class Renderer {
         }
 
         constructor(outputFile: String, allInOneName: String) : super(
-            path = config.destinationFolder.resolve(outputFile),
+            path = config.destinationDir.resolve(outputFile),
             name = allInOneName,
             template = findTemplateName(allInOneName)
         ){
@@ -384,7 +384,7 @@ class Renderer {
          * Constructor added due to known use of a allInOneName which is used for name, template and content
          */
         constructor(allInOneName: String) : this(
-            config.destinationFolder.resolve(allInOneName + (config.outputExtension ?: "")),
+            config.destinationDir.resolve(allInOneName + (config.outputExtension ?: "")),
             allInOneName
         )
 

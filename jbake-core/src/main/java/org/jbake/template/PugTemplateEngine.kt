@@ -41,7 +41,7 @@ class PugTemplateEngine : AbstractTemplateEngine {
 
     private fun initPugConfiguration() {
         // pug4j 2.x only supports .pug extension (not .jade)
-        val templatePathStr = config.templateFolder.absolutePath
+        val templatePathStr = config.templateDir.absolutePath
         val charset = Charset.forName(config.templateEncoding ?: "UTF-8")
         val loader = FileTemplateLoader(templatePathStr, charset, "pug")
 

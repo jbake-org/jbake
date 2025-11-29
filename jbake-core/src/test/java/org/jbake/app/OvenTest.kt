@@ -24,7 +24,7 @@ class OvenTest : StringSpec({
 
     lateinit var root: Path
     lateinit var configuration: DefaultJBakeConfiguration
-    lateinit var sourceFolder: File
+    lateinit var sourceDir: File
     var contentStore: ContentStore? = null
 
     beforeTest {
@@ -32,10 +32,10 @@ class OvenTest : StringSpec({
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         resetDocumentTypes()
         val output = root.resolve("output").toFile()
-        sourceFolder = TestUtils.testResourcesAsSourceFolder
-        configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
-        configuration.destinationFolder = (output)
-        configuration.templateFolder = (File(sourceFolder, "groovyMarkupTemplates"))
+        sourceDir = TestUtils.testResourcesAsSourceFolder
+        configuration = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
+        configuration.destinationDir = (output)
+        configuration.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
         configuration.setProperty("template.paper.file", "paper.tpl")
     }
 
@@ -47,9 +47,9 @@ class OvenTest : StringSpec({
     }
 
     "bakeWithAbsolutePaths" {
-        configuration.templateFolder = (File(sourceFolder, "groovyMarkupTemplates"))
-        configuration.contentFolder = (File(sourceFolder, "content"))
-        configuration.assetFolder = (File(sourceFolder, "assets"))
+        configuration.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
+        configuration.contentDir = (File(sourceDir, "content"))
+        configuration.assetDir = (File(sourceDir, "assets"))
 
         val oven = Oven(configuration)
         oven.bakeEverything()
@@ -58,21 +58,21 @@ class OvenTest : StringSpec({
     }
 
     "shouldBakeWithRelativeCustomPaths" {
-        sourceFolder = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
-        configuration = ConfigUtil().loadConfig(sourceFolder) as DefaultJBakeConfiguration
-        val assetFolder = File(configuration.destinationFolder, "css")
-        val aboutFile = File(configuration.destinationFolder, "about.html")
-        val blogSubFolder = File(configuration.destinationFolder, "blog")
+        sourceDir = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
+        configuration = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
+        val assetDir = File(configuration.destinationDir, "css")
+        val aboutFile = File(configuration.destinationDir, "about.html")
+        val blogSubFolder = File(configuration.destinationDir, "blog")
 
 
         val oven = Oven(configuration)
         oven.bakeEverything()
 
         oven.errors.isEmpty() shouldBe true
-        configuration.destinationFolder.exists() shouldBe true
-        configuration.destinationFolder.list()?.isNotEmpty() shouldBe true
-        assetFolder.exists() shouldBe true
-        assetFolder.list()?.isNotEmpty() shouldBe true
+        configuration.destinationDir.exists() shouldBe true
+        configuration.destinationDir.list()?.isNotEmpty() shouldBe true
+        assetDir.exists() shouldBe true
+        assetDir.list()?.isNotEmpty() shouldBe true
         aboutFile.shouldBeAFile()
         aboutFile.length() shouldBeGreaterThan 0
         blogSubFolder.exists() shouldBe true
@@ -108,19 +108,19 @@ class OvenTest : StringSpec({
         fw.close()
 
         configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
-        val assetFolder = File(configuration.destinationFolder, "css")
-        val aboutFile = File(configuration.destinationFolder, "about.html")
-        val blogSubFolder = File(configuration.destinationFolder, "blog")
+        val assetDir = File(configuration.destinationDir, "css")
+        val aboutFile = File(configuration.destinationDir, "about.html")
+        val blogSubFolder = File(configuration.destinationDir, "blog")
 
 
         val oven = Oven(configuration)
         oven.bakeEverything()
 
         oven.errors.isEmpty() shouldBe true
-        configuration.destinationFolder.exists() shouldBe true
-        configuration.destinationFolder.list()?.isNotEmpty() shouldBe true
-        assetFolder.exists() shouldBe true
-        assetFolder.list()?.isNotEmpty() shouldBe true
+        configuration.destinationDir.exists() shouldBe true
+        configuration.destinationDir.list()?.isNotEmpty() shouldBe true
+        assetDir.exists() shouldBe true
+        assetDir.list()?.isNotEmpty() shouldBe true
         aboutFile.shouldBeAFile()
         aboutFile.length() shouldBeGreaterThan 0
         blogSubFolder.exists() shouldBe true
@@ -129,19 +129,19 @@ class OvenTest : StringSpec({
 
 
     "shouldThrowExceptionIfSourceFolderDoesNotExist" {
-        configuration.setSourceFolder(root.resolve("none").toFile())
+        configuration.setSourceDir(root.resolve("none").toFile())
 
         shouldThrow<JBakeException> { Oven(configuration) }
     }
 
     "shouldInstantiateNeededUtensils" {
-        val template = TestUtils.newFolder(root.toFile(), "template")
-        val content = TestUtils.newFolder(root.toFile(), "content")
-        val assets = TestUtils.newFolder(root.toFile(), "assets")
+        val template = TestUtils.newDir(root.toFile(), "template")
+        val content = TestUtils.newDir(root.toFile(), "content")
+        val assets = TestUtils.newDir(root.toFile(), "assets")
 
-        configuration.templateFolder = (template)
-        configuration.contentFolder = (content)
-        configuration.assetFolder = (assets)
+        configuration.templateDir = (template)
+        configuration.contentDir = (content)
+        configuration.assetDir = (assets)
 
         val oven = Oven(configuration)
 
@@ -153,7 +153,7 @@ class OvenTest : StringSpec({
     }
 
     "shouldInspectConfigurationDuringInstantiationFromUtils" {
-        configuration.setSourceFolder(root.resolve("none").toFile())
+        configuration.setSourceDir(root.resolve("none").toFile())
 
         val contentStore = mockk<ContentStore>()
         val crawler = mockk<Crawler>()
@@ -172,13 +172,13 @@ class OvenTest : StringSpec({
     }
 
     "shouldCrawlRenderAndCopyAssets" {
-        val template = TestUtils.newFolder(root.toFile(), "template")
-        val content = TestUtils.newFolder(root.toFile(), "content")
-        val assets = TestUtils.newFolder(root.toFile(), "assets")
+        val template = TestUtils.newDir(root.toFile(), "template")
+        val content = TestUtils.newDir(root.toFile(), "content")
+        val assets = TestUtils.newDir(root.toFile(), "assets")
 
-        configuration.templateFolder = (template)
-        configuration.contentFolder = (content)
-        configuration.assetFolder = (assets)
+        configuration.templateDir = (template)
+        configuration.contentDir = (content)
+        configuration.assetDir = (assets)
 
         contentStore = spyk(ContentStore("memory", "documents" + System.currentTimeMillis()))
 

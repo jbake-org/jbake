@@ -55,9 +55,9 @@ object FileUtil {
     @get:Throws(Exception::class)
     val runningLocation: File
         /**
-         * Works out the folder where JBake is running from.
+         * Works out the directory where JBake is running from.
          *
-         * @return File referencing folder JBake is running from
+         * @return File referencing directory JBake is running from
          * @throws Exception when application is not able to work out where is JBake running from
          */
         get() {
@@ -150,15 +150,15 @@ object FileUtil {
     }
 
     fun getUriPathToDestinationRoot(config: JBakeConfiguration, sourceFile: File)
-        = getPathToRoot(config, config.destinationFolder, sourceFile)
+        = getPathToRoot(config, config.destinationDir, sourceFile)
 
     @JvmStatic
     fun getUriPathToContentRoot(config: JBakeConfiguration, sourceFile: File)
-        = getPathToRoot(config, config.contentFolder, sourceFile)
+        = getPathToRoot(config, config.contentDir, sourceFile)
 
     @JvmStatic
     fun getUriPathToSourceRoot(config: JBakeConfiguration, sourceFile: File): String {
-        val contentRoot = Paths.get(config.contentFolder.toURI())
+        val contentRoot = Paths.get(config.contentDir.toURI())
         val sourceParent = Paths.get(sourceFile.parentFile.toURI())
 
         val relative = try {

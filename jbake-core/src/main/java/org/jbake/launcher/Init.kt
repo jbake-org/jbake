@@ -8,7 +8,7 @@ import java.io.File
 import java.io.FileInputStream
 
 /**
- * Initialises sample folder structure with pre-defined template
+ * Initialises sample directory structure with pre-defined template
  */
 class Init(private val config: JBakeConfiguration) {
 
@@ -16,9 +16,9 @@ class Init(private val config: JBakeConfiguration) {
     constructor(config: CompositeConfiguration) : this(DefaultJBakeConfiguration(config))
 
     /**
-     * Performs checks on output folder before extracting template file.
+     * Performs checks on output directory before extracting template file.
      *
-     * @throws Exception if required folder structure can't be achieved without content overwriting.
+     * @throws Exception if required directory structure can't be achieved without content overwriting.
      */
     fun run(outputDir: File, templateDir: File, templateType: String) {
         if (!outputDir.canWrite()) throw Exception("Output folder is not writeable!")
@@ -28,9 +28,9 @@ class Init(private val config: JBakeConfiguration) {
         if (contents != null) {
             for (content in contents) {
                 if (!content.isDirectory()) continue
-                if (content.getName().equals(config.templateFolderName, ignoreCase = true)) safe = false
-                if (content.getName().equals(config.contentFolderName, ignoreCase = true)) safe = false
-                if (content.getName().equals(config.assetFolderName, ignoreCase = true)) safe = false
+                if (content.getName().equals(config.templateDirName, ignoreCase = true)) safe = false
+                if (content.getName().equals(config.contentDirName, ignoreCase = true)) safe = false
+                if (content.getName().equals(config.assetDirName, ignoreCase = true)) safe = false
             }
         }
 

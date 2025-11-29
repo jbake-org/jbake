@@ -31,16 +31,16 @@ class Asset {
         this.config = config
     }
 
-    /** Copy all files from assets folder to destination folder read from configuration */
-    fun copy() = copy(config.assetFolder)
+    /** Copy all files from assets directory to destination directory read from configuration */
+    fun copy() = copy(config.assetDir)
 
-    /** Copy all files from assets folder to destination folder read from configuration */
+    /** Copy all files from assets directory to destination directory read from configuration */
     fun copy(startingPath: File) {
         val filter = FileFilter { file ->
             (!config.assetIgnoreHidden || !file.isHidden())
                 && (file.isFile() || FileUtil.directoryOnlyIfNotIgnored(file, config))
         }
-        copy(startingPath, config.destinationFolder, filter)
+        copy(startingPath, config.destinationDir, filter)
     }
 
     /** Copy one asset file at a time. */
@@ -51,7 +51,7 @@ class Asset {
         }
 
         try {
-            val targetFile = config.destinationFolder.toPath().resolve(assetSubPath(asset)).toFile()
+            val targetFile = config.destinationDir.toPath().resolve(assetSubPath(asset)).toFile()
             log.info("Copying single asset file to [{}]", targetFile.path)
             copyFile(asset, targetFile)
         } catch (io: IOException) {
@@ -60,17 +60,17 @@ class Asset {
     }
 
     /**
-     * @return true if the path provided points to a file in the asset folder.
+     * @return true if the path provided points to a file in the asset directory.
      */
     fun isAssetFile(fileToValidate: File): Boolean {
         try {
             if (!FileUtil.directoryOnlyIfNotIgnored(fileToValidate.parentFile, config))
                 return false
 
-            if (FileUtil.isFileInDirectory(fileToValidate, config.assetFolder))
+            if (FileUtil.isFileInDirectory(fileToValidate, config.assetDir))
                 return true
 
-            if (FileUtil.isFileInDirectory(fileToValidate, config.contentFolder)
+            if (FileUtil.isFileInDirectory(fileToValidate, config.contentDir)
                     && FileUtil.getNotContentFileFilter(config).accept(fileToValidate))
                 return true
         }
@@ -84,22 +84,22 @@ class Asset {
      * Responsible for copying any asset files that exist within the content directory.
      */
     fun copyAssetsFromContent(contentDirectoryPath: File) {
-        copy(contentDirectoryPath, config.destinationFolder, FileUtil.getNotContentFileFilter(config))
+        copy(contentDirectoryPath, config.destinationDir, FileUtil.getNotContentFileFilter(config))
     }
 
 
     @Throws(IOException::class)
     private fun assetSubPath(asset: File): String {
         val assetPath = asset.toPath()
-        val assetFolderPath = config.assetFolder.toPath()
-        val contentFolderPath = config.contentFolder.toPath()
+        val assetDirPath = config.assetDir.toPath()
+        val contentDirPath = config.contentDir.toPath()
 
-        // Try to get relative path from asset folder.
+        // Try to get relative path from asset directory.
         val relativePath = try {
             when {
-                assetPath.startsWith(assetFolderPath) -> assetFolderPath.relativize(assetPath)
-                // Asset is in content folder, strip that path
-                assetPath.startsWith(contentFolderPath) -> contentFolderPath.relativize(assetPath)
+                assetPath.startsWith(assetDirPath) -> assetDirPath.relativize(assetPath)
+                // Asset is in content directory, strip that path
+                assetPath.startsWith(contentDirPath) -> contentDirPath.relativize(assetPath)
                 // Fallback to the file name
                 else -> assetPath.fileName ?: assetPath
             }
@@ -110,21 +110,21 @@ class Asset {
         return relativePath.toString()
     }
 
-    private fun copy(sourceFolder: File, targetFolder: File, filter: FileFilter) {
-        val assets = sourceFolder.listFiles(filter)
+    private fun copy(sourceDir: File, targetDir: File, filter: FileFilter) {
+        val assets = sourceDir.listFiles(filter)
         if (assets != null) {
             Arrays.sort(assets)
             for (asset in assets) {
-                val target = File(targetFolder, asset.getName())
+                val target = File(targetDir, asset.getName())
                 if (asset.isFile()) copyFile(asset, target)
                 else if (asset.isDirectory()) copy(asset, target, filter)
             }
         }
     }
 
-    private fun copyFile(asset: File, targetFolder: File) {
+    private fun copyFile(asset: File, targetDir: File) {
         try {
-            FileUtils.copyFile(asset, targetFolder)
+            FileUtils.copyFile(asset, targetDir)
             log.info("Copying [{}]... done!", asset.path)
         } catch (e: IOException) {
             log.error("Copying [{}]... failed!", asset.path, e)

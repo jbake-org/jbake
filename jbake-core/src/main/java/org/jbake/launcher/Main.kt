@@ -78,10 +78,10 @@ class Main @JvmOverloads constructor(
 
             // TODO: Short term fix until bake, server, init commands no longer share underlying values (such as source/dest).
             val serverPath = when {
-                !launchOptions.isBake -> config.destinationFolder // Use the default destination folder.
+                !launchOptions.isBake -> config.destinationDir // Use the default destination directory.
                 launchOptions.getDestination() != null -> launchOptions.getDestination() // Use the destination provided via the commandline.
-                launchOptions.getSource().path != "." -> launchOptions.getSource() // Use the source folder provided via the commandline.
-                else -> config.destinationFolder // Use the default DESTINATION_FOLDER value.
+                launchOptions.getSource().path != "." -> launchOptions.getSource() // Use the source directory provided via the commandline.
+                else -> config.destinationDir // Use the default DESTINATION_FOLDER value.
             }
             runServer(serverPath, config)
         }
@@ -104,10 +104,10 @@ class Main @JvmOverloads constructor(
     private fun initStructure(type: String, config: JBakeConfiguration) {
         val init = Init(config)
         try {
-            val templateFolder = FileUtil.runningLocation
-            val outputFolder = config.sourceFolder ?: File(".")
+            val templateDir = FileUtil.runningLocation
+            val outputFolder = config.sourceDir ?: File(".")
 
-            init.run(outputFolder, templateFolder, type)
+            init.run(outputFolder, templateDir, type)
             println("Base folder structure successfully created.")
         } catch (e: Exception) {
             val msg = "Failed to initialise structure: " + e.message
