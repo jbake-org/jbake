@@ -10,8 +10,8 @@ import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList.ASCIIDOCTOR_ATTRIBUTES
+import org.jbake.model.DocumentModel
 import java.io.File
-import java.io.PrintWriter
 
 class AsciidocParserTest : StringSpec({
 
@@ -29,135 +29,145 @@ class AsciidocParserTest : StringSpec({
     lateinit var validAsciiDocFileWithHeaderInContent: File
     lateinit var validAsciiDocFileWithoutJBakeMetaData: File
 
-    val validHeader =
-        "title=This is a Title = This is a valid Title\nstatus=draft\ntype=post\ndate=2013-09-02\n~~~~~~"
-    val invalidHeader = "title=This is a Title\n~~~~~~"
+    val validHeader = """
+        |title=This is a Title = This is a valid Title
+        |status=draft
+        |type=post
+        |date=2013-09-02
+        |~~~~~~
+        """.trimMargin()
+
+    val invalidHeader = """
+        |title=This is a Title
+        |~~~~~~
+        """.trimMargin()
+
+    val asciidocWithSourceContent = validHeader + "\n" + """
+        |= Hello, AsciiDoc!
+        |Test User <user@test.org>
+        |
+        |JBake now supports AsciiDoc.
+        |
+        |```
+        |#!/bin/bash
+        |
+        |echo 'hello world!'
+        |```
+        |
+        |{testattribute}
+        """.trimMargin()
+
+    val validAsciidocContent = validHeader + "\n" + """
+        |= Hello, AsciiDoc!
+        |Test User <user@test.org>
+        |
+        |JBake now supports AsciiDoc.
+        """.trimMargin()
+
+    val invalidAsciiDocContent = invalidHeader + "\n" + """
+        |= Hello, AsciiDoc!
+        |Test User <user@test.org>
+        |
+        |JBake now supports AsciiDoc.
+        """.trimMargin()
+
+    val validAsciiDocWithoutHeaderContent = """
+        |= Hello: AsciiDoc!
+        |Test User <user@test.org>
+        |2013-09-02
+        |:jbake-status: published
+        |:jbake-type: page
+        |
+        |JBake now supports AsciiDoc.
+        """.trimMargin()
+
+    val invalidAsciiDocWithoutHeaderContent = """
+        |= Hello, AsciiDoc!
+        |Test User <user@test.org>
+        |2013-09-02
+        |:jbake-status: published
+        |
+        |JBake now supports AsciiDoc.
+        """.trimMargin()
+
+    val validAsciiDocWithHeaderInContentContent = """
+        |= Hello, AsciiDoc!
+        |Test User <user@test.org>
+        |2013-09-02
+        |:jbake-status: published
+        |:jbake-type: page
+        |
+        |JBake now supports AsciiDoc.
+        |
+        |----
+        |title=Example Header
+        |date=2013-02-01
+        |type=post
+        |tags=tag1, tag2
+        |status=published
+        |~~~~~~
+        |----
+        """.trimMargin()
+
+    val validAsciiDocWithoutJBakeMetaDataContent = """
+        |= Hello: AsciiDoc!
+        |Test User <user@test.org>
+        |2013-09-02
+        |
+        |JBake now supports AsciiDoc documents without JBake meta data.
+        """.trimMargin()
+    
+    fun createTestFile(name: String, content: String) = 
+        File(folder, name).apply { createNewFile(); writeText(content) }
+
+    fun assertBasicAsciiDocContent(body: String) {
+        body shouldContain "class=\"paragraph\""
+        body shouldContain "<p>JBake now supports AsciiDoc.</p>"
+    }
+
+    fun assertMetadata(map: DocumentModel?, status: String, type: String) {
+        map.shouldNotBeNull()
+        map.status shouldBe status
+        map.type shouldBe type
+    }
 
     beforeTest {
         folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         rootPath = TestUtils.testResourcesAsSourceFolder
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
-
-        asciidocWithSource = File(folder, "asciidoc-with-source.ad").apply { createNewFile() }
-        var out = PrintWriter(asciidocWithSource)
-        out.println(validHeader)
-        out.println("= Hello, AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("")
-        out.println("JBake now supports AsciiDoc.")
-        out.println("")
-        out.println("```")
-        out.println("#!/bin/bash")
-        out.println("")
-        out.println("echo 'hello world!'")
-        out.println("```")
-        out.println("")
-        out.println("{testattribute}")
-
-        out.close()
-
-        validAsciidocFile = File(folder, "valid.ad").apply { createNewFile() }
-        out = PrintWriter(validAsciidocFile)
-        out.println(validHeader)
-        out.println("= Hello, AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("")
-        out.println("JBake now supports AsciiDoc.")
-        out.close()
-
-        invalidAsciiDocFile = File(folder, "invalid.ad").apply { createNewFile() }
-        out = PrintWriter(invalidAsciiDocFile)
-        out.println(invalidHeader)
-        out.println("= Hello, AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("")
-        out.println("JBake now supports AsciiDoc.")
-        out.close()
-
-        validAsciiDocFileWithoutHeader = File(folder, "validwoheader.ad").apply { createNewFile() }
-        out = PrintWriter(validAsciiDocFileWithoutHeader)
-        out.println("= Hello: AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("2013-09-02")
-        out.println(":jbake-status: published")
-        out.println(":jbake-type: page")
-        out.println("")
-        out.println("JBake now supports AsciiDoc.")
-        out.close()
-
-        invalidAsciiDocFileWithoutHeader = File(folder, "invalidwoheader.ad").apply { createNewFile() }
-        out = PrintWriter(invalidAsciiDocFileWithoutHeader)
-        out.println("= Hello, AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("2013-09-02")
-        out.println(":jbake-status: published")
-        out.println("")
-        out.println("JBake now supports AsciiDoc.")
-        out.close()
-
-        validAsciiDocFileWithHeaderInContent = File(folder, "validheaderincontent.ad").apply { createNewFile() }
-        out = PrintWriter(validAsciiDocFileWithHeaderInContent)
-        out.println("= Hello, AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("2013-09-02")
-        out.println(":jbake-status: published")
-        out.println(":jbake-type: page")
-        out.println("")
-        out.println("JBake now supports AsciiDoc.")
-        out.println("")
-        out.println("----")
-        out.println("title=Example Header")
-        out.println("date=2013-02-01")
-        out.println("type=post")
-        out.println("tags=tag1, tag2")
-        out.println("status=published")
-        out.println("~~~~~~")
-        out.println("----")
-        out.close()
-
-        validAsciiDocFileWithoutJBakeMetaData = File(folder, "validwojbakemetadata.ad").apply { createNewFile() }
-        out = PrintWriter(validAsciiDocFileWithoutJBakeMetaData)
-        out.println("= Hello: AsciiDoc!")
-        out.println("Test User <user@test.org>")
-        out.println("2013-09-02")
-        out.println("")
-        out.println("JBake now supports AsciiDoc documents without JBake meta data.")
-        out.close()
+        
+        asciidocWithSource = createTestFile("asciidoc-with-source.ad", asciidocWithSourceContent)
+        validAsciidocFile = createTestFile("valid.ad", validAsciidocContent)
+        invalidAsciiDocFile = createTestFile("invalid.ad", invalidAsciiDocContent)
+        validAsciiDocFileWithoutHeader = createTestFile("validwoheader.ad", validAsciiDocWithoutHeaderContent)
+        invalidAsciiDocFileWithoutHeader = createTestFile("invalidwoheader.ad", invalidAsciiDocWithoutHeaderContent)
+        validAsciiDocFileWithHeaderInContent = createTestFile("validheaderincontent.ad", validAsciiDocWithHeaderInContentContent)
+        validAsciiDocFileWithoutJBakeMetaData = createTestFile("validwojbakemetadata.ad", validAsciiDocWithoutJBakeMetaDataContent)
     }
 
 
     "parseAsciidocFileWithPrettifyAttribute" {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify")
         val map = parser.processFile(asciidocWithSource)
-        map.shouldNotBeNull()
-        map.status shouldBe "draft"
-        map.type shouldBe "post"
-        map.body shouldContain "class=\"paragraph\""
-        map.body shouldContain "<p>JBake now supports AsciiDoc.</p>"
+        assertMetadata(map, "draft", "post")
+        assertBasicAsciiDocContent(map!!.body)
         map.body shouldContain "class=\"prettyprint highlight\""
         map.body shouldNotContain "I Love Jbake"
-        println(map.body)
     }
 
     "parseAsciidocFileWithCustomAttribute" {
         config.setProperty(ASCIIDOCTOR_ATTRIBUTES.key, "source-highlighter=prettify,testattribute=I Love Jbake")
         val map = parser.processFile(asciidocWithSource)
-        map.shouldNotBeNull()
-        map.status shouldBe "draft"
-        map.type shouldBe "post"
-        map.body shouldContain "I Love Jbake"
+        assertMetadata(map, "draft", "post")
+        map!!.body shouldContain "I Love Jbake"
         map.body shouldContain "class=\"prettyprint highlight\""
-        println(map.body)
     }
 
     "parseValidAsciiDocFile" {
         val map = parser.processFile(validAsciidocFile)
-        map.shouldNotBeNull()
-        map.status shouldBe "draft"
-        map.type shouldBe "post"
-        map.body shouldContain "class=\"paragraph\""
-        map.body shouldContain "<p>JBake now supports AsciiDoc.</p>"
+        assertMetadata(map, "draft", "post")
+        assertBasicAsciiDocContent(map!!.body)
     }
 
     "parseInvalidAsciiDocFile" {
@@ -167,12 +177,9 @@ class AsciidocParserTest : StringSpec({
 
     "parseValidAsciiDocFileWithoutHeader" {
         val map = parser.processFile(validAsciiDocFileWithoutHeader)
-        map.shouldNotBeNull()
-        map["title"] shouldBe "Hello: AsciiDoc!"
-        map.status shouldBe "published"
-        map.type shouldBe "page"
-        map.body shouldContain "class=\"paragraph\""
-        map.body shouldContain "<p>JBake now supports AsciiDoc.</p>"
+        assertMetadata(map, "published", "page")
+        map!!["title"] shouldBe "Hello: AsciiDoc!"
+        assertBasicAsciiDocContent(map.body)
     }
 
     "parseInvalidAsciiDocFileWithoutHeader" {
@@ -182,11 +189,8 @@ class AsciidocParserTest : StringSpec({
 
     "parseValidAsciiDocFileWithExampleHeaderInContent" {
         val map = parser.processFile(validAsciiDocFileWithHeaderInContent)
-        map.shouldNotBeNull()
-        map.status shouldBe "published"
-        map.type shouldBe "page"
-        map.body shouldContain "class=\"paragraph\""
-        map.body shouldContain "<p>JBake now supports AsciiDoc.</p>"
+        assertMetadata(map, "published", "page")
+        assertBasicAsciiDocContent(map!!.body)
         map.body shouldContain "class=\"listingblock\""
         map.body shouldContain "class=\"content\""
         map.body shouldContain "<pre>"
@@ -200,10 +204,8 @@ class AsciidocParserTest : StringSpec({
         config.setDefaultType("page")
         val parser = Parser(config)
         val map = parser.processFile(validAsciiDocFileWithoutJBakeMetaData)
-        map.shouldNotBeNull()
-        map.status shouldBe "published"
-        map.type shouldBe "page"
-        map.body shouldContain "<p>JBake now supports AsciiDoc documents without JBake meta data.</p>"
+        assertMetadata(map, "published", "page")
+        map!!.body shouldContain "<p>JBake now supports AsciiDoc documents without JBake meta data.</p>"
     }
 
 
