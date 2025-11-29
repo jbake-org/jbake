@@ -6,14 +6,17 @@
         </encoder>
     </appender>
 
-    <logger name="org.thymeleaf" level="WARN"/>
-    <logger name="org.asciidoctor" level="INFO"/>
-    <logger name="org.jbake" level="DEBUG"/>
-    <!-- Remove confusing log messages from apache configurations/beanutils. -->
-    <logger name="org.apache.commons.beanutils.FluentPropertyBeanIntrospector" level="ERROR"/>
-
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
+
+    <logger name="org.jbake" level="DEBUG"/>
+
+    <logger name="org.thymeleaf" level="WARN"/>
+    <logger name="org.asciidoctor" level="WARN"/>
+    <!-- Remove confusing log messages from apache configurations/beanutils. -->
+    <logger name="org.apache.commons.beanutils.FluentPropertyBeanIntrospector" level="ERROR"/>
+    <logger name="org.apache.commons.beanutils.converters" level="WARN"/>
+    <logger name="io.mockk" level="WARN"/>
 
 </configuration>
