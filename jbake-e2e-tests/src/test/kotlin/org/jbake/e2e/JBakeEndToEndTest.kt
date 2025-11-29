@@ -129,7 +129,7 @@ class JBakeEndToEndTest {
             testDataDir,
             templatesPath,
             testOutputDir,
-            listOf("/jbake/content", "/jbake/output", "-t", "/jbake/templates")
+            listOf("-b", "/jbake/content", "/jbake/output", "-t", "/jbake/templates")
         ).use { container ->
             container.start()
 
@@ -164,7 +164,7 @@ class JBakeEndToEndTest {
         val templatesPath = File(testDataDir, templateDir)
 
         // Act - Build command arguments
-        val jbakeArgs = mutableListOf("/jbake/content", "/jbake/output", "-t", "/jbake/templates").apply {
+        val jbakeArgs = mutableListOf("-b", "/jbake/content", "/jbake/output", "-t", "/jbake/templates").apply {
             addAll(options)
         }
 
@@ -200,7 +200,7 @@ class JBakeEndToEndTest {
             testDataDir,
             templatesPath,
             testOutputDir,
-            listOf("/jbake/content", "/jbake/output", "-t", "/jbake/templates")
+            listOf("-b", "/jbake/content", "/jbake/output", "-t", "/jbake/templates")
         ).use { container ->
             container.start()
 
@@ -260,7 +260,6 @@ class JBakeEndToEndTest {
 
     private fun verifyBlogPosts(outputDir: File) {
         val blogDir = File(outputDir, "blog/2023")
-        blogDir.shouldExist()
         blogDir.shouldBeADirectory()
 
         val firstPost = File(blogDir, "first-post.html")
