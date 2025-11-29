@@ -15,20 +15,6 @@ import java.io.File
 
 class AsciidocParserTest : StringSpec({
 
-    lateinit var folder: File
-
-    lateinit var config: DefaultJBakeConfiguration
-    lateinit var parser: Parser
-    lateinit var rootPath: File
-
-    lateinit var asciidocWithSource: File
-    lateinit var validAsciidocFile: File
-    lateinit var invalidAsciiDocFile: File
-    lateinit var validAsciiDocFileWithoutHeader: File
-    lateinit var invalidAsciiDocFileWithoutHeader: File
-    lateinit var validAsciiDocFileWithHeaderInContent: File
-    lateinit var validAsciiDocFileWithoutJBakeMetaData: File
-
     val validHeader = """
         |title=This is a Title = This is a valid Title
         |status=draft
@@ -117,9 +103,6 @@ class AsciidocParserTest : StringSpec({
         |JBake now supports AsciiDoc documents without JBake meta data.
         """.trimMargin()
     
-    fun createTestFile(name: String, content: String) = 
-        File(folder, name).apply { createNewFile(); writeText(content) }
-
     fun assertBasicAsciiDocContent(body: String) {
         body shouldContain "class=\"paragraph\""
         body shouldContain "<p>JBake now supports AsciiDoc.</p>"
@@ -130,6 +113,22 @@ class AsciidocParserTest : StringSpec({
         map.status shouldBe status
         map.type shouldBe type
     }
+
+    lateinit var folder: File
+    lateinit var rootPath: File
+    lateinit var config: DefaultJBakeConfiguration
+    lateinit var parser: Parser
+    
+    lateinit var asciidocWithSource: File
+    lateinit var validAsciidocFile: File
+    lateinit var invalidAsciiDocFile: File
+    lateinit var validAsciiDocFileWithoutHeader: File
+    lateinit var invalidAsciiDocFileWithoutHeader: File
+    lateinit var validAsciiDocFileWithHeaderInContent: File
+    lateinit var validAsciiDocFileWithoutJBakeMetaData: File
+
+    fun createTestFile(name: String, content: String) =
+        File(folder, name).apply { createNewFile(); writeText(content) }
 
     beforeTest {
         folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
