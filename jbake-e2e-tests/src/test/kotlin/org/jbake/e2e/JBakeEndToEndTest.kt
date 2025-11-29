@@ -1,5 +1,8 @@
 package org.jbake.e2e
 
+import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.file.shouldBeADirectory
+import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
@@ -229,18 +232,17 @@ class JBakeEndToEndTest {
     }
 
     private fun verifyBasicStructure(outputDir: File) {
-        outputDir.exists() shouldBe true
-        outputDir.isDirectory shouldBe true
+        outputDir.shouldBeADirectory()
 
         // Check that some output was generated
         val files = outputDir.listFiles()
         files shouldNotBe null
-        files!!.isNotEmpty() shouldBe true
+        files!!.shouldNotBeEmpty()
     }
 
     private fun verifyIndexPage(outputDir: File) {
         val indexFile = File(outputDir, "index.html")
-        indexFile.exists() shouldBe true
+        indexFile.shouldExist()
 
         val content = indexFile.readText()
         content shouldContain "Blog Posts"
@@ -249,7 +251,7 @@ class JBakeEndToEndTest {
 
     private fun verifyAboutPage(outputDir: File) {
         val aboutFile = File(outputDir, "about.html")
-        aboutFile.exists() shouldBe true
+        aboutFile.shouldExist()
 
         val content = aboutFile.readText()
         content shouldContain "About This Site"
@@ -258,17 +260,18 @@ class JBakeEndToEndTest {
 
     private fun verifyBlogPosts(outputDir: File) {
         val blogDir = File(outputDir, "blog/2023")
-        blogDir.exists() shouldBe true
+        blogDir.shouldExist()
+        blogDir.shouldBeADirectory()
 
         val firstPost = File(blogDir, "first-post.html")
-        firstPost.exists() shouldBe true
+        firstPost.shouldExist()
 
         val firstPostContent = firstPost.readText()
         firstPostContent shouldContain "My First Post"
         firstPostContent shouldContain "testing"
 
         val secondPost = File(blogDir, "second-post.html")
-        secondPost.exists() shouldBe true
+        secondPost.shouldExist()
 
         val secondPostContent = secondPost.readText()
         secondPostContent shouldContain "Second Post"
@@ -280,8 +283,8 @@ class JBakeEndToEndTest {
         val doc = Jsoup.parse(indexFile, "UTF-8")
 
         // Verify basic HTML structure
-        doc.select("header").isNotEmpty() shouldBe true
-        doc.select("footer").isNotEmpty() shouldBe true
+        doc.select("header").shouldNotBeEmpty()
+        doc.select("footer").shouldNotBeEmpty()
 
         // Verify navigation
         val navLinks = doc.select("nav a")
