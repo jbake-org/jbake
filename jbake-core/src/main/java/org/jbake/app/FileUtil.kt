@@ -49,7 +49,7 @@ object FileUtil {
         return dir.isDirectory && dir.listFiles(ignoreFile).isEmpty()
     }
 
-    fun isExistingFolder(f: File) = f.exists() && f.isDirectory()
+    fun isExistingDirectory(f: File) = f.exists() && f.isDirectory()
 
     @JvmStatic
     @get:Throws(Exception::class)

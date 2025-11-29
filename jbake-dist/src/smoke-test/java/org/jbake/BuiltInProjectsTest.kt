@@ -20,10 +20,10 @@ class BuiltInProjectsTest {
     var extension: String? = null
 
     @Rule @JvmField
-    var folder: TemporaryFolder = TemporaryFolder()
-    private lateinit var projectFolder: File
+    var tempDir: TemporaryFolder = TemporaryFolder()
+    private lateinit var projectDir: File
     private lateinit var templateDir: File
-    private lateinit var outputFolder: File
+    private lateinit var outputDir: File
     private lateinit var jbakeExecutable: String
     private lateinit var runner: BinaryRunner
 
@@ -33,10 +33,10 @@ class BuiltInProjectsTest {
         jbakeExecutable =
             if (SystemUtils.IS_OS_WINDOWS) File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
             else File("build/install/jbake/bin/jbake").absolutePath
-        projectFolder = folder.newFolder("project")
-        templateDir = File(projectFolder, "templates")
-        outputFolder = File(projectFolder, "output")
-        runner = BinaryRunner(projectFolder)
+        projectDir = tempDir.newFolder("project")
+        templateDir = File(projectDir, "templates")
+        outputDir = File(projectDir, "output")
+        runner = BinaryRunner(projectDir)
     }
 
     @Test
@@ -50,7 +50,7 @@ class BuiltInProjectsTest {
     private fun shouldInitProject(projectName: String?, extension: String?) {
         val process = runner.runWithArguments(jbakeExecutable, "-i", "-t", projectName)
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
-        Assertions.assertThat(File(projectFolder, "jbake.properties")).exists()
+        Assertions.assertThat(File(projectDir, "jbake.properties")).exists()
         Assertions.assertThat(File(templateDir, String.format("index.%s", extension))).exists()
         process.destroy()
     }
@@ -59,7 +59,7 @@ class BuiltInProjectsTest {
     private fun shouldBakeProject() {
         val process = runner.runWithArguments(jbakeExecutable, "-b")
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
-        Assertions.assertThat(File(outputFolder, "index.html")).exists()
+        Assertions.assertThat(File(outputDir, "index.html")).exists()
         process.destroy()
     }
 

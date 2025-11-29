@@ -22,13 +22,13 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
         ensureTemplateFolder()
         ensureContentFolder()
         ensureDestination()
-        checkAssetFolder()
+        checkAssetDir()
     }
 
     @Throws(JBakeException::class)
     private fun ensureSource() {
         val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not configured.")
-        if (!FileUtil.isExistingFolder(source))
+        if (!FileUtil.isExistingDirectory(source))
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder must exist: " + source.absolutePath)
 
         if (!configuration.sourceDir!!.canRead())
@@ -37,12 +37,12 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     private fun ensureTemplateFolder() {
         val path = configuration.templateDir
-        checkRequiredFolderExists(PropertyList.TEMPLATE_FOLDER.key, path)
+        checkRequiredDirExists(PropertyList.TEMPLATE_FOLDER.key, path)
     }
 
     private fun ensureContentFolder() {
         val path = configuration.contentDir
-        checkRequiredFolderExists(PropertyList.CONTENT_FOLDER.key, path)
+        checkRequiredDirExists(PropertyList.CONTENT_FOLDER.key, path)
     }
 
     private fun ensureDestination() {
@@ -58,15 +58,15 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
         }
     }
 
-    private fun checkAssetFolder() {
+    private fun checkAssetDir() {
         val path = configuration.assetDir
         if (!path.exists()) {
             log.warn("No asset folder '{}' was found!", path.absolutePath)
         }
     }
 
-    private fun checkRequiredFolderExists(folderName: String?, path: File) {
-        if (!FileUtil.isExistingFolder(path))
+    private fun checkRequiredDirExists(folderName: String?, path: File) {
+        if (!FileUtil.isExistingDirectory(path))
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required folder cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
     }
 
