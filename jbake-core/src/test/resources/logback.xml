@@ -18,5 +18,6 @@
     <logger name="org.apache.commons.beanutils.FluentPropertyBeanIntrospector" level="ERROR"/>
     <logger name="org.apache.commons.beanutils.converters" level="WARN"/>
     <logger name="io.mockk" level="WARN"/>
+    <logger name="com.github.dockerjava" level="WARN"/>
 
 </configuration>
