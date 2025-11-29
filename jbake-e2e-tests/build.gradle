@@ -1,3 +1,5 @@
+//file:noinspection GroovyAssignabilityCheck
+
 plugins {
     id "org.jbake.convention.java-common"
     id 'org.jetbrains.kotlin.jvm'

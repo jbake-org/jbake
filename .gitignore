@@ -14,3 +14,4 @@ build/
 .gradle
 .gradletasknamecache
 /docs/kotlin-migration-line-analysis/*
+dependency-reduced-pom.xml

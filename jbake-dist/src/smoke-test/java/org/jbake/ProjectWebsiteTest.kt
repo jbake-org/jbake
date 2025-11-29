@@ -1,10 +1,9 @@
 package org.jbake
 
-import org.apache.commons.vfs2.util.Os
+import org.apache.commons.lang3.SystemUtils
 import org.assertj.core.api.Assertions
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
-import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,11 +15,13 @@ class ProjectWebsiteTest {
 
     @Rule @JvmField
     var tempDir: TemporaryFolder = TemporaryFolder()
-    private lateinit var projectFolder = projectFolder = folder.newFolder("project")
-    private lateinit var outputFolder = File(projectFolder, "output")
-    private lateinit val jbakeExecutable =
-        if (SystemUtils.is_Os_WINDOWS) "build\\install\\jbake\\bin\\jbake.bat" else "build/install/jbake/bin/jbake".let { File(it).absolutePath }
-    private lateinit var runner = BinaryRunner(projectFolder)
+    private var projectFolder = tempDir.newFolder("project")
+    private var outputFolder = File(projectFolder, "output")
+    private val jbakeExecutable: String =
+        (if (SystemUtils.IS_OS_WINDOWS) "build\\install\\jbake\\bin\\jbake.bat"
+        else "build/install/jbake/bin/jbake")
+            .let { File(it).absolutePath }
+    private var runner = BinaryRunner(projectFolder)
 
     @Before
     @Throws(IOException::class, GitAPIException::class)

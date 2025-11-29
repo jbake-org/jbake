@@ -1,6 +1,6 @@
 package org.jbake
 
-import org.apache.commons.vfs2.util.Os
+import org.apache.commons.lang3.SystemUtils
 import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Rule
@@ -31,7 +31,7 @@ class BuiltInProjectsTest {
     @Throws(IOException::class)
     fun setup() {
         jbakeExecutable =
-            if (SystemUtils.is_Os_WINDOWS) File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
+            if (SystemUtils.IS_OS_WINDOWS) File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
             else File("build/install/jbake/bin/jbake").absolutePath
         projectFolder = folder.newFolder("project")
         templateFolder = File(projectFolder, "templates")

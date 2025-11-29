@@ -42,7 +42,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
-task smokeTest(type: Test, dependsOn: installDist) {
+tasks.register('smokeTest', Test) {
+    dependsOn installDist
     group 'Verification'
     description 'Runs the integration tests.'
     setTestClassesDirs sourceSets.smokeTest.output.classesDirs
