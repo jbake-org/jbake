@@ -17,7 +17,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.testcontainers>2.0.2</version.testcontainers>
-        <version.testcontainers.junit>1.21.3</version.testcontainers.junit>
         <maven.deploy.skip>true</maven.deploy.skip>
         <skipTests>false</skipTests>
     </properties>
@@ -26,9 +25,9 @@
         <!-- Kotlin -->
         <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
 
-        <!-- TestContainers 2.0.2 for main library, 1.21.3 for junit-jupiter (2.0.2 doesn't have junit-jupiter) -->
+        <!-- TestContainers 2.0.2 - artifact renamed from junit-jupiter to testcontainers-junit-jupiter -->
         <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
-        <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${version.testcontainers.junit}</version><scope>test</scope></dependency>
+        <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
         <!-- Force newer docker-java versions that support Docker API 1.44+ (fixes issue #11212) - versions managed in parent -->
         <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-core</artifactId><scope>test</scope></dependency>
         <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-api</artifactId><scope>test</scope></dependency>
@@ -93,6 +92,9 @@
                     <environmentVariables>
                         <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
                         <DOCKER_API_VERSION>1.44</DOCKER_API_VERSION>
+                        <!-- Workaround for nested mount issue in TC 2.x - see https://github.com/testcontainers/testcontainers-java/issues/11212 -->
+                        <!--suppress DeprecatedClassUsageInspection -->
+                        <TESTCONTAINERS_DOCKER_CLIENT_STRATEGY>org.testcontainers.dockerclient.UnixSocketClientProviderStrategy</TESTCONTAINERS_DOCKER_CLIENT_STRATEGY>
                     </environmentVariables>
                 </configuration>
             </plugin>

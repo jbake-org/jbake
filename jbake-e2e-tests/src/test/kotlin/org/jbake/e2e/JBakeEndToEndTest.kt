@@ -126,18 +126,19 @@ class JBakeEndToEndTest {
 
         try {
             container.start()
-            val result = container.execInContainer("jbake", "-b", "/mnt/site")
+            // Use the new mount paths: content, templates, and output are in separate non-nested directories
+            val result = container.execInContainer("jbake", "/jbake/content", "/jbake/output", "-t", "/jbake/templates")
             println("JBake output: ${result.stdout}")
             if (result.exitCode != 0) {
                 println("JBake error: ${result.stderr}")
             }
 
             // Assert - Verify output files were created
-            val outputPath = testOutputDir.resolve("output")
-            verifyBasicStructure(outputPath.toFile())
-            verifyIndexPage(outputPath.toFile())
-            verifyAboutPage(outputPath.toFile())
-            verifyBlogPosts(outputPath.toFile())
+            // Output is directly in testOutputDir since we mounted it to /jbake/output
+            verifyBasicStructure(testOutputDir.toFile())
+            verifyIndexPage(testOutputDir.toFile())
+            verifyAboutPage(testOutputDir.toFile())
+            verifyBlogPosts(testOutputDir.toFile())
 
         } finally {
             container.stop()
@@ -167,7 +168,7 @@ class JBakeEndToEndTest {
         try {
             container.start()
 
-            val command = mutableListOf("jbake", "-b", "/mnt/site").apply {
+            val command = mutableListOf("jbake", "/jbake/content", "/jbake/output", "-t", "/jbake/templates").apply {
                 addAll(options)
             }
 
@@ -176,8 +177,8 @@ class JBakeEndToEndTest {
             // Assert
             result.exitCode shouldBe 0
 
-            val outputPath = testOutputDir.resolve("output")
-            verifyBasicStructure(outputPath.toFile())
+            // Output is directly in testOutputDir
+            verifyBasicStructure(testOutputDir.toFile())
 
         } finally {
             container.stop()
@@ -203,12 +204,12 @@ class JBakeEndToEndTest {
 
         try {
             container.start()
-            val result = container.execInContainer("jbake", "-b", "/mnt/site")
+            val result = container.execInContainer("jbake", "/jbake/content", "/jbake/output", "-t", "/jbake/templates")
 
             // Assert - Verify content rendering
             result.exitCode shouldBe 0
-            val outputPath = testOutputDir.resolve("output")
-            verifyContentRendering(outputPath.toFile(), templateEngine)
+            // Output is directly in testOutputDir
+            verifyContentRendering(testOutputDir.toFile(), templateEngine)
 
         } finally {
             container.stop()
@@ -220,10 +221,13 @@ class JBakeEndToEndTest {
         templatesPath: File,
         outputDir: Path
     ): GenericContainer<*> {
+        // Avoid nested mounts to prevent "read-only file system" errors
+        // See: https://github.com/testcontainers/testcontainers-java/issues/11212
+        // Mount to separate non-nested paths
         return GenericContainer(DockerImageName.parse(JBAKE_IMAGE))
-            .withFileSystemBind(fixtureDir.absolutePath, "/mnt/site", org.testcontainers.containers.BindMode.READ_ONLY)
-            .withFileSystemBind(templatesPath.absolutePath, "/mnt/site/templates", org.testcontainers.containers.BindMode.READ_ONLY)
-            .withFileSystemBind(outputDir.toAbsolutePath().toString(), "/mnt/site/output", org.testcontainers.containers.BindMode.READ_WRITE)
+            .withFileSystemBind(fixtureDir.absolutePath, "/jbake/content", org.testcontainers.containers.BindMode.READ_ONLY)
+            .withFileSystemBind(templatesPath.absolutePath, "/jbake/templates", org.testcontainers.containers.BindMode.READ_ONLY)
+            .withFileSystemBind(outputDir.toAbsolutePath().toString(), "/jbake/output", org.testcontainers.containers.BindMode.READ_WRITE)
             .withStartupTimeout(Duration.ofMinutes(2))
     }
 
