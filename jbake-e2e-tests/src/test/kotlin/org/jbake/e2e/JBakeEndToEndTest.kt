@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.testcontainers.DockerClientFactory
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import java.io.File
@@ -46,22 +47,22 @@ class JBakeEndToEndTest {
                 throw IllegalStateException("Test data directory not found: ${testDataDir.absolutePath}")
             }
 
-            // Check if Docker is available
+            // Check if Docker is available using Testcontainers' built-in detection
+            // This properly handles system Docker, rootless Docker, and various socket configurations
             try {
-                val dockerCheck = ProcessBuilder("docker", "info")
-                    .redirectErrorStream(true)
-                    .start()
-                dockerCheck.waitFor()
-                if (dockerCheck.exitValue() == 0) {
-                    System.setProperty("jbake.test.docker.available", "true")
+                val dockerAvailable = DockerClientFactory.instance().isDockerAvailable
+                System.setProperty("jbake.test.docker.available", dockerAvailable.toString())
+                if (dockerAvailable) {
                     println("Docker is available. E2E tests will run.")
+                    println("Docker info: ${DockerClientFactory.instance().info}")
                 } else {
                     println("WARNING: Docker not available. E2E tests will be skipped.")
                     println("To run E2E tests, ensure Docker is installed and running.")
                 }
             } catch (e: Exception) {
-                println("WARNING: Cannot execute docker command: ${e.message}")
+                println("WARNING: Cannot detect Docker: ${e.message}")
                 println("E2E tests will be skipped. Install Docker to run these tests.")
+                System.setProperty("jbake.test.docker.available", "false")
             }
 
             println("Output directory: $outputDir")
