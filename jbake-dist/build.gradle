@@ -37,6 +37,26 @@ dependencies {
         exclude group: 'org.asciidoctor', module: 'asciidoctorj'
     }
 
+    // All compileOnly dependencies from jbake-core must be explicitly declared here for runtime
+    // CLI dependencies
+    implementation "info.picocli:picocli:$picocli"
+    implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
+
+    // Content processors
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
+    implementation "org.yaml:snakeyaml:$snakeYamlVersion"
+    implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+
+    // Template engines
+    implementation "org.freemarker:freemarker:$freemarkerVersion"
+    implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
+    implementation "de.neuland-bfi:jade4j:$jade4jVersion"
+    implementation "de.neuland-bfi:pug4j:$pug4jVersion"
+    implementation "io.pebbletemplates:pebble:$pebbleVersion"
+    // Note: Groovy templates are provided by groovy-templates which is already a transitive dependency
+
     smokeTestImplementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
     smokeTestImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"

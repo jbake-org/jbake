@@ -224,7 +224,7 @@ class JBakeEndToEndTest {
             .withFileSystemBind(fixtureDir.absolutePath, "/jbake/content", org.testcontainers.containers.BindMode.READ_ONLY)
             .withFileSystemBind(templatesPath.absolutePath, "/jbake/templates", org.testcontainers.containers.BindMode.READ_ONLY)
             .withFileSystemBind(outputDir.toAbsolutePath().toString(), "/jbake/output", org.testcontainers.containers.BindMode.READ_WRITE)
-            .withCommand(jbakeArgs)  // Pass JBake arguments to the container's entrypoint
+            .withCommand(*jbakeArgs.toTypedArray())  // Spread list into vararg parameters
             .withStartupTimeout(Duration.ofMinutes(2))
     }
 
