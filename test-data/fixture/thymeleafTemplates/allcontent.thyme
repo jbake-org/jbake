@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list th:each="content : ${all_content}">
+    <content>
+        <uri th:text="${content.uri}">/blog/content.html</uri>
+        <date th:text="${#dates.format(content.date,'MMMM yyyy')}"></date>
+    </content>
+</list>

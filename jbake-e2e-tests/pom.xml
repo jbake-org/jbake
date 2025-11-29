@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jbake</groupId>
+        <artifactId>jbake-base</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jbake-e2e-tests</artifactId>
+    <packaging>jar</packaging>
+    <name>jbake-e2e-tests</name>
+    <description>End-to-end tests for JBake using TestContainers</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.testcontainers>1.21.3</version.testcontainers>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipTests>false</skipTests>
+    </properties>
+
+    <dependencies>
+        <!-- Kotlin -->
+        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
+
+        <!-- TestContainers -->
+        <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
+        <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
+        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-transport-zerodep</artifactId><version>3.4.1</version><scope>test</scope></dependency>
+        <!-- Testing frameworks -->
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-params</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId><scope>test</scope></dependency>
+
+        <!-- Utilities -->
+        <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>org.jsoup</groupId><artifactId>jsoup</artifactId><scope>test</scope></dependency>
+    </dependencies>
+
+    <build>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
+                <executions>
+                    <execution>
+                        <id>test-compile</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals>
+                        <configuration>
+                            <jvmTarget>${version.java}</jvmTarget>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${version.java}</jvmTarget>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.1</version><executions>
+                    <execution><id>default-testCompile</id><phase>none</phase></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.kt</include>
+                        <include>**/*Tests.kt</include>
+                    </includes>
+                    <excludes>
+                        <!-- Exclude E2E tests by default if TestContainers cannot detect Docker -->
+                        <!-- To run E2E tests: mvn test -DskipE2E=false -->
+                        <exclude>**/JBakeEndToEndTest.java</exclude>
+                    </excludes>
+                    <systemPropertyVariables>
+                        <jbake.test.data.dir>${project.basedir}/../test-data/fixture</jbake.test.data.dir>
+                    </systemPropertyVariables>
+                    <environmentVariables>
+                        <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
+                        <DOCKER_HOST>unix:///var/run/docker.sock</DOCKER_HOST>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Skip installation and deployment -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-install-plugin</artifactId><version>3.1.3</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+</project>
+
+

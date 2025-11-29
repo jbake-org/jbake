@@ -1,0 +1,71 @@
+plugins {
+    id "org.jbake.convention.java-common"
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+description = "End-to-end tests for JBake using TestContainers"
+
+// This module is only for testing, skip deployment
+tasks.withType(PublishToMavenRepository).configureEach {
+    enabled = false
+}
+
+sourceSets {
+    test {
+        kotlin {
+            srcDir 'src/test/kotlin'
+        }
+    }
+}
+
+dependencies {
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // TestContainers
+    testImplementation "org.testcontainers:testcontainers:1.20.4"
+    testImplementation "org.testcontainers:junit-jupiter:1.20.4"
+    testImplementation "com.github.docker-java:docker-java-transport-zerodep:3.4.1"
+
+    // Testing frameworks
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit5Version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
+    testImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
+    testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+
+    // Utilities
+    testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
+    testImplementation "commons-io:commons-io:$commonsIoVersion"
+    testImplementation "org.jsoup:jsoup:$jsoupVersion"
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    // Pass test data directory location
+    systemProperty "jbake.test.data.dir", "${projectDir}/../test-data/fixture"
+
+    // TestContainers configuration
+    systemProperty "testcontainers.reuse.enable", "false"
+    environment "TESTCONTAINERS_RYUK_DISABLED", "true"
+    environment "DOCKER_HOST", "unix:///var/run/docker.sock"
+
+    // Increase timeout for container operations
+    timeout = Duration.ofMinutes(10)
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+repositories {
+    mavenCentral()
+}
+

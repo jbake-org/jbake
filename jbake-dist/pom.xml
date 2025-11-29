@@ -143,6 +143,45 @@
                     <execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution>
                 </executions>
             </plugin>
+
+
+            <!-- Jib plugin for building Docker images -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId><version>3.4.4</version>
+                <configuration>
+                    <from><image>eclipse-temurin:21-jre-alpine</image></from>
+                    <to>
+                        <image>jbake/jbake</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+                    <containerizingMode>packaged</containerizingMode>
+                    <container>
+                        <jvmFlags>
+                            <jvmFlag>-XX:MaxDirectMemorySize=512m</jvmFlag>
+                            <jvmFlag>-Djna.nosys=true</jvmFlag>
+                        </jvmFlags>
+                        <mainClass>${main.class}</mainClass>
+                        <workingDirectory>/mnt/site</workingDirectory>
+                        <volumes>
+                            <volume>/mnt/site</volume>
+                        </volumes>
+                        <ports>
+                            <port>8820</port>
+                        </ports>
+                        <environment>
+                            <TZ>UTC</TZ>
+                        </environment>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <user>1000:1000</user>
+                    </container>
+                </configuration>
+                <executions>
+                    <execution><id>build-docker-image</id><phase>none</phase><goals><goal>dockerBuild</goal></goals></execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

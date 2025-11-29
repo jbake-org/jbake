@@ -2,6 +2,7 @@ plugins {
     id "org.jbake.convention.java-common"
     id 'application'
     id 'org.jetbrains.kotlin.jvm'
+    id 'com.google.cloud.tools.jib' version '3.4.4'
 }
 
 apply from: "$rootDir/gradle/application.gradle"
@@ -65,3 +66,25 @@ repositories {
 kotlin {
     jvmToolchain(21)
 }
+
+// Docker image configuration using Jib
+jib {
+    from {
+        image = 'eclipse-temurin:21-jre-alpine'
+    }
+    to {
+        image = 'jbake/jbake'
+        tags = [project.version.toString(), 'latest']
+    }
+    container {
+        jvmFlags = ['-XX:MaxDirectMemorySize=512m', '-Djna.nosys=true']
+        mainClass = application.mainClass.get()
+        workingDirectory = '/mnt/site'
+        volumes = ['/mnt/site']
+        ports = ['8820']
+        environment = [TZ: 'UTC']
+        creationTime = 'USE_CURRENT_TIMESTAMP'
+        user = '1000:1000'
+    }
+}
+

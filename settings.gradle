@@ -5,5 +5,7 @@ rootProject.name = 'jbake-base'
 
 include 'scripts'
 include 'jbake-core'
+include 'jbake-dist'
 // Temporarily disabled - needs Maven plugin descriptor generation fixes for Gradle 9
-// include 'jbake-maven-plugin'
+//include 'jbake-maven-plugin'
+include 'jbake-e2e-tests'
