@@ -62,7 +62,7 @@ class MdParserTest : StringSpec({
 
     beforeTest {
         folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
-        val configFile = TestUtils.testResourcesAsSourceFolder
+        val configFile = TestUtils.testResourcesAsSourceDir
         config = ConfigUtil().loadConfig(configFile) as DefaultJBakeConfiguration
 
         validMdFileBasic = File(folder, "validBasic.md").apply { createNewFile() }

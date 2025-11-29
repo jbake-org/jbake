@@ -48,19 +48,19 @@ interface JBakeConfiguration {
     /** the content directory. */
     val contentDir: File
 
-    /** name of Folder where content (that's to say files to be transformed) resides in. */
+    /** name of Dir where content (that's to say files to be transformed) resides in. */
     val contentDirName: String?
 
     /** the data directory. */
     val dataDir: File
 
-    /** name of Folder where data files reside in. */
+    /** name of Dir where data files reside in. */
     val dataDirName: String?
 
     /** docType for data files. */
     val dataFileDocType: String
 
-    /** Folder to store database files in. */
+    /** Dir to store database files in. */
     val databasePath: String?
 
     /** name to identify if database is kept in memory (memory) or persisted to disk (plocal). */

@@ -39,7 +39,7 @@ class FreemarkerTemplateEngineRenderingTest : StringSpec({
 
         helper.renderer.renderIndexPaging("index.html")
 
-        val outputFile = File(File(helper.destinationFolder, "2"), "index.html")
+        val outputFile = File(File(helper.destinationDir, "2"), "index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in helper.getExpectedInOutput("index")) {
@@ -57,10 +57,10 @@ class FreemarkerTemplateEngineRenderingTest : StringSpec({
 
         helper.renderer.renderIndexPaging("index.html")
 
-        val paginatedFile = File(helper.destinationFolder, "index2.html")
+        val paginatedFile = File(helper.destinationDir, "index2.html")
         paginatedFile.exists() shouldBe false
 
-        val indexFile = File(helper.destinationFolder, "index.html")
+        val indexFile = File(helper.destinationDir, "index.html")
         indexFile.exists() shouldBe true
     }
 })

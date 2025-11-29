@@ -514,11 +514,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     companion object {
         const val DEFAULT_TYHMELEAF_TEMPLATE_MODE: String = "HTML"
         private const val SOURCE_FOLDER_KEY = "sourceDir"
-        private const val DESTINATION_FOLDER_KEY = "destinationFolder"
+        private const val DESTINATION_FOLDER_KEY = "destinationDir"
         private const val ASSET_FOLDER_KEY = "assetDir"
         private const val TEMPLATE_FOLDER_KEY = "templateDir"
         private const val CONTENT_FOLDER_KEY = "contentDir"
-        private const val DATA_FOLDER_KEY = "dataFolder"
+        private const val DATA_FOLDER_KEY = "dataDir"
         private val TEMPLATE_DOC_PATTERN: Pattern = "template\\.([a-zA-Z0-9-_]+)\\.file".toRegex().toPattern()
         private const val DOCTYPE_FILE_POSTFIX = ".file"
         private const val DOCTYPE_EXTENSION_POSTFIX = ".extension"

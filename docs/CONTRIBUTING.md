@@ -173,11 +173,11 @@ Prefer property access over getter methods when using Kotlin code:
 ```kotlin
 // ✅ Preferred
 config.contentDir
-config.destinationFolder
+config.destinationDir
 
 // ❌ Avoid (Java-style)
-config.getContentFolder()
-config.getDestinationFolder()
+config.getContentDir()
+config.getDestinationDir()
 ```
 
 ## Testing

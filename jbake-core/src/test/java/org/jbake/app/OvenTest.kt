@@ -32,7 +32,7 @@ class OvenTest : StringSpec({
         // reset values to known state otherwise previous test case runs can affect the success of this test case
         resetDocumentTypes()
         val output = root.resolve("output").toFile()
-        sourceDir = TestUtils.testResourcesAsSourceFolder
+        sourceDir = TestUtils.testResourcesAsSourceDir
         configuration = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
         configuration.destinationDir = (output)
         configuration.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
@@ -58,11 +58,11 @@ class OvenTest : StringSpec({
     }
 
     "shouldBakeWithRelativeCustomPaths" {
-        sourceDir = TestUtils.getTestResourcesAsSourceFolder("/fixture-custom-relative")
+        sourceDir = TestUtils.getTestResourcesAsSourceDir("/fixture-custom-relative")
         configuration = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
         val assetDir = File(configuration.destinationDir, "css")
         val aboutFile = File(configuration.destinationDir, "about.html")
-        val blogSubFolder = File(configuration.destinationDir, "blog")
+        val blogSubDir = File(configuration.destinationDir, "blog")
 
 
         val oven = Oven(configuration)
@@ -75,8 +75,8 @@ class OvenTest : StringSpec({
         assetDir.list()?.isNotEmpty() shouldBe true
         aboutFile.shouldBeAFile()
         aboutFile.length() shouldBeGreaterThan 0
-        blogSubFolder.exists() shouldBe true
-        blogSubFolder.list()?.isNotEmpty() shouldBe true
+        blogSubDir.exists() shouldBe true
+        blogSubDir.list()?.isNotEmpty() shouldBe true
     }
 
     "shouldBakeWithAbsoluteCustomPaths" {
@@ -86,13 +86,13 @@ class OvenTest : StringSpec({
         val theme = root.resolve("theme")
         val destination = root.resolve("destination")
 
-        val originalSource = TestUtils.testResourcesAsSourceFolder
+        val originalSource = TestUtils.testResourcesAsSourceDir
         FileUtils.copyDirectory(originalSource, source.toFile())
-        val originalTheme = TestUtils.getTestResourcesAsSourceFolder("/fixture-theme")
+        val originalTheme = TestUtils.getTestResourcesAsSourceDir("/fixture-theme")
         FileUtils.copyDirectory(originalTheme, theme.toFile())
 
-        val expectedTemplateFolder = theme.resolve("templates")
-        val expectedAssetFolder = theme.resolve("assets")
+        val expectedTemplateDir = theme.resolve("templates")
+        val expectedAssetDir = theme.resolve("assets")
         val expectedDestination = destination.resolve("output")
 
         val properties = source.resolve("jbake.properties")
@@ -100,9 +100,9 @@ class OvenTest : StringSpec({
 
         val fw = Files.newBufferedWriter(properties)
 
-        fw.write(PropertyList.ASSET_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedAssetFolder))
+        fw.write(PropertyList.ASSET_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedAssetDir))
         fw.newLine()
-        fw.write(PropertyList.TEMPLATE_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedTemplateFolder))
+        fw.write(PropertyList.TEMPLATE_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedTemplateDir))
         fw.newLine()
         fw.write(PropertyList.DESTINATION_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedDestination))
         fw.close()
@@ -110,7 +110,7 @@ class OvenTest : StringSpec({
         configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
         val assetDir = File(configuration.destinationDir, "css")
         val aboutFile = File(configuration.destinationDir, "about.html")
-        val blogSubFolder = File(configuration.destinationDir, "blog")
+        val blogSubDir = File(configuration.destinationDir, "blog")
 
 
         val oven = Oven(configuration)
@@ -123,12 +123,12 @@ class OvenTest : StringSpec({
         assetDir.list()?.isNotEmpty() shouldBe true
         aboutFile.shouldBeAFile()
         aboutFile.length() shouldBeGreaterThan 0
-        blogSubFolder.exists() shouldBe true
-        blogSubFolder.list()?.isNotEmpty() shouldBe true
+        blogSubDir.exists() shouldBe true
+        blogSubDir.list()?.isNotEmpty() shouldBe true
     }
 
 
-    "shouldThrowExceptionIfSourceFolderDoesNotExist" {
+    "shouldThrowExceptionIfSourceDirDoesNotExist" {
         configuration.setSourceDir(root.resolve("none").toFile())
 
         shouldThrow<JBakeException> { Oven(configuration) }

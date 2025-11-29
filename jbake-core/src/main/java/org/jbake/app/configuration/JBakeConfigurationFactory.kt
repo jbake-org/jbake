@@ -97,19 +97,19 @@ class JBakeConfigurationFactory {
      * by http://localhost:[server.port].
      * The server.port is read from the project properties file.
      *
-     * @param destinationFolder The destination directory to render and copy files to
+     * @param destinationDir The destination directory to render and copy files to
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
      */
     @Throws(JBakeException::class)
     fun createJettyJbakeConfiguration(
         sourceDir: File,
-        destinationFolder: File?,
+        destinationDir: File?,
         propertiesFile: File?,
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
         val conf = this.configUtil.loadConfig(sourceDir, propertiesFile) as DefaultJBakeConfiguration
-        conf.destinationDir = destinationFolder ?: File("./output")
+        conf.destinationDir = destinationDir ?: File("./output")
         conf.clearCache = isClearCache
         conf.siteHost = "http://" + conf.serverHostname + ":" + conf.serverPort + conf.serverContextPath
         return conf

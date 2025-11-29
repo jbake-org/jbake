@@ -34,7 +34,7 @@ class FileUtilTest : StringSpec({
     }
 
     "testGetContentRoothPath" {
-        val source = TestUtils.testResourcesAsSourceFolder
+        val source = TestUtils.testResourcesAsSourceDir
         val util = ConfigUtil()
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 

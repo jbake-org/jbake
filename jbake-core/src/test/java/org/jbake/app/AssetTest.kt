@@ -71,7 +71,7 @@ class AssetTest : StringSpec({
         // TODO: verify logging with MockK appender
     }
 
-    "testCopyCustomFolder" {
+    "testCopyCustomDir" {
         config.assetDir = File(config.sourceDir, "/media")
         Asset(config).copy()
 
@@ -116,7 +116,7 @@ class AssetTest : StringSpec({
         Asset(config).copy()
     }
 
-    "testJBakeIgnoredFolder" {
+    "testJBakeIgnoredDir" {
         val assets = File(AssetTest::class.java.getResource("/fixture/assets")!!.file)
         val asset = Asset(config)
         asset.copy(assets)
@@ -129,7 +129,7 @@ class AssetTest : StringSpec({
         asset.errors.isEmpty() shouldBe true
     }
 
-    "testFooIgnoredFolder" {
+    "testFooIgnoredDir" {
         config.setProperty(PropertyList.IGNORE_FILE.key, ".fooignore")
         val assets = File(AssetTest::class.java.getResource("/fixture/assets")!!.file)
         val asset = Asset(config)

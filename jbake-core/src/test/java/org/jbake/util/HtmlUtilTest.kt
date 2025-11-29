@@ -12,7 +12,7 @@ class HtmlUtilTest : StringSpec({
     lateinit var config: DefaultJBakeConfiguration
 
     beforeTest {
-        config = ConfigUtil().loadConfig(TestUtils.testResourcesAsSourceFolder) as DefaultJBakeConfiguration
+        config = ConfigUtil().loadConfig(TestUtils.testResourcesAsSourceDir) as DefaultJBakeConfiguration
     }
 
     "shouldNotAddBodyHTMLElement" {

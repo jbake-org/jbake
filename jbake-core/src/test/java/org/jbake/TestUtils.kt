@@ -22,10 +22,10 @@ object TestUtils {
     val isWindows: Boolean
         get() = SystemUtils.IS_OS_WINDOWS
 
-    val testResourcesAsSourceFolder: File
-        get() = getTestResourcesAsSourceFolder("/fixture")
+    val testResourcesAsSourceDir: File
+        get() = getTestResourcesAsSourceDir("/fixture")
 
-    fun getTestResourcesAsSourceFolder(name: String): File {
+    fun getTestResourcesAsSourceDir(name: String): File {
         val resource = TestUtils::class.java.getResource(name) ?: throw IllegalArgumentException("Resource not found: $name")
         return File(resource.file)
     }

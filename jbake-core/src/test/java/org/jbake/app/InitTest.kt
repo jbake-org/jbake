@@ -18,7 +18,7 @@ class InitTest : StringSpec({
     lateinit var tempDir: File
 
     beforeTest {
-        rootPath = TestUtils.testResourcesAsSourceFolder
+        rootPath = TestUtils.testResourcesAsSourceDir
         if (!rootPath.exists()) throw Exception("Cannot find base path for test!")
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         // Override base template config option.

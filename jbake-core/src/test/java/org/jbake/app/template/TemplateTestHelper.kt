@@ -19,7 +19,7 @@ class TemplateTestHelper(
 ) {
     val expectedInOutput: MutableMap<String, MutableList<String>> = HashMap()
 
-    lateinit var destinationFolder: File
+    lateinit var destinationDir: File
     lateinit var templateDir_: File
     lateinit var renderer: Renderer
     lateinit var db: ContentStore
@@ -48,8 +48,8 @@ class TemplateTestHelper(
         templateDir_ = File(sourceDir, templateDir)
         if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
 
-        destinationFolder = ContentStoreIntegrationTest.tempDir
-        config.destinationDir = destinationFolder
+        destinationDir = ContentStoreIntegrationTest.tempDir
+        config.destinationDir = destinationDir
         config.templateDir = templateDir_
 
         for (docType in DocumentTypes.documentTypes) {

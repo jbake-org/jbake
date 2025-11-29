@@ -11,7 +11,7 @@ internal class ConfigurationPrinterTest : StringSpec({
 
     "shouldPrintHeader" {
         val configuration =
-            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
+            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceDir)
         val data = ByteArrayOutputStream()
         val out = PrintStream(data)
         val printer = ConfigurationPrinter(configuration, out)
@@ -28,7 +28,7 @@ internal class ConfigurationPrinterTest : StringSpec({
 
     "shouldPrintKeyAndValue" {
         val configuration =
-            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceFolder)
+            JBakeConfigurationFactory().configUtil.loadConfig(TestUtils.testResourcesAsSourceDir)
         val data = ByteArrayOutputStream()
         val out = PrintStream(data)
         val printer = ConfigurationPrinter(configuration, out)

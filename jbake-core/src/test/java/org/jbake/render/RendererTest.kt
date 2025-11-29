@@ -25,7 +25,7 @@ class RendererTest : StringSpec({
         db = mockk(relaxed = true)
         renderingEngine = mockk(relaxed = true)
 
-        val sourcePath = TestUtils.testResourcesAsSourceFolder
+        val sourcePath = TestUtils.testResourcesAsSourceDir
         if (!sourcePath.exists())
             throw Exception("Cannot find base path for test!")
         outputPath = File(folder, "output").apply { mkdirs() }

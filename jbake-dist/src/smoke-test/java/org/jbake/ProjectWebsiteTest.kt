@@ -15,13 +15,13 @@ class ProjectWebsiteTest {
 
     @Rule @JvmField
     var tempDir: TemporaryFolder = TemporaryFolder()
-    private var projectFolder = tempDir.newFolder("project")
-    private var outputFolder = File(projectFolder, "output")
+    private var projectDir = tempDir.newFolder("project")
+    private var outputDir = File(projectDir, "output")
     private val jbakeExecutable: String =
         (if (SystemUtils.IS_OS_WINDOWS) "build\\install\\jbake\\bin\\jbake.bat"
         else "build/install/jbake/bin/jbake")
             .let { File(it).absolutePath }
-    private var runner = BinaryRunner(projectFolder)
+    private var runner = BinaryRunner(projectDir)
 
     @Before
     @Throws(IOException::class, GitAPIException::class)
@@ -36,10 +36,10 @@ class ProjectWebsiteTest {
         cmd.setBranch("master")
         cmd.setRemote("origin")
         cmd.setURI(WEBSITE_REPO_URL)
-        cmd.setDirectory(projectFolder)
+        cmd.setDirectory(projectDir)
         cmd.call()
 
-        Assertions.assertThat(File(projectFolder, "README.md").exists()).isTrue()
+        Assertions.assertThat(File(projectDir, "README.md").exists()).isTrue()
     }
 
     @Test
@@ -47,7 +47,7 @@ class ProjectWebsiteTest {
     fun shouldBakeWebsite() {
         val process = runner.runWithArguments(jbakeExecutable, "-b")
         Assertions.assertThat(process.exitValue()).isEqualTo(0)
-        Assertions.assertThat(File(outputFolder, "index.html")).exists()
+        Assertions.assertThat(File(outputDir, "index.html")).exists()
         process.destroy()
     }
 

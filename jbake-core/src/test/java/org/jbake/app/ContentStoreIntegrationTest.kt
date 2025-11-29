@@ -38,7 +38,7 @@ abstract class ContentStoreIntegrationTest {
             // Create temp directory
             tempDir = Files.createTempDirectory("jbake-test").toFile()
 
-            sourceDir = TestUtils.testResourcesAsSourceFolder
+            sourceDir = TestUtils.testResourcesAsSourceDir
             if (!sourceDir.exists()) throw AssertionError("Cannot find sample data structure!")
 
             config = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration

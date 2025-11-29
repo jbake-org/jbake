@@ -74,11 +74,11 @@ object FileUtil {
             if (!codeFile.exists())
                 throw Exception("Cannot locate running location of JBake!")
 
-            val codeFolder = codeFile.getParentFile().getParentFile()
-            if (!codeFolder.exists())
+            val codeDir = codeFile.getParentFile().getParentFile()
+            if (!codeDir.exists())
                 throw Exception("Cannot locate running location of JBake!")
 
-            return codeFolder
+            return codeDir
         }
 
     // TBD: Could be replaced with Kotlin extension function File.extension.

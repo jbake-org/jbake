@@ -132,7 +132,7 @@ class AsciidocParserTest : StringSpec({
 
     beforeTest {
         folder = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
-        rootPath = TestUtils.testResourcesAsSourceFolder
+        rootPath = TestUtils.testResourcesAsSourceDir
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
         

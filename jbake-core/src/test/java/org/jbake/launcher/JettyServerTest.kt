@@ -29,7 +29,7 @@ class JettyServerTest : StringSpec({
         val out = java.io.File(tempDir, "build/jbake")
         out.mkdirs()
 
-        val source = TestUtils.testResourcesAsSourceFolder
+        val source = TestUtils.testResourcesAsSourceDir
         val port = JettyServerTest.getRandoPort()
         every { jBakeConfiguration.serverPort } returns port
         every { jBakeConfiguration.serverHostname } returns "localhost"

@@ -19,8 +19,8 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
     @Throws(JBakeException::class)
     fun inspect() {
         ensureSource()
-        ensureTemplateFolder()
-        ensureContentFolder()
+        ensureTemplateDir()
+        ensureContentDir()
         ensureDestination()
         checkAssetDir()
     }
@@ -35,12 +35,12 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Source folder is not readable: " + source.absolutePath)
     }
 
-    private fun ensureTemplateFolder() {
+    private fun ensureTemplateDir() {
         val path = configuration.templateDir
         checkRequiredDirExists(PropertyList.TEMPLATE_FOLDER.key, path)
     }
 
-    private fun ensureContentFolder() {
+    private fun ensureContentDir() {
         val path = configuration.contentDir
         checkRequiredDirExists(PropertyList.CONTENT_FOLDER.key, path)
     }

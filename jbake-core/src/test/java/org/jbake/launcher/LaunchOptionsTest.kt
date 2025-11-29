@@ -27,7 +27,7 @@ class LaunchOptionsTest : StringSpec({
         res.isRunServer shouldBe true
     }
 
-    "runServerWithFolder" {
+    "runServerWithDir" {
         val args = arrayOf("-s", "/tmp")
         val res = parseArgs(args)
 

@@ -105,9 +105,9 @@ class Main @JvmOverloads constructor(
         val init = Init(config)
         try {
             val templateDir = FileUtil.runningLocation
-            val outputFolder = config.sourceDir ?: File(".")
+            val outputDir = config.sourceDir ?: File(".")
 
-            init.run(outputFolder, templateDir, type)
+            init.run(outputDir, templateDir, type)
             println("Base folder structure successfully created.")
         } catch (e: Exception) {
             val msg = "Failed to initialise structure: " + e.message
