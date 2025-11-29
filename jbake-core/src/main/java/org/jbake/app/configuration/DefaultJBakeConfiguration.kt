@@ -113,8 +113,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     // Implement interface properties that previously existed as getX() functions
     override var assetDir: File
-        get() = getAsDir(ASSET_FOLDER_KEY) ?: error("Asset directory must be configured")
-        set(value) { setProperty(ASSET_FOLDER_KEY, value) }
+        get() = getAsDir(PropertyList.ASSET_FOLDER.key) ?: error("Asset directory must be configured")
+        set(value) { setProperty(PropertyList.ASSET_FOLDER.key, value) }
 
     override val assetDirName: String?
         get() = getAsString(PropertyList.ASSET_FOLDER.key)
@@ -134,15 +134,15 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         set(value) = setProperty(PropertyList.CLEAR_CACHE.key, value)
 
     override var contentDir: File
-        get() = getAsDir(CONTENT_FOLDER_KEY) ?: error("Content directory must be configured")
-        set(value) = setProperty(CONTENT_FOLDER_KEY, value)
+        get() = getAsDir(PropertyList.CONTENT_FOLDER.key) ?: error("Content directory must be configured")
+        set(value) = setProperty(PropertyList.CONTENT_FOLDER.key, value)
 
     override val contentDirName: String?
         get() = getAsString(PropertyList.CONTENT_FOLDER.key)
 
     override var dataDir: File
-        get() = getAsDir(DATA_FOLDER_KEY) ?: error("Data dir must be configured")
-        set(value) { setProperty(DATA_FOLDER_KEY, value) }
+        get() = getAsDir(PropertyList.DATA_FOLDER.key) ?: error("Data dir must be configured")
+        set(value) { setProperty(PropertyList.DATA_FOLDER.key, value) }
 
     override var dataDirName: String?
         get() = getAsString(PropertyList.DATA_FOLDER.key)
@@ -178,8 +178,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     override var destinationDir: File
-        get() = getAsDir(DESTINATION_FOLDER_KEY) ?: error("Destination dir must be configured")
-        set(value) = setProperty(DESTINATION_FOLDER_KEY, value)
+        get() = getAsDir(PropertyList.DESTINATION_FOLDER.key) ?: error("Destination dir must be configured")
+        set(value) = setProperty(PropertyList.DESTINATION_FOLDER.key, value)
 
     override val documentTypes: MutableList<String>
         get() {
@@ -342,8 +342,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     override var templateDir: File
-        get() = getAsDir(TEMPLATE_FOLDER_KEY) ?: error("Template dir must be configured")
-        set(value) = setProperty(TEMPLATE_FOLDER_KEY, value)
+        get() = getAsDir(PropertyList.TEMPLATE_FOLDER.key) ?: error("Template dir must be configured")
+        set(value) = setProperty(PropertyList.TEMPLATE_FOLDER.key, value)
 
     override val templateDirName: String?
         get() = getAsString(TEMPLATE_FOLDER.key)
@@ -513,12 +513,8 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     companion object {
         const val DEFAULT_TYHMELEAF_TEMPLATE_MODE: String = "HTML"
-        private const val SOURCE_FOLDER_KEY = "sourceDir"
-        private const val DESTINATION_FOLDER_KEY = "destinationDir"
-        private const val ASSET_FOLDER_KEY = "assetDir"
-        private const val TEMPLATE_FOLDER_KEY = "templateDir"
-        private const val CONTENT_FOLDER_KEY = "contentDir"
-        private const val DATA_FOLDER_KEY = "dataDir"
+        // SOURCE_FOLDER_KEY is special - sourceDir is not a configuration property, it's constructor parameter
+        private const val SOURCE_FOLDER_KEY = "source.folder"
         private val TEMPLATE_DOC_PATTERN: Pattern = "template\\.([a-zA-Z0-9-_]+)\\.file".toRegex().toPattern()
         private const val DOCTYPE_FILE_POSTFIX = ".file"
         private const val DOCTYPE_EXTENSION_POSTFIX = ".extension"
