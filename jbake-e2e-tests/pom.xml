@@ -26,17 +26,17 @@
         <!-- Kotlin -->
         <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
 
-        <!-- TestContainers 2.0.2 for main library, 1.20.3 for junit-jupiter (2.0.2 doesn't have junit-jupiter) -->
+        <!-- TestContainers 2.0.2 for main library, 1.21.3 for junit-jupiter (2.0.2 doesn't have junit-jupiter) -->
         <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
         <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${version.testcontainers.junit}</version><scope>test</scope></dependency>
-        <!-- Force newer docker-java versions that support Docker API 1.44+ (fixes issue #11212) -->
-        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-core</artifactId><version>3.4.1</version><scope>test</scope></dependency>
-        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-api</artifactId><version>3.4.2</version><scope>test</scope></dependency>
-        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-transport-zerodep</artifactId><version>3.4.1</version><scope>test</scope></dependency>
-        <!-- Jackson dependencies required by Testcontainers 2.0.2 -->
-        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-annotations</artifactId><version>2.18.2</version><scope>test</scope></dependency>
-        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><version>2.18.2</version><scope>test</scope></dependency>
-        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-core</artifactId><version>2.18.2</version><scope>test</scope></dependency>
+        <!-- Force newer docker-java versions that support Docker API 1.44+ (fixes issue #11212) - versions managed in parent -->
+        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-core</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-api</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-transport-zerodep</artifactId><scope>test</scope></dependency>
+        <!-- Jackson dependencies required by Testcontainers 2.0.2 - versions managed in parent -->
+        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-annotations</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-core</artifactId><scope>test</scope></dependency>
         <!-- Testing frameworks -->
         <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
         <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
