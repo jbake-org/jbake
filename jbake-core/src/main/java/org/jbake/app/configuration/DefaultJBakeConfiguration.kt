@@ -34,7 +34,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     constructor(sourceDir: File?, configuration: CompositeConfiguration) {
         this.compositeConfiguration = configuration
         setSourceDir(sourceDir)
-        setupPaths()
+        // Note: setupPaths() is already called by setSourceDir()
     }
 
     override fun get(key: String): Any? {
@@ -458,7 +458,11 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     }
 
     internal fun setupDefaultContentDir() {
-        contentDir = File(sourceDir, contentDirName ?: "")
+        val content = File(getAsString(PropertyList.CONTENT_FOLDER.key) ?: "")
+
+        contentDir =
+            if (content.isAbsolute) content
+            else sourceDir.resolve(content)
     }
 
     override var headerSeparator: String?
