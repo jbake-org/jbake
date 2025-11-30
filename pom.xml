@@ -4,7 +4,7 @@
 
     <groupId>ch.zizka.jbake</groupId>
     <artifactId>jbake-base</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.0.0-rc1</version>
     <packaging>pom</packaging>
 
     <name>jbake-base</name>
@@ -18,7 +18,7 @@
         <url>https://github.com/OndraZizka/jbake</url>
         <connection>scm:git:git@github.com:OndraZizka/jbake.git</connection>
         <developerConnection>scm:git:git@github.com:OndraZizka/jbake.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>jbake-base-5.0.0-rc1</tag>
     </scm>
 
     <issueManagement>
@@ -338,8 +338,11 @@
     </build>
 
     <distributionManagement>
-        <snapshotRepository><id>ossrh</id><name>ossrh</name><url>https://${ossrh.host}/content/repositories/snapshots</url></snapshotRepository>
-        <repository><id>ossrh</id><name>ossrh</name><url>https://${ossrh.host}/service/local/staging/deploy/maven2/</url></repository>
+        <!-- Central Portal (new system, OSSRH EOL June 30, 2025) -->
+        <repository>
+            <id>central</id>
+            <url>https://central.sonatype.com/api/v1/publisher</url>
+        </repository>
     </distributionManagement>
 
     <profiles>
@@ -350,17 +353,14 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- Nexus Staging Plugin for Maven Central deployment -->
+                    <!-- Central Publishing Plugin for Maven Central Portal (OSSRH EOL June 30, 2025) -->
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>1.7.0</version>
+                        <groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId><version>0.6.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://${ossrh.host}/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                            <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
-                            <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
-                            <skipStagingRepositoryClose>false</skipStagingRepositoryClose>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
                     </plugin>
 
