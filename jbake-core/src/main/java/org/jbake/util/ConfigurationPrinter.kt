@@ -14,9 +14,7 @@ class ConfigurationPrinter(private val configuration: JBakeConfiguration, privat
                 printGroup(property)
                 this.printHeader()
             }
-            if (!property.description.isEmpty()) {
-                printDescription(property)
-            }
+            if (property.description.isNotEmpty()) printDescription(property)
             printKeyAndValue(property)
 
             lastGroup = property.group
@@ -28,16 +26,11 @@ class ConfigurationPrinter(private val configuration: JBakeConfiguration, privat
         out.println(this.horizontalLine)
     }
 
-    private val horizontalLine: String
-        get() = String.format("%080d%n", 0).replace("0", "-")
+    private val horizontalLine by lazy { String.format("%080d%n", 0).replace("0", "-") }
 
-    private fun printGroup(property: JBakeProperty) {
-        out.printf("%n%s - Settings%n%n", property.group)
-    }
+    private fun printGroup(property: JBakeProperty) = out.printf("%n%s - Settings%n%n", property.group)
 
-    private fun printDescription(property: JBakeProperty) {
-        out.printf("# %s%n", property.description)
-    }
+    private fun printDescription(property: JBakeProperty) = out.printf("# %s%n", property.description)
 
     private fun printKeyAndValue(property: JBakeProperty) {
         val key = leftFillWithDots(property.key)
