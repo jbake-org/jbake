@@ -236,8 +236,7 @@ interface JBakeConfiguration {
     val freemarkerTimeZone: TimeZone
 
     fun asHashMap(): MutableMap<String, Any>
-
-    val jbakeProperties: MutableList<Property>
+    val jbakeProperties: MutableList<JBakeProperty>
 
     fun addConfiguration(properties: Properties)
 }

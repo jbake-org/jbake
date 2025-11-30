@@ -48,7 +48,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         return compositeConfiguration.getBoolean(key, false)
     }
 
-    private fun getAsDir(key: String): File? {
+    private fun getAsDir(@Suppress("SameParameterValue") key: String): File? {
         return get(key) as File?
     }
 
@@ -484,9 +484,9 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         get() = getAsBoolean(PropertyList.IMG_PATH_UPDATE.key)
 
 
-    override val jbakeProperties: MutableList<Property>
+    override val jbakeProperties: MutableList<JBakeProperty>
         get() {
-            val jbakeKeys: MutableList<Property> = ArrayList()
+            val jbakeKeys: MutableList<JBakeProperty> = ArrayList()
 
             for (i in 0 until compositeConfiguration.numberOfConfigurations) {
                 val configuration = compositeConfiguration.getConfiguration(i)
@@ -500,7 +500,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
                     }
                 }
             }
-            jbakeKeys.sort()
+            jbakeKeys.sortBy { it.key }
             return jbakeKeys
         }
 

@@ -119,8 +119,8 @@ class MainTest : StringSpec({
         every { mockFactory.createDefaultJbakeConfiguration(any<File>(), any<File>(), any<File>(), any()) } returns configuration
         System.setProperty("user.dir", src.path)
 
-        // Ensure ConfigurationPrinter has at least one Property to print the group header
-        every { configuration.jbakeProperties } returns mutableListOf(org.jbake.app.configuration.Property("site.host", "Site host"))
+        // Ensure ConfigurationPrinter has at least one JBakeProperty to print the group header
+        every { configuration.jbakeProperties } returns mutableListOf(org.jbake.app.configuration.PropertyList.SITE_HOST)
         every { configuration.get("site.host") } returns "http://www.jbake.org"
 
         val args = arrayOf("-ls")

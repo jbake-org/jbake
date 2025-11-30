@@ -1,20 +1,20 @@
 package org.jbake.util
 
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.Property
+import org.jbake.app.configuration.JBakeProperty
 import java.io.PrintStream
 
 class ConfigurationPrinter(private val configuration: JBakeConfiguration, private val out: PrintStream) {
     fun print() {
-        val properties: MutableList<Property> = configuration.jbakeProperties
-        var lastGroup: Property.Group? = null
+        val properties: MutableList<JBakeProperty> = configuration.jbakeProperties
+        var lastGroup: JBakeProperty.Group? = null
 
         for (property in properties) {
             if (lastGroup != property.group) {
                 printGroup(property)
                 this.printHeader()
             }
-            if (!property.description!!.isEmpty()) {
+            if (!property.description.isEmpty()) {
                 printDescription(property)
             }
             printKeyAndValue(property)
@@ -31,15 +31,15 @@ class ConfigurationPrinter(private val configuration: JBakeConfiguration, privat
     private val horizontalLine: String
         get() = String.format("%080d%n", 0).replace("0", "-")
 
-    private fun printGroup(property: Property) {
+    private fun printGroup(property: JBakeProperty) {
         out.printf("%n%s - Settings%n%n", property.group)
     }
 
-    private fun printDescription(property: Property) {
+    private fun printDescription(property: JBakeProperty) {
         out.printf("# %s%n", property.description)
     }
 
-    private fun printKeyAndValue(property: Property) {
+    private fun printKeyAndValue(property: JBakeProperty) {
         val key = leftFillWithDots(property.key)
         val value = configuration.get(property.key)
         out.printf("%1\$s: %2\$-40s%n%n", key, value)
