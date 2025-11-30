@@ -2,30 +2,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.jbake</groupId>
+    <groupId>ch.zizka.jbake</groupId>
     <artifactId>jbake-base</artifactId>
     <version>2.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>jbake-base</name>
     <description>JBake is a Java based open source static site/blog generator for developers.</description>
-    <url>http://jbake.org</url>
+    <url>https://github.com/OndraZizka/jbake</url>
     <inceptionYear>2012</inceptionYear>
 
     <licenses><license><name>The MIT License (MIT)</name><url>http://opensource.org/licenses/MIT</url></license></licenses>
 
     <scm>
-        <url>https://github.com/jbake-org/jbake/</url>
-        <connection>scm:git:git@github.com:jbake-org/jbake.git</connection>
-        <developerConnection>scm:git:https://github.com/jbake-org/jbake.git</developerConnection>
+        <url>https://github.com/OndraZizka/jbake</url>
+        <connection>scm:git:git@github.com:OndraZizka/jbake.git</connection>
+        <developerConnection>scm:git:git@github.com:OndraZizka/jbake.git</developerConnection>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/jbake-org/jbake/issues</url>
+        <url>https://github.com/OndraZizka/jbake/issues</url>
     </issueManagement>
 
     <developers>
+        <developer><id>ondrazizka</id><name>Ondrej Zizka</name><email>ondrej@zizka.ch</email></developer>
         <developer><id>jonbullock</id><name>Jonathan Bullock</name><email>jonbullock@gmail.com</email><url>http://jonathanbullock.com</url><timezone>Europe/London</timezone></developer>
         <developer><id>ancho</id><name>Frank Becker</name><email>frank@calmdevelopment.de</email><timezone>Europe/Berlin</timezone></developer>
         <developer><id>manikmagar</id><name>Manik Magar</name><url>https://manik.magar.me/</url><timezone>America/New_York</timezone></developer>
@@ -61,6 +63,7 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <ossrh.host>s01.oss.sonatype.org</ossrh.host>
 
         <!-- Runtime dependencies versions (synced from gradle.properties) -->
         <version.asciidoctorj>3.0.1</version.asciidoctorj>
@@ -192,6 +195,8 @@
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version></plugin>
                 <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${version.jacoco.maven.plugin}</version></plugin>
                 <plugin><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version></plugin>
+                <plugin><groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>1.7.0</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.1.1</version></plugin>
             </plugins>
         </pluginManagement>
 
@@ -332,18 +337,58 @@
     </build>
 
     <distributionManagement>
-        <snapshotRepository><id>ossrh</id><url>https://s01.oss.sonatype.org/content/repositories/snapshots</url></snapshotRepository>
-        <repository><id>ossrh</id><url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url></repository>
+        <snapshotRepository><id>ossrh</id><name>ossrh</name><url>https://${ossrh.host}/content/repositories/snapshots</url></snapshotRepository>
+        <repository><id>ossrh</id><name>ossrh</name><url>https://${ossrh.host}/service/local/staging/deploy/maven2/</url></repository>
     </distributionManagement>
 
     <profiles>
         <profile>
             <id>release</id>
+            <activation>
+                <property><name>release</name></property>
+            </activation>
             <build>
                 <plugins>
+                    <!-- Nexus Staging Plugin for Maven Central deployment -->
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version><executions>
-                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals></execution>
+                        <groupId>org.sonatype.plugins</groupId><artifactId>nexus-staging-maven-plugin</artifactId><version>1.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://${ossrh.host}/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                            <keepStagingRepositoryOnFailure>true</keepStagingRepositoryOnFailure>
+                            <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+                            <skipStagingRepositoryClose>false</skipStagingRepositoryClose>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Maven Release Plugin -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.1.1</version>
+                        <configuration>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>false</useReleaseProfile>
+                            <releaseProfiles>release</releaseProfiles>
+                            <goals>deploy</goals>
+                        </configuration>
+                    </plugin>
+
+                    <!-- GPG Plugin for signing artifacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals><goal>sign</goal></goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
