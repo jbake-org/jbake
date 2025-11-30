@@ -76,13 +76,12 @@ object PropertyList {
     fun getPropertyByKey(key: String): Property {
         // With @JvmField, properties are now accessible as public static fields
         for (field in PropertyList::class.java.fields) {
-            try {
+            runCatching {
                 val value = field.get(null)
-
-                // Check if the value is a Property instance with matching key
-                if (value is Property && value.key == key) return value
+                if (value is Property && value.key == key)
+                    return value
             }
-            catch (e: Exception) { /* Ignore inaccessible fields */ }
+            // Ignore inaccessible fields.
         }
         // Return custom property if no match found
         return Property(key, "", Property.Group.CUSTOM)
