@@ -126,6 +126,6 @@ class MainTest : StringSpec({
         val args = arrayOf("-ls")
         main.run(args)
 
-        outputStreamCaptor.toString() shouldContain "DEFAULT - Settings" // Why??
+        outputStreamCaptor.toString() shouldContain "OUTPUT - Settings"
     }
 })

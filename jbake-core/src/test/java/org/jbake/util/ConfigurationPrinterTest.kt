@@ -19,7 +19,9 @@ internal class ConfigurationPrinterTest : StringSpec({
         printer.print()
 
         val output = data.toString()
-        output shouldContain "DEFAULT - Settings"
+        // Check for some of the group headers
+        output shouldContain "CONTENT_STRUCTURE - Settings"
+        output shouldContain "OUTPUT - Settings"
         output shouldContain "CUSTOM - Settings"
         output shouldContain "Key"
         output shouldContain "Value"
