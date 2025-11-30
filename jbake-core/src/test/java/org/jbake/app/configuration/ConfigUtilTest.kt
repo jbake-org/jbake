@@ -183,6 +183,7 @@ class ConfigUtilTest : StringSpec({
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram")
         config.setProperty("asciidoctor.option.template_dirs", "src/template1,src/template2")
 
+        @Suppress("UNCHECKED_CAST")
         val option = config.getAsciidoctorOption("requires") as Collection<String>
 
         option shouldContain "asciidoctor-diagram"
