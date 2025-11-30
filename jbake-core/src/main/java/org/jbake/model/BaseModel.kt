@@ -1,7 +1,14 @@
 package org.jbake.model
 
-abstract class BaseModel : HashMap<String, Any>() {
-
+/**
+ * Base model class for JBake models.
+ * Uses delegation instead of inheritance for better design.
+ */
+abstract class BaseModel(
+    private val delegate: MutableMap<String, Any> = HashMap()
+)
+    : MutableMap<String, Any> by delegate
+{
     var uri: String
         get() = (get(ModelAttributes.URI) as String?) ?: ""
         set(uri) { put(ModelAttributes.URI, uri) }

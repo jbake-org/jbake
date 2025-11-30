@@ -33,8 +33,9 @@ object DbUtils {
 
     fun documentToModel(doc: OResult): DocumentModel {
         val result = DocumentModel()
-        doc.propertyNames.forEach { key ->
-            result[key] = doc.getProperty(key)
+        for (key in doc.propertyNames) {
+            val value = doc.getProperty<Any>(key) ?: continue // Skip null values - treat them as missing keys instead
+            result[key] = value
         }
         return result
     }
