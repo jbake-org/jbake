@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -67,7 +65,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution><phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals><configuration><sources><source>src/smoke-test/java</source></sources></configuration></execution>
                     <execution><id>add-test-resource</id><phase>generate-test-resources</phase><goals><goal>add-test-resource</goal></goals><configuration><resources><resource><directory>src/smoke-test/resources</directory></resource></resources></configuration></execution>
@@ -75,7 +73,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-assembly-plugin</artifactId><version>3.7.1</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -92,7 +90,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -109,7 +107,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
@@ -122,7 +120,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId><version>2.1.0</version>
+                <groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId>
                 <executions><execution><phase>package</phase><goals><goal>assemble</goal></goals></execution></executions>
                 <configuration>
                     <assembleDirectory>${project.build.directory}/appassembler</assembleDirectory>
@@ -144,7 +142,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId><version>3.5.4</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <includes>
                         <include>**/*SmokeTest.java</include>
@@ -162,7 +160,7 @@
 
             <!-- Jib plugin for building Docker images -->
             <plugin>
-                <groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId><version>3.4.4</version>
+                <groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId>
                 <configuration>
                     <from><image>eclipse-temurin:21-jre-alpine</image></from>
                     <to>
