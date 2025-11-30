@@ -15,21 +15,19 @@ import java.io.Writer
  * to HTML already.
  *
  *
- * An appropriate rendering engine will be chosen by JBake based on the template suffix. If
- * contents is not available in the supplied model, a template has access to the document
- * database in order to complete the model. It is in particular interesting to optimize
+ * An appropriate rendering engine will be chosen by JBake based on the template suffix.
+ * If contents is not available in the supplied model, a template has access to the document database
+ * in order to complete the model. It is in particular interesting to optimize
  * data access based on the underlying template engine capabilities.
  *
- *
- * Note that some rendering engines may rely on a different rendering model than the one
- * provided by the first argument of [.renderDocument].
+ * Note that some rendering engines may rely on a different rendering model than the one provided by the first argument of [.renderDocument].
  * In this case, it is the responsibility of the engine to convert it.
  */
 abstract class AbstractTemplateEngine
         protected constructor(protected val config: JBakeConfiguration, protected val db: ContentStore)
 {
-
-    @Deprecated("use {@link AbstractTemplateEngine(JBakeConfiguration,ContentStore)} instead")
+    // TBD: "Use [constructor(JBakeConfiguration, ContentStore)]."
+    // TBD: In general, do not use commons-configuration's CompositeConfiguration, replace with JBakeConfiguration.
     protected constructor(config: Configuration, db: ContentStore, destination: File, templatesPath: File) : this(
         JBakeConfigurationFactory().createDefaultJbakeConfiguration(
             templatesPath.getParentFile(),
