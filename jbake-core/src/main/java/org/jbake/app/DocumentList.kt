@@ -5,10 +5,14 @@ import org.jbake.model.DocumentModel
 import java.util.*
 
 /**
- * Wraps an OrientDB document iterator into a model usable by
- * template engines.
+ * Wraps an OrientDB document iterator into a model usable by template engines.
+ * Uses delegation instead of inheritance for better design.
  */
-class DocumentList<T> : LinkedList<T>() {
+class DocumentList<T>(
+    private val delegate: MutableList<T> = LinkedList()
+) : MutableList<T> by delegate {
+
+    fun push(element: T) = add(0, element)
 
     companion object {
         fun wrap(docs: OResultSet): DocumentList<DocumentModel> {
