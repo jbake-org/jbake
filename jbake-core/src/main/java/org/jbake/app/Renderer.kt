@@ -136,7 +136,11 @@ class Renderer {
         renderIndex(config.indexFileName ?: "index.html")
     }
 
-    fun renderIndexPaging(indexFile: String = config.indexFileName ?: "index.html") {
+    fun renderIndexPaging() {
+        renderIndexPaging(config.indexFileName ?: "index.html")
+    }
+
+    fun renderIndexPaging(indexFile: String) {
         val totalPosts = db.getPublishedCount("post")
         val postsPerPage = config.postsPerPage
 
