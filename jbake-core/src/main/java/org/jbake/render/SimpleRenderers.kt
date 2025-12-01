@@ -12,11 +12,9 @@ class ArchiveRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderArchive) return 0
-        try {
+        return wrapOnRenderingException {
             renderer.renderArchive(config.archiveFileName!!)
-            return 1
         }
-        catch (e: Exception) { throw RenderingException(e) }
     }
 }
 
@@ -27,12 +25,10 @@ class FeedRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderFeed) return 0
-        try {
+        return wrapOnRenderingException {
             //TODO: refactor this. the renderer has a reference to the configuration
             renderer.renderFeed(config.feedFileName)
-            return 1
         }
-        catch (e: Exception) { throw RenderingException(e) }
     }
 }
 
@@ -43,11 +39,9 @@ class Error404Renderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderError404 || config.error404FileName == null) return 0
-        try {
+        return wrapOnRenderingException {
             renderer.renderError404(config.error404FileName!!)
-            return 1
         }
-        catch (e: Exception) { throw RenderingException(e) }
     }
 }
 
@@ -58,7 +52,7 @@ class IndexRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderIndex) return 0
-        try {
+        return wrapOnRenderingException {
             val fileName = config.indexFileName ?: "index.html"
 
             // TODO: refactor this. the renderer has a reference to the configuration
@@ -67,9 +61,7 @@ class IndexRenderer : RenderingTool {
             if (paginate)
                 renderer.renderIndexPaging(fileName)
             else renderer.renderIndex(fileName)
-            return 1
         }
-        catch (e: Exception) { throw RenderingException(e) }
     }
 }
 
@@ -80,12 +72,10 @@ class SitemapRenderer : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderSiteMap) return 0
-        try {
+        return wrapOnRenderingException {
             //TODO: refactor this. the renderer has a reference to the configuration
             renderer.renderSitemap(config.siteMapFileName ?: "sitemap.xml")
-            return 1
         }
-        catch (e: Exception) { throw RenderingException(e) }
     }
 }
 
@@ -102,4 +92,10 @@ class TagsRenderer : RenderingTool {
         }
         catch (e: Exception) { throw RenderingException(e) }
     }
+}
+
+private fun wrapOnRenderingException(block: () -> Any?): Int {
+    try { block() }
+    catch (ex: Exception) { throw RenderingException(ex) }
+    return 1
 }
