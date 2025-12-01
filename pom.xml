@@ -103,8 +103,8 @@
         <version.kotest>6.0.6</version.kotest>
 
         <!-- Build dependencies versions. Keep all at the latest. -->
-        <version.maven>3.9.9</version.maven>
-        <version.maven.annotations>3.9.0</version.maven.annotations>
+        <version.maven>3.9.11</version.maven>
+        <version.maven.annotations>3.15.2</version.maven.annotations>
         <version.spark>2.9.4</version.spark>
         <version.kotlin>2.2.21</version.kotlin>
         <version.dokka>2.1.0</version.dokka>
@@ -189,11 +189,11 @@
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-install-plugin</artifactId><version>3.1.4</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-javadoc-plugin</artifactId><version>3.12.0</version></plugin>
-                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.1.1</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.2.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version></plugin>
-                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-source-plugin</artifactId><version>3.3.1</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-source-plugin</artifactId><version>3.4.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version></plugin>
-                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.3.1</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.4.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-plugin-plugin</artifactId><version>3.15.2</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId><version>2.1.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version></plugin>
@@ -202,6 +202,10 @@
                 <plugin><groupId>org.jetbrains.dokka</groupId><artifactId>dokka-maven-plugin</artifactId><version>${version.dokka}</version></plugin>
                 <plugin><groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId><version>0.9.0</version></plugin>
                 <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.14</version></plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>2.20.1</version>
+                    <configuration><rulesUri>file:///${session.executionRootDirectory}/maven-version-rules.xml</rulesUri></configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
 
