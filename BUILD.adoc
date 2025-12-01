@@ -3,62 +3,112 @@
 :gradle-home: http://gradle.org[Gradle]
 :gradle-userguide: https://docs.gradle.org/current/userguide/userguide.html[gradle userguide]
 :gradle-wrapper: https://docs.gradle.org/current/userguide/gradle_wrapper.html[gradle wrapper]
+:maven-home: https://maven.apache.org/[Maven]
+:maven-guide: https://maven.apache.org/guides/[maven guide]
 :jacoco-web: http://www.eclemma.org/jacoco/[jacoco]
-:coveralls: https://coveralls.io/github/jbake-org/jbake[coveralls]
 :sdkman: http://sdkman.io[sdkman]
+:kotlin: https://kotlinlang.org/[Kotlin]
 
-...and other useful stuff you can do with the {gradle-home} build system.
+...and other useful stuff you can do with the build systems.
 
-The project uses {gradle-home} as the build system.
-This is just a little collection of the common tasks you need to know to develop, build and deploy JBake. For more detailed information about gradle have a look at the {gradle-userguide}.
+The project supports both {gradle-home} and {maven-home} as build systems.
 
-To execute the tasks use the {gradle-wrapper}. That way you do not need to install
- gradle for yourself and can be sure you are using the exact version everyone else is using to build JBake.
+* **Gradle** - The original build system, using Gradle 9
+* **Maven** - Full Maven support with synchronized dependencies
+* **Kotlin** - The codebase includes {kotlin} code with proper documentation generation
 
-You can execute the build using one of the following commands from the root of the project:
+This document covers common tasks for developing, building and deploying JBake.
+
+== Build Systems
+
+=== Using Gradle
+
+To execute Gradle tasks use the {gradle-wrapper}. This ensures you're using the exact Gradle version (9.x) configured for the project.
+
+Commands from the root of the project:
 
 * `./gradlew <task>` (on Unix-like platforms such as Linux and Mac OS X)
-
 * `gradlew <task>` (on Windows using the gradlew.bat batch file)
 
-To get an overview of all available tasks with a short description run `./gradlew tasks`
+To get an overview of all available tasks: `./gradlew tasks`
+
+=== Using Maven
+
+Maven support is fully configured. Maven will automatically use JDK 17 via toolchains.
+
+Commands from the root of the project:
+
+* `mvn <goal>` - Maven will auto-detect JDK 17 from toolchains
+
+For detailed Maven instructions see link:docs/RELEASING.md[docs/RELEASING.md]
 
 == Structure
 
-There are 4 projects:
+There are 5 modules (both Gradle and Maven):
 
 root aka. jbake-base::
-    configures subprojects, jacoco execution aggregation and coveralls
+    - Parent project configuring submodules
+    - Gradle: jacoco execution aggregation
+    - Maven: dependency management, plugin management, release configuration
 
 jbake-core::
-    - the core library. produces jbake-core-{version}.jar (`build/libs`)
-    - publishes to bintray maven repository jbake-core
-
-jbake-maven-plugin::
-    - the JBake maven plugin, build by Gradle too
+    - The core library with Java and Kotlin code
+    - Produces `jbake-core-{version}.jar`
+    - Gradle: `build/libs`
+    - Maven: `target/`
+    - Documentation generated with Dokka for Kotlin code
 
 jbake-dist::
-    - bundles the cli to an distribution (`build/distribution`)
-    - publishes to bintray binary repository jbake
-    - publish to sdkman
+    - Bundles the CLI distribution
+    - Creates binary packages and Docker images
+    - Gradle: `build/distributions`
+    - Maven: `target/`
 
-If you want to run a task in a specific project from root run `./gradlew :jbake-core:test` for example.
+jbake-maven-plugin::
+    - The JBake Maven plugin
+    - Built by both Gradle and Maven
+
+jbake-e2e-tests::
+    - End-to-end integration tests
+    - Tests Docker container functionality
+    - Not published to Maven Central
+
+=== Running tasks in specific modules
+
+**Gradle:**
+----
+./gradlew :jbake-core:test
+----
+
+**Maven:**
+----
+mvn test -pl jbake-core
+----
 
 
 == Test
 
-=== run the tests
+=== Run the tests
+
 While developing this is the most common task you should execute.
 
+**Gradle:**
 ----
 ./gradlew test
 ----
 
-This task compiles and executes all tests within `src/test` and produces a report afterwards.
+**Maven:**
+----
+mvn test
+----
 
-You can find the report at `jbake-core/build/reports/tests/test/index.html` and can view it with your browser.
-This is very useful if something went wrong.
-You find the full stacktrace and output there.
+This compiles and executes all tests within `src/test` and produces a report afterwards.
+
+**Gradle reports:** `jbake-core/build/reports/tests/test/index.html`
+
+**Maven reports:** `jbake-core/target/surefire-reports/`
+
+You can view these reports with your browser to see full stacktraces and output when tests fail.
 
 === know what's going on
 
@@ -99,64 +149,67 @@ It executes the produced application, initializes a jbake project for each suppo
 The `check` task depends on the `smokeTest` task and is part of the travis CI execution.
 You can find the report at `jbake-dist/build/reports/tests/smokeTest/`
 
-=== code coverage
+=== Code coverage
 
-To generate a nice code coverage report run the following task.
+Generate code coverage reports with {jacoco-web}.
 
+**Gradle (aggregated):**
 ----
 ./gradlew jacocoRootReport
 ----
+Report: `build/reports/jacoco/jacocoRootReport/html`
 
-It compiles your code, execute your tests, collect data and generate a report with {jacoco-web}. It produces XML and html reports. The xml file is used to trigger the {coveralls} service with the `coveralls` task.
+**Gradle (per module):**
+----
+./gradlew :jbake-core:jacocoTestReport
+----
+Report: `<module>/build/reports/jacoco/test/html/`
 
-The reports can be found at `build/reports/jacoco/jacocoRootReport/html`.
-
-[NOTE]
-====
-This is an aggregation of all project modules.
-
-You can generate coverage reports for each module with `./gradlew jacocoTestReport`
-or for a particular module `./gradlew :jbake-core:jacocoTestReport`.
-
-The report can be found at `<module>/build/reports/jacoco/test/html/`
-====
+**Maven (per module):**
+----
+mvn test
+----
+Reports are generated automatically in `<module>/target/jacoco/`
 
 plugin:: https://docs.gradle.org/current/userguide/jacoco_plugin.html
-// TODO: write something about smokeTests and check
 
 == Build
 
-=== run the build
+=== Run the build
 
 The `build` task assembles and tests the project.
 
+**Gradle:**
 ----
 ./gradlew build
 ----
 
-It clones the example projects from github, creates zip files, generates start scripts for *NIX and Windows, bundles a distribution package, signs archives (if signing is configured properly), generates javadocs, assemble the packages and runs checks.
-
+**Maven:**
 ----
-./gradlew build
-
-BUILD SUCCESSFUL in 47s
-28 actionable tasks: 10 executed, 18 up-to-date
+mvn clean package
 ----
 
-If successful you can find everything in the `jbake-dist/build` directory.
-The distribution package can be found at `jbake-dist/build/distributions` and is called `jbake-{version}-bin.zip`
+This compiles code, runs tests, generates javadocs, creates distribution packages, and runs checks.
 
-=== install local
+**Gradle output:** `jbake-dist/build/distributions/jbake-{version}-bin.zip`
 
-You can install the distribution locally.
+**Maven output:** `jbake-dist/target/jbake-{version}-bin.zip`
 
+=== Install local
+
+**Gradle:**
 ----
 ./gradlew installDist
 ----
+Output: `jbake-dist/build/install/jbake`
 
-The distribution can be found in an exploded directory called `jbake-dist/build/install/jbake`.
+**Maven:**
+----
+mvn clean install
+----
+Installs to local Maven repository: `~/.m2/repository/ch/zizka/jbake/`
 
-NOTE: This task does not run checks. It just compiles and bundles the distribution.
+NOTE: These tasks do not run all checks. They just compile and bundle the distribution.
 
 plugin:: https://docs.gradle.org/current/userguide/application_plugin.html
 
@@ -164,28 +217,53 @@ plugin:: https://docs.gradle.org/current/userguide/application_plugin.html
 
 WARNING: Never add credentials to the repository
 
-=== github release
+=== Releasing to Maven Central
 
-Bump desired project version in the projects `gradle.properties` file.
+The project is published to Maven Central under the `ch.zizka.jbake` groupId.
 
-Like
+For complete release instructions including GPG key setup, credentials configuration, and troubleshooting, see:
+
+**link:docs/RELEASING.md[docs/RELEASING.md]**
+
+**Quick release command (Maven):**
+----
+mvn clean deploy -Prelease
+----
+
+This will:
+
+* Build all modules
+* Generate sources and javadoc JARs (using Dokka for Kotlin code)
+* Sign all artifacts with GPG
+* Upload to Maven Central Portal
+* Automatically publish to Maven Central (appears in 15-30 minutes)
+
+**Prerequisites:**
+
+* GPG key uploaded to keyservers
+* Maven Central Portal credentials in `~/.m2/settings.xml`
+* Java 17 (automatically selected via Maven toolchains)
+
+=== GitHub release
+
+Bump desired project version in `gradle.properties`:
 
 ----
 version = 2.7.0
 ----
 
-Commit and push to origin at github.
+Commit and push to GitHub, then:
 
 ----
 ./gradlew signArchives
 ./gradlew githubRelease
 ----
 
-The task will create a tag for you and create a release. Additionaly it uploads the binary distribution and the corresponding signature to the release.
+This creates a tag, creates a GitHub release, and uploads the binary distribution with signature.
 
 [NOTE]
 ====
-You need to add some properties to your local gradle.properties file (_~/.gradle/gradle.properties_)
+Add to your local `~/.gradle/gradle.properties`:
 
 ----
 github.token=<access token>
@@ -193,35 +271,32 @@ github.release.owner=jbake-org
 github.release.repo=jbake
 ----
 
-It's also possible to dry-run this task. Execute `export GITHUB_RELEASE_DRY_RUN=true` in your terminal.
+For dry-run: `export GITHUB_RELEASE_DRY_RUN=true`
 ====
 
 plugin:: https://github.com/BreadMoirai/github-release-gradle-plugin
 
-=== publish to nexus sonatype
+=== Publish with Gradle (alternative)
 
-You can publish to nexus with
+You can also publish to Maven Central using Gradle:
 
 ----
 ./gradlew publishToSonatype
 ----
 
-The task will create a staging repository. You need to close and publish it manually.
-You can automate this process with the other tasks like `closeSonatypeStagingRepository` and `closeAndReleaseSonatypeStagingRepository`.
-
-For more information see:
+For more information:
 
 * https://github.com/gradle-nexus/publish-plugin
-* https://central.sonatype.org/pages/ossrh-guide.html
+* https://central.sonatype.org/
 
-You need to add two properties to your local gradle.properties file (_~/.gradle/gradle.properties_).
+Add to `~/.gradle/gradle.properties`:
 
     sonatypeUsername=username
     sonatypePassword=secret
 
 plugin:: https://plugins.gradle.org/plugin/io.github.gradle-nexus.publish-plugin
 
-=== publish to sdkman
+=== Publish to SDKMAN
 
 To release, set to default and announce a new candidate of JBake to {sdkman} run
 
@@ -234,7 +309,7 @@ Add the following properties to your local _gradle.properties_ file (_~/.gradle/
 
 plugin:: https://plugins.gradle.org/plugin/io.sdkman.vendors
 
-=== signing
+=== Signing
 
 To enable code signing you need to add some more properties to your local _gradle.properties_ file (_~/.gradle/gradle.properties_):
 
@@ -248,7 +323,7 @@ plugin:: https://docs.gradle.org/current/userguide/signing_plugin.html
 
 == Other useful tasks
 
-=== check code convention violations
+=== Check code convention violations
 
 The Checkstyle Plugin is configured to use our code conventions defined in `config/checkstyle/checkstyle.xml`.
 
@@ -257,59 +332,25 @@ A report can be found at jbake-core/build/reports/checkstyle/.
 
 plugin:: https://docs.gradle.org/current/userguide/checkstyle_plugin.html
 
-=== keep the dependencies up-to-date
+=== Keep the dependencies up-to-date
 
-It's sometimes hard to keep track of the latest versions for your dependencies.
-Fear not.
-
+**Gradle:**
 ----
 ./gradlew dependencyUpdates
-:dependencyUpdates
-Download https://jcenter.bintray.com/org/assertj/assertj-core/3.8.0/assertj-core-3.8.0.pom
-
-------------------------------------------------------------
-: Project Dependency Updates (report to plain text file)
-------------------------------------------------------------
-
-The following dependencies are using the latest milestone version:
- - args4j:args4j:2.33
- - org.asciidoctor:asciidoctorj:1.5.5
- - commons-configuration:commons-configuration:1.10
- - commons-io:commons-io:2.5
- - org.apache.commons:commons-lang3:3.5
- - org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1
- - org.freemarker:freemarker:2.3.26-incubating
- - com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3
- - com.github.ben-manes:gradle-versions-plugin:0.14.0
- - org.codehaus.groovy:groovy:2.4.11
- - org.codehaus.groovy:groovy-templates:2.4.11
- - de.neuland-bfi:jade4j:1.2.5
- - org.eclipse.jetty:jetty-server:9.4.5.v20170502
- - com.googlecode.json-simple:json-simple:1.1.1
- - org.slf4j:jul-to-slf4j:1.7.25
- - junit:junit:4.12
- - ch.qos.logback:logback-classic:1.2.3
- - ch.qos.logback:logback-core:1.2.3
- - org.mockito:mockito-core:2.8.9
- - com.orientechnologies:orientdb-graphdb:2.2.20
- - org.slf4j:slf4j-api:1.7.25
- - org.thymeleaf:thymeleaf:3.0.6.RELEASE
-
-The following dependencies exceed the version found at the milestone revision level:
- - org.pegdown:pegdown [1.6.0 <- 1.5.0]
-
-The following dependencies have later milestone versions:
- - org.assertj:assertj-core [3.7.0 -> 3.8.0]
- - org.apache.commons:commons-vfs2 [2.1 -> 2.1.1744488.1]
-
-Failed to determine the latest version for the following dependencies (use --info for details):
- - gradle.plugin.io.sdkman:gradle-sdkvendor-plugin
-
-Generated report file build/dependencyUpdates/report.txt
-
-BUILD SUCCESSFUL
-
-Total time: 6.721 secs
 ----
 
-plugin:: https://plugins.gradle.org/plugin/com.github.ben-manes.versions
+Generates a report showing available dependency updates at `build/dependencyUpdates/report.txt`
+
+**Maven:**
+----
+mvn versions:display-dependency-updates
+mvn versions:display-plugin-updates
+----
+
+The Maven versions plugin is configured to exclude pre-release versions (alpha, beta, RC, milestone, etc.) via `maven-version-rules.xml`.
+
+Both Gradle and Maven dependency versions are synchronized between `gradle.properties` and `pom.xml`.
+
+Gradle plugin:: https://plugins.gradle.org/plugin/com.github.ben-manes.versions
+
+Maven plugin:: https://www.mojohaus.org/versions/versions-maven-plugin/
