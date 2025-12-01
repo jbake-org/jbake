@@ -9,6 +9,7 @@ NOTE: This is a fork maintained by Ondrej Zizka with modernizations including Ko
 
 image:https://img.shields.io/github/v/release/OndraZizka/jbake?label=download&sort=semver["GitHub Release Download", link="https://github.com/OndraZizka/jbake/releases/latest"]
 image:https://img.shields.io/maven-central/v/ch.zizka.jbake/jbake-core.svg["Maven Central", link="https://central.sonatype.com/artifact/ch.zizka.jbake/jbake-core"]
+image:https://github.com/jbake-org/jbake/actions/workflows/maven-build.yml/badge.svg["Maven Tests", link="https://github.com/jbake-org/jbake/actions/workflows/maven-build.yml"]
 
 *Version:* 5.0.0-rc1 | *Group ID:* `ch.zizka.jbake`
 
@@ -70,30 +71,7 @@ To build the Docker image:
 $ docker build -t jbake/jbake:latest .
 ----
 
-=== Usage
-
-To execute JBake via Docker run this from project directory:
-
-----
-$ docker run --rm -u jbake -v "$PWD":/mnt/site jbake/jbake:latest
-----
-
-This command will execute using the jbake user to avoid running as root and will mount the current working directory as `/mnt/site`
-in the Docker container where JBake is expecting your project files to be. By default the Docker image will execute a bake `-b` only.
-
-If you want to bake and serve your project using the Docker image then you'll need to override the default command:
-
-----
-$ docker run --rm -u jbake -v "$PWD":/mnt/site -p 8820:8820 jbake/jbake:latest -b -s
-----
-
-This command will also expose port 8820 from the container, you'll also need to set the following option in your `jbake.properties` file:
-
-----
-server.hostname=0.0.0.0
-----
-
-NOTE: Docker image timezone is _UTC_. This may affect the date and time expected in output content. To set different timezone, add `TZ` environment variable and set value to required https://en.wikipedia.org/wiki/List_of_tz_database_time_zones[timezone^]. Example - `docker run --rm -u jbake  -e TZ=America/New_York -v "$PWD":/mnt/site jbake/jbake:latest`
+W
 
 
 == Build System
@@ -108,7 +86,7 @@ To build the JBake distribution ZIP file:
 $ ./gradlew distZip
 ----
 
-This will build a ZIP file in the `jbake-dist/build/distributions` folder.
+This will build a ZIP file in the `jbake-dist/build/distributions` folder.W
 
 === Building with Maven
 
