@@ -181,39 +181,33 @@ class OvenTest : StringSpec({
 
         contentStore = spyk(ContentStore("memory", "documents" + System.currentTimeMillis()))
 
-        val crawler = mockk<Crawler>(relaxed = true)
-        val renderer = mockk<Renderer>(relaxed = true)
-        val asset = mockk<Asset>(relaxed = true)
+        val mockCrawler = mockk<Crawler>(relaxed = true)
+        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val mockAsset = mockk<Asset>(relaxed = true)
 
         // Mock the config property so render methods can access it
-        every { renderer.config } answers { conf }
+        every { mockRenderer.config } answers { conf }
 
         // Mock all render methods that might be called by rendering tools
         // These methods are called without parameters (using default parameters)
-        every { renderer.renderIndex() } returns Unit
-        every { renderer.renderIndexPaging() } returns Unit
-        every { renderer.renderArchive() } returns Unit
-        every { renderer.renderFeed() } returns Unit
-        every { renderer.renderError404() } returns Unit
-        every { renderer.renderSitemap() } returns Unit
-        every { renderer.renderTags() } returns 0
+        every { mockRenderer.renderIndex() } returns Unit
+        every { mockRenderer.renderIndexPaging() } returns Unit
+        every { mockRenderer.renderArchive() } returns Unit
+        every { mockRenderer.renderFeed() } returns Unit
+        every { mockRenderer.renderError404() } returns Unit
+        every { mockRenderer.renderSitemap() } returns Unit
+        every { mockRenderer.renderTags() } returns 0
 
-        val utensils = Utensils(
-            configuration = conf,
-            contentStore = contentStore,
-            renderer = renderer,
-            crawler = crawler,
-            asset = asset
-        )
+        val utensils = Utensils(conf, contentStore, mockCrawler, mockRenderer, mockAsset)
 
         val oven = Oven(utensils)
 
         oven.bakeEverything()
 
         verify(exactly = 1) { contentStore.startup() }
-        verify(atLeast = 1) { renderer.renderIndex() }
-        verify(exactly = 1) { crawler.crawlContentDirectory() }
-        verify(exactly = 1) { asset.copy() }
+        verify(atLeast = 1) { mockRenderer.renderIndex() }
+        verify(exactly = 1) { mockCrawler.crawlContentDirectory() }
+        verify(exactly = 1) { mockAsset.copy() }
     }
 
     "localeConfiguration" {
