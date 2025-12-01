@@ -10,6 +10,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.template.RenderingException
+import java.nio.file.Files
 
 class TagsRendererTest : StringSpec({
 
@@ -59,10 +60,11 @@ class TagsRendererTest : StringSpec({
     "doesRenderWhenConfigDoesRenderTags" {
         val tool = TagsRenderingTool()
 
+        val tempDir = Files.createTempDirectory("jbake-test").toFile()
         val mockConf = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { mockConf.renderTags } returns true
         every { mockConf.tagPathName } returns "mockTagfile"
-        every { mockConf.destinationDir } returns mockk(relaxed = true)
+        every { mockConf.destinationDir } returns tempDir
         every { mockConf.outputExtension } returns ".html"
         every { mockConf.renderEncoding } returns "UTF-8"
         every { mockConf.getTemplateByDocType(any()) } returns "tag.ftl"
@@ -77,6 +79,8 @@ class TagsRendererTest : StringSpec({
 
         result shouldBe 2
         verify(exactly = 2) { mockRenderingEngine.renderDocument(any(), any(), any()) }
+
+        tempDir.deleteRecursively()
     }
 
     "propogatesRenderingException" {
@@ -101,4 +105,3 @@ class TagsRendererTest : StringSpec({
         }
     }
 })
-
