@@ -24,7 +24,7 @@ import java.util.*
 class OvenTest : StringSpec({
 
     lateinit var root: Path
-    lateinit var configuration: DefaultJBakeConfiguration
+    lateinit var conf: DefaultJBakeConfiguration
     lateinit var sourceDir: File
     var contentStore: ContentStore? = null
 
@@ -34,10 +34,10 @@ class OvenTest : StringSpec({
         resetDocumentTypes()
         val output = root.resolve("output").toFile()
         sourceDir = TestUtils.testResourcesAsSourceDir
-        configuration = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
-        configuration.destinationDir = (output)
-        configuration.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
-        configuration.setProperty("template.paper.file", "paper.tpl")
+        conf = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
+        conf.destinationDir = (output)
+        conf.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
+        conf.setProperty("template.paper.file", "paper.tpl")
     }
 
     afterTest {
@@ -48,11 +48,11 @@ class OvenTest : StringSpec({
     }
 
     "bakeWithAbsolutePaths" {
-        configuration.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
-        configuration.contentDir = (File(sourceDir, "content"))
-        configuration.assetDir = (File(sourceDir, "assets"))
+        conf.templateDir = (File(sourceDir, "groovyMarkupTemplates"))
+        conf.contentDir = (File(sourceDir, "content"))
+        conf.assetDir = (File(sourceDir, "assets"))
 
-        val oven = Oven(configuration)
+        val oven = Oven(conf)
         oven.bakeEverything()
 
         oven.errors.isEmpty()
@@ -60,18 +60,18 @@ class OvenTest : StringSpec({
 
     "shouldBakeWithRelativeCustomPaths" {
         sourceDir = TestUtils.getTestResourcesAsSourceDir("/fixture-custom-relative")
-        configuration = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
-        val assetDir = File(configuration.destinationDir, "css")
-        val aboutFile = File(configuration.destinationDir, "about.html")
-        val blogSubDir = File(configuration.destinationDir, "blog")
+        conf = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
+        val assetDir = File(conf.destinationDir, "css")
+        val aboutFile = File(conf.destinationDir, "about.html")
+        val blogSubDir = File(conf.destinationDir, "blog")
 
 
-        val oven = Oven(configuration)
+        val oven = Oven(conf)
         oven.bakeEverything()
 
         oven.errors.isEmpty() shouldBe true
-        configuration.destinationDir.exists() shouldBe true
-        configuration.destinationDir.list()?.isNotEmpty() shouldBe true
+        conf.destinationDir.exists() shouldBe true
+        conf.destinationDir.list()?.isNotEmpty() shouldBe true
         assetDir.exists() shouldBe true
         assetDir.list()?.isNotEmpty() shouldBe true
         aboutFile.shouldBeAFile()
@@ -108,18 +108,18 @@ class OvenTest : StringSpec({
         fw.write(PropertyList.DESTINATION_FOLDER.key + "=" + TestUtils.escapeBackSlashes(expectedDestination))
         fw.close()
 
-        configuration = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
-        val assetDir = File(configuration.destinationDir, "css")
-        val aboutFile = File(configuration.destinationDir, "about.html")
-        val blogSubDir = File(configuration.destinationDir, "blog")
+        conf = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
+        val assetDir = File(conf.destinationDir, "css")
+        val aboutFile = File(conf.destinationDir, "about.html")
+        val blogSubDir = File(conf.destinationDir, "blog")
 
 
-        val oven = Oven(configuration)
+        val oven = Oven(conf)
         oven.bakeEverything()
 
         oven.errors.isEmpty() shouldBe true
-        configuration.destinationDir.exists() shouldBe true
-        configuration.destinationDir.list()?.isNotEmpty() shouldBe true
+        conf.destinationDir.exists() shouldBe true
+        conf.destinationDir.list()?.isNotEmpty() shouldBe true
         assetDir.exists() shouldBe true
         assetDir.list()?.isNotEmpty() shouldBe true
         aboutFile.shouldBeAFile()
@@ -130,9 +130,9 @@ class OvenTest : StringSpec({
 
 
     "shouldThrowExceptionIfSourceDirDoesNotExist" {
-        configuration.setSourceDir(root.resolve("none").toFile())
+        conf.setSourceDir(root.resolve("none").toFile())
 
-        shouldThrow<JBakeException> { Oven(configuration) }
+        shouldThrow<JBakeException> { Oven(conf) }
     }
 
     "shouldInstantiateNeededUtensils" {
@@ -140,21 +140,21 @@ class OvenTest : StringSpec({
         val content = TestUtils.newDir(root.toFile(), "content")
         val assets = TestUtils.newDir(root.toFile(), "assets")
 
-        configuration.templateDir = (template)
-        configuration.contentDir = (content)
-        configuration.assetDir = (assets)
+        conf.templateDir = (template)
+        conf.contentDir = (content)
+        conf.assetDir = (assets)
 
-        val oven = Oven(configuration)
+        val oven = Oven(conf)
 
         oven.utensils.contentStore.shouldNotBeNull()
         oven.utensils.crawler.shouldNotBeNull()
         oven.utensils.renderer.shouldNotBeNull()
         oven.utensils.asset.shouldNotBeNull()
-        oven.utensils.configuration shouldBe configuration
+        oven.utensils.configuration shouldBe conf
     }
 
     "shouldInspectConfigurationDuringInstantiationFromUtils" {
-        configuration.setSourceDir(root.resolve("none").toFile())
+        conf.setSourceDir(root.resolve("none").toFile())
 
         val contentStore = mockk<ContentStore>()
         val crawler = mockk<Crawler>()
@@ -162,7 +162,7 @@ class OvenTest : StringSpec({
         val asset = mockk<Asset>()
 
         val utensils = Utensils(
-            configuration = configuration,
+            configuration = conf,
             contentStore = contentStore,
             crawler = crawler,
             renderer = renderer,
@@ -174,9 +174,10 @@ class OvenTest : StringSpec({
 
     "shouldCrawlRenderAndCopyAssets" {
 
-        configuration.templateDir = TestUtils.newDir(root.toFile(), "template")
-        configuration.contentDir = TestUtils.newDir(root.toFile(), "content")
-        configuration.assetDir = TestUtils.newDir(root.toFile(), "assets")
+        conf.templateDir = TestUtils.newDir(root.toFile(), "template")
+        conf.contentDir = TestUtils.newDir(root.toFile(), "content")
+        conf.assetDir = TestUtils.newDir(root.toFile(), "assets")
+        conf.setProperty(PropertyList.RENDER_TAGS.key, "false")
 
         contentStore = spyk(ContentStore("memory", "documents" + System.currentTimeMillis()))
 
@@ -185,7 +186,7 @@ class OvenTest : StringSpec({
         val asset = mockk<Asset>(relaxed = true)
 
         // Mock the config property so render methods can access it
-        every { renderer.config } answers { configuration }
+        every { renderer.config } answers { conf }
 
         // Mock all render methods that might be called by rendering tools
         // These methods are called without parameters (using default parameters)
@@ -198,7 +199,7 @@ class OvenTest : StringSpec({
         every { renderer.renderTags() } returns 0
 
         val utensils = Utensils(
-            configuration = configuration,
+            configuration = conf,
             contentStore = contentStore,
             renderer = renderer,
             crawler = crawler,
@@ -216,19 +217,19 @@ class OvenTest : StringSpec({
     }
 
     "localeConfiguration" {
-        val language = configuration.jvmLocale
+        val language = conf.jvmLocale
 
-        val oven = Oven(configuration)
+        val oven = Oven(conf)
         oven.bakeEverything()
 
         Locale.getDefault() shouldBe Locale(language)
     }
 
     "noLocaleConfiguration" {
-        configuration.setProperty(PropertyList.JVM_LOCALE.key, null)
+        conf.setProperty(PropertyList.JVM_LOCALE.key, null)
 
         val language = Locale.getDefault().language
-        val oven = Oven(configuration)
+        val oven = Oven(conf)
         oven.bakeEverything()
 
         Locale.getDefault().language shouldBe language
