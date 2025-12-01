@@ -9,3 +9,4 @@ include 'jbake-dist'
 // Temporarily disabled - needs Maven plugin descriptor generation fixes for Gradle 9
 //include 'jbake-maven-plugin'
 include 'jbake-e2e-tests'
+include 'jbake-texy-service'

@@ -1,0 +1,260 @@
+plugins {
+    id "org.jbake.convention.java-common"
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+description = "Docker container for Texy markup processing service"
+
+// This module is only for Docker image and tests, skip deployment
+tasks.withType(PublishToMavenRepository).configureEach {
+    enabled = false
+}
+
+// Docker configuration
+ext {
+    dockerImageName = project.findProperty('docker.image.name') ?: 'jbake/texy-service'
+    dockerImageTag = project.findProperty('docker.image.tag') ?: project.version
+    dockerHubUsername = System.getenv('DOCKERHUB_USERNAME') ?: project.findProperty('dockerhub.username')
+    dockerHubPassword = System.getenv('DOCKERHUB_PASSWORD') ?: project.findProperty('dockerhub.password')
+    skipDocker = project.hasProperty('skipDocker') ? project.property('skipDocker').toBoolean() : false
+}
+
+sourceSets {
+    test {
+        kotlin {
+            srcDir 'src/test/kotlin'
+        }
+    }
+}
+
+dependencies {
+    // JBake core for end-to-end testing
+    testImplementation project(':jbake-core')
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // TestContainers for Docker integration testing
+    testImplementation "org.testcontainers:testcontainers:$testcontainersVersion"
+    testImplementation "org.testcontainers:testcontainers-junit-jupiter:$testcontainersVersion"
+
+    // Force newer docker-java versions that support Docker API 1.44+
+    testImplementation "com.github.docker-java:docker-java-core:$dockerJavaVersion"
+    testImplementation "com.github.docker-java:docker-java-api:$dockerJavaVersion"
+    testImplementation "com.github.docker-java:docker-java-transport-zerodep:$dockerJavaVersion"
+
+    // Jackson dependencies required by Testcontainers 2.0.2
+    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+
+    // Testing frameworks
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5Version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit5Version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
+    testImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
+    testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+
+    // HTTP Client for testing
+    testImplementation "org.apache.httpcomponents.client5:httpclient5:5.5.1"
+
+    // SLF4J for logging
+    testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
+}
+
+// Build Docker image using docker CLI
+tasks.register('dockerBuild', Exec) {
+    group = 'docker'
+    description = 'Build Texy service Docker image'
+
+    workingDir projectDir
+    commandLine 'docker', 'build', '-t', "${dockerImageName}:${dockerImageTag}", '.'
+
+    enabled = !skipDocker
+
+    doFirst {
+        logger.lifecycle("Building Docker image: ${dockerImageName}:${dockerImageTag}")
+    }
+}
+
+// Tag Docker image as latest
+tasks.register('dockerTag', Exec) {
+    group = 'docker'
+    description = 'Tag Texy service Docker image as latest'
+
+    dependsOn dockerBuild
+    commandLine 'docker', 'tag', "${dockerImageName}:${dockerImageTag}", "${dockerImageName}:latest"
+
+    enabled = !skipDocker
+
+    doFirst {
+        logger.lifecycle("Tagging Docker image as latest")
+    }
+}
+
+// Push versioned image to Docker Hub
+tasks.register('dockerPush', Exec) {
+    group = 'docker'
+    description = 'Push versioned Texy service Docker image to Docker Hub'
+
+    dependsOn dockerBuild
+    commandLine 'docker', 'push', "${dockerImageName}:${dockerImageTag}"
+
+    enabled = !skipDocker && dockerHubUsername != null && dockerHubPassword != null
+
+    doFirst {
+        logger.lifecycle("Pushing Docker image: ${dockerImageName}:${dockerImageTag}")
+        if (dockerHubUsername && dockerHubPassword) {
+            // Login to Docker Hub
+            project.exec {
+                commandLine 'docker', 'login', '-u', dockerHubUsername, '--password-stdin'
+                standardInput = new ByteArrayInputStream(dockerHubPassword.bytes)
+            }
+        }
+    }
+}
+
+// Push latest tag to Docker Hub
+tasks.register('dockerPushLatest', Exec) {
+    group = 'docker'
+    description = 'Push latest Texy service Docker image to Docker Hub'
+
+    dependsOn dockerTag, dockerPush
+    commandLine 'docker', 'push', "${dockerImageName}:latest"
+
+    enabled = !skipDocker && dockerHubUsername != null && dockerHubPassword != null
+
+    doFirst {
+        logger.lifecycle("Pushing Docker image: ${dockerImageName}:latest")
+    }
+}
+
+// Build and tag images during assemble
+tasks.named('assemble') {
+    dependsOn dockerBuild, dockerTag
+}
+
+// Push images during publish (if credentials are available)
+tasks.register('dockerPublish') {
+    group = 'docker'
+    description = 'Build and push Texy service Docker images to Docker Hub'
+
+    dependsOn dockerPush, dockerPushLatest
+}
+
+test {
+    useJUnitPlatform()
+
+    // Depend on Docker image being built
+    dependsOn dockerBuild
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    // Pass Docker image name to tests
+    systemProperty "docker.image.name", "${dockerImageName}:${dockerImageTag}"
+
+    // Docker API version for compatibility with modern Docker (1.44+)
+    systemProperty "DOCKER_API_VERSION", "1.44"
+
+    // TestContainers configuration
+    systemProperty "testcontainers.reuse.enable", "false"
+    environment "TESTCONTAINERS_RYUK_DISABLED", "true"
+    environment "DOCKER_API_VERSION", "1.44"
+
+    // Workaround for nested mount issue in TC 2.x
+    environment "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY", "org.testcontainers.dockerclient.UnixSocketClientProviderStrategy"
+
+    // Allow DOCKER_HOST to be passed through from environment (for rootless Docker)
+    if (System.getenv("DOCKER_HOST")) {
+        environment "DOCKER_HOST", System.getenv("DOCKER_HOST")
+    }
+
+    // Increase timeout for container operations
+    timeout = Duration.ofMinutes(10)
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Task to display Docker build information
+tasks.register('dockerInfo') {
+    group = 'docker'
+    description = 'Display Docker build configuration'
+
+    doLast {
+        println """
+==============================================
+Texy Service Docker Configuration
+==============================================
+Image Name:      ${dockerImageName}
+Image Tag:       ${dockerImageTag}
+Latest Tag:      ${dockerImageName}:latest
+Skip Docker:     ${skipDocker}
+Docker Hub User: ${dockerHubUsername ?: '(not set)'}
+Build Dir:       ${projectDir}
+==============================================
+        """.trim()
+    }
+}
+
+// Add help task for Docker commands
+tasks.register('dockerHelp') {
+    group = 'docker'
+    description = 'Display help for Docker tasks'
+
+    doLast {
+        println """
+==============================================
+Texy Service Docker Tasks
+==============================================
+
+Build Tasks:
+  dockerBuild         - Build Docker image
+  dockerTag           - Tag image as 'latest'
+  assemble            - Build and tag (default build)
+
+Push Tasks:
+  dockerPush          - Push versioned image to Docker Hub
+  dockerPushLatest    - Push 'latest' tag to Docker Hub
+  dockerPublish       - Push all images to Docker Hub
+
+Utility Tasks:
+  dockerInfo          - Show Docker configuration
+  dockerHelp          - Show this help
+
+Test Tasks:
+  test                - Run tests (builds image first)
+
+Examples:
+  # Build image
+  ./gradlew :jbake-texy-service:assemble
+
+  # Build and test
+  ./gradlew :jbake-texy-service:build
+
+  # Skip Docker operations
+  ./gradlew :jbake-texy-service:build -PskipDocker=true
+
+  # Push to Docker Hub
+  export DOCKERHUB_USERNAME=your-username
+  export DOCKERHUB_PASSWORD=your-password
+  ./gradlew :jbake-texy-service:dockerPublish
+
+  # Custom image name
+  ./gradlew :jbake-texy-service:dockerBuild \\
+    -Pdocker.image.name=myrepo/texy
+
+==============================================
+        """.trim()
+    }
+}
+

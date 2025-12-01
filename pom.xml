@@ -92,6 +92,7 @@
         <version.snakeyaml>2.5</version.snakeyaml>
         <version.thymeleaf>3.1.3.RELEASE</version.thymeleaf>
         <version.picocli>4.7.7</version.picocli>
+        <version.testcontainers>2.0.2</version.testcontainers>
 
         <!-- Testing dependencies versions (synced) -->
         <version.junit4>4.13.2</version.junit4>
@@ -163,6 +164,10 @@
             <dependency><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId><version>${version.kotest}</version></dependency>
             <dependency><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId><version>${version.kotest}</version></dependency>
             <dependency><groupId>io.kotest</groupId><artifactId>kotest-property</artifactId><version>${version.kotest}</version></dependency>
+            <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version></dependency>
+            <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><version>${version.testcontainers}</version></dependency>
+
+
             <!-- Maven Plugin dependencies -->
             <dependency><groupId>org.apache.maven</groupId><artifactId>maven-core</artifactId><version>${version.maven}</version></dependency>
             <dependency><groupId>org.apache.maven.plugin-tools</groupId><artifactId>maven-plugin-annotations</artifactId><version>${version.maven.annotations}</version></dependency>

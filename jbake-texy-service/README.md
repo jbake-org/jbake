@@ -166,9 +166,11 @@ Runs tests with Docker integration:
 </plugin>
 ```
 
-## Maven Profiles
+## Build Profiles & Properties
 
-### skipDocker
+### Maven Profiles
+
+#### skipDocker
 
 Skip Docker operations:
 
@@ -176,12 +178,36 @@ Skip Docker operations:
 mvn clean install -PskipDocker
 ```
 
-### docker-push
+#### docker-push
 
 Enable Docker Hub push during deploy:
 
 ```bash
 mvn clean deploy -Pdocker-push
+```
+
+### Gradle Properties
+
+#### skipDocker
+
+Skip Docker operations:
+
+```bash
+./gradlew build -PskipDocker=true
+```
+
+#### Custom Image Name/Tag
+
+```bash
+./gradlew dockerBuild \
+  -Pdocker.image.name=myrepo/texy \
+  -Pdocker.image.tag=custom-tag
+```
+
+Set in `gradle.properties`:
+```properties
+docker.image.name=myrepo/texy-service
+dockerhub.username=your-username
 ```
 
 ## CI/CD Integration
@@ -358,6 +384,7 @@ mvn test
 
 ### Local Development
 
+**Using Maven:**
 ```bash
 # 1. Build image
 mvn package -DskipTests
@@ -372,12 +399,41 @@ mvn test
 docker stop texy && docker rm texy
 ```
 
+**Using Gradle:**
+```bash
+# 1. Build image
+./gradlew :jbake-texy-service:assemble
+
+# 2. Run container
+docker run -d -p 8080:8080 --name texy jbake/texy-service:latest
+
+# 3. Run tests
+./gradlew :jbake-texy-service:test
+
+# 4. Cleanup
+docker stop texy && docker rm texy
+```
+
 ### Modifying the Service
 
 1. Edit `src/main/php/texy-service.php`
-2. Rebuild image: `mvn package -DskipTests`
+2. Rebuild image:
+   - Maven: `mvn package -DskipTests`
+   - Gradle: `./gradlew :jbake-texy-service:assemble`
 3. Test manually: `docker run ...`
-4. Run tests: `mvn test`
+4. Run tests:
+   - Maven: `mvn test`
+   - Gradle: `./gradlew :jbake-texy-service:test`
+
+### Gradle Helper Tasks
+
+```bash
+# Show Docker configuration
+./gradlew :jbake-texy-service:dockerInfo
+
+# Show all Docker tasks and examples
+./gradlew :jbake-texy-service:dockerHelp
+```
 
 ### Adding Tests
 
