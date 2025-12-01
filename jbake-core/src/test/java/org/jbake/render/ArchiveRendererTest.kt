@@ -10,6 +10,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.template.RenderingException
+import java.nio.file.Files
 
 class ArchiveRendererTest : StringSpec({
 
@@ -59,10 +60,11 @@ class ArchiveRendererTest : StringSpec({
     "doesRenderWhenConfigDoesRenderArchives" {
         val tool = ArchiveRenderingTool()
 
+        val tempDir = Files.createTempDirectory("jbake-test").toFile()
         val mockConf = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { mockConf.renderArchive } returns true
         every { mockConf.archiveFileName } returns "mockarchive.html"
-        every { mockConf.destinationDir } returns mockk(relaxed = true)
+        every { mockConf.destinationDir } returns tempDir
         every { mockConf.renderEncoding } returns "UTF-8"
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
@@ -72,15 +74,18 @@ class ArchiveRendererTest : StringSpec({
 
         result shouldBe 1
         verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
+
+        tempDir.deleteRecursively()
     }
 
     "propagatesRenderingException" {
         val tool = ArchiveRenderingTool()
 
+        val tempDir = Files.createTempDirectory("jbake-test").toFile()
         val mockConf = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { mockConf.renderArchive } returns true
         every { mockConf.archiveFileName } returns "mockarchive.html"
-        every { mockConf.destinationDir } returns mockk(relaxed = true)
+        every { mockConf.destinationDir } returns tempDir
 
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
@@ -90,5 +95,7 @@ class ArchiveRendererTest : StringSpec({
         shouldThrow<RenderingException> {
             tool.render(renderer, contentStore, mockConf)
         }
+
+        tempDir.deleteRecursively()
     }
 })
