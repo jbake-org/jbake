@@ -81,7 +81,7 @@
         <version.jetty.server>11.0.26</version.jetty.server>
         <version.json.simple>1.1.1</version.json.simple>
         <version.jade4j>1.3.2</version.jade4j>
-        <version.pug4j>2.4.0</version.pug4j>
+        <version.pug4j>2.4.1</version.pug4j>
         <version.jsoup>1.21.2</version.jsoup>
         <version.jgit>7.4.0.202509020913-r</version.jgit>
         <version.logback>1.5.21</version.logback>
