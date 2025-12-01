@@ -24,7 +24,7 @@
         <!-- API Dependencies -->
         <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId></dependency>
         <dependency><groupId>org.apache.commons</groupId><artifactId>commons-configuration2</artifactId></dependency>
-        <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>2.0.17</version></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>${version.slf4j}</version></dependency>
         <!-- Templating engines -->
         <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId><optional>true</optional></dependency>
         <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><optional>true</optional></dependency>

@@ -54,6 +54,7 @@
         <module>jbake-dist</module>
         <module>jbake-maven-plugin</module>
         <module>jbake-e2e-tests</module>
+        <module>jbake-texy-service</module>
     </modules>
 
     <properties>
