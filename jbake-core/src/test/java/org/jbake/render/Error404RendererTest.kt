@@ -50,6 +50,8 @@ class Error404RendererTest : StringSpec({
         every { configuration.error404FileName } returns "mock404file.html"
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
+        every { mockRenderer.config } answers { configuration }
+        every { mockRenderer.renderError404() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 

@@ -48,6 +48,8 @@ class FeedRendererTest : StringSpec({
         every { configuration.renderFeed } returns true
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
+        every { mockRenderer.config } answers { configuration }
+        every { mockRenderer.renderFeed() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 

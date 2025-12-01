@@ -43,8 +43,11 @@ class IndexRendererTest : StringSpec({
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
+        every { configuration.paginateIndex } returns false
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
+        every { mockRenderer.config } answers { configuration }
+        every { mockRenderer.renderIndex() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
         renderResponse shouldBe 1

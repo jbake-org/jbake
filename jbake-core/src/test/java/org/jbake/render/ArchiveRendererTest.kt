@@ -13,7 +13,7 @@ import org.jbake.template.RenderingException
 
 class ArchiveRendererTest : StringSpec({
 
-        fun returnsZeroWhenConfigDoesNotRenderArchives() {
+    "returnsZeroWhenConfigDoesNotRenderArchives" {
         val tool = ArchiveRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -49,6 +49,8 @@ class ArchiveRendererTest : StringSpec({
         every { configuration.archiveFileName } returns "archive.html"
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
+        every { mockRenderer.config } answers { configuration }
+        every { mockRenderer.renderArchive() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 

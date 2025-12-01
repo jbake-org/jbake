@@ -6,6 +6,7 @@ import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
@@ -186,9 +187,22 @@ class OvenTest : StringSpec({
         val renderer = mockk<Renderer>(relaxed = true)
         val asset = mockk<Asset>(relaxed = true)
 
+        // Mock the config property so render methods can access it
+        every { renderer.config } answers { configuration }
+
+        // Mock all render methods that might be called by rendering tools
+        // These methods are called without parameters (using default parameters)
+        every { renderer.renderIndex() } returns Unit
+        every { renderer.renderIndexPaging() } returns Unit
+        every { renderer.renderArchive() } returns Unit
+        every { renderer.renderFeed() } returns Unit
+        every { renderer.renderError404() } returns Unit
+        every { renderer.renderSitemap() } returns Unit
+        every { renderer.renderTags() } returns 0
+
         val utensils = Utensils(
             configuration = configuration,
-            contentStore = contentStore!!,
+            contentStore = contentStore,
             renderer = renderer,
             crawler = crawler,
             asset = asset
@@ -198,8 +212,8 @@ class OvenTest : StringSpec({
 
         oven.bakeEverything()
 
-        verify(exactly = 1) { contentStore!!.startup() }
-        verify(atLeast = 1) { renderer.renderIndex(any()) }
+        verify(exactly = 1) { contentStore.startup() }
+        verify(atLeast = 1) { renderer.renderIndex() }
         verify(exactly = 1) { crawler.crawlContentDirectory() }
         verify(exactly = 1) { asset.copy() }
     }

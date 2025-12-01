@@ -17,7 +17,7 @@ import java.util.*
  * Render output to a file.
  */
 class Renderer {
-    private val config: JBakeConfiguration
+    internal val config: JBakeConfiguration
     private val renderingEngine: DelegatingTemplateEngine
     private val db: ContentStore
 
