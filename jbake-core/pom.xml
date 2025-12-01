@@ -120,6 +120,30 @@
                 </configuration>
             </plugin>
 
+            <!-- Dokka plugin for Kotlin documentation (KDoc) -->
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId><artifactId>dokka-maven-plugin</artifactId><version>${version.dokka}</version>
+                <executions>
+                    <!-- Generate Javadoc-compatible JAR from Kotlin KDoc -->
+                    <execution><id>dokka-javadoc-jar</id><phase>package</phase><goals><goal>javadocJar</goal></goals></execution>
+                </executions>
+                <configuration>
+                    <sourceDirectories>
+                        <dir>${project.basedir}/src/main/java</dir>
+                    </sourceDirectories>
+                    <skip>false</skip>
+                    <!-- Use javadoc format for Maven Central compatibility -->
+                    <dokkaSourceSets>
+                        <dokkaSourceSet>
+                            <sourceRoots>
+                                <root>${project.basedir}/src/main/java</root>
+                            </sourceRoots>
+                            <jdkVersion>17</jdkVersion>
+                        </dokkaSourceSet>
+                    </dokkaSourceSets>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>

@@ -117,6 +117,26 @@
                         </manifest>
                     </archive>
                 </configuration>
+                <executions>
+                    <!-- Generate empty source JAR for Maven Central (dist module has no sources) -->
+                    <execution>
+                        <id>empty-sources-jar</id><phase>package</phase><goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <classesDirectory>${project.basedir}/src/main/resources</classesDirectory>
+                            <excludes><exclude>**/*</exclude></excludes>
+                        </configuration>
+                    </execution>
+                    <!-- Generate empty javadoc JAR for Maven Central (dist module has no sources) -->
+                    <execution>
+                        <id>empty-javadoc-jar</id><phase>package</phase><goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                            <classesDirectory>${project.basedir}/src/main/resources</classesDirectory>
+                            <excludes><exclude>**/*</exclude></excludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
