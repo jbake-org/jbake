@@ -1,23 +1,26 @@
 = JBake
-Jonathan Bullock
-2021-04-13
+Ondrej Zizka, Jonathan Bullock
+2025-12-01
 :idprefix:
 
 http://jbake.org[JBake] is a Java based open source static site/blog generator for developers.
 
-image:https://img.shields.io/github/v/release/jbake-org/jbake?label=download&sort=semver["GitHub Release Download", link="https://github.com/jbake-org/jbake/releases/latest"]
-image:https://img.shields.io/maven-central/v/org.jbake/jbake-core.svg["Maven Download", link="http://jbake.org/download.html#maven"]
-image:https://img.shields.io/homebrew/v/jbake.svg["Homebrew Download", link="http://jbake.org/download.html#homebrew"]
+NOTE: This is a fork maintained by Ondrej Zizka with modernizations including Kotlin 2.2, Gradle 9, JDK 17+, and Maven build support.
 
-image:https://img.shields.io/travis/com/jbake-org/jbake/master.svg["Build Status", link="https://travis-ci.com/github/jbake-org/jbake"]
-image:https://ci.appveyor.com/api/projects/status/2q7hvg03wsjx953b?svg=true["Appveyor Status", link="https://ci.appveyor.com/project/jbake-org/jbake"]
-image:https://img.shields.io/coveralls/jbake-org/jbake/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/jbake"]
+image:https://img.shields.io/github/v/release/OndraZizka/jbake?label=download&sort=semver["GitHub Release Download", link="https://github.com/OndraZizka/jbake/releases/latest"]
+image:https://img.shields.io/maven-central/v/ch.zizka.jbake/jbake-core.svg["Maven Central", link="https://central.sonatype.com/artifact/ch.zizka.jbake/jbake-core"]
 
-image:https://badges.gitter.im/jbake-org/jbake.svg["Gitter Chat", link="https://gitter.im/jbake-org/jbake"]
+*Version:* 5.0.0-rc1 | *Group ID:* `ch.zizka.jbake`
 
 == Documentation
 
-Full documentation is available on http://jbake.org/docs/[jbake.org].
+Original documentation is available on http://jbake.org/docs/[jbake.org].
+
+Additional documentation for this fork:
+
+* link:BUILD.adoc[Build Guide] - Information on building with Gradle or Maven
+* link:docs/releasing/RELEASING.md[Release Guide] - Instructions for publishing to Maven Central
+* link:CONTRIBUTING.asciidoc[Contributing Guide]
 
 == Contributing
 
@@ -56,9 +59,8 @@ Talk to other users of JBake on the forum:
 
 == Docker Image
 
-The image uses the official https://hub.docker.com/r/adoptopenjdk/openjdk11/[adoptopenjdk/openjdk11:alpine] image
-for building a distribution of JBake and
-https://hub.docker.com/r/adoptopenjdk/openjdk11/[adoptopenjdk/openjdk11:alpine-jre] for runtime.
+The image uses https://hub.docker.com/_/gradle[gradle:9.2.1-jdk17] for building a distribution of JBake and
+https://hub.docker.com/_/eclipse-temurin[eclipse-temurin:17-jre-alpine] for runtime.
 
 === Build
 
@@ -96,16 +98,28 @@ NOTE: Docker image timezone is _UTC_. This may affect the date and time expected
 
 == Build System
 
-The project uses http://gradle.org[Gradle] 4.9+ as the build system.
-To build the JBake distribution ZIP file execute the following command from the root of the repo:
+This project supports both http://gradle.org[Gradle] 9+ and https://maven.apache.org[Maven] as build systems.
+
+=== Building with Gradle
+
+To build the JBake distribution ZIP file:
 
 ----
 $ ./gradlew distZip
 ----
 
-This will build a ZIP file in the `/build/distributions` folder.
+This will build a ZIP file in the `jbake-dist/build/distributions` folder.
 
-For more information see link:BUILD.adoc[Test, Build and Deploy]
+=== Building with Maven
+
+To build the project with Maven:
+
+----
+$ export JAVA_HOME=/path/to/jdk-17
+$ mvn clean install
+----
+
+For more information see link:BUILD.adoc[Build Guide]
 
 == Coding conventions
 
@@ -142,16 +156,43 @@ Pick the project checkstyle file `config/checkstyle/checkstyle.xml`
 
 == Tools & Libraries Used
 
-* http://commons.apache.org/[Apache Commons IO, Configuration, Lang & Logging]
-* http://args4j.kohsuke.org/[Args4j]
-* http://asciidoctor.org/[AsciidoctorJ]
-* http://freemarker.org/[Freemarker]
-* http://gradle.org[Gradle]
-* http://groovy-lang.org/[Groovy]
-* http://junit.org/[JUnit]
-* https://github.com/vsch/flexmark-java[Flexmark]
-* http://www.eclipse.org/jetty/[Jetty Server]
-* http://www.orientdb.org/[OrientDB]
+=== Platform & Core
+
+* https://kotlinlang.org/[Kotlin 2.2] - Primary programming language
+* https://www.oracle.com/java/technologies/downloads/#java17[JDK 17+] - Java Development Kit
+* http://commons.apache.org/proper/commons-configuration/[Apache Commons Configuration] - Configuration management
+* https://logback.qos.ch/[Logback] & https://www.slf4j.org/[SLF4J] - Logging framework
+* http://args4j.kohsuke.org/[Args4j] - Command-line argument parsing
+* http://www.eclipse.org/jetty/[Jetty Server] - Embedded web server
+* http://www.orientdb.org/[OrientDB] - Document database for content storage
+
+=== Templating Engines
+
+* http://freemarker.org/[Freemarker] - Template engine
+* http://groovy-lang.org/[Groovy] - Groovy templates support
+* https://www.thymeleaf.org/[Thymeleaf] - Modern server-side Java template engine
+* https://github.com/jknack/handlebars.java[Handlebars.java] - Handlebars template engine
+
+=== Content Parsing & Processing
+
+* http://asciidoctor.org/[AsciidoctorJ] - AsciiDoc processor
+* https://github.com/vsch/flexmark-java[Flexmark] - Markdown parser and processor
+* https://commonmark.org/[CommonMark] - Markdown specification implementation
+
+=== Build Systems
+
+* https://maven.apache.org/[Maven] - Primary build system for multi-module projects
+* http://gradle.org[Gradle 9] - Alternative build system with Kotlin DSL support
+* https://docs.gradle.org/current/userguide/gradle_wrapper.html[Gradle Wrapper] - Version-locked Gradle distribution
+
+=== Testing
+
+* https://kotest.io/[Kotest] - Kotlin testing framework
+* http://junit.org/[JUnit 5] - Java testing framework
+* https://mockk.io/[MockK] - Mocking library for Kotlin
+* https://site.mockito.org/[Mockito] - Mocking framework for Java
+* https://www.testcontainers.org/[Testcontainers] - Docker-based integration testing
+* https://assertj.github.io/doc/[AssertJ] - Fluent assertions library
 
 == Copyright & License
 
