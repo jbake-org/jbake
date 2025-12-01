@@ -1,17 +1,14 @@
 package org.jbake.app
 
-import org.apache.commons.configuration2.CompositeConfiguration
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
+import org.jbake.util.Logging.logger
 import org.jbake.util.PagingHelper
 import org.slf4j.Logger
-import org.jbake.util.Logging.logger
 import java.io.*
 import java.nio.file.Files
 import java.util.*
@@ -24,39 +21,8 @@ class Renderer {
     private val renderingEngine: DelegatingTemplateEngine
     private val db: ContentStore
 
-    @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration)} instead.
-      Creates a new instance of Renderer with supplied references to folders.""")
-    constructor(db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration) : this(
-        db,
-        JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
-    ) {
-        val configuration = (this.config as DefaultJBakeConfiguration)
-        configuration.destinationDir = destination
-        configuration.templateDir = templatesPath
-    }
-
-    // TODO: Should all content be made available to all templates via this class?
-    @Deprecated("""Use {@link #Renderer(ContentStore, JBakeConfiguration, DelegatingTemplateEngine)} instead.
-      Creates a new instance of Renderer with supplied references to folders and the instance of DelegatingTemplateEngine to use.""")
-    constructor(
-        db: ContentStore,
-        destination: File,
-        templatesPath: File,
-        config: CompositeConfiguration,
-        renderingEngine: DelegatingTemplateEngine
-    ) : this(
-        db,
-        JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config),
-        renderingEngine
-    ) {
-        val configuration = (this.config as DefaultJBakeConfiguration)
-        configuration.destinationDir = destination
-        configuration.templateDir = templatesPath
-    }
-
     /**
-     * Creates a new instance of Renderer with supplied references to directorys.
-     *
+     * Creates a new instance of Renderer with supplied configuration.
      */
     constructor(db: ContentStore, config: JBakeConfiguration) {
         this.config = config
@@ -65,7 +31,7 @@ class Renderer {
     }
 
     /**
-     * Creates a new instance of Renderer with supplied references to directorys and the instance of DelegatingTemplateEngine to use.
+     * Creates a new instance of Renderer with supplied configuration and the instance of DelegatingTemplateEngine to use.
      */
     constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {
         this.config = config

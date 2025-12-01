@@ -1,29 +1,14 @@
 package org.jbake.launcher
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.JBakeException
 import org.jbake.app.Oven
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.JBakeConfigurationFactory
 import java.text.MessageFormat
 
 /**
  * Delegate class responsible for launching a Bake.
  */
 class Baker {
-    /**
-     * @param options The given cli options
-     */
-    @Deprecated("use {@link Baker#bake(JBakeConfiguration)} instead")
-    fun bake(options: LaunchOptions, config: CompositeConfiguration) {
-        val configuration: JBakeConfiguration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(
-            options.getSource(),
-            options.getDestination(),
-            config,
-            options.isClearCache
-        )
-        bake(configuration)
-    }
 
     fun bake(config: JBakeConfiguration) {
         val oven = Oven(config)

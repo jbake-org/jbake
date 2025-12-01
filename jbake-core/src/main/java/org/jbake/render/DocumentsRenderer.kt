@@ -1,17 +1,14 @@
 package org.jbake.render
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
-import java.io.File
+import org.slf4j.Logger
 import java.util.*
 
 class DocumentsRenderer : RenderingTool {
@@ -109,11 +106,5 @@ class DocumentsRenderer : RenderingTool {
         navDocument.uri = document.uri
         navDocument.title = document.title
         return navDocument
-    }
-
-    @Throws(RenderingException::class)
-    override fun render(renderer: Renderer, db: ContentStore, destination: File, templatesPath: File, config: CompositeConfiguration): Int {
-        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(templatesPath.getParentFile(), config)
-        return render(renderer, db, configuration)
     }
 }

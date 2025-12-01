@@ -8,14 +8,12 @@ import de.neuland.pug4j.filter.JsFilter
 import de.neuland.pug4j.model.PugModel
 import de.neuland.pug4j.template.FileTemplateLoader
 import de.neuland.pug4j.template.PugTemplate
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import java.io.File
 import java.io.IOException
 import java.io.Writer
 import java.nio.charset.Charset
@@ -27,17 +25,11 @@ import java.util.*
  * Renders pages using the [Pug](https://pugjs.org/) template language (formerly known as Jade).
  * Migrated to pug4j 2.x which uses de.neuland.pug4j package names.
  */
-class PugTemplateEngine : AbstractTemplateEngine {
+class PugTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
 
     private val pugConfiguration = PugConfiguration()
 
-    @Deprecated("")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-            : super(config, db, destination, templatesPath) {
-        initPugConfiguration()
-    }
-
-    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
+    init {
         initPugConfiguration()
     }
 

@@ -1,8 +1,6 @@
 package org.jbake.launcher
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ZipUtil
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import java.io.File
 import java.io.FileInputStream
@@ -12,8 +10,6 @@ import java.io.FileInputStream
  */
 class Init(private val config: JBakeConfiguration) {
 
-    @Deprecated("use {@link Init#Init(JBakeConfiguration)} instead")
-    constructor(config: CompositeConfiguration) : this(DefaultJBakeConfiguration(config))
 
     /**
      * Performs checks on output directory before extracting template file.

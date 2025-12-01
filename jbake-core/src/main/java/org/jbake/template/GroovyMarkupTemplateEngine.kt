@@ -2,13 +2,11 @@ package org.jbake.template
 
 import groovy.text.markup.MarkupTemplateEngine
 import groovy.text.markup.TemplateConfiguration
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes.DATE
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
-import java.io.File
 import java.io.Writer
 
 /**
@@ -17,19 +15,11 @@ import java.io.Writer
  *
  * @see [Groovy MarkupTemplateEngine Documentation](http://groovy-lang.org/templating.html._the_markuptemplateengine)
  */
-class GroovyMarkupTemplateEngine : AbstractTemplateEngine {
+class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     private var templateConfiguration: TemplateConfiguration? = null
     private var templateEngine: MarkupTemplateEngine? = null
 
-    @Deprecated("Use {@link #GroovyMarkupTemplateEngine(JBakeConfiguration, ContentStore)} instead")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath)
-    {
-        setupTemplateConfiguration()
-        initializeTemplateEngine()
-    }
-
-    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
+    init {
         setupTemplateConfiguration()
         initializeTemplateEngine()
     }

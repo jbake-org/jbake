@@ -1,11 +1,9 @@
 package org.jbake.launcher
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.vfs2.FileSystemException
 import org.apache.commons.vfs2.VFS
 import org.apache.commons.vfs2.impl.DefaultFileMonitor
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.slf4j.Logger
 import org.jbake.util.Logging.logger
 
@@ -14,14 +12,6 @@ import org.jbake.util.Logging.logger
  */
 class BakeWatcher {
 
-    /**
-     * Starts watching the file system for changes to trigger a bake.
-     */
-    @Deprecated("""use {@link BakeWatcher#start(JBakeConfiguration)} instead""")
-    fun start(launchOptions: LaunchOptions, config: CompositeConfiguration) {
-        val configuration = JBakeConfigurationFactory().createDefaultJbakeConfiguration(launchOptions.getSource(), config)
-        start(configuration)
-    }
 
     /**
      * Starts watching the file system for changes to trigger a bake.

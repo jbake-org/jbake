@@ -1,6 +1,5 @@
 package org.jbake.template
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.lang3.LocaleUtils
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -12,7 +11,6 @@ import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import org.thymeleaf.context.LazyContextVariable
 import org.thymeleaf.templateresolver.FileTemplateResolver
-import java.io.File
 import java.io.Writer
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -28,21 +26,13 @@ import java.util.concurrent.locks.ReentrantLock
  *
  * `template.feed.thymeleaf.mode=XML`
  */
-class ThymeleafTemplateEngine : AbstractTemplateEngine {
+class ThymeleafTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     private val lock = ReentrantLock()
     private var templateEngine: TemplateEngine? = null
     private val context: Context
     private var templateResolver: FileTemplateResolver? = null
 
-    @Deprecated("""Use {@link #ThymeleafTemplateEngine(JBakeConfiguration, ContentStore)} instead """)
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath)
-    {
-        this.context = Context()
-        initializeTemplateEngine()
-    }
-
-    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
+    init {
         this.context = Context()
         initializeTemplateEngine()
     }

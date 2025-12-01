@@ -2,30 +2,21 @@ package org.jbake.template
 
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.DataFileUtil
-import java.io.File
 import java.io.IOException
 import java.io.Writer
 import java.util.*
 
 
 /** Renders pages using the [Freemarker](http://freemarker.org/) template engine. */
-class FreemarkerTemplateEngine : AbstractTemplateEngine {
+class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     lateinit var templateCfg: Configuration
 
-    @Deprecated("")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath)
-    {
-        createTemplateConfiguration()
-    }
-
-    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
+    init {
         createTemplateConfiguration()
     }
 

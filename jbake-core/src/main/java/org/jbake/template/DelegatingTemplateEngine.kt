@@ -1,32 +1,19 @@
 package org.jbake.template
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.FileUtil
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.model.TemplateModel
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.File
 import java.io.Writer
 
 /**
- * A template which is responsible for delegating to a supported template engine,
- * based on the file extension.
+ * A template engine which delegates to a supported template engine, based on the file extension.
  */
-class DelegatingTemplateEngine : AbstractTemplateEngine {
-    private val renderers: TemplateEngines
-
-    @Deprecated("""Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.""")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath)
-    {
-        this.renderers = TemplateEngines(this.config, db)
-    }
-
-    constructor(db: ContentStore, config: JBakeConfiguration) : super(config, db) {
-        this.renderers = TemplateEngines(config, db)
-    }
+class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : AbstractTemplateEngine(config, db) {
+    private val renderers: TemplateEngines = TemplateEngines(config, db)
 
     @Throws(RenderingException::class)
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {

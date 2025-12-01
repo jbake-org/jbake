@@ -40,17 +40,6 @@ class Oven {
     ) : this(JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, isClearCache))
 
     /**
-     * @param source       Project source directory
-     * @param isClearCache Should the cache be cleaned
-     * @throws Exception if configuration is not loaded correctly
-     */
-    @Deprecated("""Use {@link #Oven(JBakeConfiguration)} instead
-      Creates a new instance of the Oven with references to the source and destination folders.""")
-    constructor(source: File, destination: File, config: CompositeConfiguration, isClearCache: Boolean) : this(
-        JBakeConfigurationFactory().createDefaultJbakeConfiguration(source, destination, config, isClearCache)
-    )
-
-    /**
      * Create an Oven instance by a [JBakeConfiguration] It creates default [Utensils] needed to bake sites.
      * TODO: Refactor - weird that this one creates default utensils, while the other ctor takes utensils with .configuration.
      */

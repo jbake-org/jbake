@@ -1,9 +1,7 @@
 package org.jbake.app
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.io.FileUtils
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.slf4j.Logger
 import org.jbake.util.Logging.logger
 import java.io.File
@@ -14,22 +12,11 @@ import java.util.*
 /**
  * Deals with assets (static files such as css, js or image files).
  */
-class Asset {
+class Asset(private val config: JBakeConfiguration) {
 
     /** A list of all errors occurred during asset copying */
     internal val errors: MutableList<Throwable> = LinkedList<Throwable>()
 
-    private val config: JBakeConfiguration
-
-    @Deprecated("""Use {@link #Asset(JBakeConfiguration)} instead. Compatibility constructor.  Creates an instance of Asset.""")
-    constructor(assetSource: File, destination: File, config: CompositeConfiguration) {
-        this.config = JBakeConfigurationFactory().createDefaultJbakeConfiguration(assetSource, destination, config)
-    }
-
-    /** Creates an instance of Asset. */
-    constructor(config: JBakeConfiguration) {
-        this.config = config
-    }
 
     /** Copy all files from assets directory to destination directory read from configuration */
     fun copy() = copy(config.assetDir)

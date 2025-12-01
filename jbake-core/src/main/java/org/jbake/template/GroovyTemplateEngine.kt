@@ -3,7 +3,6 @@ package org.jbake.template
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.text.XmlTemplateEngine
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.codehaus.groovy.runtime.MethodClosure
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
@@ -15,14 +14,9 @@ import javax.xml.parsers.ParserConfigurationException
 
 
 /** Renders documents using a Groovy template engine - [SimpleTemplateEngine] or [XmlTemplateEngine] (.gxml). */
-class GroovyTemplateEngine : AbstractTemplateEngine {
+class GroovyTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     private val cachedTemplates: MutableMap<String, Template?> = HashMap()
 
-    @Deprecated("Use {@link #GroovyTemplateEngine(JBakeConfiguration, ContentStore)} instead")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath)
-
-    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db)
 
     @Throws(RenderingException::class)
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
@@ -41,9 +35,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
         val sourceTemplate = File(config.templateDir, templateName)
         var template = cachedTemplates[templateName]
         if (template == null) {
-            template = ste.createTemplate(
-                InputStreamReader(BufferedInputStream(FileInputStream(sourceTemplate)), config.templateEncoding)
-            )
+            template = ste.createTemplate(sourceTemplate)
             cachedTemplates[templateName] = template
         }
         return template
@@ -60,7 +52,7 @@ class GroovyTemplateEngine : AbstractTemplateEngine {
                 return try {
                     extractors.extractAndTransform(db, key, model, NoopAdapter())
                 }
-                // super.get() which would recurse
+                // super.get() would recurse, so we directly access the backing map.
                 catch (e: NoModelExtractorException) { model[key] }
             }
         }

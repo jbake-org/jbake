@@ -9,7 +9,6 @@ import de.neuland.jade4j.model.JadeModel
 import de.neuland.jade4j.template.FileTemplateLoader
 import de.neuland.jade4j.template.JadeTemplate
 import de.neuland.jade4j.template.TemplateLoader
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
@@ -17,7 +16,6 @@ import org.jbake.template.model.TemplateModel
 import org.jbake.util.Logging.logger
 import org.jbake.util.PathUtils
 import org.slf4j.Logger
-import java.io.File
 import java.io.IOException
 import java.io.Writer
 import java.text.SimpleDateFormat
@@ -26,17 +24,11 @@ import java.util.*
 /**
  *  Legacy. Jade is now Pug. Use PugTemplateEngine instead and migrate your templates.
  */
-class JadeTemplateEngine : AbstractTemplateEngine {
+class JadeTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
 
     private val jadeConfiguration = JadeConfiguration()
 
-    @Deprecated("")
-    constructor(config: CompositeConfiguration, db: ContentStore, destination: File, templatesPath: File)
-        : super(config, db, destination, templatesPath) {
-        initJadeConfiguration()
-    }
-
-    constructor(config: JBakeConfiguration, db: ContentStore) : super(config, db) {
+    init {
         initJadeConfiguration()
     }
 
