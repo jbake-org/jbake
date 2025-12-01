@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ch.zizka.jbake</groupId>
+        <artifactId>jbake-base</artifactId>
+        <version>5.0.0-rc1</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>jbake-texy-service</artifactId>
+    <packaging>pom</packaging>
+    <name>jbake-texy-service</name>
+    <description>Docker container for Texy markup processing service</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <docker.image.name>jbake/texy-service</docker.image.name>
+        <docker.image.tag>${project.version}</docker.image.tag>
+        <dockerhub.username>${env.DOCKERHUB_USERNAME}</dockerhub.username>
+        <dockerhub.password>${env.DOCKERHUB_PASSWORD}</dockerhub.password>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipTests>false</skipTests>
+        <skipDocker>false</skipDocker>
+    </properties>
+
+    <dependencies>
+        <!-- JBake core for end-to-end testing -->
+        <dependency><groupId>ch.zizka.jbake</groupId><artifactId>jbake-core</artifactId><version>${project.version}</version><scope>test</scope></dependency>
+
+        <!-- Kotlin -->
+        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId><scope>test</scope></dependency>
+
+        <!-- TestContainers for Docker integration testing -->
+        <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
+        <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
+
+        <!-- Testing frameworks -->
+        <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit
+            -jupiter-engine</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core-jvm</artifactId><version>${version.kotest}</version></dependency>
+
+
+        <!-- HTTP Client for testing -->
+        <dependency><groupId>org.apache.httpcomponents.client5</groupId><artifactId>httpclient5</artifactId><version>5.5.1</version><scope>test</scope></dependency>
+
+        <!-- SLF4J for logging -->
+        <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-simple</artifactId><version>${version.slf4j}</version><scope>test</scope></dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Dockerfile Maven Plugin for building and pushing Docker images -->
+            <plugin>
+                <groupId>com.spotify</groupId><artifactId>dockerfile-maven-plugin</artifactId><version>1.4.13</version>
+                <executions>
+                    <!-- Build Docker image during package phase -->
+                    <execution>
+                        <id>build-docker-image</id><phase>package</phase><goals><goal>build</goal></goals>
+                        <configuration>
+                            <repository>${docker.image.name}</repository>
+                            <tag>${docker.image.tag}</tag>
+                            <skipDockerInfo>false</skipDockerInfo>
+                            <skip>${skipDocker}</skip>
+                        </configuration>
+                    </execution>
+
+                    <!-- Tag as latest -->
+                    <execution>
+                        <id>tag-docker-latest</id><phase>package</phase><goals><goal>tag</goal></goals>
+                        <configuration>
+                            <repository>${docker.image.name}</repository>
+                            <tag>latest</tag>
+                            <skip>${skipDocker}</skip>
+                        </configuration>
+                    </execution>
+
+                    <!-- Push versioned image to Docker Hub during deploy phase -->
+                    <execution>
+                        <id>push-docker-version</id><phase>deploy</phase><goals><goal>push</goal></goals>
+                        <configuration>
+                            <repository>${docker.image.name}</repository>
+                            <tag>${docker.image.tag}</tag>
+                            <username>${dockerhub.username}</username>
+                            <password>${dockerhub.password}</password>
+                            <skip>${skipDocker}</skip>
+                        </configuration>
+                    </execution>
+
+                    <!-- Push latest tag to Docker Hub -->
+                    <execution>
+                        <id>push-docker-latest</id><phase>deploy</phase><goals><goal>push</goal></goals>
+                        <configuration>
+                            <repository>${docker.image.name}</repository>
+                            <tag>latest</tag>
+                            <username>${dockerhub.username}</username>
+                            <password>${dockerhub.password}</password>
+                            <skip>${skipDocker}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Kotlin Maven Plugin for test compilation -->
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Surefire Plugin for running tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.kt</include>
+                        <include>**/*Tests.kt</include>
+                    </includes>
+                    <systemPropertyVariables>
+                        <docker.image.name>${docker.image.name}:${docker.image.tag}</docker.image.name>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Skip default install (this is a Docker image, not a jar) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-install-plugin</artifactId>
+                <configuration><skip>true</skip></configuration>
+            </plugin>
+
+            <!-- Deploy plugin configured for Docker Hub push -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId>
+                <configuration><skip>true</skip></configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Profile to skip Docker operations -->
+        <profile>
+            <id>skipDocker</id>
+            <properties>
+                <skipDocker>true</skipDocker>
+            </properties>
+        </profile>
+
+        <!-- Profile for CI/CD with Docker Hub push -->
+        <profile>
+            <id>docker-push</id>
+            <properties>
+                <skipDocker>false</skipDocker>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId><artifactId>dockerfile-maven-plugin</artifactId>
+                        <executions><execution><id>push-docker</id><phase>deploy</phase><goals><goal>push</goal></goals></execution></executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
+

@@ -1,0 +1,121 @@
+title=Sample Texy Document
+status=published
+type=post
+date=2025-12-01
+tags=texy,markup,example
+~~~~~~
+
+Welcome to Texy!
+================
+
+This is a sample document written in **Texy markup**.
+
+Basic Formatting
+----------------
+
+You can make text **bold** or //italic//.
+
+You can also combine them: **//bold and italic//** text.
+
+Lists
+-----
+
+Unordered list:
+- First item
+- Second item
+- Third item
+  - Nested item
+  - Another nested item
+
+Ordered list:
+1. First step
+2. Second step
+3. Third step
+
+Links
+-----
+
+Visit "JBake website":https://jbake.org for more information.
+
+Or use alternative syntax: [JBake|https://jbake.org]
+
+Images
+------
+
+You can embed images like this:
+
+[* /images/logo.png *]
+
+Or with alignment:
+
+[* /images/logo.png <*] (left aligned)
+[* /images/logo.png >*] (right aligned)
+
+Code Blocks
+-----------
+
+Inline code: `System.out.println("Hello");`
+
+Code block:
+/--code java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, Texy!");
+    }
+}
+\--
+
+Tables
+------
+
+|----
+| Name | Language | Year
+|----
+| JBake | Java/Kotlin | 2012
+| Texy | PHP | 2004
+| Markdown | Perl | 2004
+|----
+
+Quotes
+------
+
+> This is a blockquote.
+> It can span multiple lines.
+>
+> And multiple paragraphs.
+
+Horizontal Rule
+---------------
+
+----
+
+Footnotes
+---------
+
+This text has a footnote.[*note]
+
+.[*note]: This is the footnote text.
+
+Special Characters
+------------------
+
+Texy automatically converts:
+- (c) to ©
+- (r) to ®
+- (tm) to ™
+- -- to –
+- --- to —
+- ... to …
+
+Math and Special Symbols
+-------------------------
+
+Texy supports various symbols:
+- Arrows: -> <- <=>
+- Math: <= >= != +-
+
+Conclusion
+----------
+
+Texy is a powerful markup language with many features. For complete documentation, visit "Texy.info":https://texy.info.
+

@@ -1,0 +1,57 @@
+title=Texy Integration Test
+status=published
+type=post
+date=2025-12-01
+tags=texy,test
+~~~~~~
+
+Integration Test Post
+=====================
+
+This is a test post written in **Texy markup** to verify JBake integration.
+
+Text Formatting
+---------------
+
+You can make text **bold** or //italic//.
+
+Combined formatting: **//bold and italic//**
+
+Lists
+-----
+
+Unordered list:
+- First item
+- Second item
+- Third item
+
+Ordered list:
+1. Step one
+2. Step two
+3. Step three
+
+Links
+-----
+
+Visit "JBake website":https://jbake.org for more information.
+
+Code
+----
+
+Inline code: `System.out.println("Hello");`
+
+Tables
+------
+
+|----
+| Feature | Status
+|----
+| Texy Support | Working
+| JBake Integration | Complete
+|----
+
+Conclusion
+----------
+
+If you can see this properly formatted, the Texy integration is working correctly!
+
