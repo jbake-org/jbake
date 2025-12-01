@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset comparisonMethod="maven"
+         xmlns="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0
+                             https://www.mojohaus.org/versions/versions-model/xsd/rule-2.0.0.xsd">
+
+    <!-- Ignore pre-release versions globally -->
+    <ignoreVersions>
+        <ignoreVersion type="regex">.*[-_.](?i)(alpha|beta|rc|milestone|m[0-9]+|preview|pre|ea|cr|snapshot).*</ignoreVersion>
+    </ignoreVersions>
+
+</ruleset>
