@@ -1,24 +1,27 @@
-= Contributing
+= Contributing to JBake
 // settings:
 :idprefix:
 :idseparator: -
-:source-language: java
+:source-language: kotlin
 :language: {source-language}
 ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 // URIs:
-:uri-repo: https://github.com/jbake-org/jbake
-:uri-help-base: https://help.github.com/articles
+:uri-repo: https://github.com/OndraZizka/jbake
+:uri-help-base: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests
 :uri-issues: {uri-repo}/issues
-:uri-fork-help: {uri-help-base}/fork-a-repo
-:uri-branch-help: {uri-fork-help}#create-branches
-:uri-pr-help: {uri-help-base}/using-pull-requests
+:uri-fork-help: {uri-help-base}/working-with-forks/fork-a-repo
+:uri-branch-help: {uri-help-base}/working-with-forks/fork-a-repo#creating-a-branch-to-work-on
+:uri-pr-help: {uri-help-base}/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
 :uri-gist: https://gist.github.com
-:uri-hamcrest: http://hamcrest.org/JavaHamcrest/
-:uri-assertj: http://joel-costigliola.github.io/assertj/
+:uri-assertj: https://assertj.github.io/doc/
+:uri-junit5: https://junit.org/junit5/
+:uri-mockito: https://site.mockito.org/
+:uri-kotest: https://kotest.io/
 :uri-license: LICENSE
+:uri-build: BUILD.adoc
 
-First off thanks for your interest in improving JBake! We appreciate you taking the time to contribute to JBake and to
-ensure that your contribution is easy to review and process we kindly ask that you follow the guidance outlined below.
+Thank you for your interest in improving JBake! We appreciate you taking the time to contribute and to
+ensure that your contribution is easy to review and process, please follow the guidance outlined below.
 
 == License Agreement
 
@@ -38,22 +41,27 @@ content on which triggers the bad behaviour in JBake.
 
 == Raising a Pull Request
 
-Prior to starting work on a Pull Request please post a message on the developers mailing list outlining the new feature
-or bug you are planning to work on. You can then be advised if anyone else is already working on the same topic or
-if there is any pertinent information that you should be made aware of such as upcoming structural or API changes.
+Before starting work on a Pull Request, please create an issue or check existing {uri-issues}[issues] to see if someone
+is already working on the same topic. This helps avoid duplicate work and allows us to provide guidance on upcoming
+structural or API changes.
 
-Once you're ready to start work on your pull request follow the steps outlined below.
+Once you're ready to start work on your pull request:
 
-. {uri-fork-help}[Fork the repository].
-. {uri-branch-help}[Create a topic branch].
-. Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
-. Implement your feature or bug fix.
-. Run `./gradlew test` to run the tests. If your tests fail, return to step 4.
-. Add, commit, and push your changes.
-. {uri-pr-help}[Submit a pull request].
+. {uri-fork-help}[Fork the repository]
+. {uri-branch-help}[Create a topic branch]
+. Add tests for your feature or bug fix (see <<writing-and-executing-tests>>)
+. Implement your feature or bug fix
+. Run tests:
+  * Gradle: `./gradlew test`
+  * Maven: `mvn test`
+. If tests fail, return to step 4
+. Add, commit, and push your changes
+. {uri-pr-help}[Submit a pull request]
 
-For ideas about how to use pull requests, see the post
-http://blog.quickpeople.co.uk/2013/07/10/useful-github-patterns[Useful GitHub Patterns].
+=== Build Systems
+
+JBake supports both Gradle and Maven. Changes to dependencies or build configuration should be synchronized between both
+systems. See link:{uri-build}[BUILD.adoc] for detailed build instructions.
 
 ////
 uncomment when code style & prefs have been defined
@@ -65,36 +73,74 @@ can import this into their IDE.
 
 === Writing and Executing Tests
 
-Tests and their resources reside within `/src/test` and should be written using the JUnit framework, you also have the
-following testing libraries available to you when writing your tests:
+Tests and their resources reside within `/src/test` directory. JBake is written in Kotlin and uses modern Kotlin testing frameworks.
 
-* {uri-hamcrest}[Hamcrest]
-* {uri-assertj}[AssertJ]
+==== Available Testing Libraries
 
-Any resources, such as templates, that your tests require should be placed within `/src/test/resources`.
+* {uri-kotest}[Kotest] - Kotlin-native testing framework (preferred for new tests)
+* {uri-junit5}[JUnit 5] - Primary testing framework
+* JUnit 4 - Legacy tests (being migrated to JUnit 5)
+* {uri-assertj}[AssertJ] - Fluent assertions
+* {uri-mockito}[Mockito] - Mocking framework for Java interop
+* MockK - Kotlin mocking library
 
-To execute the tests from the command line you can execute the following command from the root dir in the repository:
+For Kotlin tests, prefer Kotest as it provides idiomatic Kotlin testing support with expressive DSL.
 
- $ ./gradlew test
+==== Test Resources
 
-You will be able to run the unit tests in most IDE's such as Eclipse as well.
+Place any test resources (templates, sample content, etc.) in `/src/test/resources`.
 
-If you would like to utilise another testing library in your test classes, then please mention this and your reasons
-for use when posting on the developers mailing list about your planned contribution.
+==== Running Tests
 
-If you would like to use a different testing framework instead of JUnit you may volunteer to convert the existing test
-suite over to the new framework, we'd prefer not to have multiple test suites in different frameworks.
+**Gradle:**
+----
+./gradlew test
+----
 
-////
-this next section is messy, documentation should be included with the project, a copy should exist in the web site
-repo but not only there
-=== Documentation
+**Maven:**
+----
+mvn test
+----
 
-Some pull requests may alter the existing behaviour of or add a new feature to JBake, in this scenario please
-review the JBake documentation and make...
-////
+**IDE Support:**
+
+Tests can be run directly in modern IDEs (IntelliJ IDEA, Eclipse, VS Code).
+
+==== Guidelines
+
+* Write tests for new features and bug fixes
+* Ensure tests pass before submitting a PR
+* Use descriptive test names in Kotlin style (backticks for readable names)
+* Keep tests focused and isolated
+* Prefer Kotest for new tests - it provides better Kotlin integration
+* Use MockK for mocking Kotlin classes (Mockito for Java interop only)
 
 === Supported Java Versions
 
-At present JBake supports Java 8 and above so any contributions shouldn't use Java 9+ syntax, please see
-the {uri-issues}[roadmap] for when support for later Java versions is planned.
+JBake requires **Java 17** for building and running. The project uses Maven toolchains to automatically select the correct
+JDK version, so you need to have JDK 17 installed.
+
+Maven will automatically use JDK 17 if you have `~/.m2/toolchains.xml` configured (see link:{uri-build}[BUILD.adoc]).
+
+=== Code Language
+
+The project is written entirely in **Kotlin**.
+
+When contributing:
+
+* All new code should be written in Kotlin
+* Target Kotlin 2.2+ features
+* Follow Kotlin coding conventions and idioms
+* Use Kotlin's null-safety features
+* Prefer immutable data structures where possible
+* Follow existing code patterns in the module you're modifying
+
+=== Documentation
+
+If your pull request alters existing behavior or adds a new feature:
+
+* Update relevant documentation in the `docs/` directory
+* Update README.asciidoc if adding user-facing features
+* Add or update KDoc comments for public APIs (Kotlin's documentation format)
+* Consider adding examples in `test-data/` for new features
+* Documentation is generated using Dokka for Kotlin code
