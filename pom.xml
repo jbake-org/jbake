@@ -67,10 +67,10 @@
 
         <!-- Runtime dependencies versions (synced from gradle.properties) -->
         <version.asciidoctorj>3.0.1</version.asciidoctorj>
-        <version.asciidoctorj.diagram>3.0.1</version.asciidoctorj.diagram>
+        <version.asciidoctorj.diagram>3.1.0</version.asciidoctorj.diagram>
         <version.args4j>2.37</version.args4j>
         <version.commons.io>2.21.0</version.commons.io>
-        <version.commons.configuration>2.12.0</version.commons.configuration>
+        <version.commons.configuration>2.13.0</version.commons.configuration>
         <version.commons.beanutils>1.11.0</version.commons.beanutils>
         <version.commons.lang>3.20.0</version.commons.lang>
         <version.commons.vfs2>2.10.0</version.commons.vfs2>
@@ -100,7 +100,7 @@
         <version.assertj>3.27.6</version.assertj>
         <version.mockito>5.20.0</version.mockito>
         <version.mockk>1.14.6</version.mockk>
-        <version.kotest>6.0.5</version.kotest>
+        <version.kotest>6.0.6</version.kotest>
 
         <!-- Build dependencies versions. Keep all at the latest. -->
         <version.maven>3.9.9</version.maven>
@@ -111,7 +111,7 @@
 
         <!-- E2E test dependencies versions -->
         <version.docker.java>3.7.0</version.docker.java>
-        <version.jackson>2.19.4</version.jackson>
+        <version.jackson>2.20.1</version.jackson>
     </properties>
 
     <dependencyManagement>
