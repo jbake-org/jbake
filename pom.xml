@@ -189,24 +189,24 @@
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-install-plugin</artifactId><version>3.1.4</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-javadoc-plugin</artifactId><version>3.12.0</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-plugin-plugin</artifactId><version>3.15.2</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.2.0</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.4.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-source-plugin</artifactId><version>3.4.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version></plugin>
-                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.4.0</version></plugin>
-                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-plugin-plugin</artifactId><version>3.15.2</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-toolchains-plugin</artifactId><version>3.2.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId><version>2.1.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version></plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>2.20.1</version>
+                    <configuration><rulesUri>file:///${session.executionRootDirectory}/.mvn/maven-version-rules.xml</rulesUri></configuration>
+                </plugin>
+                <plugin><groupId>org.codehaus.mojo</groupId><artifactId>flatten-maven-plugin</artifactId><version>1.6.0</version></plugin>
                 <plugin><groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId><version>3.5.1</version></plugin>
+                <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.14</version></plugin>
                 <plugin><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version></plugin>
                 <plugin><groupId>org.jetbrains.dokka</groupId><artifactId>dokka-maven-plugin</artifactId><version>${version.dokka}</version></plugin>
                 <plugin><groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId><version>0.9.0</version></plugin>
-                <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.14</version></plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId><artifactId>versions-maven-plugin</artifactId><version>2.20.1</version>
-                    <configuration><rulesUri>file:///${session.executionRootDirectory}/.mvn/maven-version-rules.xml</rulesUri></configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -325,6 +325,16 @@
             </plugin>
 
             <plugin>
+                <groupId>org.codehaus.mojo</groupId><artifactId>flatten-maven-plugin</artifactId>
+                <executions>
+                    <execution><id>flatten</id><phase>process-resources</phase><goals><goal>flatten</goal></goals>
+                        <configuration><flattenMode>ossrh</flattenMode><updatePomFile>true</updatePomFile></configuration>
+                    </execution>
+                    <execution><id>flatten.clean</id><phase>clean</phase><goals><goal>clean</goal></goals></execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId>
                 <executions>
                     <execution><id>sign-artifacts</id><phase>none</phase><goals><goal>sign</goal></goals></execution>
@@ -409,15 +419,9 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId>
                         <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals><goal>sign</goal></goals>
+                            <execution><id>sign-artifacts</id><phase>verify</phase><goals><goal>sign</goal></goals>
                                 <configuration>
-                                    <gpgArguments>
-                                        <arg>--pinentry-mode</arg>
-                                        <arg>loopback</arg>
-                                    </gpgArguments>
+                                    <gpgArguments><arg>--pinentry-mode</arg><arg>loopback</arg></gpgArguments>
                                 </configuration>
                             </execution>
                         </executions>
