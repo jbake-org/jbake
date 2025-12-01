@@ -3,9 +3,7 @@ package org.jbake.render
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
@@ -46,12 +44,15 @@ class Error404RendererTest : StringSpec({
         val tool = Error404RenderingTool()
 
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.renderError404 } returns true
-        every { configuration.error404FileName } returns "mock404file.html"
+        every { configuration.renderError404 } answers { true }
+        every { configuration.error404FileName } answers { "mock404file.html" }
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val mockRenderer = mockk<Renderer>(relaxed = false)
         every { mockRenderer.config } answers { configuration }
-        every { mockRenderer.renderError404() } returns Unit
+        every { mockRenderer.renderError404() } just runs
+        every { mockRenderer.renderError404(any()) } just runs
+        every { mockRenderer.renderIndex(any()) } just runs
+        every { mockRenderer.renderIndex() } just runs
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 

@@ -22,18 +22,9 @@ class Renderer {
     private val db: ContentStore
 
     /**
-     * Creates a new instance of Renderer with supplied configuration.
-     */
-    constructor(db: ContentStore, config: JBakeConfiguration) {
-        this.config = config
-        this.renderingEngine = DelegatingTemplateEngine(db, config)
-        this.db = db
-    }
-
-    /**
      * Creates a new instance of Renderer with supplied configuration and the instance of DelegatingTemplateEngine to use.
      */
-    constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine) {
+    constructor(db: ContentStore, config: JBakeConfiguration, renderingEngine: DelegatingTemplateEngine = DelegatingTemplateEngine(db, config)) {
         this.config = config
         this.renderingEngine = renderingEngine
         this.db = db
@@ -136,11 +127,13 @@ class Renderer {
 
     /**
      * Render an index file using the supplied content.
-     *
-     * @throws Exception if IOException or SecurityException are raised
      */
-    fun renderIndex(outputIndexFile: String = config.indexFileName ?: "index.html") {
+    fun renderIndex(outputIndexFile: String) {
         render(DefaultRenderingConfig(outputIndexFile, MASTERINDEX_TEMPLATE_NAME))
+    }
+
+    fun renderIndex() {
+        renderIndex(config.indexFileName ?: "index.html")
     }
 
     fun renderIndexPaging(indexFile: String = config.indexFileName ?: "index.html") {
