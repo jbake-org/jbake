@@ -173,13 +173,10 @@ class OvenTest : StringSpec({
     }
 
     "shouldCrawlRenderAndCopyAssets" {
-        val template = TestUtils.newDir(root.toFile(), "template")
-        val content = TestUtils.newDir(root.toFile(), "content")
-        val assets = TestUtils.newDir(root.toFile(), "assets")
 
-        configuration.templateDir = (template)
-        configuration.contentDir = (content)
-        configuration.assetDir = (assets)
+        configuration.templateDir = TestUtils.newDir(root.toFile(), "template")
+        configuration.contentDir = TestUtils.newDir(root.toFile(), "content")
+        configuration.assetDir = TestUtils.newDir(root.toFile(), "assets")
 
         contentStore = spyk(ContentStore("memory", "documents" + System.currentTimeMillis()))
 
