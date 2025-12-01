@@ -9,7 +9,7 @@ import org.jbake.model.DocumentTypes
 import org.jbake.model.ModelAttributes
 import org.jbake.util.HtmlUtil
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -220,5 +220,5 @@ class Crawler {
             else DocumentStatus.IDENTICAL
     }
 
-    private val log: Logger = LoggerFactory.getLogger(Crawler::class.java)
+    private val log: Logger by logger()
 }

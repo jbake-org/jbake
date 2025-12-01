@@ -4,7 +4,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.parser.Engines
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 
 class Parser(private val config: JBakeConfiguration) {
@@ -17,5 +17,5 @@ class Parser(private val config: JBakeConfiguration) {
         return engine.parse(config, inputFile)
     }
 
-    private val log: Logger = LoggerFactory.getLogger(Parser::class.java)
+    private val log: Logger by logger()
 }

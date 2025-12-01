@@ -3,7 +3,7 @@ package org.jbake.parser
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
@@ -71,5 +71,5 @@ class YamlEngine : MarkupEngine() {
     }
 
     val JBAKE_PREFIX: String = "jbake-"
-    private val log: Logger = LoggerFactory.getLogger(YamlEngine::class.java)
+    private val log: Logger by logger()
 }

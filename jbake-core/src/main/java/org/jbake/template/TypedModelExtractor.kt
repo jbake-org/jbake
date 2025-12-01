@@ -4,6 +4,8 @@ import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.configuration2.MapConfiguration
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.template.model.RenderContext
+import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 
 /**
  * Type-safe model extractor that works with RenderContext instead of untyped maps.
@@ -26,7 +28,7 @@ interface TypedModelExtractor<T> {
  * Adapter to bridge between old ModelExtractor and new TypedModelExtractor.
  */
 class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T>) : ModelExtractor<T> {
-    private val log = org.slf4j.LoggerFactory.getLogger(ModelExtractorAdapter::class.java)
+    private val log: Logger by logger()
 
     override fun get(db: org.jbake.app.ContentStore, model: MutableMap<String, Any>, key: String): T? {
 

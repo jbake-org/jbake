@@ -2,8 +2,8 @@ package org.jbake.template
 
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.lang.reflect.Constructor
 import java.util.*
@@ -78,6 +78,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     }
 
     companion object {
+
         /**
          * This method is used to search for a specific class, telling if loading the engine would succeed. This is typically used to avoid loading optional modules.
          *
@@ -97,6 +98,6 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
             }
         }
 
-        private val log: Logger = LoggerFactory.getLogger(TemplateEngines::class.java)
+        private val log: Logger by logger()
     }
 }

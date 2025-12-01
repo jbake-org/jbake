@@ -5,7 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.io.FileFilter
 import java.io.IOException
@@ -135,5 +135,5 @@ class Asset {
         }
     }
 
-    private val log: Logger = LoggerFactory.getLogger(Asset::class.java)
+    private val log: Logger by logger()
 }

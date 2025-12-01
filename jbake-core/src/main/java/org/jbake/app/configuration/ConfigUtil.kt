@@ -9,8 +9,9 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler
 import org.apache.commons.configuration2.ex.ConfigurationException
 import org.jbake.app.JBakeException
 import org.jbake.launcher.SystemExit
+import org.jbake.util.Logging
+import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
 import java.nio.charset.Charset
@@ -113,7 +114,7 @@ class ConfigUtil {
     companion object {
         const val LIST_DELIMITER: Char = ','
         const val DEFAULT_ENCODING: String = "UTF-8"
-        private val log: Logger = LoggerFactory.getLogger(ConfigUtil::class.java)
+        private val log: Logger by Logging.logger()
         const val LEGACY_CONFIG_FILE: String = "custom.properties"
         const val CONFIG_FILE: String = "jbake.properties"
         const val DEFAULT_CONFIG_FILE: String = "default.properties"

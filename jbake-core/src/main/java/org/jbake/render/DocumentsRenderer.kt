@@ -10,12 +10,12 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.util.*
 
 class DocumentsRenderer : RenderingTool {
-    private val log: Logger = LoggerFactory.getLogger(DocumentsRenderer::class.java)
+    private val log: Logger by logger()
 
     @Throws(RenderingException::class)
     @Deprecated("Overrides deprecated member")

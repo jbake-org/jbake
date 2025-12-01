@@ -6,7 +6,7 @@ import org.jbake.app.FileUtil
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.model.TemplateModel
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.io.Writer
 
@@ -70,5 +70,5 @@ class DelegatingTemplateEngine : AbstractTemplateEngine {
         else log.error("Warning - No template engine found for template: {}", theTemplateName)
     }
 
-    private val log: Logger = LoggerFactory.getLogger(DelegatingTemplateEngine::class.java)
+    private val log: Logger by logger()
 }

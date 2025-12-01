@@ -6,7 +6,7 @@ import org.apache.commons.vfs2.FileObject
 import org.jbake.app.Oven
 import org.jbake.app.configuration.JBakeConfiguration
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 
 class CustomFileSystemChangeListener(private val config: JBakeConfiguration) : FileListener {
@@ -31,5 +31,5 @@ class CustomFileSystemChangeListener(private val config: JBakeConfiguration) : F
         oven.bakeSingleFile(File(file.name.path))
     }
 
-    private val log: Logger = LoggerFactory.getLogger(CustomFileSystemChangeListener::class.java)
+    private val log: Logger by logger()
 }

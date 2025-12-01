@@ -6,7 +6,7 @@ import org.asciidoctor.Options
 import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciidoctorJRuby
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -199,5 +199,5 @@ class AsciidoctorEngine : MarkupEngine() {
         private const val OPT_REQUIRES = "requires"
     }
 
-    private val log: Logger = LoggerFactory.getLogger(AsciidoctorEngine::class.java)
+    private val log: Logger by logger()
 }

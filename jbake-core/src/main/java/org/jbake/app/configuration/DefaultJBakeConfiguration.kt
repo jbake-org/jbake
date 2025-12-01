@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils
 import org.jbake.app.configuration.PropertyList.ASSET_IGNORE_HIDDEN
 import org.jbake.app.configuration.PropertyList.TEMPLATE_FOLDER
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.util.*
 import java.util.regex.Matcher
@@ -532,5 +532,5 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         private const val DOCTYPE_TEMPLATE_PREFIX = "template."
     }
 
-    private val log: Logger = LoggerFactory.getLogger(DefaultJBakeConfiguration::class.java)
+    private val log: Logger by logger()
 }

@@ -7,7 +7,7 @@ import org.apache.commons.vfs2.impl.DefaultFileMonitor
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 
 /**
  * Delegate responsible for watching the file system for changes.
@@ -46,5 +46,5 @@ class BakeWatcher {
         catch (e: FileSystemException) { log.error("Problems watching filesystem changes", e) }
     }
 
-    private val log: Logger = LoggerFactory.getLogger(BakeWatcher::class.java)
+    private val log: Logger by logger()
 }

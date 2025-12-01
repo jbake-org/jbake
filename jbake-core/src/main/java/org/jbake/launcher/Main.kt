@@ -5,8 +5,9 @@ import org.jbake.app.JBakeException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.util.ConfigurationPrinter
+import org.jbake.util.Logging
+import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
 import picocli.CommandLine
 import java.io.File
@@ -135,6 +136,6 @@ class Main @JvmOverloads constructor(
 
         fun printUsage() = CommandLine.usage(LaunchOptions(), System.out)
 
-        private val log: Logger = LoggerFactory.getLogger("jbake")
+        private val log: Logger by Logging.logger()
     }
 }

@@ -4,8 +4,9 @@ import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.parser.PegdownExtensions
 import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter
+import org.jbake.util.Logging
+import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  * Renders documents in the Markdown format.
@@ -45,9 +46,9 @@ class MarkdownEngine : MarkupEngine() {
             val extField = PegdownExtensions::class.java.getDeclaredField(name)
             extension = extField.getInt(null)
         } catch (e: NoSuchFieldException) {
-            logger.debug("Undeclared extension field '{}', fallback to NONE", name)
+            log.debug("Undeclared extension field '{}', fallback to NONE", name)
         } catch (e: IllegalAccessException) {
-            logger.debug("Undeclared extension field '{}', fallback to NONE", name)
+            log.debug("Undeclared extension field '{}', fallback to NONE", name)
         }
         return extension
     }
@@ -60,7 +61,5 @@ class MarkdownEngine : MarkupEngine() {
         return previousExtensions and (unwantedExtension.inv())
     }
 
-    companion object {
-        private val logger: Logger = LoggerFactory.getLogger(MarkdownEngine::class.java)
-    }
+    private val log: Logger by Logging.logger()
 }

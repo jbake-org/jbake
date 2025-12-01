@@ -2,8 +2,8 @@ package org.jbake.util
 
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
+import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 class DataFileUtil(private val db: ContentStore, private val defaultDocType: String?) {
 
@@ -28,5 +28,5 @@ class DataFileUtil(private val db: ContentStore, private val defaultDocType: Str
         return result
     }
 
-    private val log: Logger = LoggerFactory.getLogger(DataFileUtil::class.java)
+    private val log: Logger by logger()
 }

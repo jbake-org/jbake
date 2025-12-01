@@ -14,7 +14,7 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes
 import org.jbake.model.ModelAttributes
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 import java.util.*
 
@@ -395,5 +395,5 @@ class ContentStore(private val type: String, private val name: String?) {
         private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "SELECT count(*) AS count FROM Documents WHERE type='%s'"
     }
 
-    private val log: Logger = LoggerFactory.getLogger(ContentStore::class.java)
+    private val log: Logger by logger()
 }

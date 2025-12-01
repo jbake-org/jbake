@@ -4,7 +4,7 @@ import org.jbake.app.FileUtil
 import org.jbake.app.JBakeException
 import org.jbake.launcher.SystemExit
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.File
 
 class JBakeConfigurationInspector(private val configuration: JBakeConfiguration) {
@@ -70,5 +70,5 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, "Error: Required dir cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
     }
 
-    private val log: Logger = LoggerFactory.getLogger(JBakeConfigurationInspector::class.java)
+    private val log: Logger by logger()
 }

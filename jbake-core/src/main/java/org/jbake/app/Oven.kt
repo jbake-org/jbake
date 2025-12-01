@@ -11,8 +11,8 @@ import org.jbake.render.RenderingTool
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
 import org.jbake.template.RenderingException
+import org.jbake.util.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
 import java.util.ServiceLoader.load
@@ -161,4 +161,4 @@ class Oven {
 
 }
 
-private val log: Logger = LoggerFactory.getLogger(Oven::class.java)
+private val log: Logger by logger<Oven>()

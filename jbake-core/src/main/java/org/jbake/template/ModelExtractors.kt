@@ -5,7 +5,7 @@ import org.jbake.model.DocumentTypeUtils
 import org.jbake.template.model.PublishedCustomExtractor
 import org.jbake.template.model.TypedDocumentsExtractor
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.IOException
 import java.util.*
 
@@ -160,5 +160,5 @@ class ModelExtractors private constructor() {
         }
     }
 
-    private val log: Logger = LoggerFactory.getLogger(ModelExtractors::class.java)
+    private val log: Logger by logger()
 }

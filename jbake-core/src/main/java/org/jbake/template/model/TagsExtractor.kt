@@ -4,7 +4,7 @@ import org.jbake.app.DocumentList
 import org.jbake.app.FileUtil
 import org.jbake.template.TypedModelExtractor
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 
 class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
 
@@ -48,5 +48,5 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
         return dl
     }
 
-    private val log: Logger = LoggerFactory.getLogger(TagsExtractor::class.java)
+    private val log: Logger by logger()
 }

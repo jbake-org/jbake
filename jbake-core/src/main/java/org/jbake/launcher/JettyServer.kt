@@ -10,7 +10,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler
 import org.jbake.app.JBakeException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.Closeable
 import java.io.IOException
 
@@ -82,5 +82,5 @@ class JettyServer : Closeable {
         }
     }
 
-    private val log: Logger = LoggerFactory.getLogger(JettyServer::class.java)
+    private val log: Logger by logger()
 }

@@ -11,7 +11,7 @@ import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.PagingHelper
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.jbake.util.Logging.logger
 import java.io.*
 import java.nio.file.Files
 import java.util.*
@@ -413,5 +413,5 @@ class Renderer {
         private const val ERROR404_TEMPLATE_NAME = "error404"
     }
 
-    private val log: Logger = LoggerFactory.getLogger(Renderer::class.java)
+    private val log: Logger by logger()
 }

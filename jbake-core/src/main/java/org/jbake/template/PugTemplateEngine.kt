@@ -13,6 +13,8 @@ import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
+import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.File
 import java.io.IOException
 import java.io.Writer
@@ -119,5 +121,5 @@ class PugTemplateEngine : AbstractTemplateEngine {
         private const val FILTER_SCRIPT = "js"
     }
 
-    private val log = org.slf4j.LoggerFactory.getLogger(PugTemplateEngine::class.java)
+    private val log: Logger by logger()
 }

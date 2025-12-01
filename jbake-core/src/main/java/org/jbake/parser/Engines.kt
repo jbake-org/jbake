@@ -1,7 +1,7 @@
 package org.jbake.parser
-
+import org.jbake.util.Logging
+import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 import java.util.*
@@ -124,6 +124,6 @@ class Engines private constructor() {
                 log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
         }
 
-        private val log: Logger = LoggerFactory.getLogger(Engines::class.java)
+        private val log: Logger by Logging.logger()
     }
 }
