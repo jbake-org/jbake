@@ -190,7 +190,11 @@ class Renderer {
      * @see [Sitemap protocol](http://www.sitemaps.org/)
      * @param sitemapFile configuration for site map
      */
-    fun renderSitemap(sitemapFile: String = config.siteMapFileName ?: "sitemap.xml") {
+    fun renderSitemap() {
+        renderSitemap(config.siteMapFileName ?: "sitemap.xml")
+    }
+
+    fun renderSitemap(sitemapFile: String) {
         render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
     }
 
@@ -199,7 +203,11 @@ class Renderer {
      *
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    fun renderFeed(outputFeedFile: String = config.feedFileName ?: "feed.xml") {
+    fun renderFeed() {
+        renderFeed(config.feedFileName ?: "feed.xml")
+    }
+
+    fun renderFeed(outputFeedFile: String) {
         render(DefaultRenderingConfig(outputFeedFile, FEED_TEMPLATE_NAME))
     }
 
@@ -208,16 +216,31 @@ class Renderer {
      *
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    fun renderArchive(outputArchiveFile: String = config.archiveFileName!!) {
+    fun renderArchive() {
+        renderArchive(config.archiveFileName!!)
+    }
+
+    fun renderArchive(outputArchiveFile: String) {
         render(DefaultRenderingConfig(outputArchiveFile, ARCHIVE_TEMPLATE_NAME))
     }
 
     /**
      * Render an 404 file using the predefined template.
+     * This version uses the file name from the configuration.
      *
      * @throws Exception If default rendering configuration is not loaded correctly.
      */
-    fun renderError404(outputFile: String = config.error404FileName!!) {
+    fun renderError404() {
+        renderError404(config.error404FileName!!)
+    }
+
+    /**
+     * Render an 404 file using the predefined template to a specific file.
+     *
+     * @param outputFile The file to render to.
+     * @throws Exception If default rendering configuration is not loaded correctly.
+     */
+    fun renderError404(outputFile: String) {
         render(DefaultRenderingConfig(outputFile, ERROR404_TEMPLATE_NAME))
     }
 
@@ -226,7 +249,11 @@ class Renderer {
      *
      * @return Number of rendered tags
      */
-    fun renderTags(outputTagFile: String = config.tagPathName ?: "tags"): Int {
+    fun renderTags(): Int {
+        return renderTags(config.tagPathName ?: "tags")
+    }
+
+    fun renderTags(outputTagFile: String): Int {
         var renderedCount = 0
         val errors: MutableList<Throwable> = LinkedList<Throwable>()
 

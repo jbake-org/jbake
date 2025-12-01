@@ -41,26 +41,19 @@ class TagsRendererTest : StringSpec({
         // No verification needed - we just check it doesn't throw
     }
 
-    "returnsOneWhenConfigRendersIndices" {
+    "returnsCountWhenConfigRendersTags" {
         val tool = TagsRenderingTool()
 
-        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
+        val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderTags } returns true
-        every { configuration.tagPathName } returns "mocktagpath"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
-        every { configuration.outputExtension } returns ".html"
-        every { configuration.renderEncoding } returns "UTF-8"
-        every { configuration.getTemplateByDocType(any()) } returns "tag.ftl"
-        val contentStore = mockk<ContentStore>(relaxed = true)
-        val tags: MutableSet<String> = HashSet(mutableListOf("tag1"))
-        every { contentStore.tags } returns tags
-        every { contentStore.allTags } returns tags
-        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val renderer = Renderer(contentStore, configuration, renderingEngine)
+        val contentStore = mockk<ContentStore>()
+        val mockRenderer = mockk<Renderer>()
+        every { mockRenderer.renderTags() } returns 5
 
-        val renderResponse = tool.render(renderer, contentStore, configuration)
+        val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
-        renderResponse shouldBe 1
+        renderResponse shouldBe 5
+        verify(exactly = 1) { mockRenderer.renderTags() }
     }
 
     "doesRenderWhenConfigDoesRenderIndices" {

@@ -49,10 +49,8 @@ class IndexRendererTest : StringSpec({
         every { configuration.indexFileName } returns "mockindex.html"
         every { configuration.paginateIndex } returns false
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = false)
-        every { mockRenderer.config } answers { configuration }
-        every { mockRenderer.renderIndex(any()) } just runs
-        every { mockRenderer.renderIndex() } just runs
+        val mockRenderer = mockk<Renderer>(relaxed = true)
+        every { mockRenderer.renderIndex() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
         renderResponse shouldBe 1

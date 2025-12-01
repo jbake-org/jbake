@@ -46,7 +46,6 @@ class SitemapRendererTest : StringSpec({
         every { configuration.renderSiteMap } returns true
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
-        every { mockRenderer.config } answers { configuration }
         every { mockRenderer.renderSitemap() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)

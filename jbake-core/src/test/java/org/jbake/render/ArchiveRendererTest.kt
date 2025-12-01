@@ -49,7 +49,6 @@ class ArchiveRendererTest : StringSpec({
         every { configuration.archiveFileName } returns "archive.html"
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
-        every { mockRenderer.config } answers { configuration }
         every { mockRenderer.renderArchive() } returns Unit
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)

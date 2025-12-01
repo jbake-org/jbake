@@ -44,19 +44,16 @@ class Error404RendererTest : StringSpec({
         val tool = Error404RenderingTool()
 
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.renderError404 } answers { true }
-        every { configuration.error404FileName } answers { "mock404file.html" }
+        every { configuration.renderError404 } returns true
+        every { configuration.error404FileName } returns "mock404file.html"
         val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = false)
-        every { mockRenderer.config } answers { configuration }
+        val mockRenderer = mockk<Renderer>()
         every { mockRenderer.renderError404() } just runs
-        every { mockRenderer.renderError404(any()) } just runs
-        every { mockRenderer.renderIndex(any()) } just runs
-        every { mockRenderer.renderIndex() } just runs
 
         val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 1
+        verify(exactly = 1) { mockRenderer.renderError404() }
     }
 
     "doesRenderWhenConfigDoesRenderError404" {
