@@ -195,6 +195,7 @@
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.4.0</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-plugin-plugin</artifactId><version>3.15.2</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-toolchains-plugin</artifactId><version>3.2.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId><version>2.1.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version></plugin>
                 <plugin><groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId><version>3.5.1</version></plugin>
@@ -333,6 +334,17 @@
                 </configuration>
             </plugin>
 
+            <!-- OrionDB can't run on JDK > 17. With this, Maven will automatically use JDK 17 regardless of what JVM Maven itself is running on. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-toolchains-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>toolchain</goal></goals>
+                        <configuration><toolchains><jdk><version>17</version></jdk></toolchains></configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><executions>
                     <execution>
@@ -340,10 +352,12 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion><version>3.9.9</version></requireMavenVersion>
+                                <!-- This would fail on JDKs other than 17, but we use toolchains plugin to force JDK 17 anyway.
                                 <requireJavaVersion>
                                     <version>[17,18)</version>
                                     <message>JBake tests require JDK 17 (build artifacts rely on libraries incompatible with newer JDKs). Please run the build with JDK 17 (set JAVA_HOME or use toolchains).</message>
                                 </requireJavaVersion>
+                             -->
                             </rules>
                         </configuration>
                     </execution>
