@@ -12,7 +12,7 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.template.RenderingException
 
 class SitemapRendererTest : StringSpec({
-        fun returnsZeroWhenConfigDoesNotRenderSitemaps() {
+    "returnsZeroWhenRendersSitemaps" {
         val tool = SitemapRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -39,7 +39,7 @@ class SitemapRendererTest : StringSpec({
         // No verification needed - we just check it doesn't throw
     }
 
-    fun returnsOneWhenConfigRendersSitemaps() {
+    "returnsOneWh0enRendersSitemaps" {
         val tool = SitemapRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -52,7 +52,7 @@ class SitemapRendererTest : StringSpec({
         renderResponse shouldBe 1
     }
 
-    "doesRenderWhenConfigDoesRenderSitemaps" {
+    "rendersSitemapsWhenConfigured" {
         val tool = SitemapRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
@@ -70,7 +70,7 @@ class SitemapRendererTest : StringSpec({
         verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
     }
 
-    fun propogatesRenderingException() {
+    "propagatesRenderingException" {
         val tool = SitemapRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)

@@ -2,6 +2,7 @@ package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.parser.Engines
+import org.jbake.template.RenderingException
 import java.io.*
 import java.io.File.separator
 import java.net.URLDecoder
@@ -137,8 +138,9 @@ object FileUtil {
      * @param sourceFile the file to calculate relative path for
      * @return the relative path to get to the root
      */
-    fun getPathToRoot(config: JBakeConfiguration, rootPath: File, sourceFile: File): String {
-        val root = Paths.get(rootPath.toURI())
+    fun getPathToRoot(config: JBakeConfiguration, rootDir: File, sourceFile: File): String {
+        val root = try { Paths.get(rootDir.toURI()) }
+            catch (e: Exception) { throw RenderingException("Failed getting path for URI: ${rootDir.toURI()} from file $rootDir", e) }
         val source = Paths.get(sourceFile.getParentFile().toURI())
         val relativePath = source.relativize(root)
 

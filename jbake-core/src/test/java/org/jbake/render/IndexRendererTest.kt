@@ -3,7 +3,9 @@ package org.jbake.render
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -36,12 +38,6 @@ class IndexRendererTest : StringSpec({
         // No verification needed - we just check it doesn't throw
     }
 
-    /*
-    Cannot invoke "org.jbake.app.configuration.JBakeConfiguration.getIndexFileName()" because "<parameter1>.config" is null
-    java.lang.NullPointerException: Cannot invoke "org.jbake.app.configuration.JBakeConfiguration.getIndexFileName()" because "<parameter1>.config" is null
-        at org.jbake.app.Renderer.renderIndex$default(Renderer.kt:133)
-        at org.jbake.render.IndexRendererTest$1$3.invokeSuspend$lambda$5(IndexRendererTest.kt:50)
-     */
     "returnsOneWhenConfigRendersIndices" {
         val tool = IndexRenderingTool()
         val configuration = mockk<DefaultJBakeConfiguration>()

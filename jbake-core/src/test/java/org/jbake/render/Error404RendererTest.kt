@@ -25,7 +25,7 @@ class Error404RendererTest : StringSpec({
         renderResponse shouldBe 0
     }
 
-    "doesNotRenderWhenConfigDoesNotRenderError404" {
+    "doesNotRenderWhenDoesNotRenderError404" {
         val tool = Error404RenderingTool()
 
         val configuration = mockk<JBakeConfiguration>()
@@ -40,7 +40,7 @@ class Error404RendererTest : StringSpec({
         // No verification needed - we just check it doesn't throw
     }
 
-    "returnsOneWhenConfigRendersError404" {
+    "returnsOneWhenRendersError404" {
         val tool = Error404RenderingTool()
 
         val configuration = mockk<JBakeConfiguration>()
@@ -56,7 +56,7 @@ class Error404RendererTest : StringSpec({
         verify(exactly = 1) { mockRenderer.renderError404() }
     }
 
-    "doesRenderWhenConfigDoesRenderError404" {
+    "rendersPageWhenConfigured" {
         val tool = Error404RenderingTool()
         val error404file = "mock404file.html"
 
@@ -75,7 +75,7 @@ class Error404RendererTest : StringSpec({
         verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
     }
 
-    "propogatesRenderingException" {
+    "propagatesRenderingException" {
         val tool = Error404RenderingTool()
         val error404file = "mock404file.html"
 

@@ -56,27 +56,27 @@ class TagsRendererTest : StringSpec({
         verify(exactly = 1) { mockRenderer.renderTags() }
     }
 
-    "doesRenderWhenConfigDoesRenderIndices" {
+    "doesRenderWhenConfigDoesRenderTags" {
         val tool = TagsRenderingTool()
 
-        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
-        every { configuration.renderTags } returns true
-        every { configuration.tagPathName } returns "mockTagfile"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
-        every { configuration.outputExtension } returns ".html"
-        every { configuration.renderEncoding } returns "UTF-8"
-        every { configuration.getTemplateByDocType(any()) } returns "tag.ftl"
-        val contentStore = mockk<ContentStore>(relaxed = true)
+        val mockConf = mockk<DefaultJBakeConfiguration>(relaxed = true)
+        every { mockConf.renderTags } returns true
+        every { mockConf.tagPathName } returns "mockTagfile"
+        every { mockConf.destinationDir } returns mockk(relaxed = true)
+        every { mockConf.outputExtension } returns ".html"
+        every { mockConf.renderEncoding } returns "UTF-8"
+        every { mockConf.getTemplateByDocType(any()) } returns "tag.ftl"
+        val mockContentStore = mockk<ContentStore>(relaxed = true)
         val tags: MutableSet<String> = HashSet(mutableListOf("tag1", "tags2"))
-        every { contentStore.tags } returns tags
-        every { contentStore.allTags } returns tags
-        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val renderer = Renderer(contentStore, configuration, renderingEngine)
+        every { mockContentStore.tags } returns tags
+        every { mockContentStore.allTags } returns tags
+        val mockRenderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = Renderer(mockContentStore, mockConf, mockRenderingEngine)
 
-        val result = tool.render(renderer, contentStore, configuration)
+        val result = tool.render(renderer, mockContentStore, mockConf)
 
         result shouldBe 2
-        verify(exactly = 2) { renderingEngine.renderDocument(any(), any(), any()) }
+        verify(exactly = 2) { mockRenderingEngine.renderDocument(any(), any(), any()) }
     }
 
     "propogatesRenderingException" {

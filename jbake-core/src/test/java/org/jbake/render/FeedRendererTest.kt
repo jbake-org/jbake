@@ -13,7 +13,7 @@ import org.jbake.template.RenderingException
 
 class FeedRendererTest : StringSpec({
 
-        fun returnsZeroWhenConfigDoesNotRenderFeeds() {
+    "returnsZeroWhenNotRenderFeeds" {
         val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -41,7 +41,7 @@ class FeedRendererTest : StringSpec({
         // No verification needed - we just check it doesn't throw
     }
 
-        fun returnsOneWhenConfigRendersFeeds() {
+    "returnsOneWhenRendersFeed" {
         val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
@@ -55,7 +55,7 @@ class FeedRendererTest : StringSpec({
         renderResponse shouldBe 1
     }
 
-    "doesRenderWhenConfigDoesRenderFeeds" {
+    "rendersFeedWhenConfigured" {
         val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
@@ -73,7 +73,7 @@ class FeedRendererTest : StringSpec({
         verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
     }
 
-    fun propogatesRenderingException() {
+    "propagatesRenderingException" {
         val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
