@@ -1,4 +1,4 @@
-FROM gradle:6.8-jdk11 as builder
+FROM gradle:9.2.1-jdk17 AS builder
 
 LABEL maintainer="https://jbake.org/community/team.html"
 
@@ -14,7 +14,7 @@ RUN set -o errexit -o nounset \
     && cp -r jbake-dist/build/install/jbake/* $JBAKE_HOME \
     && rm -r ~/.gradle /usr/src/jbake
 
-FROM eclipse-temurin:11-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 
 ENV JBAKE_USER=jbake
 ENV JBAKE_HOME=/opt/jbake
