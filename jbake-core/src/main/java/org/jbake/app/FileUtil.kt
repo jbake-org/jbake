@@ -140,8 +140,8 @@ object FileUtil {
      */
     fun getPathToRoot(config: JBakeConfiguration, rootDir: File, sourceFile: File): String {
         val root = try { Paths.get(rootDir.toURI()) }
-            catch (e: Exception) { throw RenderingException("Failed getting path for URI: ${rootDir.toURI()} from file $rootDir", e) }
-        val source = Paths.get(sourceFile.getParentFile().toURI())
+            catch (e: Exception) { throw RenderingException("Failed getting path for URI: ${rootDir.toURI().toURL().toString()} from file ${rootDir.path}", e) }
+        val source = Paths.get(sourceFile.parentFile.toURI())
         val relativePath = source.relativize(root)
 
         return buildString {
