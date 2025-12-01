@@ -79,7 +79,7 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+                <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution><phase>generate-sources</phase><goals><goal>add-source</goal></goals><configuration><sources><source>src/main/java</source></sources></configuration></execution>
                     <execution><id>add-test-source</id><phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals><configuration><sources><source>src/test/java</source></sources></configuration></execution>
@@ -87,12 +87,12 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId>
             </plugin>
 
             <!-- Add kotlin-maven-plugin at module level so it compiles with module dependencies on classpath -->
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version>
+                <groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>kotlin-compile</id><phase>compile</phase><goals><goal>compile</goal></goals>
@@ -122,7 +122,7 @@
 
             <!-- Dokka plugin for Kotlin documentation (KDoc) -->
             <plugin>
-                <groupId>org.jetbrains.dokka</groupId><artifactId>dokka-maven-plugin</artifactId><version>${version.dokka}</version>
+                <groupId>org.jetbrains.dokka</groupId><artifactId>dokka-maven-plugin</artifactId>
                 <executions>
                     <!-- Generate Javadoc-compatible JAR from Kotlin KDoc -->
                     <execution><id>dokka-javadoc-jar</id><phase>package</phase><goals><goal>javadocJar</goal></goals></execution>

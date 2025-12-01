@@ -103,7 +103,6 @@
         <version.kotest>6.0.5</version.kotest>
 
         <!-- Build dependencies versions. Keep all at the latest. -->
-        <version.jacoco.maven.plugin>0.8.14</version.jacoco.maven.plugin>
         <version.maven>3.9.9</version.maven>
         <version.maven.annotations>3.9.0</version.maven.annotations>
         <version.spark>2.9.4</version.spark>
@@ -193,28 +192,29 @@
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.6.1</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-source-plugin</artifactId><version>3.3.1</version></plugin>
                 <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.3.1</version></plugin>
+                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-plugin-plugin</artifactId><version>3.15.2</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>appassembler-maven-plugin</artifactId><version>2.1.0</version></plugin>
                 <plugin><groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version></plugin>
                 <plugin><groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId><version>3.5.1</version></plugin>
                 <plugin><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-maven-plugin</artifactId><version>${version.kotlin}</version></plugin>
                 <plugin><groupId>org.jetbrains.dokka</groupId><artifactId>dokka-maven-plugin</artifactId><version>${version.dokka}</version></plugin>
                 <plugin><groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId><version>0.9.0</version></plugin>
-                <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.1.1</version></plugin>
-                <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${version.jacoco.maven.plugin}</version></plugin>
+                <plugin><groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.14</version></plugin>
             </plugins>
         </pluginManagement>
 
 
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g -Djbake.buildOutputDir=${project.build.outputDirectory}</argLine>
                 </configuration>
             </plugin>
 
             <plugin>
-                <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>${version.jacoco.maven.plugin}</version>
+                <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId>
                 <executions>
                     <execution><goals><goal>prepare-agent</goal></goals></execution>
                     <execution><id>report</id><phase>test</phase><goals><goal>report</goal></goals></execution>
@@ -225,14 +225,14 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-checkstyle-plugin</artifactId><version>3.6.0</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
                     <configLocation>config/checkstyle/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.5.0</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
@@ -303,7 +303,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.1</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId>
                 <executions>
                     <execution><id>compile-after-kotlin</id><phase>compile</phase><goals><goal>compile</goal></goals></execution>
                     <execution><id>testCompile-after-kotlin</id><phase>test-compile</phase><goals><goal>testCompile</goal></goals></execution>
@@ -315,11 +315,11 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId><version>3.1.4</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId>
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId>
                 <executions>
                     <execution><id>sign-artifacts</id><phase>none</phase><goals><goal>sign</goal></goals></execution>
                 </executions>
@@ -329,7 +329,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><version>3.6.2</version><executions>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-enforcer-plugin</artifactId><executions>
                     <execution>
                         <id>enforce-maven</id><goals><goal>enforce</goal></goals>
                         <configuration>
@@ -366,7 +366,7 @@
                 <plugins>
                     <!-- Central Publishing Plugin for Maven Central Portal (OSSRH EOL June 30, 2025) -->
                     <plugin>
-                        <groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId><version>0.9.0</version>
+                        <groupId>org.sonatype.central</groupId><artifactId>central-publishing-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
@@ -377,7 +377,7 @@
 
                     <!-- Maven Release Plugin -->
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId><version>3.1.1</version>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-release-plugin</artifactId>
                         <configuration>
                             <autoVersionSubmodules>true</autoVersionSubmodules>
                             <useReleaseProfile>false</useReleaseProfile>
@@ -388,7 +388,7 @@
 
                     <!-- GPG Plugin for signing artifacts -->
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId><version>3.2.8</version>
+                        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-gpg-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
