@@ -5,11 +5,15 @@ import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.RenderingException
 
+// Note, the names of the classes were used in jbake-core/src/main/resources/META-INF/services/org.jbake.render.RenderingTool
+// Renaming them will cause the service loader to not find them under the old names.
+// Perhaps we should add wrapping classes for backwards compatibility?
+
 /**
  * Renders the archive page (if enabled in configuration).
  * The renderer uses its internal config reference to determine the archive file name.
  */
-class ArchiveRenderer : RenderingTool {
+class ArchiveRenderingTool : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderArchive) return 0
@@ -23,7 +27,7 @@ class ArchiveRenderer : RenderingTool {
  * Renders the RSS/Atom feed (if enabled in configuration).
  * The renderer uses its internal config reference to determine the feed file name.
  */
-class FeedRenderer : RenderingTool {
+class FeedRenderingTool : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderFeed) return 0
@@ -37,7 +41,7 @@ class FeedRenderer : RenderingTool {
  * Renders the 404 error page (if enabled in configuration).
  * The renderer uses its internal config reference to determine the error page file name.
  */
-class Error404Renderer : RenderingTool {
+class Error404RenderingTool : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderError404 || config.error404FileName == null) return 0
@@ -51,7 +55,7 @@ class Error404Renderer : RenderingTool {
  * Renders the index page, with optional pagination.
  * The renderer uses its internal config reference to determine pagination and file name.
  */
-class IndexRenderer : RenderingTool {
+class IndexRenderingTool : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderIndex) return 0
@@ -70,7 +74,7 @@ class IndexRenderer : RenderingTool {
  * Renders the sitemap.xml (if enabled in configuration).
  * The renderer uses its internal config reference to determine the sitemap file name.
  */
-class SitemapRenderer : RenderingTool {
+class SitemapRenderingTool : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderSiteMap) return 0
@@ -84,7 +88,7 @@ class SitemapRenderer : RenderingTool {
  * Renders tag pages (if enabled in configuration).
  * The renderer uses its internal config reference to determine the tag path.
  */
-class TagsRenderer : RenderingTool {
+class TagsRenderingTool : RenderingTool {
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         if (!config.renderTags) return 0

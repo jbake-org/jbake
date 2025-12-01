@@ -14,20 +14,20 @@ import org.jbake.template.RenderingException
 class ArchiveRendererTest : StringSpec({
 
         fun returnsZeroWhenConfigDoesNotRenderArchives() {
-        val renderer = ArchiveRenderer()
+        val tool = ArchiveRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderArchive } returns false
-
         val contentStore = mockk<ContentStore>()
         val mockRenderer = mockk<Renderer>(relaxed = true)
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+
+        val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 0
     }
 
     "doesNotRenderWhenConfigDoesNotRenderArchives" {
-        val tool = ArchiveRenderer()
+        val tool = ArchiveRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderArchive } returns false
@@ -38,35 +38,31 @@ class ArchiveRendererTest : StringSpec({
         val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         tool.render(renderer, contentStore, configuration)
-
         // No verification needed - we just check it doesn't throw
     }
 
         fun returnsOneWhenConfigRendersArchives() {
-        val renderer = ArchiveRenderer()
+        val tool = ArchiveRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderArchive } returns true
         every { configuration.archiveFileName } returns "archive.html"
-
         val contentStore = mockk<ContentStore>()
-
         val mockRenderer = mockk<Renderer>(relaxed = true)
 
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+        val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 1
     }
 
     "doesRenderWhenConfigDoesRenderArchives" {
-        val tool = ArchiveRenderer()
+        val tool = ArchiveRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderArchive } returns true
         every { configuration.archiveFileName } returns "mockarchive.html"
         every { configuration.destinationDir } returns mockk(relaxed = true)
         every { configuration.renderEncoding } returns "UTF-8"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
         val renderer = Renderer(contentStore, configuration, renderingEngine)
@@ -78,7 +74,7 @@ class ArchiveRendererTest : StringSpec({
     }
 
     fun propagatesRenderingException() {
-        val tool = ArchiveRenderer()
+        val tool = ArchiveRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderArchive } returns true
@@ -88,7 +84,6 @@ class ArchiveRendererTest : StringSpec({
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
         every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
-
         val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         shouldThrow<RenderingException> {

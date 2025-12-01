@@ -14,29 +14,27 @@ import org.jbake.template.RenderingException
 class FeedRendererTest : StringSpec({
 
         fun returnsZeroWhenConfigDoesNotRenderFeeds() {
-        val renderer = FeedRenderer()
+        val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderFeed } returns false
-
         val contentStore = mockk<ContentStore>()
-
         val mockRenderer = mockk<Renderer>(relaxed = true)
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+
+        val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 0
     }
 
     "doesNotRenderWhenConfigDoesNotRenderFeeds" {
-        val tool = FeedRenderer()
+        val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderFeed } returns false
         every { configuration.feedFileName } returns "feed.xml"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         tool.render(renderer, contentStore, configuration)
 
@@ -44,31 +42,29 @@ class FeedRendererTest : StringSpec({
     }
 
         fun returnsOneWhenConfigRendersFeeds() {
-        val renderer = FeedRenderer()
+        val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderFeed } returns true
-
         val contentStore = mockk<ContentStore>()
-
         val mockRenderer = mockk<Renderer>(relaxed = true)
 
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+        val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 1
     }
 
     "doesRenderWhenConfigDoesRenderFeeds" {
-        val tool = FeedRenderer()
+        val tool = FeedRenderingTool()
+
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderFeed } returns true
         every { configuration.feedFileName } returns "mockfeedfile.xml"
         every { configuration.destinationDir } returns mockk(relaxed = true)
         every { configuration.renderEncoding } returns "UTF-8"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         val result = tool.render(renderer, contentStore, configuration)
 
@@ -77,18 +73,16 @@ class FeedRendererTest : StringSpec({
     }
 
     fun propogatesRenderingException() {
-        val tool = FeedRenderer()
+        val tool = FeedRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderFeed } returns true
         every { configuration.feedFileName } returns "mockfeedfile.xml"
         every { configuration.destinationDir } returns mockk(relaxed = true)
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
         every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
-
-        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         shouldThrow<RenderingException> {
             tool.render(renderer, contentStore, configuration)

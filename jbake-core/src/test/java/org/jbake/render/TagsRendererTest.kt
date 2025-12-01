@@ -14,29 +14,27 @@ import org.jbake.template.RenderingException
 class TagsRendererTest : StringSpec({
 
     "returnsZeroWhenConfigDoesNotRenderTags" {
-        val renderer = TagsRenderer()
+        val tool = TagsRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderTags } returns false
-
         val contentStore = mockk<ContentStore>()
-
         val mockRenderer = mockk<Renderer>()
-        val renderResponse = renderer.render(mockRenderer, contentStore, configuration)
+
+        val renderResponse = tool.render(mockRenderer, contentStore, configuration)
 
         renderResponse shouldBe 0
     }
 
     "doesNotRenderWhenConfigDoesNotRenderTags" {
-        val tool = TagsRenderer()
+        val tool = TagsRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderTags } returns false
         every { configuration.tagPathName } returns "tags"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val mockRenderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val mockRenderer = Renderer(contentStore, configuration, renderingEngine)
 
         tool.render(mockRenderer, contentStore, configuration)
 
@@ -44,7 +42,7 @@ class TagsRendererTest : StringSpec({
     }
 
     "returnsOneWhenConfigRendersIndices" {
-        val tool = TagsRenderer()
+        val tool = TagsRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderTags } returns true
@@ -53,14 +51,12 @@ class TagsRendererTest : StringSpec({
         every { configuration.outputExtension } returns ".html"
         every { configuration.renderEncoding } returns "UTF-8"
         every { configuration.getTemplateByDocType(any()) } returns "tag.ftl"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val tags: MutableSet<String> = HashSet(mutableListOf("tag1"))
         every { contentStore.tags } returns tags
         every { contentStore.allTags } returns tags
-
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         val renderResponse = tool.render(renderer, contentStore, configuration)
 
@@ -68,7 +64,7 @@ class TagsRendererTest : StringSpec({
     }
 
     "doesRenderWhenConfigDoesRenderIndices" {
-        val tool = TagsRenderer()
+        val tool = TagsRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderTags } returns true
@@ -77,14 +73,12 @@ class TagsRendererTest : StringSpec({
         every { configuration.outputExtension } returns ".html"
         every { configuration.renderEncoding } returns "UTF-8"
         every { configuration.getTemplateByDocType(any()) } returns "tag.ftl"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val tags: MutableSet<String> = HashSet(mutableListOf("tag1", "tags2"))
         every { contentStore.tags } returns tags
         every { contentStore.allTags } returns tags
-
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
-        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         val result = tool.render(renderer, contentStore, configuration)
 
@@ -93,7 +87,7 @@ class TagsRendererTest : StringSpec({
     }
 
     "propogatesRenderingException" {
-        val tool = TagsRenderer()
+        val tool = TagsRenderingTool()
 
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderTags } returns true
@@ -101,16 +95,13 @@ class TagsRendererTest : StringSpec({
         every { configuration.destinationDir } returns mockk(relaxed = true)
         every { configuration.outputExtension } returns ".html"
         every { configuration.getTemplateByDocType(any()) } returns "tag.ftl"
-
         val contentStore = mockk<ContentStore>(relaxed = true)
         val tags: MutableSet<String> = HashSet(mutableListOf("tag1"))
         every { contentStore.tags } returns tags
         every { contentStore.allTags } returns tags
-
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
         every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
-
-        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         shouldThrow<RenderingException> {
             tool.render(renderer, contentStore, configuration)
