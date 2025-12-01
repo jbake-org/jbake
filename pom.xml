@@ -111,7 +111,7 @@
 
         <!-- E2E test dependencies versions -->
         <version.docker.java>3.7.0</version.docker.java>
-        <version.jackson>2.20.1</version.jackson>
+        <version.jackson>2.19.4</version.jackson>
     </properties>
 
     <dependencyManagement>
