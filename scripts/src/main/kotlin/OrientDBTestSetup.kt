@@ -44,8 +44,8 @@ object OrientDBTestSetup {
             db.close()
             orient.close()
             println("Database setup complete!")
-
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             println("Error setting up database: ${e.message}")
             e.printStackTrace()
             throw e
