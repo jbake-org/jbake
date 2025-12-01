@@ -7,6 +7,7 @@ import io.kotest.matchers.string.shouldContain
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.io.entity.StringEntity
+import org.jbake.texy.JBakeTexyIntegrationTest.Companion.texyContainer
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
@@ -26,16 +27,6 @@ import java.nio.charset.StandardCharsets
  */
 @Testcontainers
 class TexyServiceE2ETest : FunSpec({
-
-    companion object {
-        private const val TEXY_PORT = 8080
-
-        @Container
-        val texyContainer = GenericContainer("jbake/texy-service:latest")
-            .withExposedPorts(TEXY_PORT)
-            .waitingFor(Wait.forHttp("/").forStatusCode(200))
-            .withStartupTimeout(java.time.Duration.ofMinutes(2))
-    }
 
     test("Texy service container should start successfully") {
         texyContainer.isRunning shouldBe true
@@ -211,4 +202,15 @@ class TexyServiceE2ETest : FunSpec({
         serviceUrl shouldContain "/texy"
     }
 })
+{
+    companion object {
+        private const val TEXY_PORT = 8080
+
+        @Container
+        val texyContainer = GenericContainer("jbake/texy-service:latest")
+            .withExposedPorts(TEXY_PORT)
+            .waitingFor(Wait.forHttp("/").forStatusCode(200))
+            .withStartupTimeout(java.time.Duration.ofMinutes(2))
+    }
+}
 

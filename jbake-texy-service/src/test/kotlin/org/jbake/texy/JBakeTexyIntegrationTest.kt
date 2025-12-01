@@ -1,15 +1,13 @@
 package org.jbake.texy
 
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldContain
+import org.jbake.app.Parser
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.parser.Engines
-import org.jbake.parser.Parser
-import org.jbake.parser.TexyEngine
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
@@ -29,15 +27,6 @@ import java.nio.file.Files
 @Testcontainers
 class JBakeTexyIntegrationTest : FunSpec({
 
-    companion object {
-        private const val TEXY_PORT = 8080
-
-        @Container
-        val texyContainer = GenericContainer("jbake/texy-service:latest")
-            .withExposedPorts(TEXY_PORT)
-            .waitingFor(Wait.forHttp("/").forStatusCode(200))
-            .withStartupTimeout(java.time.Duration.ofMinutes(2))
-    }
 
     test("TexyEngine should be registered in JBake") {
         val engine = Engines.get("texy")
@@ -81,7 +70,7 @@ class JBakeTexyIntegrationTest : FunSpec({
 
             // Load configuration and parse file
             val config = ConfigUtil().loadConfig(tempDir) as DefaultJBakeConfiguration
-            config.set("texy.service.url", serviceUrl)
+            config.setProperty("texy.service.url", serviceUrl)
 
             val parser = Parser(config)
             val document = parser.processFile(texyFile)
@@ -176,7 +165,7 @@ class JBakeTexyIntegrationTest : FunSpec({
             """.trimIndent())
 
             val config = ConfigUtil().loadConfig(tempDir) as DefaultJBakeConfiguration
-            config.set("texy.service.url", serviceUrl)
+            config.setProperty("texy.service.url", serviceUrl)
             val parser = Parser(config)
 
             // Process multiple files
@@ -207,4 +196,14 @@ class JBakeTexyIntegrationTest : FunSpec({
         }
     }
 })
+{
+    companion object {
+        private const val TEXY_PORT = 8080
 
+        @Container
+        val texyContainer = GenericContainer("jbake/texy-service:latest")
+            .withExposedPorts(TEXY_PORT)
+            .waitingFor(Wait.forHttp("/").forStatusCode(200))
+            .withStartupTimeout(java.time.Duration.ofMinutes(2))
+    }
+}

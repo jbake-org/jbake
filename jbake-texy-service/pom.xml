@@ -28,30 +28,19 @@
     </properties>
 
     <dependencies>
+        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
+
         <!-- JBake core for end-to-end testing -->
-        <dependency><groupId>ch.zizka.jbake</groupId><artifactId>jbake-core</artifactId><version>${project.version}</version><scope>test</scope></dependency>
+        <dependency><scope>test</scope><groupId>ch.zizka.jbake</groupId><artifactId>jbake-core</artifactId><version>${project.version}</version></dependency>
 
-        <!-- Kotlin -->
-        <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId><scope>test</scope></dependency>
-
-        <!-- TestContainers for Docker integration testing -->
-        <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
-        <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${version.testcontainers}</version><scope>test</scope></dependency>
-
-        <!-- Testing frameworks -->
+        <dependency><scope>test</scope><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version></dependency>
+        <dependency><scope>test</scope><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><version>${version.testcontainers}</version></dependency>
         <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit -jupiter-engine</artifactId></dependency>
         <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
         <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core-jvm</artifactId><version>${version.kotest}</version></dependency>
-        <dependency><scope>test</scope><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version></dependency>
-        <dependency><scope>test</scope><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><version>${version.testcontainers}</version></dependency>
-
-
-        <!-- HTTP Client for testing -->
-        <dependency><groupId>org.apache.httpcomponents.client5</groupId><artifactId>httpclient5</artifactId><version>5.5.1</version><scope>test</scope></dependency>
-
-        <!-- SLF4J for logging -->
-        <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-simple</artifactId><version>${version.slf4j}</version><scope>test</scope></dependency>
+        <dependency><scope>test</scope><groupId>org.apache.httpcomponents.client5</groupId><artifactId>httpclient5</artifactId><version>5.5.1</version></dependency>
+        <dependency><scope>test</scope><groupId>org.slf4j</groupId><artifactId>slf4j-simple</artifactId><version>${version.slf4j}</version></dependency>
     </dependencies>
 
     <build>
