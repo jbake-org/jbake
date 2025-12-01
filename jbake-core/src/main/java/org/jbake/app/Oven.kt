@@ -1,6 +1,5 @@
 package org.jbake.app
 
-import org.apache.commons.configuration2.CompositeConfiguration
 import org.apache.commons.lang3.LocaleUtils
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
@@ -69,12 +68,7 @@ class Oven {
         this.utensils = utensils
     }
 
-    /** Shorthand for utensils.configuration.compositeConfiguration */
-    val config: CompositeConfiguration
-        // BAD - defies the purpose of Utensils being an abstraction layer.
-        get() = (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration
-        // Put back if anyone complains.
-        //set(config) { (utensils.configuration as DefaultJBakeConfiguration).compositeConfiguration = config }
+
 
     /**
      * Bake a single file. If the file is an asset, only copy that file. Otherwise, run a full bake.
