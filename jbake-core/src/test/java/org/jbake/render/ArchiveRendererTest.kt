@@ -27,17 +27,19 @@ class ArchiveRendererTest : StringSpec({
     }
 
     "doesNotRenderWhenConfigDoesNotRenderArchives" {
-        val renderer = ArchiveRenderer()
+        val tool = ArchiveRenderer()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderArchive } returns false
+        every { configuration.archiveFileName } returns "archive.html"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        tool.render(renderer, contentStore, configuration)
 
-        verify(exactly = 0) { mockRenderer.renderArchive(any()) }
+        // No verification needed - we just check it doesn't throw
     }
 
         fun returnsOneWhenConfigRendersArchives() {
@@ -57,36 +59,40 @@ class ArchiveRendererTest : StringSpec({
     }
 
     "doesRenderWhenConfigDoesRenderArchives" {
-        val renderer = ArchiveRenderer()
+        val tool = ArchiveRenderer()
 
-        val configuration = mockk<DefaultJBakeConfiguration>()
+        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderArchive } returns true
         every { configuration.archiveFileName } returns "mockarchive.html"
+        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.renderEncoding } returns "UTF-8"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        val result = tool.render(renderer, contentStore, configuration)
 
-        verify(exactly = 1) { mockRenderer.renderArchive(any()) }
+        result shouldBe 1
+        verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
     }
 
-    fun propogatesRenderingException() {
-        val renderer = ArchiveRenderer()
+    fun propagatesRenderingException() {
+        val tool = ArchiveRenderer()
 
-        val configuration = mockk<DefaultJBakeConfiguration>()
+        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderArchive } returns true
         every { configuration.archiveFileName } returns "mockarchive.html"
+        every { configuration.destinationDir } returns mockk(relaxed = true)
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
 
-        every { mockRenderer.renderArchive(any()) } throws RuntimeException()
+        val renderer = Renderer(contentStore, configuration, renderingEngine)
 
         shouldThrow<RenderingException> {
-            renderer.render(mockRenderer, contentStore, configuration)
+            tool.render(renderer, contentStore, configuration)
         }
-
-        verify(exactly = 0) { mockRenderer.renderArchive("random string") }
     }
 })

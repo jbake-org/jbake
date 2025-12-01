@@ -139,11 +139,11 @@ class Renderer {
      *
      * @throws Exception if IOException or SecurityException are raised
      */
-    fun renderIndex(outputIndexFile: String) {
+    fun renderIndex(outputIndexFile: String = config.indexFileName ?: "index.html") {
         render(DefaultRenderingConfig(outputIndexFile, MASTERINDEX_TEMPLATE_NAME))
     }
 
-    fun renderIndexPaging(indexFile: String) {
+    fun renderIndexPaging(indexFile: String = config.indexFileName ?: "index.html") {
         val totalPosts = db.getPublishedCount("post")
         val postsPerPage = config.postsPerPage
 
@@ -197,7 +197,7 @@ class Renderer {
      * @see [Sitemap protocol](http://www.sitemaps.org/)
      * @param sitemapFile configuration for site map
      */
-    fun renderSitemap(sitemapFile: String) {
+    fun renderSitemap(sitemapFile: String = config.siteMapFileName ?: "sitemap.xml") {
         render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
     }
 
@@ -206,7 +206,7 @@ class Renderer {
      *
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    fun renderFeed(outputFeedFile: String) {
+    fun renderFeed(outputFeedFile: String = config.feedFileName ?: "feed.xml") {
         render(DefaultRenderingConfig(outputFeedFile, FEED_TEMPLATE_NAME))
     }
 
@@ -215,7 +215,7 @@ class Renderer {
      *
      * @throws Exception if default rendering configuration is not loaded correctly
      */
-    fun renderArchive(outputArchiveFile: String) {
+    fun renderArchive(outputArchiveFile: String = config.archiveFileName!!) {
         render(DefaultRenderingConfig(outputArchiveFile, ARCHIVE_TEMPLATE_NAME))
     }
 
@@ -224,7 +224,7 @@ class Renderer {
      *
      * @throws Exception If default rendering configuration is not loaded correctly.
      */
-    fun renderError404(outputFile: String) {
+    fun renderError404(outputFile: String = config.error404FileName!!) {
         render(DefaultRenderingConfig(outputFile, ERROR404_TEMPLATE_NAME))
     }
 
@@ -233,7 +233,7 @@ class Renderer {
      *
      * @return Number of rendered tags
      */
-    fun renderTags(outputTagFile: String): Int {
+    fun renderTags(outputTagFile: String = config.tagPathName ?: "tags"): Int {
         var renderedCount = 0
         val errors: MutableList<Throwable> = LinkedList<Throwable>()
 

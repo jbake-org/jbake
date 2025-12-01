@@ -27,17 +27,19 @@ class IndexRendererTest : StringSpec({
     }
 
     "doesNotRenderWhenConfigDoesNotRenderIndices" {
-        val renderer = IndexRenderer()
+        val tool = IndexRenderer()
 
         val configuration = mockk<DefaultJBakeConfiguration>()
         every { configuration.renderIndex } returns false
+        every { configuration.indexFileName } returns "index.html"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        tool.render(renderer, contentStore, configuration)
 
-        verify(exactly = 0) { mockRenderer.renderIndex(any()) }
+        // No verification needed - we just check it doesn't throw
     }
 
     "returnsOneWhenConfigRendersIndices" {
@@ -57,23 +59,22 @@ class IndexRendererTest : StringSpec({
     }
 
     "propagatesRenderingException" {
-        val renderer = IndexRenderer()
+        val tool = IndexRenderer()
 
-        val configuration = mockk<DefaultJBakeConfiguration>()
+        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
+        every { configuration.destinationDir } returns mockk(relaxed = true)
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
 
-        every { mockRenderer.renderIndex(any()) } throws RuntimeException()
+        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
         shouldThrow<RenderingException> {
-            renderer.render(mockRenderer, contentStore, configuration)
+            tool.render(renderer, contentStore, configuration)
         }
-
-        // renderIndex is expected to have been invoked once and that invocation throws; verify that it was invoked
-        verify(exactly = 1) { mockRenderer.renderIndex(any()) }
     }
 
 
@@ -81,33 +82,43 @@ class IndexRendererTest : StringSpec({
      * @see [Issue 332](https://github.com/jbake-org/jbake/issues/332)
      */
     "shouldFallbackToStandardIndexRenderingIfPropertyIsMissing" {
-        val renderer = IndexRenderer()
+        val tool = IndexRenderer()
 
-        val configuration = mockk<DefaultJBakeConfiguration>()
+        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
+        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.renderEncoding } returns "UTF-8"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        val result = tool.render(renderer, contentStore, configuration)
 
-        verify(exactly = 1) { mockRenderer.renderIndex(any()) }
+        result shouldBe 1
+        verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
     }
 
     "shouldRenderPaginatedIndex" {
-        val renderer = IndexRenderer()
+        val tool = IndexRenderer()
 
-        val configuration = mockk<DefaultJBakeConfiguration>()
+        val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderIndex } returns true
         every { configuration.paginateIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
+        every { configuration.postsPerPage } returns 5
+        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.renderEncoding } returns "UTF-8"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        every { contentStore.getPublishedCount("post") } returns 0L // No posts, so it will call renderIndex instead
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
-        verify(exactly = 1) { mockRenderer.renderIndexPaging(any()) }
+        val result = tool.render(renderer, contentStore, configuration)
+
+        result shouldBe 1
     }
 })

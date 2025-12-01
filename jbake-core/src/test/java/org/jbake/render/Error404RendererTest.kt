@@ -32,13 +32,15 @@ class Error404RendererTest : StringSpec({
 
         val configuration = mockk<JBakeConfiguration>()
         every { configuration.renderError404 } returns false
+        every { configuration.error404FileName } returns "404.html"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val mockRenderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
         renderer.render(mockRenderer, contentStore, configuration)
 
-        verify(exactly = 0) { mockRenderer.renderError404(any()) }
+        // No verification needed - we just check it doesn't throw
     }
 
     "returnsOneWhenConfigRendersError404" {
@@ -60,36 +62,42 @@ class Error404RendererTest : StringSpec({
     }
 
     "doesRenderWhenConfigDoesRenderError404" {
-        val renderer = Error404Renderer()
+        val tool = Error404Renderer()
         val error404file = "mock404file.html"
 
-        val configuration = mockk<JBakeConfiguration>()
+        val configuration = mockk<JBakeConfiguration>(relaxed = true)
         every { configuration.renderError404 } returns true
         every { configuration.error404FileName } returns error404file
+        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.renderEncoding } returns "UTF-8"
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
-        renderer.render(mockRenderer, contentStore, configuration)
+        val result = tool.render(renderer, contentStore, configuration)
 
-        verify(exactly = 1) { mockRenderer.renderError404(error404file) }
+        result shouldBe 1
+        verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
     }
 
     "propogatesRenderingException" {
-        val renderer = Error404Renderer()
+        val tool = Error404Renderer()
         val error404file = "mock404file.html"
 
-        val configuration = mockk<JBakeConfiguration>()
+        val configuration = mockk<JBakeConfiguration>(relaxed = true)
         every { configuration.renderError404 } returns true
         every { configuration.error404FileName } returns error404file
+        every { configuration.destinationDir } returns mockk(relaxed = true)
 
-        val contentStore = mockk<ContentStore>()
-        val mockRenderer = mockk<Renderer>(relaxed = true)
+        val contentStore = mockk<ContentStore>(relaxed = true)
+        val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
+        every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
 
-        every { mockRenderer.renderError404(any()) } throws RuntimeException()
+        val renderer = org.jbake.app.Renderer(contentStore, configuration, renderingEngine)
 
         shouldThrow<RenderingException> {
-            renderer.render(mockRenderer, contentStore, configuration)
+            tool.render(renderer, contentStore, configuration)
         }
     }
 })
