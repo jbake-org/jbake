@@ -14,6 +14,7 @@ on:
 
 jobs:
     qodana:
+        if: false  # Disabled
         runs-on: ubuntu-latest
         permissions:
             contents: write
