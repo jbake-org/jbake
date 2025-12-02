@@ -19,10 +19,12 @@
 - Keep Java interop in mind. JBake is also used as a library. New public APIs should be easily usable from Java.
 
 - When you assume a task is done, run the full test suite with both Maven and Gradle. `mvn clean verify` and `./gradlew clean test`. Include E2E tests.
+  - The run may take around a minute.
 
-- Avoid running custom commands in CLI, as the developer has to confirm them.
-  - For instance, `find ... -exec` or `sed -i` are discouraged.
-  - Use IDEA's Find and Replace tool instead.
+- Avoid running exec commands in CLI, as the developer has to confirm them.
+  - For instance, `find ... -exec` or `sed -i` are discouraged. Use IDEA's Find and Replace tool instead.
+  - Instead of a find + exec construct, prefer using `rg`. If not installed, prompt the user to install `ripgrep`. It's faster and needs no `-exec`.
+
 
 - When modifying build files, ensure compatibility with both Maven and Gradle builds. Update both `pom.xml` and `build.gradle` as needed.
 
@@ -42,3 +44,5 @@
   - Put the logger `log` instance as a private member of the class (at the end of it) instead of using companion object.
 
 - Prefer brief code constructs over longer ones. For instance, use `mapNotNull` instead of `map` followed by `filterNotNull`.
+
+- When invoking the command line, remember to add batch mode options to avoid interactive prompts during automated processes, e.g., `--batch-mode` for Maven commands, `--no-pager` for Git commands, etc.
