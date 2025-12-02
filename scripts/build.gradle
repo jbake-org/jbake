@@ -16,7 +16,7 @@ kotlin {
     jvmToolchain(21)
 }
 
-task setupOrientDB(type: JavaExec) {
+tasks.register('setupOrientDB', JavaExec) {
     description = 'Sets up OrientDB test database'
     group = 'setup'
     dependsOn 'classes'

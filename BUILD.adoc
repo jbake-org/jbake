@@ -1,3 +1,4 @@
+// suppress inspection "AsciiDocAttributeShouldBeDefined" for whole file
 = Test, Build and Deploy
 :toc:
 :gradle-home: http://gradle.org[Gradle]
