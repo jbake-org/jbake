@@ -1,3 +1,5 @@
+@file:Suppress("UnusedVariable")
+
 package org.jbake.examples
 
 import org.jbake.app.ContentStore
@@ -20,27 +22,22 @@ object RenderContextExamples {
      * Example 1: Creating a simple render context for rendering a document.
      */
     fun createSimpleContext(config: JBakeConfiguration, db: ContentStore, document: DocumentModel, renderer: DelegatingTemplateEngine)
-        = RenderContext(
-            config = config,
-            db = db,
-            content = document,
-            renderer = renderer
-        )
+        = RenderContext(config, db, document, renderer)
 
     /**
      * Example 2: Using apply{} for construction (idiomatic Kotlin).
      */
     fun createContextWithApply(config: JBakeConfiguration, db: ContentStore)
         = RenderContext(
-            db = db,
             config = config,
+            db = db,
+            version = "100.0.0",
+            customData = mapOf("customKey" to "customValue"),
             content = DocumentModel().apply {
                 title = "My Page"
                 body = "<p>Hello World</p>"
                 type = "page"
             },
-            version = "2.7.0",
-            customData = mapOf("customKey" to "customValue")
         )
 
     /**

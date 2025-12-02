@@ -85,8 +85,9 @@
                         <include>**/*Test.kt</include>
                         <include>**/*Tests.kt</include>
                     </includes>
-                    <systemPropertyVariables>
+                    <systemPropertyVariables combine.children="append">
                         <jbake.test.data.dir>${project.basedir}/../test-data/fixture</jbake.test.data.dir>
+                        <jbake.image.tag>${project.version}</jbake.image.tag>
                         <DOCKER_API_VERSION>1.44</DOCKER_API_VERSION>
                     </systemPropertyVariables>
                     <environmentVariables>

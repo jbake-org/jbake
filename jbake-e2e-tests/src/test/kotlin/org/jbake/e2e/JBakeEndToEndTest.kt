@@ -33,7 +33,10 @@ import java.util.stream.Stream
 class JBakeEndToEndTest {
 
     companion object {
-        private const val JBAKE_IMAGE = "jbake/jbake:2.7.0-SNAPSHOT"
+
+        val jbakeImageTag = System.getProperty("jbake.image.tag")  // Not used until the CI is stable.
+
+        private val JBAKE_IMAGE = "jbake/jbake:latest"
         private lateinit var outputDir: Path
         private lateinit var testDataDir: File
 

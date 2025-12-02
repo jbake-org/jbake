@@ -250,7 +250,7 @@ This will:
 Bump desired project version in `gradle.properties`:
 
 ----
-version = 2.7.0
+version = 100.0.0
 ----
 
 Commit and push to GitHub, then:

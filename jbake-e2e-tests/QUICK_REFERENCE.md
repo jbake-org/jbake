@@ -40,7 +40,7 @@ mvn test
 - Configurable per-test run
 
 ### Docker Image
-- Name: `jbake/jbake:2.7.0-SNAPSHOT`
+- Name: `jbake/jbake:latest`
 - Base: `eclipse-temurin:17-jre-alpine`
 - Built with: Jib plugin
 
