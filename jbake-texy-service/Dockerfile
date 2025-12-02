@@ -10,6 +10,7 @@ WORKDIR /app
 COPY src/main/php/texy-service.php /app/
 
 # Install Texy library
+RUN apt-get update && apt-get install -y unzip git
 RUN composer require texy/texy
 
 # Expose port
