@@ -84,21 +84,7 @@ This will:
 4. Run JBake integration tests
 5. Verify service functionality
 
-### Test Categories
 
-**Service Tests** (`TexyServiceE2ETest.kt`):
-- Container startup
-- Health check endpoint
-- Texy markup processing
-- UTF-8 character handling
-- Error responses
-- Multiple requests
-
-**Integration Tests** (`JBakeTexyIntegrationTest.kt`):
-- JBake + Texy service integration
-- `.texy` file processing
-- Error handling
-- Multiple file processing
 
 ## Docker Image
 
@@ -134,19 +120,7 @@ None required. The service runs with default settings:
 - No authentication
 - UTF-8 encoding
 
-## Maven Plugins
-
-### Dockerfile Maven Plugin
-
-Handles Docker image building and pushing:
-
-```xml
-<plugin>
-    <groupId>com.spotify</groupId>
-    <artifactId>dockerfile-maven-plugin</artifactId>
-    <version>1.4.13</version>
-</plugin>
-```
+## Maven Configuration
 
 **Phases**:
 - `package`: Build image and tag as latest
@@ -188,30 +162,6 @@ Enable Docker Hub push during deploy:
 mvn clean deploy -Pdocker-push
 ```
 
-### Gradle Properties
-
-#### skipDocker
-
-Skip Docker operations:
-
-```bash
-./gradlew build -PskipDocker=true
-```
-
-#### Custom Image Name/Tag
-
-```bash
-./gradlew dockerBuild \
-  -Pdocker.image.name=myrepo/texy \
-  -Pdocker.image.tag=custom-tag
-```
-
-Set in `gradle.properties`:
-```properties
-docker.image.name=myrepo/texy-service
-dockerhub.username=your-username
-```
-
 ## CI/CD Integration
 
 ### GitHub Actions Example
@@ -228,10 +178,10 @@ jobs:
   build-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
 
@@ -243,215 +193,6 @@ jobs:
           cd jbake-texy-service
           mvn clean deploy -Pdocker-push
 ```
-
-### GitLab CI Example
-
-```yaml
-stages:
-  - build
-  - test
-  - deploy
-
-build-texy-service:
-  stage: build
-  script:
-    - cd jbake-texy-service
-    - mvn clean package
-
-test-texy-service:
-  stage: test
-  script:
-    - cd jbake-texy-service
-    - mvn test
-
-push-texy-service:
-  stage: deploy
-  only:
-    - tags
-  script:
-    - cd jbake-texy-service
-    - mvn deploy -Pdocker-push
-```
-
-## Dependencies
-
-### Runtime (Docker Image)
-- PHP 8.2
-- Composer
-- Texy library (via Composer)
-
-### Test Dependencies
-- JUnit Jupiter
-- Kotest
-- TestContainers
-- Apache HttpClient 5
-- JBake Core
-
-## Configuration
-
-### Maven Properties
-
-```xml
-<properties>
-    <!-- Docker image settings -->
-    <docker.image.name>jbake/texy-service</docker.image.name>
-    <docker.image.tag>${project.version}</docker.image.tag>
-
-    <!-- Docker Hub credentials (from environment) -->
-    <dockerhub.username>${env.DOCKERHUB_USERNAME}</dockerhub.username>
-    <dockerhub.password>${env.DOCKERHUB_PASSWORD}</dockerhub.password>
-
-    <!-- Skip options -->
-    <skipTests>false</skipTests>
-    <skipDocker>false</skipDocker>
-</properties>
-```
-
-### Override Properties
-
-```bash
-# Custom image name
-mvn package -Ddocker.image.name=myrepo/texy
-
-# Custom tag
-mvn package -Ddocker.image.tag=custom-tag
-
-# Skip tests
-mvn package -DskipTests=true
-```
-
-## Troubleshooting
-
-### Docker Build Fails
-
-**Problem**: Docker daemon not running or not accessible
-
-**Solution**:
-```bash
-# Check Docker is running
-docker info
-
-# Start Docker daemon (Linux)
-sudo systemctl start docker
-
-# Or skip Docker build
-mvn package -PskipDocker
-```
-
-### Tests Fail with TestContainers
-
-**Problem**: TestContainers cannot connect to Docker
-
-**Solution**:
-```bash
-# Set Docker socket permissions
-sudo chmod 666 /var/run/docker.sock
-
-# Or set environment variable
-export DOCKER_HOST=unix:///var/run/docker.sock
-```
-
-### Push to Docker Hub Fails
-
-**Problem**: Authentication error
-
-**Solution**:
-```bash
-# Login manually first
-docker login
-
-# Or set credentials
-export DOCKERHUB_USERNAME=your-username
-export DOCKERHUB_PASSWORD=your-password
-```
-
-### Image Not Found in Tests
-
-**Problem**: Tests cannot find the Docker image
-
-**Solution**:
-```bash
-# Build the image first
-mvn package
-
-# Verify image exists
-docker images | grep texy-service
-
-# Or rebuild without cache
-mvn clean package -DskipTests
-mvn test
-```
-
-## Development
-
-### Local Development
-
-**Using Maven:**
-```bash
-# 1. Build image
-mvn package -DskipTests
-
-# 2. Run container
-docker run -d -p 8080:8080 --name texy jbake/texy-service:latest
-
-# 3. Run tests
-mvn test
-
-# 4. Cleanup
-docker stop texy && docker rm texy
-```
-
-**Using Gradle:**
-```bash
-# 1. Build image
-./gradlew :jbake-texy-service:assemble
-
-# 2. Run container
-docker run -d -p 8080:8080 --name texy jbake/texy-service:latest
-
-# 3. Run tests
-./gradlew :jbake-texy-service:test
-
-# 4. Cleanup
-docker stop texy && docker rm texy
-```
-
-### Modifying the Service
-
-1. Edit `src/main/php/texy-service.php`
-2. Rebuild image:
-   - Maven: `mvn package -DskipTests`
-   - Gradle: `./gradlew :jbake-texy-service:assemble`
-3. Test manually: `docker run ...`
-4. Run tests:
-   - Maven: `mvn test`
-   - Gradle: `./gradlew :jbake-texy-service:test`
-
-### Gradle Helper Tasks
-
-```bash
-# Show Docker configuration
-./gradlew :jbake-texy-service:dockerInfo
-
-# Show all Docker tasks and examples
-./gradlew :jbake-texy-service:dockerHelp
-```
-
-### Adding Tests
-
-1. Create test in `src/test/kotlin/org/jbake/texy/`
-2. Extend `FunSpec` (Kotest)
-3. Use `@Testcontainers` annotation
-4. Run: `mvn test`
-
-## Related Modules
-
-- **jbake-core**: Contains `TexyEngine` implementation
-- **jbake-e2e-tests**: Other end-to-end tests (kept original Dockerfile copy there)
-
-## License
-
-Same as JBake (MIT License)
 
 ## Links
 
