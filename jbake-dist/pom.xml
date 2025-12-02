@@ -14,12 +14,7 @@
     <name>jbake-dist</name>
     <description>The binary distribution package that bundles JBake cli</description>
 
-    <licenses>
-        <license>
-            <name>The MIT License (MIT)</name>
-            <url>http://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
+    <licenses><license><name>The MIT License (MIT)</name><url>http://opensource.org/licenses/MIT</url></license></licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -198,15 +193,9 @@
                         </jvmFlags>
                         <mainClass>${main.class}</mainClass>
                         <workingDirectory>/mnt/site</workingDirectory>
-                        <volumes>
-                            <volume>/mnt/site</volume>
-                        </volumes>
-                        <ports>
-                            <port>8820</port>
-                        </ports>
-                        <environment>
-                            <TZ>UTC</TZ>
-                        </environment>
+                        <volumes><volume>/mnt/site</volume></volumes>
+                        <ports><port>8820</port></ports>
+                        <environment><TZ>UTC</TZ></environment>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                         <user>1000:1000</user>
                     </container>
@@ -217,5 +206,29 @@
             </plugin>
         </plugins>
     </build>
-</project>
 
+    <profiles>
+        <profile>
+            <id>sdkman</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>io.sdkman</groupId><artifactId>sdkman-maven-plugin</artifactId><version>2.0.0</version>
+                        <executions><execution><phase>deploy</phase><goals><goal>release</goal></goals></execution></executions>
+                        <configuration>
+                            <candidate>jbake</candidate>
+                            <version>${project.version}</version>
+                            <url>https://github.com/OndraZizka/jbake/releases/download/v${project.version}/jbake-${project.version}-bin.zip</url>
+                            <!-- Getting a key in progress. -->
+                            <consumerKey>${sdkman.consumer.key}</consumerKey>
+                            <consumerToken>${sdkman.consumer.token}</consumerToken>
+                        </configuration>
+                    </plugin>
+                    <!-- Another way is GitHub SDKMAN action: https://github.com/sdkman/sdkman-release-action -->
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

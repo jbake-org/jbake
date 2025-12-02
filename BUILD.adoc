@@ -309,6 +309,37 @@ Add the following properties to your local _gradle.properties_ file (_~/.gradle/
 
 plugin:: https://plugins.gradle.org/plugin/io.sdkman.vendors
 
+==== Publish to SDKMAN with Maven
+
+To publish to SDKMAN using Maven, activate the `sdkman` profile:
+
+    mvn clean deploy -Psdkman
+
+Add the following properties to your local _~/.m2/settings.xml_:
+
+[source,xml]
+----
+<settings>
+  <profiles>
+    <profile>
+      <id>sdkman</id>
+      <properties>
+        <sdkman.consumer.key>your-consumer-key</sdkman.consumer.key>
+        <sdkman.consumer.token>your-consumer-token</sdkman.consumer.token>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+----
+
+Or pass them on the command line:
+
+    mvn clean deploy -Psdkman -Dsdkman.consumer.key=your-key -Dsdkman.consumer.token=your-token
+
+This will automatically announce the new JBake version to SDKMAN during the Maven deploy phase.
+
+plugin:: https://github.com/sdkman/sdkman-maven-plugin
+
 === Signing
 
 To enable code signing you need to add some more properties to your local _gradle.properties_ file (_~/.gradle/gradle.properties_):
