@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package org.jbake.texy
 
 import io.kotest.core.spec.style.FunSpec
