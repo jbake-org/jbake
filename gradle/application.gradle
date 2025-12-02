@@ -57,6 +57,7 @@ distributions {
 }
 
 startScripts {
+    // Maven equivalent: jbake-dist/pom.xml > jvmSettings / extraArguments
     defaultJvmOpts = [
         '-XX:MaxDirectMemorySize=512m',
         '-Djna.nosys=true',

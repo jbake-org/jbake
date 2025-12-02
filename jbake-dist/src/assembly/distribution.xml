@@ -35,6 +35,15 @@
                 <include>README*</include>
             </includes>
         </fileSet>
+
+        <!-- Include lib/logging directory with logback.xml (matches Gradle's src/dist behavior) -->
+        <fileSet>
+            <directory>${project.basedir}/src/dist/lib/logging</directory>
+            <outputDirectory>/lib/logging</outputDirectory>
+            <includes>
+                <include>**/*.xml</include>
+            </includes>
+        </fileSet>
     </fileSets>
 
 </assembly>
