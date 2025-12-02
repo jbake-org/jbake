@@ -7,10 +7,10 @@ import java.io.File
 import kotlin.io.path.createTempDirectory
 
 class BuiltInProjectsTest : StringSpec({
-    val jbakeExec = BinaryRunner.jbakeExecutableRelative.absolutePath
 
     fun testTemplate(projectName: String, extension: String) {
         "$projectName template should bake successfully" {
+            val jbakeExec = BinaryRunner.jbakeExecutableRelative.absolutePath
             val tempDir = createTempDirectory("jbake-smoke-test").toFile()
             try {
                 val projectDir = File(tempDir, "project")

@@ -36,9 +36,11 @@ class BinaryRunner(private val workingDir: File) {
 
         val jbakeExecutableRelative: File
             get() {
+                // Check Gradle path first (relative to jbake-dist working directory)
                 val gradleFile = File(gradlePath)
                 if (gradleFile.exists()) return gradleFile
 
+                // Fall back to Maven path
                 val mavenFile = File(mavenPath)
                 if (mavenFile.exists()) return mavenFile
 
