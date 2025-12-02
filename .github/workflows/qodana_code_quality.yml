@@ -29,6 +29,7 @@ jobs:
                 uses: JetBrains/qodana-action@v2025.2
                 env:
                     QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+                    project.open.type: Gradle
                 with:
                     # When pr-mode is set to true, Qodana analyzes only the files that have been changed
                     pr-mode: false
