@@ -28,6 +28,9 @@ configurations {
     smokeTestImplementation.extendsFrom testImplementation
     smokeTestCompileOnly.extendsFrom testCompileOnly
     smokeTestRuntimeOnly.extendsFrom testRuntimeOnly
+
+    // Exclude pug4j from smokeTest to avoid GraalVM Unsafe issues
+    smokeTestRuntimeOnly.exclude group: 'de.neuland-bfi', module: 'pug4j'
 }
 
 

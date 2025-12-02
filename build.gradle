@@ -9,6 +9,7 @@ plugins {
     id "idea"
     id 'org.jetbrains.kotlin.jvm'               version "$kotlinVersion" apply false
     id 'io.kotest'                              version "$kotestVersion" apply false
+    id 'java-platform'
 }
 
 
@@ -45,6 +46,25 @@ dependencyUpdates.resolutionStrategy {
             if (rejected) {
                 selection.reject('Release candidate')
             }
+        }
+    }
+}
+
+subprojects {
+    //dependencies {
+        //constraints {
+    configurations.all {
+        resolutionStrategy {
+            // OrientDB
+            force "org.graalvm.truffle:truffle-api:$graalVmVersion"
+
+            // Pug4j
+            force "org.graalvm.sdk:graal-sdk:$graalVmVersion"
+            //runtime "org.graalvm.js:js:$graalVmVersion"
+            //runtime "org.graalvm.regex:regex:$graalVmVersion"
+            force "org.graalvm.js:js-scriptengine:$graalVmVersion"
+            //runtime "org.graalvm.tools:profiler:$graalVmVersion"
+            //runtime "org.graalvm.tools:chromeinspector:$graalVmVersion"
         }
     }
 }
