@@ -25,3 +25,20 @@
   - Use IDEA's Find and Replace tool instead.
 
 - When modifying build files, ensure compatibility with both Maven and Gradle builds. Update both `pom.xml` and `build.gradle` as needed.
+
+- Try not to duplicate code. If you find yourself copying and pasting code, consider refactoring it into a shared function, class, or module.
+
+- Specifically for Gemini agent: After stating "I will do X now", do it, rather than stopping.
+
+- Do not generate lengthy explanations or justifications for your actions. Focus on providing concise, actionable code changes or suggestions. Assume the user knows Kotlin, Java, Docker, and the frameworks used. Do not explain basic concepts. Do not apologize. Do not exaggerate by saying "you are absolutely right" or similar; challenge the prompts with your expertise after analyzing them the user's prompt.
+
+- Do not generate lengthy reports. The user is supposed to read and understand the code. If some construct is complex, add concise comments in the code itself. But ideally, rely on perfect naming and structure.
+
+- Prefer brief code constructs over longer ones. For instance:
+  - Use `mapNotNull` instead of `map` followed by `filterNotNull`.
+  - If an `if` contains only return, then put it on a single line.
+  - Exit the function early instead of wrapping the main logic in an `if` block.
+  - Use lambda logging using Slf4j's lazy logging: `logger.debug { "Expensive log message: ${compute()}" }`.
+  - Put the logger `log` instance as a private member of the class (at the end of it) instead of using companion object.
+
+- Prefer brief code constructs over longer ones. For instance, use `mapNotNull` instead of `map` followed by `filterNotNull`.
