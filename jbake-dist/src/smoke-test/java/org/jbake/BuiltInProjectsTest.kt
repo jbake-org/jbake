@@ -11,27 +11,33 @@ class BuiltInProjectsTest : StringSpec({
     fun testTemplate(projectName: String, extension: String) {
         "$projectName template should bake successfully" {
             val jbakeExec = BinaryRunner.jbakeExecutableRelative.absolutePath
+
             val tempDir = createTempDirectory("jbake-smoke-test").toFile()
             try {
                 val projectDir = File(tempDir, "project")
-                val templateDir = File(projectDir, "templates")
-                val outputDir = File(projectDir, "output")
-                val runner = BinaryRunner(projectDir)
+                val runner = BinaryRunner(tempDir)
 
-                // Initialize project
+                // Run JBake to initialize the dir - should create project/, templates/ etc.
                 val initProcess = runner.runWithArguments(jbakeExec, "-i", "-t", projectName)
+
                 initProcess.exitValue() shouldBe 0
-                File(projectDir, "jbake.properties").shouldExist()
+                File(tempDir, "jbake.properties").shouldExist()
+
+                val templateDir = File(tempDir, "templates") //.also { it.mkdir() }
                 File(templateDir, "index.$extension").shouldExist()
                 initProcess.destroy()
 
                 // Bake project
                 val bakeProcess = runner.runWithArguments(jbakeExec, "-b")
                 bakeProcess.exitValue() shouldBe 0
+
+                val outputDir = File(tempDir, "output") //.also { it.mkdir() }
                 File(outputDir, "index.html").shouldExist()
                 bakeProcess.destroy()
+
+                tempDir.deleteRecursively()
             }
-            finally { tempDir.deleteRecursively() }
+            finally { /*tempDir.deleteRecursively()*/ }
         }
     }
 

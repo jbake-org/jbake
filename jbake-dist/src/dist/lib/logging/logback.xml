@@ -18,5 +18,6 @@
     <logger name="org.eclipse" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
     <logger name="org.apache.commons.beanutils" level="ERROR"/>
+    <logger name="org.eclipse.jgit" level="WARN"/>
 
 </configuration>

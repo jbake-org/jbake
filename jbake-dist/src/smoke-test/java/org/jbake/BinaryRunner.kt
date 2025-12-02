@@ -1,6 +1,8 @@
 package org.jbake
 
 import org.apache.commons.lang3.SystemUtils
+import org.jbake.util.Logging
+import org.jbake.util.Logging.logger
 import java.io.*
 
 class BinaryRunner(private val workingDir: File) {
@@ -37,15 +39,18 @@ class BinaryRunner(private val workingDir: File) {
         val jbakeExecutableRelative: File
             get() {
                 // Check Gradle path first (relative to jbake-dist working directory)
-                val gradleFile = File(gradlePath)
-                if (gradleFile.exists()) return gradleFile
+                val gradleFile: File = File(gradlePath).let { if(it.exists()) return it else it }
 
                 // Fall back to Maven path
-                val mavenFile = File(mavenPath)
-                if (mavenFile.exists()) return mavenFile
+                val mavenFile: File = File(mavenPath).let { if(it.exists()) return it else it }
+
+                "No jbake launcher found! CWD: ${File(".")}  Gradle: ${gradleFile.path} Maven: ${mavenFile.path}"
+                    .let { throw Exception(it) }
 
                 // Default to Gradle path if neither exists (will fail with clear error)
-                return gradleFile
+                //return File("No/built/binary/found")
             }
+
+        private val log by Logging.logger()
     }
 }
