@@ -88,8 +88,8 @@
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/BuiltInProjectsTest.kt</exclude>
-                        <exclude>**/ProjectWebsiteTest.kt</exclude>
+                        <exclude>**/BuiltInProjectsTest.class</exclude>
+                        <exclude>**/ProjectWebsiteTest.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>

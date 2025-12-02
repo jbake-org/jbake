@@ -34,11 +34,7 @@
         <dependency><groupId>org.thymeleaf</groupId><artifactId>thymeleaf</artifactId><optional>true</optional></dependency>
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><optional>true</optional></dependency>
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId><optional>true</optional></dependency>
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>3.2.3</version>
-        </dependency>
+            <!--<dependency><groupId>com.github.ben-manes.caffeine</groupId><artifactId>caffeine</artifactId></dependency>-->
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><optional>true</optional></dependency>
         <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><optional>true</optional></dependency>
         <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId><optional>true</optional></dependency>
