@@ -1,7 +1,9 @@
 package org.jbake.parser
 
+import org.jbake.template.RenderingException
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
+import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -69,15 +71,21 @@ class TexyEngine : MarkupEngine() {
             connection.setRequestProperty("Accept", "text/html; charset=UTF-8")
 
             // Send the Texy content
-            connection.outputStream.use { outputStream ->
-                outputStream.write(texyContent.toByteArray(StandardCharsets.UTF_8))
-                outputStream.flush()
+
+            try {
+                connection.outputStream.use { outputStream ->
+                    outputStream.write(texyContent.toByteArray(StandardCharsets.UTF_8))
+                    outputStream.flush()
+                }
+            }
+            catch (e: ConnectException) {
+                throw RenderingException("Could not connect to Texy service at $serviceUrl: ${e.message}")
             }
 
             // Check response code
             val responseCode = connection.responseCode
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw RuntimeException("Texy service returned HTTP $responseCode: ${connection.responseMessage}")
+                throw RenderingException("Texy service returned HTTP $responseCode: ${connection.responseMessage}")
             }
 
             // Read the response
