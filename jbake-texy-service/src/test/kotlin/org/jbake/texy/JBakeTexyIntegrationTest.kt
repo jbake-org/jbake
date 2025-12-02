@@ -100,9 +100,8 @@ class JBakeTexyIntegrationTest : FunSpec({
             body shouldContain "bold"
             body shouldContain "<em>"
             body shouldContain "italic"
-
-        } finally {
-            // Cleanup
+        }
+        finally {
             tempDir.deleteRecursively()
         }
     }
