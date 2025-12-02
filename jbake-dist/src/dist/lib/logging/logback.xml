@@ -13,6 +13,14 @@
     </root>
     <logger name="org.jbake" level="INFO"/>
 
+    <!-- Debugging OrientDB - comprehensive logging for Java 17 serialization issue diagnosis -->
+    <logger name="com.orientechnologies" level="DEBUG"/>
+    <logger name="com.orientechnologies.orient.core" level="DEBUG"/>
+    <logger name="com.orientechnologies.orient.core.db" level="DEBUG"/>
+    <logger name="com.orientechnologies.orient.core.serialization" level="DEBUG"/>
+    <logger name="com.orientechnologies.orient.core.storage" level="DEBUG"/>
+
+    <!-- Normally, suppress noisy loggers -->
     <logger name="org.thymeleaf" level="WARN"/>
     <logger name="org.asciidoctor" level="WARN"/>
     <logger name="org.eclipse" level="WARN"/>
