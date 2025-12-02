@@ -2,6 +2,9 @@
 
 This document describes how to release JBake artifacts to Maven Central under the `ch.zizka.jbake` groupId.
 
+It's under this groupId for this branch. If/when merged, it may be changed to `org.jbake`.
+
+
 ## Quick Start
 
 ```bash
@@ -34,9 +37,7 @@ java -version  # Verify it's Java 17
 
 - Portal: https://central.sonatype.com/
 - Login with your OSSRH JIRA credentials
-- Ensure `ch.zizka` namespace is verified
-
-**Note**: The old OSSRH service (s01.oss.sonatype.org) was shut down on June 30, 2025. We now use the Maven Central Portal.
+- Ensure you may publish to `ch.zizka`
 
 ### 3. Maven Settings (~/.m2/settings.xml)
 
@@ -89,7 +90,7 @@ gpg --full-generate-key
 # Key size: 4096
 # Expiration: 0 (never expires)
 # Name: Ondrej Zizka
-# Email: zizka@seznam.cz
+# Email: ...
 # Passphrase: (optional, can be empty)
 ```
 
@@ -180,23 +181,6 @@ Note: `jbake-e2e-tests` is not deployed (has `maven.deploy.skip=true`)
 
 ## Project Configuration
 
-### Maven Central Portal
-
-The project uses the new Maven Central Portal (OSSRH was shut down June 30, 2025):
-
-- **Portal URL**: https://central.sonatype.com/
-- **Plugin**: `central-publishing-maven-plugin` 0.9.0
-- **Server ID**: `central`
-- **Auto-publish**: Enabled (artifacts automatically released after validation)
-
-### Kotlin Documentation
-
-The project uses Dokka to generate Javadoc-compatible documentation from Kotlin code:
-
-- **Plugin**: `dokka-maven-plugin` 2.1.0
-- **Format**: Javadoc (compatible with Maven Central)
-- **Generated**: Real HTML documentation from KDoc comments
-
 ### GPG Signing
 
 All artifacts are signed with GPG in the release profile:
@@ -206,12 +190,6 @@ All artifacts are signed with GPG in the release profile:
 - Public keys must be on keyservers
 
 ## Troubleshooting
-
-### Error: 401 Unauthorized
-
-Your Maven Central Portal credentials are incorrect or expired.
-
-**Solution**: Generate fresh token from https://central.sonatype.com/account
 
 ### Error: GPG signing failed: No secret key
 
@@ -228,12 +206,7 @@ gpg --full-generate-key
 
 ### Error: GPG signing failed: Inappropriate ioctl for device
 
-GPG_TTY is not set.
-
-**Solution**:
-```bash
-export GPG_TTY=$(tty)
-```
+GPG_TTY is not set. Use `export GPG_TTY=$(tty)`.
 
 ### Error: Invalid signature - Could not find public key
 
@@ -249,49 +222,15 @@ gpg --keyserver keys.openpgp.org --send-keys YOUR_KEY_ID
 gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEY_ID
 ```
 
-### Error: Javadocs/Sources must be provided
-
-Missing javadoc or sources JARs.
-
-**Solution**: This should be automatic with the current configuration. Dokka generates Kotlin documentation. If issues persist, rebuild:
-```bash
-mvn clean package -Prelease -DskipTests
-```
-
-### Error: Namespace not verified
-
-Your account doesn't have access to `ch.zizka.*` namespace.
-
-**Solution**: Contact central-support@sonatype.com
 
 ## Manual Review Before Publishing
 
 If you want to review artifacts before they're released to Maven Central:
 
-1. Edit `pom.xml` and change:
-   ```xml
-   <autoPublish>false</autoPublish>
-   ```
-
-2. Deploy:
-   ```bash
-   mvn clean deploy -Prelease
-   ```
-
+1. Change in `pom.xml`: `<autoPublish>false</autoPublish>`
+2. Deploy: `mvn clean deploy -Prelease`
 3. Review at: https://central.sonatype.com/publishing
-
 4. Click "Publish" to release to Maven Central
-
-
-## Maven Central Requirements
-
-All requirements are met by the current configuration:
-
-- ✅ **POM Metadata**: name, description, url, licenses, developers, scm
-- ✅ **Sources JAR**: maven-source-plugin configured
-- ✅ **Javadoc JAR**: Dokka generates from Kotlin code
-- ✅ **GPG Signatures**: maven-gpg-plugin in release profile
-- ✅ **Valid Coordinates**: ch.zizka.jbake namespace verified
 
 ## Helper Scripts
 
@@ -303,10 +242,4 @@ All requirements are met by the current configuration:
 
 - Maven Central Portal: https://central.sonatype.com/
 - Portal Documentation: https://central.sonatype.org/publish/publish-portal-maven/
-- OSSRH EOL Notice: https://central.sonatype.org/pages/ossrh-eol/
-- Dokka Documentation: https://kotlinlang.org/docs/dokka-introduction.html
-
----
-
-**Last Updated**: December 1, 2025
-
+- GPG Documentation: https://www.gnupg.org/documentation/S
