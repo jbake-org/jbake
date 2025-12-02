@@ -2,6 +2,8 @@
 
 Docker container for the Texy markup processing service, with Maven integration for building, testing, and pushing to Docker Hub.
 
+> **Note**: This is the canonical source for the Texy service Docker image. Other modules (e.g., `jbake-e2e-tests`) should use the pre-built `jbake/texy-service` image rather than maintaining duplicate Dockerfiles.
+
 ## Overview
 
 This module provides:
