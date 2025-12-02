@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import java.io.File
+import java.io.IOException
 import kotlin.io.path.createTempDirectory
 
 class BuiltInProjectsTest : StringSpec({
@@ -30,7 +31,13 @@ class BuiltInProjectsTest : StringSpec({
 
                 // Bake project
                 val bakeProcess = runner.runWithArguments(jbakeExec, "-b")
-                withClue("JBake process output:\n\n\n${bakeProcess.inputStream.bufferedReader().readText()}\n\n\n") {
+                val jbakeOutput = try {
+                    bakeProcess.inputStream.bufferedReader().readText()
+                }
+                catch (e: IOException) {
+                    throw Exception("Failed to read JBake process output: ${e.message}")
+                }
+                withClue("JBake process output:\n\n\n$jbakeOutput\n\n\n") {
                     bakeProcess.exitValue() shouldBe 0
                 }
 
@@ -51,3 +58,8 @@ class BuiltInProjectsTest : StringSpec({
     testTemplate("groovy", "gsp")
     testTemplate("groovy-mte", "tpl")
 })
+
+class NoStackTraceException(message: String) : RuntimeException(message) {
+    // Overriding this prevents the JVM from gathering the stack trace information, i.e. improving performance when exceptions are used for control flow.
+    override fun fillInStackTrace(): Throwable = this
+}
