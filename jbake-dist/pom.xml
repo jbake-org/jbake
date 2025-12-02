@@ -174,21 +174,61 @@
                                 <extraArguments>
                                     <extraArgument>-XX:MaxDirectMemorySize=512m</extraArgument>
                                     <extraArgument>-Djna.nosys=true</extraArgument>
+                                    <!-- Java 17+ compatibility for OrientDB -->
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/java.lang=ALL-UNNAMED</extraArgument>
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/java.lang.reflect=ALL-UNNAMED</extraArgument>
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/java.io=ALL-UNNAMED</extraArgument>
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/java.util=ALL-UNNAMED</extraArgument>
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/java.util.concurrent=ALL-UNNAMED</extraArgument>
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/sun.nio.ch=ALL-UNNAMED</extraArgument>
+                                    <extraArgument>--add-opens</extraArgument>
+                                    <extraArgument>java.base/java.nio=ALL-UNNAMED</extraArgument>
                                 </extraArguments>
+                                <!-- Mimick the setup from Gradle - include jbake-dist/src/dist/lib/logging/logback.xml  -->
+                                <extraClasspathElements>
+                                    <extraClasspathElement>lib/logging</extraClasspathElement>
+                                </extraClasspathElements>
                             </jvmSettings>
                         </program>
                     </programs>
                 </configuration>
             </plugin>
 
+            <!-- Mimick the setup from Gradle - include jbake-dist/src/dist/lib/logging/logback.xml  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-logging-config</id>
+                        <phase>package</phase>
+                        <goals><goal>copy-resources</goal></goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/appassembler/lib/logging</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/dist/lib/logging</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <includes>
-                        <include>**/*SmokeTest.kt</include>
-                        <include>**/*IT.kt</include>
-                        <include>**/BuiltInProjectsTest.kt</include>
-                        <include>**/ProjectWebsiteTest.kt</include>
+                        <include>**/*SmokeTest.*</include>
+                        <include>**/*IT.*</include>
+                        <include>**/BuiltInProjectsTest.*</include>
+                        <include>**/ProjectWebsiteTest.*</include>
                     </includes>
                     <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine>
                 </configuration>
