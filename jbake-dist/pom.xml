@@ -45,16 +45,10 @@
         <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId></dependency>
 
         <!-- Test Dependencies -->
-        <dependency><groupId>org.eclipse.jgit</groupId><artifactId>org.eclipse.jgit</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>junit</groupId><artifactId>junit</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.junit.vintage</groupId><artifactId>junit-vintage-engine</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><scope>test</scope></dependency>
-        <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><scope>test</scope></dependency>
+        <dependency><scope>test</scope><groupId>org.eclipse.jgit</groupId><artifactId>org.eclipse.jgit</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-framework-engine</artifactId></dependency>
     </dependencies>
 
     <build>
@@ -160,10 +154,10 @@
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <includes>
-                        <include>**/*SmokeTest.java</include>
                         <include>**/*SmokeTest.kt</include>
-                        <include>**/*IT.java</include>
                         <include>**/*IT.kt</include>
+                        <include>**/BuiltInProjectsTest.kt</include>
+                        <include>**/ProjectWebsiteTest.kt</include>
                     </includes>
                     <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine>
                 </configuration>
