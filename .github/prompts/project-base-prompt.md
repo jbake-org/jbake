@@ -14,7 +14,7 @@
 
 - Feel free to suggest large-scale refactoring if you see opportunities to improve code structure or readability.
 
-- Write unit tests for new features and bug fixes. Use Kotest and Mockk for testing. Kotest allows parametrized tests with `forAll` and `row`.
+- Write unit tests for new features and bug fixes. Use Kotest and Mockk for testing. Kotest allows parametrized tests with `forAll` and `row`. Use StringSpec rather than FunSpec.
 
 - Keep Java interop in mind. JBake is also used as a library. New public APIs should be easily usable from Java.
 
