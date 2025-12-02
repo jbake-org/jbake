@@ -63,6 +63,7 @@ dependencies {
     implementation "org.freemarker:freemarker:$freemarkerVersion"
     implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
     implementation "de.neuland-bfi:pug4j:$pug4jVersion"
+        implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion" // To avoid ERROR void sun.misc.Unsafe.ensureClassInitialized(java.lang.Class)
     implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
     implementation "io.pebbletemplates:pebble:$pebbleVersion"

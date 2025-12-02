@@ -1,5 +1,6 @@
 package org.jbake
 
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
@@ -31,7 +32,9 @@ class ProjectWebsiteTest : StringSpec({
             // Bake the website
             val runner = BinaryRunner(projectDir)
             val process = runner.runWithArguments(BinaryRunner.jbakeExecutableRelative.absolutePath, "-b")
-            process.exitValue() shouldBe 0
+            withClue("JBake process output:\n\n\n${process.inputStream.bufferedReader().readText()}\n\n\n") {
+                process.exitValue() shouldBe 0
+            }
             File(outputDir, "index.html").shouldExist()
             process.destroy()
         }

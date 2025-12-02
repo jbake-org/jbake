@@ -51,6 +51,7 @@ dependencies {
     implementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
     implementation "de.neuland-bfi:jade4j:$jade4jVersion"
     implementation "de.neuland-bfi:pug4j:$pug4jVersion"
+    implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion" // To avoid ERROR void sun.misc.Unsafe.ensureClassInitialized(java.lang.Class)
     implementation "io.pebbletemplates:pebble:$pebbleVersion"
     // Note: Groovy templates are provided by groovy-templates which is already a transitive dependency
 
