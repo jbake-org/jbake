@@ -38,12 +38,15 @@
 
 - Prefer brief code constructs over longer ones. For instance:
   - Use `mapNotNull` instead of `map` followed by `filterNotNull`.
-  - If an `if` contains only return, then put it on a single line.
+  - If an `if` contains only return, then put it on a single line. I.e.:
+    - `if (inBlockComment) continue`
+    - `if (isMeaningfulLine(line))\n    count++`
   - Exit the function early instead of wrapping the main logic in an `if` block.
   - Use lambda logging using Slf4j's lazy logging: `logger.debug { "Expensive log message: ${compute()}" }`.
   - Put the logger `log` instance as a private member of the class (at the end of it) instead of using companion object.
   - Use single-expression functions when they are short.
       - For longer ones, put the `=` indented on the next line.
+
 
 - Prefer brief code constructs over longer ones. For instance, use `mapNotNull` instead of `map` followed by `filterNotNull`.
 
@@ -54,3 +57,5 @@
 - When adding new dependencies, prefer using BOMs to manage versions consistently across Maven and Gradle.
 - Maven: Put the <dependency> elements on a single line each.
 - Maven and Gradle: When adding plugins, ensure they are added to both `pom.xml` and `build.gradle` files.
+
+- Write scripts as Kotlin Scripts (.kts) when practical. Avoid Python. Avoid Bash except for short scripts where Kotlin alternative would be more than twice as long.
