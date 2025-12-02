@@ -40,7 +40,7 @@ Commands from the root of the project:
 
 * `mvn <goal>` - Maven will auto-detect JDK 17 from toolchains
 
-For detailed Maven instructions see link:docs/RELEASING.md[docs/RELEASING.md]
+For detailed Maven instructions see link:docs/releasing/RELEASING.md[RELEASING.md]
 
 == Structure
 
@@ -223,7 +223,7 @@ The project is published to Maven Central under the `ch.zizka.jbake` groupId.
 
 For complete release instructions including GPG key setup, credentials configuration, and troubleshooting, see:
 
-**link:docs/RELEASING.md[docs/RELEASING.md]**
+**link:docs/releasing/RELEASING.md[RELEASING.md]**
 
 **Quick release command (Maven):**
 ----
