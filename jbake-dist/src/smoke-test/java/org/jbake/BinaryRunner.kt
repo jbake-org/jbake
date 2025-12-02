@@ -1,12 +1,14 @@
 package org.jbake
 
+import org.apache.commons.lang3.SystemUtils
 import java.io.*
 
-class BinaryRunner(private val folder: File?) {
+class BinaryRunner(private val workingDir: File) {
+
     @Throws(IOException::class, InterruptedException::class)
     fun runWithArguments(vararg arguments: String?): Process {
         val processBuilder = ProcessBuilder(*arguments)
-        processBuilder.directory(folder)
+        processBuilder.directory(workingDir)
         processBuilder.redirectErrorStream(true)
 
         val process = processBuilder.start()
@@ -25,5 +27,23 @@ class BinaryRunner(private val folder: File?) {
             println(line)
         }
         reader.close()
+    }
+
+    companion object {
+        private val isWindows = SystemUtils.IS_OS_WINDOWS
+        private val gradlePath = if (isWindows) "build\\install\\jbake\\bin\\jbake.bat" else "build/install/jbake/bin/jbake"
+        private val mavenPath = if (isWindows) "target\\appassembler\\bin\\jbake.bat" else "target/appassembler/bin/jbake"
+
+        val jbakeExecutableRelative: File
+            get() {
+                val gradleFile = File(gradlePath)
+                if (gradleFile.exists()) return gradleFile
+
+                val mavenFile = File(mavenPath)
+                if (mavenFile.exists()) return mavenFile
+
+                // Default to Gradle path if neither exists (will fail with clear error)
+                return gradleFile
+            }
     }
 }

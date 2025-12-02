@@ -1,78 +1,44 @@
 package org.jbake
 
-import org.apache.commons.lang3.SystemUtils
-import org.assertj.core.api.Assertions
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.shouldBe
 import java.io.File
-import java.io.IOException
+import kotlin.io.path.createTempDirectory
 
-@RunWith(Parameterized::class)
-class BuiltInProjectsTest {
-    @Parameterized.Parameter
-    var projectName: String? = null
+class BuiltInProjectsTest : StringSpec({
+    val jbakeExec = BinaryRunner.jbakeExecutableRelative.absolutePath
 
-    @Parameterized.Parameter(1)
-    var extension: String? = null
+    fun testTemplate(projectName: String, extension: String) {
+        "$projectName template should bake successfully" {
+            val tempDir = createTempDirectory("jbake-smoke-test").toFile()
+            try {
+                val projectDir = File(tempDir, "project")
+                val templateDir = File(projectDir, "templates")
+                val outputDir = File(projectDir, "output")
+                val runner = BinaryRunner(projectDir)
 
-    @Rule @JvmField
-    var tempDir: TemporaryFolder = TemporaryFolder()
-    private lateinit var projectDir: File
-    private lateinit var templateDir: File
-    private lateinit var outputDir: File
-    private lateinit var jbakeExecutable: String
-    private lateinit var runner: BinaryRunner
+                // Initialize project
+                val initProcess = runner.runWithArguments(jbakeExec, "-i", "-t", projectName)
+                initProcess.exitValue() shouldBe 0
+                File(projectDir, "jbake.properties").shouldExist()
+                File(templateDir, "index.$extension").shouldExist()
+                initProcess.destroy()
 
-    @Before
-    @Throws(IOException::class)
-    fun setup() {
-        jbakeExecutable =
-            if (SystemUtils.IS_OS_WINDOWS) File("build\\install\\jbake\\bin\\jbake.bat").absolutePath
-            else File("build/install/jbake/bin/jbake").absolutePath
-        projectDir = tempDir.newFolder("project")
-        templateDir = File(projectDir, "templates")
-        outputDir = File(projectDir, "output")
-        runner = BinaryRunner(projectDir)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun shouldBakeWithProject() {
-        shouldInitProject(projectName, extension)
-        shouldBakeProject()
-    }
-
-    @Throws(IOException::class, InterruptedException::class)
-    private fun shouldInitProject(projectName: String?, extension: String?) {
-        val process = runner.runWithArguments(jbakeExecutable, "-i", "-t", projectName)
-        Assertions.assertThat(process.exitValue()).isEqualTo(0)
-        Assertions.assertThat(File(projectDir, "jbake.properties")).exists()
-        Assertions.assertThat(File(templateDir, String.format("index.%s", extension))).exists()
-        process.destroy()
-    }
-
-    @Throws(IOException::class, InterruptedException::class)
-    private fun shouldBakeProject() {
-        val process = runner.runWithArguments(jbakeExecutable, "-b")
-        Assertions.assertThat(process.exitValue()).isEqualTo(0)
-        Assertions.assertThat(File(outputDir, "index.html")).exists()
-        process.destroy()
-    }
-
-    companion object {
-        @Parameterized.Parameters(name = " {0} ")
-        fun data(): Iterable<Array<Any>> {
-            return listOf(
-                arrayOf("thymeleaf", "thyme"),
-                arrayOf("freemarker", "ftl"),
-                arrayOf("jade", "jade"),
-                arrayOf("groovy", "gsp"),
-                arrayOf("groovy-mte", "tpl")
-            )
+                // Bake project
+                val bakeProcess = runner.runWithArguments(jbakeExec, "-b")
+                bakeProcess.exitValue() shouldBe 0
+                File(outputDir, "index.html").shouldExist()
+                bakeProcess.destroy()
+            }
+            finally { tempDir.deleteRecursively() }
         }
     }
-}
+
+    // Test each template
+    testTemplate("thymeleaf", "thyme")
+    testTemplate("freemarker", "ftl")
+    testTemplate("jade", "jade")
+    testTemplate("groovy", "gsp")
+    testTemplate("groovy-mte", "tpl")
+})

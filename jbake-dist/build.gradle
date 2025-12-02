@@ -33,12 +33,8 @@ configurations {
 
 dependencies {
     implementation project(':jbake-core')
-    implementation("org.asciidoctor:asciidoctorj-diagram:$asciidoctorjDiagramVersion") {
-        exclude group: 'org.asciidoctor', module: 'asciidoctorj'
-    }
 
-    // All compileOnly dependencies from jbake-core must be explicitly declared here for runtime
-    // CLI dependencies
+    // All compileOnly dependencies from jbake-core must be explicitly declared here for runtime CLI dependencies
     implementation "info.picocli:picocli:$picocli"
     implementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
@@ -48,6 +44,7 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion"
     implementation "org.yaml:snakeyaml:$snakeYamlVersion"
     implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
+    implementation "org.asciidoctor:asciidoctorj-diagram:$asciidoctorjDiagramVersion"
 
     // Template engines
     implementation "org.freemarker:freemarker:$freemarkerVersion"
@@ -59,6 +56,10 @@ dependencies {
 
     smokeTestImplementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
     smokeTestImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
+    smokeTestImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
+    smokeTestImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+    smokeTestImplementation "io.kotest:kotest-framework-engine:$kotestVersion"
+    smokeTestImplementation "io.kotest:kotest-property:$kotestVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
@@ -69,6 +70,7 @@ tasks.register('smokeTest', Test) {
     setTestClassesDirs sourceSets.smokeTest.output.classesDirs
     classpath = sourceSets.smokeTest.runtimeClasspath
     shouldRunAfter test
+    useJUnitPlatform()
 }
 
 smokeTest {
@@ -108,4 +110,3 @@ jib {
         user = '1000:1000'
     }
 }
-
