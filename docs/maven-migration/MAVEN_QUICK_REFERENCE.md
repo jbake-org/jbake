@@ -323,9 +323,3 @@ mvn -o clean compile
 # Show effective POM
 mvn help:effective-pom > effective-pom.xml
 ```
-
----
-**Last Updated**: November 19, 2025
-**JBake Version**: 2.7.0-SNAPSHOT
-**Maven**: 3.9.11
-
