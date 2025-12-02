@@ -16,12 +16,12 @@ def exampleRepositories = [
 //create clone and Zip Task for each repository
 exampleRepositories.each { name, repository ->
 
-    tasks.register("clone_${name}Repository") {
+    tasks.register("cloneRepo_${name}") {
         group = "distribution"
-        description = "Clone jbake ${name} example project repository"
+        description = "Clone example JBake project repository: ${name}"
 
         def repositoryName = "$examplesBase/$name"
-
+        file(repositoryName).deleteDir()
         outputs.dir repositoryName
 
         doLast {
@@ -36,7 +36,7 @@ exampleRepositories.each { name, repository ->
         archiveBaseName = name
         archiveFileName = "${archiveBaseName.get()}.zip"
 
-        from project.tasks.getByName("clone_${name}Repository").outputs
+        from project.tasks.getByName("cloneRepo_${name}").outputs
         exclude 'README.md'
         exclude 'LICENSE'
         exclude '.git'
