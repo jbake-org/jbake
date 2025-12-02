@@ -7,13 +7,8 @@ import io.kotest.matchers.string.shouldContain
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.io.entity.StringEntity
-import org.jbake.texy.JBakeTexyIntegrationTest.Companion.texyContainer
-import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
-import java.io.File
 import java.nio.charset.StandardCharsets
 
 /**
@@ -25,12 +20,34 @@ import java.nio.charset.StandardCharsets
  * 3. Tests JBake integration with the service
  * 4. Verifies the rendered output
  */
-@Testcontainers
 class TexyServiceE2ETest : FunSpec({
+    val texyContainer = GenericContainer("jbake/texy-service:latest")
+        .withExposedPorts(TEXY_PORT)
+        .waitingFor(Wait.forHttp("/").forStatusCode(200))
+        .withStartupTimeout(java.time.Duration.ofMinutes(2))
+
+    /**
+     * Helper function to read test resource file
+     */
+    fun readTestResource(filename: String): String {
+        return javaClass.getResourceAsStream("/texy-markup/$filename")
+            ?.bufferedReader()
+            ?.use { it.readText() }
+            ?: throw IllegalStateException("Test resource not found: /texy-markup/$filename")
+    }
+
+    beforeSpec {
+        texyContainer.start()
+    }
+
+    afterSpec {
+        texyContainer.stop()
+    }
 
     test("Texy service container should start successfully") {
         texyContainer.isRunning shouldBe true
     }
+
 
     test("Texy service should respond to health check") {
         val host = texyContainer.host
@@ -54,15 +71,7 @@ class TexyServiceE2ETest : FunSpec({
         val request = HttpPost("http://$host:$port/texy")
         request.setHeader("Content-Type", "text/plain; charset=UTF-8")
 
-        val texyMarkup = """
-            Test Heading
-            ============
-
-            This is **bold** and this is //italic//.
-
-            - List item 1
-            - List item 2
-        """.trimIndent()
+        val texyMarkup = readTestResource("simple-markup.texy")
 
         request.entity = StringEntity(texyMarkup, StandardCharsets.UTF_8)
 
@@ -104,37 +113,7 @@ class TexyServiceE2ETest : FunSpec({
         val request = HttpPost("http://$host:$port/texy")
         request.setHeader("Content-Type", "text/plain; charset=UTF-8")
 
-        val complexMarkup = """
-            Main Title
-            ==========
-
-            Subtitle
-            --------
-
-            This is a paragraph with **bold**, //italic//, and `code`.
-
-            Links
-            -----
-
-            "Visit JBake":https://jbake.org
-
-            Lists
-            -----
-
-            1. First item
-            2. Second item
-            3. Third item
-
-            Table
-            -----
-
-            |----
-            | Name | Value
-            |----
-            | Test | 123
-            | Demo | 456
-            |----
-        """.trimIndent()
+        val complexMarkup = readTestResource("complex-markup.texy")
 
         request.entity = StringEntity(complexMarkup, StandardCharsets.UTF_8)
 
@@ -160,12 +139,7 @@ class TexyServiceE2ETest : FunSpec({
         val request = HttpPost("http://$host:$port/texy")
         request.setHeader("Content-Type", "text/plain; charset=UTF-8")
 
-        val utf8Markup = """
-            Příliš žluťoučký kůň úpěl ďábelské ódy
-            ==========================================
-
-            This is **čeština** with special characters: ěščřžýáíé
-        """.trimIndent()
+        val utf8Markup = readTestResource("utf8-markup.texy")
 
         request.entity = StringEntity(utf8Markup, StandardCharsets.UTF_8)
 
@@ -201,16 +175,9 @@ class TexyServiceE2ETest : FunSpec({
         serviceUrl shouldContain "http://"
         serviceUrl shouldContain "/texy"
     }
-})
-{
+}) {
     companion object {
         private const val TEXY_PORT = 8080
-
-        @Container
-        val texyContainer = GenericContainer("jbake/texy-service:latest")
-            .withExposedPorts(TEXY_PORT)
-            .waitingFor(Wait.forHttp("/").forStatusCode(200))
-            .withStartupTimeout(java.time.Duration.ofMinutes(2))
     }
 }
 

@@ -10,8 +10,6 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.parser.Engines
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.io.File
 import java.nio.file.Files
 
@@ -24,13 +22,25 @@ import java.nio.file.Files
  * 3. Process .texy files
  * 4. Verify rendered output
  */
-@Testcontainers
 class JBakeTexyIntegrationTest : FunSpec({
 
+    val texyContainer = GenericContainer("jbake/texy-service:latest")
+        .withExposedPorts(TEXY_PORT)
+        .waitingFor(Wait.forHttp("/").forStatusCode(200))
+        .withStartupTimeout(java.time.Duration.ofMinutes(2))
+
+    beforeSpec {
+        texyContainer.start()
+    }
+
+    afterSpec {
+        texyContainer.stop()
+    }
 
     test("TexyEngine should be registered in JBake") {
         val engine = Engines.get("texy")
-        engine shouldBe org.jbake.parser.TexyEngine::class.java.let { it.getDeclaredConstructor().newInstance() }::class.java
+        engine shouldNotBe null
+        (engine is org.jbake.parser.TexyEngine) shouldBe true
     }
 
     test("JBake should process .texy files with Texy service") {
@@ -160,9 +170,7 @@ class JBakeTexyIntegrationTest : FunSpec({
         try {
             // Create configuration
             val configFile = File(tempDir, "jbake.properties")
-            configFile.writeText("""
-                texy.service.url=$serviceUrl
-            """.trimIndent())
+            configFile.writeText("""texy.service.url=$serviceUrl\n""".trimIndent())
 
             val config = ConfigUtil().loadConfig(tempDir) as DefaultJBakeConfiguration
             config.setProperty("texy.service.url", serviceUrl)
@@ -190,20 +198,13 @@ class JBakeTexyIntegrationTest : FunSpec({
                 document?.body!! shouldContain "Post Number $index"
                 document.body shouldContain "<strong>$index</strong>"
             }
-
-        } finally {
+        }
+        finally {
             tempDir.deleteRecursively()
         }
     }
-})
-{
+}) {
     companion object {
-        private const val TEXY_PORT = 8080
-
-        @Container
-        val texyContainer = GenericContainer("jbake/texy-service:latest")
-            .withExposedPorts(TEXY_PORT)
-            .waitingFor(Wait.forHttp("/").forStatusCode(200))
-            .withStartupTimeout(java.time.Duration.ofMinutes(2))
+        private const val TEXY_PORT = 37813
     }
 }
