@@ -85,7 +85,7 @@ repositories {
     mavenCentral()
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(javaVersion.toInteger())
 }
 
 test {

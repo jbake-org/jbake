@@ -39,8 +39,8 @@ class JavaCommonConventionPlugin implements Plugin<Project> {
         }
 
         project.tasks.withType(JavaCompile).configureEach {
-            sourceCompatibility = '21'
-            targetCompatibility = '21'
+            sourceCompatibility = "$javaVersion"
+            targetCompatibility = "$javaVersion"
         }
 
         //set jvm for all Test tasks (like test and smokeTest)

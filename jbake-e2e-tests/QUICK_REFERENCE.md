@@ -41,7 +41,7 @@ mvn test
 
 ### Docker Image
 - Name: `jbake/jbake:2.7.0-SNAPSHOT`
-- Base: `eclipse-temurin:21-jre-alpine`
+- Base: `eclipse-temurin:17-jre-alpine`
 - Built with: Jib plugin
 
 ### Test Engines

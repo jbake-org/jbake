@@ -17,7 +17,7 @@ The tests use Docker containers to run JBake in an isolated environment, ensurin
 ## Prerequisites
 
 - Docker must be installed and running (for full E2E tests)
-- JDK 17 (for Maven) or JDK 21 (for Gradle)
+- JDK 17
 - JBake Docker image must be built (see below)
 
 ## Test Data

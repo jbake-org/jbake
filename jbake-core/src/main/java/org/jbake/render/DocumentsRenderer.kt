@@ -15,7 +15,6 @@ class DocumentsRenderer : RenderingTool {
     private val log: Logger by logger()
 
     @Throws(RenderingException::class)
-    @Deprecated("Overrides deprecated member")
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
         var renderedCount = 0
         val errors: MutableList<String> = LinkedList<String>()

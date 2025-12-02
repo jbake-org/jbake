@@ -202,7 +202,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId><artifactId>jib-maven-plugin</artifactId>
                 <configuration>
-                    <from><image>eclipse-temurin:21-jre-alpine</image></from>
+                    <from><image>eclipse-temurin:17-jre-alpine</image></from>
                     <to>
                         <image>jbake/jbake</image>
                         <tags>

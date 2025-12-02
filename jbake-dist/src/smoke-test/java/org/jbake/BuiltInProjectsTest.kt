@@ -15,7 +15,7 @@ class BuiltInProjectsTest : StringSpec({
 
             val tempDir = createTempDirectory("jbake-smoke-test").toFile()
             try {
-                val projectDir = File(tempDir, "project")
+                ///val projectDir = File(tempDir, "project")
                 val runner = BinaryRunner(tempDir)
 
                 // Run JBake to initialize the dir - should create project/, templates/ etc.

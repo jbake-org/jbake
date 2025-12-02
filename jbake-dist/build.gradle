@@ -88,13 +88,13 @@ repositories {
     mavenCentral()
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(javaVersion.toInteger())
 }
 
 // Docker image configuration using Jib
 jib {
     from {
-        image = 'eclipse-temurin:21-jre-alpine'
+        image = 'eclipse-temurin:17-jre-alpine'
     }
     to {
         image = 'jbake/jbake'
