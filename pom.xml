@@ -121,6 +121,7 @@
             <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-bom</artifactId><version>${version.kotlin}</version><type>pom</type><scope>import</scope></dependency>
             <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version>            <type>pom</type><scope>import</scope></dependency>
             <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-bom</artifactId><version>${version.groovy}</version>   <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-bom</artifactId><version>${version.kotest}</version>           <type>pom</type><scope>import</scope></dependency>
 
             <!-- Runtime dependencies -->
             <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
@@ -161,9 +162,6 @@
             <dependency><groupId>org.mockito</groupId><artifactId>mockito-core</artifactId><version>${version.mockito}</version></dependency>
             <dependency><groupId>org.mockito</groupId><artifactId>mockito-junit-jupiter</artifactId><version>${version.mockito}</version></dependency>
             <dependency><groupId>io.mockk</groupId><artifactId>mockk</artifactId><version>${version.mockk}</version></dependency>
-            <dependency><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5</artifactId><version>${version.kotest}</version></dependency>
-            <dependency><groupId>io.kotest</groupId><artifactId>kotest-assertions-core</artifactId><version>${version.kotest}</version></dependency>
-            <dependency><groupId>io.kotest</groupId><artifactId>kotest-property</artifactId><version>${version.kotest}</version></dependency>
             <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version></dependency>
             <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><version>${version.testcontainers}</version></dependency>
 
