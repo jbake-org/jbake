@@ -39,6 +39,8 @@ class JavaCommonConventionPlugin implements Plugin<Project> {
         }
 
         project.tasks.withType(JavaCompile).configureEach {
+            // Skip smokeTest source set as it only contains Kotlin sources
+            if (it.name.contains('SmokeTest')) return
             sourceCompatibility = "$javaVersion"
             targetCompatibility = "$javaVersion"
         }
@@ -82,4 +84,3 @@ class JavaCommonConventionPlugin implements Plugin<Project> {
         }
     }
 }
-

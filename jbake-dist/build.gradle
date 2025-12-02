@@ -13,7 +13,7 @@ description = "The binary distribution package that bundles JBake cli"
 sourceSets {
     smokeTest {
         java {
-            srcDir file('src/smoke-test/java')
+            srcDirs = []
         }
         resources {
             srcDir file('src/smoke-test/resources')
@@ -74,6 +74,18 @@ tasks.register('smokeTest', Test) {
     useJUnitPlatform()
 }
 
+// Disable Java compilation for smokeTest since it only has Kotlin sources
+tasks.named('compileSmokeTestJava') {
+    enabled = false
+    // Override the javaCompiler property to avoid conflicts
+    javaCompiler = null
+}
+
+// Disable checkstyle for smokeTest source set
+tasks.named('checkstyleSmokeTest') {
+    enabled = false
+}
+
 smokeTest {
     testLogging {
         events "passed", "skipped", "failed"
@@ -89,6 +101,9 @@ repositories {
 }
 kotlin {
     jvmToolchain(javaVersion.toInteger())
+    sourceSets {
+        smokeTest.kotlin.srcDirs += 'src/smoke-test/java'
+    }
 }
 
 // Docker image configuration using Jib
