@@ -42,7 +42,15 @@
   - Exit the function early instead of wrapping the main logic in an `if` block.
   - Use lambda logging using Slf4j's lazy logging: `logger.debug { "Expensive log message: ${compute()}" }`.
   - Put the logger `log` instance as a private member of the class (at the end of it) instead of using companion object.
+  - Use single-expression functions when they are short.
+      - For longer ones, put the `=` indented on the next line.
 
 - Prefer brief code constructs over longer ones. For instance, use `mapNotNull` instead of `map` followed by `filterNotNull`.
 
 - When invoking the command line, remember to add batch mode options to avoid interactive prompts during automated processes, e.g., `--batch-mode` for Maven commands, `--no-pager` for Git commands, etc.
+
+- Don't leave empty lines before closing braces.
+
+- When adding new dependencies, prefer using BOMs to manage versions consistently across Maven and Gradle.
+- Maven: Put the <dependency> elements on a single line each.
+- Maven and Gradle: When adding plugins, ensure they are added to both `pom.xml` and `build.gradle` files.
