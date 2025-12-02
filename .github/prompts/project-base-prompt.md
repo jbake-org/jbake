@@ -2,7 +2,7 @@
 
 - JTexy test suite only runs with JDK 17. Use Eclipse Temurin JDK 17 to run the tests (don't run them now, just remember).
 
-  `export JAVA_HOME=/home/o/.jdks/temurin-17.0.17 && export PATH=$JAVA_HOME/bin:$PATH && cd /home/o/uw/jbake && mvn ...`
+  `export JAVA_HOME=$HOME/.jdks/temurin-17.0.17 && export PATH=$JAVA_HOME/bin:$PATH && mvn ...`
 
 
 - Check the docs/CONTRIBUTING.md file for coding style.

@@ -8,16 +8,14 @@ It's under this groupId for this branch. If/when merged, it may be changed to `o
 ## Quick Start
 
 ```bash
-export JAVA_HOME=.../temurin-17.0.17
+export JAVA_HOME=$HOME/.jdks/temurin-17.0.17
 export PATH=$JAVA_HOME/bin:$PATH
 export GPG_TTY=$(tty)
-cd /home/o/uw/jbake
 mvn clean deploy -Prelease
 ```
 
 Or use the deployment script:
 ```bash
-cd /home/o/uw/jbake
 ./deploy-to-central.sh
 ```
 
@@ -28,7 +26,7 @@ cd /home/o/uw/jbake
 JBake requires Java 17 for building:
 
 ```bash
-export JAVA_HOME=.../temurin-17.0.17
+export JAVA_HOME=$HOME/.jdks/temurin-17.0.17
 export PATH=$JAVA_HOME/bin:$PATH
 java -version  # Verify it's Java 17
 ```
@@ -75,10 +73,9 @@ To get fresh credentials:
 
 Your GPG key must be uploaded to public keyservers.
 
-#### If you already have a key at /home/o/.ssh/OSSRH_gpg.key:
+#### If you already have a key at $HOME/.ssh/OSSRH_gpg.key:
 
 ```bash
-cd /home/o/uw/jbake
 ./import-gpg-key.sh
 ```
 
@@ -110,10 +107,9 @@ gpg --keyserver keyserver.ubuntu.com --send-keys KEY_ID
 ### Method 1: Direct Deployment (Recommended)
 
 ```bash
-export JAVA_HOME=/home/o/.jdks/temurin-17.0.17
+export JAVA_HOME=$HOME/.jdks/temurin-17.0.17
 export PATH=$JAVA_HOME/bin:$PATH
 export GPG_TTY=$(tty)
-cd /home/o/uw/jbake
 mvn clean deploy -Prelease
 ```
 
@@ -127,7 +123,6 @@ This will:
 ### Method 2: Using Deployment Script
 
 ```bash
-cd /home/o/uw/jbake
 ./deploy-to-central.sh
 ```
 
@@ -138,16 +133,11 @@ The script performs the same steps with interactive prompts and validation.
 For version management and Git tagging:
 
 ```bash
-export JAVA_HOME=/home/o/.jdks/temurin-17.0.17
+export JAVA_HOME=$HOME/.jdks/temurin-17.0.17
 export PATH=$JAVA_HOME/bin:$PATH
 export GPG_TTY=$(tty)
-cd /home/o/uw/jbake
-
-# Prepare release (updates versions, creates Git tag)
-mvn release:prepare -Prelease
-
-# Perform release (builds and deploys)
-mvn release:perform -Prelease
+mvn release:prepare -Prelease  ## Updates versions, creates Git tag.
+mvn release:perform -Prelease  ## Builds and uploads.
 ```
 
 ## After Deployment
@@ -197,11 +187,8 @@ Your GPG key is not imported.
 
 **Solution**:
 ```bash
-# Import existing key
-cd /home/o/uw/jbake && ./import-gpg-key.sh
-
-# Or generate new key
-gpg --full-generate-key
+./import-gpg-key.sh      ## Import existing key
+gpg --full-generate-key  ## Or generate new key
 ```
 
 ### Error: GPG signing failed: Inappropriate ioctl for device
