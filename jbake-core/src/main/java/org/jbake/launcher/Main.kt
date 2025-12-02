@@ -5,9 +5,8 @@ import org.jbake.app.JBakeException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.util.ConfigurationPrinter
-import org.jbake.util.Logging
-import org.jbake.util.Logging.logger
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
 import picocli.CommandLine
 import java.io.File
@@ -49,7 +48,7 @@ class Main @JvmOverloads constructor(
             throw JBakeException(SystemExit.CONFIGURATION_ERROR, mex.message, mex)
         }
         catch (e: Throwable) {
-            throw JBakeException(SystemExit.ERROR, "An unexpected error occurred: " + e.message, e)
+            throw JBakeException(SystemExit.ERROR, "${e.javaClass.simpleName}: An unexpected error occurred: " + e.message, e)
         }
     }
 
@@ -136,6 +135,6 @@ class Main @JvmOverloads constructor(
 
         fun printUsage() = CommandLine.usage(LaunchOptions(), System.out)
 
-        private val log: Logger by Logging.logger()
+        private val log: Logger = LoggerFactory.getLogger("Main.kt")
     }
 }
