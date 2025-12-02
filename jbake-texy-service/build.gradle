@@ -55,10 +55,7 @@ dependencies {
     testImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
     testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
 
-    // HTTP Client for testing
     testImplementation "org.apache.httpcomponents.client5:httpclient5:5.5.1"
-
-    // SLF4J for logging
     testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
 }
 
