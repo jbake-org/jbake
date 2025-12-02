@@ -3,9 +3,13 @@ package org.jbake
 import org.apache.commons.lang3.SystemUtils
 import org.jbake.util.Logging
 import org.jbake.util.Logging.logger
-import java.io.*
+import java.io.File
+import java.io.IOException
 
 class BinaryRunner(private val workingDir: File) {
+
+    var processOutput: String = ""
+        private set
 
     @Throws(IOException::class, InterruptedException::class)
     fun runWithArguments(vararg arguments: String?): Process {
@@ -14,22 +18,33 @@ class BinaryRunner(private val workingDir: File) {
         processBuilder.redirectErrorStream(true)
 
         val process = processBuilder.start()
-        printOutput(process.inputStream)
+
+        // Capture output in a thread to avoid blocking
+        val outputBuilder = StringBuilder()
+        val outputThread = Thread {
+            try {
+                process.inputStream.bufferedReader().forEachLine { line ->
+                    println(line)
+                    outputBuilder.appendLine(line)
+                }
+            } catch (e: IOException) {
+                // Stream may be closed if process terminates - this is expected
+            }
+        }
+        outputThread.start()
+
+        // Wait for process to complete
         process.waitFor()
+
+        // Wait for output thread to finish reading
+        outputThread.join(5000) // Wait up to 5 seconds for output to be consumed
+
+        // Store the captured output
+        processOutput = outputBuilder.toString()
 
         return process
     }
 
-    @Throws(IOException::class)
-    private fun printOutput(inputStream: InputStream) {
-        var line: String?
-        val reader = BufferedReader(InputStreamReader(inputStream))
-
-        while ((reader.readLine().also { line = it }) != null) {
-            println(line)
-        }
-        reader.close()
-    }
 
     companion object {
         private val isWindows = SystemUtils.IS_OS_WINDOWS
