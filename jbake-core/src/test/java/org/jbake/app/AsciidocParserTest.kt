@@ -128,7 +128,7 @@ class AsciidocParserTest : StringSpec({
     lateinit var validAsciiDocFileWithoutJBakeMetaData: File
 
     fun createTestFile(name: String, content: String) =
-        File(tempDir, name).apply { createNewFile(); writeText(content) }
+        tempDir.resolve(name).apply { createNewFile(); writeText(content) }
 
     beforeTest {
         tempDir = java.nio.file.Files.createTempDirectory("jbake-test").toFile()

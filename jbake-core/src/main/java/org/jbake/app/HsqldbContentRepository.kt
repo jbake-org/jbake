@@ -163,7 +163,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
         connection.prepareStatement(insertSql).use { stmt ->
             val tagsArray = connection.createArrayOf("VARCHAR", document.tags.toTypedArray())
             val serializableDocument = createSerializableDocument(document)
-            val propertiesJson = "{}" // TODO: Fix JSON serialization of documents with JRuby objects
+            val propertiesJson = objectMapper.writeValueAsString(serializableDocument)
 
             stmt.setString(1, document.sourceUri)
             stmt.setString(2, document.type)

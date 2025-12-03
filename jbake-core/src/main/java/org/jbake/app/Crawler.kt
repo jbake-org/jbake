@@ -186,19 +186,7 @@ class Crawler {
         if (config.imgPathUpdate)
             HtmlUtil.fixImageSourceUrls(document, config)
 
-        // Filter out Ruby objects that can't be serialized
-        val filteredDocument = document.filter { (key, value) ->
-            when (value) {
-                is org.jruby.RubyObject -> false
-                is org.jruby.RubySymbol -> false
-                is org.jruby.RubyClass -> false
-                is org.jruby.RubyModule -> false
-                else -> true
-            }
-        }
-        document.clear()
-        document.putAll(filteredDocument)
-
+        db.addDocument(document)
         db.addDocument(document)
     }
 
