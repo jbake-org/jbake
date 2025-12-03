@@ -32,15 +32,15 @@ class Main @JvmOverloads constructor(
             val config: JBakeConfiguration
 
             val args: LaunchOptions = parseArguments(arguments)
-            if (args.isRunServer) {
-                config = this.jBakeConfigurationFactory
-                    .setEncoding(args.propertiesEncoding)
-                    .createJettyJbakeConfiguration(args.getSource(), args.getDestination(), args.getConfig(), args.isClearCache)
-            } else {
-                config = this.jBakeConfigurationFactory
-                    .setEncoding(args.propertiesEncoding)
-                    .createDefaultJbakeConfiguration(args.getSource(), args.getDestination(), args.getConfig(), args.isClearCache)
-            }
+            config = this.jBakeConfigurationFactory
+                .setEncoding(args.propertiesEncoding)
+                .let {
+                    if (args.isRunServer)
+                        it.createJettyJbakeConfiguration(args.getSource(), args.getDestination(), args.getConfig(), args.isClearCache)
+                    else
+                        it.createDefaultJbakeConfiguration(args.getSource(), args.getDestination(), args.getConfig(), args.isClearCache)
+                }
+
             run(args, config)
         }
         catch (e: JBakeException) { throw e }
