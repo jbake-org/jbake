@@ -82,7 +82,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
             try {
                 // Create database with explicit admin user using SQL command.
                 // This ensures the database is created with known admin/admin credentials.
-                val query = "CREATE DATABASE ${access.dbname} ${dbStorageType.name} USERS (${access.user} IDENTIFIED BY '${access.pass}' ROLE admin)"
+                val query = "CREATE DATABASE ${access.dbname} ${dbStorageType.name} USER ${access.user} IDENTIFIED BY '${access.pass}' ROLE admin"
                 log.info("Query: $query")
                 orient.execute(query)
                 log.info("Created database '${access.dbname}' with user ${access.user}")
@@ -387,7 +387,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
     override fun addDocument(document: DocumentModel) {
         // Filter out Ruby objects that can't be stored
-        val filteredDocument = document.filter(::rejectUnparsableTypes)
+        val filteredDocument = document.filterNot { (key, value) -> rejectUnparsableTypes(key, value) }
         val element = db.newElement(Schema.DOCUMENTS)
         filteredDocument.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
         @Suppress("DEPRECATION")
@@ -400,4 +400,12 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     private val log: Logger by logger()
+
+    private fun rejectUnparsableTypes(key: String, value: Any?): Boolean = when (value) {
+        is org.jruby.RubyObject -> true
+        is org.jruby.RubySymbol -> true
+        is org.jruby.RubyClass -> true
+        is org.jruby.RubyModule -> true
+        else -> false
+    }
 }

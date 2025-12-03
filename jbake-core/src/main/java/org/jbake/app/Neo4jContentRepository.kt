@@ -78,7 +78,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override fun addDocument(document: DocumentModel) {
         // Filter out Ruby objects that can't be serialized
-        val serializableDocument = document.filter(::rejectUnparsableTypes)
+        val serializableDocument = document.filterNot { (key, value) -> rejectUnparsableTypes(key, value) }
         val propertiesJson = gson.toJson(serializableDocument)
 
         database.beginTx().use { tx ->
@@ -323,19 +323,11 @@ class Neo4jContentRepository(private val type: String, private val name: String)
             val changed = if (result.hasNext()) {
                 val existingSignature = result.next()["sha1"] as? String
                 if (existingSignature != currentSignature) {
-                    tx.execute(
-                        "MATCH (s:Signature {key: 'templates'}) SET s.sha1 = ${'$'}sha1",
-                        mapOf("sha1" to currentSignature)
-                    ).close()
+                    tx.execute("MATCH (s:Signature {key: 'templates'}) SET s.sha1 = ${'$'}sha1", mapOf("sha1" to currentSignature)).close()
                     true
-                } else {
-                    false
-                }
+                } else false
             } else {
-                tx.execute(
-                    "CREATE (s:Signature {key: 'templates', sha1: ${'$'}sha1})",
-                    mapOf("sha1" to currentSignature)
-                ).close()
+                tx.execute("CREATE (s:Signature {key: 'templates', sha1: ${'$'}sha1})", mapOf("sha1" to currentSignature)).close()
                 true
             }
             tx.commit()
@@ -348,4 +340,12 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     }
 
     private val log: Logger by logger()
+
+    private fun rejectUnparsableTypes(key: String, value: Any?): Boolean = when (value) {
+        is org.jruby.RubyObject -> true
+        is org.jruby.RubySymbol -> true
+        is org.jruby.RubyClass -> true
+        is org.jruby.RubyModule -> true
+        else -> false
+    }
 }

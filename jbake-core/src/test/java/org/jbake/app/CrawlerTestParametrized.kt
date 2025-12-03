@@ -10,7 +10,6 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
-import org.jbake.app.DatabaseType
 
 class CrawlerTestHsqldb : CrawlerTestBase(DatabaseType.HSQLDB)
 class CrawlerTestNeo4j : CrawlerTestBase(DatabaseType.NEO4J)
@@ -40,65 +39,64 @@ abstract class CrawlerTestBase(dbType: DatabaseType) : StringSpec({
     }
 
     "crawlContentDirectory" {
-        val crawler = Crawler(db, config)
-        crawler.crawlContentDirectory()
+            val crawler = Crawler(db, config)
+            crawler.crawlContentDirectory()
 
-        db.getDocumentCount("post") shouldBe 4
-        db.getDocumentCount("page") shouldBe 3
+            db.getDocumentCount("post") shouldBe 4
+            db.getDocumentCount("page") shouldBe 3
 
-        val results: DocumentList<DocumentModel> = db.publishedPosts
-        results.size shouldBe 3
+            val results: DocumentList<DocumentModel> = db.publishedPosts
+            results.size shouldBe 3
 
-        for (content in results) {
-            content.containsKey(ModelAttributes.ROOTPATH) shouldBe true
-            content.containsValue("../../../") shouldBe true
+            for (content in results) {
+                content.containsKey(ModelAttributes.ROOTPATH) shouldBe true
+                content.containsValue("../../../") shouldBe true
+            }
+
+            val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
+            allPosts.size shouldBe 4
+            allPosts.filter { it.title == "Draft Post" }
+                .forEach { it.containsKey(ModelAttributes.DATE) shouldBe true }
         }
 
-        val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
-        allPosts.size shouldBe 4
-        allPosts.filter { it.title == "Draft Post" }
-            .forEach { it.containsKey(ModelAttributes.DATE) shouldBe true }
-    }
-
     "crawlDataFiles" {
-        val crawler = Crawler(db, config)
-        addDocumentType(config.dataFileDocType)
-        db.updateSchema()
+            val crawler = Crawler(db, config)
+            addDocumentType(config.dataFileDocType)
+            db.updateSchema()
 
-        crawler.crawlDataFiles()
-        db.getDocumentCount("data") shouldBe 2
+            crawler.crawlDataFiles()
+            db.getDocumentCount("data") shouldBe 2
 
-        val dataFileUtil = DataFileUtil(db, "data")
-        val videosYaml = dataFileUtil.get("videos.yaml")
-        videosYaml.isEmpty().shouldBeFalse()
-        videosYaml["data"].shouldNotBeNull()
+            val dataFileUtil = DataFileUtil(db, "data")
+            val videosYaml = dataFileUtil.get("videos.yaml")
+            videosYaml.isEmpty().shouldBeFalse()
+            videosYaml["data"].shouldNotBeNull()
 
-        val authorsFileContents = dataFileUtil.get("authors.yaml")
-        authorsFileContents.isEmpty().shouldBeFalse()
-        val authorsList = authorsFileContents["authors"]
-        authorsList.shouldBeInstanceOf<Map<*, *>>()
-        @Suppress("UNCHECKED_CAST")
-        val authors = authorsList as Map<String, MutableMap<String, Any>>
-        authors["Joe Bloggs"]!!["last_name"] shouldBe "Bloggs"
+            val authorsFileContents = dataFileUtil.get("authors.yaml")
+            authorsFileContents.isEmpty().shouldBeFalse()
+            val authorsList = authorsFileContents["authors"]
+            authorsList.shouldBeInstanceOf<Map<*, *>>()
+            @Suppress("UNCHECKED_CAST")
+            val authors = authorsList as Map<String, MutableMap<String, Any>>
+            authors["Joe Bloggs"]!!["last_name"] shouldBe "Bloggs"
     }
 
     "renderWithPrettyUrls" {
-        config.setUriWithoutExtension(true)
-        config.setPrefixForUriWithoutExtension("/blog")
+            config.setUriWithoutExtension(true)
+            config.setPrefixForUriWithoutExtension("/blog")
 
-        Crawler(db, config).crawlContentDirectory()
+            Crawler(db, config).crawlContentDirectory()
 
-        db.getDocumentCount("post") shouldBe 4
-        db.getDocumentCount("page") shouldBe 3
+            db.getDocumentCount("post") shouldBe 4
+            db.getDocumentCount("page") shouldBe 3
 
-        val documents: DocumentList<DocumentModel> = db.publishedPosts
+            val documents: DocumentList<DocumentModel> = db.publishedPosts
 
-        for (model in documents) {
-            val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.file) + "/"
-            model.noExtensionUri!!.matches(noExtensionUri.toRegex()) shouldBe true
-            model.uri!!.matches((noExtensionUri + "index\\.html").toRegex()) shouldBe true
-            model.rootPath shouldBe "../../../"
+            for (model in documents) {
+                val noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.file) + "/"
+                model.noExtensionUri!!.matches(noExtensionUri.toRegex()) shouldBe true
+                model.uri!!.matches((noExtensionUri + "index\\.html").toRegex()) shouldBe true
+                model.rootPath shouldBe "../../../"
         }
     }
 })
-
