@@ -41,15 +41,10 @@ class YamlEngine : MarkupEngine() {
      */
     override fun processHeader(context: ParserContext) {
         val fileContents = parseFile(context.file)
-        val documentModel = context.documentModel
 
         for (key in fileContents.keys) {
-            if (hasJBakePrefix(key)) {
-                val pKey = key.substring(6)
-                documentModel[pKey] = fileContents.get(key) ?: continue
-            } else {
-                documentModel[key] = fileContents.get(key) ?: continue
-            }
+            val key_ = if (hasJBakePrefix(key)) key.substring(6) else key
+            context.documentModel[key_] = fileContents.get(key) ?: continue
         }
     }
 
