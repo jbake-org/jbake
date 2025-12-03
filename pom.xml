@@ -354,7 +354,7 @@
                 <groupId>org.codehaus.mojo</groupId><artifactId>flatten-maven-plugin</artifactId>
                 <executions>
                     <execution><id>flatten</id><phase>process-resources</phase><goals><goal>flatten</goal></goals>
-                        <configuration><flattenMode>ossrh</flattenMode><updatePomFile>true</updatePomFile></configuration>
+                        <configuration><flattenMode>ossrh</flattenMode><updatePomFile>true</updatePomFile><outputDirectory>${project.outputDirectory}</outputDirectory></configuration>
                     </execution>
                     <execution><id>flatten.clean</id><phase>clean</phase><goals><goal>clean</goal></goals></execution>
                 </executions>
