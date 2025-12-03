@@ -1,0 +1,44 @@
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <!-- <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern> -->
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- OrientDB DEBUG logging - set root to DEBUG temporarily to ensure it's picked up -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Application loggers at INFO to reduce noise -->
+    <logger name="org.jbake" level="INFO"/>
+
+    <!-- OrientDB loggers explicitly at DEBUG (though root is already DEBUG) -->
+    <logger name="com.orientechnologies" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="com.orientechnologies.orient.core" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="com.orientechnologies.orient.core.db" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="com.orientechnologies.orient.core.serialization" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <logger name="com.orientechnologies.orient.core.storage" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Normally, suppress noisy loggers -->
+    <logger name="org.thymeleaf" level="WARN"/>
+    <logger name="org.asciidoctor" level="WARN"/>
+    <logger name="org.eclipse" level="WARN"/>
+    <logger name="org.apache" level="WARN"/>
+    <logger name="org.apache.commons.beanutils" level="ERROR"/>
+    <logger name="org.eclipse.jgit" level="WARN"/>
+
+</configuration>
