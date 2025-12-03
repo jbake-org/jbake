@@ -14,8 +14,8 @@ import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.DocumentTypeRegistry.addListener
 import org.jbake.model.DocumentTypeRegistry.documentTypes
 import org.jbake.model.DocumentTypeRegistry.resetDocumentTypes
+import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.template.ModelExtractors
-import org.jbake.template.ModelExtractorsDocumentTypeListener
 import java.io.File
 import java.nio.charset.Charset
 import java.util.*

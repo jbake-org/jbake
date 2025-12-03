@@ -4,8 +4,8 @@ import io.kotest.matchers.shouldBe
 import org.jbake.app.*
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.model.DocumentTypeRegistry
+import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.template.ModelExtractors
-import org.jbake.template.ModelExtractorsDocumentTypeListener
 import java.io.File
 import java.util.*
 

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.DatabaseType
 import java.io.File
 import java.nio.file.Files
 

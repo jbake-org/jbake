@@ -3,6 +3,7 @@ package org.jbake.template
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import org.jbake.model.ModelExtractorsDocumentTypeListener
 
 class ModelExtractorsDocumentTypeListenerTest : StringSpec({
     "shouldRegisterExtractorsForCustomType" {
@@ -12,7 +13,7 @@ class ModelExtractorsDocumentTypeListenerTest : StringSpec({
         val listener = ModelExtractorsDocumentTypeListener()
 
         // When: "the listener is called with that type."
-        listener.added(newDocumentType)
+        listener.onAdded(newDocumentType)
 
         // Then: "an extractor is registered by pluralized type as key."
         ModelExtractors.instance.containsKey("projects") shouldBe true

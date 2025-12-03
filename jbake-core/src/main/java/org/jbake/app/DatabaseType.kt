@@ -7,4 +7,3 @@ enum class DatabaseType(val storeName: String) {
 
     override fun toString() = storeName
 }
-

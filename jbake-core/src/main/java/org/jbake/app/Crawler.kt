@@ -5,7 +5,7 @@ import org.jbake.app.FileUtil.URI_SEPARATOR_CHAR
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentStatus
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
 import org.jbake.util.HtmlUtil
 import org.slf4j.Logger
@@ -34,7 +34,7 @@ class Crawler {
     fun crawlContentDirectory() {
         crawlDirectory(config.contentDir)
 
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             val count = db.getDocumentCount(docType)
             if (count > 0) log.info("Parsed {} files of type: {}", count, docType)
         }
@@ -176,7 +176,7 @@ class Crawler {
             return
         }
 
-        if (!DocumentTypes.contains(document.type)) {
+        if (!DocumentTypeRegistry.contains(document.type)) {
             log.warn("{} has an unknown document type '{}' and has been ignored!", sourceFile, document.type)
             return
         }

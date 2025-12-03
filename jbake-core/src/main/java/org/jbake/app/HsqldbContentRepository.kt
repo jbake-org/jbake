@@ -2,7 +2,7 @@ package org.jbake.app
 
 import com.google.gson.Gson
 import org.jbake.model.DocumentModel
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
@@ -178,7 +178,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
     override fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
         val documents = DocumentList<DocumentModel>()
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             val sql = """SELECT * FROM "Documents" WHERE "status"='published' AND "type"=? ORDER BY "date" DESC"""
             val allDocs = query(sql, docType)
             documents.addAll(allDocs.filter { doc -> tag in doc.tags })
@@ -254,7 +254,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
     override val allTags: MutableSet<String>
         get() {
             val result = mutableSetOf<String>()
-            for (docType in DocumentTypes.documentTypes) {
+            for (docType in DocumentTypeRegistry.documentTypes) {
                 val sql = """SELECT "tags" FROM "Documents" WHERE "status"='published' AND "type"=?"""
                 val docs = query(sql, docType)
                 for (document in docs) {
@@ -396,7 +396,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
     private fun deleteAllDocumentTypes() {
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             runCatching { deleteAllByDocType(docType) }
         }
     }

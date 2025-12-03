@@ -2,6 +2,7 @@ package org.jbake.app
 
 import io.kotest.core.spec.style.StringSpec
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.app.DatabaseType
 
 /**
  * Base class for parametrized database tests.

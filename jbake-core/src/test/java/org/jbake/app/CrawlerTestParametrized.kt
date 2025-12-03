@@ -10,6 +10,7 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
+import org.jbake.app.DatabaseType
 
 class CrawlerTestHsqldb : CrawlerTestBase(DatabaseType.HSQLDB)
 class CrawlerTestNeo4j : CrawlerTestBase(DatabaseType.NEO4J)

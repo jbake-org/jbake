@@ -64,6 +64,6 @@ class DocumentTypesTest : StringSpec({
         addDocumentType(newDocumentType)
 
         // the listener was called with new document type
-        verify { listener.added(newDocumentType) }
+        verify { listener.onAdded(newDocumentType) }
     }
 })

@@ -6,9 +6,9 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes.CACHED
 import org.jbake.model.ModelAttributes.DATE
 import org.jbake.model.ModelAttributes.TAGS
+import org.jbake.util.Logging.logger
 import org.json.simple.JSONValue
 import org.slf4j.Logger
-import org.jbake.util.Logging.logger
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -247,3 +247,6 @@ abstract class MarkupEngine : ParserEngine {
     private val UTF_8_BOM = "\uFEFF"
     private val log: Logger by logger()
 }
+
+
+class RawMarkupEngine : MarkupEngine()

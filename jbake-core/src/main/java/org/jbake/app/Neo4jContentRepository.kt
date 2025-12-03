@@ -2,7 +2,7 @@ package org.jbake.app
 
 import com.google.gson.Gson
 import org.jbake.model.DocumentModel
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
 import org.jbake.util.Logging.logger
 import org.neo4j.dbms.api.DatabaseManagementService
@@ -156,7 +156,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
         val documents = DocumentList<DocumentModel>()
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             documents.addAll(query(
                 "MATCH (d:Document {type: ${'$'}type, status: 'published'}) WHERE ${'$'}tag IN d.tags RETURN d ORDER BY d.date DESC",
                 mapOf("type" to docType, "tag" to tag)
@@ -228,7 +228,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     override val allTags: MutableSet<String>
         get() {
             val result = mutableSetOf<String>()
-            for (docType in DocumentTypes.documentTypes) {
+            for (docType in DocumentTypeRegistry.documentTypes) {
                 database.beginTx().use { tx ->
                     val queryResult = tx.execute(
                         "MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN d.tags as tags",
@@ -346,7 +346,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     }
 
     private fun deleteAllDocumentTypes() {
-        DocumentTypes.documentTypes.forEach { docType -> runCatching { deleteAllByDocType(docType) } }
+        DocumentTypeRegistry.documentTypes.forEach { docType -> runCatching { deleteAllByDocType(docType) } }
     }
 
     private val log: Logger by logger()

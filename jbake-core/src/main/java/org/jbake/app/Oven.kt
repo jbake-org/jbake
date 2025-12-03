@@ -1,14 +1,13 @@
 package org.jbake.app
 
 import org.apache.commons.lang3.LocaleUtils
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.app.configuration.JBakeConfigurationInspector
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
+import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.render.RenderingTool
 import org.jbake.template.ModelExtractors
-import org.jbake.template.ModelExtractorsDocumentTypeListener
 import org.jbake.template.RenderingException
 import org.jbake.util.logger
 import org.slf4j.Logger
@@ -129,17 +128,17 @@ class Oven {
      * in order to register new document types.
      */
     private fun updateDocTypesFromConfiguration() {
-        DocumentTypes.resetDocumentTypes()
+        DocumentTypeRegistry.resetDocumentTypes()
         ModelExtractors.instance.reset()
 
-        DocumentTypes.addListener(ModelExtractorsDocumentTypeListener())
+        DocumentTypeRegistry.addListener(ModelExtractorsDocumentTypeListener())
 
         for (docType in utensils.configuration.documentTypes) {
-            DocumentTypes.addDocumentType(docType)
+            DocumentTypeRegistry.addDocumentType(docType)
         }
 
         // Needs to be set manually as this isn't defined in same way as document types for content files.
-        DocumentTypes.addDocumentType(utensils.configuration.dataFileDocType)
+        DocumentTypeRegistry.addDocumentType(utensils.configuration.dataFileDocType)
     }
 
 }
