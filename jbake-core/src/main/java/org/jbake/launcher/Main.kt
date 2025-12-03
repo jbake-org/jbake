@@ -128,9 +128,12 @@ class Main @JvmOverloads constructor(
                 Main().run(args)
             } catch (e: JBakeException) {
                 log.error(e.message)
-                log.trace(e.message, e)
+                log.debug(e.message, e)
                 if (e.cause is CommandLine.MissingParameterException) printUsage()
                 exitProcess(e.getExit())
+            }
+            catch (e: Throwable) {
+                log.error(e.message, e)
             }
         }
 

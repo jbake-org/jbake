@@ -12,11 +12,13 @@ class BinaryRunner(private val workingDir: File) {
         private set
 
     @Throws(IOException::class, InterruptedException::class)
-    fun runWithArguments(vararg arguments: String?): Process {
+    fun runWithArguments(vararg arguments: String): Process {
+
         val processBuilder = ProcessBuilder(*arguments)
         processBuilder.directory(workingDir)
         processBuilder.redirectErrorStream(true)
 
+        log.debug("Starting process: ${arguments.joinToString(" ")} in directory: ${workingDir.absolutePath}")
         val process = processBuilder.start()
 
         // Capture output in a thread to avoid blocking
@@ -28,6 +30,7 @@ class BinaryRunner(private val workingDir: File) {
                     outputBuilder.appendLine(line)
                 }
             } catch (e: IOException) {
+                log.info("IOException while reading process output: ${e.message}")
                 // Stream may be closed if process terminates - this is expected
             }
         }

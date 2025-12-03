@@ -1,6 +1,7 @@
 package org.jbake.app
 
 import org.jbake.model.DocumentModel
+import org.slf4j.LoggerFactory
 import java.io.File
 
 /**
@@ -10,9 +11,13 @@ import java.io.File
  */
 class ContentStore(type: String, name: String) {
 
+    private val log: org.slf4j.Logger = LoggerFactory.getLogger(ContentStore::class.java)
+
     private val repository: ContentRepository = createRepository(type, name)
 
     private fun createRepository(type: String, name: String): ContentRepository {
+        log.info("Using Content Repository type: $type with name: $name")
+
         // Check if name contains database type hint
         return when {
             name.contains("-neo4j-") -> Neo4jContentRepository(type, name)
