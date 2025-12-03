@@ -213,7 +213,7 @@ abstract class MarkupEngine : ParserEngine {
         = tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
     private fun isJson(part: String)
-        = part.trim().startsWith("{") && part.endsWith("}")
+        = part.trim().let { it.startsWith("{") && it.endsWith("}") }
 
 
     /** Process the body of the file. */
