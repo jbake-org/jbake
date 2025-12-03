@@ -4,12 +4,11 @@ import org.apache.commons.io.FilenameUtils
 import org.jbake.app.FileUtil.URI_SEPARATOR_CHAR
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.jbake.model.DocumentStatus
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
 import org.jbake.util.HtmlUtil
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -221,4 +220,12 @@ class Crawler {
     }
 
     private val log: Logger by logger()
+}
+
+
+/** Enumeration used to determine whether rendering of a document should be done. */
+enum class DocumentStatus {
+    NEW,
+    UPDATED,
+    IDENTICAL
 }

@@ -4,8 +4,8 @@ import org.jbake.app.ContentStore
 import org.jbake.model.DocumentTypeUtils
 import org.jbake.template.model.PublishedCustomExtractor
 import org.jbake.template.model.TypedDocumentsExtractor
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.IOException
 import java.util.*
 
@@ -26,7 +26,8 @@ import java.util.*
  * This class loads the engines only if they are found on classpath. If not, the engine is not registered.
  * This allows JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better fit for embedding.
  */
-class ModelExtractors private constructor() {
+class ModelExtractorsRegistry private constructor() {
+
     private val extractors: MutableMap<String, ModelExtractor<*>> = TreeMap<String, ModelExtractor<*>>()
 
     init {
@@ -161,4 +162,13 @@ class ModelExtractors private constructor() {
     }
 
     private val log: Logger by logger()
+}
+
+// TODO: Migrate away from "ModelExtractors".
+typealias ModelExtractors = ModelExtractorsRegistry
+
+
+
+interface ModelExtractor<T> {
+    fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): T?
 }

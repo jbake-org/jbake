@@ -2,6 +2,7 @@ package org.jbake.launcher
 
 import org.jbake.app.JBakeException
 import org.jbake.app.Oven
+import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
 import java.text.MessageFormat
 

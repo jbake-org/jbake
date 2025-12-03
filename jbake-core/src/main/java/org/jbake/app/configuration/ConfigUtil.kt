@@ -8,7 +8,7 @@ import org.apache.commons.configuration2.builder.fluent.Parameters
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler
 import org.apache.commons.configuration2.ex.ConfigurationException
 import org.jbake.app.JBakeException
-import org.jbake.launcher.SystemExit
+import org.jbake.app.SystemExit.CONFIG_ERROR
 import org.jbake.util.Logging
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
@@ -27,11 +27,11 @@ class ConfigUtil {
     private fun load(source: File, propertiesFile: File?): CompositeConfiguration {
         if (!source.exists())
             throw JBakeException(
-                SystemExit.CONFIGURATION_ERROR,
+                CONFIG_ERROR,
                 "The given source dir '" + source.absolutePath + "' does not exist."
             )
         if (!source.isDirectory)
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, "The given source dir is not a directory.")
+            throw JBakeException(CONFIG_ERROR, "The given source dir is not a directory.")
 
         val legacyConfigFile = File(source, LEGACY_CONFIG_FILE)
         val customConfigFile = propertiesFile ?: File(source, CONFIG_FILE)
@@ -97,7 +97,7 @@ class ConfigUtil {
             val configuration = load(source, propertiesFile)
             return DefaultJBakeConfiguration(source, configuration)
         } catch (e: ConfigurationException) {
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, e.message, e)
+            throw JBakeException(CONFIG_ERROR, e.message ?: "Failed loading config from ${source.path} and props ${propertiesFile?.path}", e)
         }
     }
 

@@ -8,6 +8,7 @@ import org.eclipse.jetty.server.handler.DefaultHandler
 import org.eclipse.jetty.server.handler.HandlerList
 import org.eclipse.jetty.server.handler.ResourceHandler
 import org.jbake.app.JBakeException
+import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
 import org.slf4j.Logger
 import org.jbake.util.Logging.logger

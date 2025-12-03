@@ -1,15 +1,20 @@
 package org.jbake.app
 
-import org.jbake.launcher.SystemExit
-
 /**
- * This runtime exception is thrown by JBake API to indicate an processing error.
- * It always contains an error message and if available the cause.
- * @param message The error message.
- * @param cause The causing exception or `null` if no cause available.
+ * Thrown by JBake API on processing error.
  */
-class JBakeException(private val exit: SystemExit, message: String?, cause: Throwable? = null)
-    : RuntimeException(message, cause) {
-
+class JBakeException(private val exit: SystemExit, message: String, cause: Throwable? = null)
+    : RuntimeException(message, cause)
+{
     fun getExit() = exit.status
+}
+
+enum class SystemExit {
+    SUCCESS,
+    ERROR,
+    CONFIG_ERROR,
+    INIT_ERROR,
+    SERVER_ERROR;
+
+    val status: Int get() = this.ordinal
 }

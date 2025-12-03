@@ -2,6 +2,7 @@ package org.jbake.launcher
 
 import org.jbake.app.FileUtil
 import org.jbake.app.JBakeException
+import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
 import org.jbake.util.ConfigurationPrinter
@@ -45,7 +46,7 @@ class Main @JvmOverloads constructor(
         catch (e: JBakeException) { throw e }
         catch (mex: CommandLine.MissingParameterException) {
             log.error(mex.message)
-            throw JBakeException(SystemExit.CONFIGURATION_ERROR, mex.message, mex)
+            throw JBakeException(SystemExit.CONFIG_ERROR, mex.message ?: mex.javaClass.simpleName, mex)
         }
         catch (e: Throwable) {
             throw JBakeException(SystemExit.ERROR, "${e.javaClass.simpleName}: An unexpected error occurred: " + e.message, e)
