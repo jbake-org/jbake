@@ -39,11 +39,13 @@ class ContentStore(type: String, name: String) {
 
     fun getDocumentCount(docType: String) = repository.getDocumentCount(docType)
     fun getPublishedCount(docType: String) = repository.getPublishedCount(docType)
+    // TODO: Make non-nullable
     fun getDocumentByUri(uri: String?) = repository.getDocumentByUri(uri)
     fun getDocumentStatus(uri: String?) = repository.getDocumentStatus(uri)
 
     val publishedPosts get() = repository.publishedPosts
     fun getPublishedPosts(applyPaging: Boolean) = repository.getPublishedPosts(applyPaging)
+    // TODO: Make non-nullable
     fun getPublishedPostsByTag(tag: String?) = repository.getPublishedPostsByTag(tag)
     fun getPublishedDocumentsByTag(tag: String?) = repository.getPublishedDocumentsByTag(tag)
 
