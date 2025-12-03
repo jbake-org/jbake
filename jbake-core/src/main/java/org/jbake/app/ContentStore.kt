@@ -32,22 +32,22 @@ class ContentStore(private val type: String, private val name: String?) {
 
     fun startup() {
 
-        // OrientDB logging configuration - try ALL possible methods to enable FINEST level
+        // OrientDB logging configuration - try ALL possible methods to enable DEBUG level
         // System properties with orientdb. prefix
         System.setProperty("orientdb.script.pool.enabled", "false")
-        System.setProperty("orientdb.log.console.level", "finest")
-        System.setProperty("orientdb.log.file.level", "finest")
+        System.setProperty("orientdb.log.console.level", "debug")
+        System.setProperty("orientdb.log.file.level", "debug")
 
         // System properties without prefix (backup attempt)
-        System.setProperty("log.console.level", "finest")
-        System.setProperty("log.file.level", "finest")
+        System.setProperty("log.console.level", "debug")
+        System.setProperty("log.file.level", "debug")
 
         startupIfEnginesAreMissing()
 
-        // OGlobalConfiguration - set to FINEST (most verbose)
-        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue("finest")
-        OGlobalConfiguration.LOG_FILE_LEVEL.setValue("finest")
-        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue("finest")
+        // OGlobalConfiguration - set to DEBUG
+        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue("debug")
+        OGlobalConfiguration.LOG_FILE_LEVEL.setValue("debug")
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue("debug")
         OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_FULLSTACKTRACE.setValue(true)
 
 
@@ -81,6 +81,15 @@ class ContentStore(private val type: String, private val name: String?) {
             // Try to open existing database
             db = orient.open(name, adminUser, adminPass)
             log.debug("Opened existing database: {}", name)
+
+            // Configure OrientDB logging via SQL for existing database
+            try {
+                orient.execute("CONFIG SET log.console.level='finest'")
+                orient.execute("CONFIG SET log.file.level='finest'")
+                log.info("OrientDB logging configured to FINEST level via SQL")
+            } catch (configEx: Exception) {
+                log.warn("Failed to configure OrientDB logging via SQL: {}", configEx.message)
+            }
         }
         catch (e: Exception) {
             // Database doesn't exist or credentials don't work - recreate it properly
@@ -113,8 +122,14 @@ class ContentStore(private val type: String, private val name: String?) {
             // Open the newly created database
             db = orient.open(name, adminUser, adminPass)
 
-            orient.execute("CONFIG SET log.console.level='fine'")
-            orient.execute("CONFIG SET log.file.level='fine'")
+            // Configure OrientDB logging via SQL - use 'finest' for maximum verbosity
+            try {
+                orient.execute("CONFIG SET log.console.level='finest'")
+                orient.execute("CONFIG SET log.file.level='finest'")
+                log.info("OrientDB logging configured to FINEST level via SQL")
+            } catch (e: Exception) {
+                log.warn("Failed to configure OrientDB logging via SQL: {}", e.message)
+            }
         }
         activateOnCurrentThread()
         updateSchema()
