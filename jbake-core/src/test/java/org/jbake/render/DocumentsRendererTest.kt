@@ -16,14 +16,14 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.RenderingException
 
 class DocumentsRendererTest : StringSpec({
-    lateinit var documentsRenderer: DocumentsRenderer
+    lateinit var documentsRenderingTool: DocumentsRenderingTool
     lateinit var db: ContentStore
     lateinit var renderer: Renderer
     lateinit var configuration: JBakeConfiguration
     lateinit var emptyTemplateModelList: DocumentList<DocumentModel>
 
     beforeTest {
-        documentsRenderer = DocumentsRenderer()
+        documentsRenderingTool = DocumentsRenderingTool()
         db = mockk(relaxed = true)
         renderer = mockk(relaxed = true)
         configuration = mockk(relaxed = true)
@@ -33,7 +33,7 @@ class DocumentsRendererTest : StringSpec({
     "shouldReturnZeroIfNothingHasRendered" {
         every { db.unrenderedContent } returns emptyTemplateModelList
 
-        val renderResponse = documentsRenderer.render(renderer, db, configuration)
+        val renderResponse = documentsRenderingTool.render(renderer, db, configuration)
 
         renderResponse shouldBe 0
     }
@@ -48,7 +48,7 @@ class DocumentsRendererTest : StringSpec({
         every { db.unrenderedContent } returns templateModelList
         every { db.getAllContent(any<String>()) } returns templateModelList
 
-        val renderResponse = documentsRenderer.render(renderer, db, configuration)
+        val renderResponse = documentsRenderingTool.render(renderer, db, configuration)
 
         renderResponse shouldBe 2
     }
@@ -69,7 +69,7 @@ class DocumentsRendererTest : StringSpec({
         every { db.getAllContent(any<String>()) } returns templateModelList
 
         val exception = shouldThrow<RenderingException> {
-            documentsRenderer.render(renderer, db, configuration)
+            documentsRenderingTool.render(renderer, db, configuration)
         }
         exception.message shouldContain fakeExceptionMessage
     }
@@ -119,7 +119,7 @@ class DocumentsRendererTest : StringSpec({
         val capturedDocs = mutableListOf<DocumentModel>()
         every { renderer.render(capture(capturedDocs)) } just Runs
 
-        val renderResponse = documentsRenderer.render(renderer, db, configuration)
+        val renderResponse = documentsRenderingTool.render(renderer, db, configuration)
 
         verify(exactly = 7) { renderer.render(any()) }
 

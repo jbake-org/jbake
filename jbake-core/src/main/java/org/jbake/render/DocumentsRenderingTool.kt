@@ -11,8 +11,7 @@ import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.util.*
 
-class DocumentsRenderer : RenderingTool {
-    private val log: Logger by logger()
+class DocumentsRenderingTool : RenderingTool {
 
     @Throws(RenderingException::class)
     override fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int {
@@ -70,34 +69,28 @@ class DocumentsRenderer : RenderingTool {
 
     private fun getPrevDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
         var typedListIndex = typedList.indexOf(doc)
-        if (typedList.last() == doc) {
-            // last doc in typed list so there is no previous
-            return null
-        }
+
+        // Last document in typed list so there is no previous one.
+        if (typedList.last() == doc) return null
+
         while (true) {
             try {
                 val prevDoc = typedList[typedListIndex + 1]
-                if (isPublished(prevDoc)) {
+                if (isPublished(prevDoc))
                     return getContentForNav(prevDoc)
-                }
                 typedListIndex++
-            } catch (ex: IndexOutOfBoundsException) {
-                return null
             }
+            catch (ex: IndexOutOfBoundsException) { return null }
         }
     }
 
     private fun isPublished(document: DocumentModel): Boolean {
-        // Attributes.Status.PUBLISHED_DATE cannot occur here
-        // because it's converted TO either PUBLISHED or DRAFT in the Crawler.
+        // Attributes.Status.PUBLISHED_DATE cannot occur here because it's converted TO either PUBLISHED or DRAFT in the Crawler.
         return ModelAttributes.Status.PUBLISHED == document.status
     }
 
     /**
-     * Creates a simple content model to use in individual post navigations.
-     *
-     * @param document original
-     * @return navigation model for the 'document'
+     * Creates a simple navigation content model to use in individual post navigations.
      */
     private fun getContentForNav(document: DocumentModel): DocumentModel {
         val navDocument = DocumentModel()
@@ -106,4 +99,6 @@ class DocumentsRenderer : RenderingTool {
         navDocument.title = document.title
         return navDocument
     }
+
+    private val log: Logger by logger()
 }

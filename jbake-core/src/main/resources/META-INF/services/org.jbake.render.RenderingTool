@@ -1,5 +1,5 @@
 org.jbake.render.ArchiveRenderingTool
-org.jbake.render.DocumentsRenderer
+org.jbake.render.DocumentsRenderingTool
 org.jbake.render.FeedRenderingTool
 org.jbake.render.IndexRenderingTool
 org.jbake.render.SitemapRenderingTool

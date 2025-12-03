@@ -106,12 +106,13 @@ class TagsRenderingTool : RenderingTool {
 }
 
 private fun wrapOnRenderingException(block: () -> Any?): Int {
-    val returned = try { block() }
-    catch (ex: Exception) {
-        when(ex) {
-            is RenderingException -> throw ex
-            else -> throw RenderingException(ex)
+    val returned =
+        try { block() }
+        catch (ex: Exception) {
+            when(ex) {
+                is RenderingException -> throw ex
+                else -> throw RenderingException(ex)
+            }
         }
-    }
     return returned as? Int ?: 1
 }
