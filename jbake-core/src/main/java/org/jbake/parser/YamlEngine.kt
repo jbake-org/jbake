@@ -2,9 +2,9 @@ package org.jbake.parser
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
 import org.jbake.util.warn
+import org.slf4j.Logger
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
@@ -17,11 +17,9 @@ class YamlEngine : MarkupEngine() {
      */
     private fun parseFile(file: File): DocumentModel {
         val model = DocumentModel()
-        val yaml = Yaml()
         try {
             FileInputStream(file).use { inputStream ->
-
-                when (val result = yaml.load<Any>(inputStream)) {
+                when (val result = Yaml().load<Any>(inputStream)) {
                     is MutableList<*> -> model.put("data", result)
                     is MutableMap<*, *> -> {
                         @Suppress("UNCHECKED_CAST")
@@ -31,19 +29,15 @@ class YamlEngine : MarkupEngine() {
                     else -> log.warn { "Unexpected result [${result.javaClass}] while parsing YAML file $file" }
                 }
             }
-        } catch (e: IOException) {
-            log.error("Error while parsing YAML file $file", e)
         }
+        catch (e: IOException) { log.error("Error while parsing YAML file $file", e) }
         return model
     }
 
-    override fun parse(config: JBakeConfiguration, file: File): DocumentModel {
-        return parseFile(file)
-    }
+    override fun parse(config: JBakeConfiguration, file: File): DocumentModel = parseFile(file)
 
     /**
-     * This method implements the contract allowing use of Yaml files as content files
-     *
+     * Implements the contract allowing use of Yaml files as content files
      */
     override fun processHeader(context: ParserContext) {
         val fileContents = parseFile(context.file)
@@ -60,17 +54,15 @@ class YamlEngine : MarkupEngine() {
     }
 
     /**
-     * This method implements the contract allowing use of Yaml files as content files.
-     * As such there is no body for Yaml files so this method just sets an empty String as the body.
+     * Implements the contract allowing use of Yaml files as content files.
+     * As such there is no body for Yaml files, it just sets an empty String as the body.
      */
     override fun processBody(parserContext: ParserContext) {
         parserContext.body = ""
     }
 
-    private fun hasJBakePrefix(key: String): Boolean {
-        return key.startsWith(JBAKE_PREFIX)
-    }
+    private fun hasJBakePrefix(key: String): Boolean = key.startsWith(JBAKE_PREFIX)
 
-    val JBAKE_PREFIX: String = "jbake-"
+    private val JBAKE_PREFIX: String = "jbake-"
     private val log: Logger by logger()
 }
