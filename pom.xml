@@ -8,11 +8,12 @@
     <packaging>pom</packaging>
 
     <name>jbake-base</name>
-    <description>JBake is a Java based open source static site/blog generator for developers.</description>
+    <description>
+        JBake is a Java based open source static site/blog generator for developers.
+        This is a fork of JBake 2.x, modernized to use latest libraries and JDK 17+.
+    </description>
     <url>https://github.com/OndraZizka/jbake</url>
     <inceptionYear>2012</inceptionYear>
-
-    <licenses><license><name>The MIT License (MIT)</name><url>http://opensource.org/licenses/MIT</url></license></licenses>
 
     <scm>
         <url>https://github.com/OndraZizka/jbake</url>
@@ -21,10 +22,9 @@
         <tag>jbake-base-5.0.0-rc1</tag>
     </scm>
 
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/OndraZizka/jbake/issues</url>
-    </issueManagement>
+    <issueManagement><system>GitHub Issues</system><url>https://github.com/OndraZizka/jbake/issues</url></issueManagement>
+    <ciManagement><system>GitHub Actions</system><url>https://github.com/OndraZizka/jbake/actions/</url></ciManagement>
+    <licenses><license><name>The MIT License (MIT)</name><url>http://opensource.org/licenses/MIT</url></license></licenses>
 
     <developers>
         <developer><id>ondrazizka</id><name>Ondrej Zizka</name><email>ondrej@zizka.ch</email></developer>
@@ -109,6 +109,10 @@
         <version.mockk>1.14.6</version.mockk>
         <version.kotest>6.0.6</version.kotest>
 
+        <!-- JNR versions for Java 17+ compatibility - used by OrientDB and Asciidoctor. -->
+        <version.jnr.posix>3.1.21</version.jnr.posix>
+        <version.jffi>1.3.14</version.jffi>
+
         <!-- Build dependencies versions. Keep all at the latest. -->
         <version.maven>3.9.11</version.maven>
         <version.maven.annotations>3.15.2</version.maven.annotations>
@@ -163,6 +167,13 @@
             <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId><version>${version.slf4j}</version></dependency>
             <dependency><groupId>org.thymeleaf</groupId><artifactId>thymeleaf</artifactId><version>${version.thymeleaf}</version></dependency>
             <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><version>${version.snakeyaml}</version></dependency>
+
+            <!-- Transitive Dependency upgrades for Java 17+ compatibility -->
+            <dependency><groupId>com.github.ben-manes.caffeine</groupId><artifactId>caffeine</artifactId><version>${version.caffeine}</version></dependency>
+            <!-- JNR dependencies used by OrientDB and AsciidoctorJ -->
+            <dependency><groupId>com.github.jnr</groupId><artifactId>jnr-posix</artifactId><version>${version.jnr.posix}</version></dependency>
+            <dependency><groupId>com.github.jnr</groupId><artifactId>jffi</artifactId><version>${version.jffi}</version></dependency>
+
             <!-- Testing dependencies -->
             <dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>${version.junit4}</version></dependency>
             <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>${version.assertj}</version></dependency>

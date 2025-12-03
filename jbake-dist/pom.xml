@@ -196,6 +196,12 @@
                                     <extraArgument>-Dlog.console.level=FINEST</extraArgument>
                                     <extraArgument>-Dlog.file.level=FINEST</extraArgument>
 
+                                    <!-- To mitigate this:
+                                        WARNING: java.lang.System::load has been called by com.kenai.jffi.internal.StubLoader
+                                        in an unnamed module (file:.../jbake/jbake-dist/build/install/jbake/lib/jffi-1.3.13.jar)
+                                    -->
+                                    <extraArgument>--enable-native-access=ALL-UNNAMED</extraArgument>
+
                                     <!-- Java 17+ compatibility for OrientDB -->
                                     <extraArgument>--add-opens</extraArgument>
                                     <extraArgument>java.base/java.lang=ALL-UNNAMED</extraArgument>
