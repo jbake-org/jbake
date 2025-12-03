@@ -195,13 +195,11 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
     override fun getDocumentCount(docType: String): Long {
         activateOnCurrentThread()
-        val statement = String.format(STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE, docType)
-        return query(statement)[0]["count"] as Long
+        return query("SELECT count(*) AS count FROM Documents WHERE type=?", docType)[0]["count"] as Long
     }
 
     override fun getPublishedCount(docType: String): Long {
-        val statement = String.format(STATEMENT_GET_PUBLISHED_COUNT, docType)
-        return query(statement)[0].get("count") as Long
+        return query("SELECT count(*) AS count FROM Documents WHERE status='published' AND type=?", docType)[0]["count"] as Long
     }
 
     override fun getDocumentByUri(uri: String?): DocumentList<DocumentModel> {
@@ -209,7 +207,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     override fun getDocumentStatus(uri: String?): DocumentList<DocumentModel> {
-        return query(STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI, uri)
+        return query("SELECT sha1,rendered FROM Documents WHERE sourceuri=?", uri)
     }
 
     override val publishedPosts: DocumentList<DocumentModel>
@@ -220,15 +218,13 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     override fun getPublishedPostsByTag(tag: String?): DocumentList<DocumentModel> {
-        return query(STATEMENT_GET_PUBLISHED_POSTS_BY_TAG, tag)
+        return query("SELECT * FROM Documents WHERE status='published' AND type='post' AND ? IN tags ORDER BY date DESC", tag)
     }
 
     override fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
         val documents = DocumentList<DocumentModel>()
-
         for (docType in DocumentTypes.documentTypes) {
-            val statement: String = String.format(STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG, docType)
-            val documentsByTag = query(statement, tag)
+            val documentsByTag = query("SELECT * FROM Documents WHERE status='published' AND type=? AND ? IN tags ORDER BY date DESC", docType, tag)
             documents.addAll(documentsByTag)
         }
         return documents
@@ -242,10 +238,10 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     override fun getPublishedContent(docType: String, applyPaging: Boolean): DocumentList<DocumentModel> {
-        var query = String.format(STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE, docType)
+        var sql = "SELECT * FROM Documents WHERE status='published' AND type=? ORDER BY date DESC "
         if (applyPaging && hasStartAndLimitBoundary())
-            query += " SKIP $paginationOffset LIMIT $paginationLimit"
-        return query(query)
+            sql += " SKIP $paginationOffset LIMIT $paginationLimit"
+        return query(sql, docType)
     }
 
     override fun getAllContent(docType: String): DocumentList<DocumentModel> {
@@ -253,10 +249,10 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     override fun getAllContent(docType: String, applyPaging: Boolean): DocumentList<DocumentModel> {
-        var query = String.format(STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE, docType)
+        var sql = "SELECT * FROM Documents WHERE type=? ORDER BY date DESC"
         if (applyPaging && hasStartAndLimitBoundary())
-            query += " SKIP $paginationOffset LIMIT $paginationLimit"
-        return query(query)
+            sql += " SKIP $paginationOffset LIMIT $paginationLimit"
+        return query(sql, docType)
     }
 
     private fun hasStartAndLimitBoundary(): Boolean {
@@ -264,35 +260,32 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     private val allTagsFromPublishedPosts: DocumentList<DocumentModel>
-        get() = query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS)
+        get() = query("SELECT tags FROM Documents WHERE status='published' AND type='post'")
 
     private val signaturesForTemplates: DocumentList<DocumentModel>
-        get() = query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES)
+        get() = query("SELECT sha1 FROM Signatures WHERE key='templates'")
 
     override val unrenderedContent: DocumentList<DocumentModel>
-        get() = query(STATEMENT_GET_UNDRENDERED_CONTENT)
+        get() = query("SELECT * FROM Documents WHERE rendered=false ORDER BY date DESC")
 
     override fun deleteContent(uri: String) {
-        executeCommand(STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI, uri)
+        executeCommand("DELETE FROM Documents WHERE sourceuri=?", uri)
     }
 
     override fun markContentAsRendered(document: DocumentModel) {
-        val statement: String =
-            String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.type, document.sourceUri)
-        executeCommand(statement)
+        executeCommand("UPDATE Documents SET rendered=true WHERE rendered=false AND type=? AND sourceuri=? AND cached=true", document.type, document.sourceUri)
     }
 
     private fun updateSignatures(currentTemplatesSignature: String) {
-        executeCommand(STATEMENT_UPDATE_TEMPLATE_SIGNATURE, currentTemplatesSignature)
+        executeCommand("UPDATE Signatures SET sha1=? WHERE key='templates'", currentTemplatesSignature)
     }
 
     override fun deleteAllByDocType(docType: String) {
-        val statement = String.format(STATEMENT_DELETE_ALL, docType)
-        executeCommand(statement)
+        executeCommand("DELETE FROM Documents WHERE type=?", docType)
     }
 
     private fun insertTemplatesSignature(currentTemplatesSignature: String) {
-        executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature)
+        executeCommand("INSERT INTO Signatures(key,sha1) VALUES('templates',?)", currentTemplatesSignature)
     }
 
     private fun query(sql: String): DocumentList<DocumentModel> {
@@ -327,9 +320,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         get() {
             val result: MutableSet<String> = HashSet<String>()
             for (docType in DocumentTypes.documentTypes) {
-                val statement: String =
-                    String.format(STATEMENT_GET_TAGS_BY_DOCTYPE, docType)
-                val docs = query(statement)
+                val docs = query("SELECT tags FROM Documents WHERE status='published' AND type=?", docType)
                 for (document in docs) {
                     val tags = document.tags
                     Collections.addAll(result, *tags)
@@ -402,7 +393,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
             try {
                 this.deleteAllByDocType(docType)
             } catch (e: Exception) {
-                // maybe a non existing document type
+                log.warn("Failed to delete documents of type '$docType': ${e.message}")
             }
         }
     }
@@ -420,25 +411,6 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     private object Schema {
         const val DOCUMENTS: String = "Documents"
         const val SIGNATURES: String = "Signatures"
-    }
-
-    companion object {
-        private const val STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "SELECT * FROM Documents WHERE status='published' AND type='%s' AND ? IN tags ORDER BY date DESC"
-        private const val STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "SELECT sha1,rendered FROM Documents WHERE sourceuri=?"
-        private const val STATEMENT_GET_PUBLISHED_COUNT = "SELECT count(*) AS count FROM Documents WHERE status='published' AND type='%s'"
-        private const val STATEMENT_MARK_CONTENT_AS_RENDERD = "UPDATE Documents SET rendered=true WHERE rendered=false AND type='%s' AND sourceuri='%s' AND cached=true"
-        private const val STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "DELETE FROM Documents WHERE sourceuri=?"
-        private const val STATEMENT_GET_UNDRENDERED_CONTENT = "SELECT * FROM Documents WHERE rendered=false ORDER BY date DESC"
-        private const val STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "SELECT sha1 FROM Signatures WHERE key='templates'"
-        private const val STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "SELECT tags FROM Documents WHERE status='published' AND type='post'"
-        private const val STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "SELECT * FROM Documents WHERE type='%s' ORDER BY date DESC"
-        private const val STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "SELECT * FROM Documents WHERE status='published' AND type='%s' ORDER BY date DESC"
-        private const val STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "SELECT * FROM Documents WHERE status='published' AND type='post' AND ? IN tags ORDER BY date DESC"
-        private const val STATEMENT_GET_TAGS_BY_DOCTYPE = "SELECT tags FROM Documents WHERE status='published' AND type='%s'"
-        private const val STATEMENT_INSERT_TEMPLATES_SIGNATURE = "INSERT INTO Signatures(key,sha1) VALUES('templates',?)"
-        private const val STATEMENT_DELETE_ALL = "DELETE FROM Documents WHERE type='%s'"
-        private const val STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "UPDATE Signatures SET sha1=? WHERE key='templates'"
-        private const val STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "SELECT count(*) AS count FROM Documents WHERE type='%s'"
     }
 
     private val log: Logger by logger()
