@@ -5,9 +5,16 @@ import org.jbake.app.Renderer
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.RenderingException
 
-// Note, the names of the classes were used in jbake-core/src/main/resources/META-INF/services/org.jbake.render.RenderingTool
+interface RenderingTool {
+    fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int
+}
+
+
+// Backwards compatibility note:
+// The names of the classes below were used in jbake-core/src/main/resources/META-INF/services/org.jbake.render.RenderingTool
 // Renaming them will cause the service loader to not find them under the old names.
-// Perhaps we should add wrapping classes for backwards compatibility?
+// Perhaps we should add wrapping classes or typealiases?
+
 
 /**
  * Renders the archive page (if enabled in configuration).
