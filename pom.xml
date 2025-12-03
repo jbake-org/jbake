@@ -92,6 +92,7 @@
         <version.hsqldb>2.7.4</version.hsqldb>
         <version.neo4j>5.26.0</version.neo4j>
         <version.gson>2.11.0</version.gson>
+        <version.jackson>2.19.4</version.jackson>
         <version.pebble>4.0.0</version.pebble>
         <version.slf4j>2.0.17</version.slf4j>
         <version.snakeyaml>2.5</version.snakeyaml>
@@ -131,6 +132,7 @@
             <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version>            <type>pom</type><scope>import</scope></dependency>
             <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-bom</artifactId><version>${version.groovy}</version>   <type>pom</type><scope>import</scope></dependency>
             <dependency><groupId>io.kotest</groupId><artifactId>kotest-bom</artifactId><version>${version.kotest}</version>           <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>com.fasterxml.jackson</groupId><artifactId>jackson-bom</artifactId><version>${version.jackson}</version>         <type>pom</type><scope>import</scope></dependency>
 
             <!-- Runtime dependencies -->
             <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
@@ -141,9 +143,9 @@
             <dependency><groupId>org.hsqldb</groupId><artifactId>hsqldb</artifactId><version>${version.hsqldb}</version></dependency>
             <dependency><groupId>org.neo4j</groupId><artifactId>neo4j</artifactId><version>${version.neo4j}</version></dependency>
             <dependency><groupId>com.google.code.gson</groupId><artifactId>gson</artifactId><version>${version.gson}</version></dependency>
+            <!--<dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><version>${version.jackson}</version></dependency>-->
             <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><version>${version.flexmark}</version></dependency>
             <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${version.flexmark}</version></dependency>
-            <dependency><groupId>com.github.ben-manes.caffeine</groupId><artifactId>caffeine</artifactId><version>${version.caffeine}</version></dependency>
             <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId><version>${version.commons.beanutils}</version></dependency>
             <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId><version>${version.commons.io}</version></dependency>
             <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId><version>${version.jade4j}</version></dependency>

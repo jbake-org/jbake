@@ -1,6 +1,6 @@
 package org.jbake.app
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
@@ -19,7 +19,7 @@ import java.sql.Types
 class HsqldbContentRepository(private val type: String, private val name: String) : ContentRepository {
 
     private lateinit var connection: Connection
-    private val gson = Gson()
+    private val objectMapper = ObjectMapper()
 
     override var paginationOffset: Int = -1
     override var paginationLimit: Int = -1
@@ -107,7 +107,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
         connection.prepareStatement(insertSql).use { stmt ->
             val tagsArray = connection.createArrayOf("VARCHAR", document.tags.toTypedArray())
-            val propertiesJson = gson.toJson(document)
+            val propertiesJson = objectMapper.writeValueAsString(document)
 
             stmt.setString(1, document.sourceUri)
             stmt.setString(2, document.type)
@@ -327,7 +327,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                         val properties = rs.getString("properties")
                         if (properties != null) {
                             @Suppress("UNCHECKED_CAST")
-                            val map = gson.fromJson(properties, Map::class.java) as Map<String, Any>
+                            val map = objectMapper.readValue(properties, Map::class.java) as Map<String, Any>
                             // Only add properties that aren't already in the document from individual columns
                             for ((key, value) in map) {
                                 if (key.lowercase() !in document.keys.map { it.lowercase() }) {
@@ -391,4 +391,3 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
     private val log: Logger by logger()
 }
-
