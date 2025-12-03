@@ -23,11 +23,8 @@ class JettyServerTest : StringSpec({
     }
 
     "shouldRunWithCustomPortAndContext" {
-        val tempDir = java.io.File.createTempFile("jbake", "test").apply {
-            delete()
-            mkdirs()
-        }
-        val out = File(System.getProperty("java.io.tmpdir"), "build/jbake")
+        val tempDir = File.createTempFile("jbake", "test").apply { delete(); mkdirs() }
+        val out = tempDir.resolve("build/jbake")
         out.mkdirs()
 
         val source = TestUtils.testResourcesAsSourceDir

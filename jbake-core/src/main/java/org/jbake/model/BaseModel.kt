@@ -9,6 +9,10 @@ abstract class BaseModel(
 )
     : MutableMap<String, Any> by delegate
 {
+    // Override get to return null for missing keys instead of relying on Map's default behavior.
+    // This allows FreeMarker's classic_compatible mode to handle missing properties gracefully.
+    override fun get(key: String): Any? = delegate[key]
+
     var uri: String
         get() = (get(ModelAttributes.URI) as String?) ?: ""
         set(uri) { put(ModelAttributes.URI, uri) }
