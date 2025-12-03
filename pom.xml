@@ -65,6 +65,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <ossrh.host>s01.oss.sonatype.org</ossrh.host>
+        <extraJvmArgs.stores.orientdb>-Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</extraJvmArgs.stores.orientdb>
 
         <!-- Runtime dependencies versions (synced from gradle.properties) -->
         <version.asciidoctorj>3.0.1</version.asciidoctorj>
@@ -225,7 +226,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g -Djbake.buildOutputDir=${project.build.outputDirectory}</argLine>
+                    <argLine>-Xms512m -Xmx3g -Djbake.buildOutputDir=${project.build.outputDirectory}</argLine>
                 </configuration>
             </plugin>
 

@@ -304,13 +304,13 @@ class OrientDBContentRepository(private val type: String, private val name: Stri
     private fun query(sql: String): DocumentList<DocumentModel> {
         activateOnCurrentThread()
         val results = db.query(sql)
-        return DocumentList.wrap(results)
+        return DocumentList.wrapOrientDbResultToDocumentList(results)
     }
 
     private fun query(sql: String?, vararg args: Any?): DocumentList<DocumentModel> {
         activateOnCurrentThread()
         val results = db.command(sql, *args)
-        return DocumentList.wrap(results)
+        return DocumentList.wrapOrientDbResultToDocumentList(results)
     }
 
     private fun executeCommand(query: String?, vararg args: Any?) {

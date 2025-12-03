@@ -31,7 +31,9 @@ object DbUtils {
         contentStore = null
     }
 
-    fun documentToModel(doc: OResult): DocumentModel {
+
+    /** TODO: Move to OrientDB-specific utility class. */
+    fun orientdbDocumentToModel(doc: OResult): DocumentModel {
         val result = DocumentModel()
         for (key in doc.propertyNames) {
             val value = doc.getProperty<Any>(key) ?: continue // Skip null values - treat them as missing keys instead
@@ -41,16 +43,14 @@ object DbUtils {
     }
 
     /**
-     * Converts a DB list into a String array
-     *
-     * @param entry Entry input to be converted
+     * Converts a DB list into a String array. TODO: Quite fragile, check how it is used.
      * @return input entry as String[]
      */
-    @Suppress("UNCHECKED_CAST")
     fun toStringArray(entry: Any): Array<String> = when (entry) {
         is Array<*> -> entry as Array<String>
-        is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray()
+        is List<*> -> (entry as List<String>).toTypedArray()
         is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
+        is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray() // TODO: OrientDB specific
         else -> arrayOf()
     }
 }

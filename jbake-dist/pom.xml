@@ -233,7 +233,8 @@
                         <include>**/BuiltInProjectsTest.*</include>
                         <include>**/ProjectWebsiteTest.*</include>
                     </includes>
-                    <argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine>
+                    <!--<argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine> Keep-->
+                    <argLine>-Xms512m -Xmx3g</argLine>
                 </configuration>
                 <executions>
                     <execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution>
