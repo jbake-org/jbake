@@ -9,11 +9,11 @@ import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
 import org.jbake.app.Parser
 import org.jbake.app.Renderer
-import org.jbake.model.DocumentTypes
-import org.jbake.model.DocumentTypes.addDocumentType
-import org.jbake.model.DocumentTypes.addListener
-import org.jbake.model.DocumentTypes.documentTypes
-import org.jbake.model.DocumentTypes.resetDocumentTypes
+import org.jbake.model.DocumentTypeRegistry
+import org.jbake.model.DocumentTypeRegistry.addDocumentType
+import org.jbake.model.DocumentTypeRegistry.addListener
+import org.jbake.model.DocumentTypeRegistry.documentTypes
+import org.jbake.model.DocumentTypeRegistry.resetDocumentTypes
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
 import java.io.File
@@ -38,7 +38,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         Locale.setDefault(Locale.ENGLISH)
 
         val listener = ModelExtractorsDocumentTypeListener()
-        DocumentTypes.clearListenersForTests()
+        DocumentTypeRegistry.clearListenersForTests()
         addListener(listener)
 
         templateDir_ = File(sourceDir, templateDir)

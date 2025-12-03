@@ -3,10 +3,10 @@ package org.jbake.model
 object DocumentTypeUtils {
     fun unpluralize(pluralized: String): String {
         require(!(pluralized.isEmpty())) { "pluralized string should not be null or length should be bigger than zero" }
-        val documentTypes = DocumentTypes.documentTypes
+        val documentTypes = DocumentTypeRegistry.documentTypes
 
         val unpluralizedDoctype = pluralized.dropLast(1)
-        if (DocumentTypes.contains(unpluralizedDoctype)) {
+        if (DocumentTypeRegistry.contains(unpluralizedDoctype)) {
             return unpluralizedDoctype
         }
         throw UnsupportedOperationException(
@@ -16,9 +16,9 @@ object DocumentTypeUtils {
     }
 
     fun pluralize(documentType: String): String {
-        val documentTypes = DocumentTypes.documentTypes
+        val documentTypes = DocumentTypeRegistry.documentTypes
 
-        if (DocumentTypes.contains(documentType)) {
+        if (DocumentTypeRegistry.contains(documentType)) {
             return documentType + "s"
         }
         throw UnsupportedOperationException(

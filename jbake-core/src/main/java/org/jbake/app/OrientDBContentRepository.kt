@@ -13,7 +13,7 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema
 import com.orientechnologies.orient.core.metadata.schema.OType
 import com.orientechnologies.orient.core.record.ORecord
 import org.jbake.model.DocumentModel
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
@@ -223,7 +223,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
     override fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
         val documents = DocumentList<DocumentModel>()
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             val documentsByTag = query("SELECT * FROM Documents WHERE status='published' AND type=? AND ? IN tags ORDER BY date DESC", docType, tag)
             documents.addAll(documentsByTag)
         }
@@ -319,7 +319,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     override val allTags: MutableSet<String>
         get() {
             val result: MutableSet<String> = HashSet<String>()
-            for (docType in DocumentTypes.documentTypes) {
+            for (docType in DocumentTypeRegistry.documentTypes) {
                 val docs = query("SELECT tags FROM Documents WHERE status='published' AND type=?", docType)
                 for (document in docs) {
                     val tags = document.tags
@@ -389,7 +389,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     private fun deleteAllDocumentTypes() {
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             try {
                 this.deleteAllByDocType(docType)
             } catch (e: Exception) {

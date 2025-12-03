@@ -8,7 +8,7 @@ import org.jbake.parser.Engines
  *
  * Additional document types are added at runtime based on the types found in the configuration.
  */
-object DocumentTypes {
+object DocumentTypeRegistry {
 
     private val defaultDocTypes: MutableSet<String> = LinkedHashSet()
     private val listeners: MutableSet<DocumentTypeListener> = HashSet()

@@ -3,7 +3,7 @@ package org.jbake.template.model
 import org.jbake.app.DocumentList
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeUtils
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
 import org.jbake.template.TypedModelExtractor
 
 /**
@@ -40,7 +40,7 @@ class TaggedDocumentsExtractor : TypedModelExtractor<DocumentList<*>> {
 class PublishedContentExtractor : TypedModelExtractor<DocumentList<*>> {
     override fun extract(context: RenderContext, key: String): DocumentList<*> {
         val publishedContent = DocumentList<DocumentModel>()
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             val query = context.db.getPublishedContent(docType)
             publishedContent.addAll(query)
         }
@@ -58,7 +58,7 @@ class AllContentExtractor : TypedModelExtractor<DocumentList<*>> {
 
         val allContent = DocumentList<DocumentModel>()
 
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             if (docType != dataFileDocType) {
                 val query = context.db.getAllContent(docType)
                 allContent.addAll(query)

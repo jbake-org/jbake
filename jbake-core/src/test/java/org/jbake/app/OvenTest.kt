@@ -15,7 +15,7 @@ import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList
-import org.jbake.model.DocumentTypes.resetDocumentTypes
+import org.jbake.model.DocumentTypeRegistry.resetDocumentTypes
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path

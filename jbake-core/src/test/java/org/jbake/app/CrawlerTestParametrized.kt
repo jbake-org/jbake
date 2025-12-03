@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.apache.commons.io.FilenameUtils
 import org.jbake.model.DocumentModel
-import org.jbake.model.DocumentTypes.addDocumentType
+import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
 

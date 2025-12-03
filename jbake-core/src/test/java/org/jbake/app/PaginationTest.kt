@@ -7,7 +7,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.jbake.addTestDocument
 import org.jbake.model.DocumentModel
-import org.jbake.model.DocumentTypes.documentTypes
+import org.jbake.model.DocumentTypeRegistry.documentTypes
 import java.util.*
 
 class PaginationTest : StringSpec({

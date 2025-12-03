@@ -5,15 +5,15 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
-import org.jbake.model.DocumentTypes.addDocumentType
-import org.jbake.model.DocumentTypes.addListener
-import org.jbake.model.DocumentTypes.contains
-import org.jbake.model.DocumentTypes.documentTypes
+import org.jbake.model.DocumentTypeRegistry.addDocumentType
+import org.jbake.model.DocumentTypeRegistry.addListener
+import org.jbake.model.DocumentTypeRegistry.contains
+import org.jbake.model.DocumentTypeRegistry.documentTypes
 
 class DocumentTypesTest : StringSpec({
     beforeTest {
-        DocumentTypes.resetDocumentTypes()
-        DocumentTypes.clearListenersForTests()
+        DocumentTypeRegistry.resetDocumentTypes()
+        DocumentTypeRegistry.clearListenersForTests()
     }
 
     "shouldReturnDefaultDocumentTypes" {

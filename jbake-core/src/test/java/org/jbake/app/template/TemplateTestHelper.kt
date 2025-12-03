@@ -3,7 +3,7 @@ package org.jbake.app.template
 import io.kotest.matchers.shouldBe
 import org.jbake.app.*
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.model.DocumentTypes
+import org.jbake.model.DocumentTypeRegistry
 import org.jbake.template.ModelExtractors
 import org.jbake.template.ModelExtractorsDocumentTypeListener
 import java.io.File
@@ -42,8 +42,8 @@ class TemplateTestHelper(
         Locale.setDefault(Locale.ENGLISH)
 
         val listener = ModelExtractorsDocumentTypeListener()
-        DocumentTypes.clearListenersForTests()
-        DocumentTypes.addListener(listener)
+        DocumentTypeRegistry.clearListenersForTests()
+        DocumentTypeRegistry.addListener(listener)
 
         templateDir_ = File(sourceDir, templateDir)
         if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
@@ -52,7 +52,7 @@ class TemplateTestHelper(
         config.destinationDir = destinationDir
         config.templateDir = templateDir_
 
-        for (docType in DocumentTypes.documentTypes) {
+        for (docType in DocumentTypeRegistry.documentTypes) {
             val templateFile: File? = config.getTemplateFileByDocType(docType)
 
             if (templateFile != null) {
@@ -66,7 +66,7 @@ class TemplateTestHelper(
         }
 
         config.setTemplateFileNameForDocType("paper", "paper.$templateExtension")
-        DocumentTypes.addDocumentType("paper")
+        DocumentTypeRegistry.addDocumentType("paper")
         db.updateSchema()
 
         config.outputExtension shouldBe ".html"
@@ -81,8 +81,8 @@ class TemplateTestHelper(
 
     fun teardownTest() {
         db.drop()
-        DocumentTypes.resetDocumentTypes()
-        DocumentTypes.clearListenersForTests()
+        DocumentTypeRegistry.resetDocumentTypes()
+        DocumentTypeRegistry.clearListenersForTests()
         ModelExtractors.instance.reset()
         Locale.setDefault(currentLocale)
     }

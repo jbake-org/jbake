@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
-import org.jbake.model.DocumentTypes.addDocumentType
+import org.jbake.model.DocumentTypeRegistry.addDocumentType
 
 class ModelExtractorsTest : StringSpec({
 

@@ -1,9 +1,8 @@
 package org.jbake.template
 
-import org.jbake.model.DocumentTypes.addDocumentType
+import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.booleans.shouldBeTrue
 
 class ModelExtractorsDocumentTypeListenerTest : StringSpec({
     "shouldRegisterExtractorsForCustomType" {
