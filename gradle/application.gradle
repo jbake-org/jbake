@@ -61,6 +61,9 @@ startScripts {
     defaultJvmOpts = [
         '-XX:MaxDirectMemorySize=512m',
         '-Djna.nosys=true',
+        // OrientDB DEBUG logging - OrientDB uses Java Util Logging (JUL)
+        '-Dlog.console.level=FINEST',
+        '-Dlog.file.level=FINEST',
         // Java 17+ compatibility for OrientDB
         '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
         '--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',

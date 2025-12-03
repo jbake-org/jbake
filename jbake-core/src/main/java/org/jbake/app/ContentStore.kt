@@ -2,6 +2,7 @@ package org.jbake.app
 
 import com.orientechnologies.common.log.OLogManager
 import com.orientechnologies.orient.core.Orient
+import com.orientechnologies.orient.core.config.OGlobalConfiguration
 import com.orientechnologies.orient.core.db.ODatabaseSession
 import com.orientechnologies.orient.core.db.ODatabaseType
 import com.orientechnologies.orient.core.db.OrientDB
@@ -13,8 +14,8 @@ import com.orientechnologies.orient.core.record.ORecord
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypes
 import org.jbake.model.ModelAttributes
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.File
 import java.util.*
 
@@ -30,10 +31,25 @@ class ContentStore(private val type: String, private val name: String?) {
 
 
     fun startup() {
+
+        // OrientDB logging configuration - try ALL possible methods to enable FINEST level
+        // System properties with orientdb. prefix
+        System.setProperty("orientdb.script.pool.enabled", "false")
+        System.setProperty("orientdb.log.console.level", "finest")
+        System.setProperty("orientdb.log.file.level", "finest")
+
+        // System properties without prefix (backup attempt)
+        System.setProperty("log.console.level", "finest")
+        System.setProperty("log.file.level", "finest")
+
         startupIfEnginesAreMissing()
 
-        // Disable OrientDB's script manager to avoid JSR223 dependencies
-        System.setProperty("orientdb.script.pool.enabled", "false")
+        // OGlobalConfiguration - set to FINEST (most verbose)
+        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue("finest")
+        OGlobalConfiguration.LOG_FILE_LEVEL.setValue("finest")
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue("finest")
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_FULLSTACKTRACE.setValue(true)
+
 
         // For PLOCAL, the name is the database path/name. For MEMORY databases, no path needed
         val dbUri =
@@ -45,6 +61,11 @@ class ContentStore(private val type: String, private val name: String?) {
 
         // Set up database: create with proper admin user if it doesn't exist, or just open if it does
         setupOrOpenDatabase()
+
+        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue("finest")
+        OGlobalConfiguration.LOG_FILE_LEVEL.setValue("finest")
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue("finest")
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_FULLSTACKTRACE.setValue(true)
     }
 
     /**
@@ -54,7 +75,7 @@ class ContentStore(private val type: String, private val name: String?) {
     private fun setupOrOpenDatabase() {
         val adminUser = "admin"
         val adminPass = "admin"
-        val dbType = ODatabaseType.valueOf(type.uppercase(Locale.getDefault()))
+        val dbType = ODatabaseType.valueOf(type.uppercase())
 
         try {
             // Try to open existing database
@@ -78,16 +99,22 @@ class ContentStore(private val type: String, private val name: String?) {
             try {
                 // Create database with explicit admin user using SQL command
                 // This ensures the database is created with known admin/admin credentials
-                orient.execute("CREATE DATABASE $name ${dbType.name} USERS ($adminUser IDENTIFIED BY '$adminPass' ROLE admin)")
+                val query = "CREATE DATABASE $name ${dbType.name} USERS ($adminUser IDENTIFIED BY '$adminPass' ROLE admin)"
+                log.info("Query: $query")
+                orient.execute(query)
                 log.info("Created database '{}' with admin user", name)
-            } catch (createEx: Exception) {
+            }
+            catch (createEx: Exception) {
                 // If SQL create fails, try the API method
-                log.warn("SQL CREATE DATABASE failed, trying API method: {}", createEx.message)
+                log.warn("Query 'CREATE DATABASE ...' failed, trying API method: {}", createEx.message)
                 orient.create(name, dbType)
             }
 
             // Open the newly created database
             db = orient.open(name, adminUser, adminPass)
+
+            orient.execute("CONFIG SET log.console.level='fine'")
+            orient.execute("CONFIG SET log.file.level='fine'")
         }
         activateOnCurrentThread()
         updateSchema()
@@ -129,11 +156,20 @@ class ContentStore(private val type: String, private val name: String?) {
         // see https://github.com/orientechnologies/orientdb/issues/5855
         OLogManager.instance().isWarnEnabled = false
 
+        // Set OrientDB logging to FINEST level via OLogManager
+        OLogManager.instance().setFileLevel("finest")
+        OLogManager.instance().setConsoleLevel("finest")
+
         // If an instance of Orient was previously shutdown all engines are removed.
         // We need to startup Orient again.
         if (Orient.instance().engines.isEmpty())
             Orient.instance().startup()
+
         OLogManager.instance().isWarnEnabled = true
+
+        // Re-apply logging levels after Orient startup
+        OLogManager.instance().setFileLevel("finest")
+        OLogManager.instance().setConsoleLevel("finest")
     }
 
     fun drop() {

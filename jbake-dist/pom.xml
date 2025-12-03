@@ -176,6 +176,10 @@
                                     <extraArgument>-XX:MaxDirectMemorySize=512m</extraArgument>
                                     <extraArgument>-Djna.nosys=true</extraArgument>
 
+                                    <!-- OrientDB DEBUG logging - OrientDB uses Java Util Logging (JUL) -->
+                                    <extraArgument>-Dlog.console.level=FINEST</extraArgument>
+                                    <extraArgument>-Dlog.file.level=FINEST</extraArgument>
+
                                     <!-- Java 17+ compatibility for OrientDB -->
                                     <extraArgument>--add-opens</extraArgument>
                                     <extraArgument>java.base/java.lang=ALL-UNNAMED</extraArgument>
