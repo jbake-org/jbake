@@ -8,6 +8,10 @@ import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
 import org.jbake.util.HtmlUtil
 import org.jbake.util.Logging.logger
+import org.jruby.RubyClass
+import org.jruby.RubyModule
+import org.jruby.RubyObject
+import org.jruby.RubySymbol
 import org.slf4j.Logger
 import java.io.File
 import java.net.URLEncoder
@@ -186,7 +190,10 @@ class Crawler {
         if (config.imgPathUpdate)
             HtmlUtil.fixImageSourceUrls(document, config)
 
-        db.addDocument(document)
+        // Filter out Ruby objects that can't be serialized
+        val filteredDocument: Map<String, Any> = document.filter(::rejectUnparsableTypes)
+
+        db.addDocument(DocumentModel(filteredDocument))
     }
 
     private fun addAdditionalDocumentAttributes(document: DocumentModel, sourceFile: File, sha1: String, uri: String) {

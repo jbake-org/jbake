@@ -386,8 +386,10 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         get() = ::db.isInitialized && db.isActiveOnCurrentThread
 
     override fun addDocument(document: DocumentModel) {
+        // Filter out Ruby objects that can't be stored
+        val filteredDocument = document.filter(::rejectUnparsableTypes)
         val element = db.newElement(Schema.DOCUMENTS)
-        document.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
+        filteredDocument.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
         @Suppress("DEPRECATION")
         element.save<ORecord?>()
     }

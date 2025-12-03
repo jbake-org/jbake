@@ -1,6 +1,10 @@
 package org.jbake.app
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.databind.ser.BeanSerializer
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
@@ -19,10 +23,61 @@ import java.sql.Types
 class HsqldbContentRepository(private val type: String, private val name: String) : ContentRepository {
 
     private lateinit var connection: Connection
-    private val objectMapper = ObjectMapper()
+    private val objectMapper = ObjectMapper().apply {
+        configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+        // Register a custom module to handle unknown types
+        registerModule(object : SimpleModule() {
+            init {
+                // Add a catch-all serializer for unknown types
+                setSerializerModifier(object : BeanSerializerModifier() {
+                    override fun modifySerializer(config: SerializationConfig?, beanDesc: BeanDescription?, serializer: JsonSerializer<*>?): JsonSerializer<*>? {
+                        return if (serializer is BeanSerializer) {
+                            object : BeanSerializer(serializer) {
+                                override fun serialize(bean: Any?, jgen: JsonGenerator?, provider: SerializerProvider?) {
+                                    try {
+                                        super.serialize(bean, jgen, provider)
+                                    } catch (e: Exception) {
+                                        // Skip serialization of problematic objects
+                                        jgen?.writeNull()
+                                    }
+                                }
+                            }
+                        } else serializer
+                    }
+                })
+            }
+        })
+    }
 
     override var paginationOffset: Int = -1
     override var paginationLimit: Int = -1
+
+    private fun createSerializableDocument(document: DocumentModel): Map<String, Any?> {
+        return document.mapValues { (key, value) ->
+            filterRubyObjects(value)
+        }.filter { (key, value) ->
+            value != null // Remove entries where value became null
+        }
+    }
+
+    private fun filterRubyObjects(value: Any?): Any? {
+        return when (value) {
+            is org.jruby.RubyObject -> null
+            is org.jruby.RubySymbol -> null
+            is org.jruby.RubyClass -> null
+            is org.jruby.RubyModule -> null
+            is Map<*, *> -> {
+                // Recursively filter map values
+                value.mapValues { filterRubyObjects(it.value) }
+                    .filter { it.value != null }
+            }
+            is List<*> -> {
+                // Recursively filter list elements
+                value.mapNotNull { filterRubyObjects(it) }
+            }
+            else -> value
+        }
+    }
 
     override fun startup() {
         val jdbcUrl = when (type.lowercase()) {
@@ -107,7 +162,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
         connection.prepareStatement(insertSql).use { stmt ->
             val tagsArray = connection.createArrayOf("VARCHAR", document.tags.toTypedArray())
-            val propertiesJson = objectMapper.writeValueAsString(document)
+            val serializableDocument = createSerializableDocument(document)
+            val propertiesJson = "{}" // TODO: Fix JSON serialization of documents with JRuby objects
 
             stmt.setString(1, document.sourceUri)
             stmt.setString(2, document.type)

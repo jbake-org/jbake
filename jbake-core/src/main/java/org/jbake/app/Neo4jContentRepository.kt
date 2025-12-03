@@ -77,7 +77,9 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         get() = database.isAvailable(1000)
 
     override fun addDocument(document: DocumentModel) {
-        val propertiesJson = gson.toJson(document)
+        // Filter out Ruby objects that can't be serialized
+        val serializableDocument = document.filter(::rejectUnparsableTypes)
+        val propertiesJson = gson.toJson(serializableDocument)
 
         database.beginTx().use { tx ->
             // Delete existing document if present
@@ -347,4 +349,3 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     private val log: Logger by logger()
 }
-
