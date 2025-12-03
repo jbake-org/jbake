@@ -32,20 +32,14 @@ class DocumentsRenderingTool : RenderingTool {
                 renderedCount++
             } catch (e: Exception) {
                 // Log full stacktrace to help debugging in tests
-                log.error("Error rendering document {} (type={})", document.name, document.type, e)
+                log.error("Error rendering document ${document.name} (type=${document.type})", e)
                 errors.add(e.message ?: (e.toString() + " " + e.stackTrace.first().toString()))
             }
         }
 
-        if (!errors.isEmpty()) {
-            val sb = StringBuilder()
-            sb.append("Failed to render documents. Cause(s):")
-            for (error in errors) {
-                sb.append("\n").append(error)
-            }
-            throw RenderingException(sb.toString())
-        }
-        return renderedCount
+        if (errors.isEmpty()) return renderedCount
+
+        throw RenderingException("Failed to render documents. Cause(s):" + errors.joinToString { "\n$it" })
     }
 
     private fun getNextDoc(typedList: DocumentList<DocumentModel>, doc: DocumentModel?): DocumentModel? {
