@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.Orient
 import com.orientechnologies.orient.core.config.OGlobalConfiguration
 import com.orientechnologies.orient.core.db.ODatabaseSession
 import com.orientechnologies.orient.core.db.ODatabaseType
+import com.orientechnologies.orient.core.db.ODatabaseType.MEMORY
 import com.orientechnologies.orient.core.db.OrientDB
 import com.orientechnologies.orient.core.db.OrientDBConfig
 import com.orientechnologies.orient.core.metadata.schema.OClass
@@ -19,7 +20,7 @@ import org.slf4j.Logger
 import java.io.File
 import java.util.*
 
-class OrientDBContentRepository(private val type: String, private val name: String?) : ContentRepository {
+class OrientDBContentRepository(type: String, private val name: String) : ContentRepository {
 
     private lateinit var db: ODatabaseSession
     private lateinit var orient: OrientDB
@@ -29,109 +30,108 @@ class OrientDBContentRepository(private val type: String, private val name: Stri
     /** Items per page limit for pagination, like, posts per page. */
     override var paginationLimit: Int = -1
 
+    private val dbStorageType = ODatabaseType.valueOf(type.uppercase())
+
     override fun startup() {
+        System.setProperty("orientdb.script.pool.enabled", "false")
 
         // OrientDB logging configuration - try ALL possible methods to enable DEBUG level
-        // System properties with orientdb. prefix
-        System.setProperty("orientdb.script.pool.enabled", "false")
-        System.setProperty("orientdb.log.console.level", "debug")
-        System.setProperty("orientdb.log.file.level", "debug")
-
-        // System properties without prefix (backup attempt)
-        System.setProperty("log.console.level", "debug")
-        System.setProperty("log.file.level", "debug")
+        val logLevel = "debug"
+        setLoggingLevelViaSysProps(logLevel)
 
         startupIfEnginesAreMissing()
 
-        // OGlobalConfiguration - set to DEBUG
-        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue("debug")
-        OGlobalConfiguration.LOG_FILE_LEVEL.setValue("debug")
-        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue("debug")
-        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_FULLSTACKTRACE.setValue(true)
+        setLoggingLevelViaApi(logLevel)
 
-
-        // For PLOCAL, the name is the database path/name. For MEMORY databases, no path needed
-        val dbUri =
-            if (type.equals(ODatabaseType.PLOCAL.name, ignoreCase = true))
-                "$type:$name"
-            else "$type:"
-
+        val dbUri = dbStorageType.name + ":" + if (MEMORY == dbStorageType) "" else name
         orient = OrientDB(dbUri, OrientDBConfig.defaultConfig())
 
-        // Set up database: create with proper admin user if it doesn't exist, or just open if it does
-        setupOrOpenDatabase()
+        setupOrOpenDatabase(DbAccessInfo(name, "admin", "admin"))
 
-        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue("finest")
-        OGlobalConfiguration.LOG_FILE_LEVEL.setValue("finest")
-        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue("finest")
-        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_FULLSTACKTRACE.setValue(true)
+        setLoggingLevelViaApi(logLevel)
     }
 
+    data class DbAccessInfo(val dbname: String, val user: String, val pass: String)
+
+
     /**
-     * Sets up the OrientDB database, creating it with proper admin credentials if needed.
-     * This ensures the database is always created with admin/admin credentials.
+     * Set up database: create with proper admin user if it doesn't exist, or just open if it does.
      */
-    private fun setupOrOpenDatabase() {
-        val adminUser = "admin"
-        val adminPass = "admin"
-        val dbType = ODatabaseType.valueOf(type.uppercase())
+    private fun setupOrOpenDatabase(access: DbAccessInfo) {
+        runCatching { orient.drop(access.dbname) }
 
         try {
             // Try to open existing database
-            db = orient.open(name, adminUser, adminPass)
-            log.debug("Opened existing database: {}", name)
-
-            // Configure OrientDB logging via SQL for existing database
-            try {
-                orient.execute("CONFIG SET log.console.level='finest'")
-                orient.execute("CONFIG SET log.file.level='finest'")
-                log.info("OrientDB logging configured to FINEST level via SQL")
-            } catch (configEx: Exception) {
-                log.warn("Failed to configure OrientDB logging via SQL: {}", configEx.message)
-            }
+            db = orient.open(access.dbname, access.user, access.pass)
+            log.debug("Opened existing database: {}", access.dbname)
+            setConfigLevelViaSql_ConfigSet("finest")
         }
         catch (e: Exception) {
             // Database doesn't exist or credentials don't work - recreate it properly
-            log.info("Database '{}' not accessible with admin/admin, creating fresh database", name)
+            log.info("Database '${access.dbname}' not accessible with admin/admin, creating fresh database", e)
 
             try {
                 // Drop existing database if it exists but is inaccessible
-                if (orient.exists(name)) {
-                    log.warn("Dropping existing database '{}' due to authentication failure", name)
-                    orient.drop(name)
+                if (orient.exists(access.dbname)) {
+                    log.warn("Dropping existing database '${access.dbname}' due to authentication failure")
+                    orient.drop(access.dbname)
                 }
             } catch (dropEx: Exception) {
-                log.warn("Failed to drop database: {}", dropEx.message)
+                log.warn("Failed to drop database: ${dropEx.message}")
             }
 
             try {
-                // Create database with explicit admin user using SQL command
-                // This ensures the database is created with known admin/admin credentials
-                val query = "CREATE DATABASE $name ${dbType.name} USERS ($adminUser IDENTIFIED BY '$adminPass' ROLE admin)"
+                // Create database with explicit admin user using SQL command.
+                // This ensures the database is created with known admin/admin credentials.
+                val query = "CREATE DATABASE ${access.dbname} ${dbStorageType.name} USERS (${access.user} IDENTIFIED BY '${access.pass}' ROLE admin)"
                 log.info("Query: $query")
                 orient.execute(query)
-                log.info("Created database '{}' with admin user", name)
+                log.info("Created database '${access.dbname}' with user ${access.user}")
             }
-            catch (createEx: Exception) {
+            catch (e: Exception) {
                 // If SQL create fails, try the API method
-                log.warn("Query 'CREATE DATABASE ...' failed, trying API method: {}", createEx.message)
-                orient.create(name, dbType)
+                log.warn("Query 'CREATE DATABASE ...' failed, trying API method: ${e.message}")
+                orient.create(access.dbname, dbStorageType)
             }
 
             // Open the newly created database
-            db = orient.open(name, adminUser, adminPass)
+            db = orient.open(access.dbname, access.user, access.pass)
 
-            // Configure OrientDB logging via SQL - use 'finest' for maximum verbosity
-            try {
-                orient.execute("CONFIG SET log.console.level='finest'")
-                orient.execute("CONFIG SET log.file.level='finest'")
-                log.info("OrientDB logging configured to FINEST level via SQL")
-            } catch (e: Exception) {
-                log.warn("Failed to configure OrientDB logging via SQL: {}", e.message)
-            }
+            setConfigLevelViaSql_ConfigSet("finest")
         }
         activateOnCurrentThread()
         updateSchema()
+    }
+
+    private fun setLoggingLevelViaSysProps(level: String) {
+        // System properties with orientdb. prefix
+        System.setProperty("orientdb.log.console.level", level)
+        System.setProperty("orientdb.log.file.level", level)
+
+        // System properties without prefix (backup attempt)
+        System.setProperty("log.console.level", level)
+        System.setProperty("log.file.level", level)
+    }
+
+    private fun setLoggingLevelViaApi(level: String) {
+        // OGlobalConfiguration - set to DEBUG
+        OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue(level)
+        OGlobalConfiguration.LOG_FILE_LEVEL.setValue(level)
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue(level)
+        OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_FULLSTACKTRACE.setValue(true)
+    }
+
+
+    /** Won't work, because CONFIG SET is only for the OrientDB console. */
+    private fun setConfigLevelViaSql_ConfigSet(level: String) {
+        try {
+            orient.execute("CONFIG SET log.console.level='$level'")
+            orient.execute("CONFIG SET log.file.level='$level'")
+            log.info("OrientDB logging configured to level '$level' via SQL")
+        }
+        catch (e: Exception) {
+            log.warn("Failed to configure OrientDB log level via SQL: ${e.message}")
+        }
     }
 
     override fun resetPagination() {
@@ -149,14 +149,8 @@ class OrientDBContentRepository(private val type: String, private val name: Stri
     }
 
     override fun close() {
-        if (::db.isInitialized) {
-            activateOnCurrentThread()
-            db.close()
-        }
-
-        if (::orient.isInitialized) {
-            orient.close()
-        }
+        if (::db.isInitialized) { activateOnCurrentThread(); db.close() }
+        if (::orient.isInitialized) orient.close()
         DbUtils.closeDataStore()
     }
 
@@ -195,7 +189,7 @@ class OrientDBContentRepository(private val type: String, private val name: Stri
         if (::db.isInitialized) {
             db.activateOnCurrentThread()
         } else {
-            println("db is null on activate")
+            log.error("lateinit val 'db' is null on activateOnCurrentThread()")
         }
     }
 
@@ -345,7 +339,7 @@ class OrientDBContentRepository(private val type: String, private val name: Stri
         }
 
     private fun createDocType(schema: OSchema) {
-        log.debug("Create document class")
+        log.debug("Creating database class ${Schema.DOCUMENTS}")
 
         val page = schema.createClass(Schema.DOCUMENTS)
         page.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
@@ -363,6 +357,8 @@ class OrientDBContentRepository(private val type: String, private val name: Stri
     }
 
     private fun createSignatureType(schema: OSchema) {
+        log.debug("Creating database class ${Schema.SIGNATURES}")
+
         val signatures = schema.createClass(Schema.SIGNATURES)
         signatures.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
         signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1)
