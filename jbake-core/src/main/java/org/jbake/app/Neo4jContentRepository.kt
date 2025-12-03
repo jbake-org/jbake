@@ -110,7 +110,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                 "rendered" to document.rendered,
                 "title" to document.title,
                 "date" to document.date?.time,
-                "tags" to document.tags.toList(),
+                "tags" to document.tags,
                 "body" to document.getOrDefault(ModelAttributes.BODY, ""),
                 "properties" to propertiesJson
             )).close()
@@ -155,12 +155,11 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     }
 
     override fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
+        val query = "MATCH (d:Document {type: ${'$'}type, status: 'published'}) WHERE ${'$'}tag IN d.tags RETURN d ORDER BY d.date DESC"
         val documents = DocumentList<DocumentModel>()
         for (docType in DocumentTypeRegistry.documentTypes) {
-            documents.addAll(query(
-                "MATCH (d:Document {type: ${'$'}type, status: 'published'}) WHERE ${'$'}tag IN d.tags RETURN d ORDER BY d.date DESC",
-                mapOf("type" to docType, "tag" to tag)
-            ))
+            val elements = query(query, mapOf("type" to docType, "tag" to tag))
+            documents.addAll(elements)
         }
         return documents
     }
@@ -227,21 +226,18 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override val allTags: MutableSet<String>
         get() {
-            val result = mutableSetOf<String>()
+            val allTags = mutableSetOf<String>()
             for (docType in DocumentTypeRegistry.documentTypes) {
                 database.beginTx().use { tx ->
-                    val queryResult = tx.execute(
-                        "MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN d.tags as tags",
-                        mapOf("type" to docType)
-                    )
-                    while (queryResult.hasNext()) {
-                        val tags = queryResult.next()["tags"] as? List<*>
-                        tags?.forEach { tag -> if (tag is String) result.add(tag) }
+                    val rows = tx.execute("MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN d.tags as tags", mapOf("type" to docType))
+                    while (rows.hasNext()) {
+                        val tags = rows.next()["tags"] as? List<*>
+                        tags?.forEach { tag -> if (tag is String) allTags.add(tag) }
                     }
-                    tx.commit()
+                    tx.commit() // TODO: Why commit here? It's a read operation.
                 }
             }
-            return result
+            return allTags
         }
 
     override fun updateAndClearCacheIfNeeded(needed: Boolean, templateDir: File) {
@@ -276,7 +272,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                 val document = DocumentModel()
 
                 // Check if we have a node (d) or individual properties
-                if (record.containsKey("d")) {
+                if (record.containsKey("d")) {  // TODO: What the heck is this logic?
                     val node = record["d"] as org.neo4j.graphdb.Node
                     // Deserialize from properties JSON if available
                     val properties = node.getProperty("properties", null) as? String

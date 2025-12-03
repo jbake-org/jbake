@@ -106,7 +106,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
 
         connection.prepareStatement(insertSql).use { stmt ->
-            val tagsArray = connection.createArrayOf("VARCHAR", document.tags)
+            val tagsArray = connection.createArrayOf("VARCHAR", document.tags.toTypedArray())
             val propertiesJson = gson.toJson(document)
 
             stmt.setString(1, document.sourceUri)
@@ -241,28 +241,15 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
     override val tags: MutableSet<String>
-        get() {
-            val sql = """SELECT "tags" FROM "Documents" WHERE "status"='published' AND "type"='post'"""
-            val docs = query(sql)
-            val result = mutableSetOf<String>()
-            for (document in docs) {
-                result.addAll(document.tags)
-            }
-            return result
-        }
+        get() = query("""SELECT "tags" FROM "Documents" WHERE "status"='published' AND "type"='post'""")
+            .flatMap { it.tags }
+            .toMutableSet()
 
     override val allTags: MutableSet<String>
-        get() {
-            val result = mutableSetOf<String>()
-            for (docType in DocumentTypeRegistry.documentTypes) {
-                val sql = """SELECT "tags" FROM "Documents" WHERE "status"='published' AND "type"=?"""
-                val docs = query(sql, docType)
-                for (document in docs) {
-                    result.addAll(document.tags)
-                }
-            }
-            return result
-        }
+        get() = DocumentTypeRegistry.documentTypes
+            .flatMap { docType -> query("""SELECT "tags" FROM "Documents" WHERE "status"='published' AND "type"=?""", docType) }
+            .flatMap { it.tags }
+            .toMutableSet()
 
     override fun updateAndClearCacheIfNeeded(needed: Boolean, templateDir: File) {
         var clearCache = needed
@@ -319,8 +306,9 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
                         val value = when (metadata.getColumnType(i)) {
                             Types.ARRAY -> {
-                                val array = rs.getArray(i)
-                                array?.let { (it.array as Array<*>).map { it.toString() }.toTypedArray() }
+                                rs.getArray(i) ?.let {
+                                    (it.array as Array<*>).map { item -> item.toString() }.toTypedArray()
+                                }
                             }
                             Types.TIMESTAMP -> {
                                 val ts = rs.getTimestamp(i)
@@ -330,9 +318,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
                             Types.BIGINT, Types.INTEGER -> rs.getLong(i)
                             else -> rs.getObject(i)
                         }
-                        if (value != null) {
+                        if (value != null)
                             document[columnName] = value
-                        }
                     }
 
                     // If properties column exists, use it to fill in any additional fields not in individual columns
@@ -362,6 +349,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
         val currentSignature = runCatching { FileUtil.sha1(templateDir) }.getOrElse { "" }
         val sql = """SELECT "sha1" FROM "Signatures" WHERE "key"='templates'"""
 
+        // TODO: IIUC, this scans the whole Signatures table. Also, could be done with MERGE.
         connection.prepareStatement(sql).use { stmt ->
             stmt.executeQuery().use { rs ->
                 if (rs.next()) {

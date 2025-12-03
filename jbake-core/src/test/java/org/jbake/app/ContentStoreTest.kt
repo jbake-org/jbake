@@ -52,7 +52,7 @@ class ContentStoreTest : StringSpec({
 
         val model = createDefaultDocumentModel()
         model.type = typeWithHyphen
-        model.tags = arrayOf(tagWithHyphenBackslashAndBacktick)
+        model.tags = listOf(tagWithHyphenBackslashAndBacktick)
         model.date = Date()
         model.sourceUri = uri
         model["foo"] = "originalValue"
@@ -81,14 +81,14 @@ class ContentStoreTest : StringSpec({
             db.getDocumentStatus(uri)
 
         documentList4.size.toLong() shouldBe 1
-        documentList4[0]!!.rendered shouldBe false
+        documentList4[0].rendered shouldBe false
 
         val documentCount2: Long = db.getPublishedCount(typeWithHyphen)
         documentCount2 shouldBe 0
 
         val published = DocumentModel()
         published.sourceUri = "test/another-testdocument.adoc"
-        published.tags = arrayOf(tagWithHyphenBackslashAndBacktick)
+        published.tags = listOf(tagWithHyphenBackslashAndBacktick)
         published.type = typeWithHyphen
         published.status = ModelAttributes.Status.PUBLISHED
         published.cached = true
@@ -100,7 +100,7 @@ class ContentStoreTest : StringSpec({
         documentList5.size.toLong() shouldBe 2
         documentList5[0].rendered shouldBe false
         documentList5[0].type shouldBe typeWithHyphen
-        documentList5[0].tags.toList() shouldContain tagWithHyphenBackslashAndBacktick
+        documentList5[0].tags shouldContain tagWithHyphenBackslashAndBacktick
 
         val documentCount3: Long = db.getPublishedCount(typeWithHyphen)
         documentCount3 shouldBe 1
@@ -112,14 +112,14 @@ class ContentStoreTest : StringSpec({
         documentList6.size.toLong() shouldBe 1
         documentList6[0].rendered shouldBe true
         documentList6[0].type shouldBe typeWithHyphen
-        documentList6[0].tags.toList() shouldContain tagWithHyphenBackslashAndBacktick
+        documentList6[0].tags shouldContain tagWithHyphenBackslashAndBacktick
 
         val documentList7: DocumentList<DocumentModel> =
             db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
         documentList7.size.toLong() shouldBe 1
         documentList7[0].rendered shouldBe true
         documentList7[0].type shouldBe typeWithHyphen
-        documentList7[0].tags.toList() shouldContain tagWithHyphenBackslashAndBacktick
+        documentList7[0].tags shouldContain tagWithHyphenBackslashAndBacktick
 
         val documentList8: DocumentList<DocumentModel> =
             db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)

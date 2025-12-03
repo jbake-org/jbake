@@ -196,7 +196,7 @@ abstract class MarkupEngine : ParserEngine {
                 runCatching { content.date = (df.parse(value)) }
                     .onFailure { e -> log.error("Unable to parse date $value with format ${configuration?.dateFormat}", e) }
             }
-            key == TAGS            -> content.tags = (getTags(value))
+            key == TAGS            -> content.tags = getTags(value)
             key == CACHED          -> content.cached = (value.toBoolean())
             isJson(value)    -> content[key] = JSONValue.parse(value)
             else                   -> content[key] = value
@@ -205,8 +205,8 @@ abstract class MarkupEngine : ParserEngine {
 
     private fun sanitize(part: String) = part.trim { it <= ' ' }
 
-    private fun getTags(tagsPart: String): Array<String>
-        = tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+    private fun getTags(tagsPart: String): List<String>
+        = tagsPart.split(",".toRegex()).dropLastWhile { it.isEmpty() }
 
     private fun isJson(part: String)
         = part.trim().let { it.startsWith("{") && it.endsWith("}") }

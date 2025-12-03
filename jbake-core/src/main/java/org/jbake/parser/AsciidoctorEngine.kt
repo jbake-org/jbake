@@ -89,7 +89,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 }
                 keyStr == "jbake-tags" -> {
                     if (value is String)
-                        context.setTags(value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+                        context.setTags(value.split(",".toRegex()).dropLastWhile { it.isEmpty() })
                     else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
                 }
                 else -> documentModel[keyStr] = value

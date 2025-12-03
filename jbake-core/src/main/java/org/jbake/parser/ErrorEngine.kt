@@ -15,7 +15,7 @@ class ErrorEngine @JvmOverloads constructor(private val engineName: String = "un
         documentModel.status = "published"
         documentModel.title = "Rendering engine missing"
         documentModel.date = Date()
-        documentModel.tags = emptyArray<String>()
+        documentModel.tags = emptyList()
     }
 
     override fun processBody(parserContext: ParserContext) {

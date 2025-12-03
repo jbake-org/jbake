@@ -42,10 +42,10 @@ class ParserContext(
     }
 
     // TODO: Possibly nullable
-    val tags: Array<String>
+    val tags: List<String>
         get() = this.documentModel.tags
 
-    fun setTags(tags: Array<String>) {
+    fun setTags(tags: List<String>) {
         this.documentModel.tags = tags
     }
 }
