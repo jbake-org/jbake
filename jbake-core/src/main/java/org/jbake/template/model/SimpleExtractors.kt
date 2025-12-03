@@ -3,6 +3,7 @@ package org.jbake.template.model
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.configuration.PropertyList.DATA_FILE_DOCTYPE
+import org.jbake.template.ModelExtractor
 import org.jbake.template.TypedModelExtractor
 import org.jbake.util.DataFileUtil
 import java.util.*
@@ -31,6 +32,13 @@ class DBExtractor : TypedModelExtractor<ContentStore> {
 /** Extracts published pages from the context. */
 class PublishedPagesExtractor : TypedModelExtractor<DocumentList<*>> {
     override fun extract(context: RenderContext, key: String): DocumentList<*> = context.publishedPages
+}
+
+/** Extracts published posts from the database. TODO: Convert to TypedModelExtractor. */
+class PublishedPostsExtractor : ModelExtractor<DocumentList<*>> {
+    override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
+        return db.getPublishedPosts(model.containsKey("numberOfPages"))
+    }
 }
 
 /** Extracts published posts filtered by tag. */

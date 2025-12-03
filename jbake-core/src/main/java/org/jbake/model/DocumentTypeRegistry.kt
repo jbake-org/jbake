@@ -1,6 +1,6 @@
 package org.jbake.model
 
-import org.jbake.parser.Engines
+import org.jbake.parser.ParserEnginesRegistry
 
 /**
  * Utility class used to determine the list of document types.
@@ -40,7 +40,7 @@ object DocumentTypeRegistry {
         get() {
             // TODO: is this needed?
             // Make sure engines are loaded before to get document types.
-            Engines.recognizedExtensions
+            ParserEnginesRegistry.recognizedExtensions
             return defaultDocTypes.toTypedArray()
         }
 

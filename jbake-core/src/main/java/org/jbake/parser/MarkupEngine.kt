@@ -16,6 +16,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering markup in a source file
  * and exporting the result into the [contents][ParserContext.documentModel] map.
@@ -27,8 +28,6 @@ abstract class MarkupEngine : ParserEngine {
     private var configuration: JBakeConfiguration? = null
 
     /**
-     * Tests if this markup engine can process the document.
-     *
      * @return true if this markup engine has enough context to process this document. false otherwise
      */
     fun validate(context: ParserContext) = true
@@ -46,10 +45,8 @@ abstract class MarkupEngine : ParserEngine {
     open fun processBody(parserContext: ParserContext) {}
 
     /**
-     * Parse given file to extract as much infos as possible
-     *
-     * @param file file to process
-     * @return a map containing all infos. Returning null indicates an error, even if an exception would be better.
+     * Parse given file to extract as many infos as possible.
+     * @return a map containing all infos. null indicates an error. TODO: Exception would be better.
      */
     override fun parse(config: JBakeConfiguration, file: File): DocumentModel? {
         this.configuration = config

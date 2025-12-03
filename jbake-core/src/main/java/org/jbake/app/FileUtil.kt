@@ -1,7 +1,7 @@
 package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.parser.Engines
+import org.jbake.parser.ParserEnginesRegistry
 import org.jbake.template.RenderingException
 import java.io.*
 import java.io.File.separator
@@ -18,7 +18,7 @@ object FileUtil {
         return FileFilter { pathname ->
             // Accept if input is a non-hidden file with registered extension, or if a non-hidden and not-ignored directory.
             !pathname.isHidden() && (pathname.isFile()
-                && Engines.recognizedExtensions
+                && ParserEnginesRegistry.recognizedExtensions
                 .contains(fileExt(pathname))) || (directoryOnlyIfNotIgnored(pathname, config))
         }
     }
@@ -33,7 +33,7 @@ object FileUtil {
             // Accept if input  is a non-hidden file with NOT-registered extension or if a non-hidden and not-ignored directory.
             !file.isHidden()
                 // Extension should not be from registered content extensions
-                && (file.isFile() && !Engines.recognizedExtensions.contains(fileExt(file)))
+                && (file.isFile() && !ParserEnginesRegistry.recognizedExtensions.contains(fileExt(file)))
                 || (directoryOnlyIfNotIgnored(file, config))
         }
     }

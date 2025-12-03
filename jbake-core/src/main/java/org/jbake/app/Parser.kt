@@ -2,7 +2,7 @@ package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.jbake.parser.Engines
+import org.jbake.parser.ParserEnginesRegistry
 import org.slf4j.Logger
 import org.jbake.util.Logging.logger
 import java.io.File
@@ -10,7 +10,7 @@ import java.io.File
 class Parser(private val config: JBakeConfiguration) {
 
     fun processFile(inputFile: File): DocumentModel? {
-        val engine = Engines.get(FileUtil.fileExt(inputFile)) ?: run {
+        val engine = ParserEnginesRegistry.get(FileUtil.fileExt(inputFile)) ?: run {
             log.error("Unable to find suitable markup engine for {}", inputFile)
             return null
         }

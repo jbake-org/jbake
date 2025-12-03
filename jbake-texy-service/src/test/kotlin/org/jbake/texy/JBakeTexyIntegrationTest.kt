@@ -7,7 +7,7 @@ import io.kotest.matchers.string.shouldContain
 import org.jbake.app.Parser
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.parser.Engines
+import org.jbake.parser.ParserEnginesRegistry
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import java.io.File
@@ -38,7 +38,7 @@ class JBakeTexyIntegrationTest : FunSpec({
     }
 
     test("TexyEngine should be registered in JBake") {
-        val engine = Engines.get("texy")
+        val engine = ParserEnginesRegistry.get("texy")
         engine shouldNotBe null
         (engine is org.jbake.parser.TexyEngine) shouldBe true
     }

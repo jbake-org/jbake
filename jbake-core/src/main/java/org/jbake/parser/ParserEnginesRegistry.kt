@@ -1,39 +1,45 @@
 package org.jbake.parser
+import org.jbake.app.configuration.JBakeConfiguration
+import org.jbake.model.DocumentModel
 import org.jbake.util.Logging
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
+import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 import java.util.*
 
+
+interface ParserEngine {
+    /**
+     * Parse a given file and transform to a model used by [MarkdownEngine] to render the file content.
+     *
+     * @return A model representation of the given file. NULLABLE. TBD: Have a NullDocumentModel to avoid nulls?
+     */
+    fun parse(config: JBakeConfiguration, file: File): DocumentModel?
+}
+
+
 /**
- *
  * A singleton class giving access to markup engines. Markup engines are loaded based on classpath.
- * New engines may be registered either at runtime (not recommanded) or by putting a descriptor file
- * on classpath (recommanded).
- *
+ * New engines may be registered either at runtime (not recommended) or by putting a descriptor file on classpath (recommended).
  *
  * The descriptor file must be found in *META-INF* directory and named
- * *org.jbake.parser.MarkupEngines.properties*. The format of the file is easy:
- * `
+ * *org.jbake.parser.MarkupEngines.properties*. The format of the file:
+ * ```
  * org.jbake.parser.RawMarkupEngine=html<br></br>
  * org.jbake.parser.AsciidoctorEngine=ad,adoc,asciidoc<br></br>
  * org.jbake.parser.MarkdownEngine=md<br></br>
-` *
+ * ```
+  * ...where the key is the class of the engine (must extend [MarkupEngine] and have a no-arg constructor)
+ * and the value is a comma-separated list of file extensions that this engine is capable of processing.
  *
- * where the key is the class of the engine (must extend [MarkupEngine] and have a no-arg
- * constructor and the value is a comma-separated list of file extensions that this engine is capable of proceeding.
+ * Markup engines are singletons, so are typically used to initialize the underlying rendering engines.
+ * They **must not** store specific information of a currently processed file (use [the parser context][ParserContext] for that).
  *
- *
- * Markup engines are singletons, so are typically used to initialize the underlying renderning engines. They
- * **must not** store specific information of a currently processed file (use [the parser context][ParserContext]
- * for that).
- *
- * This class loads the engines only if they are found on classpath. If not, the engine is not registered. This allows
- * JBake to support multiple rendering engines without the explicit need to have them on classpath. This is a better
- * fit for embedding.
+ * This class loads and registers the engines only if they are found on classpath.
  */
-class Engines private constructor() {
+class ParserEnginesRegistry private constructor() {
     private val parsers: MutableMap<String, ParserEngine?> = HashMap()
 
     private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {
@@ -47,7 +53,7 @@ class Engines private constructor() {
     }
 
     companion object {
-        private val INSTANCE: Engines = Engines()
+        private val INSTANCE: ParserEnginesRegistry = ParserEnginesRegistry()
 
         init {
             loadEngines()
@@ -73,7 +79,7 @@ class Engines private constructor() {
          */
         private fun tryLoadEngine(engineClassName: String): ParserEngine? {
             try {
-                val engineClass = Class.forName(engineClassName, false, Engines::class.java.getClassLoader()) as Class<out ParserEngine>
+                val engineClass = Class.forName(engineClassName, false, ParserEnginesRegistry::class.java.getClassLoader()) as Class<out ParserEngine>
                 return engineClass.getDeclaredConstructor().newInstance()
             }
             catch (e: Exception) {
@@ -95,7 +101,7 @@ class Engines private constructor() {
          */
         private fun loadEngines() {
             try {
-                val cl = Engines::class.java.getClassLoader()
+                val cl = ParserEnginesRegistry::class.java.getClassLoader()
                 val resources = cl.getResources("META-INF/org.jbake.parser.MarkupEngines.properties")
                 while (resources.hasMoreElements()) {
                     val url = resources.nextElement()
@@ -116,9 +122,8 @@ class Engines private constructor() {
         private fun registerEngine(className: String, vararg extensions: String) {
             val engine = tryLoadEngine(className) ?: return
 
-            for (extension in extensions) {
+            for (extension in extensions)
                 register(extension, engine)
-            }
 
             if (engine is ErrorEngine)
                 log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)

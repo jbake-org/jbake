@@ -1,5 +1,6 @@
 package org.jbake.util
 
+
 /*
   Lazy evaluation of the messages sent to Slf4j.
   Usage:
@@ -9,6 +10,7 @@ package org.jbake.util
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.PrintStream
 
 inline fun Logger.error(msg: () -> String) { if (this.isErrorEnabled) this.error(msg()) }
 inline fun Logger.error(ex: Exception, msg: () -> String) { if (this.isErrorEnabled) this.error(msg(), ex) }
@@ -63,3 +65,14 @@ fun <T : Any> unwrapCompanionClass(ofClass: Class<T>): Class<*> {
         ofClass
     }
 }
+
+object DebugUtil {
+    fun <T : Any?> printMap(map: MutableMap<String, T?>, printStream: PrintStream) {
+        printStream.println()
+        for (entry in map.entries) {
+            printStream.println(entry.key + " :: " + entry.value)
+        }
+        printStream.println()
+    }
+}
+

@@ -7,7 +7,7 @@ import io.kotest.matchers.string.shouldContain
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.parser.Engines
+import org.jbake.parser.ParserEnginesRegistry
 import org.jbake.parser.TexyEngine
 import java.io.File
 import java.io.PrintWriter
@@ -54,13 +54,13 @@ class TexyParserTest : StringSpec({
     }
 
     "Texy engine should be registered" {
-        val engine = Engines.get("texy")
+        val engine = ParserEnginesRegistry.get("texy")
         engine.shouldNotBeNull()
         engine::class.java shouldBe TexyEngine::class.java
     }
 
     "Should recognize .texy file extension" {
-        val extensions = Engines.recognizedExtensions
+        val extensions = ParserEnginesRegistry.recognizedExtensions
         extensions.contains("texy") shouldBe true
     }
 
