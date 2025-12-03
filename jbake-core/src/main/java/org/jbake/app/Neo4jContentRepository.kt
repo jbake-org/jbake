@@ -28,43 +28,28 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override fun startup() {
         val dbPath = when (type.lowercase()) {
-            "memory" -> {
-                // Neo4j embedded doesn't support pure in-memory mode in the same way
-                // Use a temp directory that will be deleted
-                Path.of(System.getProperty("java.io.tmpdir"), "neo4j-$name-${System.currentTimeMillis()}")
-            }
+            "memory" -> Path.of(System.getProperty("java.io.tmpdir"), "neo4j-$name-${System.currentTimeMillis()}")
             "plocal", "local" -> Path.of(name)
             else -> throw IllegalArgumentException("Unknown database type: $type")
         }
 
         managementService = DatabaseManagementServiceBuilder(dbPath).build()
         database = managementService.database("neo4j")
-
-        // Register shutdown hook
-        Runtime.getRuntime().addShutdownHook(Thread {
-            managementService.shutdown()
-        })
-
+        Runtime.getRuntime().addShutdownHook(Thread { managementService.shutdown() })
         updateSchema()
     }
 
     override fun close() {
-        runCatching {
-            managementService.shutdown()
-        }
+        runCatching { managementService.shutdown() }
         DbUtils.closeDataStore()
     }
 
-    override fun shutdown() {
-        // Handled in close()
-    }
+    override fun shutdown() {}
 
-    override fun drop() {
-        database.beginTx().use { tx ->
-            tx.execute("MATCH (n:Document) DETACH DELETE n").close()
-            tx.execute("MATCH (n:Signature) DETACH DELETE n").close()
-            tx.commit()
-        }
+    override fun drop() = database.beginTx().use { tx ->
+        tx.execute("MATCH (n:Document) DETACH DELETE n").close()
+        tx.execute("MATCH (n:Signature) DETACH DELETE n").close()
+        tx.commit()
     }
 
     override fun updateSchema() {
@@ -142,36 +127,18 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         return query("MATCH (d:Document {sourceuri: ${'$'}sourceuri}) RETURN d.sha1 as sha1, d.rendered as rendered", mapOf("sourceuri" to uri))
     }
 
-    override fun getDocumentCount(docType: String): Long {
-        return database.beginTx().use { tx ->
-            val result = tx.execute(
-                "MATCH (d:Document {type: ${'$'}type}) RETURN count(d) as count",
-                mapOf("type" to docType)
-            )
-            val count = if (result.hasNext()) {
-                result.next()["count"] as Long
-            } else {
-                0L
-            }
-            tx.commit()
-            count
-        }
+    override fun getDocumentCount(docType: String): Long = database.beginTx().use { tx ->
+        val result = tx.execute("MATCH (d:Document {type: ${'$'}type}) RETURN count(d) as count", mapOf("type" to docType))
+        val count = if (result.hasNext()) result.next()["count"] as Long else 0L
+        tx.commit()
+        count
     }
 
-    override fun getPublishedCount(docType: String): Long {
-        return database.beginTx().use { tx ->
-            val result = tx.execute(
-                "MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN count(d) as count",
-                mapOf("type" to docType)
-            )
-            val count = if (result.hasNext()) {
-                result.next()["count"] as Long
-            } else {
-                0L
-            }
-            tx.commit()
-            count
-        }
+    override fun getPublishedCount(docType: String): Long = database.beginTx().use { tx ->
+        val result = tx.execute("MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN count(d) as count", mapOf("type" to docType))
+        val count = if (result.hasNext()) result.next()["count"] as Long else 0L
+        tx.commit()
+        count
     }
 
     override val publishedPosts: DocumentList<DocumentModel>
@@ -226,37 +193,22 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     override val unrenderedContent: DocumentList<DocumentModel>
         get() = query("MATCH (d:Document {rendered: false}) RETURN d ORDER BY d.date DESC")
 
-    override fun deleteContent(uri: String) {
-        database.beginTx().use { tx ->
-            tx.execute(
-                "MATCH (d:Document {sourceuri: ${'$'}sourceuri}) DETACH DELETE d",
-                mapOf("sourceuri" to uri)
-            ).close()
-            tx.commit()
-        }
+    override fun deleteContent(uri: String) = database.beginTx().use { tx ->
+        tx.execute("MATCH (d:Document {sourceuri: ${'$'}sourceuri}) DETACH DELETE d", mapOf("sourceuri" to uri)).close()
+        tx.commit()
     }
 
-    override fun markContentAsRendered(document: DocumentModel) {
-        database.beginTx().use { tx ->
-            tx.execute("""
-                MATCH (d:Document {type: ${'$'}type, sourceuri: ${'$'}sourceuri, cached: true, rendered: false})
-                SET d.rendered = true
-            """, mapOf(
-                "type" to document.type,
-                "sourceuri" to document.sourceUri
-            )).close()
-            tx.commit()
-        }
+    override fun markContentAsRendered(document: DocumentModel) = database.beginTx().use { tx ->
+        tx.execute(
+            "MATCH (d:Document {type: ${'$'}type, sourceuri: ${'$'}sourceuri, cached: true, rendered: false}) SET d.rendered = true",
+            mapOf("type" to document.type, "sourceuri" to document.sourceUri)
+        ).close()
+        tx.commit()
     }
 
-    override fun deleteAllByDocType(docType: String) {
-        database.beginTx().use { tx ->
-            tx.execute(
-                "MATCH (d:Document {type: ${'$'}type}) DETACH DELETE d",
-                mapOf("type" to docType)
-            ).close()
-            tx.commit()
-        }
+    override fun deleteAllByDocType(docType: String) = database.beginTx().use { tx ->
+        tx.execute("MATCH (d:Document {type: ${'$'}type}) DETACH DELETE d", mapOf("type" to docType)).close()
+        tx.commit()
     }
 
     override val tags: MutableSet<String>
@@ -394,9 +346,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     }
 
     private fun deleteAllDocumentTypes() {
-        for (docType in DocumentTypes.documentTypes) {
-            runCatching { deleteAllByDocType(docType) }
-        }
+        DocumentTypes.documentTypes.forEach { docType -> runCatching { deleteAllByDocType(docType) } }
     }
 
     private val log: Logger by logger()

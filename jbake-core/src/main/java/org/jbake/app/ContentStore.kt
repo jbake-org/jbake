@@ -6,11 +6,20 @@ import java.io.File
 /**
  * Facade for content storage operations.
  * Delegates to the underlying ContentRepository implementation.
- * Currently uses HSQLDB for better Java 17+ compatibility.
+ * Supports HSQLDB, Neo4j, and OrientDB backends.
  */
 class ContentStore(type: String, name: String) {
 
-    private val repository: ContentRepository = HsqldbContentRepository(type, name)
+    private val repository: ContentRepository = createRepository(type, name)
+
+    private fun createRepository(type: String, name: String): ContentRepository {
+        // Check if name contains database type hint
+        return when {
+            name.contains("-neo4j-") -> Neo4jContentRepository(type, name)
+            name.contains("-orientdb-") -> OrientDBContentRepository(type, name)
+            else -> HsqldbContentRepository(type, name) // Default
+        }
+    }
 
     var paginationOffset: Int
         get() = repository.paginationOffset
