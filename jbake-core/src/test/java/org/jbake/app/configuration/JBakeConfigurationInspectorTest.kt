@@ -34,7 +34,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val e = shouldThrow<JBakeException> { inspector.inspect() }
 
-        e.message shouldBe "Error: Source dir must exist: " + nonExistentFile.absolutePath
+        e.message shouldBe "Source dir must exist: " + nonExistentFile.absolutePath
     }
 
     "shouldThrowExceptionIfSourceDirIsNotReadable" {
@@ -51,7 +51,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val e = shouldThrow<JBakeException> { inspector.inspect() }
 
-        e.message shouldBe "Error: Source dir is not readable: " + nonReadableFile.absolutePath
+        e.message shouldBe "Source dir is not readable: " + nonReadableFile.absolutePath
     }
 
     "shouldThrowExceptionIfTemplateDirDoesNotExist" {
@@ -65,7 +65,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val e = shouldThrow<JBakeException> { inspector.inspect() }
 
-        e.message shouldBe "Error: Required dir cannot be found! Expected to find [template.folder] at: " + expectedDir.absolutePath
+        e.message shouldBe "Required dir cannot be found! Expected to find [template.folder] at: " + expectedDir.absolutePath
     }
 
     "shouldThrowExceptionIfContentDirDoesNotExist" {
@@ -83,7 +83,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val e = shouldThrow<JBakeException> { inspector.inspect() }
 
-        e.message shouldBe "Error: Required dir cannot be found! Expected to find [content.folder] at: " + contentDir.absolutePath
+        e.message shouldBe "Required dir cannot be found! Expected to find [content.folder] at: " + contentDir.absolutePath
     }
 
     "shouldCreateDestinationDirIfNotExists" {
@@ -130,7 +130,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val e = shouldThrow<JBakeException> { inspector.inspect() }
 
-        e.message shouldContain "Error: Destination dir is not writable:"
+        e.message shouldContain "Destination dir is not writable:"
     }
 
     "shouldLogWarningIfAssetDirDoesNotExist" {

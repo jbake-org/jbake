@@ -28,12 +28,12 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     @Throws(JBakeException::class)
     private fun ensureSource() {
-        val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIG_ERROR, "Error: Source dir is not configured.")
+        val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIG_ERROR, "Source dir is not configured.")
         if (!FileUtil.isExistingDirectory(source))
-            throw JBakeException(SystemExit.CONFIG_ERROR, "Error: Source dir must exist: " + source.absolutePath)
+            throw JBakeException(SystemExit.CONFIG_ERROR, "Source dir must exist: " + source.absolutePath)
 
         if (!configuration.sourceDir!!.canRead())
-            throw JBakeException(SystemExit.CONFIG_ERROR, "Error: Source dir is not readable: " + source.absolutePath)
+            throw JBakeException(SystemExit.CONFIG_ERROR, "Source dir is not readable: " + source.absolutePath)
     }
 
     private fun ensureTemplateDir() {
