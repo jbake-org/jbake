@@ -78,13 +78,12 @@ class HsqldbContentRepository(private val type: String, private val name: String
                     "properties" CLOB
                 )
             """)
-            // Create indexes - HSQLDB doesn't support IF NOT EXISTS for indexes
-            // Use runCatching to ignore errors if indexes already exist
-            runCatching { stmt.execute("""CREATE INDEX "idx_sha1" ON "Documents"("sha1")""") }
-            runCatching { stmt.execute("""CREATE INDEX "idx_cached" ON "Documents"("cached")""") }
-            runCatching { stmt.execute("""CREATE INDEX "idx_rendered" ON "Documents"("rendered")""") }
-            runCatching { stmt.execute("""CREATE INDEX "idx_status" ON "Documents"("status")""") }
-            runCatching { stmt.execute("""CREATE INDEX "idx_type" ON "Documents"("type")""") }
+            // Create indexes with IF NOT EXISTS - works with MySQL compatibility mode
+            stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_sha1" ON "Documents"("sha1")""")
+            stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_cached" ON "Documents"("cached")""")
+            stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_rendered" ON "Documents"("rendered")""")
+            stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_status" ON "Documents"("status")""")
+            stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_type" ON "Documents"("type")""")
 
             // Create Signatures table
             stmt.execute("""CREATE TABLE IF NOT EXISTS "Signatures" ("key" VARCHAR(255) PRIMARY KEY, "sha1" VARCHAR(40) NOT NULL)""")
@@ -95,20 +94,16 @@ class HsqldbContentRepository(private val type: String, private val name: String
         get() = !connection.isClosed
 
     override fun addDocument(document: DocumentModel) {
-        // Delete existing document if present, then insert
-        // This is simpler and more reliable than MERGE for debugging
+        // DELETE + INSERT for upsert - MERGE has type inference issues with ARRAY columns
         val deleteSql = """DELETE FROM "Documents" WHERE "sourceuri"=?"""
         connection.prepareStatement(deleteSql).use { stmt ->
             stmt.setString(1, document.sourceUri)
             stmt.executeUpdate()
         }
 
-        // Now insert the document
-        val insertSql = """
-            INSERT INTO "Documents"
+        val insertSql = """ INSERT INTO "Documents"
             ("sourceuri", "type", "status", "sha1", "cached", "rendered", "title", "date", "tags", "body", "properties")
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
 
         connection.prepareStatement(insertSql).use { stmt ->
             val tagsArray = connection.createArrayOf("VARCHAR", document.tags)
@@ -315,36 +310,46 @@ class HsqldbContentRepository(private val type: String, private val name: String
                 while (rs.next()) {
                     val document = DocumentModel()
 
-                    // If properties column exists, use it to populate the full document
+                    // Build document from individual columns to get proper types
+                    for (i in 1..columnCount) {
+                        val columnName = metadata.getColumnName(i).lowercase()  // Convert to lowercase for consistency
+
+                        // Skip properties column - we'll use it to fill in any missing fields
+                        if (columnName == "properties") continue
+
+                        val value = when (metadata.getColumnType(i)) {
+                            Types.ARRAY -> {
+                                val array = rs.getArray(i)
+                                array?.let { (it.array as Array<*>).map { it.toString() }.toTypedArray() }
+                            }
+                            Types.TIMESTAMP -> {
+                                val ts = rs.getTimestamp(i)
+                                ts?.let { java.util.Date(it.time) }
+                            }
+                            Types.BOOLEAN -> rs.getBoolean(i)
+                            Types.BIGINT, Types.INTEGER -> rs.getLong(i)
+                            else -> rs.getObject(i)
+                        }
+                        if (value != null) {
+                            document[columnName] = value
+                        }
+                    }
+
+                    // If properties column exists, use it to fill in any additional fields not in individual columns
                     if ("properties" in columnNames) {
                         val properties = rs.getString("properties")
                         if (properties != null) {
                             @Suppress("UNCHECKED_CAST")
                             val map = gson.fromJson(properties, Map::class.java) as Map<String, Any>
-                            document.putAll(map)
-                        }
-                    } else {
-                        // Build document from individual columns
-                        for (i in 1..columnCount) {
-                            val columnName = metadata.getColumnName(i).lowercase()  // Convert to lowercase for consistency
-                            val value = when (metadata.getColumnType(i)) {
-                                Types.ARRAY -> {
-                                    val array = rs.getArray(i)
-                                    array?.let { (it.array as Array<*>).map { it.toString() }.toTypedArray() }
+                            // Only add properties that aren't already in the document from individual columns
+                            for ((key, value) in map) {
+                                if (key.lowercase() !in document.keys.map { it.lowercase() }) {
+                                    document[key] = value
                                 }
-                                Types.TIMESTAMP -> {
-                                    val ts = rs.getTimestamp(i)
-                                    ts?.let { java.util.Date(it.time) }
-                                }
-                                Types.BOOLEAN -> rs.getBoolean(i)
-                                Types.BIGINT, Types.INTEGER -> rs.getLong(i)
-                                else -> rs.getObject(i)
-                            }
-                            if (value != null) {
-                                document[columnName] = value
                             }
                         }
                     }
+
                     documents.add(document)
                 }
             }
