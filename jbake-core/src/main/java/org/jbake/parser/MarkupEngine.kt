@@ -20,8 +20,6 @@ import java.util.*
 /**
  * Base class for markup engine wrappers. A markup engine is responsible for rendering markup in a source file
  * and exporting the result into the [contents][ParserContext.documentModel] map.
- *
- * This specific engine does nothing, meaning that the body is rendered as raw contents.
  */
 abstract class MarkupEngine : ParserEngine {
 
@@ -34,13 +32,13 @@ abstract class MarkupEngine : ParserEngine {
 
     /**
      * Processes the document header. Usually subclasses will parse the document body and look for
-     * specific header metadata and export it into [contents][ParserContext.getDocumentModel] map.
+     * specific header metadata and export it into [contents][ParserContext.documentModel] map.
      */
     open fun processHeader(context: ParserContext) {}
 
     /**
      * Processes the body of the document. Usually subclasses will parse the document body and render it,
-     * exporting the result using the [ParserContext.setBody] method.
+     * exporting the result using the [ParserContext.body] method.
      */
     open fun processBody(parserContext: ParserContext) {}
 
@@ -66,21 +64,19 @@ abstract class MarkupEngine : ParserEngine {
         sanitizeTags(context)
 
         if (context.type.isEmpty() || context.status.isEmpty()) {
-            // output error
-            log.warn("Parsing skipped (missing type or status value in header meta data) for file {}!", file)
+            log.warn("Parsing skipped - missing type or status value in header meta data for file: ${file.path}")
             return null
         }
 
-        // generate default body
+        // Generate default body.
         processDefaultBody(context)
 
-        // eventually process body using specific engine
-        if (validate(context)) {
-            processBody(context)
-        } else {
-            log.error("Incomplete source file ({}) for markup engine: {}", file, javaClass.getSimpleName())
+        if (!validate(context)) {
+            log.error("Incomplete source file (${file.path}) for markup engine: ${javaClass.simpleName}")
             return null
         }
+        // Eventually process body using specific engine.
+        processBody(context)
 
         // TODO: post parsing plugins to hook in here?
         return context.documentModel
@@ -89,16 +85,16 @@ abstract class MarkupEngine : ParserEngine {
     private fun getFileContent(file: File, encoding: String): MutableList<String> {
         try {
             FileInputStream(file).use { `is` ->
-                log.trace("Read file '{}' with encoding '{}'", file, encoding)
+                log.trace("Read file '$file' with encoding '$encoding'")
                 val lines = IOUtils.readLines(`is`, encoding)
                 if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines[0])) {
-                    log.warn("Removed BOM from file '{}' read with encoding '{}'", file, encoding)
+                    log.warn("Removed BOM from file '$file' read with encoding '$encoding'")
                     lines[0] = lines[0].replace(UTF_8_BOM, "")
                 }
                 return lines
             }
         } catch (e: IOException) {
-            log.error("Error while opening file {}", file, e)
+            log.error("Error while opening file $file", e)
             return mutableListOf()
         }
     }
@@ -119,21 +115,14 @@ abstract class MarkupEngine : ParserEngine {
     }
 
     private fun setModelDefaultsIfNotSetInHeader(context: ParserContext) {
-        if (context.date == null) {
+        if (context.date == null)
             context.date = (Date(context.file.lastModified()))
-        }
 
-        // default status has been set
-        if (context.config.defaultStatus != null && context.status.isEmpty()) {
-            // file hasn't got status so use default
+        if (context.config.defaultStatus != null && context.status.isEmpty())
             context.setDefaultStatus()
-        }
 
-        // default type has been set
-        if (context.config.defaultType != null && context.type.isEmpty()) {
-            // file hasn't got type so use default
+        if (context.config.defaultType != null && context.type.isEmpty())
             context.setDefaultType()
-        }
     }
 
     /**
@@ -144,16 +133,14 @@ abstract class MarkupEngine : ParserEngine {
         var statusFound = false
         var typeFound = false
 
-        if (!headerSeparatorDemarcatesHeader(contents)) {
-            return false
-        }
+        if (!headerSeparatorDemarcatesHeader(contents)) return false
 
         for (line in contents) {
             if (hasHeaderSeparator(line)) { log.trace("Header separator found"); break }
             if (isTypeProperty(line)) { log.trace("Type property found"); typeFound = true }
             if (isStatusProperty(line)) { log.trace("Status property found"); statusFound = true }
             if (!line.isEmpty() && !line.contains("=")) {
-                log.error("Property found without assignment [{}]", line)
+                log.error("Property found without assignment [$line]")
                 headerValid = false
             }
         }
@@ -211,7 +198,7 @@ abstract class MarkupEngine : ParserEngine {
             key == DATE -> {
                 val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
                 runCatching { content.date = (df.parse(value)) }
-                    .onFailure { e -> log.error("Unable to parse date {} with format {}", value, configuration?.dateFormat, e) }
+                    .onFailure { e -> log.error("Unable to parse date $value with format ${configuration?.dateFormat}", e) }
             }
             key == TAGS            -> content.tags = (getTags(value))
             key == CACHED          -> content.cached = (value.toBoolean())
@@ -246,4 +233,5 @@ abstract class MarkupEngine : ParserEngine {
 }
 
 
+/** This specific engine does nothing, meaning that the body is rendered as raw contents. */
 class RawMarkupEngine : MarkupEngine()
