@@ -18,7 +18,6 @@ import org.jbake.model.ModelAttributes
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.io.File
-import java.util.*
 
 class OrientDBContentRepository(type: String, private val name: String) : ContentRepository {
 
@@ -306,28 +305,13 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     override val tags: MutableSet<String>
-        get() {
-            val docs = this.allTagsFromPublishedPosts
-            val result: MutableSet<String> = HashSet<String>()
-            for (document in docs) {
-                val tags = document.tags
-                Collections.addAll(result, *tags)
-            }
-            return result
-        }
+        get() = allTagsFromPublishedPosts.flatMap { it.tags }.toMutableSet()
 
     override val allTags: MutableSet<String>
-        get() {
-            val result: MutableSet<String> = HashSet<String>()
-            for (docType in DocumentTypeRegistry.documentTypes) {
-                val docs = query("SELECT tags FROM Documents WHERE status='published' AND type=?", docType)
-                for (document in docs) {
-                    val tags = document.tags
-                    Collections.addAll(result, *tags)
-                }
-            }
-            return result
-        }
+        get() = DocumentTypeRegistry.documentTypes
+            .flatMap { docType -> query("SELECT tags FROM Documents WHERE status='published' AND type=?", docType) }
+            .flatMap { it.tags }
+            .toMutableSet()
 
     private fun createDocType(schema: OSchema) {
         log.debug("Creating database class ${Schema.DOCUMENTS}")
