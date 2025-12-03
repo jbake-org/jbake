@@ -54,18 +54,18 @@ class ParserTest : StringSpec({
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
 
-        validHTMLFile = File(tempDir, "valid.html").apply { createNewFile() }
+        validHTMLFile = tempDir.resolve("valid.html").apply { createNewFile() }
         var out = PrintWriter(validHTMLFile)
         out.println(validHeader)
         out.println("<p>This is a test.</p>")
         out.close()
 
-        invalidHTMLFile = File(tempDir, "invalid.html").apply { createNewFile() }
+        invalidHTMLFile = tempDir.resolve("invalid.html").apply { createNewFile() }
         out = PrintWriter(invalidHTMLFile)
         out.println(invalidHeader)
         out.close()
 
-        validMarkdownFileWithCustomHeader = File(tempDir, "validMdCustomHeader.md").apply { createNewFile() }
+        validMarkdownFileWithCustomHeader = tempDir.resolve("validMdCustomHeader.md").apply { createNewFile() }
 
         customHeaderSeparator = "---------------------------------------"
         out = PrintWriter(validMarkdownFileWithCustomHeader)
@@ -82,7 +82,7 @@ class ParserTest : StringSpec({
         out.println("* List")
         out.close()
 
-        validMarkdownFileWithDefaultStatus = File(tempDir, "validMdDefaultStatus.md").apply { createNewFile() }
+        validMarkdownFileWithDefaultStatus = tempDir.resolve("validMdDefaultStatus.md").apply { createNewFile() }
 
         out = PrintWriter(validMarkdownFileWithDefaultStatus)
         out.println("title=Custom Header separator")
@@ -97,7 +97,7 @@ class ParserTest : StringSpec({
         out.println("* List")
         out.close()
 
-        validMarkdownFileWithDefaultTypeAndStatus = File(tempDir, "validMdDefaultTypeAndStatus.md").apply { createNewFile() }
+        validMarkdownFileWithDefaultTypeAndStatus = tempDir.resolve("validMdDefaultTypeAndStatus.md").apply { createNewFile() }
 
         out = PrintWriter(validMarkdownFileWithDefaultTypeAndStatus)
         out.println("title=Custom Header separator")
@@ -112,7 +112,7 @@ class ParserTest : StringSpec({
         out.println("* List")
         out.close()
 
-        invalidMarkdownFileWithoutDefaultStatus = File(tempDir, "invalidMdWithoutDefaultStatus.md").apply { createNewFile() }
+        invalidMarkdownFileWithoutDefaultStatus = tempDir.resolve("invalidMdWithoutDefaultStatus.md").apply { createNewFile() }
 
         out = PrintWriter(invalidMarkdownFileWithoutDefaultStatus)
         out.println("title=Custom Header separator")
@@ -127,7 +127,7 @@ class ParserTest : StringSpec({
         out.println("* List")
         out.close()
 
-        invalidMDFile = File(tempDir, "invalidMd.md").apply { createNewFile() }
+        invalidMDFile = tempDir.resolve("invalidMd.md").apply { createNewFile() }
 
         out = PrintWriter(invalidMDFile)
         out.println(invalidHeader)
@@ -140,12 +140,12 @@ class ParserTest : StringSpec({
         out.println("* List")
         out.close()
 
-        invalidExtensionFile = File(tempDir, "invalid.invalid").apply { createNewFile() }
+        invalidExtensionFile = tempDir.resolve("invalid.invalid").apply { createNewFile() }
         out = PrintWriter(invalidExtensionFile)
         out.println("invalid content")
         out.close()
 
-        validHTMLWithJSONFile = File(tempDir, "validHTMLWithJSONFile.html").apply { createNewFile() }
+        validHTMLWithJSONFile = tempDir.resolve("validHTMLWithJSONFile.html").apply { createNewFile() }
         out = PrintWriter(validHTMLWithJSONFile)
         out.println("title=This is a Title = This is a valid Title")
         out.println("status=draft")
@@ -157,7 +157,7 @@ class ParserTest : StringSpec({
         out.println("Sample Body")
         out.close()
 
-        validAsciiDocWithJSONFile = File(tempDir, "validAsciiDocWithJSONFile.ad").apply { createNewFile() }
+        validAsciiDocWithJSONFile = tempDir.resolve("validAsciiDocWithJSONFile.ad").apply { createNewFile() }
         out = PrintWriter(validAsciiDocWithJSONFile)
         out.println("title=This is a Title = This is a valid Title")
         out.println("status=draft")
@@ -172,7 +172,7 @@ class ParserTest : StringSpec({
         out.println("JBake now supports AsciiDoc.")
         out.close()
 
-        validAsciiDocWithADHeaderJSONFile = File(tempDir, "validAsciiDocWithADHeaderJSONFile.ad").apply { createNewFile() }
+        validAsciiDocWithADHeaderJSONFile = tempDir.resolve("validAsciiDocWithADHeaderJSONFile.ad").apply { createNewFile() }
         out = PrintWriter(validAsciiDocWithADHeaderJSONFile)
         out.println("= Hello: AsciiDoc!")
         out.println("Test User <user@test.org>")
@@ -185,7 +185,7 @@ class ParserTest : StringSpec({
         out.println("JBake now supports AsciiDoc.")
         out.close()
 
-        validaAsciidocWithUnsanitizedHeader = File(tempDir, "validAsciidocWithUnsanitizedHeader.adoc").apply { createNewFile() }
+        validaAsciidocWithUnsanitizedHeader = tempDir.resolve("validAsciidocWithUnsanitizedHeader.adoc").apply { createNewFile() }
         out = PrintWriter(validaAsciidocWithUnsanitizedHeader, "UTF-8")
         // Simulating a \uFEFF Byte order Marker in utf-8
         out.print("\uFEFF")

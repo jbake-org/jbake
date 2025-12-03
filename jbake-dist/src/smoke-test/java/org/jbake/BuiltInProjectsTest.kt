@@ -16,16 +16,16 @@ class BuiltInProjectsTest : StringSpec({
 
             val tempDir = createTempDirectory("jbake-smoke-test").toFile()
             try {
-                ///val projectDir = File(tempDir, "project")
+                val projectDir = tempDir.resolve("project")
                 val runner = BinaryRunner(tempDir)
 
                 // Run JBake to initialize the dir - should create project/, templates/ etc.
                 val initProcess = runner.runWithArguments(jbakeExec, "-i", "-t", projectName)
 
                 initProcess.exitValue() shouldBe 0
-                File(tempDir, "jbake.properties").shouldExist()
+                tempDir.resolve("jbake.properties").shouldExist()
 
-                val templateDir = File(tempDir, "templates") //.also { it.mkdir() }
+                val templateDir = tempDir.resolve("templates") //.also { it.mkdir() }
                 File(templateDir, "index.$extension").shouldExist()
                 initProcess.destroy()
 
@@ -41,7 +41,7 @@ class BuiltInProjectsTest : StringSpec({
                     bakeProcess.exitValue() shouldBe 0
                 }
 
-                val outputDir = File(tempDir, "output") //.also { it.mkdir() }
+                val outputDir = tempDir.resolve("output") //.also { it.mkdir() }
                 File(outputDir, "index.html").shouldExist()
                 bakeProcess.destroy()
 

@@ -7,6 +7,7 @@ import io.mockk.mockk
 import org.jbake.TestUtils
 import org.jbake.app.configuration.JBakeConfiguration
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.ServerSocket
@@ -26,7 +27,7 @@ class JettyServerTest : StringSpec({
             delete()
             mkdirs()
         }
-        val out = java.io.File(tempDir, "build/jbake")
+        val out = File(System.getProperty("java.io.tmpdir"), "build/jbake")
         out.mkdirs()
 
         val source = TestUtils.testResourcesAsSourceDir

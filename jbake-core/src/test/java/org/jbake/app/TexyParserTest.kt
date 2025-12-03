@@ -32,7 +32,7 @@ class TexyParserTest : StringSpec({
         val configFile = TestUtils.testResourcesAsSourceDir
         config = ConfigUtil().loadConfig(configFile) as DefaultJBakeConfiguration
 
-        validTexyFile = File(tempDir, "valid.texy").apply { createNewFile() }
+        validTexyFile = tempDir.resolve("valid.texy").apply { createNewFile() }
         var out = PrintWriter(validTexyFile)
         out.println(validHeader)
         out.println()
@@ -41,7 +41,7 @@ class TexyParserTest : StringSpec({
         out.println("This is an //italic// text.")
         out.close()
 
-        invalidTexyFile = File(tempDir, "invalid.texy").apply { createNewFile() }
+        invalidTexyFile = tempDir.resolve("invalid.texy").apply { createNewFile() }
         out = PrintWriter(invalidTexyFile)
         out.println(invalidHeader)
         out.println()

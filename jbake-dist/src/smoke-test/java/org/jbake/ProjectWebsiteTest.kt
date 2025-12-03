@@ -15,7 +15,7 @@ class ProjectWebsiteTest : StringSpec({
     "should bake JBake website" {
         val tempDir = createTempDirectory("jbake-website-test").toFile()
         try {
-            val projectDir = File(tempDir, "project")
+            val projectDir = tempDir.resolve("project")
             val outputDir = File(projectDir, "output")
 
             // Clone JBake website repository

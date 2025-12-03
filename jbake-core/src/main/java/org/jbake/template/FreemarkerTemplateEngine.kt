@@ -7,12 +7,15 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.DataFileUtil
+import org.jbake.util.Logging.logger
 import java.io.IOException
 import java.io.Writer
 import java.util.*
 
 
-/** Renders pages using the [Freemarker](http://freemarker.org/) template engine. */
+/**
+ * Renders pages using the [Freemarker](http://freemarker.org/) template engine.
+ */
 class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
     lateinit var templateCfg: Configuration
 
@@ -26,10 +29,18 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         templateCfg.setOutputEncoding(config.outputEncoding)
         templateCfg.setTimeZone(config.freemarkerTimeZone)
         templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
+
+        // Configure FreeMarker to handle missing map keys gracefully
+        // This makes it so that ${content.author} returns empty string when author key is missing
+        val objectWrapper = DefaultObjectWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
+            .build()
+        templateCfg.setObjectWrapper(objectWrapper)
+        templateCfg.setClassicCompatible(true)
+
         try {
             templateCfg.setDirectoryForTemplateLoading(config.templateDir)
         } catch (e: IOException) {
-            e.printStackTrace()
+            log.warn("Failed to set template directory: ${e.message}", e)
         }
     }
 
@@ -38,11 +49,9 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         try {
             val template = templateCfg.getTemplate(templateName)
             template.process(LazyLoadingModel(templateCfg.objectWrapper, model, db, config), writer)
-        } catch (e: IOException) {
-            throw RenderingException(e)
-        } catch (e: TemplateException) {
-            throw RenderingException(e)
         }
+        catch (e: IOException) { throw RenderingException(e) }
+        catch (e: TemplateException) { throw RenderingException(e) }
     }
 
     /**
@@ -116,8 +125,9 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             }
         }
 
-        override fun isEmpty(): Boolean {
-            return false
-        }
+        override fun isEmpty() = false
     }
+
+
+    private val log by logger()
 }

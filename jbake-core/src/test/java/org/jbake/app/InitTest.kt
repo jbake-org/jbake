@@ -35,7 +35,7 @@ class InitTest : StringSpec({
 
     "initOK" {
         val init = Init(config)
-        val initPath = File(tempDir, "init")
+        val initPath = tempDir.resolve("init")
         initPath.mkdir()
         init.run(initPath, rootPath, "freemarker")
         val testFile = File(initPath, "testfile.txt")
@@ -44,7 +44,7 @@ class InitTest : StringSpec({
 
     "initFailDestinationContainsContent" {
         val init = Init(config)
-        val initPath = File(tempDir, "init")
+        val initPath = tempDir.resolve("init")
         initPath.mkdir()
         val contentDir = File(initPath.path, config.contentDirName ?: "content")
         contentDir.mkdir()
@@ -59,7 +59,7 @@ class InitTest : StringSpec({
 
     "initFailInvalidTemplateType" {
         val init = Init(config)
-        val initPath = File(tempDir, "init")
+        val initPath = tempDir.resolve("init")
         initPath.mkdir()
 
         shouldThrow<Exception> {

@@ -42,7 +42,7 @@ abstract class ContentStoreIntegrationTest {
 
         private fun createDbPath(dbType: DatabaseType): String {
             val timestamp = System.currentTimeMillis() - 1764000000000
-            var dbPath = File(tempDir, "documents-${dbType.storeName}-$timestamp").name
+            var dbPath = tempDir.resolve("documents-${dbType.storeName}-$timestamp").name
 
             if (SystemUtils.IS_OS_WINDOWS)
                 dbPath = dbPath.replace(":", "")
