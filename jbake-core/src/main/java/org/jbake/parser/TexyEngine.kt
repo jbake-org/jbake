@@ -32,12 +32,13 @@ class TexyEngine : MarkupEngine() {
         val readTimeout = (config.get("texy.read.timeout") as? Number)?.toInt() ?: DEFAULT_READ_TIMEOUT
 
         try {
-            log.debug("Processing Texy content using service at: {}", serviceUrl)
+            log.debug("Processing Texy content using service at: $serviceUrl")
             val renderedHtml = renderTexy(parserContext.body, serviceUrl, connectionTimeout, readTimeout)
             parserContext.body = renderedHtml
             log.debug("Successfully rendered Texy content")
-        } catch (e: Exception) {
-            log.error("Error rendering Texy content: {}", e.message, e)
+        }
+        catch (e: Exception) {
+            log.error("Error rendering Texy content: ${e.message}", e)
             // Fallback: keep the original content wrapped in a pre tag to indicate processing failed
             parserContext.body = "<pre>Error rendering Texy content: ${e.message}\n\n${parserContext.body}</pre>"
         }

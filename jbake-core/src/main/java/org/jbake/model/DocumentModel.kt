@@ -21,6 +21,7 @@ class DocumentModel : BaseModel() {
         get() = if (containsKey(ModelAttributes.TYPE)) get(ModelAttributes.TYPE) as String else ""
         set(type) { put(ModelAttributes.TYPE, type) }
 
+    // TODO: Migrate to use List<String>
     var tags: Array<String>
         get() = DbUtils.toStringArray(get(ModelAttributes.TAGS) ?: emptyArray<String>())
         set(tags) { put(ModelAttributes.TAGS, tags) }

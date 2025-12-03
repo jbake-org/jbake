@@ -5,8 +5,9 @@ import org.asciidoctor.Attributes
 import org.asciidoctor.Options
 import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciidoctorJRuby
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.jbake.util.error
+import org.slf4j.Logger
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -84,12 +85,12 @@ class AsciidoctorEngine : MarkupEngine() {
                     val dateFormat: String = context.config.dateFormat!!
                     val df: DateFormat = SimpleDateFormat(dateFormat)
                     runCatching { context.date = (df.parse(value)) }
-                        .onFailure { log.error("Unable to parse revdate. Expected {}", dateFormat, it) }
+                        .onFailure { log.error("Unable to parse revdate. Expected $dateFormat", it) }
                 }
                 keyStr == "jbake-tags" -> {
                     if (value is String)
                         context.setTags(value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
-                    else log.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value))
+                    else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
                 }
                 else -> documentModel[keyStr] = value
             }
