@@ -25,14 +25,10 @@ object DocumentTypeRegistry {
 
     @JvmStatic fun addDocumentType(docType: String) {
         defaultDocTypes.add(docType)
-        notifyListener(docType)
+        notifyListeners(docType)
     }
 
-    private fun notifyListener(docType: String) {
-        for (listener in listeners) {
-            listener.added(docType)
-        }
-    }
+    private fun notifyListeners(docType: String) = listeners.forEach { it.onAdded(docType) }
 
     @JvmStatic fun addListener(listener: DocumentTypeListener) = listeners.add(listener)
 
@@ -49,4 +45,9 @@ object DocumentTypeRegistry {
         }
 
     @JvmStatic fun contains(documentType: String) = defaultDocTypes.contains(documentType)
+}
+
+
+interface DocumentTypeListener {
+    fun onAdded(doctype: String)
 }
