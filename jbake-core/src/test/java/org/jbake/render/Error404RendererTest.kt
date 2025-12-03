@@ -60,10 +60,11 @@ class Error404RendererTest : StringSpec({
         val tool = Error404RenderingTool()
         val error404file = "mock404file.html"
 
+        val tempDir = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         val configuration = mockk<JBakeConfiguration>(relaxed = true)
         every { configuration.renderError404 } returns true
         every { configuration.error404FileName } returns error404file
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns tempDir
         every { configuration.renderEncoding } returns "UTF-8"
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<DelegatingTemplateEngine>(relaxed = true)
@@ -73,16 +74,19 @@ class Error404RendererTest : StringSpec({
 
         result shouldBe 1
         verify(exactly = 1) { renderingEngine.renderDocument(any(), any(), any()) }
+
+        tempDir.deleteRecursively()
     }
 
     "propagatesRenderingException" {
         val tool = Error404RenderingTool()
         val error404file = "mock404file.html"
 
+        val tempDir = java.nio.file.Files.createTempDirectory("jbake-test").toFile()
         val configuration = mockk<JBakeConfiguration>(relaxed = true)
         every { configuration.renderError404 } returns true
         every { configuration.error404FileName } returns error404file
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns tempDir
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<DelegatingTemplateEngine>(relaxed = true)
         every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
@@ -92,6 +96,7 @@ class Error404RendererTest : StringSpec({
         shouldThrow<RenderingException> {
             tool.render(renderer, contentStore, configuration)
         }
+
+        tempDir.deleteRecursively()
     }
 })
-

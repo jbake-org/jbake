@@ -33,7 +33,7 @@ class SeedMojo : AbstractMojo() {
      * Location of the Output Directory.
      */
     @Parameter(property = "jbake.outputDirectory", defaultValue = $$"${project.basedir}/src/main/jbake", required = true)
-    private var outputDirectory: File? = null
+    private lateinit var outputDirectory: File
 
     /**
      * Really force overwrite if output dir exists? defaults to false
@@ -85,9 +85,9 @@ class SeedMojo : AbstractMojo() {
             }
 
             val fileName = stripLeadingPath(ze.getName())
-            val newFile = File(outputDirectory, fileName!!)
+            val newFile = outputDirectory.resolve(fileName!!)
 
-            File(newFile.getParent()).mkdirs()
+            newFile.parentFile?.mkdirs()
 
             val fos = FileOutputStream(newFile)
 

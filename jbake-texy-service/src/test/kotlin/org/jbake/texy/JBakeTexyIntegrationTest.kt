@@ -10,7 +10,6 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.parser.ParserEnginesRegistry
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
-import java.io.File
 import java.nio.file.Files
 
 /**
@@ -51,12 +50,12 @@ class JBakeTexyIntegrationTest : FunSpec({
 
         // Create temporary test directory
         val tempDir = Files.createTempDirectory("jbake-texy-test").toFile()
-        val contentDir = File(tempDir, "content")
+        val contentDir = tempDir.resolve("content")
         contentDir.mkdirs()
 
         try {
             // Create test .texy file
-            val texyFile = File(contentDir, "test.texy")
+            val texyFile = contentDir.resolve("test.texy")
             texyFile.writeText("""
                 title=Test Post
                 status=published
@@ -70,12 +69,15 @@ class JBakeTexyIntegrationTest : FunSpec({
                 This is **bold** and //italic// text.
             """.trimIndent())
 
-            // Create minimal JBake configuration
-            val configFile = File(tempDir, "jbake.properties")
+            // Create JBake config file
+            val configFile = tempDir.resolve("jbake.properties")
             configFile.writeText("""
-                texy.service.url=$serviceUrl
-                texy.connection.timeout=5000
-                texy.read.timeout=10000
+                site.host=http://localhost:8820
+                render.tags=false
+                render.sitemap=false
+                output.extension=.html
+                template.default.file=page.ftl
+                markdown.extensions=HARDWRAPS
             """.trimIndent())
 
             // Load configuration and parse file
@@ -109,12 +111,12 @@ class JBakeTexyIntegrationTest : FunSpec({
     test("JBake should handle Texy service errors gracefully") {
         // Create temporary test directory
         val tempDir = Files.createTempDirectory("jbake-texy-error-test").toFile()
-        val contentDir = File(tempDir, "content")
+        val contentDir = tempDir.resolve("content")
         contentDir.mkdirs()
 
         try {
             // Create test .texy file
-            val texyFile = File(contentDir, "test.texy")
+            val texyFile = contentDir.resolve("test.texy")
             texyFile.writeText("""
                 title=Test Post
                 status=published
@@ -126,7 +128,7 @@ class JBakeTexyIntegrationTest : FunSpec({
             """.trimIndent())
 
             // Create configuration with invalid service URL
-            val configFile = File(tempDir, "jbake.properties")
+            val configFile = tempDir.resolve("jbake.properties")
             configFile.writeText("""
                 texy.service.url=http://invalid-host:9999/texy
                 texy.connection.timeout=1000
@@ -163,12 +165,12 @@ class JBakeTexyIntegrationTest : FunSpec({
         val serviceUrl = "http://$host:$port/texy"
 
         val tempDir = Files.createTempDirectory("jbake-texy-multi-test").toFile()
-        val contentDir = File(tempDir, "content")
+        val contentDir = tempDir.resolve("content")
         contentDir.mkdirs()
 
         try {
             // Create configuration
-            val configFile = File(tempDir, "jbake.properties")
+            val configFile = tempDir.resolve("jbake.properties")
             configFile.writeText("""texy.service.url=$serviceUrl\n""".trimIndent())
 
             val config = ConfigUtil().loadConfig(tempDir) as DefaultJBakeConfiguration
@@ -177,7 +179,7 @@ class JBakeTexyIntegrationTest : FunSpec({
 
             // Process multiple files
             repeat(5) { index ->
-                val texyFile = File(contentDir, "test-$index.texy")
+                val texyFile = contentDir.resolve("test-$index.texy")
                 texyFile.writeText("""
                     title=Test Post $index
                     status=published

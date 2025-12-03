@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.apache.commons.io.FileUtils
-import java.io.File
 import java.nio.charset.Charset
 
 class FreemarkerTemplateEngineRenderingTest : StringSpec({
@@ -39,7 +38,7 @@ class FreemarkerTemplateEngineRenderingTest : StringSpec({
 
         helper.renderer.renderIndexPaging("index.html")
 
-        val outputFile = File(File(helper.destinationDir, "2"), "index.html")
+        val outputFile = helper.destinationDir.resolve("2").resolve("index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
 
         for (string in helper.getExpectedInOutput("index")) {
@@ -57,11 +56,10 @@ class FreemarkerTemplateEngineRenderingTest : StringSpec({
 
         helper.renderer.renderIndexPaging("index.html")
 
-        val paginatedFile = File(helper.destinationDir, "index2.html")
+        val paginatedFile = helper.destinationDir.resolve("index2.html")
         paginatedFile.exists() shouldBe false
 
-        val indexFile = File(helper.destinationDir, "index.html")
+        val indexFile = helper.destinationDir.resolve("index.html")
         indexFile.exists() shouldBe true
     }
 })
-

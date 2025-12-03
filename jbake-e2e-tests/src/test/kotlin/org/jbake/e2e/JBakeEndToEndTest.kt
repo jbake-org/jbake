@@ -125,7 +125,7 @@ class JBakeEndToEndTest {
         val testOutputDir = outputDir.resolve(templateEngine)
         Files.createDirectories(testOutputDir)
 
-        val templatesPath = File(testDataDir, templateDir)
+        val templatesPath = testDataDir.resolve(templateDir)
 
         // Act - Create container with JBake command arguments
         createJBakeContainer(
@@ -164,7 +164,7 @@ class JBakeEndToEndTest {
         val testOutputDir = outputDir.resolve(testName)
         Files.createDirectories(testOutputDir)
 
-        val templatesPath = File(testDataDir, templateDir)
+        val templatesPath = testDataDir.resolve(templateDir)
 
         // Act - Build command arguments
         val jbakeArgs = mutableListOf("-b", "/jbake/content", "/jbake/output", "-t", "/jbake/templates").apply {
@@ -196,7 +196,7 @@ class JBakeEndToEndTest {
         val testOutputDir = outputDir.resolve("content-$templateEngine")
         Files.createDirectories(testOutputDir)
 
-        val templatesPath = File(testDataDir, templateDir)
+        val templatesPath = testDataDir.resolve(templateDir)
 
         // Act
         createJBakeContainer(
@@ -244,7 +244,7 @@ class JBakeEndToEndTest {
     }
 
     private fun verifyIndexPage(outputDir: File) {
-        val indexFile = File(outputDir, "index.html")
+        val indexFile = outputDir.resolve("index.html")
         indexFile.shouldExist()
 
         val content = indexFile.readText()
@@ -253,7 +253,7 @@ class JBakeEndToEndTest {
     }
 
     private fun verifyAboutPage(outputDir: File) {
-        val aboutFile = File(outputDir, "about.html")
+        val aboutFile = outputDir.resolve("about.html")
         aboutFile.shouldExist()
 
         val content = aboutFile.readText()
@@ -262,17 +262,17 @@ class JBakeEndToEndTest {
     }
 
     private fun verifyBlogPosts(outputDir: File) {
-        val blogDir = File(outputDir, "blog/2023")
+        val blogDir = outputDir.resolve("blog/2023")
         blogDir.shouldBeADirectory()
 
-        val firstPost = File(blogDir, "first-post.html")
+        val firstPost = blogDir.resolve("first-post.html")
         firstPost.shouldExist()
 
         val firstPostContent = firstPost.readText()
         firstPostContent shouldContain "My First Post"
         firstPostContent shouldContain "testing"
 
-        val secondPost = File(blogDir, "second-post.html")
+        val secondPost = blogDir.resolve("second-post.html")
         secondPost.shouldExist()
 
         val secondPostContent = secondPost.readText()
@@ -281,7 +281,7 @@ class JBakeEndToEndTest {
     }
 
     private fun verifyContentRendering(outputDir: File, templateEngine: String) {
-        val indexFile = File(outputDir, "index.html")
+        val indexFile = outputDir.resolve("index.html")
         val doc = Jsoup.parse(indexFile, "UTF-8")
 
         // Verify basic HTML structure
@@ -299,4 +299,3 @@ class JBakeEndToEndTest {
         println("Successfully verified content rendering for $templateEngine")
     }
 }
-
