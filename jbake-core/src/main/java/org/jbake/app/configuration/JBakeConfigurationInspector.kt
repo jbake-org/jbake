@@ -4,6 +4,7 @@ import org.jbake.app.FileUtil
 import org.jbake.app.JBakeException
 import org.jbake.app.SystemExit
 import org.jbake.util.Logging.logger
+import org.jbake.util.warn
 import org.slf4j.Logger
 import java.io.File
 
@@ -47,18 +48,15 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     private fun ensureDestination() {
         val destination = configuration.destinationDir
-        if (!destination.exists()) {
-            destination.mkdirs()
-        }
+        if (!destination.exists()) destination.mkdirs()
         if (!destination.canWrite())
             throw JBakeException(SystemExit.CONFIG_ERROR, "Destination dir is not writable: " + destination.absolutePath)
     }
 
     private fun checkAssetDir() {
         val path = configuration.assetDir
-        if (!path.exists()) {
-            log.warn("No asset dir '{}' was found!", path.absolutePath)
-        }
+        if (!path.exists())
+            log.warn { "No asset dir '${path.absolutePath}' was found!" }
     }
 
     private fun checkRequiredDirExists(folderName: String?, path: File) {

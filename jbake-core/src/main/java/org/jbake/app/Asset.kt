@@ -2,8 +2,8 @@ package org.jbake.app
 
 import org.apache.commons.io.FileUtils
 import org.jbake.app.configuration.JBakeConfiguration
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.File
 import java.io.FileFilter
 import java.io.IOException
@@ -33,13 +33,13 @@ class Asset(private val config: JBakeConfiguration) {
     /** Copy one asset file at a time. */
     fun copySingleFile(asset: File) {
         if (asset.isDirectory()) {
-            log.info("Skip copying single asset file [{}]. Is a directory.", asset.path)
+            log.info("Skip copying single asset file [${asset.path}]. Is a directory.")
             return
         }
 
         try {
             val targetFile = config.destinationDir.toPath().resolve(assetSubPath(asset)).toFile()
-            log.info("Copying single asset file to [{}]", targetFile.path)
+            log.info("Copying single asset file to [${targetFile.path}]")
             copyFile(asset, targetFile)
         } catch (io: IOException) {
             log.error("Failed to copy the asset file.", io)
@@ -62,7 +62,7 @@ class Asset(private val config: JBakeConfiguration) {
                 return true
         }
         catch (ioe: IOException) {
-            log.error("Unable to determine the path to asset file {}", fileToValidate.path, ioe)
+            log.error("Unable to determine the path to asset file ${fileToValidate.path}", ioe)
         }
         return false
     }
@@ -112,12 +112,12 @@ class Asset(private val config: JBakeConfiguration) {
     private fun copyFile(asset: File, targetDir: File) {
         try {
             FileUtils.copyFile(asset, targetDir)
-            log.info("Copying [{}]... done!", asset.path)
+            log.info("Copying [${asset.path}]... done!")
         } catch (e: IOException) {
-            log.error("Copying [{}]... failed!", asset.path, e)
+            log.error("Copying [${asset.path}]... failed!", e)
             errors.add(e)
         } catch (e: IllegalArgumentException) {
-            log.error("Copying [{}]... failed!", asset.path, e)
+            log.error("Copying [${asset.path}]... failed!", e)
             errors.add(e)
         }
     }

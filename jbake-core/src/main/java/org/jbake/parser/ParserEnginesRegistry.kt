@@ -3,6 +3,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.util.Logging
 import org.jbake.util.Logging.logger
+import org.jbake.util.warn
 import org.slf4j.Logger
 import java.io.File
 import java.io.IOException
@@ -40,17 +41,16 @@ interface ParserEngine {
  * This class loads and registers the engines only if they are found on classpath.
  */
 class ParserEnginesRegistry private constructor() {
+
     private val parsers: MutableMap<String, ParserEngine?> = HashMap()
 
     private fun registerEngine(fileExtension: String, markupEngine: ParserEngine) {
         val old = parsers.put(fileExtension, markupEngine)
         if (old != null)
-            log.warn("Registered a markup engine for extension [.{}] but another one was already defined: {}", fileExtension, old)
+            log.warn { "Registered a markup engine for extension [.$fileExtension] but another one was already defined: $old" }
     }
 
-    private fun getEngine(fileExtension: String): ParserEngine? {
-        return parsers[fileExtension]
-    }
+    private fun getEngine(fileExtension: String): ParserEngine? = parsers[fileExtension]
 
     companion object {
         private val INSTANCE: ParserEnginesRegistry = ParserEnginesRegistry()
@@ -89,7 +89,7 @@ class ParserEnginesRegistry private constructor() {
                     is IllegalAccessException,
                     is InstantiationException -> return ErrorEngine(engineClassName)
                     is NoSuchMethodException,
-                    is InvocationTargetException -> { log.error("unable to instantiate ParserEngine {}", engineClassName) }
+                    is InvocationTargetException -> { log.error("unable to instantiate ParserEngine $engineClassName") }
                 }
                 return null
             }
@@ -114,9 +114,8 @@ class ParserEnginesRegistry private constructor() {
                         registerEngine(className, *extensions)
                     }
                 }
-            } catch (e: IOException) {
-                log.error("Error loading Engines", e)
             }
+            catch (e: IOException) { log.error("Error loading Engines: ${e.message}", e) }
         }
 
         private fun registerEngine(className: String, vararg extensions: String) {
@@ -126,7 +125,7 @@ class ParserEnginesRegistry private constructor() {
                 register(extension, engine)
 
             if (engine is ErrorEngine)
-                log.warn("Unable to load a suitable rendering engine for extensions {}", extensions as Any)
+                log.warn { "Unable to load a suitable rendering engine for extensions $extensions" }
         }
 
         private val log: Logger by Logging.logger()

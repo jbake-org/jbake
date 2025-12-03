@@ -46,9 +46,9 @@ class MarkdownEngine : MarkupEngine() {
             val extField = PegdownExtensions::class.java.getDeclaredField(name)
             extension = extField.getInt(null)
         } catch (e: NoSuchFieldException) {
-            log.debug("Undeclared extension field '{}', fallback to NONE", name)
+            log.debug("Undeclared extension field '$name', fallback to NONE")
         } catch (e: IllegalAccessException) {
-            log.debug("Undeclared extension field '{}', fallback to NONE", name)
+            log.debug("Undeclared extension field '$name', fallback to NONE")
         }
         return extension
     }

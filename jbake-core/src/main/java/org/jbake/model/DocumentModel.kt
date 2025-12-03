@@ -22,8 +22,8 @@ class DocumentModel : BaseModel() {
         set(type) { put(ModelAttributes.TYPE, type) }
 
     // TODO: Migrate to use List<String>
-    var tags: Array<String>
-        get() = DbUtils.toStringArray(get(ModelAttributes.TAGS) ?: emptyArray<String>())
+    var tags: List<String>
+        get() = DbUtils.toStringList(get(ModelAttributes.TAGS) ?: emptyList<String>())
         set(tags) { put(ModelAttributes.TAGS, tags) }
 
     var sha1: String?

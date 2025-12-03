@@ -10,8 +10,8 @@ import org.eclipse.jetty.server.handler.ResourceHandler
 import org.jbake.app.JBakeException
 import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.Closeable
 import java.io.IOException
 
@@ -59,7 +59,7 @@ class JettyServer : Closeable {
             handlers.handlers = arrayOf<Handler>(contextHandler, DefaultHandler())
             server!!.handler = handlers
 
-            log.info("Serving out contents of: [{}] on http://{}:{}{}", resourceBase, hostname, port, contextHandler.contextPath)
+            log.info("Serving out contents of: [$resourceBase] on http://$hostname:$port${contextHandler.contextPath}")
             log.info("(To stop server hit CTRL-C)")
 
             server!!.start()

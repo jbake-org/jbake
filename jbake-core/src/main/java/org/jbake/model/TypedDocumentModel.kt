@@ -25,10 +25,10 @@ class TypedDocumentModel : TypedBaseModel() {
         get() = get(ModelAttributes.TYPE) as? String ?: ""
         set(value) { set(ModelAttributes.TYPE, value) }
 
-    var tags: Array<String>
+    var tags: List<String>
         get() {
-            val entry = get(ModelAttributes.TAGS) ?: return emptyArray()
-            return DbUtils.toStringArray(entry)
+            val entry = get(ModelAttributes.TAGS) ?: return emptyList()
+            return DbUtils.toStringList(entry)
         }
         set(value) { set(ModelAttributes.TAGS, value) }
 

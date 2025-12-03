@@ -43,13 +43,12 @@ object DbUtils {
 
     /**
      * Converts a DB list into a String array. TODO: Quite fragile, check how it is used.
-     * @return input entry as String[]
      */
-    fun toStringArray(entry: Any): Array<String> = when (entry) {
-        is Array<*> -> entry as Array<String>
-        is List<*> -> (entry as List<String>).toTypedArray()
+    fun toStringList(entry: Any): List<String> = when (entry) {
+        is Array<*> -> (entry as Array<String>).toList()
+        is List<*> -> (entry as List<String>)
         //is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
         //is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray() // TODO: OrientDB specific
-        else -> arrayOf()
+        else -> listOf()
     }
 }

@@ -45,10 +45,10 @@ class Renderer {
                 val legacyModel = TemplateModel.fromContext(context)
                 renderingEngine.renderDocument(legacyModel, templateName, out)
             }
-            log.info("Rendering [{}]... done!", outputFile)
+            log.info("Rendering done: $outputFile")
         } catch (e: Exception) {
-            log.error("Rendering [{}]... failed!", outputFile, e)
-            throw Exception("Failed to render file " + outputFile.absolutePath + ". Cause: " + e.message, e)
+            log.error("Rendering failed: $outputFile - ${e.message}", e)
+            throw Exception("Failed to render file ${outputFile.absolutePath}: ${e.message}", e)
         }
     }
 

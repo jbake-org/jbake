@@ -4,6 +4,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.jbake.util.warn
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
@@ -27,11 +28,11 @@ class YamlEngine : MarkupEngine() {
                         val map = result as? Map<String, Any> ?: emptyMap()
                         model.putAll(map)
                     }
-                    else -> log.warn("Unexpected result [{}] while parsing YAML file {}", result.javaClass, file)
+                    else -> log.warn { "Unexpected result [${result.javaClass}] while parsing YAML file $file" }
                 }
             }
         } catch (e: IOException) {
-            log.error("Error while parsing YAML file {}", file, e)
+            log.error("Error while parsing YAML file $file", e)
         }
         return model
     }
