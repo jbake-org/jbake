@@ -54,21 +54,9 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override fun updateSchema() {
         database.beginTx().use { tx ->
-            tx.execute("""
-                CREATE CONSTRAINT document_sourceuri IF NOT EXISTS
-                FOR (d:Document) REQUIRE d.sourceuri IS UNIQUE
-            """).close()
-
-            tx.execute("""
-                CREATE INDEX document_type IF NOT EXISTS
-                FOR (d:Document) ON (d.type)
-            """).close()
-
-            tx.execute("""
-                CREATE INDEX document_status IF NOT EXISTS
-                FOR (d:Document) ON (d.status)
-            """).close()
-
+            tx.execute(""" CREATE CONSTRAINT document_sourceuri IF NOT EXISTS FOR (d:Document) REQUIRE d.sourceuri IS UNIQUE """).close()
+            tx.execute(""" CREATE INDEX document_type   IF NOT EXISTS         FOR (d:Document) ON (d.type) """).close()
+            tx.execute(""" CREATE INDEX document_status IF NOT EXISTS         FOR (d:Document) ON (d.status) """).close()
             tx.commit()
         }
     }
@@ -77,45 +65,41 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         get() = database.isAvailable(1000)
 
     override fun addDocument(document: DocumentModel) {
-        // Filter out Ruby objects that can't be serialized
-        val serializableDocument = document.filterNot { (key, value) -> rejectUnparsableTypes(key, value) }
-        val propertiesJson = gson.toJson(serializableDocument)
+        // Ruby objects already converted by AsciidoctorEngine
+        val propertiesJson = gson.toJson(document)
 
         database.beginTx().use { tx ->
             // Delete existing document if present
-            tx.execute("""
-                MATCH (d:Document {sourceuri: ${'$'}sourceuri})
-                DETACH DELETE d
-            """, mapOf("sourceuri" to document.sourceUri)).close()
+            tx.execute(""" MATCH (d:Document {sourceuri: ${'$'}sourceuri}) DETACH DELETE d """, mapOf("sourceuri" to document.sourceUri)).close()
 
             // Create new document
             tx.execute("""
-                CREATE (d:Document {
-                    sourceuri: ${'$'}sourceuri,
-                    type: ${'$'}type,
-                    status: ${'$'}status,
-                    sha1: ${'$'}sha1,
-                    cached: ${'$'}cached,
-                    rendered: ${'$'}rendered,
-                    title: ${'$'}title,
-                    date: ${'$'}date,
-                    tags: ${'$'}tags,
-                    body: ${'$'}body,
-                    properties: ${'$'}properties
-                })
-            """, mapOf(
-                "sourceuri" to document.sourceUri,
-                "type" to document.type,
-                "status" to document.status,
-                "sha1" to document.sha1,
-                "cached" to (document.cached ?: false),
-                "rendered" to document.rendered,
-                "title" to document.title,
-                "date" to document.date?.time,
-                "tags" to document.tags,
-                "body" to document.getOrDefault(ModelAttributes.BODY, ""),
-                "properties" to propertiesJson
-            )).close()
+                    CREATE (d:Document {
+                        sourceuri: ${'$'}sourceuri,
+                        type: ${'$'}type,
+                        status: ${'$'}status,
+                        sha1: ${'$'}sha1,
+                        cached: ${'$'}cached,
+                        rendered: ${'$'}rendered,
+                        title: ${'$'}title,
+                        date: ${'$'}date,
+                        tags: ${'$'}tags,
+                        body: ${'$'}body,
+                        properties: ${'$'}properties
+                    }) """,
+                mapOf(
+                    "sourceuri" to document.sourceUri,
+                    "type" to document.type,
+                    "status" to document.status,
+                    "sha1" to document.sha1,
+                    "cached" to (document.cached ?: false),
+                    "rendered" to document.rendered,
+                    "title" to document.title,
+                    "date" to document.date?.time,
+                    "tags" to document.tags,
+                    "body" to document.getOrDefault(ModelAttributes.BODY, ""),
+                    "properties" to propertiesJson
+                )).close()
 
             tx.commit()
         }
@@ -202,8 +186,10 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     override fun markContentAsRendered(document: DocumentModel) = database.beginTx().use { tx ->
         tx.execute(
             "MATCH (d:Document {type: ${'$'}type, sourceuri: ${'$'}sourceuri, cached: true, rendered: false}) SET d.rendered = true",
-            mapOf("type" to document.type, "sourceuri" to document.sourceUri)
-        ).close()
+            mapOf(
+                "type" to document.type,
+                "sourceuri" to document.sourceUri
+            )).close()
         tx.commit()
     }
 
@@ -340,12 +326,4 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     }
 
     private val log: Logger by logger()
-
-    private fun rejectUnparsableTypes(key: String, value: Any?): Boolean = when (value) {
-        is org.jruby.RubyObject -> true
-        is org.jruby.RubySymbol -> true
-        is org.jruby.RubyClass -> true
-        is org.jruby.RubyModule -> true
-        else -> false
-    }
 }

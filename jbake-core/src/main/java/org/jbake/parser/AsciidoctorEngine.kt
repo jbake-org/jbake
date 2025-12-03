@@ -27,6 +27,34 @@ class AsciidoctorEngine : MarkupEngine() {
     private var gemPath: String? = null
     private var requires: List<String>? = null
 
+    /**
+     * Convert Ruby objects from Asciidoctor to Java types.
+     * This prevents serialization issues when storing documents.
+     */
+    private fun convertRubyToJava(value: Any?): Any? {
+        if (value == null) return null
+
+        // For Ruby objects, convert to string to avoid serialization issues
+        val className = value::class.java.name
+        if (className.startsWith("org.jruby.Ruby")) {
+            // Skip certain types that can't be meaningfully converted
+            if (className.contains("Symbol") ||
+                className.contains("Class") ||
+                className.contains("Module")) {
+                return null
+            }
+            // Convert other Ruby objects to strings
+            return runCatching { value.toString() }.getOrNull()
+        }
+
+        // Handle Java collections that might contain Ruby objects
+        return when (value) {
+            is Map<*, *> -> value.mapValues { convertRubyToJava(it.value) }.filter { it.value != null }
+            is List<*> -> value.mapNotNull { convertRubyToJava(it) }
+            else -> value
+        }
+    }
+
     private fun getEngine(options: Options): Asciidoctor {
         engine?.let { return it }
 
@@ -77,22 +105,32 @@ class AsciidoctorEngine : MarkupEngine() {
             when {
                 keyStr.startsWith(JBAKE_PREFIX) -> {
                     val pKey = keyStr.substring(6)
-                    if (value is String)
-                        storeHeaderValue(pKey, value, documentModel)
-                    else documentModel[pKey] = value
+                    val convertedValue = convertRubyToJava(value)
+                    if (convertedValue is String)
+                        storeHeaderValue(pKey, convertedValue, documentModel)
+                    else if (convertedValue != null)
+                        documentModel[pKey] = convertedValue
                 }
-                keyStr == REVDATE_KEY && value is String -> {
-                    val dateFormat: String = context.config.dateFormat!!
-                    val df: DateFormat = SimpleDateFormat(dateFormat)
-                    runCatching { context.date = (df.parse(value)) }
-                        .onFailure { log.error("Unable to parse revdate. Expected $dateFormat", it) }
+                keyStr == REVDATE_KEY -> {
+                    val convertedValue = convertRubyToJava(value)
+                    if (convertedValue is String) {
+                        val dateFormat: String = context.config.dateFormat!!
+                        val df: DateFormat = SimpleDateFormat(dateFormat)
+                        runCatching { context.date = (df.parse(convertedValue)) }
+                            .onFailure { log.error("Unable to parse revdate. Expected $dateFormat", it) }
+                    }
                 }
                 keyStr == "jbake-tags" -> {
-                    if (value is String)
-                        context.setTags(value.split(",".toRegex()).dropLastWhile { it.isEmpty() })
+                    val convertedValue = convertRubyToJava(value)
+                    if (convertedValue is String)
+                        context.setTags(convertedValue.split(",".toRegex()).dropLastWhile { it.isEmpty() })
                     else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
                 }
-                else -> documentModel[keyStr] = value
+                else -> {
+                    val convertedValue = convertRubyToJava(value)
+                    if (convertedValue != null)
+                        documentModel[keyStr] = convertedValue
+                }
             }
         }
     }

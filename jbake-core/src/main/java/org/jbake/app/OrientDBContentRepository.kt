@@ -386,10 +386,9 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         get() = ::db.isInitialized && db.isActiveOnCurrentThread
 
     override fun addDocument(document: DocumentModel) {
-        // Filter out Ruby objects that can't be stored
-        val filteredDocument = document.filterNot { (key, value) -> rejectUnparsableTypes(key, value) }
+        // Ruby objects already converted by AsciidoctorEngine
         val element = db.newElement(Schema.DOCUMENTS)
-        filteredDocument.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
+        document.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
         @Suppress("DEPRECATION")
         element.save<ORecord?>()
     }
@@ -400,12 +399,4 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     }
 
     private val log: Logger by logger()
-
-    private fun rejectUnparsableTypes(key: String, value: Any?): Boolean = when (value) {
-        is org.jruby.RubyObject -> true
-        is org.jruby.RubySymbol -> true
-        is org.jruby.RubyClass -> true
-        is org.jruby.RubyModule -> true
-        else -> false
-    }
 }

@@ -52,32 +52,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
     override var paginationOffset: Int = -1
     override var paginationLimit: Int = -1
 
-    private fun createSerializableDocument(document: DocumentModel): Map<String, Any?> {
-        return document.mapValues { (key, value) ->
-            filterRubyObjects(value)
-        }.filter { (key, value) ->
-            value != null // Remove entries where value became null
-        }
-    }
 
-    private fun filterRubyObjects(value: Any?): Any? {
-        return when (value) {
-            is org.jruby.RubyObject -> null
-            is org.jruby.RubySymbol -> null
-            is org.jruby.RubyClass -> null
-            is org.jruby.RubyModule -> null
-            is Map<*, *> -> {
-                // Recursively filter map values
-                value.mapValues { filterRubyObjects(it.value) }
-                    .filter { it.value != null }
-            }
-            is List<*> -> {
-                // Recursively filter list elements
-                value.mapNotNull { filterRubyObjects(it) }
-            }
-            else -> value
-        }
-    }
 
     override fun startup() {
         val jdbcUrl = when (type.lowercase()) {
@@ -162,8 +137,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
         connection.prepareStatement(insertSql).use { stmt ->
             val tagsArray = connection.createArrayOf("VARCHAR", document.tags.toTypedArray())
-            val serializableDocument = createSerializableDocument(document)
-            val propertiesJson = objectMapper.writeValueAsString(serializableDocument)
+            // Ruby objects already converted by AsciidoctorEngine
+            val propertiesJson = objectMapper.writeValueAsString(document)
 
             stmt.setString(1, document.sourceUri)
             stmt.setString(2, document.type)
