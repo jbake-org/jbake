@@ -105,12 +105,8 @@ abstract class MarkupEngine : ParserEngine {
 
     private fun sanitizeTags(context: ParserContext) {
         val tags = context.tags
-        for (i in tags.indices) {
-            tags[i] = sanitize(tags[i])
-            if (context.config.sanitizeTag) {
-                tags[i] = tags[i].replace(" ", "-")
-            }
-        }
+            .map { sanitize(it) }
+            .let { if (context.config.sanitizeTag) it.map { it.replace(" ", "-")  } else it }
         context.setTags(tags)
     }
 
