@@ -85,9 +85,9 @@ class CrawlerTest : StringSpec({
         authorsFileContents.isEmpty().shouldBeFalse()
         val authorsList = authorsFileContents["authors"]
         authorsList.shouldNotBeInstanceOf<OTrackedMap<*>>()
-        authorsList.shouldBeInstanceOf<HashMap<*, *>>()
+        authorsList.shouldBeInstanceOf<Map<*, *>>()
         @Suppress("UNCHECKED_CAST")
-        val authors = authorsList as HashMap<String, MutableMap<String, Any>>
+        val authors = authorsList as Map<String, MutableMap<String, Any>>
         authors["Joe Bloggs"]!!["last_name"] shouldBe "Bloggs"
     }
 

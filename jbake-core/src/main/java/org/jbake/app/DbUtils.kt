@@ -23,7 +23,7 @@ object DbUtils {
 
     @JvmStatic
     fun createDataStore(configuration: JBakeConfiguration): ContentStore {
-        return contentStore ?: ContentStore(configuration.databaseStore, configuration.databasePath)
+        return contentStore ?: ContentStore(configuration.databaseStore, configuration.databasePath ?: "jbake")
             .also { contentStore = it }
     }
 

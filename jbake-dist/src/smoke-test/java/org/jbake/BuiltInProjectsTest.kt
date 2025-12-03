@@ -58,8 +58,3 @@ class BuiltInProjectsTest : StringSpec({
     testTemplate("groovy", "gsp")
     testTemplate("groovy-mte", "tpl")
 })
-
-class NoStackTraceException(message: String) : RuntimeException(message) {
-    // Overriding this prevents the JVM from gathering the stack trace information, i.e. improving performance when exceptions are used for control flow.
-    override fun fillInStackTrace(): Throwable = this
-}

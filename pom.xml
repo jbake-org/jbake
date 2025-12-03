@@ -88,6 +88,8 @@
         <version.jgit>7.4.0.202509020913-r</version.jgit>
         <version.logback>1.5.21</version.logback>
         <version.orientdb>3.2.46</version.orientdb>
+        <version.hsqldb>2.7.4</version.hsqldb>
+        <version.gson>2.11.0</version.gson>
         <version.pebble>4.0.0</version.pebble>
         <version.slf4j>2.0.17</version.slf4j>
         <version.snakeyaml>2.5</version.snakeyaml>
@@ -130,6 +132,8 @@
             <dependency><groupId>org.jcommander</groupId><artifactId>jcommander</artifactId><version>${version.jcommander}</version></dependency>
             <dependency><groupId>com.googlecode.json-simple</groupId><artifactId>json-simple</artifactId><version>${version.json.simple}</version></dependency>
             <dependency><groupId>com.orientechnologies</groupId><artifactId>orientdb-core</artifactId><version>${version.orientdb}</version></dependency>
+            <dependency><groupId>org.hsqldb</groupId><artifactId>hsqldb</artifactId><version>${version.hsqldb}</version></dependency>
+            <dependency><groupId>com.google.code.gson</groupId><artifactId>gson</artifactId><version>${version.gson}</version></dependency>
             <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark-profile-pegdown</artifactId><version>${version.flexmark}</version></dependency>
             <dependency><groupId>com.vladsch.flexmark</groupId><artifactId>flexmark</artifactId><version>${version.flexmark}</version></dependency>
             <dependency><groupId>com.github.ben-manes.caffeine</groupId><artifactId>caffeine</artifactId><version>${version.caffeine}</version></dependency>
