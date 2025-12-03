@@ -1,6 +1,5 @@
 package org.jbake.app
 
-import com.orientechnologies.orient.core.db.record.OTrackedList
 import com.orientechnologies.orient.core.sql.executor.OResult
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
@@ -49,8 +48,8 @@ object DbUtils {
     fun toStringArray(entry: Any): Array<String> = when (entry) {
         is Array<*> -> entry as Array<String>
         is List<*> -> (entry as List<String>).toTypedArray()
-        is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
-        is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray() // TODO: OrientDB specific
+        //is ArrayList<*> -> (entry as ArrayList<String>).toTypedArray()
+        //is OTrackedList<*> -> (entry as OTrackedList<String>).toTypedArray() // TODO: OrientDB specific
         else -> arrayOf()
     }
 }

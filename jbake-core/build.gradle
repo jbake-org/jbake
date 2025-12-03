@@ -34,6 +34,7 @@ dependencies {
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") { exclude group: "junit", module: "junit" }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
     implementation "org.hsqldb:hsqldb:$hsqldbVersion"
+    implementation "org.neo4j:neo4j:$neo4jVersion"
     implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.jsoup:jsoup:$jsoupVersion"
     compileOnly "org.yaml:snakeyaml:$snakeYamlVersion"
