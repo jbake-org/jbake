@@ -265,7 +265,7 @@ class Renderer {
             try {
                 val ext = config.outputExtension ?: ""
                 val path = config.destinationDir.resolve(outputTagFile).resolve(tag + ext)
-                val map = buildSimpleModel(ModelAttributes.TAG).apply {
+                val map = buildSimpleModel(ModelAttributes.TAGS_CURRENT_TAG).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
                 val model = TemplateModel().apply {
@@ -277,7 +277,7 @@ class Renderer {
                     this.put("jbake_config", config)
                 }
 
-                val renderConfig = ModelRenderingConfig(path, ModelAttributes.TAG, model, findTemplateName(ModelAttributes.TAG))
+                val renderConfig = ModelRenderingConfig(path, ModelAttributes.TAGS_CURRENT_TAG, model, findTemplateName(ModelAttributes.TAGS_CURRENT_TAG))
                 render(renderConfig)
 
                 renderedCount++
@@ -290,7 +290,7 @@ class Renderer {
                 // Add an index file at root directory of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
                 val path = config.destinationDir.resolve(outputTagFile).resolve("index$ext")
-                val map = buildSimpleModel(ModelAttributes.TAGS).apply {
+                val map = buildSimpleModel(ModelAttributes.DOC_TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
                 val model = TemplateModel().apply {

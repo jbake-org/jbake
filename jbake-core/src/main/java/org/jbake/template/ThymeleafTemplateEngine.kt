@@ -101,8 +101,8 @@ class ThymeleafTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Ab
 
                     override fun adapt(key: String, extractedValue: Any): LazyContextVariable<*> {
                         return when (key) {
-                            ModelAttributes.ALLTAGS -> object : LazyContextVariable<MutableSet<*>>() { override fun loadValue() = extractedValue as MutableSet<*>? }
-                            ModelAttributes.PUBLISHED_DATE -> object : LazyContextVariable<Date>() { override fun loadValue() = extractedValue as Date? }
+                            ModelAttributes.TAGS_ALL -> object : LazyContextVariable<MutableSet<*>>() { override fun loadValue() = extractedValue as MutableSet<*>? }
+                            ModelAttributes.GLOB_PUBLISHING_DATE_FORMATTED -> object : LazyContextVariable<Date>() { override fun loadValue() = extractedValue as Date? }
                             else -> object : LazyContextVariable<Any>() { override fun loadValue(): Any = extractedValue }
                         }
                     }

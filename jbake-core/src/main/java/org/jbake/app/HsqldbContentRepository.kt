@@ -149,7 +149,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
             stmt.setString(7, document.title)
             stmt.setTimestamp(8, document.date?.let { Timestamp(it.time) })
             stmt.setArray(9, tagsArray)
-            stmt.setString(10, document.getOrDefault(ModelAttributes.BODY, "") as String)
+            stmt.setString(10, document.getOrDefault(ModelAttributes.DOC_BODY_RENDERED, "") as String)
             stmt.setString(11, propertiesJson)
 
             stmt.executeUpdate()

@@ -317,26 +317,26 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         log.debug("Creating database class ${Schema.DOCUMENTS}")
 
         val page = schema.createClass(Schema.DOCUMENTS)
-        page.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
-        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1)
-        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).isNotNull = true
-        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI)
-        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).isNotNull = true
-        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED)
-        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).isNotNull = true
-        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED)
-        page.createProperty(ModelAttributes.STATUS, OType.STRING).isNotNull = true
-        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS)
-        page.createProperty(ModelAttributes.TYPE, OType.STRING).isNotNull = true
-        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE)
+        page.createProperty(ModelAttributes.FS_DOC_SHA1, OType.STRING).isNotNull = true
+        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.FS_DOC_SHA1)
+        page.createProperty(ModelAttributes.FS_DOC_SOURCE_REL_URI, OType.STRING).isNotNull = true
+        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.FS_DOC_SOURCE_REL_URI)
+        page.createProperty(ModelAttributes.FS_DOC_IS_CACHED_IN_DB, OType.BOOLEAN).isNotNull = true
+        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.FS_DOC_IS_CACHED_IN_DB)
+        page.createProperty(ModelAttributes.FS_DOC_WAS_RENDERED, OType.BOOLEAN).isNotNull = true
+        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.FS_DOC_WAS_RENDERED)
+        page.createProperty(ModelAttributes.DOC_STATUS, OType.STRING).isNotNull = true
+        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.DOC_STATUS)
+        page.createProperty(ModelAttributes.DOC_TYPE, OType.STRING).isNotNull = true
+        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.DOC_TYPE)
     }
 
     private fun createSignatureType(schema: OSchema) {
         log.debug("Creating database class ${Schema.SIGNATURES}")
 
         val signatures = schema.createClass(Schema.SIGNATURES)
-        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).isNotNull = true
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1)
+        signatures.createProperty(ModelAttributes.FS_DOC_SHA1, OType.STRING).isNotNull = true
+        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.FS_DOC_SHA1)
     }
 
     override fun updateAndClearCacheIfNeeded(needed: Boolean, templateDir: File) {

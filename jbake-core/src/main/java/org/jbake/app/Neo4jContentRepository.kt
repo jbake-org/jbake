@@ -97,7 +97,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                     "title" to document.title,
                     "date" to document.date?.time,
                     "tags" to document.tags,
-                    "body" to document.getOrDefault(ModelAttributes.BODY, ""),
+                    "body" to document.getOrDefault(ModelAttributes.DOC_BODY_RENDERED, ""),
                     "properties" to propertiesJson
                 )).close()
 

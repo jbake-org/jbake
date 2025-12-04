@@ -12,7 +12,6 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
 import org.jbake.util.DataFileUtil
-import org.jbake.app.DatabaseType
 
 class CrawlerTest : StringSpec({
 
@@ -49,7 +48,7 @@ class CrawlerTest : StringSpec({
         results.size shouldBe 3
 
         for (content in results) {
-            content.containsKey(ModelAttributes.ROOTPATH) shouldBe true
+            content.containsKey(ModelAttributes.FS_REL_FROM_DOC_TO_SITEROOT) shouldBe true
             content.containsValue("../../../") shouldBe true
         }
 
@@ -58,7 +57,7 @@ class CrawlerTest : StringSpec({
         allPosts.size shouldBe 4
 
         allPosts.filter { it.title == "Draft Post" }
-            .forEach { it.containsKey(ModelAttributes.DATE) shouldBe true }
+            .forEach { it.containsKey(ModelAttributes.DOC_DATE) shouldBe true }
 
         // Covers bug #213
         val publishedPostsByTag: DocumentList<DocumentModel> =

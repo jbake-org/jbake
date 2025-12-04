@@ -14,12 +14,12 @@ abstract class BaseModel(
     override fun get(key: String): Any? = delegate[key]
 
     var uri: String
-        get() = (get(ModelAttributes.URI) as String?) ?: ""
-        set(uri) { put(ModelAttributes.URI, uri) }
+        get() = (get(ModelAttributes.FS_DOC_OUTPUT_URI) as String?) ?: ""
+        set(uri) { put(ModelAttributes.FS_DOC_OUTPUT_URI, uri) }
 
     var name: String
-        get() = (get(ModelAttributes.NAME) as String?) ?: ""
-        set(name) { put(ModelAttributes.NAME, name) }
+        get() = (get(ModelAttributes.DOC_NAME) as String?) ?: ""
+        set(name) { put(ModelAttributes.DOC_NAME, name) }
 
     fun putOrRemoveIfNull(key: String, value: Any?) {
         if (value == null) remove(key)

@@ -4,7 +4,7 @@ import groovy.text.markup.MarkupTemplateEngine
 import groovy.text.markup.TemplateConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.model.ModelAttributes.DATE
+import org.jbake.model.ModelAttributes.DOC_DATE
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import java.io.Writer
@@ -79,12 +79,12 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
     /** Recursively wrap date fields in SafeDate to prevent NPE in Groovy templates */
     private fun transformForGroovy(value: Any?): Any? = when (value) {
         null -> null
-        is org.jbake.model.DocumentModel -> HashMap(value).apply { put(DATE, SafeDate(value.date)) }
-        is org.jbake.model.BaseModel -> HashMap(value).apply { put(DATE, SafeDate(value[DATE] as? java.util.Date)) }
+        is org.jbake.model.DocumentModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value.date)) }
+        is org.jbake.model.BaseModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value[DOC_DATE] as? java.util.Date)) }
         is Map<*, *> -> {
             @Suppress("UNCHECKED_CAST")
             val map = value as? Map<String, Any?> ?: return value
-            HashMap(map).apply { put(DATE, SafeDate(map[DATE] as? java.util.Date)) }
+            HashMap(map).apply { put(DOC_DATE, SafeDate(map[DOC_DATE] as? java.util.Date)) }
         }
         is Collection<*> -> value.map(::transformForGroovy)
         else -> value

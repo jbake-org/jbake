@@ -17,6 +17,7 @@ import java.util.*
  * Renders pages using the [Freemarker](http://freemarker.org/) template engine.
  */
 class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
+
     lateinit var templateCfg: Configuration
 
     init {
@@ -81,12 +82,12 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
                 // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
 
-                if (key == ModelAttributes.DB) {
+                if (key == ModelAttributes.TMPL_DB_ACCESS) {
                     val bwb = BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
                     val bw = bwb.build()
                     return bw.wrap(db)
                 }
-                if (key == ModelAttributes.DATA) {
+                if (key == ModelAttributes.DATA_FILES) {
                     val bwb = BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
                     val bw = bwb.build()
                     return bw.wrap(DataFileUtil(db, config.dataFileDocType))
@@ -94,7 +95,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 
                 // Provide a merged config map to templates so both legacy underscore keys (feed_file)
                 // and dotted keys are available. Prefer values from configuration.asHashMap().
-                if (key == ModelAttributes.CONFIG) {
+                if (key == ModelAttributes.TMPL_JBAKE_CONFIG) {
                     val merged: MutableMap<String, Any> = HashMap()
 
                     // Base from configuration (underscore-style keys)
@@ -103,29 +104,39 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                     // Overlay any values present in the eager model's config
                     @Suppress("UNCHECKED_CAST")
                     val map = eagerModel.toMap() as? MutableMap<String, Any> ?: mutableMapOf()
-                    val cfgAny = map[ModelAttributes.CONFIG]
+                    val cfgAny = map[ModelAttributes.TMPL_JBAKE_CONFIG]
                     if (cfgAny is Map<*, *>)
                         @Suppress("UNCHECKED_CAST")
                         (cfgAny as? Map<String, Any>)?.let { merged.putAll(it) }
                     return wrapper.wrap(merged)
                 }
 
-                 val adapter = object : TemplateEngineAdapter<freemarker.template.TemplateModel> {
-
-                     override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
+                val adapter = object : TemplateEngineAdapter<freemarker.template.TemplateModel> {
+                    override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
                         return when (key) {
-                            ModelAttributes.ALLTAGS -> SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
-                            ModelAttributes.PUBLISHED_DATE -> SimpleDate(extractedValue as Date?, TemplateDateModel.UNKNOWN)
+                            ModelAttributes.TAGS_ALL -> SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
+                            ModelAttributes.GLOB_PUBLISHING_DATE_FORMATTED -> SimpleDate(extractedValue as Date?, TemplateDateModel.UNKNOWN)
                             // All other cases, as far as I know, are document collections
                             else -> SimpleSequence(extractedValue as MutableCollection<*>?, wrapper)
                         }
                     }
                 }
+
                 @Suppress("UNCHECKED_CAST")
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
                 @Suppress("UNCHECKED_CAST")
                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
                 return extractors.extractAndTransform(db, key, map, adapterTyped)
+
+                /*
+                val result = extractors.extractAndTransform(db, key, map, adapterTyped)
+                val result = eagerModel.get(key)
+
+                // Wrap Map results with NullSafeMapModel to handle missing keys gracefully
+                if (result is SimpleHash)
+                    return NullSafeMapModel(result, wrapper)
+                return result
+                */
             }
             catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)
@@ -133,6 +144,46 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         }
 
         override fun isEmpty() = false
+
+
+        /// The two classes below are quite suspicious hacks and I will probably REMOVE them.
+
+        /**
+         * Custom ObjectWrapper that wraps all Maps with NullSafeMapModel.
+         */
+        class NullSafeObjectWrapper(incompatibleImprovements: Version)
+            : DefaultObjectWrapper(incompatibleImprovements) {
+
+            override fun wrap(obj: Any?): freemarker.template.TemplateModel {
+                if (obj is Map<*, *>) {
+                    // Wrap maps with our null-safe wrapper
+                    val simpleHash = super.wrap(obj) as? SimpleHash
+                    return if (simpleHash != null) NullSafeMapModel(simpleHash, this) else super.wrap(obj)
+                }
+                return super.wrap(obj)
+            }
+        }
+
+        /**
+         * Recursive wrapper for SimpleHash that returns null for missing keys instead of throwing exceptions.
+         * This allows FreeMarker's classic_compatible mode to work correctly with ${content.author} when the author key is missing.
+         */
+        class NullSafeMapModel(
+            private val delegate: SimpleHash,
+            private val wrapper: ObjectWrapper
+        ) : TemplateHashModel {
+
+            override fun get(key: String): freemarker.template.TemplateModel? {
+                // If the value is another map, wrap it too.
+                return try {
+                    delegate.get(key).let { if (it is SimpleHash) NullSafeMapModel(it, wrapper) else it }
+                }
+                // Return null for missing keys instead of throwing.
+                catch (_: TemplateModelException) { null }
+            }
+
+            override fun isEmpty(): Boolean = delegate.isEmpty
+        }
     }
 
 

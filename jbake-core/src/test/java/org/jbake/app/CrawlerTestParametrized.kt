@@ -49,14 +49,14 @@ abstract class CrawlerTestBase(dbType: DatabaseType) : StringSpec({
             results.size shouldBe 3
 
             for (content in results) {
-                content.containsKey(ModelAttributes.ROOTPATH) shouldBe true
+                content.containsKey(ModelAttributes.FS_REL_FROM_DOC_TO_SITEROOT) shouldBe true
                 content.containsValue("../../../") shouldBe true
             }
 
             val allPosts: DocumentList<DocumentModel> = db.getAllContent("post")
             allPosts.size shouldBe 4
             allPosts.filter { it.title == "Draft Post" }
-                .forEach { it.containsKey(ModelAttributes.DATE) shouldBe true }
+                .forEach { it.containsKey(ModelAttributes.DOC_DATE) shouldBe true }
         }
 
     "crawlDataFiles" {

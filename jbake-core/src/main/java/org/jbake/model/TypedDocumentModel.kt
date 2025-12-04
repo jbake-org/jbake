@@ -10,66 +10,66 @@ import java.util.*
 class TypedDocumentModel : TypedBaseModel() {
 
     var body: String
-        get() = get(ModelAttributes.BODY) as? String ?: ""
-        set(value) { set(ModelAttributes.BODY, value) }
+        get() = get(ModelAttributes.DOC_BODY_RENDERED) as? String ?: ""
+        set(value) { set(ModelAttributes.DOC_BODY_RENDERED, value) }
 
     var date: Date?
-        get() = get(ModelAttributes.DATE) as? Date
-        set(value) { putOrRemoveIfNull(ModelAttributes.DATE, value) }
+        get() = get(ModelAttributes.DOC_DATE) as? Date
+        set(value) { putOrRemoveIfNull(ModelAttributes.DOC_DATE, value) }
 
     var status: String?
-        get() = get(ModelAttributes.STATUS) as? String ?: ""
-        set(value) { putOrRemoveIfNull(ModelAttributes.STATUS, value) }
+        get() = get(ModelAttributes.DOC_STATUS) as? String ?: ""
+        set(value) { putOrRemoveIfNull(ModelAttributes.DOC_STATUS, value) }
 
     var type: String
-        get() = get(ModelAttributes.TYPE) as? String ?: ""
-        set(value) { set(ModelAttributes.TYPE, value) }
+        get() = get(ModelAttributes.DOC_TYPE) as? String ?: ""
+        set(value) { set(ModelAttributes.DOC_TYPE, value) }
 
     var tags: List<String>
         get() {
-            val entry = get(ModelAttributes.TAGS) ?: return emptyList()
+            val entry = get(ModelAttributes.DOC_TAGS) ?: return emptyList()
             return DbUtils.toStringList(entry)
         }
-        set(value) { set(ModelAttributes.TAGS, value) }
+        set(value) { set(ModelAttributes.DOC_TAGS, value) }
 
     var sha1: String?
-        get() = get(ModelAttributes.SHA1) as? String
-        set(value) { putOrRemoveIfNull(ModelAttributes.SHA1, value) }
+        get() = get(ModelAttributes.FS_DOC_SHA1) as? String
+        set(value) { putOrRemoveIfNull(ModelAttributes.FS_DOC_SHA1, value) }
 
     var sourceUri: String?
-        get() = get(ModelAttributes.SOURCE_URI) as? String
-        set(value) { putOrRemoveIfNull(ModelAttributes.SOURCE_URI, value) }
+        get() = get(ModelAttributes.FS_DOC_SOURCE_REL_URI) as? String
+        set(value) { putOrRemoveIfNull(ModelAttributes.FS_DOC_SOURCE_REL_URI, value) }
 
     var rootPath: String
-        get() = get(ModelAttributes.ROOTPATH) as? String ?: ""
-        set(value) { set(ModelAttributes.ROOTPATH, value) }
+        get() = get(ModelAttributes.FS_REL_FROM_DOC_TO_SITEROOT) as? String ?: ""
+        set(value) { set(ModelAttributes.FS_REL_FROM_DOC_TO_SITEROOT, value) }
 
     var rendered: Boolean
-        get() = get(ModelAttributes.RENDERED) as? Boolean ?: false
-        set(value) { set(ModelAttributes.RENDERED, value) }
+        get() = get(ModelAttributes.FS_DOC_WAS_RENDERED) as? Boolean ?: false
+        set(value) { set(ModelAttributes.FS_DOC_WAS_RENDERED, value) }
 
     var file: String?
-        get() = get(ModelAttributes.FILE) as? String
-        set(value) { putOrRemoveIfNull(ModelAttributes.FILE, value) }
+        get() = get(ModelAttributes.FS_DOC_SOURCE_PATH_ABS) as? String
+        set(value) { putOrRemoveIfNull(ModelAttributes.FS_DOC_SOURCE_PATH_ABS, value) }
 
     var noExtensionUri: String?
-        get() = get(ModelAttributes.NO_EXTENSION_URI) as? String
-        set(value) { putOrRemoveIfNull(ModelAttributes.NO_EXTENSION_URI, value) }
+        get() = get(ModelAttributes.FS_DOC_OUTPUT_URI_NOEXT) as? String
+        set(value) { putOrRemoveIfNull(ModelAttributes.FS_DOC_OUTPUT_URI_NOEXT, value) }
 
     var title: String?
-        get() = get(ModelAttributes.TITLE) as? String
-        set(value) { putOrRemoveIfNull(ModelAttributes.TITLE, value) }
+        get() = get(ModelAttributes.DOC_TITLE) as? String
+        set(value) { putOrRemoveIfNull(ModelAttributes.DOC_TITLE, value) }
 
     var cached: Boolean?
         get() {
-            val value = get(ModelAttributes.CACHED)
+            val value = get(ModelAttributes.FS_DOC_IS_CACHED_IN_DB)
             return when (value) {
                 is String -> value.toBoolean()
                 is Boolean -> value
                 else -> null
             }
         }
-        set(value) { putOrRemoveIfNull(ModelAttributes.CACHED, value) }
+        set(value) { putOrRemoveIfNull(ModelAttributes.FS_DOC_IS_CACHED_IN_DB, value) }
 
     /**
      * Create a copy of this document model.

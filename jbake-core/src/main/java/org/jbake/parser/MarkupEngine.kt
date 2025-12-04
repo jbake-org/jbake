@@ -3,9 +3,9 @@ package org.jbake.parser
 import org.apache.commons.io.IOUtils
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.jbake.model.ModelAttributes.CACHED
-import org.jbake.model.ModelAttributes.DATE
-import org.jbake.model.ModelAttributes.TAGS
+import org.jbake.model.ModelAttributes.FS_DOC_IS_CACHED_IN_DB
+import org.jbake.model.ModelAttributes.DOC_DATE
+import org.jbake.model.ModelAttributes.DOC_TAGS
 import org.jbake.util.Logging.logger
 import org.json.simple.JSONValue
 import org.slf4j.Logger
@@ -191,13 +191,13 @@ abstract class MarkupEngine : ParserEngine {
         val value = sanitize(inputValue)
 
         when {
-            key == DATE -> {
+            key == DOC_DATE -> {
                 val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
                 runCatching { content.date = (df.parse(value)) }
                     .onFailure { e -> log.error("Unable to parse date $value with format ${configuration?.dateFormat}", e) }
             }
-            key == TAGS            -> content.tags = getTags(value)
-            key == CACHED          -> content.cached = (value.toBoolean())
+            key == DOC_TAGS            -> content.tags = getTags(value)
+            key == FS_DOC_IS_CACHED_IN_DB          -> content.cached = (value.toBoolean())
             isJson(value)    -> content[key] = JSONValue.parse(value)
             else                   -> content[key] = value
         }

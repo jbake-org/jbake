@@ -10,12 +10,12 @@ abstract class TypedBaseModel {
 
     // Common properties
     var uri: String
-        get() = attributes[ModelAttributes.URI] as? String ?: ""
-        set(value) { attributes[ModelAttributes.URI] = value }
+        get() = attributes[ModelAttributes.FS_DOC_OUTPUT_URI] as? String ?: ""
+        set(value) { attributes[ModelAttributes.FS_DOC_OUTPUT_URI] = value }
 
     var name: String
-        get() = attributes[ModelAttributes.NAME] as? String ?: ""
-        set(value) { attributes[ModelAttributes.NAME] = value }
+        get() = attributes[ModelAttributes.DOC_NAME] as? String ?: ""
+        set(value) { attributes[ModelAttributes.DOC_NAME] = value }
 
     /**
      * Get a custom attribute by key.
