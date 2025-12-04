@@ -11,6 +11,7 @@ import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList.ASCIIDOCTOR_ATTRIBUTES
 import org.jbake.model.DocumentModel
+import org.jbake.parser.Parser
 import java.io.File
 
 class AsciidocParserTest : StringSpec({

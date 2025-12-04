@@ -1,4 +1,5 @@
 package org.jbake.parser
+import org.jbake.app.FileUtil
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.util.Logging
@@ -25,6 +26,22 @@ interface ParserEngine {
      * @return A model representation of the given file. NULLABLE. TBD: Have a NullDocumentModel to avoid nulls?
      */
     fun parse(config: JBakeConfiguration, file: File): DocumentModel?
+}
+
+
+class Parser(private val config: JBakeConfiguration) {
+
+    fun processFile(inputFile: File): DocumentModel? {
+        val fileExtension = FileUtil.fileExt(inputFile)
+        val engine = ParserEnginesRegistry.get(fileExtension)
+            ?: run {
+                log.error("Unable to find suitable markup engine for $inputFile")
+                return null
+            }
+        return engine.parse(config, inputFile)
+    }
+
+    private val log: Logger by logger()
 }
 
 
@@ -138,3 +155,4 @@ class ParserEnginesRegistry private constructor() {
         private val log: Logger by Logging.logger()
     }
 }
+

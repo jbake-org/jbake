@@ -5,6 +5,7 @@ import org.asciidoctor.Attributes
 import org.asciidoctor.Options
 import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciidoctorJRuby
+import org.jbake.util.AuthorTracer
 import org.jbake.util.Logging.logger
 import org.jbake.util.error
 import org.slf4j.Logger
@@ -55,7 +56,7 @@ class AsciidoctorEngine : MarkupEngine() {
         }
     }
 
-    private fun getEngine(options: Options): Asciidoctor {
+    private fun getOrCreateAsciidoctorEngine(options: Options): Asciidoctor {
         engine?.let { return it }
 
         synchronized(engineLock) {
@@ -80,7 +81,7 @@ class AsciidoctorEngine : MarkupEngine() {
 
     override fun processHeader(context: ParserContext) {
         val attributes = buildAttributes(context)
-        val asciidoctor = getEngine(buildOptions(context, attributes))
+        val asciidoctor = getOrCreateAsciidoctorEngine(buildOptions(context, attributes))
 
         // In AsciidoctorJ 3.x, use loadFile with header_only option to get document header
         val headerOptions = Options.builder()
@@ -93,6 +94,17 @@ class AsciidoctorEngine : MarkupEngine() {
 
         val document = asciidoctor.loadFile(context.file, headerOptions)
         val documentModel = context.documentModel
+
+        val authorName = document.getAttribute(AUTHOR_KEY)?.toString()?.takeIf { it.isNotBlank() }
+        val authorEmail = document.getAttribute(AUTHOR_EMAIL_KEY)?.toString()?.takeIf { it.isNotBlank() }
+        if (!authorName.isNullOrBlank()) {
+            documentModel[AUTHOR_KEY] = authorName
+            authorEmail?.let { documentModel[AUTHOR_EMAIL_KEY] = it }
+        }
+        val fallbackEmail = document.getAttribute("email")?.toString()?.takeIf { it.isNotBlank() }
+        if (!documentModel.containsKey(AUTHOR_EMAIL_KEY) && fallbackEmail != null) {
+            documentModel[AUTHOR_EMAIL_KEY] = fallbackEmail
+        }
 
         // Get title from document
         val title = document.doctitle
@@ -138,6 +150,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 }
             }
         }
+        AuthorTracer.trace("asciidoctor-header", documentModel, context.file.name)
     }
 
     private fun getValueClassName(value: Any?) = value?.javaClass?.getCanonicalName() ?: "null"
@@ -157,7 +170,7 @@ class AsciidoctorEngine : MarkupEngine() {
     private fun processAsciiDoc(context: ParserContext) {
         val attributes = buildAttributes(context)
         val options = buildOptions(context, attributes)
-        val asciidoctor = getEngine(options)
+        val asciidoctor = getOrCreateAsciidoctorEngine(options)
         context.body = (asciidoctor.convert(context.body, options))
     }
 
@@ -235,6 +248,8 @@ class AsciidoctorEngine : MarkupEngine() {
     companion object {
         const val JBAKE_PREFIX: String = "jbake-"
         const val REVDATE_KEY: String = "revdate"
+        private const val AUTHOR_KEY = "author"
+        private const val AUTHOR_EMAIL_KEY = "author_email"
 
         /** Comma-separated file paths to additional gems */
         private const val OPT_GEM_PATH = "gemPath"

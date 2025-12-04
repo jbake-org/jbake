@@ -5,6 +5,7 @@ import org.jbake.model.BaseModel
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
+import org.jbake.util.AuthorTracer
 import java.io.Writer
 
 open class TemplateModel : BaseModel {
@@ -82,7 +83,16 @@ open class TemplateModel : BaseModel {
 
         /** Create TemplateModel from a type-safe RenderContext. This is the new preferred way to create template models. */
         @Suppress("DEPRECATION")
-        fun fromContext(context: RenderContext) = TemplateModel().apply { putAll(context.toLegacyMap()) }
+        /// Was: : TemplateModel().apply { putAll(context.toLegacyMap()) }
+        fun fromContext(context: RenderContext): TemplateModel {
+            val model = TemplateModel()
+            model.renderer = context.renderer
+            context.content?.let { model.content = it }
+            model.config = context.config.asHashMap()
+            model.put("jbake_config", context.config)
+            AuthorTracer.trace("template-model-from-context", model.content)
+            return model
+        }
 
         /**
          * Convert TemplateModel to RenderContext.

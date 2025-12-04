@@ -7,7 +7,7 @@ import io.kotest.matchers.string.shouldNotContain
 import org.apache.commons.io.FileUtils
 import org.jbake.app.ContentStoreIntegrationTest
 import org.jbake.app.Crawler
-import org.jbake.app.Parser
+import org.jbake.parser.Parser
 import org.jbake.app.Renderer
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.DocumentTypeRegistry.addDocumentType

@@ -5,6 +5,7 @@ import org.jbake.app.*
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelExtractorsDocumentTypeListener
+import org.jbake.parser.Parser
 import org.jbake.template.ModelExtractors
 import java.io.File
 import java.util.*

@@ -6,6 +6,8 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
+import org.jbake.parser.Parser
+import org.jbake.util.AuthorTracer
 import org.jbake.util.HtmlUtil
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
@@ -174,6 +176,7 @@ class Crawler {
             log.warn("{} has an invalid header, it has been ignored!", sourceFile)
             return
         }
+        AuthorTracer.trace("crawler-parse", document, sourceFile.name)
 
         if (!DocumentTypeRegistry.contains(document.type)) {
             log.warn("{} has an unknown document type '{}' and has been ignored!", sourceFile, document.type)
@@ -187,6 +190,7 @@ class Crawler {
             HtmlUtil.fixImageSourceUrls(document, config)
 
         db.addDocument(document)
+        AuthorTracer.trace("crawler-addDocument", document, sourceFile.name)
         db.addDocument(document)
     }
 

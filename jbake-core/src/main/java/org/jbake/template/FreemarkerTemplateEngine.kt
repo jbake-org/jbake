@@ -6,6 +6,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
+import org.jbake.util.AuthorTracer
 import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
 import java.io.IOException
@@ -126,6 +127,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
                 @Suppress("UNCHECKED_CAST")
                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
+                AuthorTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], key)
                 return extractors.extractAndTransform(db, key, map, adapterTyped)
 
                 /*

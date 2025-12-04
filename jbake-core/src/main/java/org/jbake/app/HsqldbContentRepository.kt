@@ -157,6 +157,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
             stmt.setString(11, propertiesJson)
 
             stmt.executeUpdate()
+            AuthorTracer.trace("hsqldb-insert", document, document.sourceUri)
         }
     }
 
@@ -372,6 +373,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                         }
                     }
 
+                    AuthorTracer.trace("hsqldb-query", document, sql)
                     documents.add(document)
                 }
             }

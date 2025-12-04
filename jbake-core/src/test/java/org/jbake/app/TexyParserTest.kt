@@ -7,6 +7,7 @@ import io.kotest.matchers.string.shouldContain
 import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
+import org.jbake.parser.Parser
 import org.jbake.parser.ParserEnginesRegistry
 import org.jbake.parser.TexyEngine
 import java.io.File

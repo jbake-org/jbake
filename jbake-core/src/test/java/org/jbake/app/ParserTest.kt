@@ -10,6 +10,7 @@ import org.jbake.TestUtils
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.PropertyList
+import org.jbake.parser.Parser
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import java.io.File
