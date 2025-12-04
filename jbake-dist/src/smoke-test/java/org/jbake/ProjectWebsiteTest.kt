@@ -13,7 +13,7 @@ class ProjectWebsiteTest : StringSpec({
     val WEBSITE_REPO_URL = "https://github.com/jbake-org/jbake.org.git"
 
     "should bake JBake website" {
-        val tempDir = createTempDirectory("jbake-website-test").toFile()
+        val tempDir = createTempDirectory("jbake-website-test-").toFile()
         try {
             val projectDir = tempDir.resolve("project")
             val outputDir = File(projectDir, "output")
@@ -38,6 +38,8 @@ class ProjectWebsiteTest : StringSpec({
             File(outputDir, "index.html").shouldExist()
             process.destroy()
         }
-        finally { tempDir.deleteRecursively() }
+        finally {
+            tempDir.deleteRecursively()
+        }
     }
 })
