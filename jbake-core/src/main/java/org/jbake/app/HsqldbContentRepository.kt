@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
+import org.jbake.util.AuthorTracer
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.io.File
@@ -25,24 +26,27 @@ class HsqldbContentRepository(private val type: String, private val name: String
     private lateinit var connection: Connection
     private val objectMapper = ObjectMapper().apply {
         configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-        // Register a custom module to handle unknown types
+
+        // Register a custom module to handle unknown types TODO: This seems was added to fix some issue - verify if still needed.
         registerModule(object : SimpleModule() {
             init {
                 // Add a catch-all serializer for unknown types
                 setSerializerModifier(object : BeanSerializerModifier() {
                     override fun modifySerializer(config: SerializationConfig?, beanDesc: BeanDescription?, serializer: JsonSerializer<*>?): JsonSerializer<*>? {
-                        return if (serializer is BeanSerializer) {
-                            object : BeanSerializer(serializer) {
-                                override fun serialize(bean: Any?, jgen: JsonGenerator?, provider: SerializerProvider?) {
-                                    try {
-                                        super.serialize(bean, jgen, provider)
-                                    } catch (e: Exception) {
-                                        // Skip serialization of problematic objects
-                                        jgen?.writeNull()
-                                    }
+                        if (serializer !is BeanSerializer) return serializer
+
+                        return object : BeanSerializer(serializer) {
+                            override fun serialize(bean: Any?, jgen: JsonGenerator?, provider: SerializerProvider?) {
+                                try {
+                                    super.serialize(bean, jgen, provider)
                                 }
+                                // Skip serialization of problematic objects
+                                catch (e: Exception) { jgen?.writeNull() }
+
+                                // TODO: Replace with runCatching:
+                                //runCatching { super.serialize(bean, jgen, provider)}.onFailure { jgen?.writeNull() }
                             }
-                        } else serializer
+                        }
                     }
                 })
             }
@@ -106,8 +110,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
                     "tags" VARCHAR(64) ARRAY,
                     "body" CLOB,
                     "properties" CLOB
-                )
-            """)
+                ) """)
+
             // Create indexes with IF NOT EXISTS - works with MySQL compatibility mode
             stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_sha1" ON "Documents"("sha1")""")
             stmt.execute("""CREATE INDEX IF NOT EXISTS "idx_cached" ON "Documents"("cached")""")
@@ -309,10 +313,10 @@ class HsqldbContentRepository(private val type: String, private val name: String
         connection.prepareStatement(sql).use { stmt ->
             params.forEachIndexed { index, param ->
                 when (param) {
-                    is String -> stmt.setString(index + 1, param)
-                    is Int -> stmt.setInt(index + 1, param)
-                    is Long -> stmt.setLong(index + 1, param)
-                    is Boolean -> stmt.setBoolean(index + 1, param)
+                    is String    -> stmt.setString(index + 1, param)
+                    is Int       -> stmt.setInt(index + 1, param)
+                    is Long      -> stmt.setLong(index + 1, param)
+                    is Boolean   -> stmt.setBoolean(index + 1, param)
                     is Timestamp -> stmt.setTimestamp(index + 1, param)
                     is java.util.Date -> stmt.setTimestamp(index + 1, Timestamp(param.time))
                     null -> stmt.setNull(index + 1, Types.VARCHAR)
