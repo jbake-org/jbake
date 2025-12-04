@@ -3,9 +3,9 @@ package org.jbake.parser
 import org.apache.commons.io.IOUtils
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
-import org.jbake.model.ModelAttributes.FS_DOC_IS_CACHED_IN_DB
 import org.jbake.model.ModelAttributes.DOC_DATE
 import org.jbake.model.ModelAttributes.DOC_TAGS
+import org.jbake.model.ModelAttributes.FS_DOC_IS_CACHED_IN_DB
 import org.jbake.util.Logging.logger
 import org.json.simple.JSONValue
 import org.slf4j.Logger
@@ -119,6 +119,9 @@ abstract class MarkupEngine : ParserEngine {
 
         if (context.config.defaultType != null && context.type.isEmpty())
             context.setDefaultType()
+
+        if (context.config.defaultAuthor != null)
+            context.setDefaultAuthor()
     }
 
     /**

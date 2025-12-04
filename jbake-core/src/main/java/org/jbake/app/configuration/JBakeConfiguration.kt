@@ -75,6 +75,9 @@ interface JBakeConfiguration {
     /** Default type to use (in order to avoid putting it in all files). */
     val defaultType: String?
 
+    /** Default author to use when not specified in document. */
+    val defaultAuthor: String?
+
     /** The destination directory to render and copy files to. */
     var destinationDir: File
 

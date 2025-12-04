@@ -6,8 +6,8 @@ import org.apache.commons.configuration2.SystemConfiguration
 import org.apache.commons.lang3.StringUtils
 import org.jbake.app.configuration.PropertyList.ASSET_IGNORE_HIDDEN
 import org.jbake.app.configuration.PropertyList.TEMPLATE_FOLDER
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 import java.io.File
 import java.util.*
 import java.util.regex.Matcher
@@ -182,6 +182,13 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
 
     fun setDefaultType(type: String?) {
         setProperty(PropertyList.DEFAULT_TYPE.key, type)
+    }
+
+    override val defaultAuthor: String?
+        get() = getAsString(PropertyList.DEFAULT_AUTHOR.key)
+
+    fun setDefaultAuthor(author: String?) {
+        setProperty(PropertyList.DEFAULT_AUTHOR.key, author)
     }
 
     override var destinationDir: File

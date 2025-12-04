@@ -13,9 +13,7 @@ class ParserContext(
 ) {
     val documentModel: DocumentModel = DocumentModel.createDefaultDocumentModel()
 
-    fun hasHeader(): Boolean {
-        return hasHeader
-    }
+    fun hasHeader(): Boolean = hasHeader
 
     var body: String
         get() = documentModel.body
@@ -39,6 +37,14 @@ class ParserContext(
 
     fun setDefaultType() {
         this.documentModel.type = this.config.defaultType ?: ""
+    }
+
+    fun setDefaultAuthor() {
+        if (this.documentModel.containsKey("author")) return
+
+        val defaultAuthor = this.config.defaultAuthor
+        if (!defaultAuthor.isNullOrEmpty())
+            this.documentModel["author"] = defaultAuthor
     }
 
     // TODO: Possibly nullable
