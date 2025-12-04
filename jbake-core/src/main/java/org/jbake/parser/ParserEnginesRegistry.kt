@@ -10,6 +10,13 @@ import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 import java.util.*
 
+/*
+ * TBD: Add support for more markup languages:
+ *  - reStructuredText (reST) - The de facto standard for the Python ecosystem
+ *  - Wiki Markup (MediaWiki/GitHub Wiki)
+ *  - Org-mode - popular within the Emacs text editor community
+ *  - Textile - An older, more complex lightweight markup language
+ */
 
 interface ParserEngine {
     /**

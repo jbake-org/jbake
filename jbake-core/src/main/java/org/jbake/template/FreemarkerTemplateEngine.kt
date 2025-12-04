@@ -1,6 +1,5 @@
 package org.jbake.template
 
-import freemarker.core.InvalidReferenceException
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
 import org.jbake.app.ContentStore
@@ -126,73 +125,16 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
                 @Suppress("UNCHECKED_CAST")
                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
-                val result = extractors.extractAndTransform(db, key, map, adapterTyped)
-                // Wrap Map results with NullSafeMapModel to handle missing keys gracefully
-                if (result is SimpleHash) {
-                    return NullSafeMapModel(result, wrapper)
-                }
-                return result
+                return extractors.extractAndTransform(db, key, map, adapterTyped)
             }
             catch (_: NoModelExtractorException) {
-                val result = eagerModel.get(key)
-                // Wrap Map results with NullSafeMapModel to handle missing keys gracefully
-                if (result is SimpleHash) {
-                    return NullSafeMapModel(result, wrapper)
-                }
-                return result
+                return eagerModel.get(key)
             }
         }
 
         override fun isEmpty() = false
     }
 
-    /**
-     * Custom ObjectWrapper that wraps all Maps with NullSafeMapModel.
-     */
-    class NullSafeObjectWrapper(incompatibleImprovements: freemarker.template.Version)
-        : DefaultObjectWrapper(incompatibleImprovements) {
-
-        override fun wrap(obj: Any?): freemarker.template.TemplateModel? {
-            if (obj is Map<*, *>) {
-                // Wrap maps with our null-safe wrapper
-                val simpleHash = super.wrap(obj) as? SimpleHash
-                return if (simpleHash != null) {
-                    NullSafeMapModel(simpleHash, this)
-                } else {
-                    super.wrap(obj)
-                }
-            }
-            return super.wrap(obj)
-        }
-    }
-
-    /**
-     * Wrapper for SimpleHash that returns null for missing keys instead of throwing exceptions.
-     * This allows FreeMarker's classic_compatible mode to work correctly with ${content.author}
-     * when the author key is missing.
-     */
-    class NullSafeMapModel(
-        private val delegate: SimpleHash,
-        private val wrapper: ObjectWrapper
-    ) : TemplateHashModel {
-
-        override fun get(key: String): freemarker.template.TemplateModel? {
-            return try {
-                val value = delegate.get(key)
-                // If the value is another map, wrap it too
-                if (value is SimpleHash) {
-                    NullSafeMapModel(value, wrapper)
-                } else {
-                    value
-                }
-            } catch (_: TemplateModelException) {
-                // Return null for missing keys instead of throwing
-                null
-            }
-        }
-
-        override fun isEmpty(): Boolean = delegate.isEmpty
-    }
 
     private val log by logger()
 }
