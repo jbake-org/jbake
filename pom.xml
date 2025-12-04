@@ -67,6 +67,12 @@
         <ossrh.host>s01.oss.sonatype.org</ossrh.host>
         <extraJvmArgs.stores.orientdb>-Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</extraJvmArgs.stores.orientdb>
 
+        <!-- Build metadata properties for resource filtering -->
+        <jbakeVersion>${project.version}</jbakeVersion>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <gitHash>dev</gitHash>
+
         <!-- Runtime dependencies versions (synced from gradle.properties) -->
         <version.asciidoctorj>3.0.1</version.asciidoctorj>
         <version.asciidoctorj.diagram>3.1.0</version.asciidoctorj.diagram>
