@@ -3,6 +3,7 @@ package org.jbake.model
 /**
  * Base model class for JBake models.
  * Uses delegation instead of inheritance for better design.
+ * TODO: Refactor not to delegate all MutableMap, but the individual selected methods.
  */
 abstract class BaseModel(
     private val delegate: MutableMap<String, Any> = HashMap()
