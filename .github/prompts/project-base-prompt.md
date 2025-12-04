@@ -60,7 +60,8 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - Feel free to suggest large-scale refactoring if you see opportunities to improve code structure or readability.
 - Avoid running exec commands in CLI, as the developer has to confirm them.
   - For instance, `find ... -exec` or `sed -i` are discouraged. Use IDEA's Find and Replace tool instead.
-  - Instead of a find + exec construct, prefer using `rg`. If not installed, prompt the user to install `ripgrep`. It's faster and needs no `-exec`.
+  - Instead of `find ... | grep ...` or `find ... -exec ...`, prefer using `rg`. If not installed, prompt the user to install `ripgrep`.
+- When running CLI, add the motivation for the command as a very brief comment after it, e.g. `rg 'somePattern'  # Expecting it to appear in ...`.
 - Write scripts as Kotlin Scripts (.kts) when practical. Avoid Python. Avoid Bash except for short scripts where Kotlin alternative would be more than twice as long.
 - When invoking the command line, remember to add batch mode options to avoid interactive prompts during automated processes, e.g., `--batch-mode` for Maven commands, `--no-pager` for Git commands, etc.
 
