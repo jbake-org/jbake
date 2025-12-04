@@ -19,15 +19,8 @@ class ProjectWebsiteTest : StringSpec({
             val outputDir = File(projectDir, "output")
 
             // Clone JBake website repository
-            Git.cloneRepository()
-                .setBare(false)
-                .setBranch("master")
-                .setRemote("origin")
-                .setURI(WEBSITE_REPO_URL)
-                .setDirectory(projectDir)
-                .call()
-
-            File(projectDir, "README.md").shouldExist()
+            Git.cloneRepository().setURI(WEBSITE_REPO_URL).setDirectory(projectDir).setBare(false).setBranch("master").setRemote("origin").call()
+            projectDir.resolve("README.md").shouldExist()
 
             // Bake the website
             val runner = BinaryRunner(projectDir)
@@ -35,7 +28,7 @@ class ProjectWebsiteTest : StringSpec({
             withClue("\n========= JBake process output: =========\n\n${runner.processOutput}\n\n====================================\n\n") {
                 process.exitValue() shouldBe 0
             }
-            File(outputDir, "index.html").shouldExist()
+            outputDir.resolve("index.html").shouldExist()
             process.destroy()
         }
         finally {
