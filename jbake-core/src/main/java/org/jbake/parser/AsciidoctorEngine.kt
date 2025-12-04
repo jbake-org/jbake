@@ -63,8 +63,10 @@ class AsciidoctorEngine : MarkupEngine() {
             log.info("Initializing Asciidoctor engine...")
 
             val newEngine = if (gemPath != null) {
+                log.info("Creating AsciidoctorJRuby engine with gem path: $gemPath")
                 AsciidoctorJRuby.Factory.create(gemPath)
             } else {
+                log.info("Creating Asciidoctor engine")
                 Asciidoctor.Factory.create()
             }
 
@@ -99,12 +101,11 @@ class AsciidoctorEngine : MarkupEngine() {
         }
 
         // Get attributes from document
-        ///log.info("=== Parsing attributes for document: {} ===", context.file.name)
+        log.info("=== Parsing attributes for document: ${context.file.name} ===")
         for ((key, value) in document.attributes) {
+
             val keyStr = key.toString()
-            ///val valueClass = value?.javaClass?.name ?: "null"
-            ///val valueStr = value?.toString() ?: "null"
-            ///log.info("Attribute: {} = {} (class: {})", keyStr, valueStr, valueClass)
+            log.info("Attribute: $keyStr = $value (class: ${value?.javaClass?.name})")///
 
             when {
                 keyStr.startsWith(JBAKE_PREFIX) -> {
