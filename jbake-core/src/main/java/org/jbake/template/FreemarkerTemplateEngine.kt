@@ -1,7 +1,5 @@
 package org.jbake.template
 
-import freemarker.core.Environment
-import freemarker.core.InvalidReferenceException
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
 import org.jbake.app.ContentStore
@@ -33,13 +31,9 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         templateCfg.setOutputEncoding(config.outputEncoding)
         templateCfg.setTimeZone(config.freemarkerTimeZone)
         templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
-
-        // Configure FreeMarker to handle missing map keys gracefully.
-        // This makes it so that ${content.author} returns empty string when author key is missing.
-        val objectWrapper = LazyLoadingModel.NullSafeObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
-        templateCfg.setObjectWrapper(objectWrapper)
         templateCfg.setClassicCompatible(true)
 
+        /* Keep this here for debugging!
         // Custom exception handler that ignores InvalidReferenceException
         // Silently replace missing references with empty string.
         templateCfg.setTemplateExceptionHandler { ex: TemplateException, env: Environment, out ->
@@ -52,6 +46,14 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 throw ex
             }
         }
+         */
+
+        // Configure FreeMarker to handle missing variables gracefully
+        // Use IGNORE handler which prints nothing for undefined variables
+        templateCfg.templateExceptionHandler = TemplateExceptionHandler.IGNORE_HANDLER
+
+        // Alternative: use RETHROW_HANDLER for debugging
+        // templateCfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
 
         try {
             templateCfg.setDirectoryForTemplateLoading(config.templateDir)

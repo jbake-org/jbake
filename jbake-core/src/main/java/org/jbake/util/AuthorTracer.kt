@@ -22,8 +22,8 @@ object AuthorTracer {
         else
             "AuthorTracer[$stage] author missing$suffix"
 
-        // Force output to stderr so we always see it
-        System.err.println(Instant.now().toDateTime().toLocalDateTime().toString() + msg)
+        val timestamp = Instant.now().toDateTime().toLocalDateTime().toString()
+        System.err.println("$timestamp $msg") // Force output to stderr so we always see it
         log.warn(msg)
     }
 
