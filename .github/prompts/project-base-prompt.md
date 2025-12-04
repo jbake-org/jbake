@@ -47,6 +47,7 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - Try not to duplicate code. If you find yourself copying and pasting code, consider refactoring it into a shared function, class, or module.
 - Keep Java interop in mind. JBake is also used as a library. New public APIs should be easily usable from Java.
 - When you add code intended for debugging or investigation, mark it somehow, e.g. with `... // DEBUG` comment or `// +++ DEBUG block start` and `// +++ DEBUG block end`, so it can be easily found and removed later.
+- Add dots at the end of comment sentences, and capitalize them.
 
 ## Testing
 
