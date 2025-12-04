@@ -14,10 +14,14 @@ object AuthorTracer {
     fun trace(stage: String, payload: Any?, context: String? = null) {
         val (hasAuthor, value) = extractAuthor(payload)
         val suffix = context?.let { " (context=$it)" } ?: ""
-        if (hasAuthor)
-            log.debug("AuthorTracer[{}] author='{}'{}", stage, value, suffix)
+        val msg = if (hasAuthor)
+            "AuthorTracer[$stage] author='$value'$suffix"
         else
-            log.warn("AuthorTracer[{}] author missing{}", stage, suffix)
+            "AuthorTracer[$stage] author missing$suffix"
+
+        // Force output to stderr so we always see it
+        System.err.println(msg)
+        log.warn(msg)
     }
 
     private fun extractAuthor(payload: Any?): Pair<Boolean, Any?>

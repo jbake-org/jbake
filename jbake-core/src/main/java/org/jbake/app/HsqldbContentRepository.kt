@@ -352,6 +352,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
                             }
                             Types.BOOLEAN -> rs.getBoolean(i)
                             Types.BIGINT, Types.INTEGER -> rs.getLong(i)
+                            Types.CLOB -> rs.getClob(i)?.let { it.getSubString(1, it.length().toInt()) }
+                            Types.BLOB -> rs.getBlob(i)?.let { String(it.getBytes(1, it.length().toInt())) }
                             else -> rs.getObject(i)
                         }
                         if (value != null)

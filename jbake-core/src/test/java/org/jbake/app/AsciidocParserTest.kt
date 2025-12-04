@@ -208,6 +208,27 @@ class AsciidocParserTest : StringSpec({
         map!!.body shouldContain "<p>JBake now supports AsciiDoc documents without JBake meta data.</p>"
     }
 
+    "should parse author from Asciidoc document header" {
+        val docWithAuthor = """
+            |= Test Post Title
+            |Jonathan Bullock
+            |2013-10-15
+            |:jbake-type: post
+            |:jbake-status: published
+            |
+            |This is the content of the post.
+        """.trimMargin()
+        
+        val testFile = createTestFile("with-author.ad", docWithAuthor)
+        val map = parser.processFile(testFile)
+        
+        map.shouldNotBeNull()
+        map.type shouldBe "post"
+        map.status shouldBe "published"
+        map["author"] shouldBe "Jonathan Bullock"
+        println("Parsed author: ${map["author"]}")
+    }
+
 
     afterTest {
         tempDir.deleteRecursively()

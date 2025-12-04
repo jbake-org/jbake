@@ -15,6 +15,7 @@ class ContentStore(type: String, name: String) {
 
     private val repository: ContentRepository = createRepository(type, name)
 
+
     private fun createRepository(type: String, name: String): ContentRepository {
         log.info("Using Content Repository type: $type with name: $name")
 
