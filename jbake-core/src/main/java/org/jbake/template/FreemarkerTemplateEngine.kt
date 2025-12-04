@@ -31,22 +31,19 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         templateCfg.setTimeZone(config.freemarkerTimeZone)
         templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
 
-        // Configure FreeMarker to handle missing map keys gracefully
-        // This makes it so that ${content.author} returns empty string when author key is missing
+        /*
+        // Configure FreeMarker to handle missing map keys gracefully.
+        // This makes it so that ${content.author} returns empty string when author key is missing.
         val objectWrapper = NullSafeObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
         templateCfg.setObjectWrapper(objectWrapper)
         templateCfg.setClassicCompatible(true)
 
         // Custom exception handler that ignores InvalidReferenceException
-        templateCfg.setTemplateExceptionHandler { te, env, out ->
-            if (te is InvalidReferenceException) {
-                // Silently replace missing references with empty string
-                out.write("")
-            } else {
-                // Re-throw other exceptions
-                throw te
-            }
+        // Silently replace missing references with empty string.
+        templateCfg.setTemplateExceptionHandler { ex: TemplateException, env: Environment, out ->
+            if (ex is InvalidReferenceException) out.write("") else throw ex
         }
+         */
 
         try {
             templateCfg.setDirectoryForTemplateLoading(config.templateDir)
