@@ -99,12 +99,12 @@ class AsciidoctorEngine : MarkupEngine() {
         }
 
         // Get attributes from document
-        log.info("=== Parsing attributes for document: {} ===", context.file.name)
+        ///log.info("=== Parsing attributes for document: {} ===", context.file.name)
         for ((key, value) in document.attributes) {
             val keyStr = key.toString()
-            val valueClass = value?.javaClass?.name ?: "null"
-            val valueStr = value?.toString() ?: "null"
-            log.info("Attribute: {} = {} (class: {})", keyStr, valueStr, valueClass)
+            ///val valueClass = value?.javaClass?.name ?: "null"
+            ///val valueStr = value?.toString() ?: "null"
+            ///log.info("Attribute: {} = {} (class: {})", keyStr, valueStr, valueClass)
 
             when {
                 keyStr.startsWith(JBAKE_PREFIX) -> {
