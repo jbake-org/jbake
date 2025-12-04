@@ -1,14 +1,12 @@
 
 
 - JTexy test suite only runs with JDK 17. Use Eclipse Temurin JDK 17 to run the tests (don't run them now, just remember).
-
-  `export JAVA_HOME=$HOME/.jdks/temurin-17.0.17 && export PATH=$JAVA_HOME/bin:$PATH && mvn ...`
-
+  ~~`export JAVA_HOME=$HOME/.jdks/temurin-17.0.17 && export PATH=$JAVA_HOME/bin:$PATH && mvn ...`~~
+    - Update: Not needed anymore, Maven is now set up with `<toolchain>` so it work just with `mvn ...`.
 
 - Check the docs/CONTRIBUTING.md file for coding style.
 
 - Prefer Kotlin idioms over Java ones where possible.
-
     * runCatching instead of try-catch when both `try` and `catch` blocks are short.
     * Use Kotlin's rich collection APIs.
 
@@ -24,7 +22,6 @@
 - Avoid running exec commands in CLI, as the developer has to confirm them.
   - For instance, `find ... -exec` or `sed -i` are discouraged. Use IDEA's Find and Replace tool instead.
   - Instead of a find + exec construct, prefer using `rg`. If not installed, prompt the user to install `ripgrep`. It's faster and needs no `-exec`.
-
 
 - When modifying build files, ensure compatibility with both Maven and Gradle builds. Update both `pom.xml` and `build.gradle` as needed.
 
@@ -46,7 +43,6 @@
   - Put the logger `log` instance as a private member of the class (at the end of it) instead of using companion object.
   - Use single-expression functions when they are short.
       - For longer ones, put the `=` indented on the next line.
-
 
 - Prefer brief code constructs over longer ones. For instance, use `mapNotNull` instead of `map` followed by `filterNotNull`.
 
