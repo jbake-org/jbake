@@ -64,6 +64,7 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - When running CLI, add the motivation for the command as a very brief comment after it, e.g. `rg 'somePattern'  # Expecting it to appear in ...`.
 - Write scripts as Kotlin Scripts (.kts) when practical. Avoid Python. Avoid Bash except for short scripts where Kotlin alternative would be more than twice as long.
 - When invoking the command line, remember to add batch mode options to avoid interactive prompts during automated processes, e.g., `--batch-mode` for Maven commands, `--no-pager` for Git commands, etc.
+- To get the usages of ModelAttributes, run this: `rg 'import .+ModelAttributes' --type kotlin | grep '.kt' | cut -f1 -d':' | xargs grep -B6 -A4 'ModelAttributes' {} | grep -v import`
 
 ## Agent Behavior
 
