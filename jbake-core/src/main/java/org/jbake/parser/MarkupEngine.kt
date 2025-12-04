@@ -7,6 +7,7 @@ import org.jbake.model.ModelAttributes.DOC_DATE
 import org.jbake.model.ModelAttributes.DOC_TAGS
 import org.jbake.model.ModelAttributes.FS_DOC_IS_CACHED_IN_DB
 import org.jbake.util.Logging.logger
+import org.jbake.util.trace
 import org.json.simple.JSONValue
 import org.slf4j.Logger
 import java.io.File
@@ -85,7 +86,7 @@ abstract class MarkupEngine : ParserEngine {
     private fun getFileContent(file: File, encoding: String): MutableList<String> {
         try {
             FileInputStream(file).use { `is` ->
-                log.trace("Read file '$file' with encoding '$encoding'")
+                log.trace { "Read file '$file' with encoding '$encoding'" }
                 val lines = IOUtils.readLines(`is`, encoding)
                 if (!lines.isEmpty() && isUtf8WithBOM(encoding, lines[0])) {
                     log.warn("Removed BOM from file '$file' read with encoding '$encoding'")
@@ -234,3 +235,23 @@ abstract class MarkupEngine : ParserEngine {
 
 /** This specific engine does nothing, meaning that the body is rendered as raw contents. */
 class RawMarkupEngine : MarkupEngine()
+
+/**
+ * An internal rendering engine used to notify the user that the markup format he used requires an engine that couldn't be loaded.
+ */
+class ErrorEngine @JvmOverloads constructor(private val engineName: String = "unknown")
+    : MarkupEngine()
+{
+    override fun processHeader(context: ParserContext) {
+        val documentModel = context.documentModel
+        documentModel.type = "post"
+        documentModel.status = "published"
+        documentModel.title = "Rendering engine missing"
+        documentModel.date = Date()
+        documentModel.tags = emptyList()
+    }
+
+    override fun processBody(parserContext: ParserContext) {
+        parserContext.body = "The markup engine [" + engineName + "] for [" + parserContext.file + "] couldn't be loaded"
+    }
+}
