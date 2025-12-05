@@ -16,6 +16,8 @@ class InitTest : StringSpec({
     lateinit var config: DefaultJBakeConfiguration
     lateinit var rootPath: File
     lateinit var tempDir: File
+    lateinit var init: Init
+    lateinit var initPath: File
 
     beforeTest {
         rootPath = TestUtils.testResourcesAsSourceDir
@@ -26,48 +28,34 @@ class InitTest : StringSpec({
 
         // Create temp directory for each test
         tempDir = Files.createTempDirectory("jbake-init-test").toFile()
+        initPath = tempDir.resolve("init").apply { mkdir() }
+        init = Init(config)
     }
 
     afterTest {
-        // Clean up temp directory
         tempDir.deleteRecursively()
     }
 
     "initOK" {
-        val init = Init(config)
-        val initPath = tempDir.resolve("init")
-        initPath.mkdir()
         init.run(initPath, rootPath, "freemarker")
-        val testFile = File(initPath, "testfile.txt")
-        testFile.shouldExist()
+        initPath.resolve("testfile.txt").shouldExist()
     }
 
     "initFailDestinationContainsContent" {
-        val init = Init(config)
-        val initPath = tempDir.resolve("init")
-        initPath.mkdir()
-        val contentDir = File(initPath.path, config.contentDirName ?: "content")
-        contentDir.mkdir()
+        File(initPath.path, config.contentDirName ?: "content").mkdir()
 
         shouldThrow<Exception> {
             init.run(initPath, rootPath, "freemarker")
         }
 
-        val testFile = File(initPath, "testfile.txt")
-        testFile.shouldNotExist()
+        initPath.resolve("testfile.txt").shouldNotExist()
     }
 
     "initFailInvalidTemplateType" {
-        val init = Init(config)
-        val initPath = tempDir.resolve("init")
-        initPath.mkdir()
-
         shouldThrow<Exception> {
             init.run(initPath, rootPath, "invalid")
         }
 
-        val testFile = File(initPath, "testfile.txt")
-        testFile.shouldNotExist()
+        initPath.resolve("testfile.txt").shouldNotExist()
     }
 })
-
