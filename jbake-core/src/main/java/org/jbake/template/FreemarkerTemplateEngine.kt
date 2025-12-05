@@ -137,17 +137,15 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 @Suppress("UNCHECKED_CAST")
                 val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
                 AuthorTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], key)
-                return extractors.extractAndTransform(db, key, map, adapterTyped)
-
-                /*
                 val result = extractors.extractAndTransform(db, key, map, adapterTyped)
-                val result = eagerModel.get(key)
 
-                // Wrap Map results with NullSafeMapModel to handle missing keys gracefully
+                // Wrap Map results (especially document models like "content") with NullSafeMapModel
+                // This ensures ${content.author} returns null instead of throwing InvalidReferenceException
+                // when the document doesn't have an author field. Combined with classicCompatible=true,
+                // null values are treated as empty strings in templates.
                 if (result is SimpleHash)
                     return NullSafeMapModel(result, wrapper)
                 return result
-                */
             }
             catch (_: NoModelExtractorException) {
                 return eagerModel.get(key)

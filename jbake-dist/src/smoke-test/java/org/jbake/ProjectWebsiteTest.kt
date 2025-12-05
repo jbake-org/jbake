@@ -25,7 +25,9 @@ class ProjectWebsiteTest : StringSpec({
             // Bake the website
             val runner = BinaryRunner(projectDir)
             val process = runner.runWithArguments(BinaryRunner.jbakeExecutableRelative.absolutePath, "-b")
-            withClue("\n========= JBake process output: =========\n\n${runner.processOutput}\n\n====================================\n\n") {
+            withClue("\n" +
+                "========= JBake process output: =========\n\n${runner.processOutput}\n" +
+                "=========================================\nProcess exit code:") {
                 process.exitValue() shouldBe 0
             }
             outputDir.resolve("index.html").shouldExist()
