@@ -76,9 +76,18 @@
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <resources>
+            <!-- Text resources that need property filtering -->
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes><exclude>**/*.zip</exclude></excludes>
+                <!--<includes><include>*.properties</include></includes>-->
+            </resource>
+            <!-- Binary resources that should NOT be filtered. TODO: Why should we bring this with the program? -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes><include>**/*.zip</include></includes>
             </resource>
         </resources>
         <plugins>
