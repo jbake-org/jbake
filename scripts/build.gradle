@@ -6,6 +6,7 @@ dependencies {
     implementation platform("org.jetbrains.kotlin:kotlin-bom")
     implementation platform("io.kotest:kotest-bom:6.0.6")
     implementation(platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"

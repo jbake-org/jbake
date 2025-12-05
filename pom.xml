@@ -134,11 +134,11 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-bom</artifactId><version>${version.kotlin}</version><type>pom</type><scope>import</scope></dependency>
-            <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version>            <type>pom</type><scope>import</scope></dependency>
-            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-bom</artifactId><version>${version.groovy}</version>   <type>pom</type><scope>import</scope></dependency>
-            <dependency><groupId>io.kotest</groupId><artifactId>kotest-bom</artifactId><version>${version.kotest}</version>           <type>pom</type><scope>import</scope></dependency>
-            <dependency><groupId>com.fasterxml.jackson</groupId><artifactId>jackson-bom</artifactId><version>${version.jackson}</version>         <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-bom</artifactId><version>${version.kotlin}</version>   <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.junit</groupId><artifactId>junit-bom</artifactId><version>${version.junit5}</version>               <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-bom</artifactId><version>${version.groovy}</version>      <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>io.kotest</groupId><artifactId>kotest-bom</artifactId><version>${version.kotest}</version>              <type>pom</type><scope>import</scope></dependency>
+            <dependency><groupId>com.fasterxml.jackson</groupId><artifactId>jackson-bom</artifactId><version>${version.jackson}</version><type>pom</type><scope>import</scope></dependency>
 
             <!-- Runtime dependencies -->
             <dependency><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>

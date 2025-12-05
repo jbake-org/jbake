@@ -53,7 +53,7 @@ dependencyUpdates.resolutionStrategy {
 subprojects {
     //dependencies {
         //constraints {
-    configurations.all {
+    configurations.configureEach {
         resolutionStrategy {
             // OrientDB
             force "org.graalvm.truffle:truffle-api:$graalVmVersion"

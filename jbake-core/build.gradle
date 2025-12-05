@@ -26,6 +26,7 @@ publishing {
 
 
 dependencies {
+    implementation(platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion")) // BOMs are already in scripts/build.gradle, is it needed here?
     api "commons-io:commons-io:$commonsIoVersion"
     api "org.apache.commons:commons-configuration2:$commonsConfigurationVersion"
     implementation "commons-beanutils:commons-beanutils:$commonsBeanutilsVersion"
@@ -33,6 +34,7 @@ dependencies {
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation("com.googlecode.json-simple:json-simple:$jsonSimpleVersion") { exclude group: "junit", module: "junit" }
     implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation "org.jsoup:jsoup:$jsoupVersion"
     compileOnly "org.yaml:snakeyaml:$snakeYamlVersion"
 

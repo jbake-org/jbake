@@ -1,7 +1,7 @@
 package org.jbake.model
 
 import org.jbake.app.DbUtils
-import java.util.*
+import java.time.OffsetDateTime
 
 /**
  * Type-safe document model that replaces the HashMap-based DocumentModel.
@@ -13,8 +13,8 @@ class TypedDocumentModel : TypedBaseModel() {
         get() = get(ModelAttributes.DOC_BODY_RENDERED) as? String ?: ""
         set(value) { set(ModelAttributes.DOC_BODY_RENDERED, value) }
 
-    var date: Date?
-        get() = get(ModelAttributes.DOC_DATE) as? Date
+    var date: OffsetDateTime?
+        get() = get(ModelAttributes.DOC_DATE) as? OffsetDateTime
         set(value) { putOrRemoveIfNull(ModelAttributes.DOC_DATE, value) }
 
     var status: String?

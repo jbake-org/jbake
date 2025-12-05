@@ -134,7 +134,12 @@ class AsciidoctorEngine : MarkupEngine() {
                     val convertedValue = convertRubyToJava(value)
                     if (convertedValue is String) {
                         runCatching { context.date = OffsetDateTime.parse(convertedValue, dateFormat) }
-                            .onFailure { log.error("Unable to parse revdate. Expected $dateFormat", it) }
+                        .recoverCatching {
+                            // If full date-time parsing fails, try as LocalDate
+                            val localDate = java.time.LocalDate.parse(convertedValue, dateFormat)
+                            context.date = localDate.atStartOfDay().atOffset(java.time.ZoneOffset.UTC)
+                        }
+                        .onFailure { log.error("Unable to parse revdate '$convertedValue'. Expected format: $dateFormat", it) }
                     }
                 }
                 keyStr == "jbake-tags" -> {

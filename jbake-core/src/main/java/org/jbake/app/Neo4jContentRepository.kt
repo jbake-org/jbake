@@ -1,6 +1,7 @@
 package org.jbake.app
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
@@ -11,7 +12,6 @@ import org.neo4j.graphdb.GraphDatabaseService
 import org.slf4j.Logger
 import java.io.File
 import java.nio.file.Path
-import java.util.*
 
 /**
  * Neo4j embedded database implementation of ContentRepository.
@@ -21,7 +21,10 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     private lateinit var managementService: DatabaseManagementService
     private lateinit var database: GraphDatabaseService
-    private val gson = Gson()
+
+    private val objectMapper = ObjectMapper().apply {
+        registerModule(JavaTimeModule())
+    }
 
     override var paginationOffset: Int = -1
     override var paginationLimit: Int = -1
@@ -66,7 +69,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override fun addDocument(document: DocumentModel) {
         // Ruby objects already converted by AsciidoctorEngine
-        val propertiesJson = gson.toJson(document)
+        val propertiesJson = objectMapper.writeValueAsString(document)
 
         database.beginTx().use { tx ->
             // Delete existing document if present
@@ -266,9 +269,8 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                     // Deserialize from properties JSON if available
                     val properties = node.getProperty("properties", null) as? String
                     if (properties != null) {
-                        @Suppress("UNCHECKED_CAST")
-                        val map = gson.fromJson(properties, Map::class.java) as Map<String, Any>
-                        document.putAll(map)
+                        val map = objectMapper.readValue<Map<String, Any?>>(properties, objectMapper.typeFactory.constructMapType(Map::class.java, String::class.java, Any::class.java))
+                        map.forEach { (k, v) -> if (v != null) document[k] = v }
                     } else {
                         // Fallback: read individual properties
                         node.propertyKeys.forEach { key: String ->
@@ -282,14 +284,12 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                     }
                 } else {
                     // Individual properties returned (e.g., for count queries)
-                    record.keys.forEach { key: String ->
-                        val value = record[key]
-                        if (value != null) {
-                            when (key) {
-                                "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
-                                "tags" -> document[key] = (value as? List<*>)?.map { it.toString() }?.toTypedArray() ?: emptyArray<String>()
-                                else -> document[key] = value
-                            }
+                    for (key: String in record.keys) {
+                        val value = record[key] ?: continue
+                        when (key) {
+                            "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
+                            "tags" -> document[key] = (value as? List<*>)?.map { it.toString() }?.toTypedArray() ?: emptyArray<String>()
+                            else -> document[key] = value
                         }
                     }
                 }
@@ -307,16 +307,18 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
         return database.beginTx().use { tx ->
             val result = tx.execute("MATCH (s:Signature {key: 'templates'}) RETURN s.sha1 as sha1")
-            val changed = if (result.hasNext()) {
-                val existingSignature = result.next()["sha1"] as? String
-                if (existingSignature != currentSignature) {
-                    tx.execute("MATCH (s:Signature {key: 'templates'}) SET s.sha1 = ${'$'}sha1", mapOf("sha1" to currentSignature)).close()
+            val changed =
+                if (result.hasNext()) {
+                    val existingSignature = result.next()["sha1"] as? String
+                    if (existingSignature == currentSignature) false
+                    else {
+                        tx.execute("MATCH (s:Signature {key: 'templates'}) SET s.sha1 = ${'$'}sha1", mapOf("sha1" to currentSignature)).close()
+                        true
+                    }
+                } else {
+                    tx.execute("CREATE (s:Signature {key: 'templates', sha1: ${'$'}sha1})", mapOf("sha1" to currentSignature)).close()
                     true
-                } else false
-            } else {
-                tx.execute("CREATE (s:Signature {key: 'templates', sha1: ${'$'}sha1})", mapOf("sha1" to currentSignature)).close()
-                true
-            }
+                }
             tx.commit()
             changed
         }

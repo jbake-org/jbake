@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.BeanSerializer
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
@@ -26,6 +27,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
     private lateinit var connection: Connection
     private val objectMapper = ObjectMapper().apply {
         configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+        registerModule(JavaTimeModule())  // Support for Java 8 date/time types like OffsetDateTime
 
         // Register a custom module to handle unknown types TODO: This seems was added to fix some issue - verify if still needed.
         registerModule(object : SimpleModule() {

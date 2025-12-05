@@ -204,8 +204,15 @@ abstract class MarkupEngine : ParserEngine {
         when {
             key == DOC_DATE -> {
                 runCatching {
-                    content.date = OffsetDateTime.parse(value, formatter) }
-                        .onFailure { e -> log.error("Unable to parse date $value with format from 'configuration?.dateFormat' - ${configuration?.dateFormat} : ${e.message}") }
+                    // Try parsing as OffsetDateTime first (for full date-time with offset)
+                    content.date = OffsetDateTime.parse(value, formatter)
+                }
+                .recoverCatching {
+                    // If that fails, try parsing as LocalDate and convert to OffsetDateTime at start of day in system timezone
+                    val localDate = java.time.LocalDate.parse(value, formatter)
+                    content.date = localDate.atStartOfDay().atOffset(java.time.ZoneOffset.UTC)
+                }
+                .onFailure { e -> log.error("Unable to parse date $value with format '${configuration?.dateFormat}': ${e.message}") }
             }
             key == DOC_TAGS            -> content.tags = getTags(value)
             key == FS_DOC_IS_CACHED_IN_DB          -> content.cached = (value.toBoolean())
