@@ -11,29 +11,25 @@ import org.jbake.TestUtils.newDir
 import org.jbake.app.JBakeExitException
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 
 class JBakeConfigurationInspectorTest : StringSpec({
 
-    lateinit var tempDir: Path
+    lateinit var tempDir: File
 
     beforeTest {
-        tempDir = Files.createTempDirectory("jbake-test")
+        tempDir = Files.createTempDirectory("jbake-test").toFile()
     }
 
     afterTest {
-        tempDir.toFile().deleteRecursively()
+        tempDir.deleteRecursively()
     }
 
     "shouldThrowExceptionIfSourceDirDoesNotExist" {
-        val nonExistentFile = File(tempDir.toFile(), "nofolder")
+        val nonExistentFile = File(tempDir, "nofolder")
         val configuration = mockk<JBakeConfiguration>()
         every { configuration.sourceDir } returns nonExistentFile
 
-        val inspector = JBakeConfigurationInspector(configuration)
-
-        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
-
+        val e = shouldThrow<JBakeExitException> { JBakeConfigurationInspector(configuration).inspect() }
         e.message shouldBe "Source dir must exist: " + nonExistentFile.absolutePath
     }
 
@@ -47,18 +43,14 @@ class JBakeConfigurationInspectorTest : StringSpec({
         val configuration = mockk<JBakeConfiguration>()
         every { configuration.sourceDir } returns nonReadableFile
 
-        val inspector = JBakeConfigurationInspector(configuration)
-
-        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
-
+        val e = shouldThrow<JBakeExitException> { JBakeConfigurationInspector(configuration).inspect() }
         e.message shouldBe "Source dir is not readable: " + nonReadableFile.absolutePath
     }
 
     "shouldThrowExceptionIfTemplateDirDoesNotExist" {
-        val templateDirName = "template/custom"
-        val expectedDir = File(tempDir.toFile(), templateDirName)
+        val expectedDir = File(tempDir, "template/custom")
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.sourceDir } returns tempDir.toFile()
+        every { configuration.sourceDir } returns tempDir
         every { configuration.templateDir } returns expectedDir
 
         val inspector = JBakeConfigurationInspector(configuration)
@@ -69,92 +61,69 @@ class JBakeConfigurationInspectorTest : StringSpec({
     }
 
     "shouldThrowExceptionIfContentDirDoesNotExist" {
-        val contentDirName = "content"
-        val templateDirName = "template"
-        val templateDir = newDir(tempDir.toFile(), templateDirName)
-        val contentDir = File(tempDir.toFile(), contentDirName)
+        val contentDir = File(tempDir, "content")
 
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.sourceDir } returns tempDir.toFile()
-        every { configuration.templateDir } returns templateDir
+        every { configuration.sourceDir } returns tempDir
+        every { configuration.templateDir } returns newDir(tempDir, "template")
         every { configuration.contentDir } returns contentDir
 
-        val inspector = JBakeConfigurationInspector(configuration)
-
-        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
-
+        val e = shouldThrow<JBakeExitException> { JBakeConfigurationInspector(configuration).inspect() }
         e.message shouldBe "Required dir cannot be found! Expected to find [content.folder] at: " + contentDir.absolutePath
     }
 
     "shouldCreateDestinationDirIfNotExists" {
-        val contentDirName = "content"
-        val templateDirName = "template"
-        val destinationDirName = "output"
 
-        val templateDir = newDir(tempDir.toFile(), templateDirName)
-        val contentDir = newDir(tempDir.toFile(), contentDirName)
-        val destinationDir = File(tempDir.toFile(), destinationDirName)
+        val templateDir = newDir(tempDir, "template")
+        val contentDir = newDir(tempDir, "content")
+        val destinationDir = File(tempDir, "output")
 
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.sourceDir } returns tempDir.toFile()
+        every { configuration.sourceDir } returns tempDir
         every { configuration.templateDir } returns templateDir
         every { configuration.contentDir } returns contentDir
         every { configuration.destinationDir } returns destinationDir
         every { configuration.assetDir } returns destinationDir
 
-        val inspector = JBakeConfigurationInspector(configuration)
-
-        inspector.inspect()
-
+        JBakeConfigurationInspector(configuration).inspect()
         destinationDir.shouldExist()
     }
 
     "shouldThrowExceptionIfDestinationDirNotWritable" {
-        val contentDirName = "content"
-        val templateDirName = "template"
 
-        val templateDir = newDir(tempDir.toFile(), templateDirName)
-        val contentDir = newDir(tempDir.toFile(), contentDirName)
+        val templateDir = newDir(tempDir, "template")
+        val contentDir = newDir(tempDir, "content")
         val destinationDir = mockk<File>()
         every { destinationDir.exists() } returns true
         every { destinationDir.canWrite() } returns false
         every { destinationDir.absolutePath } returns "/tmp/notwritable"
 
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.sourceDir } returns tempDir.toFile()
+        every { configuration.sourceDir } returns tempDir
         every { configuration.templateDir } returns templateDir
         every { configuration.contentDir } returns contentDir
         every { configuration.destinationDir } returns destinationDir
 
-        val inspector = JBakeConfigurationInspector(configuration)
-
-        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
-
+        val e = shouldThrow<JBakeExitException> { JBakeConfigurationInspector(configuration).inspect() }
         e.message shouldContain "Destination dir is not writable:"
     }
 
     "shouldLogWarningIfAssetDirDoesNotExist" {
-        val contentDirName = "content"
-        val templateDirName = "template"
-        val destinationDirName = "output"
-        val assetDirName = "assets"
 
-        val templateDir = newDir(tempDir.toFile(), templateDirName)
-        val contentDir = newDir(tempDir.toFile(), contentDirName)
-        val destinationDir = newDir(tempDir.toFile(), destinationDirName)
-        val assetDir = File(tempDir.toFile(), assetDirName)
+        val templateDir = newDir(tempDir, "template")
+        val contentDir = newDir(tempDir, "content")
+        val destinationDir = newDir(tempDir, "output")
+        val assetDir = File(tempDir, "assets")
 
         val configuration = mockk<JBakeConfiguration>()
-        every { configuration.sourceDir } returns tempDir.toFile()
+        every { configuration.sourceDir } returns tempDir
         every { configuration.templateDir } returns templateDir
         every { configuration.contentDir } returns contentDir
         every { configuration.destinationDir } returns destinationDir
         every { configuration.assetDir } returns assetDir
 
-        val inspector = JBakeConfigurationInspector(configuration)
-
         // Should not throw exception, just log warning
-        inspector.inspect()
+        JBakeConfigurationInspector(configuration).inspect()
 
         // Test passes if no exception is thrown
         assetDir.exists() shouldBe false

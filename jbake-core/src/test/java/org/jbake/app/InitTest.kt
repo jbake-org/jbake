@@ -14,13 +14,12 @@ import java.nio.file.Files
 class InitTest : StringSpec({
 
     lateinit var config: DefaultJBakeConfiguration
-    lateinit var rootPath: File
+    var rootPath: File = TestUtils.testResourcesAsSourceDir
     lateinit var tempDir: File
     lateinit var init: Init
     lateinit var initPath: File
 
     beforeTest {
-        rootPath = TestUtils.testResourcesAsSourceDir
         if (!rootPath.exists()) throw Exception("Cannot find base path for test!")
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         // Override base template config option.
