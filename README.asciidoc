@@ -166,11 +166,8 @@ Pick the project checkstyle file `config/checkstyle/checkstyle.xml`
 === Testing
 
 * https://kotest.io/[Kotest] - Kotlin testing framework
-* http://junit.org/[JUnit 5] - Java testing framework
 * https://mockk.io/[MockK] - Mocking library for Kotlin
-* https://site.mockito.org/[Mockito] - Mocking framework for Java
 * https://www.testcontainers.org/[Testcontainers] - Docker-based integration testing
-* https://assertj.github.io/doc/[AssertJ] - Fluent assertions library
 
 == Copyright & License
 

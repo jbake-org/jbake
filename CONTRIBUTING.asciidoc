@@ -13,9 +13,6 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :uri-branch-help: {uri-help-base}/working-with-forks/fork-a-repo#creating-a-branch-to-work-on
 :uri-pr-help: {uri-help-base}/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
 :uri-gist: https://gist.github.com
-:uri-assertj: https://assertj.github.io/doc/
-:uri-junit5: https://junit.org/junit5/
-:uri-mockito: https://site.mockito.org/
 :uri-kotest: https://kotest.io/
 :uri-license: LICENSE
 :uri-build: BUILD.adoc
@@ -78,10 +75,6 @@ Tests and their resources reside within `/src/test` directory. JBake is written 
 ==== Available Testing Libraries
 
 * {uri-kotest}[Kotest] - Kotlin-native testing framework (preferred for new tests)
-* {uri-junit5}[JUnit 5] - Primary testing framework
-* JUnit 4 - Legacy tests (being migrated to JUnit 5)
-* {uri-assertj}[AssertJ] - Fluent assertions
-* {uri-mockito}[Mockito] - Mocking framework for Java interop
 * MockK - Kotlin mocking library
 
 For Kotlin tests, prefer Kotest as it provides idiomatic Kotlin testing support with expressive DSL.
@@ -113,7 +106,7 @@ Tests can be run directly in modern IDEs (IntelliJ IDEA, Eclipse, VS Code).
 * Use descriptive test names in Kotlin style (backticks for readable names)
 * Keep tests focused and isolated
 * Prefer Kotest for new tests - it provides better Kotlin integration
-* Use MockK for mocking Kotlin classes (Mockito for Java interop only)
+* Use MockK for mocking Kotlin classes
 
 === Supported Java Versions
 

@@ -45,7 +45,7 @@ dependencies {
     testImplementation "com.github.docker-java:docker-java-transport-zerodep:$dockerJavaVersion"
 
     // Jackson dependencies required by Testcontainers 2.0.2
-    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-annotations:2.20" // Not $jacksonVersion... wrong version published
     testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     testImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
 

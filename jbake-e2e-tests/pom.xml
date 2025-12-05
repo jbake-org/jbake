@@ -33,7 +33,7 @@
         <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-api</artifactId><scope>test</scope></dependency>
         <dependency><groupId>com.github.docker-java</groupId><artifactId>docker-java-transport-zerodep</artifactId><scope>test</scope></dependency>
         <!-- Jackson dependencies required by Testcontainers 2.0.2 - versions managed in parent -->
-        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-annotations</artifactId><scope>test</scope></dependency>
+        <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-annotations</artifactId><scope>test</scope><version>2.20</version><!-- Special :/ --></dependency>
         <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><scope>test</scope></dependency>
         <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-core</artifactId><scope>test</scope></dependency>
         <!-- Testing frameworks -->

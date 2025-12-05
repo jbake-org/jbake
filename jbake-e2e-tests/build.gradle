@@ -27,18 +27,12 @@ dependencies {
     // TestContainers 2.0.2 - artifact renamed from junit-jupiter to testcontainers-junit-jupiter
     testImplementation "org.testcontainers:testcontainers:$testcontainersVersion"
     testImplementation "org.testcontainers:testcontainers-junit-jupiter:$testcontainersVersion"
-
-    // Force newer docker-java versions that support Docker API 1.44+ (fixes issue #11212)
     testImplementation "com.github.docker-java:docker-java-core:$dockerJavaVersion"
     testImplementation "com.github.docker-java:docker-java-api:$dockerJavaVersion"
     testImplementation "com.github.docker-java:docker-java-transport-zerodep:$dockerJavaVersion"
-
-    // Jackson dependencies required by Testcontainers 2.0.2
-    testImplementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    testImplementation "com.fasterxml.jackson.core:jackson-annotations:2.20" // Not $jacksonVersion... wrong version published
     testImplementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     testImplementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-
-    // SLF4J binding for Testcontainers logging (2.x for Testcontainers 2.0.2)
     testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
 
     // Testing frameworks

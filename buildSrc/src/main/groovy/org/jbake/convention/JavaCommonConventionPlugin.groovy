@@ -25,16 +25,8 @@ class JavaCommonConventionPlugin implements Plugin<Project> {
             implementation "ch.qos.logback:logback-classic:${project.logbackVersion}"
             implementation "ch.qos.logback:logback-core:${project.logbackVersion}"
 
-            testImplementation "org.junit-pioneer:junit-pioneer:${project.junitPioneer}"
             testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit5Version}"
-            testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit5Version}"
-            // compatibility for Junit 4 test
-            testCompileOnly "junit:junit:${project.junit4Version}"
-            testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${project.junit5Version}"
 
-            testImplementation "org.assertj:assertj-core:${project.assertjCoreVersion}"
-            testImplementation "org.mockito:mockito-core:${project.mockitoVersion}"
-            testImplementation "org.mockito:mockito-junit-jupiter:${project.mockitoVersion}"
             testImplementation "org.itsallcode:junit5-system-extensions:${project.junit5SystemExtVersion}"
         }
 

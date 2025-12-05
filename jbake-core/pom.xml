@@ -20,6 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <!-- Kepp the lines sorted. -->
     <dependencies>
         <!-- API Dependencies -->
         <dependency><groupId>commons-io</groupId><artifactId>commons-io</artifactId></dependency>
@@ -41,34 +42,34 @@
 
 
         <!-- Implementation Dependencies -->
-        <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId></dependency>
-        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><optional>true</optional></dependency>
-        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-lang3</artifactId></dependency>
-        <dependency><groupId>com.googlecode.json-simple</groupId><artifactId>json-simple</artifactId><exclusions><exclusion><groupId>junit</groupId><artifactId>junit</artifactId></exclusion></exclusions></dependency>
-        <dependency><groupId>com.orientechnologies</groupId><artifactId>orientdb-core</artifactId></dependency>
-        <dependency><groupId>org.hsqldb</groupId><artifactId>hsqldb</artifactId></dependency>
-        <dependency><groupId>org.neo4j</groupId><artifactId>neo4j</artifactId></dependency>
         <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId></dependency>
         <dependency><groupId>com.fasterxml.jackson.datatype</groupId><artifactId>jackson-datatype-jdk8</artifactId></dependency>
         <dependency><groupId>com.fasterxml.jackson.datatype</groupId><artifactId>jackson-datatype-jsr310</artifactId></dependency>
-        <dependency><groupId>org.jsoup</groupId><artifactId>jsoup</artifactId></dependency>
-        <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><optional>true</optional></dependency>
-        <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>com.googlecode.json-simple</groupId><artifactId>json-simple</artifactId><exclusions><exclusion><groupId>junit</groupId><artifactId>junit</artifactId></exclusion></exclusions></dependency>
+        <dependency><groupId>com.orientechnologies</groupId><artifactId>orientdb-core</artifactId></dependency>
+        <dependency><groupId>commons-beanutils</groupId><artifactId>commons-beanutils</artifactId></dependency>
         <dependency><groupId>info.picocli</groupId><artifactId>picocli</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-lang3</artifactId></dependency>
+        <dependency><groupId>org.apache.commons</groupId><artifactId>commons-vfs2</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.eclipse.jetty</groupId><artifactId>jetty-server</artifactId><optional>true</optional></dependency>
+        <dependency><groupId>org.hsqldb</groupId><artifactId>hsqldb</artifactId></dependency>
         <dependency><groupId>org.jetbrains.kotlin</groupId><artifactId>kotlin-stdlib-jdk8</artifactId></dependency>
+        <dependency><groupId>org.jsoup</groupId><artifactId>jsoup</artifactId></dependency>
+        <dependency><groupId>org.neo4j</groupId><artifactId>neo4j</artifactId></dependency>
+        <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><optional>true</optional></dependency>
 
         <!-- Test Dependencies -->
         <dependency><scope>test</scope><groupId>ch.qos.logback</groupId><artifactId>logback-classic</artifactId><version>${version.logback}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-property-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
+        <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk-jvm</artifactId><version>${version.mockk}</version></dependency>
         <dependency><scope>test</scope><groupId>junit</groupId><artifactId>junit</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk-jvm</artifactId><version>${version.mockk}</version></dependency>
-        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
-        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-assertions-core-jvm</artifactId><version>${version.kotest}</version></dependency>
-        <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-property-jvm</artifactId><version>${version.kotest}</version></dependency>
     </dependencies>
 
     <build>
