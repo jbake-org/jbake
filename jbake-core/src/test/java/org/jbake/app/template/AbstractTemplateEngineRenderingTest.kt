@@ -41,7 +41,7 @@ abstract class AbstractTemplateEngineRenderingTest(
         DocumentTypeRegistry.clearListenersForTests()
         addListener(listener)
 
-        templateDir_ = File(sourceDir, templateDir)
+        templateDir_ = sourceDir.resolve(templateDir)
         if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
 
         destinationDir_ = tempDir

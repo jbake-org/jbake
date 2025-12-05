@@ -27,7 +27,7 @@ class TestResourcesVerificationTest {
     @Test
     fun `should have jbake properties file`() {
         val testDataDir = getTestDataDir()
-        val propsFile = File(testDataDir, "jbake.properties")
+        val propsFile = testDataDir.resolve("jbake.properties")
         propsFile.exists() shouldBe true
         propsFile.readText() shouldNotBe ""
     }
@@ -35,7 +35,7 @@ class TestResourcesVerificationTest {
     @Test
     fun `should have content directory`() {
         val testDataDir = getTestDataDir()
-        val contentDir = File(testDataDir, "content")
+        val contentDir = testDataDir.resolve("content")
         contentDir.exists() shouldBe true
         contentDir.isDirectory shouldBe true
     }
@@ -43,7 +43,7 @@ class TestResourcesVerificationTest {
     @Test
     fun `should have blog posts`() {
         val testDataDir = getTestDataDir()
-        val blogDir = File(testDataDir, "content/blog")
+        val blogDir = testDataDir.resolve("content/blog")
         blogDir.exists() shouldBe true
         blogDir.isDirectory shouldBe true
     }
@@ -51,37 +51,37 @@ class TestResourcesVerificationTest {
     @Test
     fun `should have freemarker templates`() {
         val testDataDir = getTestDataDir()
-        val templatesDir = File(testDataDir, "freemarkerTemplates")
+        val templatesDir = testDataDir.resolve("freemarkerTemplates")
         templatesDir.exists() shouldBe true
         templatesDir.isDirectory shouldBe true
 
-        File(templatesDir, "index.ftl").exists() shouldBe true
-        File(templatesDir, "page.ftl").exists() shouldBe true
-        File(templatesDir, "post.ftl").exists() shouldBe true
+        templatesDir.resolve("index.ftl").exists() shouldBe true
+        templatesDir.resolve("page.ftl").exists() shouldBe true
+        templatesDir.resolve("post.ftl").exists() shouldBe true
     }
 
     @Test
     fun `should have groovy templates`() {
         val testDataDir = getTestDataDir()
-        val templatesDir = File(testDataDir, "groovyTemplates")
+        val templatesDir = testDataDir.resolve("groovyTemplates")
         templatesDir.exists() shouldBe true
         templatesDir.isDirectory shouldBe true
 
-        File(templatesDir, "index.gsp").exists() shouldBe true
-        File(templatesDir, "page.gsp").exists() shouldBe true
-        File(templatesDir, "post.gsp").exists() shouldBe true
+        templatesDir.resolve("index.gsp").exists() shouldBe true
+        templatesDir.resolve("page.gsp").exists() shouldBe true
+        templatesDir.resolve("post.gsp").exists() shouldBe true
     }
 
     @Test
     fun `should have thymeleaf templates`() {
         val testDataDir = getTestDataDir()
-        val templatesDir = File(testDataDir, "thymeleafTemplates")
+        val templatesDir = testDataDir.resolve("thymeleafTemplates")
         templatesDir.exists() shouldBe true
         templatesDir.isDirectory shouldBe true
 
-        File(templatesDir, "index.thyme").exists() shouldBe true
-        File(templatesDir, "page.thyme").exists() shouldBe true
-        File(templatesDir, "post.thyme").exists() shouldBe true
+        templatesDir.resolve("index.thyme").exists() shouldBe true
+        templatesDir.resolve("page.thyme").exists() shouldBe true
+        templatesDir.resolve("post.thyme").exists() shouldBe true
     }
 
     @Test
@@ -91,7 +91,7 @@ class TestResourcesVerificationTest {
         // Check all essential directories exist
         listOf("content", "freemarkerTemplates", "groovyTemplates", "thymeleafTemplates", "assets")
             .forEach { dir ->
-                File(testDataDir, dir).exists() shouldBe true
+                testDataDir.resolve(dir).exists() shouldBe true
             }
     }
 }

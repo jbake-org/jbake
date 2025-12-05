@@ -16,7 +16,7 @@ class ProjectWebsiteTest : StringSpec({
         val tempDir = createTempDirectory("jbake-website-test-").toFile()
         try {
             val projectDir = tempDir.resolve("project")
-            val outputDir = File(projectDir, "output")
+            val outputDir = projectDir.resolve("output")
 
             // Clone JBake website repository
             Git.cloneRepository().setURI(WEBSITE_REPO_URL).setDirectory(projectDir).setBare(false).setBranch("master").setRemote("origin").call()

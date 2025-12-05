@@ -23,10 +23,10 @@ class FileUtilTest : StringSpec({
 
     "testIsFileInDirectory" {
         val fixtureDir = File(this.javaClass.getResource("/fixture").file)
-        val jbakeFile = File(fixtureDir, "jbake.properties")
+        val jbakeFile = fixtureDir.resolve("jbake.properties")
         isFileInDirectory(jbakeFile, fixtureDir).shouldBeTrue()
 
-        val contentFile = File(File(fixtureDir, "content"), "projects.html")
+        val contentFile = File(fixtureDir.resolve("content"), "projects.html")
         isFileInDirectory(contentFile, fixtureDir).shouldBeTrue()
 
         val contentDir = contentFile.getParentFile()
@@ -38,13 +38,13 @@ class FileUtilTest : StringSpec({
         val util = ConfigUtil()
         val config = util.loadConfig(source) as DefaultJBakeConfiguration
 
-        var path = getUriPathToContentRoot(config, File(config.contentDir, "index.html"))
+        var path = getUriPathToContentRoot(config, config.contentDir.resolve("index.html"))
         path shouldBe ""
 
-        path = getUriPathToContentRoot(config, File(config.contentDir, "/blog/index.html"))
+        path = getUriPathToContentRoot(config, config.contentDir.resolve("/blog/index.html"))
         path shouldBe "../"
 
-        path = getUriPathToContentRoot(config, File(config.contentDir, "/blog/level2/index.html"))
+        path = getUriPathToContentRoot(config, config.contentDir.resolve("/blog/level2/index.html"))
         path shouldBe "../../"
     }
 })

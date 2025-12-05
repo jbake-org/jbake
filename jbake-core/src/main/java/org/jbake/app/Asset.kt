@@ -102,7 +102,7 @@ class Asset(private val config: JBakeConfiguration) {
         if (assets != null) {
             Arrays.sort(assets)
             for (asset in assets) {
-                val target = File(targetDir, asset.getName())
+                val target = targetDir.resolve(asset.getName())
                 if (asset.isFile()) copyFile(asset, target)
                 else if (asset.isDirectory()) copy(asset, target, filter)
             }

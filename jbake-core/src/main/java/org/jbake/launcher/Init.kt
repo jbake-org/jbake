@@ -42,7 +42,7 @@ class Init(private val config: JBakeConfiguration) {
         }
 
         // Fall back to filesystem (development mode)
-        val templateFile = File(templateDir, exampleProjectName)
+        val templateFile = templateDir.resolve(exampleProjectName)
         if (!templateFile.exists())
             throw Exception("Cannot find example project file: $exampleProjectName (tried classpath and filesystem at ${templateFile.path})")
 

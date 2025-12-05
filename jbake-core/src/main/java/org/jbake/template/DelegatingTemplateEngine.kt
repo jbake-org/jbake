@@ -33,7 +33,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
 
         // If default template exists we will use it.
         val templateDir = config.templateDir
-        var templateFile = File(templateDir, templateName)
+        var templateFile = templateDir.resolve(templateName)
         var theTemplateName = templateName
 
         if (!templateFile.exists()) {
@@ -41,7 +41,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
             // if default template does not exist then check if any alternative engine templates exist
             val templateNameWithoutExt = templateName.dropLast(4)
             for (extension in renderers.recognizedExtensions) {
-                templateFile = File(templateDir, "$templateNameWithoutExt.$extension")
+                templateFile = templateDir.resolve("$templateNameWithoutExt.$extension")
                 if (templateFile.exists()) {
                     log.info("Found alternative template file: {} using this instead", templateFile.getName())
                     theTemplateName = templateFile.getName()

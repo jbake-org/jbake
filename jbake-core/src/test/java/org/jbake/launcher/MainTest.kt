@@ -52,7 +52,7 @@ class MainTest : StringSpec({
 
     "launchJetty" {
         val currentWorkingdir = tempDir.resolve("src/jbake").apply { mkdirs() }
-        val expectedOutputDir = File(currentWorkingdir, "output")
+        val expectedOutputDir = currentWorkingdir.resolve("output")
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
         every { mockFactory.createJettyJbakeConfiguration(any<File>(), any(), any(), any()) } returns configuration
@@ -98,7 +98,7 @@ class MainTest : StringSpec({
 
     "launchBakeAndJetty" {
         val currentWorkingdir = tempDir.resolve("src/jbake").apply { mkdirs() }
-        val expectedOutput = File(currentWorkingdir, "output")
+        val expectedOutput = currentWorkingdir.resolve("output")
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
 
         every { mockFactory.createJettyJbakeConfiguration(any<File>(), any<File>(), any<File>(), any()) } returns configuration

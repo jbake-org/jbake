@@ -26,7 +26,7 @@ class BuiltInProjectsTest : StringSpec({
                 tempDir.resolve("jbake.properties").shouldExist()
 
                 val templateDir = tempDir.resolve("templates") //.also { it.mkdir() }
-                File(templateDir, "index.$extension").shouldExist()
+                templateDir.resolve("index.$extension").shouldExist()
                 initProcess.destroy()
 
                 // Bake project
@@ -42,7 +42,7 @@ class BuiltInProjectsTest : StringSpec({
                 }
 
                 val outputDir = tempDir.resolve("output") //.also { it.mkdir() }
-                File(outputDir, "index.html").shouldExist()
+                outputDir.resolve("index.html").shouldExist()
                 bakeProcess.destroy()
 
                 tempDir.deleteRecursively()

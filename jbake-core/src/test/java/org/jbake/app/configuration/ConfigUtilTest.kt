@@ -80,7 +80,7 @@ class ConfigUtilTest : StringSpec({
 
     "shouldReturnDestinationDirFromConfiguration" {
         val sourceDir = TestUtils.testResourcesAsSourceDir
-        val expectedDestinationDir = File(sourceDir, "output")
+        val expectedDestinationDir = sourceDir.resolve("output")
         val config = util.loadConfig(sourceDir)
 
         config.destinationDir shouldBe expectedDestinationDir
@@ -88,7 +88,7 @@ class ConfigUtilTest : StringSpec({
 
     "shouldReturnAssetDirFromConfiguration" {
         val sourceDir = TestUtils.testResourcesAsSourceDir
-        val expectedDestinationDir = File(sourceDir, "assets")
+        val expectedDestinationDir = sourceDir.resolve("assets")
         val config = util.loadConfig(sourceDir)
 
         config.assetDir shouldBe expectedDestinationDir
@@ -96,7 +96,7 @@ class ConfigUtilTest : StringSpec({
 
     "shouldReturnTemplateDirFromConfiguration" {
         val sourceDir = TestUtils.testResourcesAsSourceDir
-        val expectedDestinationDir = File(sourceDir, "templates")
+        val expectedDestinationDir = sourceDir.resolve("templates")
         val config = util.loadConfig(sourceDir)
 
         config.templateDir shouldBe expectedDestinationDir
@@ -104,7 +104,7 @@ class ConfigUtilTest : StringSpec({
 
     "shouldReturnContentDirFromConfiguration" {
         val sourceDir = TestUtils.testResourcesAsSourceDir
-        val expectedDestinationDir = File(sourceDir, "content")
+        val expectedDestinationDir = sourceDir.resolve("content")
         val config = util.loadConfig(sourceDir)
 
         config.contentDir shouldBe expectedDestinationDir
@@ -112,7 +112,7 @@ class ConfigUtilTest : StringSpec({
 
     "shouldGetTemplateFileDoctype" {
         val sourceDir = TestUtils.testResourcesAsSourceDir
-        val expectedTemplateFile = File(sourceDir, "templates/index.ftl")
+        val expectedTemplateFile = sourceDir.resolve("templates/index.ftl")
         val config = util.loadConfig(sourceDir)
 
         val templateFile = config.getTemplateFileByDocType("masterindex")

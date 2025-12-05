@@ -72,7 +72,7 @@ class AssetTest : StringSpec({
     }
 
     "testCopyCustomDir" {
-        config.assetDir = File(config.sourceDir, "/media")
+        config.assetDir = config.sourceDir.resolve("/media")
         Asset(config).copy()
 
         tempDir.resolve("favicon.ico").exists() shouldBe true
@@ -101,7 +101,7 @@ class AssetTest : StringSpec({
         }
         css.setReadOnly()
 
-        config.assetDir = File(config.sourceDir, "assets")
+        config.assetDir = config.sourceDir.resolve("assets")
         config.destinationDir = tempDir
         val asset = Asset(config)
         asset.copy()
@@ -112,7 +112,7 @@ class AssetTest : StringSpec({
     }
 
     "testUnlistable" {
-        config.assetDir = File(config.sourceDir, "non-existent")
+        config.assetDir = config.sourceDir.resolve("non-existent")
         Asset(config).copy()
     }
 
@@ -156,8 +156,8 @@ class AssetTest : StringSpec({
     }
 
     "testIsFileAsset" {
-        val cssAsset = File(config.assetDir, "css/bootstrap.min.css")
-        val contentFile = File(config.contentDir, "about.html")
+        val cssAsset = config.assetDir.resolve("css/bootstrap.min.css")
+        val contentFile = config.contentDir.resolve("about.html")
         val asset = Asset(config)
 
         cssAsset.exists() shouldBe true

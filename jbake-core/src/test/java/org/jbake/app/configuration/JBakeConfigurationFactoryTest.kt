@@ -45,7 +45,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
         val contentDir = TestUtils.newDir(root, "content/custom")
 
 
-        val properties = File(sourceDir, "jbake.properties")
+        val properties = sourceDir.resolve("jbake.properties")
 
         val pw = FileWriter(properties)
         pw.write("template.folder=templates/custom\n")

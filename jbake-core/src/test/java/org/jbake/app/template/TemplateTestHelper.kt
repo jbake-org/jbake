@@ -46,7 +46,7 @@ class TemplateTestHelper(
         DocumentTypeRegistry.clearListenersForTests()
         DocumentTypeRegistry.addListener(listener)
 
-        templateDir_ = File(sourceDir, templateDir)
+        templateDir_ = sourceDir.resolve(templateDir)
         if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
 
         destinationDir = ContentStoreIntegrationTest.tempDir

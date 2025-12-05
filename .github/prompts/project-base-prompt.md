@@ -43,6 +43,18 @@ This document provides guidelines for contributing to **JBake**, an open-source 
   - Put the logger `log` instance as a private member of the class (at the end of it) instead of using companion object.
   - Use single-expression functions when they are short.
       - For longer ones, put the `=` indented on the next line.
+      - Prefer returning simpler values in `if` rather than later (in `else` or after the `if`).
+        - ```kotlin
+          //  Not so great:
+          if (!templateFileName.isNullOrEmpty()) {
+              return templateDir.resolve(templateFileName)
+          }
+          return null
+
+          // Better:
+          if (templateFileName.isNullOrEmpty()) return null
+          return templateDir.resolve(templateFileName)
+          ```
 - Don't leave empty lines before closing braces.
 - Try not to duplicate code. If you find yourself copying and pasting code, consider refactoring it into a shared function, class, or module.
 - Keep Java interop in mind. JBake is also used as a library. New public APIs should be easily usable from Java.

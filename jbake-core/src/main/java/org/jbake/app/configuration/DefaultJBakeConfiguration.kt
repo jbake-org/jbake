@@ -340,19 +340,15 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override fun getTemplateByDocType(doctype: String): String? {
         val templateKey: String = DOCTYPE_TEMPLATE_PREFIX + doctype + DOCTYPE_FILE_POSTFIX
         val templateFileName = getAsString(templateKey)
-        if (templateFileName != null && templateFileName.isNotEmpty()) {
-            return templateFileName
-        }
+        if (!templateFileName.isNullOrBlank()) return templateFileName
         log.warn("Cannot find configuration key '{}' for document type '{}'", templateKey, doctype)
         return null
     }
 
     override fun getTemplateFileByDocType(doctype: String): File? {
         val templateFileName = getTemplateByDocType(doctype)
-        if (!templateFileName.isNullOrEmpty()) {
-            return File(templateDir, templateFileName)
-        }
-        return null
+        if (templateFileName.isNullOrBlank()) return null
+        return templateDir.resolve(templateFileName)
     }
 
     override var templateDir: File
@@ -442,7 +438,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
         val destination = File(destinationPath)
         destinationDir =
             if (destination.isAbsolute) destination
-            else File(sourceDir, destinationPath)
+            else sourceDir.resolve(destinationPath)
     }
 
     /// TODO This is weird logic, review

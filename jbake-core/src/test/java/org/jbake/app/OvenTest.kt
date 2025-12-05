@@ -61,9 +61,9 @@ class OvenTest : StringSpec({
     "shouldBakeWithRelativeCustomPaths" {
         sourceDir = TestUtils.getTestResourcesAsSourceDir("/fixture-custom-relative")
         conf = ConfigUtil().loadConfig(sourceDir) as DefaultJBakeConfiguration
-        val assetDir = File(conf.destinationDir, "css")
-        val aboutFile = File(conf.destinationDir, "about.html")
-        val blogSubDir = File(conf.destinationDir, "blog")
+        val assetDir = conf.destinationDir.resolve("css")
+        val aboutFile = conf.destinationDir.resolve("about.html")
+        val blogSubDir = conf.destinationDir.resolve("blog")
 
 
         val oven = Oven(conf)
@@ -109,9 +109,9 @@ class OvenTest : StringSpec({
         fw.close()
 
         conf = ConfigUtil().loadConfig(source.toFile()) as DefaultJBakeConfiguration
-        val assetDir = File(conf.destinationDir, "css")
-        val aboutFile = File(conf.destinationDir, "about.html")
-        val blogSubDir = File(conf.destinationDir, "blog")
+        val assetDir = conf.destinationDir.resolve("css")
+        val aboutFile = conf.destinationDir.resolve("about.html")
+        val blogSubDir = conf.destinationDir.resolve("blog")
 
 
         val oven = Oven(conf)
