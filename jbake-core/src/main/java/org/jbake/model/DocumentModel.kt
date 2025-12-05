@@ -1,7 +1,7 @@
 package org.jbake.model
 
 import org.jbake.app.DbUtils
-import java.util.*
+import java.time.LocalDate
 
 class DocumentModel : BaseModel() {
 
@@ -9,8 +9,8 @@ class DocumentModel : BaseModel() {
         get() = get(ModelAttributes.DOC_BODY_RENDERED) as String
         set(body) { put(ModelAttributes.DOC_BODY_RENDERED, body) }
 
-    var date: Date?
-        get() = get(ModelAttributes.DOC_DATE) as Date?
+    var date: LocalDate?
+        get() = get(ModelAttributes.DOC_DATE) as LocalDate?
         set(date) = putOrRemoveIfNull(ModelAttributes.DOC_DATE, date)
 
     var status: String?

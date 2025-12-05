@@ -13,8 +13,8 @@ import org.slf4j.Logger
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -190,15 +190,17 @@ abstract class MarkupEngine : ParserEngine {
             storeHeaderValue(parts[0], parts[1], content)
     }
 
+    val formatter: DateTimeFormatter by lazy { configuration?.dateFormat?.let { DateTimeFormatter.ofPattern(it) } ?: DateTimeFormatter.ISO_LOCAL_DATE }
+
     fun storeHeaderValue(inputKey: String, inputValue: String, content: DocumentModel) {
         val key = sanitize(inputKey).lowercase()
         val value = sanitize(inputValue)
 
         when {
             key == DOC_DATE -> {
-                val df: DateFormat = SimpleDateFormat(configuration?.dateFormat ?: "yyyy-MM-dd")
-                runCatching { content.date = (df.parse(value)) }
-                    .onFailure { e -> log.error("Unable to parse date $value with format ${configuration?.dateFormat}", e) }
+                runCatching {
+                    content.date = LocalDate.parse(value, formatter) }
+                        .onFailure { e -> log.error("Unable to parse date $value with format from 'configuration?.dateFormat' - ${configuration?.dateFormat} : ${e.message}") }
             }
             key == DOC_TAGS            -> content.tags = getTags(value)
             key == FS_DOC_IS_CACHED_IN_DB          -> content.cached = (value.toBoolean())
@@ -247,7 +249,7 @@ class ErrorEngine @JvmOverloads constructor(private val engineName: String = "un
         documentModel.type = "post"
         documentModel.status = "published"
         documentModel.title = "Rendering engine missing"
-        documentModel.date = Date()
+        documentModel.date = LocalDate.now()
         documentModel.tags = emptyList()
     }
 

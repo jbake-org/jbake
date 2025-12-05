@@ -3,6 +3,10 @@ package org.jbake.app
 import org.jbake.model.DocumentModel
 import java.time.LocalDate
 
+
+/**
+ * Just a playground to debug HSQLDB issues.
+ */
 object HsqldbDebugMain {
 
     @JvmStatic fun main(args: Array<String>) {
@@ -30,11 +34,9 @@ object HsqldbDebugMain {
 
         log.info("5. Got count: " + count);
 
-        if (count == 1L) {
-            log.info("SUCCESS!");
-        } else {
-            log.info("FAILURE! Expected 1 but got " + count);
-        }
+        if (count == 1L) log.info("SUCCESS!")
+        else log.info("FAILURE! Expected 1 but got " + count)
+
         repo.close()
     }
 
