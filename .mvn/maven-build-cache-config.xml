@@ -1,0 +1,60 @@
+<cache xmlns="http://maven.apache.org/BUILD-CACHE-CONFIG/1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-CONFIG/1.2.0 https://maven.apache.org/xsd/build-cache-config-1.2.0.xsd">
+
+    <!--
+        Template Maven build cache configuration
+     -->
+
+    <configuration>
+        <enabled>true</enabled>
+        <local>
+            <maxBuildsCached>3</maxBuildsCached>
+        </local>
+        <projectVersioning adjustMetaInf="true"/>
+    </configuration>
+
+    <input>
+        <global>
+            <includes>
+                <include>src/</include>
+            </includes>
+        </global>
+    </input>
+
+    <executionControl>
+        <runAlways>
+            <plugins>
+                <plugin artifactId="maven-failsafe-plugin"/>
+            </plugins>
+            <goalsLists>
+                <goalsList artifactId="maven-install-plugin"><goals><goal>install</goal></goals></goalsList>
+                <goalsList artifactId="maven-deploy-plugin"><goals><goal>deploy</goal></goals></goalsList>
+                <goalsList artifactId="bb-sdk-codegen"><goals><goal>deploy-local</goal></goals></goalsList>
+            </goalsLists>
+        </runAlways>
+        <reconcile logAllProperties="true">
+            <plugins>
+                <plugin artifactId="maven-compiler-plugin" goal="compile">
+                    <reconciles>
+                        <reconcile propertyName="source"/>
+                        <reconcile propertyName="target"/>
+                        <reconcile propertyName="debug"/>
+                        <reconcile propertyName="debuglevel"/>
+                    </reconciles>
+                    <!-- whitelist of logged properties-->
+                    <logs>
+                        <log propertyName="includes"/>
+                        <log propertyName="excludes"/>
+                        <log propertyName="argLine"/>
+                    </logs>
+                </plugin>
+                <plugin artifactId="duplicate-finder-maven-plugin" goal="check">
+                    <reconciles>
+                        <reconcile propertyName="skip" skipValue="true"/>
+                        <reconcile propertyName="quiet" skipValue="true"/>
+                    </reconciles>
+                </plugin>
+            </plugins>
+        </reconcile>
+    </executionControl>
+</cache>
