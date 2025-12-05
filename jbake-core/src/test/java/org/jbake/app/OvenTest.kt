@@ -132,7 +132,7 @@ class OvenTest : StringSpec({
     "shouldThrowExceptionIfSourceDirDoesNotExist" {
         conf.setSourceDir(root.resolve("none").toFile())
 
-        shouldThrow<JBakeException> { Oven(conf) }
+        shouldThrow<JBakeExitException> { Oven(conf) }
     }
 
     "shouldInstantiateNeededUtensils" {
@@ -169,7 +169,7 @@ class OvenTest : StringSpec({
             asset = asset
         )
 
-        shouldThrow<JBakeException> { Oven(utensils) }
+        shouldThrow<JBakeExitException> { Oven(utensils) }
     }
 
     "shouldCrawlRenderAndCopyAssets" {

@@ -1,6 +1,6 @@
 package org.jbake.launcher
 
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import org.jbake.app.Oven
 import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
@@ -25,7 +25,7 @@ class Baker {
                 msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.message))
                 ++errNr
             }
-            throw JBakeException(SystemExit.ERROR, msg.toString(), errors[0])
+            throw JBakeExitException(SystemExit.ERROR, msg.toString(), errors[0])
         }
     }
 }

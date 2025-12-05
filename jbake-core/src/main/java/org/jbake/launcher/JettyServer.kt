@@ -7,7 +7,7 @@ import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.server.handler.DefaultHandler
 import org.eclipse.jetty.server.handler.HandlerList
 import org.eclipse.jetty.server.handler.ResourceHandler
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.util.Logging.logger
@@ -65,7 +65,7 @@ class JettyServer : Closeable {
             server!!.start()
             server!!.join()
         } catch (e: Exception) {
-            throw JBakeException(SystemExit.SERVER_ERROR, "unable to start the server", e)
+            throw JBakeExitException(SystemExit.SERVER_ERROR, "unable to start the server", e)
         }
     }
 

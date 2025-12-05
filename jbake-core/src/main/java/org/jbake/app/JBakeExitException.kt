@@ -3,7 +3,7 @@ package org.jbake.app
 /**
  * Thrown by JBake API on processing error.
  */
-class JBakeException(private val exit: SystemExit, message: String, cause: Throwable? = null)
+class JBakeExitException(private val exit: SystemExit, message: String, cause: Throwable? = null)
     : RuntimeException(message, cause)
 {
     fun getExit() = exit.status

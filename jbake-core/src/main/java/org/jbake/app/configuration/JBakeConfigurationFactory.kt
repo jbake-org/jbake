@@ -1,6 +1,6 @@
 package org.jbake.app.configuration
 
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import java.io.File
 
 
@@ -17,9 +17,9 @@ class JBakeConfigurationFactory {
      * @param sourceDir The source directory of the project
      * @param destination The destination directory to render and copy files to
      * @param isClearCache Whether to clear database cache or not
-     * @throws JBakeException if loading the configuration fails
+     * @throws JBakeExitException if loading the configuration fails
      */
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun createDefaultJbakeConfiguration(sourceDir: File, destination: File, isClearCache: Boolean): DefaultJBakeConfiguration
         = createDefaultJbakeConfiguration(sourceDir, destination, null as File?, isClearCache)
 
@@ -29,9 +29,9 @@ class JBakeConfigurationFactory {
      * @param destination The destination directory to render and copy files to
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
-     * @throws JBakeException if loading the configuration fails
+     * @throws JBakeExitException if loading the configuration fails
      */
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun createDefaultJbakeConfiguration(
         sourceDir: File,
         destination: File,
@@ -52,10 +52,10 @@ class JBakeConfigurationFactory {
      *
      * @param destinationDir The destination directory to render and copy files to
      * @param isClearCache Whether to clear database cache or not
-     * @throws JBakeException if loading the configuration fails
+     * @throws JBakeExitException if loading the configuration fails
      */
     @Deprecated("use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead")
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun createJettyJbakeConfiguration(sourceDir: File, destinationDir: File, isClearCache: Boolean)
         = createJettyJbakeConfiguration(sourceDir, destinationDir, null as File?, isClearCache)
 
@@ -68,7 +68,7 @@ class JBakeConfigurationFactory {
      * @param propertiesFile The properties file for the project
      * @param isClearCache Whether to clear database cache or not
      */
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun createJettyJbakeConfiguration(
         sourceDir: File,
         destinationDir: File?,

@@ -1,7 +1,7 @@
 package org.jbake.launcher
 
 import org.jbake.app.FileUtil
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
@@ -23,7 +23,7 @@ class Main @JvmOverloads constructor(
 ) {
     var jBakeConfigurationFactory: JBakeConfigurationFactory = JBakeConfigurationFactory()
 
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun run(arguments: Array<String>) {
         try {
             SLF4JBridgeHandler.removeHandlersForRootLogger()
@@ -43,13 +43,13 @@ class Main @JvmOverloads constructor(
 
             run(args, config)
         }
-        catch (e: JBakeException) { throw e }
+        catch (e: JBakeExitException) { throw e }
         catch (mex: CommandLine.MissingParameterException) {
             log.error(mex.message)
-            throw JBakeException(SystemExit.CONFIG_ERROR, mex.message ?: mex.javaClass.simpleName, mex)
+            throw JBakeExitException(SystemExit.CONFIG_ERROR, mex.message ?: mex.javaClass.simpleName, mex)
         }
         catch (e: Throwable) {
-            throw JBakeException(SystemExit.ERROR, "${e.javaClass.simpleName}: An unexpected error occurred: " + e.message, e)
+            throw JBakeExitException(SystemExit.ERROR, "${e.javaClass.simpleName}: An unexpected error occurred: " + e.message, e)
         }
     }
 
@@ -112,7 +112,7 @@ class Main @JvmOverloads constructor(
             println("Base dir structure successfully created.")
         } catch (e: Exception) {
             val msg = "Failed to initialise structure: " + e.message
-            throw JBakeException(SystemExit.INIT_ERROR, msg, e)
+            throw JBakeExitException(SystemExit.INIT_ERROR, msg, e)
         }
     }
 
@@ -126,7 +126,7 @@ class Main @JvmOverloads constructor(
         fun main(args: Array<String>) {
             try {
                 Main().run(args)
-            } catch (e: JBakeException) {
+            } catch (e: JBakeExitException) {
                 log.error(e.message)
                 log.debug(e.message, e)
                 if (e.cause is CommandLine.MissingParameterException) printUsage()

@@ -9,7 +9,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.apache.commons.io.FileUtils
 import org.jbake.TestUtils
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -57,7 +57,7 @@ class ConfigUtilTest : StringSpec({
         every { nonExistentSourceDir.absolutePath } returns "/tmp/nonexistent"
         every { nonExistentSourceDir.exists() } returns false
 
-        val e = shouldThrow<JBakeException> { util.loadConfig(nonExistentSourceDir) }
+        val e = shouldThrow<JBakeExitException> { util.loadConfig(nonExistentSourceDir) }
         e.message shouldBe "The given source dir '/tmp/nonexistent' does not exist."
     }
 
@@ -74,7 +74,7 @@ class ConfigUtilTest : StringSpec({
         every { sourceDir.isDirectory() } returns false
         every { sourceDir.absolutePath } returns "/tmp/notadir"
 
-        val e = shouldThrow<JBakeException> { util.loadConfig(sourceDir) }
+        val e = shouldThrow<JBakeExitException> { util.loadConfig(sourceDir) }
         e.message shouldBe "The given source dir is not a directory."
     }
 

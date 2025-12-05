@@ -8,7 +8,7 @@ import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
 import org.jbake.TestUtils.newDir
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -32,7 +32,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = shouldThrow<JBakeException> { inspector.inspect() }
+        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
 
         e.message shouldBe "Source dir must exist: " + nonExistentFile.absolutePath
     }
@@ -49,7 +49,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = shouldThrow<JBakeException> { inspector.inspect() }
+        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
 
         e.message shouldBe "Source dir is not readable: " + nonReadableFile.absolutePath
     }
@@ -63,7 +63,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = shouldThrow<JBakeException> { inspector.inspect() }
+        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
 
         e.message shouldBe "Required dir cannot be found! Expected to find [template.folder] at: " + expectedDir.absolutePath
     }
@@ -81,7 +81,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = shouldThrow<JBakeException> { inspector.inspect() }
+        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
 
         e.message shouldBe "Required dir cannot be found! Expected to find [content.folder] at: " + contentDir.absolutePath
     }
@@ -128,7 +128,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val inspector = JBakeConfigurationInspector(configuration)
 
-        val e = shouldThrow<JBakeException> { inspector.inspect() }
+        val e = shouldThrow<JBakeExitException> { inspector.inspect() }
 
         e.message shouldContain "Destination dir is not writable:"
     }

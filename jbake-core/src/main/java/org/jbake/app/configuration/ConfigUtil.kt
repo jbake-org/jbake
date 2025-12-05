@@ -7,7 +7,7 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder
 import org.apache.commons.configuration2.builder.fluent.Parameters
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler
 import org.apache.commons.configuration2.ex.ConfigurationException
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import org.jbake.app.SystemExit.CONFIG_ERROR
 import org.jbake.util.Logging
 import org.jbake.util.Logging.logger
@@ -26,12 +26,12 @@ class ConfigUtil {
     @Throws(ConfigurationException::class)
     private fun load(source: File, propertiesFile: File?): CompositeConfiguration {
         if (!source.exists())
-            throw JBakeException(
+            throw JBakeExitException(
                 CONFIG_ERROR,
                 "The given source dir '" + source.absolutePath + "' does not exist."
             )
         if (!source.isDirectory)
-            throw JBakeException(CONFIG_ERROR, "The given source dir is not a directory.")
+            throw JBakeExitException(CONFIG_ERROR, "The given source dir is not a directory.")
 
         val legacyConfigFile = File(source, LEGACY_CONFIG_FILE)
         val customConfigFile = propertiesFile ?: File(source, CONFIG_FILE)
@@ -91,13 +91,13 @@ class ConfigUtil {
         log.warn("Usage of this file is being deprecated, please rename this file to: {} to remove this warning", CONFIG_FILE)
     }
 
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun loadConfig(source: File, propertiesFile: File? = null): JBakeConfiguration {
         try {
             val configuration = load(source, propertiesFile)
             return DefaultJBakeConfiguration(source, configuration)
         } catch (e: ConfigurationException) {
-            throw JBakeException(CONFIG_ERROR, e.message ?: "Failed loading config from ${source.path} and props ${propertiesFile?.path}", e)
+            throw JBakeExitException(CONFIG_ERROR, e.message ?: "Failed loading config from ${source.path} and props ${propertiesFile?.path}", e)
         }
     }
 

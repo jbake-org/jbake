@@ -1,7 +1,7 @@
 package org.jbake.app.configuration
 
 import org.jbake.app.FileUtil
-import org.jbake.app.JBakeException
+import org.jbake.app.JBakeExitException
 import org.jbake.app.SystemExit
 import org.jbake.util.Logging.logger
 import org.jbake.util.warn
@@ -15,9 +15,9 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
      * Checks source path contains required sub-directorys (i.e. templates) and setups up variables for them.
      * Creates destination directory if it does not exist.
      *
-     * @throws JBakeException If template or contents directory don't exist
+     * @throws JBakeExitException If template or contents directory don't exist
      */
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     fun inspect() {
         ensureSource()
         ensureTemplateDir()
@@ -26,14 +26,14 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
         checkAssetDir()
     }
 
-    @Throws(JBakeException::class)
+    @Throws(JBakeExitException::class)
     private fun ensureSource() {
-        val source = configuration.sourceDir ?: throw JBakeException(SystemExit.CONFIG_ERROR, "Source dir is not configured.")
+        val source = configuration.sourceDir ?: throw JBakeExitException(SystemExit.CONFIG_ERROR, "Source dir is not configured.")
         if (!FileUtil.isExistingDirectory(source))
-            throw JBakeException(SystemExit.CONFIG_ERROR, "Source dir must exist: " + source.absolutePath)
+            throw JBakeExitException(SystemExit.CONFIG_ERROR, "Source dir must exist: " + source.absolutePath)
 
         if (!configuration.sourceDir!!.canRead())
-            throw JBakeException(SystemExit.CONFIG_ERROR, "Source dir is not readable: " + source.absolutePath)
+            throw JBakeExitException(SystemExit.CONFIG_ERROR, "Source dir is not readable: " + source.absolutePath)
     }
 
     private fun ensureTemplateDir() {
@@ -50,7 +50,7 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
         val destination = configuration.destinationDir
         if (!destination.exists()) destination.mkdirs()
         if (!destination.canWrite())
-            throw JBakeException(SystemExit.CONFIG_ERROR, "Destination dir is not writable: " + destination.absolutePath)
+            throw JBakeExitException(SystemExit.CONFIG_ERROR, "Destination dir is not writable: " + destination.absolutePath)
     }
 
     private fun checkAssetDir() {
@@ -61,7 +61,7 @@ class JBakeConfigurationInspector(private val configuration: JBakeConfiguration)
 
     private fun checkRequiredDirExists(folderName: String?, path: File) {
         if (!FileUtil.isExistingDirectory(path))
-            throw JBakeException(SystemExit.CONFIG_ERROR, "Required dir cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
+            throw JBakeExitException(SystemExit.CONFIG_ERROR, "Required dir cannot be found! Expected to find [" + folderName + "] at: " + path.absolutePath)
     }
 
     private val log: Logger by logger()
