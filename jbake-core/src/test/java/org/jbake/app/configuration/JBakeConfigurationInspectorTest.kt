@@ -7,7 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
-import org.jbake.TestUtils.newDir
+import org.jbake.TestUtils.createOrEmptyDir
 import org.jbake.app.JBakeExitException
 import java.io.File
 import java.nio.file.Files
@@ -65,7 +65,7 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
         val configuration = mockk<JBakeConfiguration>()
         every { configuration.sourceDir } returns tempDir
-        every { configuration.templateDir } returns newDir(tempDir, "template")
+        every { configuration.templateDir } returns createOrEmptyDir(tempDir, "template")
         every { configuration.contentDir } returns contentDir
 
         val e = shouldThrow<JBakeExitException> { JBakeConfigurationInspector(configuration).inspect() }
@@ -74,8 +74,8 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
     "shouldCreateDestinationDirIfNotExists" {
 
-        val templateDir = newDir(tempDir, "template")
-        val contentDir = newDir(tempDir, "content")
+        val templateDir = createOrEmptyDir(tempDir, "template")
+        val contentDir = createOrEmptyDir(tempDir, "content")
         val destinationDir = File(tempDir, "output")
 
         val configuration = mockk<JBakeConfiguration>()
@@ -91,8 +91,8 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
     "shouldThrowExceptionIfDestinationDirNotWritable" {
 
-        val templateDir = newDir(tempDir, "template")
-        val contentDir = newDir(tempDir, "content")
+        val templateDir = createOrEmptyDir(tempDir, "template")
+        val contentDir = createOrEmptyDir(tempDir, "content")
         val destinationDir = mockk<File>()
         every { destinationDir.exists() } returns true
         every { destinationDir.canWrite() } returns false
@@ -110,9 +110,9 @@ class JBakeConfigurationInspectorTest : StringSpec({
 
     "shouldLogWarningIfAssetDirDoesNotExist" {
 
-        val templateDir = newDir(tempDir, "template")
-        val contentDir = newDir(tempDir, "content")
-        val destinationDir = newDir(tempDir, "output")
+        val templateDir = createOrEmptyDir(tempDir, "template")
+        val contentDir = createOrEmptyDir(tempDir, "content")
+        val destinationDir = createOrEmptyDir(tempDir, "output")
         val assetDir = File(tempDir, "assets")
 
         val configuration = mockk<JBakeConfiguration>()

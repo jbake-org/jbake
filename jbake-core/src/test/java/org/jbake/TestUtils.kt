@@ -30,7 +30,14 @@ object TestUtils {
         return File(resource.file)
     }
 
-    fun newDir(base: File, folderName: String) = base.resolve(folderName).also { it.mkdir() }
+    fun createOrEmptyDir(base: File, folderName: String): File {
+        if (base.toPath().count() < 4 && !base.startsWith(System.getProperty("java.io.tmpdir").toString()))
+            throw IllegalArgumentException("Refusing to create test directory near root level: ${base.absolutePath}")
+
+        return base.resolve(folderName)
+            .also { it.deleteRecursively() }
+            .also { it.mkdirs() }
+    }
 
     fun escapeBackSlashes(path: Path)
         = path.toString().let {

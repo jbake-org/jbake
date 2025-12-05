@@ -42,7 +42,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
         setLoggingLevelViaApi(logLevel)
 
-        val dbUri = dbStorageType.name + ":" + if (MEMORY == dbStorageType) "" else name
+        val dbUri = dbStorageType.name.lowercase() + ":" + if (MEMORY == dbStorageType) "" else name
         orient = OrientDB(dbUri, OrientDBConfig.defaultConfig())
 
         setupOrOpenDatabase(DbAccessInfo(name, "admin", "admin"))
@@ -54,50 +54,30 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
 
     /**
-     * Set up database: create with proper admin user if it doesn't exist, or just open if it does.
+     * Set up database: always create fresh for clean state.
      */
     private fun setupOrOpenDatabase(access: DbAccessInfo) {
-        runCatching { orient.drop(access.dbname) }
-
-        try {
-            // Try to open existing database
-            db = orient.open(access.dbname, access.user, access.pass)
-            log.debug("Opened existing database: {}", access.dbname)
-            setConfigLevelViaSql_ConfigSet("finest")
-        }
-        catch (e: Exception) {
-            // Database doesn't exist or credentials don't work - recreate it properly
-            log.info("Database '${access.dbname}' not accessible with admin/admin, creating fresh database", e)
-
+        // Always start fresh - drop if exists
+        if (orient.exists(access.dbname)) {
             try {
-                // Drop existing database if it exists but is inaccessible
-                if (orient.exists(access.dbname)) {
-                    log.warn("Dropping existing database '${access.dbname}' due to authentication failure")
-                    orient.drop(access.dbname)
-                }
-            } catch (dropEx: Exception) {
-                log.warn("Failed to drop database: ${dropEx.message}")
+                orient.drop(access.dbname)
+                log.debug("Dropped existing database: {}", access.dbname)
+            } catch (e: Exception) {
+                log.warn("Failed to drop database '${access.dbname}': ${e.message}")
             }
-
-            try {
-                // Create database with explicit admin user using SQL command.
-                // This ensures the database is created with known admin/admin credentials.
-                val query = "CREATE DATABASE ${access.dbname} ${dbStorageType.name} USER ${access.user} IDENTIFIED BY '${access.pass}' ROLE admin"
-                log.info("Query: $query")
-                orient.execute(query)
-                log.info("Created database '${access.dbname}' with user ${access.user}")
-            }
-            catch (e: Exception) {
-                // If SQL create fails, try the API method
-                log.warn("Query 'CREATE DATABASE ...' failed, trying API method: ${e.message}")
-                orient.create(access.dbname, dbStorageType)
-            }
-
-            // Open the newly created database
-            db = orient.open(access.dbname, access.user, access.pass)
-
-            setConfigLevelViaSql_ConfigSet("finest")
         }
+
+        // Create fresh database with security configuration
+        val config = OrientDBConfig.builder()
+            .addConfig(OGlobalConfiguration.CREATE_DEFAULT_USERS, true)
+            .build()
+        orient.create(access.dbname, dbStorageType, config)
+        log.debug("Created database: {}", access.dbname)
+
+        // Open with admin credentials
+        db = orient.open(access.dbname, access.user, access.pass)
+        log.debug("Opened database: {}", access.dbname)
+
         activateOnCurrentThread()
         updateSchema()
     }
@@ -167,8 +147,8 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         OLogManager.instance().setFileLevel("finest")
         OLogManager.instance().setConsoleLevel("finest")
 
-        // If an instance of Orient was previously shutdown all engines are removed.
-        // We need to startup Orient again.
+        // If an instance of OrientDB was previously shutdown all engines are removed.
+        // We need to startup OrientDB again.
         if (Orient.instance().engines.isEmpty())
             Orient.instance().startup()
 

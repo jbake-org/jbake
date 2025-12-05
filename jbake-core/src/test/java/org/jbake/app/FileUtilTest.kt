@@ -41,10 +41,10 @@ class FileUtilTest : StringSpec({
         var path = getUriPathToContentRoot(config, config.contentDir.resolve("index.html"))
         path shouldBe ""
 
-        path = getUriPathToContentRoot(config, config.contentDir.resolve("/blog/index.html"))
+        path = getUriPathToContentRoot(config, config.contentDir.resolve("blog/index.html"))
         path shouldBe "../"
 
-        path = getUriPathToContentRoot(config, config.contentDir.resolve("/blog/level2/index.html"))
+        path = getUriPathToContentRoot(config, config.contentDir.resolve("blog/level2/index.html"))
         path shouldBe "../../"
     }
 })

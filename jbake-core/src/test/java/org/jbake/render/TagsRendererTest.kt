@@ -6,10 +6,12 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.jbake.TestUtils
 import org.jbake.app.ContentStore
+import org.jbake.app.ContentStoreIntegrationTest.Companion.tempDir
 import org.jbake.app.Renderer
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.RenderingException
+import org.jbake.app.configuration.DefaultJBakeConfiguration
 import java.nio.file.Files
 
 class TagsRendererTest : StringSpec({
@@ -64,7 +66,7 @@ class TagsRendererTest : StringSpec({
         val mockConf = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { mockConf.renderTags } returns true
         every { mockConf.tagPathName } returns "mockTagfile"
-        every { mockConf.destinationDir } returns tempDir
+        every { mockConf.destinationDir } returns TestUtils.createOrEmptyDir(tempDir, "output")
         every { mockConf.outputExtension } returns ".html"
         every { mockConf.renderEncoding } returns "UTF-8"
         every { mockConf.getTemplateByDocType(any()) } returns "tag.ftl"
@@ -89,7 +91,7 @@ class TagsRendererTest : StringSpec({
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderTags } returns true
         every { configuration.tagPathName } returns "mocktagpath/tag"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns TestUtils.createOrEmptyDir(tempDir, "output")
         every { configuration.outputExtension } returns ".html"
         every { configuration.getTemplateByDocType(any()) } returns "tag.ftl"
         val contentStore = mockk<ContentStore>(relaxed = true)

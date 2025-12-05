@@ -6,7 +6,9 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.jbake.TestUtils
 import org.jbake.app.ContentStore
+import org.jbake.app.ContentStoreIntegrationTest.Companion.tempDir
 import org.jbake.app.Renderer
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.DefaultJBakeConfiguration
@@ -61,7 +63,7 @@ class FeedRendererTest : StringSpec({
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderFeed } returns true
         every { configuration.feedFileName } returns "mockfeedfile.xml"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns TestUtils.createOrEmptyDir(tempDir, "output")
         every { configuration.renderEncoding } returns "UTF-8"
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
@@ -79,7 +81,7 @@ class FeedRendererTest : StringSpec({
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderFeed } returns true
         every { configuration.feedFileName } returns "mockfeedfile.xml"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns TestUtils.createOrEmptyDir(tempDir,"output")
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
         every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")

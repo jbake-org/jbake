@@ -131,36 +131,14 @@ None required. The service runs with default settings:
 - `docker.image.tag`: Image tag (default: project version)
 - `skipDocker`: Skip Docker operations (default: false)
 
-### Surefire Plugin
-
-Runs tests with Docker integration:
-
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-</plugin>
-```
 
 ## Build Profiles & Properties
 
 ### Maven Profiles
 
-#### skipDocker
+Skip Docker operations: ```bash mvn clean install -PskipDocker```
 
-Skip Docker operations:
-
-```bash
-mvn clean install -PskipDocker
-```
-
-#### docker-push
-
-Enable Docker Hub push during deploy:
-
-```bash
-mvn clean deploy -Pdocker-push
-```
+Enable Docker Hub push during deploy: ```bash mvn clean deploy -Pdocker-push```
 
 ## CI/CD Integration
 
@@ -199,4 +177,3 @@ jobs:
 - [Texy Official Site](https://texy.info/)
 - [TestContainers](https://www.testcontainers.org/)
 - [Spotify Dockerfile Maven Plugin](https://github.com/spotify/dockerfile-maven)
-

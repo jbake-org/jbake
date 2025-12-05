@@ -136,9 +136,9 @@ class OvenTest : StringSpec({
     }
 
     "shouldInstantiateNeededUtensils" {
-        val template = TestUtils.newDir(root.toFile(), "template")
-        val content = TestUtils.newDir(root.toFile(), "content")
-        val assets = TestUtils.newDir(root.toFile(), "assets")
+        val template = TestUtils.createOrEmptyDir(root.toFile(), "template")
+        val content = TestUtils.createOrEmptyDir(root.toFile(), "content")
+        val assets = TestUtils.createOrEmptyDir(root.toFile(), "assets")
 
         conf.templateDir = (template)
         conf.contentDir = (content)
@@ -174,9 +174,9 @@ class OvenTest : StringSpec({
 
     "shouldCrawlRenderAndCopyAssets" {
 
-        conf.templateDir = TestUtils.newDir(root.toFile(), "template")
-        conf.contentDir = TestUtils.newDir(root.toFile(), "content")
-        conf.assetDir = TestUtils.newDir(root.toFile(), "assets")
+        conf.templateDir = TestUtils.createOrEmptyDir(root.toFile(), "template")
+        conf.contentDir = TestUtils.createOrEmptyDir(root.toFile(), "content")
+        conf.assetDir = TestUtils.createOrEmptyDir(root.toFile(), "assets")
         conf.setProperty(PropertyList.RENDER_TAGS.key, "false")
 
         contentStore = spyk(ContentStore("memory", "documents" + System.currentTimeMillis()))

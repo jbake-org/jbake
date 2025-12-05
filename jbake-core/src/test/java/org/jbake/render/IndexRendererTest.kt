@@ -6,12 +6,15 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.jbake.TestUtils
 import org.jbake.app.ContentStore
+import org.jbake.app.ContentStoreIntegrationTest.Companion.tempDir
 import org.jbake.app.Renderer
-import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.RenderingException
+import org.jbake.app.configuration.DefaultJBakeConfiguration
 
 class IndexRendererTest : StringSpec({
+
     "returnsZeroWhenConfigDoesNotRenderIndices" {
         val tool = IndexRenderingTool()
 
@@ -58,7 +61,7 @@ class IndexRendererTest : StringSpec({
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns TestUtils.createOrEmptyDir(tempDir, "output")
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
         every { renderingEngine.renderDocument(any(), any(), any()) } throws RuntimeException("Test exception")
@@ -80,7 +83,7 @@ class IndexRendererTest : StringSpec({
         val configuration = mockk<DefaultJBakeConfiguration>(relaxed = true)
         every { configuration.renderIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns TestUtils.createOrEmptyDir(tempDir, "output")
         every { configuration.renderEncoding } returns "UTF-8"
         val contentStore = mockk<ContentStore>(relaxed = true)
         val renderingEngine = mockk<org.jbake.template.DelegatingTemplateEngine>(relaxed = true)
@@ -100,7 +103,7 @@ class IndexRendererTest : StringSpec({
         every { configuration.paginateIndex } returns true
         every { configuration.indexFileName } returns "mockindex.html"
         every { configuration.postsPerPage } returns 5
-        every { configuration.destinationDir } returns mockk(relaxed = true)
+        every { configuration.destinationDir } returns TestUtils.createOrEmptyDir(tempDir, "output")
         every { configuration.renderEncoding } returns "UTF-8"
         val contentStore = mockk<ContentStore>(relaxed = true)
         every { contentStore.getPublishedCount("post") } returns 0L // No posts, so it will call renderIndex instead

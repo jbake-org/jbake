@@ -18,6 +18,11 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
 
     lateinit var db: ContentStore
 
+    // Shared test data
+    val typeWithHyphen = "type-with-hyphen"
+    val tagWithWeirdChars = "identifier-with\\`backtick"
+    val testUri = "test/testMergeDocument"
+
     beforeSpec {
         ContentStoreIntegrationTest.setUpClass(dbType)
         db = ContentStoreIntegrationTest.db
@@ -25,6 +30,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
 
     beforeTest {
         db.startup()
+        addDocumentType(typeWithHyphen)
     }
 
     afterTest {
@@ -39,96 +45,151 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
         repeat(5) {
             db.addTestDocument(type = DOC_TYPE_POST, status = "published")
         }
-
         db.addTestDocument(type = DOC_TYPE_POST, status = "draft")
 
         db.getDocumentCount(DOC_TYPE_POST) shouldBe 6
         db.getPublishedCount(DOC_TYPE_POST) shouldBe 5
     }
 
-    "testStoreTypeWithSpecialCharacters" {
-            val typeWithHyphen = "type-with-hyphen"
+    "shouldStoreAndRetrieveDocumentWithSpecialCharacters" {
+        val model = createDefaultDocumentModel()
+        model.type = typeWithHyphen
+        model.tags = listOf(tagWithWeirdChars)
+        model.date = OffsetDateTime.now()
+        model.sourceUri = testUri
+        model["foo"] = "originalValue"
 
-            addDocumentType(typeWithHyphen)
+        db.addDocument(model)
 
-            val tagWithWeirdChars = "identifier-with\\`backtick"
-            val uri = "test/testMergeDocument"
+        db.getAllContent(typeWithHyphen).size shouldBe 1
+        db.getAllContent(typeWithHyphen, true).size shouldBe 1
+        db.getDocumentByUri(testUri).size shouldBe 1
+        db.getDocumentCount(typeWithHyphen) shouldBe 1L
+    }
 
-            val model = createDefaultDocumentModel()
-            model.type = typeWithHyphen
-            model.tags = listOf(tagWithWeirdChars)
-            model.date = OffsetDateTime.now()
-            model.sourceUri = uri
-            model["foo"] = "originalValue"
+    "shouldGetDocumentStatus" {
+        val model = createDefaultDocumentModel()
+        model.type = typeWithHyphen
+        model.tags = listOf(tagWithWeirdChars)
+        model.date = OffsetDateTime.now()
+        model.sourceUri = testUri
 
-            db.addDocument(model)
+        db.addDocument(model)
 
-            val documentList1 = db.getAllContent(typeWithHyphen)
-            documentList1.size.toLong() shouldBe 1
+        val statusList = db.getDocumentStatus(testUri)
+        statusList.size shouldBe 1
+        statusList[0].rendered shouldBe false
+    }
 
-            val documentList2 =
-                db.getAllContent(typeWithHyphen, true)
-            documentList2.size.toLong() shouldBe 1
+    "shouldCountPublishedDocuments" {
+        val draft = createDefaultDocumentModel()
+        draft.type = typeWithHyphen
+        draft.sourceUri = testUri
+        draft.date = OffsetDateTime.now()
+        db.addDocument(draft)
 
-            val documentList3 = db.getDocumentByUri(uri)
-            documentList3.size.toLong() shouldBe 1
+        db.getPublishedCount(typeWithHyphen) shouldBe 0
 
-            val documentCount1: Long = db.getDocumentCount(typeWithHyphen)
-            documentCount1 shouldBe 1L
+        val published = DocumentModel()
+        published.sourceUri = "test/published.adoc"
+        published.type = typeWithHyphen
+        published.status = ModelAttributes.Status.PUBLISHED
+        db.addDocument(published)
 
-            val documentList4 = db.getDocumentStatus(uri)
+        db.getPublishedCount(typeWithHyphen) shouldBe 1
+    }
 
-            documentList4.size.toLong() shouldBe 1
-            documentList4[0].rendered shouldBe false
+    "shouldGetUnrenderedContent" {
+        val doc1 = createDefaultDocumentModel()
+        doc1.type = typeWithHyphen
+        doc1.sourceUri = testUri
+        doc1.tags = listOf(tagWithWeirdChars)
+        doc1.date = OffsetDateTime.now()
+        db.addDocument(doc1)
 
-            val documentCount2: Long = db.getPublishedCount(typeWithHyphen)
-            documentCount2 shouldBe 0
+        val doc2 = DocumentModel()
+        doc2.sourceUri = "test/another.adoc"
+        doc2.tags = listOf(tagWithWeirdChars)
+        doc2.type = typeWithHyphen
+        doc2.status = ModelAttributes.Status.PUBLISHED
+        doc2.cached = true
+        doc2.rendered = false
+        db.addDocument(doc2)
 
-            val published = DocumentModel()
-            published.sourceUri = "test/another-testdocument.adoc"
-            published.tags = listOf(tagWithWeirdChars)
-            published.type = typeWithHyphen
-            published.status = ModelAttributes.Status.PUBLISHED
-            published.cached = true
-            published.rendered = false
+        val unrendered = db.unrenderedContent
+        unrendered.size shouldBe 2
+        unrendered[0].rendered shouldBe false
+        unrendered[0].type shouldBe typeWithHyphen
+        unrendered[0].tags shouldContain tagWithWeirdChars
+    }
 
-            db.addDocument(published)
+    "shouldMarkContentAsRendered" {
+        val published = DocumentModel()
+        published.sourceUri = testUri
+        published.tags = listOf(tagWithWeirdChars)
+        published.type = typeWithHyphen
+        published.status = ModelAttributes.Status.PUBLISHED
+        published.cached = true
+        published.rendered = false
+        db.addDocument(published)
 
-            val documentList5 = db.unrenderedContent
-            documentList5.size.toLong() shouldBe 2
-            documentList5[0].rendered shouldBe false
-            documentList5[0].type shouldBe typeWithHyphen
-            documentList5[0].tags shouldContain tagWithWeirdChars
+        db.markContentAsRendered(published)
 
-            val documentCount3: Long = db.getPublishedCount(typeWithHyphen)
-            documentCount3 shouldBe 1
+        val content = db.getPublishedContent(typeWithHyphen)
+        content.size shouldBe 1
+        content[0].rendered shouldBe true
+        content[0].type shouldBe typeWithHyphen
+        content[0].tags shouldContain tagWithWeirdChars
+    }
 
-            db.markContentAsRendered(published)
+    "shouldGetPublishedDocumentsByTag" {
+        val published = DocumentModel()
+        published.sourceUri = testUri
+        published.tags = listOf(tagWithWeirdChars)
+        published.type = typeWithHyphen
+        published.status = ModelAttributes.Status.PUBLISHED
+        published.rendered = true
+        db.addDocument(published)
 
-            val documentList6 = db.getPublishedContent(typeWithHyphen)
-            documentList6.size.toLong() shouldBe 1
-            documentList6[0].rendered shouldBe true
-            documentList6[0].type shouldBe typeWithHyphen
-            documentList6[0].tags shouldContain tagWithWeirdChars
+        val byTag = db.getPublishedDocumentsByTag(tagWithWeirdChars)
+        byTag.size shouldBe 1
+        byTag[0].rendered shouldBe true
+        byTag[0].type shouldBe typeWithHyphen
+        byTag[0].tags shouldContain tagWithWeirdChars
 
-            val documentList7 = db.getPublishedDocumentsByTag(tagWithWeirdChars)
-            documentList7.size.toLong() shouldBe 1
-            documentList7[0].rendered shouldBe true
-            documentList7[0].type shouldBe typeWithHyphen
-            documentList7[0].tags shouldContain tagWithWeirdChars
+        // Posts only - should be empty since type is not "post"
+        db.getPublishedPostsByTag(tagWithWeirdChars).size shouldBe 0
+    }
 
-            val documentList8 = db.getPublishedPostsByTag(tagWithWeirdChars)
-            documentList8.size.toLong() shouldBe 0
+    "shouldGetAllTags" {
+        val doc = DocumentModel()
+        doc.sourceUri = testUri
+        doc.tags = listOf(tagWithWeirdChars)
+        doc.type = typeWithHyphen
+        doc.status = ModelAttributes.Status.PUBLISHED
+        db.addDocument(doc)
 
-            val tags: MutableSet<String> = db.allTags
-            tags shouldBe mutableSetOf(tagWithWeirdChars)
+        db.allTags shouldBe mutableSetOf(tagWithWeirdChars)
+    }
 
-            db.deleteContent(uri)
+    "shouldDeleteContent" {
+        val doc1 = DocumentModel()
+        doc1.sourceUri = testUri
+        doc1.type = typeWithHyphen
+        db.addDocument(doc1)
 
-            val documentCount4: Long = db.getDocumentCount(typeWithHyphen)
-            documentCount4 shouldBe 1
+        val doc2 = DocumentModel()
+        doc2.sourceUri = "test/another.adoc"
+        doc2.type = typeWithHyphen
+        db.addDocument(doc2)
 
-            db.deleteAllByDocType(typeWithHyphen)
+        db.getDocumentCount(typeWithHyphen) shouldBe 2
+
+        db.deleteContent(testUri)
+        db.getDocumentCount(typeWithHyphen) shouldBe 1
+
+        db.deleteAllByDocType(typeWithHyphen)
+        db.getDocumentCount(typeWithHyphen) shouldBe 0
     }
 }) {
     companion object {

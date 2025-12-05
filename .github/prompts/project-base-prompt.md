@@ -84,4 +84,4 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - Specifically for Grok agent: You tend not to provide any comments on your actions. Provide concise reasoning for your code changes when non-trivial. Comment on results of test runs and findings from web.
 - Do not generate lengthy reports. The user is supposed to read and understand the code. If some construct is complex, add concise comments in the code itself. But ideally, rely on perfect naming and structure.
 - Specifically for Gemini agent: After stating "I will do X now", do it, rather than stopping.
-
+- If you detect "corrupted" file, it is probably the developer doing changes. Pause for 10 seconds and retry reading it. If still corrupted, mention it concisely and ask the user to fix it.
