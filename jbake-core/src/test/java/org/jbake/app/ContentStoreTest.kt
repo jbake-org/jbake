@@ -51,38 +51,32 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
 
             addDocumentType(typeWithHyphen)
 
-            val tagWithHyphenBackslashAndBacktick = "identifier-with\\`backtick"
+            val tagWithWeirdChars = "identifier-with\\`backtick"
             val uri = "test/testMergeDocument"
 
             val model = createDefaultDocumentModel()
             model.type = typeWithHyphen
-            model.tags = listOf(tagWithHyphenBackslashAndBacktick)
+            model.tags = listOf(tagWithWeirdChars)
             model.date = OffsetDateTime.now()
             model.sourceUri = uri
             model["foo"] = "originalValue"
 
             db.addDocument(model)
 
-            val documentList1: DocumentList<DocumentModel> =
-                db.getAllContent(typeWithHyphen)
-
+            val documentList1 = db.getAllContent(typeWithHyphen)
             documentList1.size.toLong() shouldBe 1
 
-            val documentList2: DocumentList<DocumentModel> =
+            val documentList2 =
                 db.getAllContent(typeWithHyphen, true)
-
             documentList2.size.toLong() shouldBe 1
 
-            val documentList3: DocumentList<DocumentModel> = db.getDocumentByUri(uri)
-
+            val documentList3 = db.getDocumentByUri(uri)
             documentList3.size.toLong() shouldBe 1
 
             val documentCount1: Long = db.getDocumentCount(typeWithHyphen)
-
             documentCount1 shouldBe 1L
 
-            val documentList4: DocumentList<DocumentModel> =
-                db.getDocumentStatus(uri)
+            val documentList4 = db.getDocumentStatus(uri)
 
             documentList4.size.toLong() shouldBe 1
             documentList4[0].rendered shouldBe false
@@ -92,7 +86,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
 
             val published = DocumentModel()
             published.sourceUri = "test/another-testdocument.adoc"
-            published.tags = listOf(tagWithHyphenBackslashAndBacktick)
+            published.tags = listOf(tagWithWeirdChars)
             published.type = typeWithHyphen
             published.status = ModelAttributes.Status.PUBLISHED
             published.cached = true
@@ -100,37 +94,34 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
 
             db.addDocument(published)
 
-            val documentList5: DocumentList<DocumentModel> = db.unrenderedContent
+            val documentList5 = db.unrenderedContent
             documentList5.size.toLong() shouldBe 2
             documentList5[0].rendered shouldBe false
             documentList5[0].type shouldBe typeWithHyphen
-            documentList5[0].tags shouldContain tagWithHyphenBackslashAndBacktick
+            documentList5[0].tags shouldContain tagWithWeirdChars
 
             val documentCount3: Long = db.getPublishedCount(typeWithHyphen)
             documentCount3 shouldBe 1
 
             db.markContentAsRendered(published)
 
-            val documentList6: DocumentList<DocumentModel> =
-                db.getPublishedContent(typeWithHyphen)
+            val documentList6 = db.getPublishedContent(typeWithHyphen)
             documentList6.size.toLong() shouldBe 1
             documentList6[0].rendered shouldBe true
             documentList6[0].type shouldBe typeWithHyphen
-            documentList6[0].tags shouldContain tagWithHyphenBackslashAndBacktick
+            documentList6[0].tags shouldContain tagWithWeirdChars
 
-            val documentList7: DocumentList<DocumentModel> =
-                db.getPublishedDocumentsByTag(tagWithHyphenBackslashAndBacktick)
+            val documentList7 = db.getPublishedDocumentsByTag(tagWithWeirdChars)
             documentList7.size.toLong() shouldBe 1
             documentList7[0].rendered shouldBe true
             documentList7[0].type shouldBe typeWithHyphen
-            documentList7[0].tags shouldContain tagWithHyphenBackslashAndBacktick
+            documentList7[0].tags shouldContain tagWithWeirdChars
 
-            val documentList8: DocumentList<DocumentModel> =
-                db.getPublishedPostsByTag(tagWithHyphenBackslashAndBacktick)
+            val documentList8 = db.getPublishedPostsByTag(tagWithWeirdChars)
             documentList8.size.toLong() shouldBe 0
 
             val tags: MutableSet<String> = db.allTags
-            tags shouldBe mutableSetOf(tagWithHyphenBackslashAndBacktick)
+            tags shouldBe mutableSetOf(tagWithWeirdChars)
 
             db.deleteContent(uri)
 
