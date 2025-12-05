@@ -65,9 +65,7 @@
         <dependency><scope>test</scope><groupId>io.kotest</groupId><artifactId>kotest-runner-junit5-jvm</artifactId><version>${version.kotest}</version></dependency>
         <dependency><scope>test</scope><groupId>io.mockk</groupId><artifactId>mockk-jvm</artifactId><version>${version.mockk}</version></dependency>
         <dependency><scope>test</scope><groupId>junit</groupId><artifactId>junit</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId></dependency>
-        <dependency><scope>test</scope><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-api</artifactId></dependency>
         <dependency><scope>test</scope><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter-engine</artifactId></dependency>
     </dependencies>

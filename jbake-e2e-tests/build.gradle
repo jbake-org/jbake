@@ -43,7 +43,6 @@ dependencies {
     testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
 
     // Utilities
-    testImplementation "org.assertj:assertj-core:$assertjCoreVersion"
     testImplementation "commons-io:commons-io:$commonsIoVersion"
     testImplementation "org.jsoup:jsoup:$jsoupVersion"
 }

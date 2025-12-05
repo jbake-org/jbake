@@ -110,7 +110,6 @@
         <version.junit5>6.0.1</version.junit5>
         <version.junit5.system.ext>1.2.2</version.junit5.system.ext>
         <version.junit.pioneer>2.3.0</version.junit.pioneer>
-        <version.assertj>3.27.6</version.assertj>
         <version.mockk>1.14.6</version.mockk>
         <version.kotest>6.0.7</version.kotest>
         <version.testcontainers>2.0.2</version.testcontainers>
@@ -181,9 +180,7 @@
 
             <!-- Testing dependencies -->
             <dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>${version.junit4}</version></dependency>
-            <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>${version.assertj}</version></dependency>
             <dependency><groupId>org.itsallcode</groupId><artifactId>junit5-system-extensions</artifactId><version>${version.junit5.system.ext}</version></dependency>
-            <dependency><groupId>org.junit-pioneer</groupId><artifactId>junit-pioneer</artifactId><version>${version.junit.pioneer}</version></dependency>
             <dependency><groupId>io.mockk</groupId><artifactId>mockk</artifactId><version>${version.mockk}</version></dependency>
             <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${version.testcontainers}</version></dependency>
             <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers-junit-jupiter</artifactId><version>${version.testcontainers}</version></dependency>
