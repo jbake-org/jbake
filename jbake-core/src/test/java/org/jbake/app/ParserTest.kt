@@ -15,7 +15,9 @@ import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import java.io.File
 import java.io.PrintWriter
-import java.util.*
+import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 class ParserTest : StringSpec({
     lateinit var tempDir: File
@@ -24,16 +26,16 @@ class ParserTest : StringSpec({
     lateinit var parser: Parser
     lateinit var rootPath: File
 
-    lateinit var validHTMLFile: File
+    lateinit var validHtmlFile: File
     lateinit var invalidHTMLFile: File
     lateinit var validMarkdownFileWithCustomHeader: File
     lateinit var validMarkdownFileWithDefaultStatus: File
     lateinit var validMarkdownFileWithDefaultTypeAndStatus: File
     lateinit var invalidMarkdownFileWithoutDefaultStatus: File
-    lateinit var invalidMDFile: File
+    lateinit var invalidMdFile: File
     lateinit var invalidExtensionFile: File
-    lateinit var validHTMLWithJSONFile: File
-    lateinit var validAsciiDocWithJSONFile: File
+    lateinit var validHtmlWithJsonFile: File
+    lateinit var validAsciiDocWithJsonFile: File
     lateinit var validAsciiDocWithADHeaderJSONFile: File
     lateinit var validaAsciidocWithUnsanitizedHeader: File
 
@@ -55,8 +57,8 @@ class ParserTest : StringSpec({
         config = ConfigUtil().loadConfig(rootPath) as DefaultJBakeConfiguration
         parser = Parser(config)
 
-        validHTMLFile = tempDir.resolve("valid.html").apply { createNewFile() }
-        var out = PrintWriter(validHTMLFile)
+        validHtmlFile = tempDir.resolve("valid.html").apply { createNewFile() }
+        var out = PrintWriter(validHtmlFile)
         out.println(validHeader)
         out.println("<p>This is a test.</p>")
         out.close()
@@ -128,9 +130,9 @@ class ParserTest : StringSpec({
         out.println("* List")
         out.close()
 
-        invalidMDFile = tempDir.resolve("invalidMd.md").apply { createNewFile() }
+        invalidMdFile = tempDir.resolve("invalidMd.md").apply { createNewFile() }
 
-        out = PrintWriter(invalidMDFile)
+        out = PrintWriter(invalidMdFile)
         out.println(invalidHeader)
         out.println("# Hello Markdown!")
         out.println("")
@@ -146,8 +148,8 @@ class ParserTest : StringSpec({
         out.println("invalid content")
         out.close()
 
-        validHTMLWithJSONFile = tempDir.resolve("validHTMLWithJSONFile.html").apply { createNewFile() }
-        out = PrintWriter(validHTMLWithJSONFile)
+        validHtmlWithJsonFile = tempDir.resolve("validHTMLWithJSONFile.html").apply { createNewFile() }
+        out = PrintWriter(validHtmlWithJsonFile)
         out.println("title=This is a Title = This is a valid Title")
         out.println("status=draft")
         out.println("type=post")
@@ -158,8 +160,8 @@ class ParserTest : StringSpec({
         out.println("Sample Body")
         out.close()
 
-        validAsciiDocWithJSONFile = tempDir.resolve("validAsciiDocWithJSONFile.ad").apply { createNewFile() }
-        out = PrintWriter(validAsciiDocWithJSONFile)
+        validAsciiDocWithJsonFile = tempDir.resolve("validAsciiDocWithJSONFile.ad").apply { createNewFile() }
+        out = PrintWriter(validAsciiDocWithJsonFile)
         out.println("title=This is a Title = This is a valid Title")
         out.println("status=draft")
         out.println("type=post")
@@ -203,18 +205,14 @@ class ParserTest : StringSpec({
         out.close()
     }
 
-    "parseValidHTMLFile" {
-        val documentModel = parser.processFile(validHTMLFile)!!
+    "parseValidHtmlFile" {
+        val documentModel = parser.processFile(validHtmlFile)!!
         documentModel.shouldNotBeNull()
         documentModel.status shouldBe "draft"
         documentModel.type shouldBe "post"
         documentModel.title shouldBe "This is a Title = This is a valid Title"
         documentModel.date.shouldNotBeNull()
-        val cal = Calendar.getInstance()
-        cal.setTime(documentModel.date)
-        cal.get(Calendar.MONTH) shouldBe 8
-        cal.get(Calendar.DAY_OF_MONTH) shouldBe 2
-        cal.get(Calendar.YEAR) shouldBe 2013
+        documentModel.date shouldBe OffsetDateTime.of(LocalDate.of(2013, 9, 2).atStartOfDay(), ZoneOffset.UTC)
     }
 
     "parseInvalidHTMLFile" {
@@ -275,7 +273,7 @@ class ParserTest : StringSpec({
     }
 
     "parseInvalidMarkdownFile" {
-        val documentModel = parser.processFile(invalidMDFile)
+        val documentModel = parser.processFile(invalidMdFile)
         documentModel.shouldBeNull()
     }
 
@@ -297,19 +295,19 @@ class ParserTest : StringSpec({
     }
 
 
-    "parseValidHTMLWithJSONFile" {
-        val documentModel = parser.processFile(validHTMLWithJSONFile)!!
-        ParserTest.assertJSONExtracted(documentModel["jsondata"])
+    "parseValidHtmlWithJSONFile" {
+        val documentModel = parser.processFile(validHtmlWithJsonFile)!!
+        assertJSONExtracted(documentModel["jsondata"])
     }
 
     "parseValidAsciiDocWithJSONFile" {
-        val documentModel = parser.processFile(validAsciiDocWithJSONFile)!!
-        ParserTest.assertJSONExtracted(documentModel["jsondata"])
+        val documentModel = parser.processFile(validAsciiDocWithJsonFile)!!
+        assertJSONExtracted(documentModel["jsondata"])
     }
 
     "testValidAsciiDocWithADHeaderJSONFile" {
         val documentModel = parser.processFile(validAsciiDocWithADHeaderJSONFile)!!
-        ParserTest.assertJSONExtracted(documentModel["jsondata"])
+        assertJSONExtracted(documentModel["jsondata"])
     }
 
     afterTest {

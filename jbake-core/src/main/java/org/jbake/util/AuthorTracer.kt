@@ -22,7 +22,7 @@ object AuthorTracer {
         else
             "AuthorTracer[$stage] author missing$suffix"
 
-        val timestamp = Instant.now().toDateTime().toLocalDateTime().toString()
+        val timestamp = Instant.now().toDateTime().toDateTime().toString()
         System.err.println("$timestamp $msg") // Force output to stderr so we always see it
         log.warn(msg)
     }

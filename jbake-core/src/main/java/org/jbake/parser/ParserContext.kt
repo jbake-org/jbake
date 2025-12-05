@@ -3,7 +3,7 @@ package org.jbake.parser
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import java.io.File
-import java.time.LocalDate
+import java.time.OffsetDateTime
 
 class ParserContext(
     val file: File,
@@ -21,7 +21,7 @@ class ParserContext(
             documentModel.body = str
         }
 
-    var date: LocalDate?
+    var date: OffsetDateTime?
         get() = this.documentModel.date
         set(date) { this.documentModel.date = date}
 

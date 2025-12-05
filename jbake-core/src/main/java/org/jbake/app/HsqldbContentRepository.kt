@@ -151,7 +151,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
             stmt.setBoolean(5, document.cached ?: false)
             stmt.setBoolean(6, document.rendered)
             stmt.setString(7, document.title)
-            stmt.setTimestamp(8, document.date?.let { Timestamp(it.time) })
+            stmt.setTimestamp(8, document.date?.let { it.let { Timestamp(it.toInstant().toEpochMilli()) } })
             stmt.setArray(9, tagsArray)
             stmt.setString(10, document.getOrDefault(ModelAttributes.DOC_BODY_RENDERED, "") as String)
             stmt.setString(11, propertiesJson)
@@ -348,7 +348,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                             }
                             Types.TIMESTAMP -> {
                                 val ts = rs.getTimestamp(i)
-                                ts?.let { java.util.Date(it.time) }
+                                ts?.toInstant()?.atOffset(java.time.ZoneOffset.UTC)
                             }
                             Types.BOOLEAN -> rs.getBoolean(i)
                             Types.BIGINT, Types.INTEGER -> rs.getLong(i)

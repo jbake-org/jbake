@@ -5,11 +5,14 @@ import groovy.text.Template
 import groovy.text.XmlTemplateEngine
 import org.codehaus.groovy.runtime.MethodClosure
 import org.jbake.app.ContentStore
+import org.jbake.app.NoModelExtractorException
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import org.xml.sax.SAXException
-import java.io.*
+import java.io.IOException
+import java.io.Writer
 import javax.xml.parsers.ParserConfigurationException
 
 
@@ -24,9 +27,8 @@ class GroovyTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
             val template = findTemplate(templateName)
             val writable = template.make(wrap(model))
             writable.writeTo(writer)
-        } catch (e: Exception) {
-            throw RenderingException(e)
         }
+        catch (e: Exception) { throw RenderingException(e.message?:"",e) }
     }
 
     @Throws(SAXException::class, ParserConfigurationException::class, ClassNotFoundException::class, IOException::class)

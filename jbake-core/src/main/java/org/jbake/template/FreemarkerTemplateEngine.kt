@@ -3,6 +3,8 @@ package org.jbake.template
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
 import org.jbake.app.ContentStore
+import org.jbake.app.NoModelExtractorException
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
@@ -68,8 +70,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             val template = templateCfg.getTemplate(templateName)
             template.process(LazyLoadingModel(templateCfg.objectWrapper, model, db, config), writer)
         }
-        catch (e: IOException) { throw RenderingException(e) }
-        catch (e: TemplateException) { throw RenderingException(e) }
+        catch (e: Exception) { throw RenderingException("",e) }
     }
 
     /**

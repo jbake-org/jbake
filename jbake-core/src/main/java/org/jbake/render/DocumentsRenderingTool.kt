@@ -3,10 +3,10 @@ package org.jbake.render
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.Renderer
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
-import org.jbake.template.RenderingException
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.util.*

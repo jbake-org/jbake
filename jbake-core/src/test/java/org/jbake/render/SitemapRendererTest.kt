@@ -9,7 +9,7 @@ import io.mockk.verify
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.template.RenderingException
+import org.jbake.app.RenderingException
 
 class SitemapRendererTest : StringSpec({
     "returnsZeroWhenRendersSitemaps" {

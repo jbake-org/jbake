@@ -10,8 +10,8 @@ import org.jbake.util.Logging.logger
 import org.jbake.util.error
 import org.slf4j.Logger
 import java.io.File
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Renders documents in the asciidoc format using the Asciidoctor engine.
@@ -80,8 +80,10 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     override fun processHeader(context: ParserContext) {
+
         val attributes = buildAttributes(context)
         val asciidoctor = getOrCreateAsciidoctorEngine(buildOptions(context, attributes))
+        val dateFormat: DateTimeFormatter = context.config.dateFormat?.let { DateTimeFormatter.ofPattern(it) } ?: DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
         // In AsciidoctorJ 3.x, use loadFile with header_only option to get document header
         val headerOptions = Options.builder()
@@ -131,9 +133,7 @@ class AsciidoctorEngine : MarkupEngine() {
                 keyStr == REVDATE_KEY -> {
                     val convertedValue = convertRubyToJava(value)
                     if (convertedValue is String) {
-                        val dateFormat: String = context.config.dateFormat!!
-                        val df: DateFormat = SimpleDateFormat(dateFormat)
-                        runCatching { context.date = (df.parse(convertedValue)) }
+                        runCatching { context.date = OffsetDateTime.parse(convertedValue, dateFormat) }
                             .onFailure { log.error("Unable to parse revdate. Expected $dateFormat", it) }
                     }
                 }
@@ -152,6 +152,8 @@ class AsciidoctorEngine : MarkupEngine() {
         }
         AuthorTracer.trace("asciidoctor-header", documentModel, context.file.name)
     }
+
+
 
     private fun getValueClassName(value: Any?) = value?.javaClass?.getCanonicalName() ?: "null"
 

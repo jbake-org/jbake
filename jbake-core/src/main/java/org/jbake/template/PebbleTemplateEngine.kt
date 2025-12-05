@@ -7,6 +7,8 @@ import io.pebbletemplates.pebble.loader.FileLoader
 import io.pebbletemplates.pebble.loader.Loader
 import io.pebbletemplates.pebble.template.PebbleTemplate
 import org.jbake.app.ContentStore
+import org.jbake.app.NoModelExtractorException
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
@@ -39,9 +41,9 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
             template = engine!!.getTemplate(templateName)
             template.evaluate(writer, wrap(model))
         } catch (e: PebbleException) {
-            throw RenderingException(e)
+            throw RenderingException("Templating engine Pebble complains: ${e.message}", e)
         } catch (e: IOException) {
-            throw RenderingException(e)
+            throw RenderingException("I/O error: ${e.message}", e)
         }
     }
 

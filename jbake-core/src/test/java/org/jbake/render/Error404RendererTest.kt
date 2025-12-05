@@ -6,9 +6,9 @@ import io.kotest.matchers.shouldBe
 import io.mockk.*
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.DelegatingTemplateEngine
-import org.jbake.template.RenderingException
 
 class Error404RendererTest : StringSpec({
 

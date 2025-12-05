@@ -3,7 +3,7 @@ package org.jbake.app
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import org.jbake.model.DocumentModel
-import java.time.LocalDate
+import java.time.OffsetDateTime
 
 class HsqldbContentRepositoryBasicTest : StringSpec({
 
@@ -17,7 +17,7 @@ class HsqldbContentRepositoryBasicTest : StringSpec({
             type = "post"
             status = "published"
             title = "Test"
-            date = LocalDate.now()
+            date = OffsetDateTime.now()
             rendered = false
         }
 
@@ -38,7 +38,7 @@ class HsqldbContentRepositoryBasicTest : StringSpec({
             type = "post"
             status = "published"
             title = "Test 1"
-            date = LocalDate.now()
+            date = OffsetDateTime.now()
             rendered = false
         }
 
@@ -61,7 +61,7 @@ class HsqldbContentRepositoryBasicTest : StringSpec({
             type = "post"
             status = "published"
             title = "Test 2"
-            date = LocalDate.now()
+            date = OffsetDateTime.now()
             rendered = false
         }
 

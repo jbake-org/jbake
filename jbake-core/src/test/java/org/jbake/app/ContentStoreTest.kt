@@ -8,7 +8,7 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentModel.Companion.createDefaultDocumentModel
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
-import java.time.LocalDate
+import java.time.OffsetDateTime
 
 class ContentStoreTestHsqldb : ContentStoreTestBase(DatabaseType.HSQLDB)
 class ContentStoreTestNeo4j : ContentStoreTestBase(DatabaseType.NEO4J)
@@ -57,7 +57,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
             val model = createDefaultDocumentModel()
             model.type = typeWithHyphen
             model.tags = listOf(tagWithHyphenBackslashAndBacktick)
-            model.date = LocalDate.now()
+            model.date = OffsetDateTime.now()
             model.sourceUri = uri
             model["foo"] = "originalValue"
 

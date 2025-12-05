@@ -4,12 +4,13 @@ import org.jbake.app.ContentStore
 import org.jbake.model.DocumentModel
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.time.OffsetDateTime
 import java.util.*
 
 fun ContentStore.addTestDocument(
     type: String,
     status: String = "published",
-    date: Date? = Date(),
+    date: OffsetDateTime? = OffsetDateTime.now(),
     cached: Boolean = true,
     sha1: String? = generateRandomSha1(),
     sourceUri: String? = "/tmp/${generateRandomSha1()}.txt",
@@ -18,7 +19,7 @@ fun ContentStore.addTestDocument(
     val document = DocumentModel().apply {
         this.type = type
         this.status = status
-        this.date = date
+        this.date =  date
         this.cached = cached
         this.sha1 = sha1
         this.sourceUri = sourceUri

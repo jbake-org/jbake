@@ -1,7 +1,7 @@
 package org.jbake.app
 
 import org.jbake.model.DocumentModel
-import java.time.LocalDate
+import java.time.OffsetDateTime
 
 
 /**
@@ -10,7 +10,7 @@ import java.time.LocalDate
 object HsqldbDebugMain {
 
     @JvmStatic fun main(args: Array<String>) {
-        log.info("=== HSQLDB Debug Test ===");
+        log.info("=== HSQLDB Debug Test ===")
 
         val repo = HsqldbContentRepository("memory", "test-debug")
 
@@ -23,19 +23,19 @@ object HsqldbDebugMain {
         doc.type = "post"
         doc.status = "published"
         doc.title = "Test"
-        doc.date = LocalDate.now()
+        doc.date = OffsetDateTime.now()
         doc.rendered = false
 
-        log.info("3. Created document");
+        log.info("3. Created document")
         repo.addDocument(doc)
 
-        log.info("4. Added document");
+        log.info("4. Added document")
         val count = repo.getDocumentCount("post")
 
-        log.info("5. Got count: " + count);
+        log.info("5. Got count: $count")
 
         if (count == 1L) log.info("SUCCESS!")
-        else log.info("FAILURE! Expected 1 but got " + count)
+        else log.info("FAILURE! Expected 1 but got $count")
 
         repo.close()
     }

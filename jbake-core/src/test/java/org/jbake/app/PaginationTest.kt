@@ -8,8 +8,10 @@ import io.kotest.matchers.shouldBe
 import org.jbake.addTestDocument
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry.documentTypes
-import java.util.*
+import java.time.ZoneOffset
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class PaginationTest : StringSpec({
 
     lateinit var db: ContentStore
@@ -42,12 +44,12 @@ class PaginationTest : StringSpec({
 
     "testPagination" {
         val TOTAL_POSTS = 5
-        val cal = Calendar.getInstance(Locale.ENGLISH)
+        var now = java.time.Instant.now()
 
         // Create posts with incrementing dates
         repeat(TOTAL_POSTS) {
-            cal.add(Calendar.SECOND, 5)
-            db.addTestDocument(type = "post", status = "published", cached = true, date = cal.time)
+            now = now.plusSeconds(5)
+            db.addTestDocument(type = "post", status = "published", cached = true, date = now.atOffset(ZoneOffset.UTC))
         }
 
         var pageCount = 1

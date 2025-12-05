@@ -3,11 +3,15 @@ package org.jbake.template
 import groovy.text.markup.MarkupTemplateEngine
 import groovy.text.markup.TemplateConfiguration
 import org.jbake.app.ContentStore
+import org.jbake.app.NoModelExtractorException
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes.DOC_DATE
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import java.io.Writer
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.
@@ -48,7 +52,7 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
             val writable = template.make(wrappedModel)
             writable.writeTo(writer)
         } catch (e: Exception) {
-            throw RenderingException(e)
+            throw RenderingException(e.message ?: "",e)
         }
     }
 
@@ -71,8 +75,8 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
     }
 
     /** SafeDate wrapper that prevents NPE when Groovy templates call date.format() on null dates */
-    private class SafeDate(private val date: java.util.Date?) {
-        fun format(pattern: String) = date?.let { java.text.SimpleDateFormat(pattern).format(it) } ?: ""
+    private class SafeDate(private val date: OffsetDateTime?) {
+        fun format(pattern: String) = date?.let { DateTimeFormatter.ofPattern(pattern).format(it) } ?: ""
         override fun toString() = date?.toString() ?: ""
     }
 
@@ -80,11 +84,11 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
     private fun transformForGroovy(value: Any?): Any? = when (value) {
         null -> null
         is org.jbake.model.DocumentModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value.date)) }
-        is org.jbake.model.BaseModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value[DOC_DATE] as? java.util.Date)) }
+        is org.jbake.model.BaseModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value[DOC_DATE] as? OffsetDateTime)) }
         is Map<*, *> -> {
             @Suppress("UNCHECKED_CAST")
             val map = value as? Map<String, Any?> ?: return value
-            HashMap(map).apply { put(DOC_DATE, SafeDate(map[DOC_DATE] as? java.util.Date)) }
+            HashMap(map).apply { put(DOC_DATE, SafeDate(map[DOC_DATE] as? OffsetDateTime)) }
         }
         is Collection<*> -> value.map(::transformForGroovy)
         else -> value

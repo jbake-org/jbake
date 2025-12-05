@@ -9,11 +9,11 @@ import io.mockk.*
 import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.app.Renderer
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
-import org.jbake.template.RenderingException
 
 class DocumentsRendererTest : StringSpec({
     lateinit var documentsRenderingTool: DocumentsRenderingTool

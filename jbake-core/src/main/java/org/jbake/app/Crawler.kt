@@ -5,7 +5,8 @@ import org.jbake.app.FileUtil.URI_SEPARATOR_CHAR
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
-import org.jbake.model.ModelAttributes
+import org.jbake.model.ModelAttributes.Status.PUBLISHED
+import org.jbake.model.ModelAttributes.Status.PUBLISHED_DATE
 import org.jbake.parser.Parser
 import org.jbake.util.AuthorTracer
 import org.jbake.util.HtmlUtil
@@ -14,6 +15,7 @@ import org.slf4j.Logger
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.time.OffsetDateTime
 import java.util.*
 
 /**
@@ -203,11 +205,8 @@ class Crawler {
         document.uri = uri
         document.cached = true
 
-        if (document.status == ModelAttributes.Status.PUBLISHED_DATE
-                && document.date != null
-                && Date().after(document.date)
-        )
-            document.status = ModelAttributes.Status.PUBLISHED
+        if (document.status == PUBLISHED_DATE && document.date != null && OffsetDateTime.now().isAfter(document.date!!))
+            document.status = PUBLISHED
 
         if (config.uriWithoutExtension)
             document.noExtensionUri = uri.replace("/index.html", "/")

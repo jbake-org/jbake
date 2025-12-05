@@ -46,33 +46,18 @@ class JBakeConfigurationFactory {
 
 
     /**
-     * Creates a [DefaultJBakeConfiguration] with value site.host replaced
-     * by http://localhost:[server.port].
-     * The server.port is read from the project properties file.
+     * Creates a [DefaultJBakeConfiguration] with value `site.host` replaced by `http://localhost:[server.port]`.
+     * The `server.port` is read from the project properties file.
      *
-     * @param destinationDir The destination directory to render and copy files to
-     * @param isClearCache Whether to clear database cache or not
-     * @throws JBakeExitException if loading the configuration fails
-     */
-    @Deprecated("use {@link #createJettyJbakeConfiguration(File, File, File, boolean)} instead")
-    @Throws(JBakeExitException::class)
-    fun createJettyJbakeConfiguration(sourceDir: File, destinationDir: File, isClearCache: Boolean)
-        = createJettyJbakeConfiguration(sourceDir, destinationDir, null as File?, isClearCache)
-
-    /**
-     * Creates a [DefaultJBakeConfiguration] with value site.host replaced
-     * by http://localhost:[server.port].
-     * The server.port is read from the project properties file.
-     *
-     * @param destinationDir The destination directory to render and copy files to
-     * @param propertiesFile The properties file for the project
-     * @param isClearCache Whether to clear database cache or not
+     * @param destinationDir The destination directory to render and copy files to, or "./output" if null.
+     * @param propertiesFile The properties file of the project, or "jbake.properties" if null.
+     * @param isClearCache   Whether to clear the database cache.
      */
     @Throws(JBakeExitException::class)
     fun createJettyJbakeConfiguration(
         sourceDir: File,
         destinationDir: File?,
-        propertiesFile: File?,
+        propertiesFile: File?, // TBD: Why not configuration right away?
         isClearCache: Boolean
     ): DefaultJBakeConfiguration {
         val conf = this.configUtil.loadConfig(sourceDir, propertiesFile) as DefaultJBakeConfiguration

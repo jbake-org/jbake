@@ -1,6 +1,6 @@
 package org.jbake.parser
 
-import org.jbake.template.RenderingException
+import org.jbake.app.RenderingException
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.net.ConnectException

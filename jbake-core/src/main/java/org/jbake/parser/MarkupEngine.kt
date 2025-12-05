@@ -13,9 +13,11 @@ import org.slf4j.Logger
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 
 
 /**
@@ -111,9 +113,12 @@ abstract class MarkupEngine : ParserEngine {
         context.setTags(tags)
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun setModelDefaultsIfNotSetInHeader(context: ParserContext) {
         if (context.date == null)
-            context.date = (Date(context.file.lastModified()))
+            context.date =
+                Instant.fromEpochMilliseconds(context.file.lastModified()).toJavaInstant()
+                    .atZone(context.config.freemarkerTimeZone.toZoneId()).toOffsetDateTime()
 
         if (context.config.defaultStatus != null && context.status.isEmpty())
             context.setDefaultStatus()
@@ -199,7 +204,7 @@ abstract class MarkupEngine : ParserEngine {
         when {
             key == DOC_DATE -> {
                 runCatching {
-                    content.date = LocalDate.parse(value, formatter) }
+                    content.date = OffsetDateTime.parse(value, formatter) }
                         .onFailure { e -> log.error("Unable to parse date $value with format from 'configuration?.dateFormat' - ${configuration?.dateFormat} : ${e.message}") }
             }
             key == DOC_TAGS            -> content.tags = getTags(value)
@@ -249,7 +254,7 @@ class ErrorEngine @JvmOverloads constructor(private val engineName: String = "un
         documentModel.type = "post"
         documentModel.status = "published"
         documentModel.title = "Rendering engine missing"
-        documentModel.date = LocalDate.now()
+        documentModel.date = OffsetDateTime.now()
         documentModel.tags = emptyList()
     }
 

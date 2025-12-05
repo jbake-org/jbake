@@ -84,7 +84,7 @@ class JBakeConfigurationFactoryTest : StringSpec({
         val destinationDir = TestUtils.newDir(root, "output")
         val siteHost = "http://localhost:8820/"
 
-        val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceDir, destinationDir, true)
+        val configuration = JBakeConfigurationFactory().createJettyJbakeConfiguration(sourceDir, destinationDir, null, true)
 
         configuration.siteHost shouldBe siteHost
     }

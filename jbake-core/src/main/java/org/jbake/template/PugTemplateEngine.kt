@@ -9,6 +9,8 @@ import de.neuland.pug4j.model.PugModel
 import de.neuland.pug4j.template.FileTemplateLoader
 import de.neuland.pug4j.template.PugTemplate
 import org.jbake.app.ContentStore
+import org.jbake.app.NoModelExtractorException
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
@@ -55,7 +57,7 @@ class PugTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstract
             val template = pugConfiguration.getTemplate(templateName)
             renderTemplate(template, model, writer)
         } catch (e: IOException) {
-            throw RenderingException(e)
+            throw RenderingException(e.message ?: "", e)
         }
     }
 

@@ -73,19 +73,20 @@ class Neo4jContentRepository(private val type: String, private val name: String)
             tx.execute(""" MATCH (d:Document {sourceuri: ${'$'}sourceuri}) DETACH DELETE d """, mapOf("sourceuri" to document.sourceUri)).close()
 
             // Create new document
-            tx.execute("""
+            tx.execute(
+                $$"""
                     CREATE (d:Document {
-                        sourceuri: ${'$'}sourceuri,
-                        type: ${'$'}type,
-                        status: ${'$'}status,
-                        sha1: ${'$'}sha1,
-                        cached: ${'$'}cached,
-                        rendered: ${'$'}rendered,
-                        title: ${'$'}title,
-                        date: ${'$'}date,
-                        tags: ${'$'}tags,
-                        body: ${'$'}body,
-                        properties: ${'$'}properties
+                        sourceuri: $sourceuri,
+                        type: $type,
+                        status: $status,
+                        sha1: $sha1,
+                        cached: $cached,
+                        rendered: $rendered,
+                        title: $title,
+                        date: $date,
+                        tags: $tags,
+                        body: $body,
+                        properties: $properties
                     }) """,
                 mapOf(
                     "sourceuri" to document.sourceUri,
@@ -95,7 +96,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                     "cached" to (document.cached ?: false),
                     "rendered" to document.rendered,
                     "title" to document.title,
-                    "date" to document.date?.time,
+                    "date" to document.date?.toInstant()?.toEpochMilli(),
                     "tags" to document.tags,
                     "body" to document.getOrDefault(ModelAttributes.DOC_BODY_RENDERED, ""),
                     "properties" to propertiesJson
@@ -273,7 +274,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                         node.propertyKeys.forEach { key: String ->
                             val value = node.getProperty(key)
                             when (key) {
-                                "date" -> document[key] = if (value is Long) Date(value) else value
+                                "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
                                 "tags" -> document[key] = (value as? List<*>)?.map { it.toString() }?.toTypedArray() ?: emptyArray<Any>()
                                 else -> document[key] = value
                             }
@@ -285,7 +286,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                         val value = record[key]
                         if (value != null) {
                             when (key) {
-                                "date" -> document[key] = if (value is Long) Date(value) else value
+                                "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
                                 "tags" -> document[key] = (value as? List<*>)?.map { it.toString() }?.toTypedArray() ?: emptyArray<String>()
                                 else -> document[key] = value
                             }

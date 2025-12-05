@@ -2,11 +2,11 @@ package org.jbake.template
 
 import org.jbake.app.ContentStore
 import org.jbake.app.FileUtil
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
-import java.io.File
 import java.io.Writer
 
 /**

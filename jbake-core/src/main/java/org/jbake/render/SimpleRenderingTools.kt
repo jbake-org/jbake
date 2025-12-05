@@ -2,8 +2,8 @@ package org.jbake.render
 
 import org.jbake.app.ContentStore
 import org.jbake.app.Renderer
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.RenderingException
 
 interface RenderingTool {
     fun render(renderer: Renderer, db: ContentStore, config: JBakeConfiguration): Int
@@ -111,7 +111,7 @@ private fun wrapOnRenderingException(block: () -> Any?): Int {
         catch (ex: Exception) {
             when(ex) {
                 is RenderingException -> throw ex
-                else -> throw RenderingException(ex)
+                else -> throw RenderingException(ex.message ?: ex.javaClass.simpleName, ex)
             }
         }
     return returned as? Int ?: 1

@@ -10,6 +10,8 @@ import de.neuland.jade4j.template.FileTemplateLoader
 import de.neuland.jade4j.template.JadeTemplate
 import de.neuland.jade4j.template.TemplateLoader
 import org.jbake.app.ContentStore
+import org.jbake.app.NoModelExtractorException
+import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
@@ -51,7 +53,7 @@ class JadeTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstrac
 
             renderTemplate(template, model, writer)
         } catch (e: IOException) {
-            throw RenderingException(e)
+            throw RenderingException(e.message?:"", e)
         }
     }
 

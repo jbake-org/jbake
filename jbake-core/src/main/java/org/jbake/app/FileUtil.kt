@@ -2,7 +2,6 @@ package org.jbake.app
 
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.parser.ParserEnginesRegistry
-import org.jbake.template.RenderingException
 import java.io.*
 import java.io.File.separator
 import java.net.URLDecoder

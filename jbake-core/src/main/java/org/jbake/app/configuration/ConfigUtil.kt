@@ -26,10 +26,7 @@ class ConfigUtil {
     @Throws(ConfigurationException::class)
     private fun load(source: File, propertiesFile: File?): CompositeConfiguration {
         if (!source.exists())
-            throw JBakeExitException(
-                CONFIG_ERROR,
-                "The given source dir '" + source.absolutePath + "' does not exist."
-            )
+            throw JBakeExitException(CONFIG_ERROR, "The given source dir '" + source.absolutePath + "' does not exist.")
         if (!source.isDirectory)
             throw JBakeExitException(CONFIG_ERROR, "The given source dir is not a directory.")
 
@@ -93,6 +90,7 @@ class ConfigUtil {
 
     @Throws(JBakeExitException::class)
     fun loadConfig(source: File, propertiesFile: File? = null): JBakeConfiguration {
+        // W
         try {
             val configuration = load(source, propertiesFile)
             return DefaultJBakeConfiguration(source, configuration)

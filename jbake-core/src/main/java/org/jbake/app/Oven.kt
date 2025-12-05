@@ -8,7 +8,6 @@ import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.render.RenderingTool
 import org.jbake.template.ModelExtractors
-import org.jbake.template.RenderingException
 import org.jbake.util.logger
 import org.slf4j.Logger
 import java.io.File
