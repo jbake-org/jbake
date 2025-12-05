@@ -35,7 +35,7 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         System.setProperty("orientdb.script.pool.enabled", "false")
 
         // OrientDB logging configuration - try ALL possible methods to enable DEBUG level
-        val logLevel = "debug"
+        val logLevel = "FINEST"
         setLoggingLevelViaSysProps(logLevel)
 
         startupIfEnginesAreMissing()
@@ -112,8 +112,8 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         System.setProperty("log.file.level", level)
     }
 
+    /** @param level JUL level string, e.g., "fine" */
     private fun setLoggingLevelViaApi(level: String) {
-        // OGlobalConfiguration - set to DEBUG
         OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue(level)
         OGlobalConfiguration.LOG_FILE_LEVEL.setValue(level)
         OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue(level)

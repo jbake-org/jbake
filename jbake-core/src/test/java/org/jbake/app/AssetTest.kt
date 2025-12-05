@@ -72,7 +72,7 @@ class AssetTest : StringSpec({
     }
 
     "testCopyCustomDir" {
-        config.assetDir = config.sourceDir.resolve("/media")
+        config.assetDir = config.sourceDir.resolve("media")
         Asset(config).copy()
 
         tempDir.resolve("favicon.ico").exists() shouldBe true
