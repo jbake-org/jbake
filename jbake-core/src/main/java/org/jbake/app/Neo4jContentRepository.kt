@@ -57,9 +57,9 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     override fun updateSchema() {
         database.beginTx().use { tx ->
-            tx.execute(""" CREATE CONSTRAINT document_sourceuri IF NOT EXISTS FOR (d:Document) REQUIRE d.sourceuri IS UNIQUE """).close()
-            tx.execute(""" CREATE INDEX document_type   IF NOT EXISTS         FOR (d:Document) ON (d.type) """).close()
-            tx.execute(""" CREATE INDEX document_status IF NOT EXISTS         FOR (d:Document) ON (d.status) """).close()
+            tx.execute("CREATE CONSTRAINT document_sourceuri IF NOT EXISTS FOR (d:Document) REQUIRE d.sourceuri IS UNIQUE").close()
+            tx.execute("CREATE INDEX document_type IF NOT EXISTS FOR (d:Document) ON (d.type)").close()
+            tx.execute("CREATE INDEX document_status IF NOT EXISTS FOR (d:Document) ON (d.status)").close()
             tx.commit()
         }
     }
@@ -68,17 +68,11 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         get() = database.isAvailable(1000)
 
     override fun addDocument(document: DocumentModel) {
-        // Ruby objects already converted by AsciidoctorEngine
         val propertiesJson = objectMapper.writeValueAsString(document)
 
         database.beginTx().use { tx ->
-            // Delete existing document if present
-            tx.execute(""" MATCH (d:Document {sourceuri: ${'$'}sourceuri}) DETACH DELETE d """, mapOf("sourceuri" to document.sourceUri)).close()
-
-            // Create new document
-            tx.execute(
-                $$"""
-                    CREATE (d:Document {
+            tx.execute($$"MATCH (d:Document {sourceuri: $sourceuri}) DETACH DELETE d", mapOf("sourceuri" to document.sourceUri)).close()
+            tx.execute($$"""CREATE (d:Document {
                         sourceuri: $sourceuri,
                         type: $type,
                         status: $status,
@@ -90,7 +84,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                         tags: $tags,
                         body: $body,
                         properties: $properties
-                    }) """,
+                    })""",
                 mapOf(
                     "sourceuri" to document.sourceUri,
                     "type" to document.type,
@@ -100,7 +94,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                     "rendered" to document.rendered,
                     "title" to document.title,
                     "date" to document.date?.toInstant()?.toEpochMilli(),
-                    "tags" to document.tags,
+                    "tags" to document.tags.toTypedArray(),
                     "body" to document.getOrDefault(ModelAttributes.DOC_BODY_RENDERED, ""),
                     "properties" to propertiesJson
                 )).close()
@@ -109,23 +103,21 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         }
     }
 
-    override fun getDocumentByUri(uri: String?): DocumentList<DocumentModel> {
-        return query("MATCH (d:Document {sourceuri: ${'$'}sourceuri}) RETURN d", mapOf("sourceuri" to uri))
-    }
+    override fun getDocumentByUri(uri: String?): DocumentList<DocumentModel> =
+        query($$"MATCH (d:Document {sourceuri: $sourceuri}) RETURN d", mapOf("sourceuri" to uri))
 
-    override fun getDocumentStatus(uri: String?): DocumentList<DocumentModel> {
-        return query("MATCH (d:Document {sourceuri: ${'$'}sourceuri}) RETURN d.sha1 as sha1, d.rendered as rendered", mapOf("sourceuri" to uri))
-    }
+    override fun getDocumentStatus(uri: String?): DocumentList<DocumentModel> =
+        query($$"MATCH (d:Document {sourceuri: $sourceuri}) RETURN d.sha1 as sha1, d.rendered as rendered", mapOf("sourceuri" to uri))
 
     override fun getDocumentCount(docType: String): Long = database.beginTx().use { tx ->
-        val result = tx.execute("MATCH (d:Document {type: ${'$'}type}) RETURN count(d) as count", mapOf("type" to docType))
+        val result = tx.execute($$"MATCH (d:Document {type: $type}) RETURN count(d) as count", mapOf("type" to docType))
         val count = if (result.hasNext()) result.next()["count"] as Long else 0L
         tx.commit()
         count
     }
 
     override fun getPublishedCount(docType: String): Long = database.beginTx().use { tx ->
-        val result = tx.execute("MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN count(d) as count", mapOf("type" to docType))
+        val result = tx.execute("MATCH (d:Document {type: \$type, status: 'published'}) RETURN count(d) as count", mapOf("type" to docType))
         val count = if (result.hasNext()) result.next()["count"] as Long else 0L
         tx.commit()
         count
@@ -137,19 +129,14 @@ class Neo4jContentRepository(private val type: String, private val name: String)
     override fun getPublishedPosts(applyPaging: Boolean) =
         getPublishedContent("post", applyPaging)
 
-    override fun getPublishedPostsByTag(tag: String?): DocumentList<DocumentModel> {
-        return query(
-            "MATCH (d:Document {type: 'post', status: 'published'}) WHERE ${'$'}tag IN d.tags RETURN d ORDER BY d.date DESC",
-            mapOf("tag" to tag)
-        )
-    }
+    override fun getPublishedPostsByTag(tag: String?): DocumentList<DocumentModel> =
+        query("MATCH (d:Document {type: 'post', status: 'published'}) WHERE \$tag IN d.tags RETURN d ORDER BY d.date DESC", mapOf("tag" to tag))
 
     override fun getPublishedDocumentsByTag(tag: String?): DocumentList<DocumentModel> {
-        val query = "MATCH (d:Document {type: ${'$'}type, status: 'published'}) WHERE ${'$'}tag IN d.tags RETURN d ORDER BY d.date DESC"
+        val cypher = "MATCH (d:Document {type: \$type, status: 'published'}) WHERE \$tag IN d.tags RETURN d ORDER BY d.date DESC"
         val documents = DocumentList<DocumentModel>()
         for (docType in DocumentTypeRegistry.documentTypes) {
-            val elements = query(query, mapOf("type" to docType, "tag" to tag))
-            documents.addAll(elements)
+            documents.addAll(query(cypher, mapOf("type" to docType, "tag" to tag)))
         }
         return documents
     }
@@ -161,7 +148,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         getPublishedContent(docType, false)
 
     override fun getPublishedContent(docType: String, applyPaging: Boolean): DocumentList<DocumentModel> {
-        var cypher = "MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN d ORDER BY d.date DESC"
+        var cypher = "MATCH (d:Document {type: \$type, status: 'published'}) RETURN d ORDER BY d.date DESC"
         if (applyPaging && hasStartAndLimitBoundary()) {
             cypher += " SKIP $paginationOffset LIMIT $paginationLimit"
         }
@@ -172,7 +159,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         getAllContent(docType, false)
 
     override fun getAllContent(docType: String, applyPaging: Boolean): DocumentList<DocumentModel> {
-        var cypher = "MATCH (d:Document {type: ${'$'}type}) RETURN d ORDER BY d.date DESC"
+        var cypher = "MATCH (d:Document {type: \$type}) RETURN d ORDER BY d.date DESC"
         if (applyPaging && hasStartAndLimitBoundary()) {
             cypher += " SKIP $paginationOffset LIMIT $paginationLimit"
         }
@@ -183,22 +170,20 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         get() = query("MATCH (d:Document {rendered: false}) RETURN d ORDER BY d.date DESC")
 
     override fun deleteContent(uri: String) = database.beginTx().use { tx ->
-        tx.execute("MATCH (d:Document {sourceuri: ${'$'}sourceuri}) DETACH DELETE d", mapOf("sourceuri" to uri)).close()
+        tx.execute("MATCH (d:Document {sourceuri: \$sourceuri}) DETACH DELETE d", mapOf("sourceuri" to uri)).close()
         tx.commit()
     }
 
     override fun markContentAsRendered(document: DocumentModel) = database.beginTx().use { tx ->
         tx.execute(
-            "MATCH (d:Document {type: ${'$'}type, sourceuri: ${'$'}sourceuri, cached: true, rendered: false}) SET d.rendered = true",
-            mapOf(
-                "type" to document.type,
-                "sourceuri" to document.sourceUri
-            )).close()
+            "MATCH (d:Document {type: \$type, sourceuri: \$sourceuri, cached: true, rendered: false}) SET d.rendered = true",
+            mapOf("type" to document.type, "sourceuri" to document.sourceUri)
+        ).close()
         tx.commit()
     }
 
     override fun deleteAllByDocType(docType: String) = database.beginTx().use { tx ->
-        tx.execute("MATCH (d:Document {type: ${'$'}type}) DETACH DELETE d", mapOf("type" to docType)).close()
+        tx.execute("MATCH (d:Document {type: \$type}) DETACH DELETE d", mapOf("type" to docType)).close()
         tx.commit()
     }
 
@@ -208,8 +193,8 @@ class Neo4jContentRepository(private val type: String, private val name: String)
             database.beginTx().use { tx ->
                 val queryResult = tx.execute("MATCH (d:Document {type: 'post', status: 'published'}) RETURN d.tags as tags")
                 while (queryResult.hasNext()) {
-                    val tags = queryResult.next()["tags"] as? List<*>
-                    tags?.forEach { tag -> if (tag is String) result.add(tag) }
+                    val tags = queryResult.next()["tags"] as? Array<*>
+                    tags?.filterIsInstance<String>()?.forEach { result.add(it) }
                 }
                 tx.commit()
             }
@@ -221,10 +206,10 @@ class Neo4jContentRepository(private val type: String, private val name: String)
             val allTags = mutableSetOf<String>()
             for (docType in DocumentTypeRegistry.documentTypes) {
                 database.beginTx().use { tx ->
-                    val rows = tx.execute("MATCH (d:Document {type: ${'$'}type, status: 'published'}) RETURN d.tags as tags", mapOf("type" to docType))
+                    val rows = tx.execute($$"MATCH (d:Document {type: $type, status: 'published'}) RETURN d.tags as tags", mapOf("type" to docType))
                     while (rows.hasNext()) {
-                        val tags = rows.next()["tags"] as? List<*>
-                        tags?.forEach { tag -> if (tag is String) allTags.add(tag) }
+                        val tags = rows.next()["tags"] as? Array<*>
+                        tags?.filterIsInstance<String>()?.forEach { allTags.add(it) }
                     }
                     tx.commit() // TODO: Why commit here? It's a read operation.
                 }
@@ -237,7 +222,6 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         if (!needed) {
             clearCache = updateTemplateSignatureIfChanged(templateDir)
         }
-
         if (clearCache) {
             deleteAllDocumentTypes()
             updateSchema()
@@ -249,10 +233,8 @@ class Neo4jContentRepository(private val type: String, private val name: String)
         paginationLimit = -1
     }
 
-    // Private helper methods
-
-    private fun hasStartAndLimitBoundary() =
-        (paginationOffset >= 0) && (paginationLimit > -1)
+    private fun hasStartAndLimitBoundary()
+        = (paginationOffset >= 0) && (paginationLimit > -1)
 
     private fun query(cypher: String, params: Map<String, Any?> = emptyMap()): DocumentList<DocumentModel> {
         val documents = DocumentList<DocumentModel>()
@@ -263,23 +245,24 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                 val record = result.next()
                 val document = DocumentModel()
 
-                // Check if we have a node (d) or individual properties
-                if (record.containsKey("d")) {  // TODO: What the heck is this logic?
+                if (record.containsKey("d")) {
                     val node = record["d"] as org.neo4j.graphdb.Node
-                    // Deserialize from properties JSON if available
-                    val properties = node.getProperty("properties", null) as? String
-                    if (properties != null) {
-                        val map = objectMapper.readValue<Map<String, Any?>>(properties, objectMapper.typeFactory.constructMapType(Map::class.java, String::class.java, Any::class.java))
+
+                    // First, load extra properties from JSON (for fields not stored as node properties)
+                    val propertiesJson = node.getProperty("properties", null) as? String
+                    if (propertiesJson != null) {
+                        val map = objectMapper.readValue<Map<String, Any?>>(propertiesJson, objectMapper.typeFactory.constructMapType(Map::class.java, String::class.java, Any::class.java))
                         map.forEach { (k, v) -> if (v != null) document[k] = v }
-                    } else {
-                        // Fallback: read individual properties
-                        node.propertyKeys.forEach { key: String ->
-                            val value = node.getProperty(key)
-                            when (key) {
-                                "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
-                                "tags" -> document[key] = (value as? List<*>)?.map { it.toString() }?.toTypedArray() ?: emptyArray<Any>()
-                                else -> document[key] = value
-                            }
+                    }
+
+                    // Then, override with actual node property values (which may have been updated)
+                    node.propertyKeys.forEach { key: String ->
+                        if (key == "properties") return@forEach
+                        val value = node.getProperty(key)
+                        when (key) {
+                            "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
+                            "tags" -> document[key] = (value as? Array<*>)?.filterIsInstance<String>() ?: emptyList<String>()
+                            else -> document[key] = value
                         }
                     }
                 } else {
@@ -288,7 +271,7 @@ class Neo4jContentRepository(private val type: String, private val name: String)
                         val value = record[key] ?: continue
                         when (key) {
                             "date" -> document[key] = if (value is Long) java.time.Instant.ofEpochMilli(value).atOffset(java.time.ZoneOffset.UTC) else value
-                            "tags" -> document[key] = (value as? List<*>)?.map { it.toString() }?.toTypedArray() ?: emptyArray<String>()
+                            "tags" -> document[key] = (value as? Array<*>)?.filterIsInstance<String>() ?: emptyList<String>()
                             else -> document[key] = value
                         }
                     }
@@ -307,18 +290,17 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
         return database.beginTx().use { tx ->
             val result = tx.execute("MATCH (s:Signature {key: 'templates'}) RETURN s.sha1 as sha1")
-            val changed =
-                if (result.hasNext()) {
-                    val existingSignature = result.next()["sha1"] as? String
-                    if (existingSignature == currentSignature) false
-                    else {
-                        tx.execute("MATCH (s:Signature {key: 'templates'}) SET s.sha1 = ${'$'}sha1", mapOf("sha1" to currentSignature)).close()
-                        true
-                    }
-                } else {
-                    tx.execute("CREATE (s:Signature {key: 'templates', sha1: ${'$'}sha1})", mapOf("sha1" to currentSignature)).close()
+            val changed = if (result.hasNext()) {
+                val existingSignature = result.next()["sha1"] as? String
+                if (existingSignature == currentSignature) false
+                else {
+                    tx.execute("MATCH (s:Signature {key: 'templates'}) SET s.sha1 = \$sha1", mapOf("sha1" to currentSignature)).close()
                     true
                 }
+            } else {
+                tx.execute("CREATE (s:Signature {key: 'templates', sha1: \$sha1})", mapOf("sha1" to currentSignature)).close()
+                true
+            }
             tx.commit()
             changed
         }
@@ -330,3 +312,4 @@ class Neo4jContentRepository(private val type: String, private val name: String)
 
     private val log: Logger by logger()
 }
+
