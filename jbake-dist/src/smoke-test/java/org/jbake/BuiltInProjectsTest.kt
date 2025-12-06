@@ -5,7 +5,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
-import java.io.IOException
 import kotlin.io.path.createTempDirectory
 
 data class TemplateTestCase(val name: String, val extension: String) {
@@ -29,19 +28,16 @@ class BuiltInProjectsTest : FunSpec({
 
                 // Run JBake to initialize the dir
                 val initProcess = runner.runWithArguments(jbakeExec, "-i", "-t", projectName)
-                initProcess.exitValue() shouldBe 0
+                withClue("JBake init run printed:\n\n${runner.processOutput}\n") {
+                    initProcess.exitValue() shouldBe 0
+                }
                 tempDir.resolve("jbake.properties").shouldExist()
                 tempDir.resolve("templates/index.$extension").shouldExist()
                 initProcess.destroy()
 
                 // Bake project
                 val bakeProcess = runner.runWithArguments(jbakeExec, "-b")
-                val jbakeOutput = try {
-                    bakeProcess.inputStream.bufferedReader().readText()
-                } catch (e: IOException) {
-                    throw Exception("Failed to read JBake process output: ${e.message}")
-                }
-                withClue("JBake process output:\n\n$jbakeOutput\n\n") {
+                withClue("JBake bake run printed:\n\n${runner.processOutput}\n") {
                     bakeProcess.exitValue() shouldBe 0
                 }
                 tempDir.resolve("output/index.html").shouldExist()

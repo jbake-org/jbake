@@ -127,12 +127,17 @@ class Main @JvmOverloads constructor(
             try {
                 Main().run(args)
             } catch (e: JBakeExitException) {
+                // Always print to stderr so users see errors even if logging isn't configured
+                System.err.println("ERROR: ${e.message}")
+                e.cause?.let { System.err.println("Cause: ${it.message}") }
                 log.error(e.message)
                 log.debug(e.message, e)
                 if (e.cause is CommandLine.MissingParameterException) printUsage()
                 exitProcess(e.getExit())
             }
             catch (e: Throwable) {
+                System.err.println("ERROR: ${e.message}")
+                e.printStackTrace()
                 log.error(e.message, e)
             }
         }
