@@ -165,7 +165,10 @@
             <dependency><groupId>org.hsqldb</groupId><artifactId>hsqldb</artifactId><version>${version.hsqldb}</version></dependency>
             <dependency><groupId>org.jcommander</groupId><artifactId>jcommander</artifactId><version>${version.jcommander}</version></dependency>
             <dependency><groupId>org.jsoup</groupId><artifactId>jsoup</artifactId><version>${version.jsoup}</version></dependency>
-            <dependency><groupId>org.neo4j</groupId><artifactId>neo4j</artifactId><version>${version.neo4j}</version></dependency>
+            <dependency><groupId>org.neo4j</groupId><artifactId>neo4j</artifactId><version>${version.neo4j}</version>
+                <!-- TODO: Reduce Neo4j dependencies more, or make whole Neo4j entirely optional. -->
+                <exclusions><exclusion><groupId>org.neo4j</groupId><artifactId>neo4j-slf4j-provider</artifactId></exclusion></exclusions>
+            </dependency>
             <dependency><groupId>org.slf4j</groupId><artifactId>jcl-over-slf4j</artifactId><version>${version.slf4j}</version></dependency>
             <dependency><groupId>org.slf4j</groupId><artifactId>jul-to-slf4j</artifactId><version>${version.slf4j}</version></dependency>
             <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId><version>${version.slf4j}</version></dependency>
