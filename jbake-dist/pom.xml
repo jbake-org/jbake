@@ -44,6 +44,9 @@
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId></dependency>
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId></dependency>
         <dependency><groupId>io.pebbletemplates</groupId><artifactId>pebble</artifactId></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-templates</artifactId></dependency>
+        <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy-dateutil</artifactId></dependency>
 
         <!-- Test Dependencies -->
         <dependency><scope>test</scope><groupId>org.eclipse.jgit</groupId><artifactId>org.eclipse.jgit</artifactId></dependency>
