@@ -114,45 +114,70 @@ class AsciidoctorEngine : MarkupEngine() {
             documentModel.title = title
         }
 
+        // Build set of JBake config keys (normalized with underscores) to identify exported attributes
+        val exportedConfigKeys = buildSet {
+            val prefix = context.config.attributesExportPrefixForAsciidoctor ?: ""
+            val it = context.config.keys
+            while (it.hasNext()) {
+                val key = it.next()
+                if (!key.startsWith("asciidoctor")) {
+                    add(prefix + key.replace(".", "_"))
+                }
+            }
+        }
+
         // Get attributes from document
         val skippedKeys = setOf("java_class_path", "sun_java_command", )
         log.info("=== Parsing attributes for document: ${context.file.name} ===")
-        for ((key, value) in document.attributes.filter { it.key !in skippedKeys }.toSortedMap()) {
+        for ((key, value) in document.attributes.filter { it.key !in SKIPPED_ATTRIBUTES }.toSortedMap()) {
 
             val keyStr = key.toString()
-            log.info("    ${keyStr.padEnd(32)} = '$value' (class: ${value?.javaClass?.name?.removePrefix("java.lang.")})")///
+            log.info("    ${keyStr.padEnd(32)} = '$value' (class: ${value?.javaClass?.name?.removePrefix("java.lang.")})")
 
             when {
+                // JBake-specific attributes: store without prefix
                 keyStr.startsWith(JBAKE_PREFIX) -> {
-                    val pKey = keyStr.substring(6)
+                    val pKey = keyStr.substring(JBAKE_PREFIX.length)
                     val convertedValue = convertRubyToJava(value)
                     if (convertedValue is String)
                         storeHeaderValue(pKey, convertedValue, documentModel)
                     else if (convertedValue != null)
                         documentModel[pKey] = convertedValue
                 }
+                // Revision date: special handling for date parsing
                 keyStr == REVDATE_KEY -> {
                     val convertedValue = convertRubyToJava(value)
                     if (convertedValue is String) {
                         runCatching { context.date = OffsetDateTime.parse(convertedValue, dateFormat) }
                         .recoverCatching {
-                            // If full date-time parsing fails, try as LocalDate
                             val localDate = java.time.LocalDate.parse(convertedValue, dateFormat)
                             context.date = localDate.atStartOfDay().atOffset(java.time.ZoneOffset.UTC)
                         }
                         .onFailure { log.error("Unable to parse revdate '$convertedValue'. Expected format: $dateFormat", it) }
                     }
                 }
+
+                // JBake tags special case (may appear without jbake- prefix in some configs)
                 keyStr == "jbake-tags" -> {
                     val convertedValue = convertRubyToJava(value)
                     if (convertedValue is String)
                         context.setTags(convertedValue.split(",".toRegex()).dropLastWhile { it.isEmpty() })
                     else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
                 }
+
+                // Skip attributes exported from JBake config (already available via config)
+                keyStr in exportedConfigKeys -> { }
+
+                // Built-in Asciidoctor attributes: prefix with "asciidoc."
+                keyStr in ASCIIDOCTOR_BUILTIN_ATTRIBUTES || keyStr.matches(ASCIIDOCTOR_BUILTIN_PATTERN) -> {
+                    val convertedValue = convertRubyToJava(value) ?: continue
+                    documentModel["$EXPORT_PREFIX_ASCIIDOC$keyStr"] = convertedValue
+                }
+
+                // Custom document attributes (user-defined in the .adoc file): prefix with "doc_attr."
                 else -> {
-                    val convertedValue = convertRubyToJava(value)
-                    if (convertedValue != null)
-                        documentModel[keyStr] = convertedValue
+                    val convertedValue = convertRubyToJava(value) ?: continue
+                    documentModel["$EXPORT_PREFIX_DOC_ATTR$keyStr"] = convertedValue
                 }
             }
         }
@@ -264,6 +289,43 @@ class AsciidoctorEngine : MarkupEngine() {
 
         /** Comma-separated gem names */
         private const val OPT_REQUIRES = "requires"
+
+        /** Prefix for built-in Asciidoctor attributes stored in the document model */
+        private const val EXPORT_PREFIX_ASCIIDOC = "asciidoc."
+
+        /** Prefix for custom document attributes (user-defined in the .adoc file) */
+        private const val EXPORT_PREFIX_DOC_ATTR = "doc_attr."
+
+        /** Attributes to skip entirely (too large, sensitive, or irrelevant) */
+        private val SKIPPED_ATTRIBUTES = setOf("java_class_path", "sun_java_command", "surefire_test_class_path", "surefire_real_class_path")
+
+        /** Regex pattern for dynamic Asciidoctor attributes (e.g., backend-html5, doctype-article, etc.) */
+        private val ASCIIDOCTOR_BUILTIN_PATTERN = Regex("^(backend-|basebackend-|doctype-|filetype-|safe-mode-|author_|authorinitials_|email_|firstname_|lastname_|middlename_).*")
+
+        /** Known built-in Asciidoctor attributes (not user-defined, not JBake config) */
+        private val ASCIIDOCTOR_BUILTIN_ATTRIBUTES = setOf(
+            // Document info
+            "docdate", "docdatetime", "docdir", "docfile", "docfilesuffix", "docname", "doctime", "doctitle", "doctype", "docyear",
+            // Processing
+            "asciidoctor", "asciidoctor-version", "backend", "basebackend", "embedded",
+            "filetype", "htmlsyntax", "outfilesuffix", "safe-mode-level", "safe-mode-name",
+            // Locale/time
+            "localdate", "localdatetime", "localtime", "localyear",
+            // Authoring
+            "author", "authorinitials", "authorcount", /* "email", */ "firstname", "lastname", "middlename",
+            "revdate", "revnumber", "revremark",
+            // Section/TOC
+            "idprefix", "idseparator", "sectids", "sectanchors", "sectlinks", "sectnums", "sectnumlevels",
+            "toc", "toc-placement", "toc-title", "toclevels",
+            // Captions and labels
+            "appendix-caption", "appendix-refsig", "caution-caption", "chapter-refsig",
+            "example-caption", "figure-caption", "important-caption", "last-update-label",
+            "note-caption", "part-refsig", "section-refsig", "table-caption", "tip-caption",
+            "untitled-label", "version-label", "warning-caption",
+            // Misc built-ins
+            "attribute-missing", "attribute-undefined", "iconsdir", "imagesdir", "stylesdir",
+            "max-include-depth", "notitle", "prewrap", "source-highlighter", "stem", "user-home"
+        )
     }
 
     private val log: Logger by logger()
