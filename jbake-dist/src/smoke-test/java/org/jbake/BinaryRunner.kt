@@ -35,14 +35,8 @@ class BinaryRunner(private val workingDir: File) {
             }
         }
         outputThread.start()
-
-        // Wait for process to complete
         process.waitFor()
-
-        // Wait for output thread to finish reading
         outputThread.join(5000) // Wait up to 5 seconds for output to be consumed
-
-        // Store the captured output
         processOutput = outputBuilder.toString()
 
         return process
@@ -64,9 +58,6 @@ class BinaryRunner(private val workingDir: File) {
 
                 "No jbake launcher found! CWD: ${File(".")}  Gradle: ${gradleFile.path} Maven: ${mavenFile.path}"
                     .let { throw Exception(it) }
-
-                // Default to Gradle path if neither exists (will fail with clear error)
-                //return File("No/built/binary/found")
             }
 
         private val log by Logging.logger()
