@@ -14,3 +14,7 @@ object PathUtils {
     fun ensureTrailingSeparatorForDirectory(directory: File)
         = directory.path.trimEnd(File.separatorChar) + File.separator
 }
+
+inline fun <reified T : kotlin.Enum<T>> enumValueOf(type: String): T? {
+    return runCatching { java.lang.Enum.valueOf(T::class.java, type)  }.getOrNull()
+}
