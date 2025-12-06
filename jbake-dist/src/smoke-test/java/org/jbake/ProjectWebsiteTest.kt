@@ -5,15 +5,12 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.eclipse.jgit.api.Git
-import java.io.File
 import kotlin.io.path.createTempDirectory
 
 class ProjectWebsiteTest : StringSpec({
 
-    val WEBSITE_REPO_URL = "https://github.com/jbake-org/jbake.org.git"
-
     "should bake JBake website" {
-        val tempDir = createTempDirectory("jbake-website-test-").toFile()
+        val tempDir = createTempDirectory(buildOutputDir, "jbake-website-test-").toFile()
         try {
             val projectDir = tempDir.resolve("project")
             val outputDir = projectDir.resolve("output")
@@ -38,3 +35,5 @@ class ProjectWebsiteTest : StringSpec({
         }
     }
 })
+
+private const val WEBSITE_REPO_URL = "https://github.com/jbake-org/jbake.org.git"

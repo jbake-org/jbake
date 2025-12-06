@@ -1,5 +1,7 @@
 package org.jbake
 
+import java.nio.file.Path
+
 class NoStackTraceException(message: String) : RuntimeException(message) {
     // Overriding this prevents the JVM from gathering the stack trace information.
     // - Improves performance when exceptions are used for control flow.
@@ -18,3 +20,7 @@ class ShortTraceException(message: String, val cutStackAt: Int) : RuntimeExcepti
         return this
     }
 }
+
+val buildOutputDir: Path
+    = System.getProperty("jbake.buildOutputDir")?.let { Path.of(it) }
+        ?: Path.of(System.getProperty("java.io.tmpdir"))

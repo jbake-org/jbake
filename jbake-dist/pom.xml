@@ -255,9 +255,10 @@
                         <include>**/BuiltInProjectsTest.*</include>
                         <include>**/ProjectWebsiteTest.*</include>
                     </includes>
+                    <!-- Keep these here: -->
                     <!--<argLine>-Xms512m -Xmx3g -Dorientdb.installCustomFormatter=false -Djna.nosys=true -XX:MaxDirectMemorySize=2g</argLine> Keep-->
-                    <argLine>-Xms512m -Xmx3g</argLine>
                     <!--<forkCount>5</forkCount>   Helps but now I need serial for logs. -->
+                    <!-- <systemProperties> defined in root pom. -->
                 </configuration>
                 <executions>
                     <execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution>

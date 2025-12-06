@@ -1,60 +1,54 @@
 package org.jbake
 
 import io.kotest.assertions.withClue
-import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.datatest.withData
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
-import java.io.File
 import java.io.IOException
 import kotlin.io.path.createTempDirectory
 
-class BuiltInProjectsTest : StringSpec({
+data class TemplateTestCase(val name: String, val extension: String) {
+    override fun toString() = "$name template"
+}
 
-    fun testTemplate(projectName: String, extension: String) {
-        "$projectName template should bake successfully" {
+class BuiltInProjectsTest : FunSpec({
+
+    context("should bake successfully") {
+        withData(
+            TemplateTestCase("freemarker", "ftl"),
+            TemplateTestCase("thymeleaf", "thyme"),
+            TemplateTestCase("jade", "jade"),
+            TemplateTestCase("groovy", "gsp"),
+            TemplateTestCase("groovy-mte", "tpl"),
+        ) { (projectName, extension) ->
             val jbakeExec = BinaryRunner.jbakeExecutableRelative.absolutePath
-
-            val tempDir = createTempDirectory("jbake-smoke-test").toFile()
+            val tempDir = createTempDirectory(buildOutputDir, "jbake-smoke-test-").toFile()
             try {
-                val projectDir = tempDir.resolve("project")
                 val runner = BinaryRunner(tempDir)
 
-                // Run JBake to initialize the dir - should create project/, templates/ etc.
+                // Run JBake to initialize the dir
                 val initProcess = runner.runWithArguments(jbakeExec, "-i", "-t", projectName)
-
                 initProcess.exitValue() shouldBe 0
                 tempDir.resolve("jbake.properties").shouldExist()
-
-                val templateDir = tempDir.resolve("templates") //.also { it.mkdir() }
-                templateDir.resolve("index.$extension").shouldExist()
+                tempDir.resolve("templates/index.$extension").shouldExist()
                 initProcess.destroy()
 
                 // Bake project
                 val bakeProcess = runner.runWithArguments(jbakeExec, "-b")
                 val jbakeOutput = try {
                     bakeProcess.inputStream.bufferedReader().readText()
-                }
-                catch (e: IOException) {
+                } catch (e: IOException) {
                     throw Exception("Failed to read JBake process output: ${e.message}")
                 }
-                withClue("JBake process output:\n\n\n$jbakeOutput\n\n\n") {
+                withClue("JBake process output:\n\n$jbakeOutput\n\n") {
                     bakeProcess.exitValue() shouldBe 0
                 }
-
-                val outputDir = tempDir.resolve("output") //.also { it.mkdir() }
-                outputDir.resolve("index.html").shouldExist()
+                tempDir.resolve("output/index.html").shouldExist()
                 bakeProcess.destroy()
-
+            } finally {
                 tempDir.deleteRecursively()
             }
-            finally { /*tempDir.deleteRecursively()*/ }
         }
     }
-
-    // Test each template
-    testTemplate("thymeleaf", "thyme")
-    testTemplate("freemarker", "ftl")
-    testTemplate("jade", "jade")
-    testTemplate("groovy", "gsp")
-    testTemplate("groovy-mte", "tpl")
 })
