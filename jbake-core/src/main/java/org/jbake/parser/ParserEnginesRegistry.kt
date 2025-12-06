@@ -77,6 +77,9 @@ class ParserEnginesRegistry private constructor() {
     private fun getEngine(fileExtension: String): ParserEngine? = parsers[fileExtension]
 
     companion object {
+        // Logger must be declared first, before any code that uses it
+        private val log: Logger by Logging.logger()
+
         private val INSTANCE: ParserEnginesRegistry = ParserEnginesRegistry()
 
         init {
@@ -151,8 +154,6 @@ class ParserEnginesRegistry private constructor() {
             if (engine is ErrorEngine)
                 log.warn { "Unable to load a suitable rendering engine for extensions $extensions" }
         }
-
-        private val log: Logger by Logging.logger()
     }
 }
 
