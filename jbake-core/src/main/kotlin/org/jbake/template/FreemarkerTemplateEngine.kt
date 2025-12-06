@@ -51,12 +51,8 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         }
          */
 
-        // Configure FreeMarker to handle missing variables gracefully
-        // Use IGNORE handler which prints nothing for undefined variables
-        templateCfg.templateExceptionHandler = TemplateExceptionHandler.IGNORE_HANDLER
-
-        // Alternative: use RETHROW_HANDLER for debugging
-        // templateCfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
+        // Use RETHROW handler so exceptions are not suppressed and tests fail on template errors
+        templateCfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
 
         try {
             templateCfg.setDirectoryForTemplateLoading(config.templateDir)
@@ -220,4 +216,3 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         }
     }
 }
-
