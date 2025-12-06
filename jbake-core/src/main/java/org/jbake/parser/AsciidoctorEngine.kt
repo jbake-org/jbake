@@ -5,12 +5,15 @@ import org.asciidoctor.Attributes
 import org.asciidoctor.Options
 import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciidoctorJRuby
+import org.jbake.model.DocumentModel
 import org.jbake.util.AuthorTracer
 import org.jbake.util.Logging.logger
 import org.jbake.util.error
 import org.slf4j.Logger
 import java.io.File
+import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /**
@@ -126,16 +129,7 @@ class AsciidoctorEngine : MarkupEngine() {
         }
 
         // Build set of JBake config keys (normalized with underscores) to identify exported attributes
-        val exportedConfigKeys = buildSet {
-            val prefix = context.config.attributesExportPrefixForAsciidoctor ?: ""
-            val it = context.config.keys
-            while (it.hasNext()) {
-                val key = it.next()
-                if (!key.startsWith("asciidoctor")) {
-                    add(prefix + key.replace(".", "_"))
-                }
-            }
-        }
+        val exportedConfigKeys = collectExportedKeys(context)
 
         // Get attributes from document
         log.info("=== Parsing attributes for document: ${context.file.name} ===")
@@ -144,59 +138,69 @@ class AsciidoctorEngine : MarkupEngine() {
             val keyStr = key.toString()
             log.info("    ${keyStr.padEnd(32)} = '$value' (class: ${value?.javaClass?.name?.removePrefix("java.lang.")})")
 
-            when {
-                // JBake-specific attributes: store without prefix
-                keyStr.startsWith(JBAKE_PREFIX) -> {
-                    val pKey = keyStr.substring(JBAKE_PREFIX.length)
-                    val convertedValue = convertRubyToJava(value)
-                    if (convertedValue is String)
-                        storeHeaderValue(pKey, convertedValue, documentModel)
-                    else if (convertedValue != null)
-                        documentModel[pKey] = convertedValue
-                }
-                // Revision date: special handling for date parsing
-                keyStr == REVDATE_KEY -> {
-                    val convertedValue = convertRubyToJava(value)
-                    if (convertedValue is String) {
-                        runCatching { context.date = OffsetDateTime.parse(convertedValue, dateFormat) }
-                        .recoverCatching {
-                            val localDate = java.time.LocalDate.parse(convertedValue, dateFormat)
-                            context.date = localDate.atStartOfDay().atOffset(java.time.ZoneOffset.UTC)
-                        }
-                        .onFailure { log.error("Unable to parse revdate '$convertedValue'. Expected format: $dateFormat", it) }
-                    }
-                }
-
-                // JBake tags special case (may appear without jbake- prefix in some configs)
-                keyStr == "jbake-tags" -> {
-                    val convertedValue = convertRubyToJava(value)
-                    if (convertedValue is String)
-                        context.setTags(convertedValue.split(",".toRegex()).dropLastWhile { it.isEmpty() })
-                    else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
-                }
-
-                // Skip author/email - already handled above with special logic
-                keyStr in AUTHOR_ATTRIBUTES -> { }
-
-                // Skip attributes exported from JBake config (already available via config)
-                keyStr in exportedConfigKeys -> { }
-
-                // Built-in Asciidoctor attributes: prefix with "asciidoc."
-                keyStr in ASCIIDOCTOR_BUILTIN_ATTRIBUTES || keyStr.matches(ASCIIDOCTOR_BUILTIN_PATTERN) -> {
-                    val convertedValue = convertRubyToJava(value) ?: continue
-                    documentModel["$EXPORT_PREFIX_ASCIIDOC$keyStr"] = convertedValue
-                }
-
-                // Custom document attributes (user-defined in the .adoc file): prefix with "doc_attr."
-                else -> {
-                    val convertedValue = convertRubyToJava(value) ?: continue
-                    documentModel["$EXPORT_PREFIX_DOC_ATTR$keyStr"] = convertedValue
-                }
-            }
+            processAttribute(keyStr, value, documentModel, context, dateFormat, exportedConfigKeys)
         }
         AuthorTracer.trace("asciidoctor-header", documentModel, context.file.name)
     }
 
+    private fun processAttribute(
+        keyStr: String,
+        value: Any?,
+        documentModel: DocumentModel,
+        context: ParserContext,
+        dateFormat: DateTimeFormatter,
+        exportedConfigKeys: Set<String>,
+    ) {
+        when {
+            // JBake-specific attributes: store without prefix
+            keyStr.startsWith(JBAKE_PREFIX) -> {
+                val pKey = keyStr.substring(JBAKE_PREFIX.length)
+                val convertedValue = convertRubyToJava(value)
+                if (convertedValue is String)
+                    storeHeaderValue(pKey, convertedValue, documentModel)
+                else if (convertedValue != null)
+                    documentModel[pKey] = convertedValue
+            }
+            // Revision date: special handling for date parsing
+            keyStr == REVDATE_KEY -> {
+                val convertedValue = convertRubyToJava(value)
+                if (convertedValue is String) {
+                    runCatching { context.date = OffsetDateTime.parse(convertedValue, dateFormat) }
+                        .recoverCatching {
+                            val localDate = LocalDate.parse(convertedValue, dateFormat)
+                            context.date = localDate.atStartOfDay().atOffset(ZoneOffset.UTC)
+                        }
+                        .onFailure { log.error("Unable to parse revdate '$convertedValue'. Expected format: $dateFormat", it) }
+                }
+            }
+
+            // JBake tags special case (may appear without jbake- prefix in some configs)
+            keyStr == "jbake-tags" -> {
+                val convertedValue = convertRubyToJava(value)
+                if (convertedValue is String)
+                    context.setTags(convertedValue.split(",".toRegex()).dropLastWhile { it.isEmpty() })
+                else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
+            }
+
+            // Skip author/email - already handled above with special logic
+            keyStr in AUTHOR_ATTRIBUTES -> {}
+
+            // Skip attributes exported from JBake config (already available via config)
+            keyStr in exportedConfigKeys -> {}
+
+            // Built-in Asciidoctor attributes: prefix with "asciidoc."
+            keyStr in ASCIIDOCTOR_BUILTIN_ATTRIBUTES || keyStr.matches(ASCIIDOCTOR_BUILTIN_PATTERN) -> {
+                val convertedValue = convertRubyToJava(value) ?: return
+                documentModel["$EXPORT_PREFIX_ASCIIDOC$keyStr"] = convertedValue
+            }
+
+            // Custom document attributes (user-defined in the .adoc file): prefix with "doc_attr."
+            else -> {
+                val convertedValue = convertRubyToJava(value) ?: return
+                documentModel["$EXPORT_PREFIX_DOC_ATTR$keyStr"] = convertedValue
+            }
+        }
+    }
 
 
     private fun getValueClassName(value: Any?) = value?.javaClass?.getCanonicalName() ?: "null"
@@ -349,4 +353,13 @@ class AsciidoctorEngine : MarkupEngine() {
     }
 
     private val log: Logger by logger()
+}
+
+private fun collectExportedKeys(context: ParserContext): Set<String> = buildSet {
+    val prefix = context.config.attributesExportPrefixForAsciidoctor ?: ""
+    val it = context.config.keys
+    while (it.hasNext()) {
+        val key = it.next()
+        if (!key.startsWith("asciidoctor")) add(prefix + key.replace(".", "_"))
+    }
 }
