@@ -76,8 +76,10 @@
     </dependencies>
 
     <build>
+        <!-- This only affects Java compiler?
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        -->
         <resources>
             <!-- Text resources that need property filtering -->
             <resource>
@@ -147,16 +149,6 @@
                     <sourceDirectories>
                         <dir>${project.basedir}/src/main/kotlin</dir>
                     </sourceDirectories>
-                    <skip>false</skip>
-                    <!-- Use javadoc format for Maven Central compatibility -->
-                    <dokkaSourceSets>
-                        <dokkaSourceSet>
-                            <sourceRoots>
-                                <root>${project.basedir}/src/main/kotlin</root>
-                            </sourceRoots>
-                            <jdkVersion>17</jdkVersion>
-                        </dokkaSourceSet>
-                    </dokkaSourceSets>
                 </configuration>
             </plugin>
 
