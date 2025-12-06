@@ -56,7 +56,7 @@ class BinaryRunner(private val workingDir: File) {
                 // Fall back to Maven path
                 val mavenFile: File = File(mavenPath).let { if(it.exists()) return it else it }
 
-                "No jbake launcher found! CWD: ${File(".")}  Gradle: ${gradleFile.path} Maven: ${mavenFile.path}"
+                "No jbake launcher found! CWD: ${File(".").path}  Gradle: ${gradleFile.path} Maven: ${mavenFile.path}"
                     .let { throw Exception(it) }
             }
 
