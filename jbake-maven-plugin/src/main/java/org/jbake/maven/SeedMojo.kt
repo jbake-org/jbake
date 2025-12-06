@@ -1,7 +1,6 @@
 package org.jbake.maven
 
 import org.apache.commons.io.IOUtils
-import org.apache.commons.lang3.StringUtils
 import org.apache.maven.plugin.AbstractMojo
 import org.apache.maven.plugin.MojoExecutionException
 import org.apache.maven.plugins.annotations.Mojo
@@ -11,7 +10,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
-import java.util.*
 import java.util.zip.ZipInputStream
 
 /**
@@ -19,9 +17,8 @@ import java.util.zip.ZipInputStream
  */
 @Mojo(name = "seed", requiresProject = true, requiresDirectInvocation = true)
 class SeedMojo : AbstractMojo() {
-    /**
-     * Location of the Seeding Zip
-     */
+
+    /** The URL that will provide the Seeding zip file to download. */
     @Parameter(
         property = "jbake.seedUrl",
         defaultValue = "https://github.com/jbake-org/jbake-template-bootstrap/zipball/master/",
@@ -29,26 +26,18 @@ class SeedMojo : AbstractMojo() {
     )
     private var seedUrl: String? = null
 
-    /**
-     * Location of the Output Directory.
-     */
+    /** Where to unzip to. */
     @Parameter(property = "jbake.outputDirectory", defaultValue = $$"${project.basedir}/src/main/jbake", required = true)
     private lateinit var outputDirectory: File
 
-    /**
-     * Really force overwrite if output dir exists? defaults to false
-     */
+    /** Overwrite the output dir if exists? Default false. */
     @Parameter(property = "jbake.force", defaultValue = "false")
-    private var force: Boolean? = null
+    private var force: Boolean = false
 
     @Throws(MojoExecutionException::class)
     override fun execute() {
-        if (outputDirectory!!.exists() && (!force!!)) throw MojoExecutionException(
-            String.format(
-                "The outputDirectory %s must *NOT* exist. Invoke with jbake.force as true to disregard",
-                outputDirectory!!.getName()
-            )
-        )
+        if (outputDirectory.exists() && !force)
+            throw MojoExecutionException("The outputDirectory ${outputDirectory.name} must *NOT* exist. Invoke with jbake.force as true to disregard")
 
         try {
             val url = URL(seedUrl)
@@ -56,44 +45,35 @@ class SeedMojo : AbstractMojo() {
 
             log.info("Downloading JBake template from: $seedUrl to temporary file: ${tmpZipFile.absolutePath}")
 
-            val fos = FileOutputStream(tmpZipFile)
-            val length = IOUtils.copy(url.openStream(), fos)
+            val length = FileOutputStream(tmpZipFile).use { fos -> IOUtils.copy(url.openStream(), fos) }
 
-            fos.close()
-
-            log.info("Downloaded $length bytes. Unpacking template to output directory: ${outputDirectory!!.absolutePath}")
+            log.info("Downloaded $length bytes. Unpacking template to output directory: ${outputDirectory.absolutePath}")
 
             unpackZip(tmpZipFile)
-            log.info("JBake template successfully seeded into: ${outputDirectory!!.absolutePath}")
+            log.info("JBake template successfully seeded into: ${outputDirectory.absolutePath}")
         } catch (e: Exception) {
-            log.error("Failed to seed JBake template from: $seedUrl to: ${outputDirectory!!.absolutePath} - ${e.message}", e)
-            throw MojoExecutionException("Failed to seed JBake template into ${outputDirectory!!.absolutePath}", e)
+            log.error("Failed to seed JBake template from '$seedUrl' to '${outputDirectory.absolutePath}': ${e.message}", e)
+            throw MojoExecutionException("Failed to seed JBake template into ${outputDirectory.absolutePath}", e)
         }
     }
 
     @Throws(IOException::class)
     private fun unpackZip(tmpZipFile: File) {
-        val zis =
-            ZipInputStream(FileInputStream(tmpZipFile))
+        val zis = ZipInputStream(FileInputStream(tmpZipFile))
         // Get the zipped file list entry.
         var ze = zis.getNextEntry()
 
         while (ze != null) {
-            if (ze.isDirectory) {
+            val fileName = stripLeadingPath(ze.getName())
+            if (fileName.isEmpty() || ze.isDirectory) {
                 ze = zis.getNextEntry()
                 continue
             }
-
-            val fileName = stripLeadingPath(ze.getName())
-            val newFile = outputDirectory.resolve(fileName!!)
-
+            val newFile = outputDirectory.resolve(fileName)
             newFile.parentFile?.mkdirs()
-
-            val fos = FileOutputStream(newFile)
-
-            IOUtils.copy(zis, fos)
-
-            fos.close()
+            FileOutputStream(newFile).use { fos ->
+                IOUtils.copy(zis, fos)
+            }
             ze = zis.getNextEntry()
         }
 
@@ -101,13 +81,22 @@ class SeedMojo : AbstractMojo() {
         zis.close()
     }
 
-    private fun stripLeadingPath(name: String): String? {
-        val elements =
-            LinkedList(listOf(*name.split("/".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray()))
+    /**
+     * Strips the first path segment from a zip entry name.
+     *
+     * GitHub zipball archives contain a top-level directory (e.g., "user-repo-hash/")
+     * that we want to skip when extracting. This function removes that leading segment.
+     *
+     * Example: "jbake-org-jbake-template-abc123/templates/post.ftl" → "templates/post.ftl"
+     *
+     * @param name the full path from the zip entry
+     * @return the path with the first segment removed, or empty string if only one segment
+     */
+    private fun stripLeadingPath(name: String): String {
+        //val elements = LinkedList(listOf(*name.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())).apply { pop() }
+        //return StringUtils.join(elements.iterator(), '/')
 
-        elements.pop()
-
-        return StringUtils.join(elements.iterator(), '/')
+        val path = java.nio.file.Path.of(name)
+        return if (path.nameCount > 1) path.subpath(1, path.nameCount).toString() else ""
     }
 }

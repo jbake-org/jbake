@@ -50,10 +50,13 @@ publishing {
 dependencies {
     implementation project(":jbake-core")
 
+    // Maven Plugin API - provides AbstractMojo, MojoExecutionException
+    compileOnly "org.apache.maven:maven-plugin-api:$mavenVersion"
     compileOnly "org.apache.maven:maven-core:$mavenVersion"
     compileOnly "org.apache.maven.plugin-tools:maven-plugin-annotations:$mavenAnnotationsVersion"
 
     implementation "com.sparkjava:spark-core:$sparkVersion"
+    implementation "commons-io:commons-io:$commonsIoVersion" // SeedMojo uses.
 
     // Include all optional dependencies by default
     implementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
