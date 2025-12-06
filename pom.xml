@@ -4,7 +4,7 @@
 
     <groupId>ch.zizka.jbake</groupId>
     <artifactId>jbake-base</artifactId>
-    <version>5.0.0-rc1</version>
+    <version>6.0.0-r1</version>
     <packaging>pom</packaging>
 
     <name>jbake-base</name>
