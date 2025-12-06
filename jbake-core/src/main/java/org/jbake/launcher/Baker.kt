@@ -4,10 +4,9 @@ import org.jbake.app.JBakeExitException
 import org.jbake.app.Oven
 import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
-import java.text.MessageFormat
 
 /**
- * Delegate class responsible for launching a Bake.
+ * A delegate class responsible for launching a Bake.
  */
 class Baker {
 
@@ -16,16 +15,11 @@ class Baker {
         oven.bakeEverything()
 
         val errors = oven.errors
-        if (!errors.isEmpty()) {
-            val msg = StringBuilder()
-            // TODO: Decide if we want all errors here.
-            msg.append(MessageFormat.format("JBake failed with {0} errors:\n", errors.size))
-            var errNr = 1
-            for (error in errors) {
-                msg.append(MessageFormat.format("{0}. {1}\n", errNr, error.message))
-                ++errNr
-            }
-            throw JBakeExitException(SystemExit.ERROR, msg.toString(), errors[0])
-        }
+        if (errors.isEmpty()) return
+
+        val msg = "JBake failed with ${errors.size} errors: " +
+            errors.mapIndexed { index, error -> "\n  ${index + 1}. ${error.message}" }
+                .joinToString()
+        throw JBakeExitException(SystemExit.ERROR, msg, errors[0])
     }
 }
