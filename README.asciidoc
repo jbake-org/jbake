@@ -181,3 +181,9 @@ Licensed under the MIT License, see the link:LICENSE[LICENSE] file for details.
 * Set up a website for this fork
 * Check if the maven plugin works
 * Rename jbake-base to jbake-root
+* Refactor the Map-backed models to use the reified inline trick for type-safe accessors.
+* Solve the shader warnings - duplicate classes between dependencies.
+* Split jbake-dist into one module per database.
+* Distribute also jbake-core for those who use it as a library.
+* Add GitHub Actions for publishing to Maven Central.
+* Add code coverage reporting.
