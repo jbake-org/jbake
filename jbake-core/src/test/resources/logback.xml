@@ -19,5 +19,6 @@
     <logger name="org.apache.commons.beanutils.converters" level="WARN"/>
     <logger name="io.mockk" level="WARN"/>
     <logger name="com.github.dockerjava" level="WARN"/>
+    <logger name="org.eclipse.jgit" level="WARN"/>
 
 </configuration>

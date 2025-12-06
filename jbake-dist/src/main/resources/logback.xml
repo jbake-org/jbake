@@ -9,7 +9,7 @@
     </appender>
 
     <!-- OrientDB DEBUG logging - set root to DEBUG temporarily to ensure it's picked up -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
@@ -17,21 +17,11 @@
     <logger name="org.jbake" level="INFO"/>
 
     <!-- OrientDB loggers explicitly at DEBUG (though root is already DEBUG) -->
-    <logger name="com.orientechnologies" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-    <logger name="com.orientechnologies.orient.core" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-    <logger name="com.orientechnologies.orient.core.db" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-    <logger name="com.orientechnologies.orient.core.serialization" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-    <logger name="com.orientechnologies.orient.core.storage" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
+    <logger name="com.orientechnologies" level="DEBUG" additivity="false"/>
+    <logger name="com.orientechnologies.orient.core" level="DEBUG" additivity="false"/>
+    <logger name="com.orientechnologies.orient.core.db" level="DEBUG" additivity="false"/>
+    <logger name="com.orientechnologies.orient.core.serialization" level="DEBUG" additivity="false"/>
+    <logger name="com.orientechnologies.orient.core.storage" level="DEBUG" additivity="false"/>
 
     <!-- Normally, suppress noisy loggers -->
     <logger name="org.thymeleaf" level="WARN"/>
