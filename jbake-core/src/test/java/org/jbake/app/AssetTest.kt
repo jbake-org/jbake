@@ -80,7 +80,8 @@ class AssetTest : StringSpec({
 
     "testCopyIgnore" {
         val assetDir = tempDir.resolve("ignoredAssets").apply { mkdirs() }
-        FileUtils.copyDirectory(File(AssetTest::class.java.getResource("/fixture/ignorables")!!.file), assetDir)
+        val resourcesToCopy = File(AssetTest::class.java.getResource("/fixture/ignorables")!!.file)
+        FileUtils.copyDirectory(resourcesToCopy, assetDir)
         config.assetDir = assetDir
         config.assetIgnoreHidden = true
         TestUtils.hideAssets(assetDir)
