@@ -1,6 +1,7 @@
 package org.jbake.app.configuration
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.maps.shouldNotContainKey
 import io.kotest.matchers.shouldBe
 import org.jbake.TestUtils
 import org.jbake.parser.Parser
@@ -229,8 +230,7 @@ class DefaultAuthorTest : StringSpec({
             val parsedDoc = parser.processFile(docFile)
 
             // No default, no author field -> should not have author key
-            parsedDoc!!.containsKey("author") shouldBe false
-
+            parsedDoc!!.shouldNotContainKey("author")
         } finally {
             tempDir.deleteRecursively()
         }

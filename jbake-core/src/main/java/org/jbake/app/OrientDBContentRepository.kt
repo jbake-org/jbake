@@ -19,7 +19,7 @@ import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.io.File
 
-class OrientDBContentRepository(type: String, private val name: String) : ContentRepository {
+class OrientDBContentRepository(storageType: String, private val dbName: String) : ContentRepository {
 
     private lateinit var db: ODatabaseSession
     private lateinit var orient: OrientDB
@@ -29,9 +29,21 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
     /** Items per page limit for pagination, like, posts per page. */
     override var paginationLimit: Int = -1
 
-    private val dbStorageType = ODatabaseType.valueOf(type.uppercase())
+    private val dbStorageType = ODatabaseType.valueOf(storageType.uppercase())
 
     override fun startup() {
+        // If already initialized and active, just activate on current thread
+        if (::db.isInitialized && ::orient.isInitialized) {
+            try {
+                db.activateOnCurrentThread()
+                if (db.isClosed)
+                    db = orient.open(dbName, "admin", "admin")
+                return
+            } catch (e: Exception) {
+                log.debug("Database not active, will reinitialize: ${e.message}")
+            }
+        }
+
         System.setProperty("orientdb.script.pool.enabled", "false")
 
         // OrientDB logging configuration - try ALL possible methods to enable DEBUG level
@@ -42,10 +54,10 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
         setLoggingLevelViaApi(logLevel)
 
-        val dbUri = dbStorageType.name.lowercase() + ":" + if (MEMORY == dbStorageType) "" else name
+        val dbUri = dbStorageType.name.lowercase() + ":" + if (MEMORY == dbStorageType) "" else dbName
         orient = OrientDB(dbUri, OrientDBConfig.defaultConfig())
 
-        setupOrOpenDatabase(DbAccessInfo(name, "admin", "admin"))
+        setupOrOpenDatabase(DbAccessInfo(dbName, "admin", "admin"))
 
         setLoggingLevelViaApi(logLevel)
     }
@@ -54,16 +66,22 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
 
     /**
-     * Set up database: always create fresh for clean state.
+     * Set up database: try to open existing, or create fresh if needed.
      */
     private fun setupOrOpenDatabase(access: DbAccessInfo) {
-        // Always start fresh - drop if exists
+
         if (orient.exists(access.dbname)) {
+            // Database exists, try to open it
             try {
-                orient.drop(access.dbname)
-                log.debug("Dropped existing database: {}", access.dbname)
+                db = orient.open(access.dbname, access.user, access.pass)
+                log.debug("Opened existing database: {}", access.dbname)
+                activateOnCurrentThread()
+                updateSchema()
+                return
             } catch (e: Exception) {
-                log.warn("Failed to drop database '${access.dbname}': ${e.message}")
+                log.warn("Failed to open existing database '${access.dbname}': ${e.message}, will recreate")
+                runCatching { orient.drop(access.dbname) }
+                    .onFailure { log.warn("Failed to drop database: ${it.message}") }
             }
         }
 
@@ -161,7 +179,11 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
 
     override fun drop() {
         activateOnCurrentThread()
-        orient.drop(name)
+        // Clear all documents using TRUNCATE CLASS which is faster and more reliable than DELETE
+        db.command("TRUNCATE CLASS Documents UNSAFE")
+        db.command("TRUNCATE CLASS Signatures UNSAFE")
+        // Rebuild indexes to ensure they're clean
+        db.command("REBUILD INDEX *")
     }
 
     private fun activateOnCurrentThread() {
@@ -366,7 +388,15 @@ class OrientDBContentRepository(type: String, private val name: String) : Conten
         get() = ::db.isInitialized && db.isActiveOnCurrentThread
 
     override fun addDocument(document: DocumentModel) {
-        // Ruby objects already converted by AsciidoctorEngine
+        activateOnCurrentThread()
+
+        // Delete existing document with same sourceuri if present (upsert behavior)
+        val sourceUri = document.sourceUri
+        if (sourceUri != null) {
+            db.command("DELETE FROM Documents WHERE sourceuri = ?", sourceUri)
+        }
+
+        // Create new document
         val element = db.newElement(Schema.DOCUMENTS)
         document.forEach { (k: String?, v: Any?) -> element.setProperty(k, v, OType.ANY) }
         @Suppress("DEPRECATION")
