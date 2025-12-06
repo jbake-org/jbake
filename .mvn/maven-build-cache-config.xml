@@ -1,14 +1,17 @@
+<!--
+  Maven Build Cache configuration for JBake.
+  https://maven.apache.org/extensions/maven-build-cache-extension/
+
+  Enable with: <enabled>true</enabled>
+  Disable with: <enabled>false</enabled> or -Dmaven.build.cache.enabled=false
+-->
 <cache xmlns="http://maven.apache.org/BUILD-CACHE-CONFIG/1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://maven.apache.org/BUILD-CACHE-CONFIG/1.2.0 https://maven.apache.org/xsd/build-cache-config-1.2.0.xsd">
 
-    <!--
-        Template Maven build cache configuration
-     -->
-
     <configuration>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
         <local>
-            <maxBuildsCached>3</maxBuildsCached>
+            <maxBuildsCached>5</maxBuildsCached>
         </local>
         <projectVersioning adjustMetaInf="true"/>
     </configuration>
@@ -16,20 +19,29 @@
     <input>
         <global>
             <includes>
-                <include>src/</include>
+                <include>**/src/**</include>
+                <include>pom.xml</include>
+                <include>**/pom.xml</include>
             </includes>
+            <excludes>
+                <!-- Exclude generated/temporary files -->
+                <exclude>**/target/**</exclude>
+                <exclude>**/.flattened-pom.xml</exclude>
+            </excludes>
         </global>
     </input>
 
     <executionControl>
         <runAlways>
             <plugins>
+                <!-- Integration tests should always run -->
                 <plugin artifactId="maven-failsafe-plugin"/>
+                <!-- Shade plugin creates uber-jar, should always run to ensure fresh build -->
+                <plugin artifactId="maven-shade-plugin"/>
             </plugins>
             <goalsLists>
                 <goalsList artifactId="maven-install-plugin"><goals><goal>install</goal></goals></goalsList>
                 <goalsList artifactId="maven-deploy-plugin"><goals><goal>deploy</goal></goals></goalsList>
-                <goalsList artifactId="bb-sdk-codegen"><goals><goal>deploy-local</goal></goals></goalsList>
             </goalsLists>
         </runAlways>
         <reconcile logAllProperties="true">
@@ -41,12 +53,17 @@
                         <reconcile propertyName="debug"/>
                         <reconcile propertyName="debuglevel"/>
                     </reconciles>
-                    <!-- whitelist of logged properties-->
                     <logs>
                         <log propertyName="includes"/>
                         <log propertyName="excludes"/>
-                        <log propertyName="argLine"/>
                     </logs>
+                </plugin>
+                <plugin artifactId="kotlin-maven-plugin" goal="compile">
+                    <reconciles>
+                        <reconcile propertyName="jvmTarget"/>
+                        <reconcile propertyName="languageVersion"/>
+                        <reconcile propertyName="apiVersion"/>
+                    </reconciles>
                 </plugin>
                 <plugin artifactId="duplicate-finder-maven-plugin" goal="check">
                     <reconciles>
