@@ -56,16 +56,21 @@ object FileUtil {
     val runningLocation: File
         /**
          * Works out the directory where JBake is running from.
+         * This is typically where compiled classes and resources are located.
          *
          * @return File referencing directory JBake is running from
          * @throws Exception when application is not able to work out where is JBake running from
          */
         get() {
             // Check for system property first (set by build tools during tests)
-            val classesPath = System.getProperty("jbake.buildOutputDir")
-            if (classesPath != null) {
-                val classesDir = File(classesPath)
+            // jbake.buildOutputDir points to target/ or build/, so we need to resolve to classes/
+            val buildOutputDir = System.getProperty("jbake.buildOutputDir")
+            if (buildOutputDir != null) {
+                val classesDir = File(buildOutputDir, "classes")
                 if (classesDir.exists()) return classesDir
+                // Fallback to the buildOutputDir itself if classes doesn't exist
+                val buildDir = File(buildOutputDir)
+                if (buildDir.exists()) return buildDir
             }
 
             val codePath = FileUtil::class.java.getProtectionDomain().codeSource.location.path

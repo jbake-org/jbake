@@ -16,9 +16,22 @@ class FileUtilTest : StringSpec({
 
     "testGetRunningLocation" {
         val path = runningLocation
-        val pathA = File("build/classes").absolutePath
-        val pathB = File("target/classes").absolutePath
-        (path.path == pathA || path.path == pathB).shouldBeTrue()
+
+        // If jbake.buildOutputDir is set, runningLocation resolves to classes subdirectory
+        val buildOutputDir = System.getProperty("jbake.buildOutputDir")
+        if (buildOutputDir != null) {
+            val expectedClassesDir = File(buildOutputDir, "classes")
+            if (expectedClassesDir.exists()) {
+                path.path shouldBe expectedClassesDir.path
+            } else {
+                path.path shouldBe buildOutputDir
+            }
+        } else {
+            // Otherwise, check for standard build output directories
+            val pathA = File("build/classes").absolutePath
+            val pathB = File("target/classes").absolutePath
+            (path.path == pathA || path.path == pathB).shouldBeTrue()
+        }
     }
 
     "testIsFileInDirectory" {
