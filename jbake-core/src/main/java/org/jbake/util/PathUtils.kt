@@ -15,6 +15,6 @@ object PathUtils {
         = directory.path.trimEnd(File.separatorChar) + File.separator
 }
 
-inline fun <reified T : kotlin.Enum<T>> enumValueOf(type: String): T? {
+inline fun <reified T : Enum<T>> enumValueOf(type: String): T? {
     return runCatching { java.lang.Enum.valueOf(T::class.java, type)  }.getOrNull()
 }
