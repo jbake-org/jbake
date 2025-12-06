@@ -35,7 +35,6 @@ class DefaultAuthorTest : StringSpec({
 
             // Verify default author was applied
             parsedDoc!!["author"] shouldBe "Default Author Name"
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -68,7 +67,6 @@ class DefaultAuthorTest : StringSpec({
 
             // Verify explicit author is preserved
             parsedDoc!!["author"] shouldBe "Explicit Author"
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -99,7 +97,6 @@ class DefaultAuthorTest : StringSpec({
 
             // Verify default author was applied
             parsedDoc["author"] shouldBe "Asciidoc Default Author"
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -131,7 +128,6 @@ class DefaultAuthorTest : StringSpec({
 
             // Verify native author is used, not default
             parsedDoc["author"] shouldBe "Native Author Name"
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -165,7 +161,6 @@ class DefaultAuthorTest : StringSpec({
             // Empty author field exists, so default should NOT be applied
             // The empty string should be preserved
             parsedDoc!!["author"] shouldBe ""
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -182,7 +177,7 @@ class DefaultAuthorTest : StringSpec({
                 2023-12-04
                 :jbake-type: post
                 :jbake-status: published
-                :author: Attribute Author
+                :author: Someauthor FromColonAuthorAttribute
 
                 This has author in both places.
             """.trimIndent())
@@ -198,8 +193,7 @@ class DefaultAuthorTest : StringSpec({
 
             // :author: attribute overrides line 2 author in Asciidoctor
             // This is Asciidoctor's documented behavior - attributes override document header
-            parsedDoc["author"] shouldBe "Attribute Author"
-
+            parsedDoc["author"] shouldBe "Someauthor FromColonAuthorAttribute"
         } finally {
             tempDir.deleteRecursively()
         }
@@ -262,7 +256,6 @@ class DefaultAuthorTest : StringSpec({
 
             // :author: attribute should be used
             parsedDoc["author"] shouldBe "Attribute Only Author"
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -296,7 +289,6 @@ class DefaultAuthorTest : StringSpec({
             // Whitespace gets trimmed, becomes empty string
             // Since key exists (even if empty), default should NOT be applied
             parsedDoc!!["author"] shouldBe ""
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -330,7 +322,6 @@ class DefaultAuthorTest : StringSpec({
             parsedDoc["author"] shouldBe "John Doe"
             // Should also extract email
             parsedDoc["email"] shouldBe "john@example.com"
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -364,7 +355,6 @@ class DefaultAuthorTest : StringSpec({
             // Verify special characters are preserved exactly as written
             // Old JBake header format preserves & as-is (no HTML encoding)
             parsedDoc!!["author"] shouldBe weirdAuthor
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -397,7 +387,6 @@ class DefaultAuthorTest : StringSpec({
             // Verify special characters are preserved
             // Asciidoctor converts & to &amp; in attribute values
             parsedDoc["author"] shouldBe weirdAuthor.replace("&", "&amp;")
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -430,7 +419,6 @@ class DefaultAuthorTest : StringSpec({
 
             // Verify special characters are preserved (Asciidoctor may normalize some)
             parsedDoc["author"] shouldBe weirdAuthor.replace("&", "&amp;")
-
         } finally {
             tempDir.deleteRecursively()
         }
@@ -463,7 +451,6 @@ class DefaultAuthorTest : StringSpec({
 
             // Verify default author with special characters is applied correctly
             parsedDoc!!["author"] shouldBe weirdDefaultAuthor
-
         } finally {
             tempDir.deleteRecursively()
         }

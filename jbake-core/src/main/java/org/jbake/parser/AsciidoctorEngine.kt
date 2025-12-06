@@ -115,11 +115,12 @@ class AsciidoctorEngine : MarkupEngine() {
         }
 
         // Get attributes from document
+        val skippedKeys = setOf("java_class_path", "sun_java_command", )
         log.info("=== Parsing attributes for document: ${context.file.name} ===")
-        for ((key, value) in document.attributes) {
+        for ((key, value) in document.attributes.filter { it.key !in skippedKeys }.toSortedMap()) {
 
             val keyStr = key.toString()
-            log.info("Attribute: $keyStr = $value (class: ${value?.javaClass?.name})")///
+            log.info("    ${keyStr.padEnd(32)} = '$value' (class: ${value?.javaClass?.name?.removePrefix("java.lang.")})")///
 
             when {
                 keyStr.startsWith(JBAKE_PREFIX) -> {
