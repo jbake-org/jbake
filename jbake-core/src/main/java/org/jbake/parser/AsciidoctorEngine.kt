@@ -100,6 +100,11 @@ class AsciidoctorEngine : MarkupEngine() {
         val authorName = document.getAttribute(AUTHOR_KEY)?.toString()?.takeIf { it.isNotBlank() }
         val authorEmail = document.getAttribute(AUTHOR_EMAIL_KEY)?.toString()?.takeIf { it.isNotBlank() }
         if (!authorName.isNullOrBlank()) {
+            // Warn if author looks like a date (common mistake: date on line 2 instead of author)
+            if (authorName.matches(DATE_PATTERN)) {
+                log.warn("Author '$authorName' in '${context.file.name}' looks like a date. " +
+                    "In Asciidoc, line 2 is the author line. If you meant to specify a date, use ':revdate: $authorName' attribute instead.")
+            }
             documentModel[AUTHOR_KEY] = authorName
             authorEmail?.let {
                 documentModel[AUTHOR_EMAIL_KEY] = it
@@ -313,6 +318,9 @@ class AsciidoctorEngine : MarkupEngine() {
 
         /** Regex pattern for dynamic Asciidoctor attributes (e.g., backend-html5, doctype-article, etc.) */
         private val ASCIIDOCTOR_BUILTIN_PATTERN = Regex("^(backend-|basebackend-|doctype-|filetype-|safe-mode-|author_|authorinitials_|email_|firstname_|lastname_|middlename_).*")
+
+        /** Regex pattern to detect if author value looks like a date (common mistake: date on line 2) */
+        private val DATE_PATTERN = Regex("^\\d{4}[-/]\\d{1,2}[-/]\\d{1,2}.*")
 
         /** Known built-in Asciidoctor attributes (not user-defined, not JBake config) */
         private val ASCIIDOCTOR_BUILTIN_ATTRIBUTES = setOf(
