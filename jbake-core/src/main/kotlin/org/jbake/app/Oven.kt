@@ -102,6 +102,7 @@ class Oven {
                     renderedCount += tool.render(utensils.renderer, utensils.contentStore, utensils.configuration)
                 }
                 catch (e: RenderingException) { errors.add(e) }
+                catch (e: Exception) { errors.add(RenderingException("Error rendering with ${tool.javaClass.simpleName}: ${e.message}", e)) }
             }
 
             // Copy assets.

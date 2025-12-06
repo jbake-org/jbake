@@ -9,6 +9,7 @@ import org.jbake.model.DocumentModel
 import org.jbake.util.AuthorTracer
 import org.jbake.util.Logging.logger
 import org.jbake.util.error
+import org.jbake.util.trace
 import org.slf4j.Logger
 import java.io.File
 import java.time.LocalDate
@@ -132,11 +133,13 @@ class AsciidoctorEngine : MarkupEngine() {
         val exportedConfigKeys = collectExportedKeys(context)
 
         // Get attributes from document
-        log.info("=== Parsing attributes for document: ${context.file.name} ===")
-        for ((key, value) in document.attributes.filter { it.key !in SKIPPED_ATTRIBUTES }.toSortedMap()) {
+        log.trace { "=== Parsing attributes for document: ${context.file.name} ===" }
+
+        val relevantAttribs = document.attributes.filter { it.key !in SKIPPED_ATTRIBUTES }.toSortedMap()
+        for ((key, value) in relevantAttribs) {
 
             val keyStr = key.toString()
-            log.info("    ${keyStr.padEnd(32)} = '$value' (class: ${value?.javaClass?.name?.removePrefix("java.lang.")})")
+            log.trace { "    ${keyStr.padEnd(32)} = '$value' (class: ${value?.javaClass?.name?.removePrefix("java.lang.")})" }
 
             processAttribute(keyStr, value, documentModel, context, dateFormat, exportedConfigKeys)
         }
