@@ -24,14 +24,14 @@ class ConfigUtil {
         private set
 
     @Throws(ConfigurationException::class)
-    private fun load(source: File, propertiesFile: File?): CompositeConfiguration {
-        if (!source.exists())
-            throw JBakeExitException(CONFIG_ERROR, "The given source dir '" + source.absolutePath + "' does not exist.")
-        if (!source.isDirectory)
+    private fun load(sourceDir: File, propertiesFile: File?): CompositeConfiguration {
+        if (!sourceDir.exists())
+            throw JBakeExitException(CONFIG_ERROR, "The given source dir '" + sourceDir.absolutePath + "' does not exist.")
+        if (!sourceDir.isDirectory)
             throw JBakeExitException(CONFIG_ERROR, "The given source dir is not a directory.")
 
-        val legacyConfigFile = File(source, LEGACY_CONFIG_FILE)
-        val customConfigFile = propertiesFile ?: File(source, CONFIG_FILE)
+        val legacyConfigFile = File(sourceDir, LEGACY_CONFIG_FILE)
+        val customConfigFile = propertiesFile ?: File(sourceDir, CONFIG_FILE)
 
         val config = CompositeConfiguration().apply {
             listDelimiterHandler = DefaultListDelimiterHandler(LIST_DELIMITER)

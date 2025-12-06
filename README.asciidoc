@@ -174,6 +174,7 @@ Pick the project checkstyle file `config/checkstyle/checkstyle.xml`
 Licensed under the MIT License, see the link:LICENSE[LICENSE] file for details.
 
 == TODOs
+
 * Update documentation to reflect changes in this fork
 * Add more integration tests
 * Rename to avoid confusion with the original project
@@ -184,6 +185,7 @@ Licensed under the MIT License, see the link:LICENSE[LICENSE] file for details.
 * Refactor the Map-backed models to use the reified inline trick for type-safe accessors.
 * Solve the shader warnings - duplicate classes between dependencies.
 * Split jbake-dist into one module per database.
+  * Or at least make Neo4j optional.
 * Distribute also jbake-core for those who use it as a library.
 * Add GitHub Actions for publishing to Maven Central.
 * Add code coverage reporting.
@@ -191,3 +193,4 @@ Licensed under the MIT License, see the link:LICENSE[LICENSE] file for details.
   * Add an option `-l` / `--log-level` to enable logging / set the logging level, and enable the logger *programatically* if this option is set.
   * Also, if possible with the used argj library, add -v, -vv, -vvv, with the same effect as setting WARN, INFO, DEBUG levels.
   * Lastly, add `--log-config=<path>` which will point to a logback config file file relative to the user.dir, and apply it to LogBack's runtime config.,
+* Review all unchecked casts - @Suppress("UNCHECKED_CAST")

@@ -22,16 +22,13 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     var compositeConfiguration: CompositeConfiguration
 
     /**
-     * Some deprecated implementations just need access to the configuration without access to the source directory
-     *
-     * @param configuration The project configuration
+     * Some deprecated implementations just need access to the configuration without access to the source directory.
      */
-    @Deprecated("use {@link #DefaultJBakeConfiguration(File, CompositeConfiguration)} instead")
     constructor(configuration: CompositeConfiguration) {
         this.compositeConfiguration = configuration
     }
 
-    constructor(sourceDir: File?, configuration: CompositeConfiguration) {
+    constructor(sourceDir: File, configuration: CompositeConfiguration) {
         this.compositeConfiguration = configuration
         setSourceDir(sourceDir)
         // Note: setupPaths() is already called by setSourceDir()
@@ -326,7 +323,7 @@ class DefaultJBakeConfiguration : JBakeConfiguration {
     override val sourceDir: File
         get() = getAsDir(SOURCE_FOLDER_KEY) ?: error("Source dir must be configured")
 
-    fun setSourceDir(sourceDir: File?) {
+    fun setSourceDir(sourceDir: File) {
         setProperty(SOURCE_FOLDER_KEY, sourceDir)
         // Note: setupPaths() removed - paths are computed lazily when Dir properties are accessed
     }

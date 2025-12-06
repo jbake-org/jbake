@@ -106,10 +106,12 @@ class ParserEnginesRegistry private constructor() {
          */
         private fun tryLoadEngine(engineClassName: String): ParserEngine? {
             try {
-                val engineClass = Class.forName(engineClassName, false, ParserEnginesRegistry::class.java.getClassLoader()) as Class<out ParserEngine>
+                val classLoader = ParserEnginesRegistry::class.java.getClassLoader()
+                @Suppress("UNCHECKED_CAST")
+                val engineClass = Class.forName(engineClassName, false, classLoader) as Class<out ParserEngine>
                 return engineClass.getDeclaredConstructor().newInstance()
             }
-            catch (e: Exception) {
+            catch (e: Throwable) {
                 when (e) {
                     is ClassNotFoundException,
                     is NoClassDefFoundError,

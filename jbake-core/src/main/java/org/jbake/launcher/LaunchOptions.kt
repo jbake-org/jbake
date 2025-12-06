@@ -96,6 +96,7 @@ class LaunchOptions {
             ?: File(System.getProperty("user.dir"))
     }
 
+    // TODO: Possibly null if neither destinationValue is set nor sourceValue is set?
     fun getDestination(): File {
         return destinationValue?.let { File(it) }
             ?: File(getSource(), "output")

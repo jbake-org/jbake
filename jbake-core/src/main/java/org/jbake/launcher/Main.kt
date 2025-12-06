@@ -104,6 +104,7 @@ class Main @JvmOverloads constructor(
             watcher.start(config)
 
             // TODO: Short term fix until bake, server, init commands no longer share underlying values (such as source/dest).
+            @Suppress("SENSELESS_COMPARISON")
             val serverPath = when {
                 !launchOptions.isBake -> config.destinationDir // Use the default destination directory.
                 launchOptions.getDestination() != null -> launchOptions.getDestination() // Use the destination provided via the commandline.
