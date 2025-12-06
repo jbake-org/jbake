@@ -63,7 +63,7 @@
                 <executions>
                     <execution>
                         <phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals>
-                        <configuration><sources><source>src/smoke-test/java</source></sources></configuration>
+                        <configuration><sources><source>src/smoke-test/kotlin</source></sources></configuration>
                     </execution>
                     <execution>
                         <id>add-test-resource</id><phase>generate-test-resources</phase><goals><goal>add-test-resource</goal></goals>
@@ -80,7 +80,7 @@
                         <id>compile-smoke-tests</id><phase>test-compile</phase><goals><goal>test-compile</goal></goals>
                         <configuration>
                             <sourceDirs>
-                                <sourceDir>${project.basedir}/src/smoke-test/java</sourceDir>
+                                <sourceDir>${project.basedir}/src/smoke-test/kotlin</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>
