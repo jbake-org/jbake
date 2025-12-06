@@ -101,11 +101,17 @@ class AsciidoctorEngine : MarkupEngine() {
         val authorEmail = document.getAttribute(AUTHOR_EMAIL_KEY)?.toString()?.takeIf { it.isNotBlank() }
         if (!authorName.isNullOrBlank()) {
             documentModel[AUTHOR_KEY] = authorName
-            authorEmail?.let { documentModel[AUTHOR_EMAIL_KEY] = it }
+            authorEmail?.let {
+                documentModel[AUTHOR_EMAIL_KEY] = it
+                documentModel[EMAIL_KEY] = it  // For backwards compatibility
+            }
         }
-        val fallbackEmail = document.getAttribute("email")?.toString()?.takeIf { it.isNotBlank() }
-        if (!documentModel.containsKey(AUTHOR_EMAIL_KEY) && fallbackEmail != null) {
-            documentModel[AUTHOR_EMAIL_KEY] = fallbackEmail
+        val fallbackEmail = document.getAttribute(EMAIL_KEY)?.toString()?.takeIf { it.isNotBlank() }
+        if (fallbackEmail != null && !documentModel.containsKey(EMAIL_KEY)) {
+            // Use email as fallback for missing author_email.
+            documentModel[EMAIL_KEY] = fallbackEmail
+            if (!documentModel.containsKey(AUTHOR_EMAIL_KEY))
+                documentModel[AUTHOR_EMAIL_KEY] = fallbackEmail
         }
 
         // Get title from document
@@ -127,7 +133,6 @@ class AsciidoctorEngine : MarkupEngine() {
         }
 
         // Get attributes from document
-        val skippedKeys = setOf("java_class_path", "sun_java_command", )
         log.info("=== Parsing attributes for document: ${context.file.name} ===")
         for ((key, value) in document.attributes.filter { it.key !in SKIPPED_ATTRIBUTES }.toSortedMap()) {
 
@@ -164,6 +169,9 @@ class AsciidoctorEngine : MarkupEngine() {
                         context.setTags(convertedValue.split(",".toRegex()).dropLastWhile { it.isEmpty() })
                     else log.error { "Wrong value of 'jbake-tags'. Expected a String got '${getValueClassName(value)}'" }
                 }
+
+                // Skip author/email - already handled above with special logic
+                keyStr in AUTHOR_ATTRIBUTES -> { }
 
                 // Skip attributes exported from JBake config (already available via config)
                 keyStr in exportedConfigKeys -> { }
@@ -283,6 +291,10 @@ class AsciidoctorEngine : MarkupEngine() {
         const val REVDATE_KEY: String = "revdate"
         private const val AUTHOR_KEY = "author"
         private const val AUTHOR_EMAIL_KEY = "author_email"
+        private const val EMAIL_KEY = "email"
+
+        /** Author-related attributes that get special handling (stored unprefixed) */
+        private val AUTHOR_ATTRIBUTES = setOf(AUTHOR_KEY, AUTHOR_EMAIL_KEY, EMAIL_KEY)
 
         /** Comma-separated file paths to additional gems */
         private const val OPT_GEM_PATH = "gemPath"
