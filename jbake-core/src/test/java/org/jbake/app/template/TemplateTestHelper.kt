@@ -6,7 +6,7 @@ import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.parser.Parser
-import org.jbake.template.ModelExtractors
+import org.jbake.template.ModelExtractorsRegistry
 import java.io.File
 import java.util.*
 
@@ -84,7 +84,7 @@ class TemplateTestHelper(
         db.drop()
         DocumentTypeRegistry.resetDocumentTypes()
         DocumentTypeRegistry.clearListenersForTests()
-        ModelExtractors.instance.reset()
+        ModelExtractorsRegistry.instance.reset()
         Locale.setDefault(currentLocale)
     }
 

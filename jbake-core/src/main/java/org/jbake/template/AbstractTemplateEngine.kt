@@ -27,6 +27,6 @@ abstract class AbstractTemplateEngine protected constructor(
     abstract fun renderDocument(model: TemplateModel, templateName: String, writer: Writer)
 
     companion object {
-        internal var extractors: ModelExtractors = ModelExtractors.instance
+        internal var extractors: ModelExtractorsRegistry = ModelExtractorsRegistry.instance
     }
 }

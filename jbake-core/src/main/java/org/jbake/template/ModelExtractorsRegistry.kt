@@ -62,7 +62,7 @@ class ModelExtractorsRegistry private constructor() {
      */
     private fun loadEngines() {
         try {
-            val cl = ModelExtractors::class.java.getClassLoader()
+            val cl = ModelExtractorsRegistry::class.java.getClassLoader()
             val resources = cl.getResources(PROPERTIES)
             while (resources.hasMoreElements()) {
                 val url = resources.nextElement()
@@ -126,7 +126,7 @@ class ModelExtractorsRegistry private constructor() {
     companion object {
         private const val PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties"
 
-        val instance by lazy { ModelExtractors() }
+        val instance by lazy { ModelExtractorsRegistry() }
 
         /**
          * This method is used to search for a specific class, telling if loading the engine would succeed.
@@ -137,7 +137,7 @@ class ModelExtractorsRegistry private constructor() {
          */
         private fun tryLoadEngine(engineClassName: String?): ModelExtractor<*>? {
             return try {
-                val cl = ModelExtractors::class.java.getClassLoader()
+                val cl = ModelExtractorsRegistry::class.java.getClassLoader()
                 val klass = Class.forName(engineClassName, false, cl)
 
                 // If it's a TypedModelExtractor, instantiate and wrap with adapter
@@ -166,7 +166,7 @@ class ModelExtractorsRegistry private constructor() {
 }
 
 // TODO: Migrate away from "ModelExtractors".
-typealias ModelExtractors = ModelExtractorsRegistry
+//typealias ModelExtractors = ModelExtractorsRegistry
 
 
 

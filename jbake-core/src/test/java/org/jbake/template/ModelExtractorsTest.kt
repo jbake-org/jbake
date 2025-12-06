@@ -10,7 +10,7 @@ import org.jbake.model.DocumentTypeRegistry.addDocumentType
 class ModelExtractorsTest : StringSpec({
 
     afterTest {
-        ModelExtractors.instance.reset()
+        ModelExtractorsRegistry.instance.reset()
     }
 
     "shouldLoadExtractorsOnInstantiation" {
@@ -18,7 +18,7 @@ class ModelExtractorsTest : StringSpec({
             "published_content,published_date,all_content,alltags,db,tag_posts,tags,tagged_documents").split(",")
 
         for (aKey in expectedKeys) {
-            ModelExtractors.instance.containsKey(aKey).shouldBeTrue()
+            ModelExtractorsRegistry.instance.containsKey(aKey).shouldBeTrue()
         }
     }
 
@@ -26,9 +26,9 @@ class ModelExtractorsTest : StringSpec({
         val knownDocumentType = "alltag"
         addDocumentType(knownDocumentType)
 
-        ModelExtractors.instance.registerExtractorsForCustomTypes(knownDocumentType)
+        ModelExtractorsRegistry.instance.registerExtractorsForCustomTypes(knownDocumentType)
 
-        ModelExtractors.instance.containsKey("published_alltags").shouldBeFalse()
+        ModelExtractorsRegistry.instance.containsKey("published_alltags").shouldBeFalse()
     }
 
     "shouldRegisterExtractorsForCustomType" {
@@ -37,19 +37,19 @@ class ModelExtractorsTest : StringSpec({
         addDocumentType(newDocumentType)
 
         // When we register extractors for the new type.
-        ModelExtractors.instance.registerExtractorsForCustomTypes(newDocumentType)
+        ModelExtractorsRegistry.instance.registerExtractorsForCustomTypes(newDocumentType)
 
         // Then an extractor is registered by pluralized type as key.
-        ModelExtractors.instance.containsKey("projects").shouldBeTrue()
+        ModelExtractorsRegistry.instance.containsKey("projects").shouldBeTrue()
 
         // And an extractor for published types is registered.
-        ModelExtractors.instance.containsKey("published_projects").shouldBeTrue()
+        ModelExtractorsRegistry.instance.containsKey("published_projects").shouldBeTrue()
     }
 
     "shouldThrowAnExceptionIfDocumentTypeIsUnknown" {
         val unknownDocumentType = "unknown"
         shouldThrow<UnsupportedOperationException> {
-            ModelExtractors.instance.registerExtractorsForCustomTypes(unknownDocumentType)
+            ModelExtractorsRegistry.instance.registerExtractorsForCustomTypes(unknownDocumentType)
         }
     }
 
@@ -59,16 +59,16 @@ class ModelExtractorsTest : StringSpec({
         addDocumentType(newDocumentType)
 
         // When we register extractors for the new type.
-        ModelExtractors.instance.registerExtractorsForCustomTypes(newDocumentType)
+        ModelExtractorsRegistry.instance.registerExtractorsForCustomTypes(newDocumentType)
 
         // Expect: 18 extractors.
-        ModelExtractors.instance.keySet().size shouldBe 18
+        ModelExtractorsRegistry.instance.keySet().size shouldBe 18
 
         // When: reset.
-        ModelExtractors.instance.reset()
+        ModelExtractorsRegistry.instance.reset()
 
         // Then: 16 extractors.
-        ModelExtractors.instance.keySet().size shouldBe 16
+        ModelExtractorsRegistry.instance.keySet().size shouldBe 16
     }
 })
 

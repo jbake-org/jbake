@@ -55,6 +55,6 @@ interface DocumentTypeListener {
 
 class ModelExtractorsDocumentTypeListener : DocumentTypeListener {
     override fun onAdded(doctype: String) {
-        org.jbake.template.ModelExtractors.instance.registerExtractorsForCustomTypes(doctype)
+        org.jbake.template.ModelExtractorsRegistry.instance.registerExtractorsForCustomTypes(doctype)
     }
 }

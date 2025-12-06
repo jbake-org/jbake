@@ -7,7 +7,7 @@ import org.jbake.app.configuration.JBakeConfigurationInspector
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.render.RenderingTool
-import org.jbake.template.ModelExtractors
+import org.jbake.template.ModelExtractorsRegistry
 import org.jbake.util.logger
 import org.slf4j.Logger
 import java.io.File
@@ -128,7 +128,7 @@ class Oven {
      */
     private fun updateDocTypesFromConfiguration() {
         DocumentTypeRegistry.resetDocumentTypes()
-        ModelExtractors.instance.reset()
+        ModelExtractorsRegistry.instance.reset()
 
         DocumentTypeRegistry.addListener(ModelExtractorsDocumentTypeListener())
 

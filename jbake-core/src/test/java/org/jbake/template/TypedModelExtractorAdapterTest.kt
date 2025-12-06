@@ -11,7 +11,7 @@ import org.jbake.template.model.RenderContext
 class TypedModelExtractorAdapterTest : StringSpec({
 
     afterTest {
-        ModelExtractors.instance.reset()
+        ModelExtractorsRegistry.instance.reset()
     }
 
     "typed extractor should be usable via adapter and extractAndTransform" {
@@ -22,7 +22,7 @@ class TypedModelExtractorAdapterTest : StringSpec({
             override fun extract(context: RenderContext, key: String) = "hello-typed"
         }
 
-        ModelExtractors.instance.registerEngine(key, typed)
+        ModelExtractorsRegistry.instance.registerEngine(key, typed)
 
         // Provide minimal legacy model map expected by the adapter (config is required)
         val model = mutableMapOf<String, Any>()
@@ -31,7 +31,7 @@ class TypedModelExtractorAdapterTest : StringSpec({
         // Use a lightweight ContentStore instance; adapter will pass it through but typed extractor doesn't use it
         val db = ContentStore("memory", "testdb")
 
-        val adapted: Any? = ModelExtractors.instance.extractAndTransform(db, key, model, NoopAdapter())
+        val adapted: Any? = ModelExtractorsRegistry.instance.extractAndTransform(db, key, model, NoopAdapter())
 
         adapted shouldBe "hello-typed"
     }
