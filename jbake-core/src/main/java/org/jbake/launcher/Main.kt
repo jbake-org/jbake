@@ -32,6 +32,10 @@ class Main @JvmOverloads constructor(
             val config: JBakeConfiguration
 
             val args: LaunchOptions = parseArguments(arguments)
+
+            // Configure log level based on command line options
+            configureLogLevel(args.effectiveLogLevel)
+
             config = this.jBakeConfigurationFactory
                 .setEncoding(args.propertiesEncoding)
                 .let {
@@ -50,6 +54,28 @@ class Main @JvmOverloads constructor(
         }
         catch (e: Throwable) {
             throw JBakeExitException(SystemExit.ERROR, "${e.javaClass.simpleName}: An unexpected error occurred: " + e.message, e)
+        }
+    }
+
+    /**
+     * Configures log level programmatically using Logback.
+     * @param level The log level string (OFF, ERROR, WARN, INFO, DEBUG, TRACE) or null for default
+     */
+    private fun configureLogLevel(level: String?) {
+        if (level == null) return
+
+        try {
+            // Use Logback API directly to set log level
+            val loggerContext = LoggerFactory.getILoggerFactory()
+            if (loggerContext is ch.qos.logback.classic.LoggerContext) {
+                val rootLogger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)
+                val logLevel = ch.qos.logback.classic.Level.toLevel(level.uppercase(), ch.qos.logback.classic.Level.WARN)
+                rootLogger.level = logLevel
+                log.debug("Log level set to: {}", logLevel)
+            }
+        } catch (e: Exception) {
+            // Logback not available or other issue - silently ignore
+            System.err.println("Warning: Could not configure log level: ${e.message}")
         }
     }
 
@@ -129,15 +155,18 @@ class Main @JvmOverloads constructor(
             } catch (e: JBakeExitException) {
                 // Always print to stderr so users see errors even if logging isn't configured
                 System.err.println("ERROR: ${e.message}")
-                e.cause?.let { System.err.println("Cause: ${it.message}") }
+                e.cause?.let {
+                    System.err.println("Cause: ${it.message}")
+                    it.printStackTrace(System.err)
+                }
                 log.error(e.message)
                 log.debug(e.message, e)
                 if (e.cause is CommandLine.MissingParameterException) printUsage()
                 exitProcess(e.getExit())
             }
             catch (e: Throwable) {
-                System.err.println("ERROR: ${e.message}")
-                e.printStackTrace()
+                System.err.println("ERROR: ${e.javaClass.simpleName}: ${e.message}")
+                e.printStackTrace(System.err)
                 log.error(e.message, e)
             }
         }

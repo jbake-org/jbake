@@ -26,8 +26,8 @@ class BuiltInProjectsTest : FunSpec({
             try {
                 val runner = BinaryRunner(tempDir)
 
-                // Run JBake to initialize the dir
-                val initProcess = runner.runWithArguments(jbakeExec, "-i", "-t", projectName)
+                // Run JBake to initialize the dir (with verbose logging to debug failures)
+                val initProcess = runner.runWithArguments(jbakeExec, "-vvv", "-i", "-t", projectName)
                 withClue("JBake init run printed:\n\n${runner.processOutput}\n") {
                     initProcess.exitValue() shouldBe 0
                 }
@@ -35,8 +35,8 @@ class BuiltInProjectsTest : FunSpec({
                 tempDir.resolve("templates/index.$extension").shouldExist()
                 initProcess.destroy()
 
-                // Bake project
-                val bakeProcess = runner.runWithArguments(jbakeExec, "-b")
+                // Bake project (with verbose logging to debug failures)
+                val bakeProcess = runner.runWithArguments(jbakeExec, "-vvv", "-b")
                 withClue("JBake bake run printed:\n\n${runner.processOutput}\n") {
                     bakeProcess.exitValue() shouldBe 0
                 }

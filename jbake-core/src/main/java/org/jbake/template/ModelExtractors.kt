@@ -30,6 +30,7 @@ import java.util.*
 class ModelExtractorsRegistry private constructor() {
 
     private val extractors: MutableMap<String, ModelExtractor<*>> = TreeMap<String, ModelExtractor<*>>()
+    private val log: Logger by logger()
 
     init {
         loadEngines()
@@ -125,7 +126,7 @@ class ModelExtractorsRegistry private constructor() {
     companion object {
         private const val PROPERTIES = "META-INF/org.jbake.template.ModelExtractors.properties"
 
-        val instance = ModelExtractors()
+        val instance by lazy { ModelExtractors() }
 
         /**
          * This method is used to search for a specific class, telling if loading the engine would succeed.
@@ -162,7 +163,6 @@ class ModelExtractorsRegistry private constructor() {
         }
     }
 
-    private val log: Logger by logger()
 }
 
 // TODO: Migrate away from "ModelExtractors".

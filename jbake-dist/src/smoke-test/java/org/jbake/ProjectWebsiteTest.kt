@@ -19,9 +19,9 @@ class ProjectWebsiteTest : StringSpec({
             Git.cloneRepository().setURI(WEBSITE_REPO_URL).setDirectory(projectDir).setBare(false).setBranch("master").setRemote("origin").call()
             projectDir.resolve("README.md").shouldExist()
 
-            // Bake the website
+            // Bake the website (with verbose logging to debug failures)
             val runner = BinaryRunner(projectDir)
-            val process = runner.runWithArguments(BinaryRunner.jbakeExecutableRelative.absolutePath, "-b")
+            val process = runner.runWithArguments(BinaryRunner.jbakeExecutableRelative.absolutePath, "-vvv", "-b")
             withClue("\n" +
                 "========= JBake process output: =========\n\n${runner.processOutput}\n" +
                 "=========================================\nProcess exit code:") {

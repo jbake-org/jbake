@@ -11,6 +11,38 @@ import java.io.File
 )
 class LaunchOptions {
 
+    @CommandLine.Option(
+        names = ["-l", "--log-level"],
+        description = ["set log level: OFF, ERROR, WARN, INFO, DEBUG, TRACE (default: WARN)"],
+        paramLabel = "<level>"
+    )
+    var logLevel: String? = null
+
+    @CommandLine.Option(
+        names = ["-v"],
+        description = ["verbose output (-v=WARN, -vv=INFO, -vvv=DEBUG)"]
+    )
+    var verbose: BooleanArray = booleanArrayOf()
+
+    /**
+     * Returns the effective log level based on -l or -v options.
+     * -v = WARN, -vv = INFO, -vvv = DEBUG
+     * -l takes precedence if both are specified.
+     */
+    val effectiveLogLevel: String?
+        get() {
+            // Explicit log level takes precedence
+            if (logLevel != null) return logLevel
+
+            // Count -v occurrences
+            return when (verbose.size) {
+                0 -> null  // Use default
+                1 -> "WARN"
+                2 -> "INFO"
+                else -> "DEBUG"  // 3 or more
+            }
+        }
+
     @CommandLine.Parameters(index = "0", arity = "0..1",
         description = ["source dir of site content (with templates and assets), if not supplied will default to current directory"],
     )
