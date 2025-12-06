@@ -165,10 +165,19 @@ Pick the project checkstyle file `config/checkstyle/checkstyle.xml`
 
 === Testing
 
-* https://kotest.io/[Kotest] - Kotlin testing framework
+* https://kotest.io/[Kotest] - Kotlin testing frameworkA
 * https://mockk.io/[MockK] - Mocking library for Kotlin
 * https://www.testcontainers.org/[Testcontainers] - Docker-based integration testing
 
 == Copyright & License
 
 Licensed under the MIT License, see the link:LICENSE[LICENSE] file for details.
+
+== TODOs
+* Update documentation to reflect changes in this fork
+* Add more integration tests
+* Rename to avoid confusion with the original project
+* Publish to SDKMAN
+* Set up a website for this fork
+* Check if the maven plugin works
+* Rename jbake-base to jbake-root
