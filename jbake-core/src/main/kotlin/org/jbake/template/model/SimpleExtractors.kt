@@ -37,7 +37,14 @@ class PublishedPagesExtractor : TypedModelExtractor<DocumentList<*>> {
 /** Extracts published posts from the database. TODO: Convert to TypedModelExtractor. */
 class PublishedPostsExtractor : ModelExtractor<DocumentList<*>> {
     override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
-        return db.getPublishedPosts(model.containsKey("numberOfPages"))
+        val posts = db.getPublishedPosts(model.containsKey("numberOfPages"))
+        // Convert date fields to java.util.Date for Freemarker compatibility
+        posts.forEach { post ->
+            val date = post["date"]
+            if (date is OffsetDateTime)
+                post["date"] = java.util.Date.from(date.toInstant())
+        }
+        return posts
     }
 }
 
@@ -65,4 +72,3 @@ class DataExtractor : TypedModelExtractor<DataFileUtil> {
         return DataFileUtil(context.db, defaultDocType)
     }
 }
-
