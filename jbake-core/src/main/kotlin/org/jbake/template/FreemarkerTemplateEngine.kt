@@ -11,6 +11,7 @@ import org.jbake.template.model.TemplateModel
 import org.jbake.util.AuthorTracer
 import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
+import org.jbake.util.convertDatesInModel
 import java.io.IOException
 import java.io.Writer
 
@@ -21,6 +22,7 @@ import java.io.Writer
 class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
 
     lateinit var templateCfg: Configuration
+    private val log by logger()
 
     init {
         createTemplateConfiguration()
@@ -67,10 +69,25 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
     override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
         try {
             val template = templateCfg.getTemplate(templateName)
-            template.process(LazyLoadingModel(templateCfg.objectWrapper, model, db, config), writer)
+
+            // Recursively convert OffsetDateTime to java.util.Date for Freemarker compatibility
+            val convertedModel = convertDatesInModel(model)
+
+            @Suppress("IfThenToElvis")
+            // Ensure convertedModel is a TemplateModel for LazyLoadingModel
+            val templateModel =
+                if (convertedModel is TemplateModel) convertedModel
+                else TemplateModel().apply {
+                    if (convertedModel is Map<*, *>) {
+                        @Suppress("UNCHECKED_CAST")
+                        putAll(convertedModel as Map<String, Any>)
+                    }
+                }
+            template.process(LazyLoadingModel(templateCfg.objectWrapper, templateModel, db, config), writer)
         }
         catch (e: Exception) { throw RenderingException("",e) }
     }
+
 
     /**
      * A custom Freemarker model that avoids loading the whole documents into memory if not necessary.
@@ -202,7 +219,5 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             override fun isEmpty(): Boolean = delegate.isEmpty
         }
     }
-
-
-    private val log by logger()
 }
+

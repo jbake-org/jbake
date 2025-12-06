@@ -10,7 +10,6 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import java.io.IOException
 import java.io.Writer
@@ -51,7 +50,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
 
         override fun get(key: String): Any? {
             return try {
-                extractors.extractAndTransform(db, key, this, NoopAdapter())
+                extractors.extractAndTransform(db, key, this, TemplateEngineAdapter.NoopAdapter())
             }
             catch (e: NoModelExtractorException) { model[key] }
         }

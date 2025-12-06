@@ -1,5 +1,6 @@
 package org.jbake.app.template
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -36,7 +37,9 @@ class FreemarkerTemplateEngineRenderingTest : StringSpec({
             "2 of 3"
         )
 
-        helper.renderer.renderIndexPaging("index.html")
+        shouldNotThrowAny {
+            helper.renderer.renderIndexPaging("index.html")
+        }
 
         val outputFile = helper.destinationDir.resolve("2").resolve("index.html")
         val output = FileUtils.readFileToString(outputFile, Charset.defaultCharset())
@@ -54,7 +57,9 @@ class FreemarkerTemplateEngineRenderingTest : StringSpec({
 
         helper.db.deleteAllByDocType("post")
 
-        helper.renderer.renderIndexPaging("index.html")
+        shouldNotThrowAny {
+            helper.renderer.renderIndexPaging("index.html")
+        }
 
         val paginatedFile = helper.destinationDir.resolve("index2.html")
         paginatedFile.exists() shouldBe false

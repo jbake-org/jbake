@@ -6,9 +6,9 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
+import org.jbake.util.AuthorTracer
 import org.jbake.util.Logging.logger
 import org.jbake.util.PagingHelper
-import org.jbake.util.AuthorTracer
 import org.slf4j.Logger
 import java.io.*
 import java.nio.file.Files
