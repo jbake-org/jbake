@@ -1,5 +1,6 @@
 package org.jbake.app
 
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -21,16 +22,20 @@ class FileUtilTest : StringSpec({
         val buildOutputDir = System.getProperty("jbake.buildOutputDir")
         if (buildOutputDir != null) {
             val expectedClassesDir = File(buildOutputDir, "classes")
-            if (expectedClassesDir.exists()) {
-                path.path shouldBe expectedClassesDir.path
-            } else {
-                path.path shouldBe buildOutputDir
+            withClue("runningLocation should point to jbake.buildOutputDir/classes/java/main or jbake.buildOutputDir, but was: ${path.path}; jbake.buildOutputDir = $buildOutputDir") {
+                if (expectedClassesDir.exists())
+                    path.path shouldBe expectedClassesDir.path
+                else
+                    path.path shouldBe buildOutputDir
             }
-        } else {
+        }
+        else {
             // Otherwise, check for standard build output directories
-            val pathA = File("build/classes").absolutePath
-            val pathB = File("target/classes").absolutePath
-            (path.path == pathA || path.path == pathB).shouldBeTrue()
+            withClue("runningLocation should point to build/classes/java/main or target/classes, but was: ${path.path}; jbake.buildOutputDir = ${System.getProperty("jbake.buildOutputDir")}") {
+                val pathA = File("build/classes").absolutePath
+                val pathB = File("target/classes").absolutePath
+                (path.path == pathA || path.path == pathB).shouldBeTrue()
+            }
         }
     }
 

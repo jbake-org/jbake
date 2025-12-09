@@ -99,5 +99,6 @@ kotlin {
 
 test {
     useJUnitPlatform()
-    systemProperty 'jbake.buildOutputDir', sourceSets.main.output.classesDirs.asPath.split(':')[0]
+    systemProperty 'jbake.builtClassesDir', sourceSets.main.output.classesDirs.asPath.split(':')[0]
+    systemProperty 'jbake.buildOutputDir', "build"
 }
