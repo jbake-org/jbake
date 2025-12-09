@@ -195,3 +195,5 @@ Licensed under the MIT License, see the link:LICENSE[LICENSE] file for details.
   * Lastly, add `--log-config=<path>` which will point to a logback config file file relative to the user.dir, and apply it to LogBack's runtime config.,
 * Review all unchecked casts - @Suppress("UNCHECKED_CAST")
 * What the heck is `temurin-17.0.17!/jdk.hotspot.agent/sun/jvm/hotspot/HelloWorld.class` ?!
+* Create some type conversion layer between the Databases and the rendering?
+    * E.g., DB has OffsetDateTime (I want it that way), but the templates want Date.
