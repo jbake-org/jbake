@@ -2,6 +2,7 @@ package org.jbake.app
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.file.shouldBeAFile
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -55,7 +56,9 @@ class OvenTest : StringSpec({
         val oven = Oven(conf)
         oven.bakeEverything()
 
-        oven.errors.isEmpty()
+        if (oven.errors.isNotEmpty())
+            println("Oven errors:\n" + oven.errors.map { " * $it" }.joinToString())
+        oven.errors.shouldBeEmpty()
     }
 
     "shouldBakeWithRelativeCustomPaths" {
@@ -69,7 +72,10 @@ class OvenTest : StringSpec({
         val oven = Oven(conf)
         oven.bakeEverything()
 
-        oven.errors.isEmpty() shouldBe true
+        if (oven.errors.isNotEmpty())
+            println("Oven errors:\n" + oven.errors.map { " * $it" }.joinToString())
+        oven.errors.shouldBeEmpty()
+
         conf.destinationDir.exists() shouldBe true
         conf.destinationDir.list()?.isNotEmpty() shouldBe true
         assetDir.exists() shouldBe true
@@ -117,7 +123,10 @@ class OvenTest : StringSpec({
         val oven = Oven(conf)
         oven.bakeEverything()
 
-        oven.errors.isEmpty() shouldBe true
+        if (oven.errors.isNotEmpty())
+            println("Oven errors:\n" + oven.errors.map { " * $it" }.joinToString())
+        oven.errors.shouldBeEmpty()
+
         conf.destinationDir.exists() shouldBe true
         conf.destinationDir.list()?.isNotEmpty() shouldBe true
         assetDir.exists() shouldBe true
