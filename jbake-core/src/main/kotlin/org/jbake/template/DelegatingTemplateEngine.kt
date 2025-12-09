@@ -52,8 +52,22 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
 
         val ext = FileUtil.fileExt(theTemplateName)
         val engine = renderers.getEngine(ext)
-        if (engine != null)
-            engine.renderDocument(model, theTemplateName, writer)
+        if (engine != null) {
+            // Convert OffsetDateTime to java.util.Date for all template engines
+            val convertedModel = org.jbake.util.convertDatesInModel(model)
+            // If engine expects TemplateModel, wrap as needed
+            if (convertedModel is TemplateModel)
+                engine.renderDocument(convertedModel, theTemplateName, writer)
+            else {
+                val tm = TemplateModel().apply {
+                    if (convertedModel is Map<*, *>) {
+                        @Suppress("UNCHECKED_CAST")
+                        putAll(convertedModel as Map<String, Any>)
+                    }
+                }
+                engine.renderDocument(tm, theTemplateName, writer)
+            }
+        }
         else log.error("Warning - No template engine found for template: {}", theTemplateName)
     }
 

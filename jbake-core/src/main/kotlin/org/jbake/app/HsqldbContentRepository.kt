@@ -17,6 +17,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Timestamp
 import java.sql.Types
+import java.time.OffsetDateTime
 
 /**
  * HSQLDB-based implementation of ContentRepository.
@@ -375,6 +376,29 @@ class HsqldbContentRepository(private val type: String, private val name: String
                                 }
                             }
                         }
+                    }
+
+                    // After merging, ensure 'date' is always OffsetDateTime if possible
+                    // This is the canonical place to ensure the type for downstream consumers (e.g., templates)
+                    val dateValue = document["date"]
+                    when (dateValue) {
+                        is String -> {
+                            // Try ISO first, then fallback to legacy formats
+                            val parsed = runCatching { OffsetDateTime.parse(dateValue) }.getOrNull()
+                                ?: runCatching {
+                                    // Try parsing as java.util.Date (e.g., yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss)
+                                    val fmt1 = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+                                    val fmt2 = java.text.SimpleDateFormat("yyyy-MM-dd")
+                                    val d = runCatching { fmt1.parse(dateValue) }.getOrNull()
+                                        ?: runCatching { fmt2.parse(dateValue) }.getOrNull()
+                                    d?.toInstant()?.atOffset(java.time.ZoneOffset.UTC)
+                                }.getOrNull()
+                            if (parsed != null) document["date"] = parsed
+                        }
+                        is java.util.Date -> {
+                            document["date"] = dateValue.toInstant().atOffset(java.time.ZoneOffset.UTC)
+                        }
+                        // else: already OffsetDateTime or null
                     }
 
                     AuthorTracer.trace("hsqldb-query", document, sql)
