@@ -690,7 +690,7 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
 
     @Override
     public void addConfiguration(Properties properties) {
-        compositeConfiguration.addConfiguration(new MapConfiguration(properties));
+        compositeConfiguration.addConfigurationFirst(new MapConfiguration(properties));
     }
 
     @Override
