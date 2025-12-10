@@ -8,7 +8,6 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import org.xml.sax.SAXException
 import java.io.IOException
@@ -52,7 +51,7 @@ class GroovyTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
                     return MethodClosure(this@GroovyTemplateEngine, "doInclude").curry(this)
 
                 return try {
-                    extractors.extractAndTransform(db, key, model, NoopAdapter())
+                    extractors.extractAndTransform(db, key, model, TemplateEngineAdapter.NoopAdapter())
                 }
                 // super.get() would recurse, so we directly access the backing map.
                 catch (e: NoModelExtractorException) { model[key] }

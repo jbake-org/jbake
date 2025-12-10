@@ -30,3 +30,24 @@ abstract class AbstractTemplateEngine protected constructor(
         internal var extractors: ModelExtractorsRegistry = ModelExtractorsRegistry.instance
     }
 }
+
+
+
+/**
+ * Adapts model extractor output to used template engine.
+ * This method typically wraps results of model extractions into data types suited to the template engine.
+ */
+interface TemplateEngineAdapter<Type> {
+
+    /**
+     * Adapt value to expected output.
+     */
+    fun adapt(key: String, extractedValue: Any): Type
+
+
+    class NoopAdapter : TemplateEngineAdapter<Any> {
+        override fun adapt(key: String, extractedValue: Any): Any {
+            return extractedValue
+        }
+    }
+}

@@ -155,10 +155,10 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 }
 
                 @Suppress("UNCHECKED_CAST")
-                val map = eagerAsSimpleHash.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
+                val map = eagerAsSimpleHash.toMap() as MutableMap<String, Any> // TBD converter function to check the types
 
                 AuthorTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], key)
-                val result = extractors.extractAndTransform(db, key, map, adapter)
+                val result: freemarker.template.TemplateModel = extractors.extractAndTransform(db, key, map, adapter)
 
                 // Wrap Map results (especially document models like "content") with NullSafeMapModel.
                 // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.
@@ -221,12 +221,12 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 // Kept for potential special-case usage but are not required when using Java8ObjectWrapper.
 // TBD Currently not used; freemarker-java8 instead -> remove when stable.
 
-private class OffsetDateTimeModel(private val dateTime: OffsetDateTime) : TemplateDateModel {
+class OffsetDateTimeModel(private val dateTime: OffsetDateTime) : TemplateDateModel {
     override fun getDateType() = DATETIME
     override fun getAsDate(): Date = Date.from(dateTime.toInstant())
 }
 
-private class InstantModel(private val instant: Instant) : TemplateDateModel {
+class InstantModel(private val instant: Instant) : TemplateDateModel {
     override fun getDateType() = DATETIME
     override fun getAsDate(): Date = Date.from(instant)
 }

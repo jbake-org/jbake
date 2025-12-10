@@ -13,7 +13,6 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.Logging.logger
 import org.jbake.util.PathUtils
@@ -70,7 +69,7 @@ class JadeTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstrac
                 super.get(key)?.let { return it }
 
                 return try {
-                    extractors.extractAndTransform(db, key, this, NoopAdapter())
+                    extractors.extractAndTransform(db, key, this, TemplateEngineAdapter.NoopAdapter())
                 } catch (e: NoModelExtractorException) {
                     model[key]
                 }

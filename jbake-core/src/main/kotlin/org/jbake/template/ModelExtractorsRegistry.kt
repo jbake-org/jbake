@@ -95,7 +95,7 @@ class ModelExtractorsRegistry private constructor() {
         key: String,
         map: MutableMap<String, Any>,
         adapter: TemplateEngineAdapter<Type>
-    ): Type? {
+    ): Type {
         val extractor = extractors[key] ?: throw NoModelExtractorException("no model extractor for key \"$key\"")
         val extractedValue = extractor.get(db, map, key)
         return adapter.adapt(key, extractedValue!!)
@@ -106,7 +106,7 @@ class ModelExtractorsRegistry private constructor() {
      * @param key A key a [ModelExtractor] is registered with
      * @return true if key is registered
      */
-    fun containsKey(key: Any?): Boolean = extractors.containsKey(key)
+    fun containsKey(key: Any): Boolean = extractors.containsKey(key)
 
     /**
      *  A @[Set] of all known keys a @[ModelExtractor] is registered with,

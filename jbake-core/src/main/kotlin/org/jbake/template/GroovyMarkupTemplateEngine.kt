@@ -7,7 +7,6 @@ import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes.DOC_DATE
-import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import java.io.Writer
 import java.text.SimpleDateFormat
@@ -67,7 +66,7 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
                     // Pass a plain map to avoid invoking the overridden get and causing recursion.
                     @Suppress("UNCHECKED_CAST")
                     val plainMap = (model as? Map<String, Any>)?.toMutableMap() ?: return null
-                    val extracted = extractors.extractAndTransform(db, key, plainMap, NoopAdapter())
+                    val extracted = extractors.extractAndTransform(db, key, plainMap, TemplateEngineAdapter.NoopAdapter())
                     return transformForGroovy(extracted)
                 } catch (e: NoModelExtractorException) {
                     return model[key]

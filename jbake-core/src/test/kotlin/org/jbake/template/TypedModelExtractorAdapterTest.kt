@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.configuration2.CompositeConfiguration
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.DefaultJBakeConfiguration
-import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.RenderContext
 
 class TypedModelExtractorAdapterTest : StringSpec({
@@ -31,7 +30,7 @@ class TypedModelExtractorAdapterTest : StringSpec({
         // Use a lightweight ContentStore instance; adapter will pass it through but typed extractor doesn't use it
         val db = ContentStore("memory", "testdb")
 
-        val adapted: Any? = ModelExtractorsRegistry.instance.extractAndTransform(db, key, model, NoopAdapter())
+        val adapted: Any = ModelExtractorsRegistry.instance.extractAndTransform(db, key, model, TemplateEngineAdapter.NoopAdapter())
 
         adapted shouldBe "hello-typed"
     }

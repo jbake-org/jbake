@@ -15,6 +15,26 @@ import java.util.*
  */
 class FreemarkerDateTypesTest : StringSpec({
 
+    "freemarker formats Date with string pattern" {
+        @Suppress("DEPRECATION") val date = Date(2025-1900, 12-1, 10, 14, 30, 0)
+        val map = mutableMapOf<String, Any>("content" to mapOf("mydate" to date))
+        val template = $$"${content.mydate?string('yyyy-MM-dd HH:mm:ssXXX')}"
+
+        val out = renderInlineTemplate(map, template)
+        out.shouldContain("2025-12-10 14:30:00+01:00")
+    }
+
+    // Error: For "...(...)" callee: Expected a method or function, but this has evaluated to a string (wrapper: f.t.SimpleScalar):
+    "freemarker formats OffsetDateTime, wrapped" {
+        val odt = OffsetDateTime.of(2025, 12, 10, 14, 30, 0, 0, ZoneOffset.ofHours(1))
+        val map = mutableMapOf<String, Any>("content" to mapOf("date" to OffsetDateTimeModel(odt)))
+        val template = $$"${content.date?string('yyyy-MM-dd HH:mm:ssXXX')}"
+
+        val out = renderInlineTemplate(map, template)
+        out.shouldContain("2025-12-10 14:30:00+01:00")
+    }
+
+    // Error: For "...(...)" callee: Expected a method or function, but this has evaluated to a string (wrapper: f.t.SimpleScalar):
     "freemarker formats OffsetDateTime with string pattern" {
         val odt = OffsetDateTime.of(2025, 12, 10, 14, 30, 0, 0, ZoneOffset.ofHours(1))
         val map = mutableMapOf<String, Any>("content" to mapOf("date" to odt))
@@ -55,10 +75,11 @@ class FreemarkerDateTypesTest : StringSpec({
         out.shouldContain("2025-12-10")
     }
 
-    "freemarker date/time built-ins" {
+    "freemarker date-time built-ins" {
         val odt = OffsetDateTime.of(2025,12,5,9,0,0,0, ZoneOffset.UTC)
         val map = mutableMapOf<String, Any>("content" to mapOf("date" to odt))
         val t = $$"${content.date?date?string('yyyy-MM-dd')}|${content.date?time?string('HH:mm:ss')}|${content.date?datetime?string('yyyy-MM-dd HH:mm:ssXXX')}"
+
         val out = renderInlineTemplate(map, t)
         out.shouldContain("2025-12-05")
         out.shouldContain("09:00:00")
@@ -73,12 +94,13 @@ fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String
     val cfg = Configuration(Configuration.VERSION_2_3_34)
     cfg.defaultEncoding = "UTF-8"
     cfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
+    // See
     cfg.objectWrapper = Java8ObjectWrapper(Configuration.VERSION_2_3_34)
 
     // Use StringTemplateLoader to load template text under a name
     val loader = freemarker.cache.StringTemplateLoader()
-    val name = "inline"
-    loader.putTemplate(name, templateText)
+    val templateName = "inline"
+    loader.putTemplate(templateName, templateText)
     cfg.templateLoader = loader
 
     // Convert java.time types to java.util.Date for compatibility
@@ -95,7 +117,7 @@ fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String
     ///val javaModel = toJavaObject(modelMap) as? Map<*, *> ?: modelMap
     val javaModel = modelMap
 
-    val template = cfg.getTemplate(name)
+    val template = cfg.getTemplate(templateName)
     val writer = StringWriter()
     template.process(javaModel, writer)
     return writer.toString()
