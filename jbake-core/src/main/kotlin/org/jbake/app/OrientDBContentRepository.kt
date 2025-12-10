@@ -74,7 +74,7 @@ class OrientDBContentRepository(storageType: String, private val dbName: String)
             // Database exists, try to open it
             try {
                 db = orient.open(access.dbname, access.user, access.pass)
-                log.debug("Opened existing database: {}", access.dbname)
+                log.debug("Opened existing database: ${access.dbname}")
                 activateOnCurrentThread()
                 updateSchema()
                 return
@@ -90,11 +90,11 @@ class OrientDBContentRepository(storageType: String, private val dbName: String)
             .addConfig(OGlobalConfiguration.CREATE_DEFAULT_USERS, true)
             .build()
         orient.create(access.dbname, dbStorageType, config)
-        log.debug("Created database: {}", access.dbname)
+        log.debug("Created database: ${access.dbname}")
 
         // Open with admin credentials
         db = orient.open(access.dbname, access.user, access.pass)
-        log.debug("Opened database: {}", access.dbname)
+        log.debug("Opened database: ${access.dbname}")
 
         activateOnCurrentThread()
         updateSchema()

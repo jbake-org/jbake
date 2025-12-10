@@ -38,7 +38,7 @@ class ConfigUtil {
         }
 
         if (legacyConfigFile.exists()) {
-            displayLegacyConfigFileWarningIfRequired()
+            log.warn("Part of your JBake configuration is in a deprecated '$LEGACY_CONFIG_FILE'. Rename it to '$CONFIG_FILE'.")
             config.addConfiguration(getFileBasedPropertiesConfiguration(legacyConfigFile))
         }
         if (customConfigFile.exists())
@@ -83,14 +83,8 @@ class ConfigUtil {
         return builder.getConfiguration()
     }
 
-    private fun displayLegacyConfigFileWarningIfRequired() {
-        log.warn("You have defined a part of your JBake configuration in {}", LEGACY_CONFIG_FILE)
-        log.warn("Usage of this file is being deprecated, please rename this file to: {} to remove this warning", CONFIG_FILE)
-    }
-
     @Throws(JBakeExitException::class)
     fun loadConfig(source: File, propertiesFile: File? = null): JBakeConfiguration {
-        // W
         try {
             val configuration = load(source, propertiesFile)
             return DefaultJBakeConfiguration(source, configuration)
@@ -104,7 +98,7 @@ class ConfigUtil {
             this.encoding = encoding
         } else {
             this.encoding = DEFAULT_ENCODING
-            log.warn("Unsupported encoding '{}'. Using default encoding '{}'", encoding, this.encoding)
+            log.warn("Unsupported encoding '$encoding'. Using default encoding '$this.encoding'.")
         }
         return this
     }

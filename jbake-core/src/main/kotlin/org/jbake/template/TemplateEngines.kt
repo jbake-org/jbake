@@ -3,6 +3,7 @@ package org.jbake.template
 import org.jbake.app.ContentStore
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.util.Logging.logger
+import org.jbake.util.debug
 import org.slf4j.Logger
 import java.io.IOException
 import java.lang.reflect.Constructor
@@ -41,7 +42,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
     private fun registerEngine(fileExtension: String, templateEngine: AbstractTemplateEngine) {
         val old = engines.put(fileExtension, templateEngine)
         if (old != null)
-            log.warn("Registered a template engine for extension [.{}] but another one was already defined: {}", fileExtension, old)
+            log.warn("Registered a template engine for extension '.$fileExtension', but another one was already defined: $old")
     }
 
     fun getEngine(fileExtension: String): AbstractTemplateEngine? = engines[fileExtension]
@@ -60,7 +61,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
                 for (entry in props.entries) {
                     val className = entry.key as String
                     val extensions = (entry.value as String).split(",".toRegex()).dropLastWhile { it.isEmpty() }
-                    log.info("Registering template engine: {} for extensions: {}", className, extensions)
+                    log.info("Registering template engine: $className for extensions: $extensions")
                     registerEngine(config, db, className, extensions)
                 }
             }
@@ -93,7 +94,7 @@ class TemplateEngines(config: JBakeConfiguration, db: ContentStore) {
             }
             catch (e: Throwable) {
                 // Not all engines might be necessary, therefore only emit class loading issue with level warn.
-                log.debug("Template engine not available: $engineClassName", e)
+                log.debug { "Template engine not available: $engineClassName" }
                 return null
             }
         }

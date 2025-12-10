@@ -46,10 +46,10 @@ class Renderer {
                 val legacyModel = TemplateModel.fromContext(context)
                 renderingEngine.renderDocument(legacyModel, templateName, out)
             }
-            log.info("Rendering done: $outputFile")
+            log.info("Rendering done: ${outputFile.absolutePath}")
         } catch (e: Exception) {
-            log.error("Rendering failed: $outputFile - ${e.message}", e)
-            throw Exception("Failed to render file ${outputFile.absolutePath}: ${e.message}", e)
+            log.error("Rendering failed: ${outputFile.absolutePath} - ${e.message}", e)
+            throw Exception("Failed to render file ${outputFile.absolutePath} - ${e.message}", e)
         }
     }
 
@@ -97,10 +97,10 @@ class Renderer {
             createWriter(finalOutputFile).use { out ->
                 renderingEngine.renderDocument(model, findTemplateName(docType), out)
             }
-            log.info("Rendering [{}]... done!", finalOutputFile)
+            log.info("Rendered: $finalOutputFile")
         } catch (e: Exception) {
-            log.error("Rendering [{}]... failed!", finalOutputFile, e)
-            throw Exception("Failed to render file " + finalOutputFile.absolutePath + ". Cause: " + e.message, e)
+            log.error("Rendering failed: $finalOutputFile : ${e.message}", e)
+            throw Exception("Failed to render file ${finalOutputFile.absolutePath}: ${e.message}", e)
         }
     }
 
@@ -120,9 +120,9 @@ class Renderer {
             createWriter(outputFile).use { out ->
                 renderingEngine.renderDocument(renderConfig.model, renderConfig.template, out)
             }
-            log.info("Rendering {} [{}]... done!", renderConfig.name, outputFile)
+            log.info("Rendered: ${renderConfig.name} $outputFile")
         } catch (e: Exception) {
-            log.error("Rendering {} [{}]... failed!", renderConfig.name, outputFile, e)
+            log.error("Rendering failed: ${renderConfig.name} : $outputFile", e)
             throw Exception("Failed to render " + renderConfig.name, e)
         }
     }

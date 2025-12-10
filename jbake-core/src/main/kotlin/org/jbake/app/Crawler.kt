@@ -39,7 +39,7 @@ class Crawler {
 
         for (docType in DocumentTypeRegistry.documentTypes) {
             val count = db.getDocumentCount(docType)
-            if (count > 0) log.info("Parsed {} files of type: {}", count, docType)
+            if (count > 0) log.info("Parsed $count files of type: $docType.")
         }
     }
 
@@ -81,7 +81,7 @@ class Crawler {
         crawlDataFiles(config.dataDir)
 
         val count = db.getDocumentCount(config.dataFileDocType)
-        if (count > 0) log.info("Parsed {} files", count)
+        if (count > 0) log.info("Parsed " + count + " files.")
     }
 
     private fun crawlDataFiles(startFromDirectory: File) {
@@ -157,7 +157,7 @@ class Crawler {
     private fun crawlDataFile(sourceFile: File, sha1: String, uri: String, documentType: String) {
         try {
             val document = parser.processFile(sourceFile) ?: run {
-                log.warn("{} couldn't be parsed so it has been ignored!", sourceFile)
+                log.warn("$sourceFile couldn't be parsed so it has been ignored.")
                 return
             }
 
@@ -175,13 +175,13 @@ class Crawler {
 
     private fun processSourceFile(sourceFile: File, sha1: String, uri: String) {
         val document = parser.processFile(sourceFile) ?: run {
-            log.warn("{} has an invalid header, it has been ignored!", sourceFile)
+            log.warn("$sourceFile has an invalid header, it has been ignored.")
             return
         }
         AuthorTracer.trace("crawler-parse", document, sourceFile.name)
 
         if (!DocumentTypeRegistry.contains(document.type)) {
-            log.warn("{} has an unknown document type '{}' and has been ignored!", sourceFile, document.type)
+            log.warn("$sourceFile has an unknown document type '${document.type}' and has been ignored.")
             return
         }
 

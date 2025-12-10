@@ -60,7 +60,7 @@ class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T
                 DefaultJBakeConfiguration(cc)
             }
             else -> {
-                log.warn("Unsupported config type in model: {}. Falling back to empty configuration.", raw::class)
+                log.warn("Unsupported config type in model: ${raw::class}. Falling back to empty configuration.")
                 val cc = CompositeConfiguration()
                 DefaultJBakeConfiguration(cc)
             }
@@ -94,10 +94,9 @@ class ModelExtractorAdapter<T>(private val typedExtractor: TypedModelExtractor<T
         if (model["config"] is Map<*, *>) {
             val cfgMap = model["config"] as Map<*, *>
             if (cfgMap.containsKey("tag.path") || cfgMap.containsKey("tag_path")) {
-                log.info("ModelExtractorAdapter: config contains tag.path='{}', tag_path='{}'",
-                    cfgMap["tag.path"], cfgMap["tag_path"])
+                log.info("ModelExtractorAdapter: config contains tag.path='${cfgMap["tag.path"]}', tag_path='${cfgMap["tag_path"]}'.")
             } else {
-                log.info("ModelExtractorAdapter: config does NOT contain tag.path or tag_path keys. size={}", cfgMap.size)
+                log.info("ModelExtractorAdapter: config does NOT contain tag.path or tag_path keys. size=${cfgMap.size}")
             }
         }
 

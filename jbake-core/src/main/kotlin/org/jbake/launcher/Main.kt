@@ -5,7 +5,7 @@ import org.jbake.app.JBakeExitException
 import org.jbake.app.SystemExit
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeConfigurationFactory
-import org.jbake.util.ConfigurationPrinter
+import org.jbake.util.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
@@ -71,7 +71,7 @@ class Main @JvmOverloads constructor(
                 val rootLogger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME)
                 val logLevel = ch.qos.logback.classic.Level.toLevel(level.uppercase(), ch.qos.logback.classic.Level.WARN)
                 rootLogger.level = logLevel
-                log.debug("Log level set to: {}", logLevel)
+                log.debug { "Log level set to: $logLevel." }
             }
         } catch (e: Exception) {
             // Logback not available or other issue - silently ignore

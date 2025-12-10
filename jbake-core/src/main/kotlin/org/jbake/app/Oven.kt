@@ -114,10 +114,10 @@ class Oven {
 
             log.info("Baking finished!")
             val durationMs = java.time.Duration.between(start, Instant.now()).toMillis()
-            log.info("Baked $renderedCount items in $durationMs ms")
+            log.info("Baked $renderedCount items in $durationMs ms.")
 
             if (!errors.isEmpty())
-                log.error("Failed to bake {} item(s)!", errors.size)
+                log.error("Failed to bake ${errors.size} item(s)!")
         }
         finally {
             utensils.contentStore.close()

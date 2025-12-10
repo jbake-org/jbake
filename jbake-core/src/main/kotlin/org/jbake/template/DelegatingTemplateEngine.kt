@@ -37,13 +37,13 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
         var templateFileName = templateName
 
         if (!templateFile.exists()) {
-            log.info("Default template: {} was not found, searching for others...", templateName)
+            log.info("Default template: $templateName was not found, searching for others...")
             // if default template does not exist then check if any alternative engine templates exist
             val templateNameWithoutExt = templateName.dropLast(4)
             for (extension in renderers.recognizedExtensions) {
                 templateFile = templateDir.resolve("$templateNameWithoutExt.$extension")
                 if (templateFile.exists()) {
-                    log.info("Found alternative template file: {} using this instead", templateFile.getName())
+                    log.info("Found alternative template file: ${templateFile.getName()} using this instead.")
                     templateFileName = templateFile.getName()
                     break
                 }
@@ -53,7 +53,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
         val ext = FileUtil.fileExt(templateFileName)
         val engine = renderers.getEngine(ext)
         if (engine == null) {
-            log.error("Warning - No template engine found for template: {}", templateFileName)
+            log.error("Warning - No template engine found for template: $templateFileName.")
             return
         }
 

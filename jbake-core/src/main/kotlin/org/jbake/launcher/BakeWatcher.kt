@@ -4,8 +4,8 @@ import org.apache.commons.vfs2.FileSystemException
 import org.apache.commons.vfs2.VFS
 import org.apache.commons.vfs2.impl.DefaultFileMonitor
 import org.jbake.app.configuration.JBakeConfiguration
-import org.slf4j.Logger
 import org.jbake.util.Logging.logger
+import org.slf4j.Logger
 
 /**
  * Delegate responsible for watching the file system for changes.
@@ -24,7 +24,7 @@ class BakeWatcher {
             val assetPath = fsMan.resolveFile(config.assetDir.toURI())
             val dataPath = fsMan.resolveFile(config.dataDir.toURI())
 
-            log.info("Watching for (content, data, template, asset) changes in [{}]", config.sourceDir!!.path)
+            log.info("Watching for (content, data, template, asset) changes in '${config.sourceDir!!.path}'")
             val monitor = DefaultFileMonitor(CustomFileSystemChangeListener(config))
             monitor.isRecursive = true
             monitor.addFile(listenPath)
