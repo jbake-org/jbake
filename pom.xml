@@ -97,7 +97,7 @@
         <version.jsoup>1.21.2</version.jsoup>
         <version.logback>1.5.21</version.logback>
         <version.neo4j>5.26.0</version.neo4j>
-        <version.orientdb>3.2.46</version.orientdb>
+        <version.orientdb>3.2.47</version.orientdb>
         <version.pebble>4.0.0</version.pebble>
         <version.picocli>4.7.7</version.picocli>
         <version.pug4j>2.4.1</version.pug4j>
