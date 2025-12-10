@@ -33,6 +33,7 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - Prefer Kotlin idioms over Java ones where possible.
     * runCatching instead of try-catch when both `try` and `catch` blocks are short.
     * Use Kotlin's rich collection APIs.
+    * Kotlin 2.2.x has a syntax of $$"..." where you do not need to escape dollar symbols using ${'$'}. So keep those where they exist, and use them where sensible.
 - Prefer brief code constructs over longer ones. For instance:
   - Use `mapNotNull` instead of `map` followed by `filterNotNull`.
   - If an `if` contains only `return`, `break`, or `continue`, then put it on a single line. I.e.:
@@ -85,3 +86,4 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - Do not generate lengthy reports. The user is supposed to read and understand the code. If some construct is complex, add concise comments in the code itself. But ideally, rely on perfect naming and structure.
 - Specifically for Gemini agent: After stating "I will do X now", do it, rather than stopping.
 - If you detect "corrupted" file, it is probably the developer doing changes. Pause for 10 seconds and retry reading it. If still corrupted, mention it concisely and ask the user to fix it.
+- IDE console tool has some weird bug that the first command in a given console gets split to two lines after the first minus and fails. If that happens, run the same command again, that works.
