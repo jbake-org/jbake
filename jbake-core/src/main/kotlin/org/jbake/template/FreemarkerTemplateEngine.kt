@@ -2,6 +2,9 @@ package org.jbake.template
 
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
+import freemarker.template.TemplateDateModel.DATETIME
+import freemarker.template.TemplateDateModel.UNKNOWN
+import no.api.freemarker.java8.Java8ObjectWrapper
 import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
@@ -14,6 +17,8 @@ import org.jbake.util.Logging.logger
 import org.jbake.util.convertDatesInModel
 import java.io.IOException
 import java.io.Writer
+import java.time.OffsetDateTime
+import java.util.*
 
 
 /**
@@ -35,7 +40,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         templateCfg.setOutputEncoding(config.outputEncoding)
         templateCfg.setTimeZone(config.freemarkerTimeZone)
         templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
-        templateCfg.setClassicCompatible(true)
+        templateCfg.isClassicCompatible = true
 
         /* Keep this here for debugging!
         // Custom exception handler that ignores InvalidReferenceException
@@ -156,15 +161,13 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 
                 @Suppress("UNCHECKED_CAST")
                 val map = eagerModel.toMap() as MutableMap<String, Any> // TBD converter function to check the types.
-                @Suppress("UNCHECKED_CAST")
-                val adapterTyped = adapter as TemplateEngineAdapter<freemarker.template.TemplateModel?>
-                AuthorTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], key)
-                val result = extractors.extractAndTransform(db, key, map, adapterTyped)
 
-                // Wrap Map results (especially document models like "content") with NullSafeMapModel
-                // This ensures ${content.author} returns null instead of throwing InvalidReferenceException
-                // when the document doesn't have an author field. Combined with classicCompatible=true,
-                // null values are treated as empty strings in templates.
+                AuthorTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], key)
+                val result = extractors.extractAndTransform(db, key, map, adapter)
+
+                // Wrap Map results (especially document models like "content") with NullSafeMapModel.
+                // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.
+                // Combined with classicCompatible=true, null values are treated as empty strings in templates.
                 if (result is SimpleHash)
                     return NullSafeMapModel(result, wrapper)
                 return result
