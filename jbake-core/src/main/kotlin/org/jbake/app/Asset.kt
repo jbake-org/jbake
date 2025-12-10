@@ -40,7 +40,7 @@ class Asset(private val config: JBakeConfiguration) {
         try {
             val targetFile = config.destinationDir.toPath().resolve(assetSubPath(asset)).toFile()
             log.info("Copying single asset file to [${targetFile.path}]")
-            copyFile(asset, targetFile)
+            copyFileOrAddError(asset, targetFile)
         } catch (io: IOException) {
             log.error("Failed to copy the asset file.", io)
         }
@@ -98,26 +98,29 @@ class Asset(private val config: JBakeConfiguration) {
     }
 
     private fun copy(sourceDir: File, targetDir: File, filter: FileFilter) {
-        val assets = sourceDir.listFiles(filter)
-        if (assets != null) {
-            Arrays.sort(assets)
-            for (asset in assets) {
-                val target = targetDir.resolve(asset.getName())
-                if (asset.isFile()) copyFile(asset, target)
-                else if (asset.isDirectory()) copy(asset, target, filter)
+        val assets = sourceDir.listFiles(filter) ?: return
+
+        Arrays.sort(assets)
+        for (asset in assets) {
+            val target = targetDir.resolve(asset.getName())
+            if (asset.isDirectory()) {
+                copy(asset, target, filter)
+                continue
             }
+
+            if (!asset.isFile()) continue
+
+            copyFileOrAddError(asset, target)
         }
     }
 
-    private fun copyFile(asset: File, targetDir: File) {
+    private fun copyFileOrAddError(sourceFile: File, destFile: File) {
         try {
-            FileUtils.copyFile(asset, targetDir)
-            log.info("Copying [${asset.path}]... done!")
-        } catch (e: IOException) {
-            log.error("Copying [${asset.path}]... failed!", e)
-            errors.add(e)
-        } catch (e: IllegalArgumentException) {
-            log.error("Copying [${asset.path}]... failed!", e)
+            FileUtils.copyFile(sourceFile, destFile)
+            log.info("Copied: " + sourceFile.path)
+        }
+        catch (e: Exception) {
+            log.error("Copying '${sourceFile.path}' failed: ${e.message}", e)
             errors.add(e)
         }
     }
