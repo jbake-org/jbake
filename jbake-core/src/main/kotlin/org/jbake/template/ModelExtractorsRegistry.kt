@@ -165,11 +165,6 @@ class ModelExtractorsRegistry private constructor() {
 
 }
 
-// TODO: Migrate away from "ModelExtractors".
-//typealias ModelExtractors = ModelExtractorsRegistry
-
-
-
 interface ModelExtractor<T> {
     fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): T?
 }
