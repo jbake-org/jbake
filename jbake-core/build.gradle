@@ -52,7 +52,8 @@ dependencies {
         compileOnly "com.github.ben-manes.caffeine:caffeine:$caffeineVersion" // To avoid ERROR void sun.misc.Unsafe.ensureClassInitialized(java.lang.Class)
     compileOnly "io.pebbletemplates:pebble:$pebbleVersion"
     compileOnly "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
-    compileOnly "org.freemarker:freemarker:$freemarkerVersion"
+    compileOnly ("org.freemarker:freemarker:$freemarkerVersion")// { dependencies {''} }
+        compileOnly "no.api.freemarker:freemarker-java8:3.0.3"
     compileOnly "org.thymeleaf:thymeleaf:$thymeleafVersion"
     implementation "org.apache.groovy:groovy:$groovyVersion"
     implementation "org.apache.groovy:groovy-templates:$groovyVersion"

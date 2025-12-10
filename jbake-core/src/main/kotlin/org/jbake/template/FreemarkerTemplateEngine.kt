@@ -30,6 +30,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 
     private fun createTemplateConfiguration() {
         templateCfg = Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
+        templateCfg.setObjectWrapper(Java8ObjectWrapper(Configuration.VERSION_2_3_34))
         templateCfg.setDefaultEncoding(config.renderEncoding)
         templateCfg.setOutputEncoding(config.outputEncoding)
         templateCfg.setTimeZone(config.freemarkerTimeZone)
