@@ -11,7 +11,7 @@ import java.io.Writer
 open class TemplateModel : BaseModel {
     constructor()
 
-    constructor(model: TemplateModel) {
+    constructor(model: Map<String, Any>) {
         putAll(model)
     }
 
@@ -80,6 +80,11 @@ open class TemplateModel : BaseModel {
         get() = get(ModelAttributes.TMPL_OUT_WRITER) as Writer?
 
     companion object {
+
+        fun fromMap(map: Map<String, Any>): TemplateModel {
+            return TemplateModel().apply { putAll(map) }
+        }
+
 
         /** Create TemplateModel from a type-safe RenderContext. This is the new preferred way to create template models. */
         @Suppress("DEPRECATION")

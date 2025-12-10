@@ -68,11 +68,11 @@ abstract class CrawlerTestBase(dbType: DatabaseType) : StringSpec({
             db.getDocumentCount("data") shouldBe 2
 
             val dataFileUtil = DataFileUtil(db, "data")
-            val videosYaml = dataFileUtil.get("videos.yaml")
+            val videosYaml = dataFileUtil.loadDocumentsByUri("videos.yaml")
             videosYaml.isEmpty().shouldBeFalse()
             videosYaml["data"].shouldNotBeNull()
 
-            val authorsFileContents = dataFileUtil.get("authors.yaml")
+            val authorsFileContents = dataFileUtil.loadDocumentsByUri("authors.yaml")
             authorsFileContents.isEmpty().shouldBeFalse()
             val authorsList = authorsFileContents["authors"]
             authorsList.shouldBeInstanceOf<Map<*, *>>()

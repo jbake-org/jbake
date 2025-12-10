@@ -76,12 +76,12 @@ class CrawlerTest : StringSpec({
         db.getDocumentCount("data") shouldBe 2
 
         val dataFileUtil = DataFileUtil(db, "data")
-        val videosYaml = dataFileUtil.get("videos.yaml")
+        val videosYaml = dataFileUtil.loadDocumentsByUri("videos.yaml")
         videosYaml.isEmpty().shouldBeFalse()
         videosYaml["data"].shouldNotBeNull()
 
         // Regression test for issue #747.
-        val authorsFileContents = dataFileUtil.get("authors.yaml")
+        val authorsFileContents = dataFileUtil.loadDocumentsByUri("authors.yaml")
         authorsFileContents.isEmpty().shouldBeFalse()
         val authorsList = authorsFileContents["authors"]
         authorsList.shouldNotBeInstanceOf<OTrackedMap<*>>()

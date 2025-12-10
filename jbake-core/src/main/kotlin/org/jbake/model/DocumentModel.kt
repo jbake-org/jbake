@@ -75,5 +75,9 @@ class DocumentModel : BaseModel() {
             cached = true
             rendered = false
         }
+
+        fun fromMap(map: Map<String, Any>): DocumentModel {
+            return DocumentModel().apply { putAll(map) }
+        }
     }
 }

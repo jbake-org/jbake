@@ -3,7 +3,7 @@
 // Usage: Execute via Gradle task or directly with proper classpath
 
 @file:Repository("https://repo1.maven.org/maven2/")
-@file:DependsOn("com.orientechnologies:orientdb-core:3.2.46")
+@file:DependsOn("com.orientechnologies:orientdb-core:3.2.47")
 
 import com.orientechnologies.orient.core.db.ODatabaseType
 import com.orientechnologies.orient.core.db.OrientDB
