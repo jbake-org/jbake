@@ -34,6 +34,7 @@ This document provides guidelines for contributing to **JBake**, an open-source 
     * runCatching instead of try-catch when both `try` and `catch` blocks are short.
     * Use Kotlin's rich collection APIs.
     * Kotlin 2.2.x has a syntax of $$"..." where you do not need to escape dollar symbols using ${'$'}. So keep those where they exist, and use them where sensible.
+    * DO NOT REPLACE THE $$"..." syntax with escaped dollars!!
 - Prefer brief code constructs over longer ones. For instance:
   - Use `mapNotNull` instead of `map` followed by `filterNotNull`.
   - If an `if` contains only `return`, `break`, or `continue`, then put it on a single line. I.e.:
@@ -64,7 +65,7 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 
 ## Testing
 
-- Write unit tests for new features and bug fixes. Use Kotest and Mockk for testing. Kotest allows parametrized tests with `forAll` and `row`. Use StringSpec rather than FunSpec.
+- Write unit tests for new features and bug fixes. Use Kotest and Mockk for testing. Kotest allows parametrized tests with `forAll` and `row`. Use StringSpec rather than FunSpec. Do NOT use JUnit, especially not constructs like `assertTrue(foo.contains("bar"))`!
 - When you assume a task is done, run the full test suite with both Maven and Gradle. `mvn clean verify` and `./gradlew clean test`. Include E2E tests.
   - The run may take around a minute.
 

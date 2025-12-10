@@ -74,7 +74,7 @@ dependencies {
     testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
     testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotestVersion"
     testImplementation "io.kotest:kotest-property-jvm:$kotestVersion"
-    testImplementation "io.mockk:mockk:1.14.6"
+    testImplementation "io.mockk:mockk:$mockkVersion"
     testImplementation "io.pebbletemplates:pebble:$pebbleVersion"
     testImplementation "org.apache.commons:commons-vfs2:$commonsVfs2Version"
     testImplementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"

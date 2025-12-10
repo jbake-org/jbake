@@ -110,7 +110,7 @@
         <version.junit5>6.0.1</version.junit5>
         <version.junit5.system.ext>1.2.2</version.junit5.system.ext>
         <version.junit.pioneer>2.3.0</version.junit.pioneer>
-        <version.mockk>1.14.6</version.mockk>
+        <version.mockk>1.14.7</version.mockk>
         <version.kotest>6.0.7</version.kotest>
         <version.testcontainers>2.0.2</version.testcontainers>
 
