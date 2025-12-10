@@ -49,7 +49,7 @@ class FreemarkerDateTypesTest : StringSpec({
         val utilDate = Date.from(instant)
         val sqlDate = java.sql.Date.from(instant)
         val map = mutableMapOf<String, Any>("content" to mapOf("inst" to instant, "ud" to utilDate, "sd" to sqlDate))
-        val t = "${'$'}{content.inst?string('yyyy-MM-dd')},${'$'}{content.ud?string('yyyy-MM-dd')},${'$'}{content.sd?string('yyyy-MM-dd')}"
+        val t = $$"${content.inst?string('yyyy-MM-dd')},${content.ud?string('yyyy-MM-dd')},${content.sd?string('yyyy-MM-dd')}"
 
         val out = renderInlineTemplate(map, t)
         out.shouldContain("2025-12-10")
@@ -58,7 +58,7 @@ class FreemarkerDateTypesTest : StringSpec({
     "freemarker date/time built-ins" {
         val odt = OffsetDateTime.of(2025,12,5,9,0,0,0, ZoneOffset.UTC)
         val map = mutableMapOf<String, Any>("content" to mapOf("date" to odt))
-        val t = "${'$'}{content.date?date?string('yyyy-MM-dd')}|${'$'}{content.date?time?string('HH:mm:ss')}|${'$'}{content.date?datetime?string('yyyy-MM-dd HH:mm:ssXXX')}"
+        val t = $$"${content.date?date?string('yyyy-MM-dd')}|${content.date?time?string('HH:mm:ss')}|${content.date?datetime?string('yyyy-MM-dd HH:mm:ssXXX')}"
         val out = renderInlineTemplate(map, t)
         out.shouldContain("2025-12-05")
         out.shouldContain("09:00:00")
