@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 import org.jbake.TestUtils
 import org.jbake.app.FileUtil.getUriPathToContentRoot
 import org.jbake.app.FileUtil.isFileInDirectory
-import org.jbake.app.FileUtil.runningLocation
+import org.jbake.app.FileUtil.templateDirForTestsOrForRuntime
 import org.jbake.app.configuration.ConfigUtil
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import java.io.File
@@ -16,7 +16,10 @@ import java.io.File
 class FileUtilTest : StringSpec({
 
     "testGetRunningLocation" {
-        val path = runningLocation
+
+        // The point of this test is to check the System properties being passed form the build tool, and FileUtil.runningLocation taking it properly.
+
+        val path = templateDirForTestsOrForRuntime
 
         // If jbake.buildOutputDir is set, runningLocation resolves to classes subdirectory
         val buildOutputDir = System.getProperty("jbake.buildOutputDir")

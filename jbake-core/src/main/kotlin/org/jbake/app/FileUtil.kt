@@ -51,19 +51,26 @@ object FileUtil {
 
     fun isExistingDirectory(f: File) = f.exists() && f.isDirectory()
 
+
+    /**
+     * For tests, this points to test resources dir, which is in the classes dir, specified by sysprop `jbake.builtClassesDir`.
+     * For the runtime,
+     *
+     * @return File referencing directory JBake is running from
+     * @throws Exception when application is not able to work out where is JBake running from
+     */
     @JvmStatic
     @get:Throws(Exception::class)
-    val runningLocation: File
-        /**
-         * Works out the directory where JBake is running from.
-         * This is typically where compiled classes and resources are located.
-         *
-         * @return File referencing directory JBake is running from
-         * @throws Exception when application is not able to work out where is JBake running from
-         */
+    val templateDirForTestsOrForRuntime: File
         get() {
-            // Check for system property first (set by build tools during tests)
-            // jbake.buildOutputDir points to target/ or build/, so we need to resolve to classes/
+            // Prefer explicit built classes directory (set by tests/build tools)
+            val builtClassesDir = System.getProperty("jbake.builtClassesDir")
+            if (builtClassesDir != null) {
+                val classes = File(builtClassesDir)
+                if (classes.exists()) return classes
+            }
+
+            // Check for build output dir next (points to target/ or build/), resolve to classes/
             val buildOutputDir = System.getProperty("jbake.buildOutputDir")
             if (buildOutputDir != null) {
                 val classesDir = File(buildOutputDir, "classes")
@@ -73,11 +80,12 @@ object FileUtil {
                 if (buildDir.exists()) return buildDir
             }
 
+            // Production (outside of tests): Location of this class /../.. - which points to the `org` package? TODO review and do better.
             val codePath = FileUtil::class.java.getProtectionDomain().codeSource.location.path
-            val decodedPath = URLDecoder.decode(codePath, "UTF-8")
-            val codeFile = File(decodedPath)
+            val decodedUrl = URLDecoder.decode(codePath, "UTF-8")
+            val codeFile = File(decodedUrl)
             if (!codeFile.exists())
-                throw Exception("Cannot locate running location of JBake!")
+                throw Exception("Cannot locate running location of JBake. (From URL of class FileUtils: $decodedUrl)")
 
             val codeDir = codeFile.getParentFile().getParentFile()
             if (!codeDir.exists())

@@ -19,22 +19,23 @@ class Init(private val config: JBakeConfiguration) {
         if (!outputDir.canWrite()) throw Exception("Output dir is not writeable!")
 
         val contents = outputDir.listFiles()
-        var safe = true
+        var somethingAlreadyExists = false
         if (contents != null) {
             for (content in contents) {
                 if (!content.isDirectory()) continue
-                if (content.getName().equals(config.templateDirName, ignoreCase = true)) safe = false
-                if (content.getName().equals(config.contentDirName, ignoreCase = true)) safe = false
-                if (content.getName().equals(config.assetDirName, ignoreCase = true)) safe = false
+                if (content.getName().equals(config.templateDirName, ignoreCase = true)) somethingAlreadyExists = true
+                if (content.getName().equals(config.contentDirName, ignoreCase = true)) somethingAlreadyExists = true
+                if (content.getName().equals(config.assetDirName, ignoreCase = true)) somethingAlreadyExists = true
             }
         }
 
-        if (!safe) throw Exception(String.format("Output dir '%s' already contains structure!", outputDir.absolutePath))
+        if (somethingAlreadyExists) throw Exception("Output dir '${outputDir.absolutePath}' already contains structure!")
 
         val exampleProjectName = config.getExampleProjectByType(templateType)
-            ?: throw Exception("No name of the example project for template type $templateType")
+            ?: throw Exception("No known example project for template type '$templateType'.")
 
         // Try loading from classpath first (when running from jar)
+        // TODO: Handle exceptions
         val resourceStream = javaClass.classLoader.getResourceAsStream(exampleProjectName)
         if (resourceStream != null) {
             ZipUtil.extract(resourceStream, outputDir)
@@ -46,6 +47,8 @@ class Init(private val config: JBakeConfiguration) {
         if (!templateFile.exists())
             throw Exception("Cannot find example project file: $exampleProjectName (tried classpath and filesystem at ${templateFile.path})")
 
+        // TODO: Handle exceptions
+        // TODO: Document what these files are supposed to be and how to build them.
         ZipUtil.extract(FileInputStream(templateFile), outputDir)
     }
 }

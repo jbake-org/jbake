@@ -132,7 +132,7 @@ class Main @JvmOverloads constructor(
     private fun initStructure(type: String, config: JBakeConfiguration) {
         val init = Init(config)
         try {
-            val templateDir = FileUtil.runningLocation
+            val templateDir = FileUtil.templateDirForTestsOrForRuntime
             val outputDir = config.sourceDir ?: File(".")
 
             init.run(outputDir, templateDir, type)
