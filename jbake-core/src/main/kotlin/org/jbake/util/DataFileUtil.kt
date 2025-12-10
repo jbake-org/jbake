@@ -4,18 +4,29 @@ import org.jbake.app.ContentStore
 import org.jbake.app.DocumentList
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
+import java.time.ZoneId
 
+/**
+ * Used in templates - passed under "data".
+ */
 class DataFileUtil(private val db: ContentStore, private val defaultDocType: String?) {
 
-    fun get(ref: String?): MutableMap<String,  Any> {
 
-        var result = mutableMapOf<String,  Any>()
-        val docs: DocumentList<*> = db.getDocumentByUri(ref)
+    fun get(uri: String?): MutableMap<String,  Any> {
+        uri ?: return mutableMapOf()
+        return loadDocumentsByUri(uri)
+    }
+
+    // Only used in tests
+    fun loadDocumentsByUri(uri: String): MutableMap<String,  Any> {
+
+        val result = mutableMapOf<String,  Any>()
+        val docs: DocumentList<*> = db.getDocumentByUri(uri)
 
         if (docs.isEmpty())
-            log.warn("Unable to locate content for ref: $ref")
+            log.warn("Unable to locate content for ref: $uri")
         else if (docs.size != 1)
-            log.warn("Located multiple hits for ref: $ref")
+            log.warn("Located multiple hits for ref: $uri")
 
         else @Suppress("UNCHECKED_CAST")
             return if (docs[0] !is MutableMap<*, *>) mutableMapOf()
@@ -28,18 +39,16 @@ class DataFileUtil(private val db: ContentStore, private val defaultDocType: Str
 }
 
 /**
- * Recursively convert OffsetDateTime to java.util.Date in the model for Freemarker compatibility.
+ * Recursively convert Java time types to java.util.Date in the model for Freemarker compatibility.
+ * Handles OffsetDateTime, ZonedDateTime, Instant, LocalDateTime and LocalDate.
  */
 fun convertDatesInModel(value: Any?): Any? = when (value) {
-    is Map<*, *> -> value.mapValues { (_, v) -> convertDatesInModel(v) }
+    is Map<*, *> -> value.mapValues { (_, v) -> convertDatesInModel(v) } // Also handles DocumentModel etc.
     is Collection<*> -> value.map { convertDatesInModel(it) }
-    /* Not needed, it is accounted for in the Map case above.
-    is org.jbake.model.DocumentModel -> {
-        val map = HashMap<String, Any>()
-        map.putAll(value)
-        value.date?.let { map[ModelAttributes.DOC_DATE] = java.util.Date.from(it.toInstant()) }
-        map.mapValues { (_, v) -> convertDatesInModel(v) }
-    }*/
-    ///is java.time.OffsetDateTime -> java.util.Date.from(value.toInstant()) /// TODO Remove when Freemarker adapter stable.
+    is java.time.OffsetDateTime -> java.util.Date.from(value.toInstant())
+    is java.time.ZonedDateTime -> java.util.Date.from(value.toInstant())
+    is java.time.Instant -> java.util.Date.from(value)
+    is java.time.LocalDateTime -> java.util.Date.from(value.atZone(ZoneId.systemDefault()).toInstant())
+    is java.time.LocalDate -> java.util.Date.from(value.atStartOfDay(ZoneId.systemDefault()).toInstant())
     else -> value
 }
