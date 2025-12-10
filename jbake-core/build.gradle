@@ -80,6 +80,7 @@ dependencies {
     testImplementation "org.asciidoctor:asciidoctorj:$asciidoctorjVersion"
     testImplementation "org.eclipse.jetty:jetty-server:$jettyServerVersion"
     testImplementation "org.freemarker:freemarker:$freemarkerVersion"
+        testImplementation "no.api.freemarker:freemarker-java8:3.0.3"
     testImplementation "org.thymeleaf:thymeleaf:$thymeleafVersion"
     testImplementation "org.yaml:snakeyaml:$snakeYamlVersion"
 }

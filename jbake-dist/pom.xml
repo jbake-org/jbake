@@ -40,6 +40,7 @@
         <dependency><groupId>org.asciidoctor</groupId><artifactId>asciidoctorj</artifactId></dependency>
         <!-- Template engines -->
         <dependency><groupId>org.freemarker</groupId><artifactId>freemarker</artifactId></dependency>
+            <dependency><groupId>no.api.freemarker</groupId><artifactId>freemarker-java8</artifactId><version>3.0.3</version></dependency>
         <dependency><groupId>org.thymeleaf</groupId><artifactId>thymeleaf</artifactId></dependency>
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>jade4j</artifactId></dependency>
         <dependency><groupId>de.neuland-bfi</groupId><artifactId>pug4j</artifactId></dependency>
