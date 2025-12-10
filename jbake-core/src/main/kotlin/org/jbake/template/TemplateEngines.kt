@@ -13,7 +13,7 @@ import java.util.*
  * A singleton class giving access to rendering engines. Rendering engines are loaded based on classpath.
  * New rendering may be registered either at runtime (not recommanded) or by putting a descriptor file on classpath (recommanded).
  *
- * The descriptor file must be found in *META-INF* directory and named [org.jbake.parser.TemplateEngines.properties]. The format of the file is easy:
+ * The descriptor file must be found in *META-INF* directory and named `org.jbake.parser.TemplateEngines.properties`. The format is:
  *
  *   ```
  *   org.jbake.parser.FreeMarkerRenderer=ftl

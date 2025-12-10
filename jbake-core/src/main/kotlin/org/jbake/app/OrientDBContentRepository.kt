@@ -100,7 +100,7 @@ class OrientDBContentRepository(storageType: String, private val dbName: String)
         updateSchema()
     }
 
-    private fun setLoggingLevelViaSysProps(level: String) {
+    private fun setLoggingLevelViaSysProps(@Suppress("SameParameterValue") level: String) {
         // System properties with orientdb. prefix
         System.setProperty("orientdb.log.console.level", level)
         System.setProperty("orientdb.log.file.level", level)
@@ -111,7 +111,7 @@ class OrientDBContentRepository(storageType: String, private val dbName: String)
     }
 
     /** @param level JUL level string, e.g., "fine" */
-    private fun setLoggingLevelViaApi(level: String) {
+    private fun setLoggingLevelViaApi(@Suppress("SameParameterValue") level: String) {
         OGlobalConfiguration.LOG_CONSOLE_LEVEL.setValue(level)
         OGlobalConfiguration.LOG_FILE_LEVEL.setValue(level)
         OGlobalConfiguration.SERVER_LOG_DUMP_CLIENT_EXCEPTION_LEVEL.setValue(level)

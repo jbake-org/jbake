@@ -191,6 +191,10 @@ class Renderer {
             throw Exception("Failed to render index. Cause: " + e.message, e)
         }
     }
+    fun renderSitemap() {
+        renderSitemap(config.siteMapFileName ?: "sitemap.xml")
+    }
+
     /**
      * Render an XML sitemap file using the supplied content.
      *
@@ -199,10 +203,6 @@ class Renderer {
      * @see [Sitemap protocol](http://www.sitemaps.org/)
      * @param sitemapFile configuration for site map
      */
-    fun renderSitemap() {
-        renderSitemap(config.siteMapFileName ?: "sitemap.xml")
-    }
-
     fun renderSitemap(sitemapFile: String) {
         render(DefaultRenderingConfig(sitemapFile, SITEMAP_TEMPLATE_NAME))
     }
@@ -213,7 +213,7 @@ class Renderer {
      * @throws Exception if default rendering configuration is not loaded correctly
      */
     fun renderFeed() {
-        renderFeed(config.feedFileName ?: "feed.xml")
+        renderFeed(config.feedFileName) //  ?: "feed.xml"
     }
 
     fun renderFeed(outputFeedFile: String) {
