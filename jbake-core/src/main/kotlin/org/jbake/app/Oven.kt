@@ -11,6 +11,7 @@ import org.jbake.template.ModelExtractorsRegistry
 import org.jbake.util.logger
 import org.slf4j.Logger
 import java.io.File
+import java.time.Instant
 import java.util.*
 import java.util.ServiceLoader.load
 
@@ -80,7 +81,7 @@ class Oven {
         Locale.setDefault(newLocale ?: Locale.getDefault())
 
         try {
-            val start = Date().time
+            val start = Instant.now()
             log.info("Baking has started at $start. Starting ContentStore...")
 
             utensils.contentStore.startup()
@@ -112,7 +113,8 @@ class Oven {
             errors.addAll(utensils.asset.errors)
 
             log.info("Baking finished!")
-            log.info("Baked {} items in {}ms", renderedCount, Date().time - start)
+            val durationMs = java.time.Duration.between(start, Instant.now()).toMillis()
+            log.info("Baked $renderedCount items in $durationMs ms")
 
             if (!errors.isEmpty())
                 log.error("Failed to bake {} item(s)!", errors.size)
