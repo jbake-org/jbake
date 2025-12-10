@@ -138,6 +138,7 @@ class Renderer {
         renderIndex(config.indexFileName ?: "index.html")
     }
 
+
     fun renderIndexPaging() {
         renderIndexPaging(config.indexFileName ?: "index.html")
     }
@@ -147,7 +148,7 @@ class Renderer {
         val postsPerPage = config.postsPerPage
 
         if (totalPosts == 0L) {
-            //paging makes no sense. render single index file instead
+            // Paging makes no sense. Render single index file instead.
             renderIndex(indexFile)
             return
         }
@@ -180,6 +181,7 @@ class Renderer {
                 fileName = pagingHelper.getCurrentFileName(page, fileName)
                 val renderConfig = ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME)
                 AuthorTracer.trace("renderer-index-page", model.content, "page-$page")
+
                 render(renderConfig)
                 pageStart += postsPerPage
                 page++
@@ -347,15 +349,19 @@ class Renderer {
     private inner class ModelRenderingConfig : AbstractRenderingConfig {
         override val model: TemplateModel
 
+        // Used only for renderIndexPaging().
         constructor(fileName: String, model: TemplateModel, templateType: String)
                 : super(config.destinationDir.resolve(fileName), fileName, findTemplateName(templateType))
         {
             this.model = model
         }
 
-        constructor(path: File, name: String, model: TemplateModel, template: String) : super(path, name, template) {
-             this.model = model
-         }
+        // Used only for renderTags().
+        constructor(path: File, name: String, model: TemplateModel, template: String)
+                : super(path, name, template)
+        {
+            this.model = model
+        }
     }
 
     internal inner class DefaultRenderingConfig : AbstractRenderingConfig {
@@ -372,7 +378,7 @@ class Renderer {
             name = allInOneName,
             template = findTemplateName(allInOneName)
         ){
-          this.content = buildSimpleModel(allInOneName)
+            this.content = buildSimpleModel(allInOneName)
         }
 
         /**
