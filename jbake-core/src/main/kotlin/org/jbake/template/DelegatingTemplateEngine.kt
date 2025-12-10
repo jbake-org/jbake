@@ -34,7 +34,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
         // If default template exists we will use it.
         val templateDir = config.templateDir
         var templateFile = templateDir.resolve(templateName)
-        var theTemplateName = templateName
+        var templateFileName = templateName
 
         if (!templateFile.exists()) {
             log.info("Default template: {} was not found, searching for others...", templateName)
@@ -44,31 +44,24 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
                 templateFile = templateDir.resolve("$templateNameWithoutExt.$extension")
                 if (templateFile.exists()) {
                     log.info("Found alternative template file: {} using this instead", templateFile.getName())
-                    theTemplateName = templateFile.getName()
+                    templateFileName = templateFile.getName()
                     break
                 }
             }
         }
 
-        val ext = FileUtil.fileExt(theTemplateName)
+        val ext = FileUtil.fileExt(templateFileName)
         val engine = renderers.getEngine(ext)
-        if (engine != null) {
-            // Convert OffsetDateTime to java.util.Date for all template engines
-            val convertedModel = org.jbake.util.convertDatesInModel(model)
-            // If engine expects TemplateModel, wrap as needed
-            if (convertedModel is TemplateModel)
-                engine.renderDocument(convertedModel, theTemplateName, writer)
-            else {
-                val tm = TemplateModel().apply {
-                    if (convertedModel is Map<*, *>) {
-                        @Suppress("UNCHECKED_CAST")
-                        putAll(convertedModel as Map<String, Any>)
-                    }
-                }
-                engine.renderDocument(tm, theTemplateName, writer)
-            }
+        if (engine == null) {
+            log.error("Warning - No template engine found for template: {}", templateFileName)
+            return
         }
-        else log.error("Warning - No template engine found for template: {}", theTemplateName)
+
+        // Convert OffsetDateTime to java.util.Date for all template engines
+        val convertedModel = org.jbake.util.convertDatesInModel(model)
+
+
+        engine.renderDocument(convertedModel, templateFileName, writer)
     }
 
     private val log: Logger by logger()
