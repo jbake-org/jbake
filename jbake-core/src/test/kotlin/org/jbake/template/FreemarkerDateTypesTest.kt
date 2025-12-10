@@ -65,39 +65,8 @@ class FreemarkerDateTypesTest : StringSpec({
         out.shouldContain("2025-12-05 09:00:00")
     }
 
-}) {
+})
 
-    // Helper: render a template string by creating a temporary template file in Freemarker Configuration
-    private fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String): String {
-        val cfg = Configuration(Configuration.VERSION_2_3_34)
-        cfg.defaultEncoding = "UTF-8"
-        cfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
-        cfg.objectWrapper = Java8ObjectWrapper(Configuration.VERSION_2_3_34)
-
-        // Use StringTemplateLoader to load template text under a name
-        val loader = freemarker.cache.StringTemplateLoader()
-        val name = "inline"
-        loader.putTemplate(name, templateText)
-        cfg.templateLoader = loader
-
-        // Convert java.time types to java.util.Date for compatibility
-        val converted = convertDatesInModel(modelMap) as? Map<*, *> ?: modelMap
-
-        // Convert to Java native maps/lists recursively so FreeMarker unwraps them correctly
-        fun toJavaObject(obj: Any?): Any? = when (obj) {
-            is Map<*, *> -> HashMap<String, Any?>().apply { obj.forEach { (k, v) -> this[k.toString()] = toJavaObject(v) } }
-            is Collection<*> -> ArrayList(obj.map { toJavaObject(it) })
-            else -> obj
-        }
-
-        val javaModel = toJavaObject(converted) as? Map<*, *> ?: converted
-
-        val template = cfg.getTemplate(name)
-        val writer = StringWriter()
-        template.process(javaModel, writer)
-        return writer.toString()
-    }
-}
 
 // Shared helper for test rendering of inline Freemarker templates
 fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String): String {
@@ -112,14 +81,19 @@ fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String
     loader.putTemplate(name, templateText)
     cfg.templateLoader = loader
 
+    // Convert java.time types to java.util.Date for compatibility
+    val converted = convertDatesInModel(modelMap) as? Map<*, *> ?: modelMap
+
     // Convert Kotlin maps/lists to Java maps/lists but DO NOT convert date/time types
+    // TBD: Is this even needed? Kotlin types map to JDK types at runtime.
     fun toJavaObject(obj: Any?): Any? = when (obj) {
         is Map<*, *> -> HashMap<String, Any?>().apply { obj.forEach { (k, v) -> this[k.toString()] = toJavaObject(v) } }
         is Collection<*> -> ArrayList(obj.map { toJavaObject(it) })
         else -> obj
     }
 
-    val javaModel = toJavaObject(modelMap) as? Map<*, *> ?: modelMap
+    ///val javaModel = toJavaObject(modelMap) as? Map<*, *> ?: modelMap
+    val javaModel = modelMap
 
     val template = cfg.getTemplate(name)
     val writer = StringWriter()
