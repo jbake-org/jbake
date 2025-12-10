@@ -10,8 +10,10 @@ import org.jbake.model.ModelAttributes.DOC_DATE
 import org.jbake.template.TemplateEngineAdapter.NoopAdapter
 import org.jbake.template.model.TemplateModel
 import java.io.Writer
+import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 /**
  * Renders documents using the GroovyMarkupTemplateEngine.
@@ -74,22 +76,35 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
         }
     }
 
-    /** SafeDate wrapper that prevents NPE when Groovy templates call date.format() on null dates */
-    private class SafeDate(private val dateTime: OffsetDateTime?) {
-        fun format(pattern: String) = dateTime?.let { DateTimeFormatter.ofPattern(pattern).format(it) } ?: ""
+    /** Wrapper that prevents NPE when Groovy templates call date.format() on null dates */
+    private interface SafeGroovyTemporal {
+        fun format(pattern: String): String
+        companion object {
+            fun wrap(it: OffsetDateTime?) = SafeOffsetDateTime(it)
+            fun wrap(it: Date?) = SafeJavaUtilDate(it)
+        }
+    }
+    private class SafeOffsetDateTime(private val dateTime: OffsetDateTime?) : SafeGroovyTemporal {
+        // TBD: Test the pattern at the start.
+        override fun format(pattern: String) = runCatching { dateTime?.let { DateTimeFormatter.ofPattern(pattern).format(it) } }.getOrNull() ?: ""
         override fun toString() = dateTime?.toString() ?: ""
+    }
+
+    private class SafeJavaUtilDate(private val javaUtilDate: Date?) : SafeGroovyTemporal {
+        override fun format(pattern: String) = runCatching { javaUtilDate?.let { SimpleDateFormat(pattern).format(it) } }.getOrNull() ?: ""
+        override fun toString() = javaUtilDate?.toString() ?: ""
     }
 
     /** Recursively wrap date fields in SafeDate to prevent NPE in Groovy templates */
     private fun transformForGroovy(value: Any?): Any? =
         when (value) {
             null -> null
-            is org.jbake.model.DocumentModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value.date)) }
-            is org.jbake.model.BaseModel -> HashMap(value).apply { put(DOC_DATE, SafeDate(value[DOC_DATE] as? OffsetDateTime)) }
+            is org.jbake.model.DocumentModel -> HashMap(value).apply { put(DOC_DATE, SafeGroovyTemporal.wrap(value.date)) }
+            is org.jbake.model.BaseModel -> HashMap(value).apply { put(DOC_DATE, SafeGroovyTemporal.wrap(value[DOC_DATE] as? OffsetDateTime)) }
             is Map<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
                 val map = value as? Map<String, Any?> ?: return value
-                HashMap(map).apply { put(DOC_DATE, SafeDate(map[DOC_DATE] as? OffsetDateTime)) }
+                HashMap(map).apply { put(DOC_DATE, SafeOffsetDateTime(map[DOC_DATE] as? OffsetDateTime)) }
             }
             is Collection<*> -> value.map(::transformForGroovy)
             else -> value

@@ -11,7 +11,7 @@ class DocumentModel : BaseModel() {
 
     var date: OffsetDateTime?
         get() = get(ModelAttributes.DOC_DATE) as OffsetDateTime?
-        set(date) = putOrRemoveIfNull(ModelAttributes.DOC_DATE, date)
+        set(date) = putOrRemoveIfNull(ModelAttributes.DOC_DATE, date as OffsetDateTime)
 
     var status: String?
         get() = if (containsKey(ModelAttributes.DOC_STATUS)) get(ModelAttributes.DOC_STATUS) as String? else ""

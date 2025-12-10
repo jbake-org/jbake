@@ -145,13 +145,12 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                         return when (key) {
                             ModelAttributes.TAGS_ALL -> SimpleCollection(extractedValue as MutableCollection<*>?, wrapper)
                             ModelAttributes.GLOB_PUBLISHING_DATE_FORMATTED -> {
-                                // Convert OffsetDateTime to Date for Freemarker compatibility
-                                val date = when (extractedValue) {
-                                    is java.time.OffsetDateTime -> java.util.Date.from(extractedValue.toInstant())
-                                    is java.util.Date -> extractedValue
-                                    else -> null
+                                // With freemarker-java8, it should be process OffsetDateTime directly. TBD: check that.
+                                when (extractedValue) {
+                                    is OffsetDateTime -> SimpleDate(Date.from(extractedValue.toInstant()), DATETIME)
+                                    is Date -> SimpleDate(extractedValue, UNKNOWN)
+                                    else -> SimpleDate(null, UNKNOWN)
                                 }
-                                SimpleDate(date, TemplateDateModel.UNKNOWN)
                             }
                             // All other cases, as far as I know, are document collections
                             else -> SimpleSequence(extractedValue as MutableCollection<*>?, wrapper)
@@ -219,4 +218,18 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             override fun isEmpty(): Boolean = delegate.isEmpty
         }
     }
+}
+
+
+// Wrappers to convert Java 8 date/time types to Freemarker TemplateDateModels.
+// TBD Currently not used; freemarker-java8 instead -> remove when stable.
+
+private class OffsetDateTimeModel(private val dateTime: java.time.OffsetDateTime) : TemplateDateModel {
+    override fun getDateType() = DATETIME
+    override fun getAsDate(): Date = Date.from(dateTime.toInstant())
+}
+
+private class InstantModel(private val instant: java.time.Instant) : TemplateDateModel {
+    override fun getDateType() = DATETIME
+    override fun getAsDate(): Date = Date.from(instant)
 }

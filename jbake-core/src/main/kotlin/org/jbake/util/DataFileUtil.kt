@@ -40,6 +40,6 @@ fun convertDatesInModel(value: Any?): Any? = when (value) {
         value.date?.let { map[ModelAttributes.DOC_DATE] = java.util.Date.from(it.toInstant()) }
         map.mapValues { (_, v) -> convertDatesInModel(v) }
     }*/
-    is java.time.OffsetDateTime -> java.util.Date.from(value.toInstant())
+    ///is java.time.OffsetDateTime -> java.util.Date.from(value.toInstant()) /// TODO Remove when Freemarker adapter stable.
     else -> value
 }

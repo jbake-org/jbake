@@ -38,12 +38,13 @@ class PublishedPagesExtractor : TypedModelExtractor<DocumentList<*>> {
 class PublishedPostsExtractor : ModelExtractor<DocumentList<*>> {
     override fun get(db: ContentStore, model: MutableMap<String, Any>, key: String): DocumentList<*> {
         val posts = db.getPublishedPosts(model.containsKey("numberOfPages"))
-        // Convert date fields to java.util.Date for Freemarker compatibility
-        posts.forEach { post ->
+        /// Convert date fields to java.util.Date for Freemarker compatibility
+        /// TODO Remove when Freemarker adapter stable.
+        /*posts.forEach { post ->
             val date = post["date"]
             if (date is OffsetDateTime)
                 post["date"] = java.util.Date.from(date.toInstant())
-        }
+        }*/
         return posts
     }
 }
