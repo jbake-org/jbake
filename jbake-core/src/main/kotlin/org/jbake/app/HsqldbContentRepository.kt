@@ -9,8 +9,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
-import org.jbake.util.ValueTracer
 import org.jbake.util.Logging.logger
+import org.jbake.util.ValueTracer
+import org.jbake.util.debug
 import org.slf4j.Logger
 import java.io.File
 import java.sql.Connection
@@ -315,6 +316,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
         val documents = DocumentList<DocumentModel>()
 
         connection.prepareStatement(sql).use { stmt ->
+
             params.forEachIndexed { index, param ->
                 when (param) {
                     is String    -> stmt.setString(index + 1, param)
@@ -329,9 +331,11 @@ class HsqldbContentRepository(private val type: String, private val name: String
             }
 
             stmt.executeQuery().use { rs ->
+
                 val metadata = rs.metaData
                 val columnCount = metadata.columnCount
                 val columnNames = (1..columnCount).map { metadata.getColumnName(it).lowercase() }
+                log.debug { "SQL query: $sql, cols: ${columnNames.joinToString(", ")}" }
 
                 while (rs.next()) {
                     val document = DocumentModel()
@@ -344,19 +348,13 @@ class HsqldbContentRepository(private val type: String, private val name: String
                         if (columnName == "properties") continue
 
                         val value = when (metadata.getColumnType(i)) {
-                            Types.ARRAY -> {
-                                rs.getArray(i) ?.let {
-                                    (it.array as Array<*>).map { item -> item.toString() }.toTypedArray()
-                                }
-                            }
-                            Types.TIMESTAMP -> {
-                                val ts = rs.getTimestamp(i)
-                                ts?.toInstant()?.atOffset(java.time.ZoneOffset.UTC)
-                            }
-                            Types.BOOLEAN -> rs.getBoolean(i)
-                            Types.BIGINT, Types.INTEGER -> rs.getLong(i)
-                            Types.CLOB -> rs.getClob(i)?.let { it.getSubString(1, it.length().toInt()) }
-                            Types.BLOB -> rs.getBlob(i)?.let { String(it.getBytes(1, it.length().toInt())) }
+                            Types.ARRAY     -> rs.getArray(i)?.let { (it.array as Array<*>).map { item -> item.toString() }.toTypedArray() }
+                            Types.TIMESTAMP -> rs.getTimestamp(i)?.toInstant()?.atOffset(java.time.ZoneOffset.UTC);
+                            Types.BOOLEAN   -> rs.getBoolean(i)
+                            Types.BIGINT,
+                            Types.INTEGER   -> rs.getLong(i)
+                            Types.CLOB      -> rs.getClob(i)?.let { it.getSubString(1, it.length().toInt()) }
+                            Types.BLOB      -> rs.getBlob(i)?.let { String(it.getBytes(1, it.length().toInt())) }
                             else -> rs.getObject(i)
                         }
                         if (value != null)
@@ -378,30 +376,32 @@ class HsqldbContentRepository(private val type: String, private val name: String
                         }
                     }
 
-                    // After merging, ensure 'date' is always OffsetDateTime if possible
+                    // After merging, ensure 'date' is always OffsetDateTime if possible.
                     // This is the canonical place to ensure the type for downstream consumers (e.g., templates)
                     val dateValue = document["date"]
                     when (dateValue) {
+
+                        is java.util.Date -> {
+                            ValueTracer.trace("hsqldb-query", document, sql)
+                            document["date"] = dateValue.toInstant().atOffset(java.time.ZoneOffset.UTC)
+                        }
+
                         is String -> {
+                            ValueTracer.trace("hsqldb-query", document, sql)
                             // Try ISO first, then fallback to legacy formats
                             val parsed = runCatching { OffsetDateTime.parse(dateValue) }.getOrNull()
                                 ?: runCatching {
-                                    // Try parsing as java.util.Date (e.g., yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss)
-                                    val fmt1 = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-                                    val fmt2 = java.text.SimpleDateFormat("yyyy-MM-dd")
+                                    // Try parsing as java.util.Date
                                     val d = runCatching { fmt1.parse(dateValue) }.getOrNull()
                                         ?: runCatching { fmt2.parse(dateValue) }.getOrNull()
                                     d?.toInstant()?.atOffset(java.time.ZoneOffset.UTC)
                                 }.getOrNull()
                             if (parsed != null) document["date"] = parsed
                         }
-                        is java.util.Date -> {
-                            document["date"] = dateValue.toInstant().atOffset(java.time.ZoneOffset.UTC)
-                        }
                         // else: already OffsetDateTime or null
                     }
 
-                    ValueTracer.trace("hsqldb-query", document, sql)
+                    //ValueTracer.trace("hsqldb-query-parsed", document, sql)
                     documents.add(document)
                 }
             }
@@ -409,6 +409,11 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
         return documents
     }
+
+
+    private val fmt1 = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+    private val fmt2 = java.text.SimpleDateFormat("yyyy-MM-dd")
+
 
     private fun updateTemplateSignatureIfChanged(templateDir: File): Boolean {
         val currentSignature = runCatching { FileUtil.sha1(templateDir) }.getOrElse { "" }
