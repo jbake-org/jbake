@@ -76,48 +76,44 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
     )
         : TemplateHashModel
     {
-        @Throws(TemplateModelException::class)
+        private val beansWrapper = BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
+
         override fun get(contentMapKey: String): FmTemplateModel? {
 
-            // Make the methods of ContentWrapper accessible in the template - e.g.: `${db.getPublishedPostsByTag(tagName).size()}`
-            if (contentMapKey == ModelAttributes.TMPL_DB_ACCESS)
-                return BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
-                    .wrap(db)
+            when (contentMapKey) {
 
-            if (contentMapKey == ModelAttributes.DATA_FILES) {
-                return BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
-                    .wrap(DataFileUtil(db, jbakeConfig.dataFileDocType))
-            }
+                // Make the methods of ContentWrapper accessible in the template - e.g.: `${db.getPublishedPostsByTag(tagName).size()}`
+                ModelAttributes.TMPL_DB_ACCESS -> return beansWrapper.wrap(db)
 
-            // JBake config. Merged from engine's jbakeConfig and templateModel's config. TODO: Probably they are the same?
-            @Suppress("UNCHECKED_CAST")
-            if (contentMapKey == ModelAttributes.TMPL_JBAKE_CONFIG) {
-                val merged: MutableMap<String, Any> = HashMap()
+                ModelAttributes.DATA_FILES -> return beansWrapper.wrap(DataFileUtil(db, jbakeConfig.dataFileDocType))
 
-                merged.putAll(jbakeConfig.asHashMap())
+                //ModelAttributes.DOC_DATE -> return freeMarkerWrapper.wrap(jbakeTemplateModel.get(ModelAttributes.DOC_DATE) ?: Date())
+                ModelAttributes.DOC_DATE -> return OffsetDateTimeModel(OffsetDateTime.now())
 
-                // Overlay merged config values with eager's.
-                merged.putAll(jbakeTemplateModel.config)
+                // JBake config. Merged from engine's jbakeConfig and templateModel's config.
+                ModelAttributes.TMPL_JBAKE_CONFIG -> {
+                    val merged = mutableMapOf<String, Any>()
+                    merged.putAll(jbakeConfig.asHashMap())
+                    merged.putAll(jbakeTemplateModel.config)
+                    return freeMarkerWrapper.wrap(merged)
+                }
+                else -> try {
+                    ValueTracer.trace("freemarker-eager-model", jbakeTemplateModel.content, "LazyLoadingModel['$contentMapKey']")
+                    val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper)
+                    val result: FmTemplateModel = extractors.extractAndTransform(db, contentMapKey, jbakeTemplateModel, adapter)
 
-                return freeMarkerWrapper.wrap(merged)
-            }
+                    // Wrap Map results (especially document models like "content") with NullSafeMapModel.
+                    // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.
+                    // Combined with classicCompatible=true, null values are treated as empty strings in templates.
+                    //if (result is SimpleHash)
+                    //    return NullSafeMapModel(result, wrapper)
+                    // Not needed as it turns out - no change in tests.
 
-            try {
-                ValueTracer.trace("freemarker-eager-model", jbakeTemplateModel.content, contentMapKey)
-                val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper)
-                val result: FmTemplateModel = extractors.extractAndTransform(db, contentMapKey, jbakeTemplateModel, adapter)
-
-                // Wrap Map results (especially document models like "content") with NullSafeMapModel.
-                // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.
-                // Combined with classicCompatible=true, null values are treated as empty strings in templates.
-                //if (result is SimpleHash)
-                //    return NullSafeMapModel(result, wrapper)
-                // Not needed as it turns out - no change in tests.
-
-                return result
-            }
-            catch (_: NoModelExtractorException) {
-                return freeMarkerWrapper.wrap(jbakeTemplateModel.get(contentMapKey))
+                    return result
+                }
+                catch (_: NoModelExtractorException) {
+                    return freeMarkerWrapper.wrap(jbakeTemplateModel[contentMapKey])
+                }
             }
         }
 
