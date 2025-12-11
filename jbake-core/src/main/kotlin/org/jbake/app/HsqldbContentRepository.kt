@@ -9,7 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
-import org.jbake.util.AuthorTracer
+import org.jbake.util.ValueTracer
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.io.File
@@ -160,7 +160,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
             stmt.setString(11, propertiesJson)
 
             stmt.executeUpdate()
-            AuthorTracer.trace("hsqldb-insert", document, document.sourceUri)
+            ValueTracer.trace("hsqldb-insert", document, document.sourceUri)
         }
     }
 
@@ -401,7 +401,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                         // else: already OffsetDateTime or null
                     }
 
-                    AuthorTracer.trace("hsqldb-query", document, sql)
+                    ValueTracer.trace("hsqldb-query", document, sql)
                     documents.add(document)
                 }
             }

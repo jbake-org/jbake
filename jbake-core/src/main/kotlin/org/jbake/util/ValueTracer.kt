@@ -8,21 +8,19 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
- * Tiny helper used while chasing the missing `author` attribute through the pipeline.
+ * A helper for chasing missing or wrong attributes through the pipeline.
  * Emits a single DEBUG/WARN line per stage so we can see where the value disappears.
- *
- * Keep this file here and it's usage temporary until the root cause is found.
  */
-object AuthorTracer {
+object ValueTracer {
     fun trace(stage: String, payload: Any?, where: String? = null) {
-        if (true) return // Disable temporarily
+        //if (true) return // Disable temporarily
 
         val (hasAuthor, value) = extractAuthor(payload)
         val suffix = where?.let { "(Observed in: $it)" } ?: ""
         val msg = if (hasAuthor)
-            "AuthorTracer[$stage] author='$value' $suffix"
+            "ValueTracer[$stage] $TRACED_KEY='$value' $suffix"
         else
-            "AuthorTracer[$stage] author missing $suffix"
+            "ValueTracer[$stage] $TRACED_KEY missing $suffix"
 
         val timestamp = Instant.now().atZone(ZoneId.systemDefault()).format(timeFormatter)
         System.err.println("$timestamp DEBUG $msg")
@@ -40,6 +38,8 @@ object AuthorTracer {
         }
 
     private const val AUTHOR_KEY = "author"
-    private val log = LoggerFactory.getLogger(AuthorTracer::class.java)
+    private const val DATE_KEY = "date"
+    private const val TRACED_KEY = DATE_KEY
+    private val log = LoggerFactory.getLogger(ValueTracer::class.java)
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 }

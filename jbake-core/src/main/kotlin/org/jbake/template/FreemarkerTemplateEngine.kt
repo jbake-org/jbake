@@ -11,7 +11,7 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
 import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
-import org.jbake.util.AuthorTracer
+import org.jbake.util.ValueTracer
 import org.jbake.util.convertTemporalsInModelToJavaUtilDate
 import java.io.Writer
 import java.time.*
@@ -111,7 +111,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 @Suppress("UNCHECKED_CAST")
                 val map = eagerAsSimpleHash.toMap() as MutableMap<String, Any> // TBD converter function to check the types
 
-                AuthorTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], contentMapKey)
+                ValueTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], contentMapKey)
                 val adapter = FreemarkerTemplateModelAdapter(wrapper)
                 val result: freemarker.template.TemplateModel = extractors.extractAndTransform(db, contentMapKey, map, adapter)
 

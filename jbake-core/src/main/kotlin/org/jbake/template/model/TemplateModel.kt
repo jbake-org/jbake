@@ -5,7 +5,7 @@ import org.jbake.model.BaseModel
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
-import org.jbake.util.AuthorTracer
+import org.jbake.util.ValueTracer
 import java.io.Writer
 
 open class TemplateModel : BaseModel {
@@ -103,7 +103,7 @@ open class TemplateModel : BaseModel {
             context.content?.let { model.content = it }
             model.config = context.config.asHashMap()
             model.put("jbake_config", context.config)
-            AuthorTracer.trace("template-model-from-context", model.content)
+            ValueTracer.trace("template-model-from-context", model.content)
             return model
         }
 

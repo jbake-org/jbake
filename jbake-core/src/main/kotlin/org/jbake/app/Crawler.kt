@@ -8,7 +8,7 @@ import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes.Status.PUBLISHED
 import org.jbake.model.ModelAttributes.Status.PUBLISHED_DATE
 import org.jbake.parser.Parser
-import org.jbake.util.AuthorTracer
+import org.jbake.util.ValueTracer
 import org.jbake.util.HtmlUtil
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
@@ -178,7 +178,7 @@ class Crawler {
             log.warn("$sourceFile has an invalid header, it has been ignored.")
             return
         }
-        AuthorTracer.trace("crawler-parse", document, sourceFile.name)
+        ValueTracer.trace("crawler-parse", document, sourceFile.name)
 
         if (!DocumentTypeRegistry.contains(document.type)) {
             log.warn("$sourceFile has an unknown document type '${document.type}' and has been ignored.")
@@ -192,7 +192,7 @@ class Crawler {
             HtmlUtil.fixImageSourceUrls(document, config)
 
         db.addDocument(document)
-        AuthorTracer.trace("crawler-addDocument", document, sourceFile.name)
+        ValueTracer.trace("crawler-addDocument", document, sourceFile.name)
         db.addDocument(document)
     }
 

@@ -7,7 +7,7 @@ import org.asciidoctor.SafeMode
 import org.asciidoctor.jruby.AsciidoctorJRuby
 import org.jbake.model.DocumentModel
 import org.jbake.util.Logging.logger
-import org.jbake.util.AuthorTracer
+import org.jbake.util.ValueTracer
 import org.jbake.util.error
 import org.jbake.util.trace
 import org.slf4j.Logger
@@ -143,7 +143,7 @@ class AsciidoctorEngine : MarkupEngine() {
 
             processAttribute(keyStr, value, documentModel, context, dateFormat, exportedConfigKeys)
         }
-        AuthorTracer.trace("asciidoctor-header", documentModel, context.file.name)
+        ValueTracer.trace("asciidoctor-header", documentModel, context.file.name)
     }
 
     private fun processAttribute(

@@ -6,7 +6,7 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
-import org.jbake.util.AuthorTracer
+import org.jbake.util.ValueTracer
 import org.jbake.util.Logging.logger
 import org.jbake.util.PagingHelper
 import org.slf4j.Logger
@@ -91,7 +91,7 @@ class Renderer {
             this.content = content
             this.renderer = renderingEngine
         }
-        AuthorTracer.trace("renderer-model", model.content, content.sourceUri)
+        ValueTracer.trace("renderer-model", model.content, content.sourceUri)
 
         try {
             createWriter(finalOutputFile).use { out ->
@@ -178,7 +178,7 @@ class Renderer {
                 // Add page number to file name
                 fileName = pagingHelper.getCurrentFileName(page, fileName)
                 val renderConfig = ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME)
-                AuthorTracer.trace("renderer-index-page", model.content, "page-$page")
+                ValueTracer.trace("renderer-index-page", model.content, "page-$page")
 
                 render(renderConfig)
                 pageStart += postsPerPage
@@ -281,7 +281,7 @@ class Renderer {
                 }
 
                 val renderConfig = ModelRenderingConfig(path, ModelAttributes.TAGS_CURRENT_TAG, model, findTemplateName(ModelAttributes.TAGS_CURRENT_TAG))
-                AuthorTracer.trace("renderer-tag", model.content, tag)
+                ValueTracer.trace("renderer-tag", model.content, tag)
                 render(renderConfig)
 
                 renderedCount++
@@ -305,7 +305,7 @@ class Renderer {
                     this.put("jbake_config", config)
                 }
 
-                AuthorTracer.trace("renderer-tag-index", model.content, "tags-index")
+                ValueTracer.trace("renderer-tag-index", model.content, "tags-index")
                 render(ModelRenderingConfig(path, "tagindex", model, findTemplateName("tagsindex")))
                 renderedCount++
             }
@@ -399,7 +399,7 @@ class Renderer {
                     model.nextFileName = null
                 }
 
-                AuthorTracer.trace("renderer-default-config", model.content, name)
+                ValueTracer.trace("renderer-default-config", model.content, name)
                 return model
             }
     }
