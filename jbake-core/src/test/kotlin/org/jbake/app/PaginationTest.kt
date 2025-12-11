@@ -61,6 +61,9 @@ class PaginationTest : StringSpec({
         while (paginationOffset < TOTAL_POSTS) {
             db.paginationOffset = paginationOffset
             val posts: DocumentList<DocumentModel> = db.getPublishedPosts(true)
+            for (post in posts) {
+                println("Post date: ${post.date}")
+            }
 
             posts.size shouldBeLessThanOrEqual 2
 

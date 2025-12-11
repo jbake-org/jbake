@@ -313,7 +313,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                             val parsed = parseTemporalIntoOffsetDateTime(dateValue)
                             if (parsed != null) document[DOC_DATE] = parsed
                         }
-                        is OffsetDateTime -> document[DOC_DATE] = dateValue.withSecond(0)
+                        is OffsetDateTime -> document[DOC_DATE] = dateValue
                         // else: already OffsetDateTime or null
                     }
 

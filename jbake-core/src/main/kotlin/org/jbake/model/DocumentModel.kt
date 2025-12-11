@@ -5,6 +5,8 @@ import java.time.OffsetDateTime
 
 class DocumentModel : BaseModel() {
 
+    override fun toString() = "DocumentModel{date: $date, type $type, status: $status, sourceUri: $sourceUri tags: $tags}"
+
     var body: String
         get() = get(ModelAttributes.DOC_BODY_RENDERED) as String
         set(body) { put(ModelAttributes.DOC_BODY_RENDERED, body) }

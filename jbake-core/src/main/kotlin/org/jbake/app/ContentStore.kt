@@ -27,10 +27,12 @@ class ContentStore(type: String, name: String) {
         }
     }
 
+    // TODO: This must be in a context, not in the DAO.
     var paginationOffset: Int
         get() = repository.paginationOffset
         set(value) { repository.paginationOffset = value }
 
+    // TODO: This must be in a context, not in the DAO.
     var paginationLimit: Int
         get() = repository.paginationLimit
         set(value) { repository.paginationLimit = value }
