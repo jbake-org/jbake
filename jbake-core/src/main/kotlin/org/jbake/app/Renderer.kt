@@ -6,9 +6,9 @@ import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TemplateModel
-import org.jbake.util.ValueTracer
 import org.jbake.util.Logging.logger
 import org.jbake.util.PagingHelper
+import org.jbake.util.ValueTracer
 import org.slf4j.Logger
 import java.io.*
 import java.nio.file.Files
@@ -117,6 +117,7 @@ class Renderer {
     private fun render(renderConfig: RenderingConfig) {
         val outputFile = renderConfig.path
         try {
+            log.info("Rendering: ${renderConfig.path} -> $outputFile")
             createWriter(outputFile).use { out ->
                 renderingEngine.renderDocument(renderConfig.model, renderConfig.template, out)
             }
@@ -146,7 +147,7 @@ class Renderer {
     fun renderIndexPaging(indexFile: String) {
         val totalPosts = db.getPublishedCount("post")
         val postsPerPage = config.postsPerPage
-        log.debug("Rendering index for $totalPosts posts paged by $postsPerPage.")
+        log.debug("Rendering index $indexFile for $totalPosts posts paged by $postsPerPage.")
 
         if (totalPosts == 0L) { renderIndex(indexFile); return }
 

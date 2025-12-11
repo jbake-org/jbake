@@ -180,23 +180,12 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
     override fun getDocumentCount(docType: String): Long {
         val sql = """SELECT count(*) AS "count" FROM "Documents" WHERE "type"=?"""
-        val result: DocumentList<DocumentModel> = query(sql, docType)
-        if (result.isEmpty()) return 0L
-        val countValue = result[0]["count"]
-        return anythingToLong(countValue)
+        return querySingleValue<Long>(sql, docType) ?: 0L
     }
 
     override fun getPublishedCount(docType: String): Long {
         val sql = """SELECT count(*) AS "count" FROM "Documents" WHERE "status"='published' AND "type"=?"""
-        val result = query(sql, docType)
-        if (result.isEmpty()) return 0L
-        val countValue = result[0]["count"]
-        return when (countValue) {
-            is Long -> countValue
-            is Int -> countValue.toLong()
-            is Number -> countValue.toLong()
-            else -> 0L
-        }
+        return querySingleValue<Long>(sql, docType) ?: 0L
     }
 
     override val publishedPosts: DocumentList<DocumentModel>
@@ -315,18 +304,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
         connection.prepareStatement(sql).use { stmt ->
 
-            params.forEachIndexed { index, param ->
-                when (param) {
-                    is String    -> stmt.setString(index + 1, param)
-                    is Int       -> stmt.setInt(index + 1, param)
-                    is Long      -> stmt.setLong(index + 1, param)
-                    is Boolean   -> stmt.setBoolean(index + 1, param)
-                    is Timestamp -> stmt.setTimestamp(index + 1, param)
-                    is Date -> stmt.setTimestamp(index + 1, Timestamp(param.time))
-                    null -> stmt.setNull(index + 1, Types.VARCHAR)
-                    else -> stmt.setObject(index + 1, param)
-                }
-            }
+            // set params
+            setParameters(stmt, params)
 
             stmt.executeQuery().use { rs ->
 
@@ -345,21 +324,11 @@ class HsqldbContentRepository(private val type: String, private val name: String
                         // Skip properties column - we'll use it to fill in any missing fields
                         if (columnName == "properties") continue
 
-                        val value = when (metadata.getColumnType(i)) {
-                            Types.ARRAY     -> rs.getArray(i)?.let { (it.array as Array<*>).map { item -> item.toString() }.toTypedArray() }
-                            Types.TIMESTAMP -> rs.getTimestamp(i)?.toInstant()?.atOffset(ZoneOffset.UTC);
-                            Types.BOOLEAN   -> rs.getBoolean(i)
-                            Types.BIGINT,
-                            Types.INTEGER   -> rs.getLong(i)
-                            Types.CLOB      -> rs.getClob(i)?.let { it.getSubString(1, it.length().toInt()) }
-                            Types.BLOB      -> rs.getBlob(i)?.let { String(it.getBytes(1, it.length().toInt())) }
-                            else -> rs.getObject(i)
-                        }
-                        if (value != null)
-                            document[columnName] = value
+                        val value = readColumnValue(rs, i)
+                        if (value != null) document[columnName] = value
                     }
 
-                    // If properties column exists, use it to fill in any additional fields not in individual columns
+                    // Use JSON from `properties` column to fill properties not in individual columns.
                     if ("properties" in columnNames) {
                         val properties = rs.getString("properties")
                         if (properties != null) {
@@ -406,6 +375,88 @@ class HsqldbContentRepository(private val type: String, private val name: String
         }
 
         return documents
+    }
+
+    private inline fun <reified T> querySingleValue(sql: String, vararg params: Any?): T? {
+        connection.prepareStatement(sql).use { stmt ->
+
+            setParameters(stmt, params)
+
+            stmt.executeQuery().use { rs ->
+                if (!rs.next()) return null
+                val raw = readColumnValue(rs, 1)
+                return convertToType<T>(raw)
+            }
+        }
+    }
+
+
+    // Read and convert a single column value from the ResultSet, handling special SQL types.
+    private fun readColumnValue(rs: java.sql.ResultSet, columnIndex: Int): Any? {
+        val md = rs.metaData
+        val sqlType = md.getColumnType(columnIndex)
+        return when (sqlType) {
+            Types.ARRAY -> rs.getArray(columnIndex)?.let { arr ->
+                val a = arr.array as? Array<*>
+                a?.map { it?.toString() }?.toTypedArray()
+            }
+            Types.TIMESTAMP -> rs.getTimestamp(columnIndex)?.toInstant()?.atOffset(ZoneOffset.UTC)
+            Types.BOOLEAN -> {
+                val b = rs.getBoolean(columnIndex)
+                if (rs.wasNull()) null else b
+            }
+            Types.BIGINT, Types.INTEGER -> {
+                val l = rs.getLong(columnIndex)
+                if (rs.wasNull()) null else l
+            }
+            Types.CLOB -> rs.getClob(columnIndex)?.let { it.getSubString(1, it.length().toInt()) }
+            Types.BLOB -> rs.getBlob(columnIndex)?.let { String(it.getBytes(1, it.length().toInt())) }
+            else -> rs.getObject(columnIndex)
+        }
+    }
+
+    // Helper to bind parameters to a PreparedStatement (keeps the binding logic in one place)
+    private fun setParameters(stmt: java.sql.PreparedStatement, params: Array<out Any?>) {
+        params.forEachIndexed { index, param ->
+            when (param) {
+                is String -> stmt.setString(index + 1, param)
+                is Int -> stmt.setInt(index + 1, param)
+                is Long -> stmt.setLong(index + 1, param)
+                is Boolean -> stmt.setBoolean(index + 1, param)
+                is Timestamp -> stmt.setTimestamp(index + 1, param)
+                is Date -> stmt.setTimestamp(index + 1, Timestamp(param.time))
+                null -> stmt.setNull(index + 1, Types.VARCHAR)
+                else -> stmt.setObject(index + 1, param)
+            }
+        }
+    }
+
+    private inline fun <reified T> convertToType(value: Any?): T? {
+        if (value == null) return null
+        return when (T::class) {
+            Long::class -> when (value) {
+                is Long -> value
+                is Int -> value.toLong()
+                is Number -> value.toLong()
+                is String -> value.toLongOrNull()
+                else -> null
+            } as T?
+            Int::class -> when (value) {
+                is Int -> value
+                is Long -> value.toInt()
+                is Number -> value.toInt()
+                is String -> value.toIntOrNull()
+                else -> null
+            } as T?
+            String::class -> value.toString() as T
+            Boolean::class -> when (value) {
+                is Boolean -> value
+                is Number -> value.toInt() != 0
+                is String -> value.toBoolean()
+                else -> null
+            } as T?
+            else -> if (value is T) value else value as? T
+        }
     }
 
 
@@ -458,11 +509,4 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
     private val log: Logger by logger()
-}
-
-private fun anythingToLong(countValue: Any?): Long = when (countValue) {
-    is Long -> countValue
-    is Int -> countValue.toLong()
-    is Number -> countValue.toLong()
-    else -> 0L
 }
