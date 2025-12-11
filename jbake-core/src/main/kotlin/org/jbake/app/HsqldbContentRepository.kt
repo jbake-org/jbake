@@ -1,10 +1,7 @@
 package org.jbake.app
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.*
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.BeanSerializer
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
@@ -33,31 +30,6 @@ class HsqldbContentRepository(private val type: String, private val name: String
     private val objectMapper = ObjectMapper().apply {
         configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
         registerModule(JavaTimeModule())  // Support for Java 8 date/time types like OffsetDateTime
-
-        // Register a custom module to handle unknown types TODO: This seems was added to fix some issue - verify if still needed.
-        registerModule(object : SimpleModule() {
-            init {
-                // Add a catch-all serializer for unknown types
-                setSerializerModifier(object : BeanSerializerModifier() {
-                    override fun modifySerializer(config: SerializationConfig?, beanDesc: BeanDescription?, serializer: JsonSerializer<*>?): JsonSerializer<*>? {
-                        if (serializer !is BeanSerializer) return serializer
-
-                        return object : BeanSerializer(serializer) {
-                            override fun serialize(bean: Any?, jgen: JsonGenerator?, provider: SerializerProvider?) {
-                                try {
-                                    super.serialize(bean, jgen, provider)
-                                }
-                                // Skip serialization of problematic objects
-                                catch (e: Exception) { jgen?.writeNull() }
-
-                                // TODO: Replace with runCatching:
-                                //runCatching { super.serialize(bean, jgen, provider)}.onFailure { jgen?.writeNull() }
-                            }
-                        }
-                    }
-                })
-            }
-        })
     }
 
     override var paginationOffset: Int = -1
@@ -304,7 +276,6 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
         connection.prepareStatement(sql).use { stmt ->
 
-            // set params
             setParameters(stmt, params)
 
             stmt.executeQuery().use { rs ->
