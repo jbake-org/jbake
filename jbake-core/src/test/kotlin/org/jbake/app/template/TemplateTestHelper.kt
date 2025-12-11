@@ -1,7 +1,10 @@
 package org.jbake.app.template
 
 import io.kotest.matchers.shouldBe
-import org.jbake.app.*
+import org.jbake.app.ContentStore
+import org.jbake.app.ContentStoreIntegrationTest
+import org.jbake.app.Crawler
+import org.jbake.app.Renderer
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelExtractorsDocumentTypeListener
@@ -59,10 +62,7 @@ class TemplateTestHelper(
             if (templateFile != null) {
                 val fileName = templateFile.name
                 val fileBaseName = fileName.take(fileName.lastIndexOf("."))
-                config.setTemplateFileNameForDocType(
-                    docType,
-                    "$fileBaseName.$templateExtension"
-                )
+                config.setTemplateFileNameForDocType(docType, "$fileBaseName.$templateExtension")
             }
         }
 
