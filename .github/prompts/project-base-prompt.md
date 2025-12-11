@@ -88,3 +88,5 @@ This document provides guidelines for contributing to **JBake**, an open-source 
 - Specifically for Gemini agent: After stating "I will do X now", do it, rather than stopping.
 - If you detect "corrupted" file, it is probably the developer doing changes. Pause for 10 seconds and retry reading it. If still corrupted, mention it concisely and ask the user to fix it.
 - IDE console tool has some weird bug that the first command in a given console gets split to two lines after the first minus and fails. If that happens, run the same command again, that works.
+- Do not remove in-line comments unless they become false by the changes of the code.
+- Do not remove commented-out parts of the code without being asked for it. The user will actively ask for a cleanup.
