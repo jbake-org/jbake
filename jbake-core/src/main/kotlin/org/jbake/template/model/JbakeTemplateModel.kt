@@ -8,7 +8,7 @@ import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.util.ValueTracer
 import java.io.Writer
 
-open class TemplateModel : BaseModel {
+open class JbakeTemplateModel : BaseModel {
     constructor()
 
     constructor(model: Map<String, Any>) {
@@ -81,8 +81,8 @@ open class TemplateModel : BaseModel {
 
     companion object {
 
-        fun fromMap(map: Map<*, *>): TemplateModel {
-            val model = TemplateModel()
+        fun fromMap(map: Map<*, *>): JbakeTemplateModel {
+            val model = JbakeTemplateModel()
             val violations = mutableListOf<String>()
             for ((k, v) in map) {
                 if (v == null) continue
@@ -97,8 +97,8 @@ open class TemplateModel : BaseModel {
         /** Create TemplateModel from a type-safe RenderContext. This is the new preferred way to create template models. */
         @Suppress("DEPRECATION")
         /// Was: : TemplateModel().apply { putAll(context.toLegacyMap()) }
-        fun fromContext(context: RenderContext): TemplateModel {
-            val model = TemplateModel()
+        fun fromContext(context: RenderContext): JbakeTemplateModel {
+            val model = JbakeTemplateModel()
             model.renderer = context.renderer
             context.content?.let { model.content = it }
             model.config = context.config.asHashMap()
@@ -111,7 +111,7 @@ open class TemplateModel : BaseModel {
          * Convert TemplateModel to RenderContext.
          * This allows gradual migration to the new architecture.
          */
-        fun toContext(model: TemplateModel, db: org.jbake.app.ContentStore): RenderContext {
+        fun toContext(model: JbakeTemplateModel, db: org.jbake.app.ContentStore): RenderContext {
             val config = model.config
             val configObj = if (config.containsKey("config") && config["config"] is org.jbake.app.configuration.JBakeConfiguration) {
                 config["config"] as org.jbake.app.configuration.JBakeConfiguration

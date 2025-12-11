@@ -8,7 +8,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.xml.sax.SAXException
 import java.io.IOException
 import java.io.Writer
@@ -21,7 +21,7 @@ class GroovyTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
 
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         try {
             val template = findTemplate(templateName)
             val writable = template.make(wrap(model))
@@ -42,9 +42,9 @@ class GroovyTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
         return template
     }
 
-    private fun wrap(model: TemplateModel): TemplateModel {
+    private fun wrap(model: JbakeTemplateModel): JbakeTemplateModel {
 
-        return object : TemplateModel(model) {
+        return object : JbakeTemplateModel(model) {
 
             override fun get(key: String): Any? {
                 if ("include" == key)
@@ -59,7 +59,7 @@ class GroovyTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
         }
     }
 
-    private fun doInclude(model: TemplateModel, templateName: String) {
+    private fun doInclude(model: JbakeTemplateModel, templateName: String) {
         val engine: AbstractTemplateEngine = model.renderer!!
         val out = model.writer!!
         engine.renderDocument(model, templateName, out)

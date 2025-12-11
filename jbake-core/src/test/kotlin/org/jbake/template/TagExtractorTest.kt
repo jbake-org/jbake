@@ -11,7 +11,7 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.template.model.RenderContext
 import org.jbake.template.model.TagsExtractor
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 
 class TagExtractorTest : StringSpec({
     fun mockDbWithTags(vararg tags: String): ContentStore {
@@ -44,7 +44,7 @@ class TagExtractorTest : StringSpec({
         list.shouldNotBeNull()
         list.size shouldBe 1
 
-        val tm = list.first() as TemplateModel
+        val tm = list.first() as JbakeTemplateModel
         tm.name shouldBe "blog"
         tm.uri shouldBe "tags/blog.html"
     }
@@ -57,7 +57,7 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.firstOrNull { (it as TemplateModel).name == "blog" } as TemplateModel?
+        val tm = list.firstOrNull { (it as JbakeTemplateModel).name == "blog" } as JbakeTemplateModel?
         tm.shouldNotBeNull()
         tm.uri shouldBe "blog.html"
     }
@@ -70,7 +70,7 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.firstOrNull { (it as TemplateModel).name == "news" } as TemplateModel?
+        val tm = list.firstOrNull { (it as JbakeTemplateModel).name == "news" } as JbakeTemplateModel?
         tm.shouldNotBeNull()
         tm.uri shouldBe "tags/news"
     }
@@ -83,7 +83,7 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.firstOrNull { (it as TemplateModel).name == "blog" } as TemplateModel?
+        val tm = list.firstOrNull { (it as JbakeTemplateModel).name == "blog" } as JbakeTemplateModel?
         tm.shouldNotBeNull()
         tm.uri shouldBe "tags/blog.html"
     }
@@ -96,7 +96,7 @@ class TagExtractorTest : StringSpec({
         val extractor = TagsExtractor()
         val list = extractor.extract(context, "tags")
 
-        val tm = list.firstOrNull { (it as TemplateModel).name == "blog" } as TemplateModel?
+        val tm = list.firstOrNull { (it as JbakeTemplateModel).name == "blog" } as JbakeTemplateModel?
         tm.shouldNotBeNull()
         tm.uri shouldBe "blog.html"
     }

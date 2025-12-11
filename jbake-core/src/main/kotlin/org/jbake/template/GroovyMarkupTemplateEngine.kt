@@ -7,7 +7,7 @@ import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes.DOC_DATE
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import java.io.Writer
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
@@ -46,7 +46,7 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         try {
             val template = templateEngine!!.createTemplateByPath(templateName)
             val wrappedModel = wrap(model)
@@ -57,9 +57,9 @@ class GroovyMarkupTemplateEngine(config: JBakeConfiguration, db: ContentStore) :
         }
     }
 
-    private fun wrap(model: TemplateModel): TemplateModel {
+    private fun wrap(model: JbakeTemplateModel): JbakeTemplateModel {
 
-        return object : TemplateModel(model) {
+        return object : JbakeTemplateModel(model) {
 
             override fun get(key: String): Any? {
                 try {

@@ -13,7 +13,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.jbake.util.Logging.logger
 import org.jbake.util.PathUtils
 import org.slf4j.Logger
@@ -46,7 +46,7 @@ class JadeTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstrac
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         try {
             val template = jadeConfiguration.getTemplate(templateName)
 
@@ -56,13 +56,13 @@ class JadeTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstrac
         }
     }
 
-    fun renderTemplate(template: JadeTemplate, model: TemplateModel, writer: Writer) {
+    fun renderTemplate(template: JadeTemplate, model: JbakeTemplateModel, writer: Writer) {
         val jadeModel = wrap(model)
         jadeModel.putAll(jadeConfiguration.sharedVariables)
         template.process(jadeModel, writer)
     }
 
-    private fun wrap(model: TemplateModel): JadeModel {
+    private fun wrap(model: JbakeTemplateModel): JadeModel {
         return object : JadeModel(model) {
             override fun get(key: String): Any? {
                 // First check if it's in the JadeModel map itself (e.g., shared variables like formatter)

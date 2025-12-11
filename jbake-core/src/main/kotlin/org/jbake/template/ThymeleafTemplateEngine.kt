@@ -6,7 +6,7 @@ import org.jbake.app.NoModelExtractorException
 import org.jbake.app.configuration.DefaultJBakeConfiguration
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.jbake.util.PathUtils
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
@@ -53,16 +53,16 @@ class ThymeleafTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Ab
         engine.clearTemplateCache()
     }
 
-    private fun updateTemplateMode(model: TemplateModel) {
+    private fun updateTemplateMode(model: JbakeTemplateModel) {
         templateResolver!!.setTemplateMode(getTemplateModeByModel(model))
     }
 
-    private fun getTemplateModeByModel(model: TemplateModel): String {
+    private fun getTemplateModeByModel(model: JbakeTemplateModel): String {
         val content = model.content
         return config.getThymeleafModeByType(content.type)
     }
 
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         val localeString = config.thymeleafLocale
         val locale = if (localeString != null) LocaleUtils.toLocale(localeString) else Locale.getDefault()
 
@@ -77,7 +77,7 @@ class ThymeleafTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Ab
         }
     }
 
-    private fun initializeContext(locale: Locale, model: TemplateModel) {
+    private fun initializeContext(locale: Locale, model: JbakeTemplateModel) {
         context.clearVariables()
         context.locale = locale
         context.setVariables(model)
@@ -93,7 +93,7 @@ class ThymeleafTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Ab
     private class ContextVariable(
         private val db: ContentStore,
         private val key: String,
-        private val model: TemplateModel
+        private val model: JbakeTemplateModel
     ) : LazyContextVariable<Any>() {
 
         override fun loadValue(): Any {

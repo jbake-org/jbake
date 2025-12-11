@@ -1,6 +1,6 @@
 package org.jbake.util
 
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import java.time.ZoneId
 
 
@@ -19,11 +19,11 @@ fun Map<Any?, Any?>.mapOfStringToAny(): Map<String, Any> {
  * Recursively convert Java time types to java.util.Date in the model for Freemarker compatibility.
  * Handles OffsetDateTime, ZonedDateTime, Instant, LocalDateTime and LocalDate.
  */
-fun convertTemporalsInModelToJavaUtilDate(model: Map<String, Any>): TemplateModel {
+fun convertTemporalsInModelToJavaUtilDate(model: Map<String, Any>): JbakeTemplateModel {
     val converted = doConvertDatesInModel(model)
     return when (converted) {
-        is TemplateModel -> converted
-        is Map<*, *> -> TemplateModel.fromMap(converted)
+        is JbakeTemplateModel -> converted
+        is Map<*, *> -> JbakeTemplateModel.fromMap(converted)
         //is null ->  throw Exception("Unexpected type returned from conversion: ${model1.javaClass.simpleName}")
         else -> throw Exception("Unexpected type returned from conversion: ${converted?.javaClass?.simpleName}")
     }

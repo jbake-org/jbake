@@ -3,7 +3,7 @@ package org.jbake.template
 import org.jbake.app.ContentStore
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import java.io.Writer
 
 /**
@@ -24,7 +24,7 @@ abstract class AbstractTemplateEngine protected constructor(
     protected val db: ContentStore
 ) {
     @Throws(RenderingException::class)
-    abstract fun renderDocument(model: TemplateModel, templateName: String, writer: Writer)
+    abstract fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer)
 
     companion object {
         internal var extractors: ModelExtractorsRegistry = ModelExtractorsRegistry.instance

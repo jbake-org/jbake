@@ -8,7 +8,7 @@ import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
 import org.jbake.util.ValueTracer
@@ -51,12 +51,12 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         try {
             val template = templateCfg.getTemplate(templateName)
 
             // Recursively convert OffsetDateTime to java.util.Date for Freemarker compatibility
-            val modelWithDates: TemplateModel = convertTemporalsInModelToJavaUtilDate(model)
+            val modelWithDates: JbakeTemplateModel = convertTemporalsInModelToJavaUtilDate(model)
 
             template.process(LazyLoadingModel(templateCfg.objectWrapper, modelWithDates, db, config), writer)
         }
@@ -71,7 +71,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
      */
     class LazyLoadingModel(
         private val freeMarkerWrapper: ObjectWrapper,
-        private val jbakeTemplateModel: TemplateModel,
+        private val jbakeTemplateModel: JbakeTemplateModel,
         private val db: ContentStore,
         private val jbakeConfig: JBakeConfiguration
     )
@@ -104,11 +104,9 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             }
 
             try {
-                val map = jbakeTemplateModel
-
-                ValueTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], contentMapKey)
+                ValueTracer.trace("freemarker-eager-model", jbakeTemplateModel.content, contentMapKey)
                 val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper)
-                val result: freemarker.template.TemplateModel = extractors.extractAndTransform(db, contentMapKey, map, adapter)
+                val result: freemarker.template.TemplateModel = extractors.extractAndTransform(db, contentMapKey, jbakeTemplateModel, adapter)
 
                 // Wrap Map results (especially document models like "content") with NullSafeMapModel.
                 // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.

@@ -10,7 +10,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import java.io.IOException
 import java.io.Writer
 
@@ -34,7 +34,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         val template: PebbleTemplate
         try {
             template = engine!!.getTemplate(templateName)
@@ -46,7 +46,7 @@ class PebbleTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstr
         }
     }
 
-    private fun wrap(model: TemplateModel) = object : TemplateModel(model) {
+    private fun wrap(model: JbakeTemplateModel) = object : JbakeTemplateModel(model) {
 
         override fun get(key: String): Any? {
             return try {

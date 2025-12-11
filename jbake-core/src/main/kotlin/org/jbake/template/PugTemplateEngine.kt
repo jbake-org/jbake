@@ -12,7 +12,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.io.IOException
@@ -50,7 +50,7 @@ class PugTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstract
     }
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         log.debug("Rendering document with template: $templateName")
         try {
             val template = pugConfiguration.getTemplate(templateName)
@@ -60,13 +60,13 @@ class PugTemplateEngine(config: JBakeConfiguration, db: ContentStore) : Abstract
         }
     }
 
-    fun renderTemplate(template: PugTemplate, model: TemplateModel, writer: Writer) {
+    fun renderTemplate(template: PugTemplate, model: JbakeTemplateModel, writer: Writer) {
         val pugModel = wrap(model)
         pugModel.putAll(pugConfiguration.sharedVariables)
         template.process(pugModel, writer, pugConfiguration)
     }
 
-    private fun wrap(model: TemplateModel): PugModel {
+    private fun wrap(model: JbakeTemplateModel): PugModel {
         return object : PugModel(model) {
             override fun get(key: String): Any? {
                 // First check if it's in the PugModel map itself (e.g., shared variables like formatter)

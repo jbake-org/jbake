@@ -1,7 +1,7 @@
 package org.jbake.util
 
 import org.jbake.model.DocumentModel
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.slf4j.LoggerFactory
 import java.time.format.DateTimeFormatter
 
@@ -29,7 +29,7 @@ object ValueTracer {
     private fun extractKey(payload: Any?): Pair<Boolean, Any?>
         = when (payload) {
             is DocumentModel -> payload.containsKey(AUTHOR_KEY) to payload[AUTHOR_KEY]
-            is TemplateModel -> runCatching { payload.content }.getOrNull()
+            is JbakeTemplateModel -> runCatching { payload.content }.getOrNull()
                 ?.let { content -> content.containsKey(AUTHOR_KEY) to content[AUTHOR_KEY] }
                 ?: (false to null)
             is Map<*, *> -> (payload.containsKey(AUTHOR_KEY)) to payload[AUTHOR_KEY]

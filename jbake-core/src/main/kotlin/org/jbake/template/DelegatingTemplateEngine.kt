@@ -4,7 +4,7 @@ import org.jbake.app.ContentStore
 import org.jbake.app.FileUtil
 import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.jbake.util.Logging.logger
 import org.slf4j.Logger
 import java.io.Writer
@@ -16,7 +16,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
     private val renderers: TemplateEngines = TemplateEngines(config, db)
 
     @Throws(RenderingException::class)
-    override fun renderDocument(model: TemplateModel, templateName: String, writer: Writer) {
+    override fun renderDocument(model: JbakeTemplateModel, templateName: String, writer: Writer) {
         model.version = (config.jbakeVersion)
         model.config = run {
             // Use configuration's asHashMap which provides underscore-style keys and defaults similar to legacy behavior.

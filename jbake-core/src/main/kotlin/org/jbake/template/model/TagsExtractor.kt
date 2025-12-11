@@ -30,10 +30,10 @@ class TagsExtractor : TypedModelExtractor<DocumentList<*>> {
         // If outputExtension is null, treat it as empty (no extension). Preserve empty string if explicitly set.
         val effectiveOutputExt = cfg.outputExtension ?: ""
 
-        val dl = DocumentList<TemplateModel>()
+        val dl = DocumentList<JbakeTemplateModel>()
 
         for (tag in context.db.allTags) {
-            val newTag = TemplateModel()
+            val newTag = JbakeTemplateModel()
             newTag.name = tag
 
             val uri = if (effectiveTagPath.isNotEmpty())

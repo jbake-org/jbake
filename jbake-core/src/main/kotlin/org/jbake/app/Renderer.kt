@@ -5,7 +5,7 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
 import org.jbake.template.model.RenderContext
-import org.jbake.template.model.TemplateModel
+import org.jbake.template.model.JbakeTemplateModel
 import org.jbake.util.Logging.logger
 import org.jbake.util.PagingHelper
 import org.jbake.util.ValueTracer
@@ -43,7 +43,7 @@ class Renderer {
         try {
             createWriter(outputFile).use { out ->
                 // For now, convert to legacy model for compatibility
-                val legacyModel = TemplateModel.fromContext(context)
+                val legacyModel = JbakeTemplateModel.fromContext(context)
                 renderingEngine.renderDocument(legacyModel, templateName, out)
             }
             log.info("Rendering done: ${outputFile.absolutePath}")
@@ -87,7 +87,7 @@ class Renderer {
             publishedFile
         }
 
-        val model = TemplateModel().apply {
+        val model = JbakeTemplateModel().apply {
             this.content = content
             this.renderer = renderingEngine
         }
@@ -153,7 +153,7 @@ class Renderer {
 
         val pagingHelper = PagingHelper(totalPosts, postsPerPage)
 
-        val model = TemplateModel().apply {
+        val model = JbakeTemplateModel().apply {
             renderer = renderingEngine
             numberOfPages = pagingHelper.numberOfPages
         }
@@ -272,7 +272,7 @@ class Renderer {
                 val map = buildEmptyModelWithType(ModelAttributes.TAGS_CURRENT_TAG).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
-                val model = TemplateModel().apply {
+                val model = JbakeTemplateModel().apply {
                     renderer = renderingEngine
                     this.tag = tag
                     content = map
@@ -298,7 +298,7 @@ class Renderer {
                 val map = buildEmptyModelWithType(ModelAttributes.DOC_TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
-                val model = TemplateModel().apply {
+                val model = JbakeTemplateModel().apply {
                     renderer = renderingEngine
                     content = map
                     // Provide configuration to template model so typed extractors can access it
@@ -334,7 +334,7 @@ class Renderer {
         val path: File
         val name: String
         val template: String
-        val model: TemplateModel
+        val model: JbakeTemplateModel
     }
 
     internal abstract class AbstractRenderingConfig(
@@ -345,17 +345,17 @@ class Renderer {
 
 
     private inner class ModelRenderingConfig : AbstractRenderingConfig {
-        override val model: TemplateModel
+        override val model: JbakeTemplateModel
 
         // Used only for renderIndexPaging().
-        constructor(fileName: String, model: TemplateModel, templateType: String)
+        constructor(fileName: String, model: JbakeTemplateModel, templateType: String)
                 : super(config.destinationDir.resolve(fileName), fileName, findTemplateName(templateType))
         {
             this.model = model
         }
 
         // Used only for renderTags().
-        constructor(path: File, name: String, model: TemplateModel, template: String)
+        constructor(path: File, name: String, model: JbakeTemplateModel, template: String)
                 : super(path, name, template)
         {
             this.model = model
@@ -387,9 +387,9 @@ class Renderer {
             allInOneName
         )
 
-        override val model: TemplateModel
+        override val model: JbakeTemplateModel
             get() {
-                val model = TemplateModel()
+                val model = JbakeTemplateModel()
                 model.renderer = renderingEngine
                 model.content = content
 
