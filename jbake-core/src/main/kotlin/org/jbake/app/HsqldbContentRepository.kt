@@ -18,7 +18,10 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Timestamp
 import java.sql.Types
+import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.util.*
 
 /**
  * HSQLDB-based implementation of ContentRepository.
@@ -177,15 +180,10 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
     override fun getDocumentCount(docType: String): Long {
         val sql = """SELECT count(*) AS "count" FROM "Documents" WHERE "type"=?"""
-        val result = query(sql, docType)
+        val result: DocumentList<DocumentModel> = query(sql, docType)
         if (result.isEmpty()) return 0L
         val countValue = result[0]["count"]
-        return when (countValue) {
-            is Long -> countValue
-            is Int -> countValue.toLong()
-            is Number -> countValue.toLong()
-            else -> 0L
-        }
+        return anythingToLong(countValue)
     }
 
     override fun getPublishedCount(docType: String): Long {
@@ -324,7 +322,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                     is Long      -> stmt.setLong(index + 1, param)
                     is Boolean   -> stmt.setBoolean(index + 1, param)
                     is Timestamp -> stmt.setTimestamp(index + 1, param)
-                    is java.util.Date -> stmt.setTimestamp(index + 1, Timestamp(param.time))
+                    is Date -> stmt.setTimestamp(index + 1, Timestamp(param.time))
                     null -> stmt.setNull(index + 1, Types.VARCHAR)
                     else -> stmt.setObject(index + 1, param)
                 }
@@ -349,7 +347,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
                         val value = when (metadata.getColumnType(i)) {
                             Types.ARRAY     -> rs.getArray(i)?.let { (it.array as Array<*>).map { item -> item.toString() }.toTypedArray() }
-                            Types.TIMESTAMP -> rs.getTimestamp(i)?.toInstant()?.atOffset(java.time.ZoneOffset.UTC);
+                            Types.TIMESTAMP -> rs.getTimestamp(i)?.toInstant()?.atOffset(ZoneOffset.UTC);
                             Types.BOOLEAN   -> rs.getBoolean(i)
                             Types.BIGINT,
                             Types.INTEGER   -> rs.getLong(i)
@@ -381,9 +379,9 @@ class HsqldbContentRepository(private val type: String, private val name: String
                     val dateValue = document["date"]
                     when (dateValue) {
 
-                        is java.util.Date -> {
+                        is Date -> {
                             ValueTracer.trace("hsqldb-query", document, sql)
-                            document["date"] = dateValue.toInstant().atOffset(java.time.ZoneOffset.UTC)
+                            document["date"] = dateValue.toInstant().atOffset(ZoneOffset.UTC)
                         }
 
                         is String -> {
@@ -394,7 +392,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
                                     // Try parsing as java.util.Date
                                     val d = runCatching { fmt1.parse(dateValue) }.getOrNull()
                                         ?: runCatching { fmt2.parse(dateValue) }.getOrNull()
-                                    d?.toInstant()?.atOffset(java.time.ZoneOffset.UTC)
+                                    d?.toInstant()?.atOffset(ZoneOffset.UTC)
                                 }.getOrNull()
                             if (parsed != null) document["date"] = parsed
                         }
@@ -411,8 +409,8 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
 
-    private val fmt1 = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-    private val fmt2 = java.text.SimpleDateFormat("yyyy-MM-dd")
+    private val fmt1 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+    private val fmt2 = SimpleDateFormat("yyyy-MM-dd")
 
 
     private fun updateTemplateSignatureIfChanged(templateDir: File): Boolean {
@@ -460,4 +458,11 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
     private val log: Logger by logger()
+}
+
+private fun anythingToLong(countValue: Any?): Long = when (countValue) {
+    is Long -> countValue
+    is Int -> countValue.toLong()
+    is Number -> countValue.toLong()
+    else -> 0L
 }
