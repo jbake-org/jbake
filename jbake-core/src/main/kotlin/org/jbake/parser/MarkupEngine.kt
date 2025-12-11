@@ -40,14 +40,14 @@ abstract class MarkupEngine : ParserEngine {
     open fun processHeader(context: ParserContext) {}
 
     /**
-     * Processes the body of the document. Usually subclasses will parse the document body and render it,
-     * exporting the result using the [ParserContext.body] method.
+     * Processes the body of the document. Usually, subclasses will parse the document body and render it,
+     * exporting the result as [ParserContext.body].
      */
     open fun processBody(parserContext: ParserContext) {}
 
     /**
-     * Parse given file to extract as many infos as possible.
-     * @return a map containing all infos. null indicates an error. TODO: Exception would be better.
+     * Parse the given file to extract as many infos as possible.
+     * @return A map containing all infos. null indicates an error. TODO: Exception would be better.
      */
     override fun parse(config: JBakeConfiguration, file: File): DocumentModel? {
         this.configuration = config
@@ -81,7 +81,7 @@ abstract class MarkupEngine : ParserEngine {
         // Eventually process body using specific engine.
         processBody(context)
 
-        // TODO: post parsing plugins to hook in here?
+        // TODO: post-parsing plugins to hook in here?
         return context.documentModel
     }
 

@@ -11,6 +11,8 @@ class ParserContext(
     val config: JBakeConfiguration,
     private val hasHeader: Boolean
 ) {
+
+    // TODO: Not sure if this is delegation or tracking or what. Review and refactor - probably callers should access directly.
     val documentModel: DocumentModel = DocumentModel.createDefaultDocumentModel()
 
     fun hasHeader(): Boolean = hasHeader

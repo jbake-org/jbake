@@ -11,14 +11,11 @@ import org.jbake.util.ValueTracer
 import org.jbake.util.debug
 import org.slf4j.Logger
 import java.io.File
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.Timestamp
-import java.sql.Types
+import java.sql.*
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.Date
 
 /**
  * HSQLDB-based implementation of ContentRepository.
@@ -27,14 +24,9 @@ import java.util.*
 class HsqldbContentRepository(private val type: String, private val name: String) : ContentRepository {
 
     private lateinit var connection: Connection
-    private val objectMapper = ObjectMapper().apply {
-        configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-        registerModule(JavaTimeModule())  // Support for Java 8 date/time types like OffsetDateTime
-    }
 
     override var paginationOffset: Int = -1
     override var paginationLimit: Int = -1
-
 
 
     override fun startup() {
@@ -282,6 +274,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
                 val metadata = rs.metaData
                 val columnCount = metadata.columnCount
+                val trace = columnCount > 2
                 val columnNames = (1..columnCount).map { metadata.getColumnName(it).lowercase() }
                 log.debug { "SQL query: $sql, cols: ${columnNames.joinToString(", ")}" }
 
@@ -289,51 +282,31 @@ class HsqldbContentRepository(private val type: String, private val name: String
                     val document = DocumentModel()
 
                     // Build document from individual columns to get proper types
-                    for (i in 1..columnCount) {
-                        val columnName = metadata.getColumnName(i).lowercase()  // Convert to lowercase for consistency
-
-                        // Skip properties column - we'll use it to fill in any missing fields
-                        if (columnName == "properties") continue
-
-                        val value = readColumnValue(rs, i)
-                        if (value != null) document[columnName] = value
+                    columnNames.forEachIndexed { idx, colName ->
+                        if (colName == "properties") return@forEachIndexed
+                        val value = readColumnValue(rs, idx + 1)
+                        if (value != null) document[colName] = value
                     }
 
                     // Use JSON from `properties` column to fill properties not in individual columns.
                     if ("properties" in columnNames) {
-                        val properties = rs.getString("properties")
-                        if (properties != null) {
-                            @Suppress("UNCHECKED_CAST")
-                            val map = objectMapper.readValue(properties, Map::class.java) as Map<String, Any>
-                            // Only add properties that aren't already in the document from individual columns
-                            for ((key, value) in map) {
-                                if (key.lowercase() !in document.keys.map { it.lowercase() }) {
-                                    document[key] = value
-                                }
-                            }
+                        rs.getString("properties") ?.let { propertiesJson ->
+                            applyArbitraryPropertiesToDocument(propertiesJson, document)
                         }
                     }
 
                     // After merging, ensure 'date' is always OffsetDateTime if possible.
-                    // This is the canonical place to ensure the type for downstream consumers (e.g., templates)
+                    // This is the canonical place to ensure the type for downstream consumers (e.g., templates).
                     val dateValue = document["date"]
                     when (dateValue) {
-
                         is Date -> {
-                            ValueTracer.trace("hsqldb-query", document, sql)
+                            if (trace) ValueTracer.trace("hsqldb-query-date", document, sql)
                             document["date"] = dateValue.toInstant().atOffset(ZoneOffset.UTC)
                         }
-
                         is String -> {
-                            ValueTracer.trace("hsqldb-query", document, sql)
+                            if (trace) ValueTracer.trace("hsqldb-query-string", document, sql)
                             // Try ISO first, then fallback to legacy formats
-                            val parsed = runCatching { OffsetDateTime.parse(dateValue) }.getOrNull()
-                                ?: runCatching {
-                                    // Try parsing as java.util.Date
-                                    val d = runCatching { fmt1.parse(dateValue) }.getOrNull()
-                                        ?: runCatching { fmt2.parse(dateValue) }.getOrNull()
-                                    d?.toInstant()?.atOffset(ZoneOffset.UTC)
-                                }.getOrNull()
+                            val parsed = parseTemporalIntoOffsetDateTime(dateValue)
                             if (parsed != null) document["date"] = parsed
                         }
                         // else: already OffsetDateTime or null
@@ -363,7 +336,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
 
     // Read and convert a single column value from the ResultSet, handling special SQL types.
-    private fun readColumnValue(rs: java.sql.ResultSet, columnIndex: Int): Any? {
+    private fun readColumnValue(rs: ResultSet, columnIndex: Int): Any? {
         val md = rs.metaData
         val sqlType = md.getColumnType(columnIndex)
         return when (sqlType) {
@@ -387,7 +360,7 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
     // Helper to bind parameters to a PreparedStatement (keeps the binding logic in one place)
-    private fun setParameters(stmt: java.sql.PreparedStatement, params: Array<out Any?>) {
+    private fun setParameters(stmt: PreparedStatement, params: Array<out Any?>) {
         params.forEachIndexed { index, param ->
             when (param) {
                 is String -> stmt.setString(index + 1, param)
@@ -429,10 +402,6 @@ class HsqldbContentRepository(private val type: String, private val name: String
             else -> if (value is T) value else value as? T
         }
     }
-
-
-    private val fmt1 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-    private val fmt2 = SimpleDateFormat("yyyy-MM-dd")
 
 
     private fun updateTemplateSignatureIfChanged(templateDir: File): Boolean {
@@ -480,4 +449,36 @@ class HsqldbContentRepository(private val type: String, private val name: String
     }
 
     private val log: Logger by logger()
+}
+
+
+private fun HsqldbContentRepository.parseTemporalIntoOffsetDateTime(dateValue: String): OffsetDateTime? {
+    val parsed = runCatching { OffsetDateTime.parse(dateValue) }.getOrNull()
+        ?: runCatching {
+            // Try parsing as java.util.Date
+            val d = runCatching { fmt1.parse(dateValue) }.getOrNull()
+                ?: runCatching { fmt2.parse(dateValue) }.getOrNull()
+            d?.toInstant()?.atOffset(ZoneOffset.UTC)
+        }.getOrNull()
+    return parsed
+}
+
+private val fmt1 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+private val fmt2 = SimpleDateFormat("yyyy-MM-dd")
+
+
+private fun applyArbitraryPropertiesToDocument(properties: String, document: DocumentModel) {
+    @Suppress("UNCHECKED_CAST")
+    val map = objectMapper.readValue(properties, Map::class.java) as Map<String, Any>
+    // Only add properties that aren't already in the document from individual columns
+    for ((key, value) in map) {
+        if (key.lowercase() !in document.keys.map { it.lowercase() }) {
+            document[key] = value
+        }
+    }
+}
+
+private val objectMapper = ObjectMapper().apply {
+    configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+    registerModule(JavaTimeModule())  // Support for Java 8 date/time types like OffsetDateTime
 }
