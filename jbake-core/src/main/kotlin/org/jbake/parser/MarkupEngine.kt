@@ -15,6 +15,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlin.time.toJavaInstant
@@ -210,7 +211,8 @@ abstract class MarkupEngine : ParserEngine {
                 .recoverCatching {
                     // If that fails, try parsing as LocalDate and convert to OffsetDateTime at start of day in system timezone
                     val localDate = java.time.LocalDate.parse(value, formatter)
-                    content.date = localDate.atStartOfDay().atOffset(java.time.ZoneOffset.UTC)
+                    content.date = localDate.atTime(0,0,0).atOffset(java.time.ZoneOffset.UTC)
+                    // TODO: This was .atStartOfDay(), but that doesn't give seconds, so parsing failed. Investigate how to treat that later in processing.
                 }
                 .onFailure { e -> log.error("Unable to parse date $value with format '${configuration?.dateFormat}': ${e.message}") }
             }
@@ -261,7 +263,7 @@ class ErrorEngine @JvmOverloads constructor(private val engineName: String = "un
         documentModel.type = "post"
         documentModel.status = "published"
         documentModel.title = "Rendering engine missing"
-        documentModel.date = OffsetDateTime.now()
+        documentModel.date = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         documentModel.tags = emptyList()
     }
 

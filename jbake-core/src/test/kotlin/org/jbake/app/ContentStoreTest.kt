@@ -8,7 +8,9 @@ import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentModel.Companion.createDefaultDocumentModel
 import org.jbake.model.DocumentTypeRegistry.addDocumentType
 import org.jbake.model.ModelAttributes
+import org.jbake.util.sec
 import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 class ContentStoreTestHsqldb : ContentStoreTestBase(DatabaseType.HSQLDB)
 class ContentStoreTestNeo4j : ContentStoreTestBase(DatabaseType.NEO4J)
@@ -43,9 +45,9 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
 
     "shouldGetCountForPublishedDocuments" {
         repeat(5) {
-            db.addTestDocument(type = DOC_TYPE_POST, status = "published")
+            db.addTestDocument(type = DOC_TYPE_POST, status = "published", date = OffsetDateTime.now().sec())
         }
-        db.addTestDocument(type = DOC_TYPE_POST, status = "draft")
+        db.addTestDocument(type = DOC_TYPE_POST, status = "draft", date = OffsetDateTime.now().sec())
 
         db.getDocumentCount(DOC_TYPE_POST) shouldBe 6
         db.getPublishedCount(DOC_TYPE_POST) shouldBe 5
@@ -55,7 +57,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
         val model = createDefaultDocumentModel()
         model.type = typeWithHyphen
         model.tags = listOf(tagWithWeirdChars)
-        model.date = OffsetDateTime.now()
+        model.date = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         model.sourceUri = testUri
         model["foo"] = "originalValue"
 
@@ -71,7 +73,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
         val model = createDefaultDocumentModel()
         model.type = typeWithHyphen
         model.tags = listOf(tagWithWeirdChars)
-        model.date = OffsetDateTime.now()
+        model.date = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         model.sourceUri = testUri
 
         db.addDocument(model)
@@ -85,7 +87,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
         val draft = createDefaultDocumentModel()
         draft.type = typeWithHyphen
         draft.sourceUri = testUri
-        draft.date = OffsetDateTime.now()
+        draft.date = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         db.addDocument(draft)
 
         db.getPublishedCount(typeWithHyphen) shouldBe 0
@@ -104,7 +106,7 @@ abstract class ContentStoreTestBase(dbType: DatabaseType) : StringSpec({
         doc1.type = typeWithHyphen
         doc1.sourceUri = testUri
         doc1.tags = listOf(tagWithWeirdChars)
-        doc1.date = OffsetDateTime.now()
+        doc1.date = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         db.addDocument(doc1)
 
         val doc2 = DocumentModel()

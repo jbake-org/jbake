@@ -12,8 +12,10 @@ import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
 import org.jbake.util.ValueTracer
 import org.jbake.util.convertTemporalsInModelToJavaUtilDate
+import org.jbake.util.debug
 import java.io.Writer
 import java.time.*
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 
@@ -22,7 +24,7 @@ import java.util.*
  */
 class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : AbstractTemplateEngine(config, db) {
 
-    lateinit var templateCfg: Configuration
+    lateinit var templateCfg: FmConfiguration
     private val log by logger()
 
     init {
@@ -32,6 +34,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
     private fun setupTemplateConfiguration() {
         templateCfg = Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
         //templateCfg.setObjectWrapper(Java8ObjectWrapper(Configuration.VERSION_2_3_34))
+        templateCfg.setObjectWrapper(TemporalsObjectWrapper(Configuration.VERSION_2_3_34))
         templateCfg.setDefaultEncoding(config.renderEncoding)
         templateCfg.setOutputEncoding(config.outputEncoding)
         templateCfg.setTimeZone(config.freemarkerTimeZone)
@@ -57,6 +60,10 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             // Recursively convert OffsetDateTime to java.util.Date for Freemarker compatibility
             val modelWithDates: JbakeTemplateModel = convertTemporalsInModelToJavaUtilDate(model)
 
+            log.debug {
+                "Freemarking template $templateName; model: ${modelWithDates.entries.filter { it.key != "config" }.map { "\n * $it" }.joinToString() }" +
+                    "\n  Config: " + modelWithDates.config.entries.filter { it.key !in setOf("java.class.path", "java_class_path") }.map { "\n\t* $it" }.sorted().joinToString()
+            }
             template.process(LazyLoadingModel(templateCfg.objectWrapper, modelWithDates, db, config), writer)
         }
         catch (e: Exception) { throw RenderingException("Failed rendering ${model} for $templateName: ${e.message}",e) }
@@ -88,7 +95,13 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 ModelAttributes.DATA_FILES -> return beansWrapper.wrap(DataFileUtil(db, jbakeConfig.dataFileDocType))
 
                 //ModelAttributes.DOC_DATE -> return freeMarkerWrapper.wrap(jbakeTemplateModel.get(ModelAttributes.DOC_DATE) ?: Date())
-                ModelAttributes.DOC_DATE -> return OffsetDateTimeModel(OffsetDateTime.now())
+                ModelAttributes.DOC_DATE -> {
+                    val odt: OffsetDateTime =
+                        // OffsetDateTime.now()
+                        jbakeTemplateModel.get(ModelAttributes.DOC_DATE) as? OffsetDateTime ?: OffsetDateTime.now()
+
+                    return OffsetDateTimeModel(odt.truncatedTo(ChronoUnit.SECONDS))
+                }
 
                 // JBake config. Merged from engine's jbakeConfig and templateModel's config.
                 ModelAttributes.TMPL_JBAKE_CONFIG -> {
@@ -156,3 +169,4 @@ class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper) : Templ
 }
 
 typealias FmTemplateModel = TemplateModel
+typealias FmConfiguration = Configuration

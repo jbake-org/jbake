@@ -8,6 +8,7 @@ import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelExtractorsDocumentTypeListener
 import org.jbake.render.RenderingTool
 import org.jbake.template.ModelExtractorsRegistry
+import org.jbake.util.instantNowMs
 import org.jbake.util.logger
 import org.slf4j.Logger
 import java.io.File
@@ -81,7 +82,7 @@ class Oven {
         Locale.setDefault(newLocale ?: Locale.getDefault())
 
         try {
-            val start = Instant.now()
+            val start = instantNowMs()
             log.info("Baking has started at $start. Starting ContentStore...")
 
             utensils.contentStore.startup()

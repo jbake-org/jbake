@@ -10,7 +10,7 @@ import java.util.*
 fun ContentStore.addTestDocument(
     type: String,
     status: String = "published",
-    date: OffsetDateTime? = OffsetDateTime.now(),
+    date: OffsetDateTime,
     cached: Boolean = true,
     sha1: String? = generateRandomSha1(),
     sourceUri: String? = "/tmp/${generateRandomSha1()}.txt",

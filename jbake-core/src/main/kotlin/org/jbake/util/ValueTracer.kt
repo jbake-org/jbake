@@ -14,25 +14,25 @@ object ValueTracer {
     fun trace(stage: String, payload: Any?, context: String? = null) {
         //if (true) return // Disable temporarily
 
-        val (hasAuthor, value) = extractKey(payload)
+        val (hasIt, value) = extractKey(payload)
         val suffix = context?.let { "(Context: $it)" } ?: ""
-        val msg = if (hasAuthor)
+        val msg = if (hasIt)
             "ValueTracer[$stage] $TRACED_KEY PRESENT = '$value' $suffix"
         else
             "ValueTracer[$stage] $TRACED_KEY MISSING $suffix"
 
         //val timestamp = Instant.now().atZone(ZoneId.systemDefault()).format(timeFormatter)
         //System.err.println("$timestamp DEBUG $msg")
-        log.warn(msg)
+        log.debug(msg)
     }
 
     private fun extractKey(payload: Any?): Pair<Boolean, Any?>
         = when (payload) {
-            is DocumentModel -> payload.containsKey(AUTHOR_KEY) to payload[AUTHOR_KEY]
+            is DocumentModel -> payload.containsKey(TRACED_KEY) to payload[TRACED_KEY]
             is JbakeTemplateModel -> runCatching { payload.content }.getOrNull()
-                ?.let { content -> content.containsKey(AUTHOR_KEY) to content[AUTHOR_KEY] }
+                ?.let { content -> content.containsKey(TRACED_KEY) to content[TRACED_KEY] }
                 ?: (false to null)
-            is Map<*, *> -> (payload.containsKey(AUTHOR_KEY)) to payload[AUTHOR_KEY]
+            is Map<*, *> -> (payload.containsKey(TRACED_KEY)) to payload[TRACED_KEY]
             else -> false to null
         }
 

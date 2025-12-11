@@ -1,8 +1,16 @@
 package org.jbake.util
 
 import org.jbake.template.model.JbakeTemplateModel
+import java.time.Instant
+import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
+
+fun instantNowMs() = Instant.now().truncatedTo(ChronoUnit.MILLIS)
+fun instantNowSec() = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+fun OffsetDateTime.ms() = this.truncatedTo(ChronoUnit.MILLIS)
+fun OffsetDateTime.sec() = this.truncatedTo(ChronoUnit.SECONDS)
 
 fun Map<Any?, Any?>.mapOfStringToAny(): Map<String, Any> {
     @Suppress("UNCHECKED_CAST")

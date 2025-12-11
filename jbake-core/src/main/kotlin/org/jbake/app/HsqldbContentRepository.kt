@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.jbake.model.DocumentModel
 import org.jbake.model.DocumentTypeRegistry
 import org.jbake.model.ModelAttributes
+import org.jbake.model.ModelAttributes.DOC_DATE
 import org.jbake.util.Logging.logger
 import org.jbake.util.ValueTracer
 import org.jbake.util.debug
@@ -15,6 +16,8 @@ import java.sql.*
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.util.Date
 
 /**
@@ -281,14 +284,14 @@ class HsqldbContentRepository(private val type: String, private val name: String
                 while (rs.next()) {
                     val document = DocumentModel()
 
-                    // Build document from individual columns to get proper types
+                    // Build a Document from the columns, skip `properties`.
                     columnNames.forEachIndexed { idx, colName ->
                         if (colName == "properties") return@forEachIndexed
                         val value = readColumnValue(rs, idx + 1)
                         if (value != null) document[colName] = value
                     }
 
-                    // Use JSON from `properties` column to fill properties not in individual columns.
+                    // Use JSON from `properties` column to fill the properties not present in the individual columns.
                     if ("properties" in columnNames) {
                         rs.getString("properties") ?.let { propertiesJson ->
                             applyArbitraryPropertiesToDocument(propertiesJson, document)
@@ -297,22 +300,24 @@ class HsqldbContentRepository(private val type: String, private val name: String
 
                     // After merging, ensure 'date' is always OffsetDateTime if possible.
                     // This is the canonical place to ensure the type for downstream consumers (e.g., templates).
-                    val dateValue = document["date"]
+                    val dateValue = document[DOC_DATE]
+                    log.debug("Date: $dateValue ${dateValue?.javaClass?.name}")
                     when (dateValue) {
                         is Date -> {
                             if (trace) ValueTracer.trace("hsqldb-query-date", document, sql)
-                            document["date"] = dateValue.toInstant().atOffset(ZoneOffset.UTC)
+                            document[DOC_DATE] = dateValue.toInstant().atOffset(ZoneOffset.UTC)
                         }
                         is String -> {
                             if (trace) ValueTracer.trace("hsqldb-query-string", document, sql)
                             // Try ISO first, then fallback to legacy formats
                             val parsed = parseTemporalIntoOffsetDateTime(dateValue)
-                            if (parsed != null) document["date"] = parsed
+                            if (parsed != null) document[DOC_DATE] = parsed
                         }
+                        is OffsetDateTime -> document[DOC_DATE] = dateValue.withSecond(0)
                         // else: already OffsetDateTime or null
                     }
 
-                    //ValueTracer.trace("hsqldb-query-parsed", document, sql)
+                    ValueTracer.trace("hsqldb-query-mapped", document, sql + "\n\t${document.keys}\n\tdate = ${document.date}")
                     documents.add(document)
                 }
             }
@@ -452,19 +457,37 @@ class HsqldbContentRepository(private val type: String, private val name: String
 }
 
 
-private fun HsqldbContentRepository.parseTemporalIntoOffsetDateTime(dateValue: String): OffsetDateTime? {
+private val log: Logger by org.jbake.util.logger<HsqldbContentRepository>()
+
+
+private fun parseTemporalIntoOffsetDateTime(dateValue: String): OffsetDateTime? {
     val parsed = runCatching { OffsetDateTime.parse(dateValue) }.getOrNull()
         ?: runCatching {
-            // Try parsing as java.util.Date
-            val d = runCatching { fmt1.parse(dateValue) }.getOrNull()
-                ?: runCatching { fmt2.parse(dateValue) }.getOrNull()
-            d?.toInstant()?.atOffset(ZoneOffset.UTC)
-        }.getOrNull()
-    return parsed
+            /*// Try parsing as java.util.Date
+            val d = runCatching { fmtDate1.parse(dateValue) }.getOrNull()
+                ?: runCatching { fmtDate2.parse(dateValue) }.getOrNull()
+            d?.toInstant()?.atOffset(ZoneOffset.UTC)*/
+
+            optionalFormats.parse(dateValue)
+        }
+            //.getOrElse { log.warn("Can't parse date string: $dateValue"); null }
+            .getOrElse { throw Exception("Can't parse date string: $dateValue") }
+
+    return when (parsed) {
+        is OffsetDateTime -> parsed
+        is java.time.LocalDateTime -> parsed.atOffset(ZoneOffset.UTC)
+        is java.time.LocalDate -> parsed.atStartOfDay().atOffset(ZoneOffset.UTC)
+        else -> throw Exception("Unknown date-time type: ${parsed.javaClass.name}")
+    }
+
 }
 
-private val fmt1 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
-private val fmt2 = SimpleDateFormat("yyyy-MM-dd")
+private val fmtDate1 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+private val fmtDate2 = SimpleDateFormat("yyyy-MM-dd'T'HH:mmXXX")
+private val fmtDate3 = SimpleDateFormat("yyyy-MM-dd")
+
+private val optionalFormats = DateTimeFormatterBuilder().append(DateTimeFormatter.ofPattern("yyyy-MM-dd['T'HH:mm[:ss]XXX]")).toFormatter()
+// Other formats: "[MM/dd/yyyy][dd-MM-yyyy][yyyy-MM-dd]"
 
 
 private fun applyArbitraryPropertiesToDocument(properties: String, document: DocumentModel) {

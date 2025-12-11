@@ -25,6 +25,22 @@ class InstantModel(private val instant: Instant) : TemplateDateModel {
 /**
  * Custom ObjectWrapper that wraps all Maps with NullSafeMapModel.
  */
+class TemporalsObjectWrapper(incompatibleImprovements: Version)
+    : DefaultObjectWrapper(incompatibleImprovements) {
+
+    override fun wrap(obj: Any?): TemplateModel? {
+        return when(obj) {
+            is OffsetDateTime -> OffsetDateTimeModel(obj)
+            is Instant        -> InstantModel(obj)
+            null -> null
+            else -> super.wrap(obj)
+        }
+    }
+}
+
+/**
+ * Custom ObjectWrapper that wraps all OffsetDateTime in OffsetDateTimeModel.
+ */
 private class NullSafeObjectWrapper(incompatibleImprovements: Version)
     : DefaultObjectWrapper(incompatibleImprovements) {
 

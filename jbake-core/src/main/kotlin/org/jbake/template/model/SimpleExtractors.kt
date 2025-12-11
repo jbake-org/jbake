@@ -6,6 +6,7 @@ import org.jbake.app.configuration.PropertyList.DATA_FILE_DOCTYPE
 import org.jbake.template.ModelExtractor
 import org.jbake.template.TypedModelExtractor
 import org.jbake.util.DataFileUtil
+import org.jbake.util.sec
 import java.time.OffsetDateTime
 
 /**
@@ -21,7 +22,7 @@ class AllTagsExtractor : TypedModelExtractor<MutableSet<String>> {
 
 /** Extracts the current date as the published date. */
 class PublishedDateExtractor : TypedModelExtractor<OffsetDateTime> {
-    override fun extract(context: RenderContext, key: String): OffsetDateTime = OffsetDateTime.now()
+    override fun extract(context: RenderContext, key: String): OffsetDateTime = OffsetDateTime.now().sec()
 }
 
 /** Extracts the database/content store itself. */

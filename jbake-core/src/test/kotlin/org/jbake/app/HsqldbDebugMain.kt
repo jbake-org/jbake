@@ -1,6 +1,7 @@
 package org.jbake.app
 
 import org.jbake.model.DocumentModel
+import org.jbake.util.sec
 import java.time.OffsetDateTime
 
 
@@ -23,7 +24,7 @@ object HsqldbDebugMain {
         doc.type = "post"
         doc.status = "published"
         doc.title = "Test"
-        doc.date = OffsetDateTime.now()
+        doc.date = OffsetDateTime.now().sec()
         doc.rendered = false
 
         log.info("3. Created document")
