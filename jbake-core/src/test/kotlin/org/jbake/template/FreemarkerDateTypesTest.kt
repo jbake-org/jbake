@@ -1,10 +1,10 @@
 package org.jbake.template
 
+import freemarker.cache.StringTemplateLoader
 import freemarker.template.Configuration
 import freemarker.template.TemplateExceptionHandler
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
-import no.api.freemarker.java8.Java8ObjectWrapper
 import org.jbake.util.convertTemporalsInModelToJavaUtilDate
 import java.io.StringWriter
 import java.time.*
@@ -82,8 +82,8 @@ class FreemarkerDateTypesTest : StringSpec({
 
         val out = renderInlineTemplate(map, t)
         out.shouldContain("2025-12-05")
-        out.shouldContain("09:00:00")
-        out.shouldContain("2025-12-05 09:00:00")
+        out.shouldContain("10:00:00")
+        out.shouldContain("2025-12-05 10:00:00")
     }
 
 })
@@ -94,32 +94,19 @@ fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String
     val cfg = Configuration(Configuration.VERSION_2_3_34)
     cfg.defaultEncoding = "UTF-8"
     cfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
-    // See
-    cfg.objectWrapper = Java8ObjectWrapper(Configuration.VERSION_2_3_34)
+    // Force timezone in tests so freemarker built-ins (?date, ?time, ?datetime) produce deterministic results.
+    // Use a fixed offset (GMT+01:00) to avoid DST transitions causing test flakiness.
+    cfg.timeZone = TimeZone.getTimeZone("GMT+01:00")
+    // See https://github.com/lazee/freemarker-java-8/tree/master
+    //cfg.objectWrapper = Java8ObjectWrapper(Configuration.VERSION_2_3_34)
 
-    // Use StringTemplateLoader to load template text under a name
-    val loader = freemarker.cache.StringTemplateLoader()
-    val templateName = "inline"
-    loader.putTemplate(templateName, templateText)
-    cfg.templateLoader = loader
+    cfg.templateLoader = StringTemplateLoader().apply { putTemplate("inline", templateText) }
 
     // Convert java.time types to java.util.Date for compatibility
-    val converted = convertTemporalsInModelToJavaUtilDate(modelMap) as? Map<*, *> ?: modelMap
+    val convertedTemplateModel = convertTemporalsInModelToJavaUtilDate(modelMap) as? Map<*, *> ?: modelMap
 
-    // Convert Kotlin maps/lists to Java maps/lists but DO NOT convert date/time types
-    // TBD: Is this even needed? Kotlin types map to JDK types at runtime.
-    fun toJavaObject(obj: Any?): Any? = when (obj) {
-        is Map<*, *> -> HashMap<String, Any?>().apply { obj.forEach { (k, v) -> this[k.toString()] = toJavaObject(v) } }
-        is Collection<*> -> ArrayList(obj.map { toJavaObject(it) })
-        else -> obj
-    }
-
-    ///val javaModel = toJavaObject(modelMap) as? Map<*, *> ?: modelMap
-    val javaModel = modelMap
-
-    val template = cfg.getTemplate(templateName)
+    val template = cfg.getTemplate("inline")
     val writer = StringWriter()
-    template.process(javaModel, writer)
+    template.process(convertedTemplateModel, writer)
     return writer.toString()
 }
-

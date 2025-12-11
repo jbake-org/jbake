@@ -40,6 +40,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
             log.info("Default template: $templateName was not found, searching for others...")
             // if default template does not exist then check if any alternative engine templates exist
             val templateNameWithoutExt = templateName.dropLast(4)
+
             for (extension in renderers.recognizedExtensions) {
                 templateFile = templateDir.resolve("$templateNameWithoutExt.$extension")
                 if (templateFile.exists()) {

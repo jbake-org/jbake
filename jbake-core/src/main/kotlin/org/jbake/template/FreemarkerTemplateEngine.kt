@@ -3,7 +3,6 @@ package org.jbake.template
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
 import freemarker.template.TemplateDateModel.DATETIME
-import no.api.freemarker.java8.Java8ObjectWrapper
 import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
@@ -33,7 +32,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 
     private fun setupTemplateConfiguration() {
         templateCfg = Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS)
-        templateCfg.setObjectWrapper(Java8ObjectWrapper(Configuration.VERSION_2_3_34))
+        //templateCfg.setObjectWrapper(Java8ObjectWrapper(Configuration.VERSION_2_3_34))
         templateCfg.setDefaultEncoding(config.renderEncoding)
         templateCfg.setOutputEncoding(config.outputEncoding)
         templateCfg.setTimeZone(config.freemarkerTimeZone)
