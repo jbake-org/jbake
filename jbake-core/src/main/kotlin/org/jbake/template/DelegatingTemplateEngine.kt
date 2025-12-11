@@ -57,9 +57,8 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
             return
         }
 
-        // Convert OffsetDateTime to java.util.Date for all template engines
-        val convertedModel = org.jbake.util.convertDatesInModel(model)
-
+        // Convert Temporals to java.util.Date for all template engines
+        val convertedModel = org.jbake.util.convertTemporalsInModelToJavaUtilDate(model)
 
         engine.renderDocument(convertedModel, templateFileName, writer)
     }

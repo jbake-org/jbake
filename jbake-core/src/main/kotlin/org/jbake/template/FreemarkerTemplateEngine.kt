@@ -13,7 +13,7 @@ import org.jbake.template.model.TemplateModel
 import org.jbake.util.AuthorTracer
 import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
-import org.jbake.util.convertDatesInModel
+import org.jbake.util.convertTemporalsInModelToJavaUtilDate
 import java.io.Writer
 import java.time.*
 import java.util.*
@@ -56,7 +56,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             val template = templateCfg.getTemplate(templateName)
 
             // Recursively convert OffsetDateTime to java.util.Date for Freemarker compatibility
-            val model: TemplateModel = convertDatesInModel(model)
+            val model: TemplateModel = convertTemporalsInModelToJavaUtilDate(model)
 
             // Ensure convertedModel is a TemplateModel for LazyLoadingModel
             /*

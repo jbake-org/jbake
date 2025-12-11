@@ -5,7 +5,7 @@ import freemarker.template.TemplateExceptionHandler
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
 import no.api.freemarker.java8.Java8ObjectWrapper
-import org.jbake.util.convertDatesInModel
+import org.jbake.util.convertTemporalsInModelToJavaUtilDate
 import java.io.StringWriter
 import java.time.*
 import java.util.*
@@ -104,7 +104,7 @@ fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String
     cfg.templateLoader = loader
 
     // Convert java.time types to java.util.Date for compatibility
-    val converted = convertDatesInModel(modelMap) as? Map<*, *> ?: modelMap
+    val converted = convertTemporalsInModelToJavaUtilDate(modelMap) as? Map<*, *> ?: modelMap
 
     // Convert Kotlin maps/lists to Java maps/lists but DO NOT convert date/time types
     // TBD: Is this even needed? Kotlin types map to JDK types at runtime.

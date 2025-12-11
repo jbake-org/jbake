@@ -4,7 +4,11 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.app.configuration.JBakeProperty
 import java.io.PrintStream
 
-class ConfigurationPrinter(private val configuration: JBakeConfiguration, private val out: PrintStream) {
+class ConfigurationPrinter(
+    private val configuration: JBakeConfiguration,
+    private val out: PrintStream,
+) {
+
     fun print() {
         val properties: MutableList<JBakeProperty> = configuration.jbakeProperties
         var lastGroup: JBakeProperty.Group? = null
