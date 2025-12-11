@@ -66,64 +66,61 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 
     /**
      * A custom Freemarker model that avoids loading the whole documents into memory if not necessary.
+     *
+     * This is an ugly class mixing several concerns into a single hard-to-reason-about blob. Should be split per concerns.
      */
     class LazyLoadingModel(
-        private val wrapper: ObjectWrapper,
-        eagerModel: TemplateModel,
+        private val freeMarkerWrapper: ObjectWrapper,
+        private val jbakeTemplateModel: TemplateModel,
         private val db: ContentStore,
-        private val config: JBakeConfiguration
+        private val jbakeConfig: JBakeConfiguration
     )
         : TemplateHashModel
     {
-        private val eagerAsSimpleHash = SimpleHash(eagerModel, wrapper)
-
         @Throws(TemplateModelException::class)
         override fun get(contentMapKey: String): freemarker.template.TemplateModel? {
+
+            // Make the methods of ContentWrapper accessible in the template - e.g.: `${db.getPublishedPostsByTag(tagName).size()}`
+            if (contentMapKey == ModelAttributes.TMPL_DB_ACCESS)
+                return BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
+                    .wrap(db)
+
+            if (contentMapKey == ModelAttributes.DATA_FILES) {
+                return BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
+                    .wrap(DataFileUtil(db, jbakeConfig.dataFileDocType))
+            }
+
+            // JBake config. Merged from engine's jbakeConfig and templateModel's config. TODO: Probably they are the same?
+            @Suppress("UNCHECKED_CAST")
+            if (contentMapKey == ModelAttributes.TMPL_JBAKE_CONFIG) {
+                val merged: MutableMap<String, Any> = HashMap()
+
+                merged.putAll(jbakeConfig.asHashMap())
+
+                // Overlay merged config values with eager's.
+                merged.putAll(jbakeTemplateModel.config)
+
+                return freeMarkerWrapper.wrap(merged)
+            }
+
             try {
-                // GIT Issue#357: Accessing db in freemarker template throws exception
-                // When content store is accessed with key "db" then wrap the ContentStore with BeansWrapper and return to template.
-                // All methods on db are then accessible in template. Eg: ${db.getPublishedPostsByTag(tagName).size()}
-                if (contentMapKey == ModelAttributes.TMPL_DB_ACCESS)
-                    return BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
-                        .wrap(db)
-
-                if (contentMapKey == ModelAttributes.DATA_FILES) {
-                    return BeansWrapperBuilder(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS).build()
-                        .wrap(DataFileUtil(db, config.dataFileDocType))
-                }
-
-                // Provide a merged config map to templates so both legacy underscore keys (feed_file) and dotted keys are available.
-                // Prefer values from config.asHashMap().
-                if (contentMapKey == ModelAttributes.TMPL_JBAKE_CONFIG) {
-                    val merged: MutableMap<String, Any> = HashMap()
-
-                    // Base from configuration (underscore-style keys)
-                    runCatching { merged.putAll(config.asHashMap()) }
-
-                    // Overlay merged config values with eager's. TODO: This looks wrong, needs to be refactored / simplified.
-                    @Suppress("UNCHECKED_CAST")
-                    val eagerAsMap = eagerAsSimpleHash.toMap() as? Map<String, Any> ?: mapOf()
-                    @Suppress("UNCHECKED_CAST")
-                    (eagerAsMap[ModelAttributes.TMPL_JBAKE_CONFIG] as? Map<String, Any>)?.let { merged.putAll(it) }
-                    return wrapper.wrap(merged)
-                }
-
-                @Suppress("UNCHECKED_CAST")
-                val map = eagerAsSimpleHash.toMap() as MutableMap<String, Any> // TBD converter function to check the types
+                val map = jbakeTemplateModel
 
                 ValueTracer.trace("freemarker-eager-model", map[ModelAttributes.TMPL_CONTENT_MODEL], contentMapKey)
-                val adapter = FreemarkerTemplateModelAdapter(wrapper)
+                val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper)
                 val result: freemarker.template.TemplateModel = extractors.extractAndTransform(db, contentMapKey, map, adapter)
 
                 // Wrap Map results (especially document models like "content") with NullSafeMapModel.
                 // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.
                 // Combined with classicCompatible=true, null values are treated as empty strings in templates.
-                if (result is SimpleHash)
-                    return NullSafeMapModel(result, wrapper)
+                //if (result is SimpleHash)
+                //    return NullSafeMapModel(result, wrapper)
+                // Not needed as it turns out - no change in tests.
+
                 return result
             }
             catch (_: NoModelExtractorException) {
-                return eagerAsSimpleHash.get(contentMapKey)
+                return freeMarkerWrapper.wrap(jbakeTemplateModel.get(contentMapKey))
             }
         }
 
@@ -135,7 +132,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         /**
          * Custom ObjectWrapper that wraps all Maps with NullSafeMapModel.
          */
-        class NullSafeObjectWrapper(incompatibleImprovements: Version)
+        private class NullSafeObjectWrapper(incompatibleImprovements: Version)
             : DefaultObjectWrapper(incompatibleImprovements) {
 
             override fun wrap(obj: Any?): freemarker.template.TemplateModel {
@@ -152,7 +149,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
          * Recursive wrapper for SimpleHash that returns null for missing keys instead of throwing exceptions.
          * This allows FreeMarker's classic_compatible mode to work correctly with ${content.author} when the author key is missing.
          */
-        class NullSafeMapModel(
+        private class NullSafeMapModel(
             private val delegate: SimpleHash,
             private val wrapper: ObjectWrapper
         ) : TemplateHashModel {
