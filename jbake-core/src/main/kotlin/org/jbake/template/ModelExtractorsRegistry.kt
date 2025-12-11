@@ -96,7 +96,7 @@ class ModelExtractorsRegistry private constructor() {
         map: MutableMap<String, Any>,
         adapter: TemplateEngineAdapter<Type>
     ): Type {
-        val extractor = extractors[key] ?: throw NoModelExtractorException("no model extractor for key \"$key\"")
+        val extractor = extractors[key] ?: throw NoModelExtractorException("No model extractor for key \"$key\"")
         val extractedValue = extractor.get(db, map, key)
         return adapter.adapt(key, extractedValue!!)
     }

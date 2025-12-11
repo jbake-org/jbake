@@ -24,7 +24,7 @@ class FreemarkerDateTypesTest : StringSpec({
         out.shouldContain("2025-12-10 14:30:00+01:00")
     }
 
-    // Error: For "...(...)" callee: Expected a method or function, but this has evaluated to a string (wrapper: f.t.SimpleScalar):
+
     "freemarker formats OffsetDateTime, wrapped" {
         val odt = OffsetDateTime.of(2025, 12, 10, 14, 30, 0, 0, ZoneOffset.ofHours(1))
         val map = mutableMapOf<String, Any>("content" to mapOf("date" to OffsetDateTimeModel(odt)))
