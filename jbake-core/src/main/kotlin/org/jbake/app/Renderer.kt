@@ -4,8 +4,8 @@ import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.DocumentModel
 import org.jbake.model.ModelAttributes
 import org.jbake.template.DelegatingTemplateEngine
-import org.jbake.template.model.RenderContext
 import org.jbake.template.model.JbakeTemplateModel
+import org.jbake.template.model.RenderContext
 import org.jbake.util.Logging.logger
 import org.jbake.util.PagingHelper
 import org.jbake.util.ValueTracer
@@ -295,12 +295,12 @@ class Renderer {
                 // Add an index file at root directory of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
                 val path = config.destinationDir.resolve(outputTagFile).resolve("index$ext")
-                val map = buildEmptyModelWithType(ModelAttributes.DOC_TAGS).apply {
+                val documentModel = buildEmptyModelWithType(ModelAttributes.DOC_TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
                 val model = JbakeTemplateModel().apply {
                     renderer = renderingEngine
-                    content = map
+                    content = documentModel
                     // Provide configuration to template model so typed extractors can access it
                     this.config = this@Renderer.config.asHashMap()
                     this.put("jbake_config", config)

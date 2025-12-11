@@ -67,9 +67,10 @@ class PublishedCustomExtractor(private val customDocumentType: String) : TypedMo
 class DataExtractor : TypedModelExtractor<DataFileUtil> {
     @Suppress("DEPRECATION", "UNCHECKED_CAST")
     override fun extract(context: RenderContext, key: String): DataFileUtil {
-        val model = context.toLegacyMap()
-        val config = model["config"] as? Map<String, Any>
-        val defaultDocType: String = config?.get(DATA_FILE_DOCTYPE.key.replace(".", "_"))?.toString() ?: ""
+        //val model = context.toLegacyMap()
+        //val config = model["config"] as? Map<String, Any>
+        val config = context.config
+        val defaultDocType: String = config.get(DATA_FILE_DOCTYPE.key)?.toString() ?: ""
         return DataFileUtil(context.db, defaultDocType)
     }
 }

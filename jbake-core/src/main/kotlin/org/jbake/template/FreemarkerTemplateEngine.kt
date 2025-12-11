@@ -2,7 +2,6 @@ package org.jbake.template
 
 import freemarker.ext.beans.BeansWrapperBuilder
 import freemarker.template.*
-import freemarker.template.TemplateDateModel.DATETIME
 import org.jbake.app.ContentStore
 import org.jbake.app.NoModelExtractorException
 import org.jbake.app.RenderingException
@@ -78,7 +77,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         : TemplateHashModel
     {
         @Throws(TemplateModelException::class)
-        override fun get(contentMapKey: String): freemarker.template.TemplateModel? {
+        override fun get(contentMapKey: String): FmTemplateModel? {
 
             // Make the methods of ContentWrapper accessible in the template - e.g.: `${db.getPublishedPostsByTag(tagName).size()}`
             if (contentMapKey == ModelAttributes.TMPL_DB_ACCESS)
@@ -106,7 +105,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             try {
                 ValueTracer.trace("freemarker-eager-model", jbakeTemplateModel.content, contentMapKey)
                 val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper)
-                val result: freemarker.template.TemplateModel = extractors.extractAndTransform(db, contentMapKey, jbakeTemplateModel, adapter)
+                val result: FmTemplateModel = extractors.extractAndTransform(db, contentMapKey, jbakeTemplateModel, adapter)
 
                 // Wrap Map results (especially document models like "content") with NullSafeMapModel.
                 // This ensures ${content.author} returns null instead of throwing InvalidReferenceException when the document doesn't have an author field.
@@ -123,52 +122,12 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         }
 
         override fun isEmpty() = false
-
-
-        /// The two classes below are quite suspicious hacks and I will probably REMOVE them.
-
-        /**
-         * Custom ObjectWrapper that wraps all Maps with NullSafeMapModel.
-         */
-        private class NullSafeObjectWrapper(incompatibleImprovements: Version)
-            : DefaultObjectWrapper(incompatibleImprovements) {
-
-            override fun wrap(obj: Any?): freemarker.template.TemplateModel {
-                if (obj is Map<*, *>) {
-                    // Wrap maps with our null-safe wrapper
-                    val simpleHash = super.wrap(obj) as? SimpleHash
-                    return if (simpleHash != null) NullSafeMapModel(simpleHash, this) else super.wrap(obj)
-                }
-                return super.wrap(obj)
-            }
-        }
-
-        /**
-         * Recursive wrapper for SimpleHash that returns null for missing keys instead of throwing exceptions.
-         * This allows FreeMarker's classic_compatible mode to work correctly with ${content.author} when the author key is missing.
-         */
-        private class NullSafeMapModel(
-            private val delegate: SimpleHash,
-            private val wrapper: ObjectWrapper
-        ) : TemplateHashModel {
-
-            override fun get(key: String): freemarker.template.TemplateModel? {
-                // If the value is another map, wrap it too.
-                return try {
-                    delegate.get(key).let { if (it is SimpleHash) NullSafeMapModel(it, wrapper) else it }
-                }
-                // Return null for missing keys instead of throwing.
-                catch (_: TemplateModelException) { null }
-            }
-
-            override fun isEmpty(): Boolean = delegate.isEmpty
-        }
     }
 }
 
 
-class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper) : TemplateEngineAdapter<freemarker.template.TemplateModel> {
-    override fun adapt(key: String, extractedValue: Any): freemarker.template.TemplateModel {
+class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper) : TemplateEngineAdapter<FmTemplateModel> {
+    override fun adapt(key: String, extractedValue: Any): FmTemplateModel {
         // If the extracted value is a Java 8 time type, convert to java.util.Date and let the wrapper produce a TemplateDateModel.
         when (extractedValue) {
             is OffsetDateTime -> return wrapper.wrap(Date.from(extractedValue.toInstant()))
@@ -200,17 +159,4 @@ class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper) : Templ
     }
 }
 
-
-// Wrappers to convert Java 8 date/time types to Freemarker TemplateDateModels.
-// Kept for potential special-case usage but are not required when using Java8ObjectWrapper.
-// TBD Currently not used; freemarker-java8 instead -> remove when stable.
-
-class OffsetDateTimeModel(private val dateTime: OffsetDateTime) : TemplateDateModel {
-    override fun getDateType() = DATETIME
-    override fun getAsDate(): Date = Date.from(dateTime.toInstant())
-}
-
-class InstantModel(private val instant: Instant) : TemplateDateModel {
-    override fun getDateType() = DATETIME
-    override fun getAsDate(): Date = Date.from(instant)
-}
+typealias FmTemplateModel = TemplateModel

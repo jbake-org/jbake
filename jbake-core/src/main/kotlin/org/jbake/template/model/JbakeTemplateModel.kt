@@ -21,7 +21,7 @@ open class JbakeTemplateModel : BaseModel {
         set(configModel) { put(ModelAttributes.TMPL_JBAKE_CONFIG, configModel) }
 
     var content: DocumentModel
-        get() = get(ModelAttributes.TMPL_CONTENT_MODEL) as DocumentModel
+        get() = (get(ModelAttributes.TMPL_CONTENT_MODEL) as Map<String, Any>).let { DocumentModel.fromMap(it) }
         set(content) { put(ModelAttributes.TMPL_CONTENT_MODEL, content) }
 
     var renderer: DelegatingTemplateEngine?
