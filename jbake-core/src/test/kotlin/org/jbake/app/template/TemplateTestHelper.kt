@@ -50,24 +50,24 @@ class TemplateTestHelper(
         DocumentTypeRegistry.addListener(listener)
 
         templateDir_ = sourceDir.resolve(templateDir)
-        if (!templateDir_.exists()) throw Exception("Cannot find template folder!")
+        if (!templateDir_.exists()) throw Exception("Template dir does not exist: $templateDir_")
 
         destinationDir = ContentStoreIntegrationTest.tempDir
         config.destinationDir = destinationDir
         config.templateDir = templateDir_
 
+        // Remap configured template filenames to the extension under test. Not really necessary - the files already match.
         for (docType in DocumentTypeRegistry.documentTypes) {
-            val templateFile: File? = config.getTemplateFileByDocType(docType)
+            val templateFile: File = config.getTemplateFileByDocType(docType) ?: continue
 
-            if (templateFile != null) {
-                val fileName = templateFile.name
-                val fileBaseName = fileName.take(fileName.lastIndexOf("."))
-                config.setTemplateFileNameForDocType(docType, "$fileBaseName.$templateExtension")
-            }
+            val candidate = templateDir_.resolve("${templateFile.nameWithoutExtension}.$templateExtension")
+            if (candidate.exists())
+                config.setTemplateFileNameForDocType(docType, candidate.name)
         }
 
         config.setTemplateFileNameForDocType("paper", "paper.$templateExtension")
         DocumentTypeRegistry.addDocumentType("paper")
+
         db.updateSchema()
 
         config.outputExtension shouldBe ".html"

@@ -9,9 +9,9 @@ import org.jbake.app.RenderingException
 import org.jbake.app.configuration.JBakeConfiguration
 import org.jbake.model.ModelAttributes
 import org.jbake.template.model.TemplateModel
-import org.jbake.util.AuthorTracer
 import org.jbake.util.DataFileUtil
 import org.jbake.util.Logging.logger
+import org.jbake.util.AuthorTracer
 import org.jbake.util.convertTemporalsInModelToJavaUtilDate
 import java.io.Writer
 import java.time.*
@@ -38,6 +38,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         templateCfg.setTimeZone(config.freemarkerTimeZone)
         templateCfg.setSQLDateAndTimeTimeZone(config.freemarkerTimeZone)
         templateCfg.isClassicCompatible = true
+        templateCfg.logTemplateExceptions = false
 
         // Use RETHROW handler so exceptions are not suppressed and tests fail on template errors
         templateCfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
@@ -55,21 +56,9 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
             val template = templateCfg.getTemplate(templateName)
 
             // Recursively convert OffsetDateTime to java.util.Date for Freemarker compatibility
-            val model: TemplateModel = convertTemporalsInModelToJavaUtilDate(model)
+            val modelWithDates: TemplateModel = convertTemporalsInModelToJavaUtilDate(model)
 
-            // Ensure convertedModel is a TemplateModel for LazyLoadingModel
-            /*
-            val templateModel =
-                if (convertedModel is TemplateModel) convertedModel
-                else TemplateModel().apply {
-                    if (convertedModel is Map<*, *>) {
-                        @Suppress("UNCHECKED_CAST")
-                        putAll(model as Map<String, Any>)
-                    }
-                }
-            }*/
-
-            template.process(LazyLoadingModel(templateCfg.objectWrapper, model, db, config), writer)
+            template.process(LazyLoadingModel(templateCfg.objectWrapper, modelWithDates, db, config), writer)
         }
         catch (e: Exception) { throw RenderingException("Failed rendering ${model} for $templateName: ${e.message}",e) }
     }

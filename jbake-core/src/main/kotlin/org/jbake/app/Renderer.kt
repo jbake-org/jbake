@@ -146,14 +146,12 @@ class Renderer {
     fun renderIndexPaging(indexFile: String) {
         val totalPosts = db.getPublishedCount("post")
         val postsPerPage = config.postsPerPage
+        log.debug("Rendering index for $totalPosts posts paged by $postsPerPage.")
 
-        if (totalPosts == 0L) {
-            // Paging makes no sense. Render single index file instead.
-            renderIndex(indexFile)
-            return
-        }
+        if (totalPosts == 0L) { renderIndex(indexFile); return }
 
         val pagingHelper = PagingHelper(totalPosts, postsPerPage)
+
         val model = TemplateModel().apply {
             renderer = renderingEngine
             numberOfPages = pagingHelper.numberOfPages
@@ -171,7 +169,7 @@ class Renderer {
                 model.previousFilename = pagingHelper.getPreviousFileName(page)
                 model.nextFileName = pagingHelper.getNextFileName(page)
 
-                val contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME)
+                val contentModel = buildEmptyModelWithType(MASTERINDEX_TEMPLATE_NAME)
 
                 if (page > 1)
                     contentModel.rootPath = "../"
@@ -270,7 +268,7 @@ class Renderer {
             try {
                 val ext = config.outputExtension ?: ""
                 val path = config.destinationDir.resolve(outputTagFile).resolve(tag + ext)
-                val map = buildSimpleModel(ModelAttributes.TAGS_CURRENT_TAG).apply {
+                val map = buildEmptyModelWithType(ModelAttributes.TAGS_CURRENT_TAG).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
                 val model = TemplateModel().apply {
@@ -296,7 +294,7 @@ class Renderer {
                 // Add an index file at root directory of tags. This will prevent directory listing and also provide an option to display all tags page.
                 val ext = config.outputExtension ?: ""
                 val path = config.destinationDir.resolve(outputTagFile).resolve("index$ext")
-                val map = buildSimpleModel(ModelAttributes.DOC_TAGS).apply {
+                val map = buildEmptyModelWithType(ModelAttributes.DOC_TAGS).apply {
                     rootPath = FileUtil.getUriPathToDestinationRoot(config, path)
                 }
                 val model = TemplateModel().apply {
@@ -322,13 +320,12 @@ class Renderer {
     }
 
     /** Builds simple map of values, which are exposed when rendering index/archive/sitemap/feed/tags. */
-    private fun buildSimpleModel(type: String): DocumentModel {
-        val content = DocumentModel()
-        content.type = type
-        content.rootPath = ""
-        // Add any more keys here that need to have a default value to prevent need to perform null check in templates.
-        return content
-    }
+    private fun buildEmptyModelWithType(type: String): DocumentModel
+        = DocumentModel().apply {
+            this.type = type
+            this.rootPath = ""
+            // Add any more keys here that need to have a default value to prevent need to perform null check in templates.
+        }
 
     private interface RenderingConfig {
 
@@ -370,7 +367,7 @@ class Renderer {
         private constructor(path: File, allInOneName: String)
             : super(path, allInOneName, findTemplateName(allInOneName))
         {
-            this.content = buildSimpleModel(allInOneName)
+            this.content = buildEmptyModelWithType(allInOneName)
         }
 
         constructor(outputFile: String, allInOneName: String) : super(
@@ -378,7 +375,7 @@ class Renderer {
             name = allInOneName,
             template = findTemplateName(allInOneName)
         ){
-            this.content = buildSimpleModel(allInOneName)
+            this.content = buildEmptyModelWithType(allInOneName)
         }
 
         /**
