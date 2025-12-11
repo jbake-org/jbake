@@ -81,8 +81,16 @@ open class TemplateModel : BaseModel {
 
     companion object {
 
-        fun fromMap(map: Map<String, Any>): TemplateModel {
-            return TemplateModel().apply { putAll(map) }
+        fun fromMap(map: Map<*, *>): TemplateModel {
+            val model = TemplateModel()
+            val violations = mutableListOf<String>()
+            for ((k, v) in map) {
+                if (v == null) continue
+                if (k !is String) violations += "${k?.javaClass?.name ?: "null"}: '${k}'"
+                else model.put(k, v)
+            }
+            if (violations.isEmpty()) return model
+            throw IllegalArgumentException("TemplateModel: all keys must be Strings; found:\n" + violations.joinToString("\n") { "  * $it" })
         }
 
 
