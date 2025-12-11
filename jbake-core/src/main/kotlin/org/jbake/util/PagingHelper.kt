@@ -4,38 +4,30 @@ import java.net.URI
 import java.net.URISyntaxException
 import kotlin.math.ceil
 
-class PagingHelper(private val totalDocuments: Long, private val postsPerPage: Int) {
-    val numberOfPages: Int
-        get() = ceil((totalDocuments * 1.0) / (postsPerPage * 1.0)).toInt()
+class PagingHelper(totalDocuments: Long, postsPerPage: Int) {
+
+    val numberOfPages: Int = ceil((totalDocuments * 1.0) / (postsPerPage * 1.0)).toInt()
 
     /** Returns the next page file name or null if there is no next page.  */
     @Throws(URISyntaxException::class)
-    fun getNextFileName(currentPageNumber: Int): String? {
-        return if (currentPageNumber >= this.numberOfPages) null
-        else URI((currentPageNumber + 1).toString() + URI_SEPARATOR).toString()
-    }
+    fun getNextFileName(currentPage: Int): String? =
+        if (currentPage >= this.numberOfPages) null
+        else validated("${currentPage + 1}/")
+
 
     @Throws(URISyntaxException::class)
-    fun getPreviousFileName(currentPageNumber: Int): String? {
-        return when {
-            isFirstPage(currentPageNumber) -> null
-            // Returning to first page, return empty string which when prefixed with content.rootpath should get to root of the site.
-            currentPageNumber == 2 -> ""
-            else -> URI((currentPageNumber - 1).toString() + URI_SEPARATOR).toString()
+    fun getPreviousFileName(currentPage: Int): String?
+        = when (currentPage) {
+            1 -> null
+            // Returning to first page -> return "" -> prefixed with `content.rootpath` should get to site root.
+            2 -> ""
+            else -> validated("${currentPage - 1}/")
         }
-    }
-
-    private fun isFirstPage(page: Int): Boolean {
-        return page == 1
-    }
 
     @Throws(URISyntaxException::class)
-    fun getCurrentFileName(page: Int, fileName: String): String {
-        return if (isFirstPage(page)) fileName
-            else URI(page.toString() + URI_SEPARATOR + fileName).toString()
-    }
+    fun getCurrentFileName(page: Int, fileName: String): String =
+        if (page == 1) fileName
+        else validated("$page/$fileName")
 
-    companion object {
-        private const val URI_SEPARATOR = "/"
-    }
+    private fun validated(path: String) = URI(path).toString()
 }
