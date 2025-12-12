@@ -28,7 +28,10 @@ public class ZipUtil {
         byte[] buffer = new byte[1024];
 
         while ((entry = zis.getNextEntry()) != null) {
-            File outputFile = new File(outputFolder.getCanonicalPath() + File.separatorChar + entry.getName());
+            File outputFile = new File(outputFolder.getCanonicalPath(), entry.getName());
+            if (!outputFile.toPath().normalize().startsWith(outputFolder.getCanonicalPath())) {
+                throw new IOException("Bad zip entry");
+            }
             File outputParent = new File(outputFile.getParent());
             outputParent.mkdirs();
 
