@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 object ValueTracer {
 
     fun trace(stage: String, payload: Any?, context: String? = null) {
-        //if (true) return // Disable temporarily
+        if (true) return // Disable temporarily
 
         val (hasIt, value) = extractKey(payload)
         val suffix = context?.let { "(Context: $it)" } ?: ""

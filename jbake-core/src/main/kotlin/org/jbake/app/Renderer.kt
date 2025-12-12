@@ -122,9 +122,11 @@ class Renderer {
                 renderingEngine.renderDocument(renderConfig.model, renderConfig.template, out)
             }
             log.info("Rendered: ${renderConfig.name} $outputFile")
-        } catch (e: Exception) {
-            log.error("Rendering failed: ${renderConfig.name} : $outputFile", e)
-            throw Exception("Failed to render " + renderConfig.name, e)
+        }
+        catch (e: Exception) {
+            val message = "Failed to render renderConfig '${renderConfig.name}' into $outputFile: ${e.javaClass.simpleName} ${e.message}"
+            log.error("$message Rethrowing", e)
+            throw Exception(message, e)
         }
     }
 
