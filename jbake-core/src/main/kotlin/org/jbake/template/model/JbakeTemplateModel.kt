@@ -26,7 +26,7 @@ open class JbakeTemplateModel : BaseModel {
 
     var renderer: DelegatingTemplateEngine?
         get() = get(ModelAttributes.TMPL_ENGINE) as DelegatingTemplateEngine?
-        set(renderingEngine) { put(ModelAttributes.TMPL_ENGINE, renderingEngine!!) }
+        set(renderingEngine) { putOrRemoveIfNull(ModelAttributes.TMPL_ENGINE, renderingEngine) }
 
     var numberOfPages: Int
         get() = get(ModelAttributes.PAGI_TOTAL_PAGES_COUNT) as Int? ?: 0
