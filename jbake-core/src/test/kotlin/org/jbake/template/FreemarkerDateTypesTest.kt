@@ -91,22 +91,24 @@ class FreemarkerDateTypesTest : StringSpec({
 
 // Shared helper for test rendering of inline Freemarker templates
 fun renderInlineTemplate(modelMap: MutableMap<String, Any>, templateText: String): String {
-    val cfg = Configuration(Configuration.VERSION_2_3_34)
-    cfg.defaultEncoding = "UTF-8"
-    cfg.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
+    val fmConfig = FreemarkerConfig(Configuration.VERSION_2_3_34)
+    fmConfig.defaultEncoding = "UTF-8"
+    fmConfig.templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
     // Force timezone in tests so freemarker built-ins (?date, ?time, ?datetime) produce deterministic results.
     // Use a fixed offset (GMT+01:00) to avoid DST transitions causing test flakiness.
-    cfg.timeZone = TimeZone.getTimeZone("GMT+01:00")
+    fmConfig.timeZone = TimeZone.getTimeZone("GMT+01:00")
     // See https://github.com/lazee/freemarker-java-8/tree/master
     //cfg.objectWrapper = Java8ObjectWrapper(Configuration.VERSION_2_3_34)
 
-    cfg.templateLoader = StringTemplateLoader().apply { putTemplate("inline", templateText) }
+    fmConfig.templateLoader = StringTemplateLoader().apply { putTemplate("inline", templateText) }
 
     // Convert java.time types to java.util.Date for compatibility
-    val convertedTemplateModel = convertTemporalsInModelToJavaUtilDate(modelMap) as? Map<*, *> ?: modelMap
+    val convertedTemplateModel = convertTemporalsInModelToJavaUtilDate(modelMap, fmConfig.timeZone.toZoneId()) as? Map<*, *> ?: modelMap
 
-    val template = cfg.getTemplate("inline")
+    val template = fmConfig.getTemplate("inline")
     val writer = StringWriter()
     template.process(convertedTemplateModel, writer)
     return writer.toString()
 }
+
+typealias FreemarkerConfig = Configuration

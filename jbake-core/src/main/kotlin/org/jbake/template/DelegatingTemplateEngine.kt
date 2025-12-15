@@ -59,7 +59,7 @@ class DelegatingTemplateEngine(db: ContentStore, config: JBakeConfiguration) : A
         }
 
         // Convert Temporals to java.util.Date for all template engines
-        val convertedModel = org.jbake.util.convertTemporalsInModelToJavaUtilDate(model)
+        val convertedModel = org.jbake.util.convertTemporalsInModelToJavaUtilDate(model, config.freemarkerTimeZone.toZoneId())
 
         engine.renderDocument(convertedModel, templateFileName, writer)
     }

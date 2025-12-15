@@ -57,12 +57,12 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
         try {
             val template = templateCfg.getTemplate(templateName)
 
-            // Recursively convert OffsetDateTime to java.util.Date for Freemarker compatibility
-            val modelWithDates: JbakeTemplateModel = convertTemporalsInModelToJavaUtilDate(model)
+            val zoneToUse: ZoneId = config.freemarkerTimeZone.toZoneId() ?: ZoneId.systemDefault()
+            val modelWithDates: JbakeTemplateModel = convertTemporalsInModelToJavaUtilDate(model, zoneToUse)
 
             log.debug {
-                "Freemarking template $templateName; model: ${modelWithDates.entries.filter { it.key != "config" }.map { "\n * $it" }.joinToString() }" +
-                    "\n  Config: " + modelWithDates.config.entries.filter { it.key !in setOf("java.class.path", "java_class_path") }.map { "\n\t* $it" }.sorted().joinToString()
+                "Freemarking template $templateName; model: ${modelWithDates.entries.filter { it.key != "config" }.joinToString { "\n * $it" }}" +
+                    "\n  Config: " + modelWithDates.config.toSortedMap().entries.filter { it.key !in setOf("java.class.path", "java_class_path") }.joinToString { "\n\t* $it" }
             }
             template.process(LazyLoadingModel(templateCfg.objectWrapper, modelWithDates, db, config), writer)
         }
@@ -112,7 +112,8 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
                 }
                 else -> try {
                     ValueTracer.trace("freemarker-eager-model", jbakeTemplateModel.content, "LazyLoadingModel['$contentMapKey']")
-                    val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper)
+                    val zoneForAdapter = jbakeConfig.freemarkerTimeZone.toZoneId() ?: ZoneId.systemDefault()
+                    val adapter = FreemarkerTemplateModelAdapter(freeMarkerWrapper, zoneForAdapter)
                     val result: FmTemplateModel = extractors.extractAndTransform(db, contentMapKey, jbakeTemplateModel, adapter)
 
                     // Wrap Map results (especially document models like "content") with NullSafeMapModel.
@@ -135,7 +136,7 @@ class FreemarkerTemplateEngine(config: JBakeConfiguration, db: ContentStore) : A
 }
 
 
-class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper) : TemplateEngineAdapter<FmTemplateModel> {
+class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper, private val zoneId: ZoneId) : TemplateEngineAdapter<FmTemplateModel> {
     override fun adapt(key: String, extractedValue: Any): FmTemplateModel {
         // If the extracted value is a Java 8 time type, convert to java.util.Date and let the wrapper produce a TemplateDateModel.
         when (extractedValue) {
@@ -143,8 +144,8 @@ class FreemarkerTemplateModelAdapter(private val wrapper: ObjectWrapper) : Templ
             is ZonedDateTime  -> return wrapper.wrap(Date.from(extractedValue.toInstant()))
             is Instant        -> return wrapper.wrap(Date.from(extractedValue))
 
-            is LocalDateTime  -> return wrapper.wrap(Date.from(extractedValue.atZone(ZoneId.systemDefault()).toInstant()))
-            is LocalDate      -> return wrapper.wrap(Date.from(extractedValue.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+            is LocalDateTime  -> return wrapper.wrap(Date.from(extractedValue.atZone(zoneId).toInstant()))
+            is LocalDate      -> return wrapper.wrap(Date.from(extractedValue.atStartOfDay(zoneId).toInstant()))
 
             // Delegate wrapping to Freemarker's ObjectWrapper (Java8ObjectWrapper) so other java.time types are handled natively
             else -> return wrapper.wrap(extractedValue)
