@@ -23,26 +23,25 @@
  */
 package org.jbake.app;
 
-import org.jbake.FakeDocumentBuilder;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.BeforeClass;
-
 import java.util.Calendar;
 import java.util.Locale;
 
+import org.jbake.FakeDocumentBuilder;
+import org.jbake.model.DocumentModel;
+import org.jbake.model.DocumentTypes;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author jdlee
  */
-public class PaginationTest extends ContentStoreIntegrationTest {
+class PaginationTest extends ContentStoreIntegrationTest {
 
-    @Before
-    public void setUpOwn() {
+    @BeforeEach
+    void setUpOwn() {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             String fileBaseName = docType;
             if (docType.equals("masterindex")) {
@@ -56,7 +55,7 @@ public class PaginationTest extends ContentStoreIntegrationTest {
     }
 
     @Test
-    public void testPagination() {
+    void testPagination() {
         final int TOTAL_POSTS = 5;
         final int PER_PAGE = 2;
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
@@ -89,6 +88,6 @@ public class PaginationTest extends ContentStoreIntegrationTest {
             pageCount++;
             start += PER_PAGE;
         }
-        Assert.assertEquals(4, pageCount);
+        assertEquals(4, pageCount);
     }
 }

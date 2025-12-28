@@ -1,8 +1,11 @@
 package org.jbake.launcher;
 
-import ch.qos.logback.classic.spi.LoggingEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
+import java.nio.file.Path;
+
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.itsallcode.junit.sysextensions.ExitGuard;
 import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
 import org.jbake.app.LoggingTest;
@@ -13,20 +16,16 @@ import org.jbake.app.configuration.JBakeConfigurationFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+
+import ch.qos.logback.classic.spi.LoggingEvent;
 import picocli.CommandLine;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Path;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.itsallcode.junit.sysextensions.AssertExit.assertExitWithStatus;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doThrow;
@@ -35,7 +34,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ExitGuard.class)
 class MainTest extends LoggingTest {
 
     private final PrintStream standardOut = System.out;
@@ -196,12 +194,13 @@ class MainTest extends LoggingTest {
 
         String[] args = {"-t", "groovy-mte"};
 
-        assertExitWithStatus(SystemExit.CONFIGURATION_ERROR.getStatus(), ()->Main.main(args));
-
-        verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
-
-        LoggingEvent loggingEvent = captorLoggingEvent.getValue();
-        assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init");
+        try (MockedStatic<BakeOff> utilities = Mockito.mockStatic(BakeOff.class)) {
+            Main.main(args);
+            verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
+            LoggingEvent loggingEvent = captorLoggingEvent.getValue();
+            assertThat(loggingEvent.getMessage()).isEqualTo("Error: Missing required argument(s): --init");
+            utilities.verify(() -> BakeOff.exit(SystemExit.CONFIGURATION_ERROR.getStatus()));
+        }
     }
 
     @Test

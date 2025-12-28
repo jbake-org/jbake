@@ -1,7 +1,7 @@
-mainClassName = "org.jbake.launcher.Main"
-applicationName = "jbake"
-
-def examplesBase = "$project.buildDir/examples"
+application {
+    mainClass = "org.jbake.launcher.Main"
+    applicationName = "jbake"
+}
 
 def exampleRepositories = [
     "example_project_freemarker": "https://github.com/jbake-org/jbake-example-project-freemarker.git",
@@ -14,27 +14,24 @@ def exampleRepositories = [
 //create clone and Zip Task for each repository
 exampleRepositories.each { name, repository ->
 
-    task "clone_${name}Repository"() {
+    tasks.register("clone_${name}Repository", Exec) {
         group = "distribution"
-        description "Clone jbake ${name} example project repository"
+        description = "Clone jbake ${name} example project repository"
+        def repositoryName = "${project.layout.buildDirectory.asFile.get()}/examples/$name"
 
-        def repositoryName = "$examplesBase/$name"
+        outputs.dir(repositoryName)
 
-        outputs.dir repositoryName
-
-        doLast {
-            grgit.clone(dir: repositoryName, uri: repository)
-        }
+        executable "git"
+        args "clone", "$repository", "$repositoryName"
     }
 
-    task "${name}Zip"(type: Zip) {
-        group "distribution"
-        description "Zip $name repository"
+    tasks.register("${name}Zip", Zip) {
+        group = "distribution"
+        description = "Zip $name repository"
 
-        archiveBaseName = name
-        archiveFileName = "${archiveBaseName.get()}.zip"
+        archiveFileName = "${name}.zip"
 
-        from project.tasks.getByName("clone_${name}Repository").outputs
+        from project.tasks.named("clone_${name}Repository").get().outputs
         exclude 'README.md'
         exclude 'LICENSE'
         exclude '.git'

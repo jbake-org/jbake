@@ -19,6 +19,8 @@ script:
 jobs:
   include:
 
+  - jdk: openjdk21
+
   - jdk: openjdk17
 
   - jdk: openjdk11

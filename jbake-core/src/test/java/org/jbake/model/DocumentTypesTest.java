@@ -1,15 +1,15 @@
 package org.jbake.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class DocumentTypesTest {
+class DocumentTypesTest {
 
     @Test
-    public void shouldReturnDefaultDocumentTypes() throws Exception {
+    void shouldReturnDefaultDocumentTypes() throws Exception {
         String[] knownDocumentTypes = DocumentTypes.getDocumentTypes();
         String[] expectedDocumentType = new String[] {"page", "post", "masterindex", "archive", "feed" };
 
@@ -17,7 +17,7 @@ public class DocumentTypesTest {
     }
 
     @Test
-    public void shouldAddNewDocumentType() {
+    void shouldAddNewDocumentType() {
         String newDocumentType = "newDocumentType";
 
         DocumentTypes.addDocumentType(newDocumentType);
@@ -26,7 +26,7 @@ public class DocumentTypesTest {
     }
 
     @Test
-    public void shouldAddDocumentTypeOnlyOnce() {
+    void shouldAddDocumentTypeOnlyOnce() {
         // A a document type is already known
         String knownDocumentType = "known";
         DocumentTypes.addDocumentType(knownDocumentType);
@@ -39,7 +39,7 @@ public class DocumentTypesTest {
     }
 
     @Test
-    public void shouldTellIfDocumentTypeIsKnown() {
+    void shouldTellIfDocumentTypeIsKnown() {
         String knownDocumentType = "known";
         DocumentTypes.addDocumentType(knownDocumentType);
 
@@ -47,14 +47,14 @@ public class DocumentTypesTest {
     }
 
     @Test
-    public void shouldTellIfDocumentTypeIsUnknown() {
+    void shouldTellIfDocumentTypeIsUnknown() {
         String unknownType = "unknown";
 
         assertThat( DocumentTypes.contains(unknownType) ).isFalse();
     }
 
     @Test
-    public void shouldNotifyListenersWhenNewDocumentTypeIsAdded() {
+    void shouldNotifyListenersWhenNewDocumentTypeIsAdded() {
         // A DocumentTypeListener is added
         String newDocumentType = "newDocumentType";
         DocumentTypeListener listener = mock(DocumentTypeListener.class);

@@ -16,12 +16,6 @@ package org.jbake.maven;
  * limitations under the License.
  */
 
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,6 +24,12 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -40,17 +40,17 @@ import static org.apache.commons.lang3.StringUtils.join;
  */
 @Mojo(name = "seed", requiresProject = true, requiresDirectInvocation = true)
 public class SeedMojo extends AbstractMojo {
-	/**
-	 * Location of the Seeding Zip
-	 */
-	@Parameter(property = "jbake.seedUrl", defaultValue = "https://github.com/jbake-org/jbake-template-bootstrap/zipball/master/", required = true)
-	protected String seedUrl;
+    /**
+     * Location of the Seeding Zip
+     */
+    @Parameter(property = "jbake.seedUrl", defaultValue = "https://github.com/jbake-org/jbake-template-bootstrap/zipball/master/", required = true)
+    protected String seedUrl;
 
-	/**
-	 * Location of the Output Directory.
-	 */
-	@Parameter(property = "jbake.outputDirectory", defaultValue = "${project.basedir}/src/main/jbake", required = true)
-	protected File outputDirectory;
+    /**
+     * Location of the Output Directory.
+     */
+    @Parameter(property = "jbake.outputDirectory", defaultValue = "${project.basedir}/src/main/jbake", required = true)
+    protected File outputDirectory;
 
     /**
      * Really force overwrite if output dir exists? defaults to false
@@ -59,10 +59,11 @@ public class SeedMojo extends AbstractMojo {
     protected Boolean force;
 
     public void execute() throws MojoExecutionException {
-        if (outputDirectory.exists() && (! force))
+        if (outputDirectory.exists() && (!force)) {
             throw new MojoExecutionException(format("The outputDirectory %s must *NOT* exist. Invoke with jbake.force as true to disregard", outputDirectory.getName()));
+        }
 
-		try {
+        try {
             URL url = new URL(seedUrl);
             File tmpZipFile = File.createTempFile("jbake", ".zip");
 
@@ -76,19 +77,19 @@ public class SeedMojo extends AbstractMojo {
             getLog().info(format("%d bytes downloaded. Unpacking into %s", length, outputDirectory));
 
             unpackZip(tmpZipFile);
-		} catch (Exception e) {
-			getLog().info("Oops", e);
-			throw new MojoExecutionException("Failure when running: ", e);
-		}
-	}
+        } catch (Exception e) {
+            getLog().info("Oops", e);
+            throw new MojoExecutionException("Failure when running: ", e);
+        }
+    }
 
     private void unpackZip(File tmpZipFile) throws IOException {
         ZipInputStream zis =
-                new ZipInputStream(new FileInputStream(tmpZipFile));
+            new ZipInputStream(new FileInputStream(tmpZipFile));
         //get the zipped file list entry
         ZipEntry ze = zis.getNextEntry();
 
-        while(ze!=null){
+        while (ze != null) {
             if (ze.isDirectory()) {
                 ze = zis.getNextEntry();
                 continue;

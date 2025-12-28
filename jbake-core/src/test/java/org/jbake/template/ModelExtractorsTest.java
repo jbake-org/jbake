@@ -1,25 +1,22 @@
 package org.jbake.template;
 
 import org.jbake.model.DocumentTypes;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ModelExtractorsTest {
+class ModelExtractorsTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         ModelExtractors.getInstance().reset();
     }
 
     @Test
-    public void shouldLoadExtractorsOnInstantiation() {
+    void shouldLoadExtractorsOnInstantiation() {
 
         ModelExtractors.getInstance();
         String[] expectedKeys = new String[]{
@@ -46,7 +43,7 @@ public class ModelExtractorsTest {
     }
 
     @Test
-    public void shouldRegisterExtractorsOnlyForCustomTypes() {
+    void shouldRegisterExtractorsOnlyForCustomTypes() {
         String knownDocumentType = "alltag";
         DocumentTypes.addDocumentType(knownDocumentType);
 
@@ -56,7 +53,7 @@ public class ModelExtractorsTest {
     }
 
     @Test
-    public void shouldRegisterExtractorsForCustomType() {
+    void shouldRegisterExtractorsForCustomType() {
         // A document type is known
         String newDocumentType = "project";
         DocumentTypes.addDocumentType(newDocumentType);
@@ -72,15 +69,14 @@ public class ModelExtractorsTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
-        thrown.expect(UnsupportedOperationException.class);
-
+    void shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
         String unknownDocumentType = "unknown";
-        ModelExtractors.getInstance().registerExtractorsForCustomTypes(unknownDocumentType);
+        assertThatThrownBy(() -> ModelExtractors.getInstance().registerExtractorsForCustomTypes(unknownDocumentType))
+            .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    public void shouldResetToNonCustomizedExtractors() throws Exception {
+    void shouldResetToNonCustomizedExtractors() throws Exception {
 
         //given:
         // A document type is known
@@ -98,6 +94,5 @@ public class ModelExtractorsTest {
 
         //then:
         assertThat(ModelExtractors.getInstance().keySet().size()).isEqualTo(16);
-
     }
 }

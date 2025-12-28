@@ -1,23 +1,30 @@
 package org.jbake.parser;
 
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.Options;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.jruby.AsciidoctorJRuby;
-import org.jbake.app.configuration.JBakeConfiguration;
-import org.jbake.model.DocumentModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.asciidoctor.AttributesBuilder.attributes;
-import static org.asciidoctor.OptionsBuilder.options;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Attributes;
+import org.asciidoctor.Options;
+import org.asciidoctor.ast.Document;
+import org.asciidoctor.jruby.AsciidoctorJRuby;
+import org.jbake.app.configuration.JBakeConfiguration;
+import org.jbake.model.DocumentModel;
+import org.jruby.RubyArray;
+import org.jruby.RubyBasicObject;
+import org.jruby.RubyString;
+import org.jruby.RubySymbol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.asciidoctor.SafeMode.UNSAFE;
 
 /**
@@ -84,15 +91,16 @@ public class AsciidoctorEngine extends MarkupEngine {
     public void processHeader(final ParserContext context) {
         Options options = getAsciiDocOptionsAndAttributes(context);
         final Asciidoctor asciidoctor = getEngine(options);
-        DocumentHeader header = asciidoctor.readDocumentHeader(context.getFile());
+        Document header = asciidoctor.loadFile(context.getFile(), options);
         DocumentModel documentModel = context.getDocumentModel();
-        if (header.getDocumentTitle() != null) {
-            documentModel.setTitle(header.getDocumentTitle().getCombined());
+        if (header.getDoctitle() != null) {
+            documentModel.setTitle(header.getDoctitle());
         }
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
             String key = attribute.getKey();
-            Object value = attribute.getValue();
+            Object value = rubyAsJavaOrValue(attribute.getValue());
+
 
             if (hasJBakePrefix(key)) {
                 String pKey = key.substring(6);
@@ -120,13 +128,25 @@ public class AsciidoctorEngine extends MarkupEngine {
                     LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
                 }
             } else {
-                documentModel.put(key, attributes.get(key));
+                documentModel.put(key, value);
             }
         }
     }
 
     private boolean canCastToString(Object value) {
         return value instanceof String;
+    }
+
+    private Object rubyAsJavaOrValue(Object value) {
+        if (value instanceof RubyString) {
+            return ((RubyString) value).asJavaString();
+        } else if (value instanceof RubySymbol) {
+            return ((RubySymbol) value).asJavaString();
+        } else if (value instanceof RubyArray<?>) {
+            return ((RubyArray<?>) value).toArray();
+        } else {
+            return value;
+        }
     }
 
     private String getValueClassName(Object value) {
@@ -144,8 +164,8 @@ public class AsciidoctorEngine extends MarkupEngine {
     // TODO: write tests with options and attributes
     @Override
     public void processBody(ParserContext context) {
-        StringBuilder body = new StringBuilder(context.getBody().length());
         if (!context.hasHeader()) {
+            StringBuilder body = new StringBuilder(context.getBody().length());
             for (String line : context.getFileLines()) {
                 body.append(line).append("\n");
             }
@@ -163,20 +183,22 @@ public class AsciidoctorEngine extends MarkupEngine {
     private Options getAsciiDocOptionsAndAttributes(ParserContext context) {
         JBakeConfiguration config = context.getConfig();
         List<String> asciidoctorAttributes = config.getAsciidoctorAttributes();
-        final AttributesBuilder attributes = attributes(asciidoctorAttributes.toArray(new String[0]));
+        Attributes attributes = Attributes.builder().build();
+        attributes.setAttributes(asciidoctorAttributes.toArray(new String[0]));
         if (config.getExportAsciidoctorAttributes()) {
             final String prefix = config.getAttributesExportPrefixForAsciidoctor();
 
             for (final Iterator<String> it = config.getKeys(); it.hasNext(); ) {
                 final String key = it.next();
                 if (!key.startsWith("asciidoctor")) {
-                    attributes.attribute(prefix + key.replace(".", "_"), config.get(key));
+                    attributes.setAttribute(prefix + key.replace(".", "_"), config.get(key));
                 }
             }
         }
 
         final List<String> optionsSubset = config.getAsciidoctorOptionKeys();
-        final Options options = options().attributes(attributes.get()).get();
+
+        final Options options = Options.builder().attributes(attributes).build();
         for (final String optionKey : optionsSubset) {
 
             Object optionValue = config.getAsciidoctorOption(optionKey);

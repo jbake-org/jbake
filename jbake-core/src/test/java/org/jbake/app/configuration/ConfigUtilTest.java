@@ -1,6 +1,13 @@
 package org.jbake.app.configuration;
 
-import ch.qos.logback.classic.spi.LoggingEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.jbake.TestUtils;
 import org.jbake.app.JBakeException;
@@ -9,52 +16,41 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
+import ch.qos.logback.classic.spi.LoggingEvent;
 
 import static ch.qos.logback.classic.Level.WARN;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.jbake.TestUtils.getTestResourcesAsSourceFolder;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ConfigUtilTest extends LoggingTest {
+class ConfigUtilTest extends LoggingTest {
 
     private Path sourceFolder;
     private ConfigUtil util;
 
     @BeforeEach
-    public void setup(@TempDir Path folder) {
+    void setup(@TempDir Path folder) {
         this.sourceFolder = folder;
         this.util = new ConfigUtil();
     }
 
     @Test
-    public void shouldLoadSiteHost() throws Exception {
+    void shouldLoadSiteHost() throws Exception {
         JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         assertThat(config.getSiteHost()).isEqualTo("http://www.jbake.org");
     }
 
     @Test
-    public void shouldLoadADefaultConfiguration() throws Exception {
+    void shouldLoadADefaultConfiguration() throws Exception {
         JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
         assertDefaultPropertiesPresent(config);
     }
 
     @Test
-    public void shouldLoadACustomConfiguration() throws Exception {
+    void shouldLoadACustomConfiguration() throws Exception {
         File customConfigFile = new File(sourceFolder.toFile(), "jbake.properties");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(customConfigFile));
@@ -68,7 +64,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionIfSourcefolderDoesNotExist() throws Exception {
+    void shouldThrowAnExceptionIfSourcefolderDoesNotExist() throws Exception {
         File nonExistentSourceFolder = mock(File.class);
         when(nonExistentSourceFolder.getAbsolutePath()).thenReturn("/tmp/nonexistent");
         when(nonExistentSourceFolder.exists()).thenReturn(false);
@@ -78,7 +74,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldAddSourcefolderToConfiguration() throws Exception {
+    void shouldAddSourcefolderToConfiguration() throws Exception {
 
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         JBakeConfiguration config = util.loadConfig(sourceFolder);
@@ -87,7 +83,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionIfSourcefolderIsNotADirectory() throws Exception {
+    void shouldThrowAnExceptionIfSourcefolderIsNotADirectory() throws Exception {
 
         File sourceFolder = mock(File.class);
         when(sourceFolder.exists()).thenReturn(true);
@@ -98,7 +94,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnDestinationFolderFromConfiguration() throws Exception {
+    void shouldReturnDestinationFolderFromConfiguration() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder, "output");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
@@ -107,7 +103,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnAssetFolderFromConfiguration() throws Exception {
+    void shouldReturnAssetFolderFromConfiguration() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder, "assets");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
@@ -116,7 +112,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnTemplateFolderFromConfiguration() throws Exception {
+    void shouldReturnTemplateFolderFromConfiguration() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder, "templates");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
@@ -125,7 +121,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnContentFolderFromConfiguration() throws Exception {
+    void shouldReturnContentFolderFromConfiguration() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedDestinationFolder = new File(sourceFolder, "content");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
@@ -134,7 +130,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldGetTemplateFileDoctype() throws Exception {
+    void shouldGetTemplateFileDoctype() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         File expectedTemplateFile = new File(sourceFolder, "templates/index.ftl");
         JBakeConfiguration config = util.loadConfig(sourceFolder);
@@ -147,7 +143,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldLogWarningIfDocumentTypeNotFound() throws Exception {
+    void shouldLogWarningIfDocumentTypeNotFound() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -162,7 +158,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldGetTemplateOutputExtension() throws Exception {
+    void shouldGetTemplateOutputExtension() throws Exception {
 
         String docType = "masterindex";
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
@@ -175,7 +171,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldGetMarkdownExtensionsAsList() throws Exception {
+    void shouldGetMarkdownExtensionsAsList() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
@@ -185,7 +181,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnConfiguredDocTypes() throws Exception {
+    void shouldReturnConfiguredDocTypes() throws Exception {
 
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
@@ -197,7 +193,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnAListOfAsciidoctorOptionsKeys() throws Exception {
+    void shouldReturnAListOfAsciidoctorOptionsKeys() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
@@ -209,7 +205,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnAnAsciidoctorOption() throws Exception {
+    void shouldReturnAnAsciidoctorOption() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
@@ -221,7 +217,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnAnAsciidoctorOptionWithAListValue() throws Exception {
+    void shouldReturnAnAsciidoctorOptionWithAListValue() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
         config.setProperty("asciidoctor.option.requires", "asciidoctor-diagram");
@@ -233,7 +229,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldReturnEmptyListIfOptionNotAvailable() throws Exception {
+    void shouldReturnEmptyListIfOptionNotAvailable() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
@@ -243,7 +239,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldLogAWarningIfAsciidocOptionCouldNotBeFound() throws Exception {
+    void shouldLogAWarningIfAsciidocOptionCouldNotBeFound() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         DefaultJBakeConfiguration config = (DefaultJBakeConfiguration) util.loadConfig(sourceFolder);
 
@@ -257,7 +253,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldHandleNonExistingFiles() throws Exception {
+    void shouldHandleNonExistingFiles() throws Exception {
 
         File source = TestUtils.getTestResourcesAsSourceFolder();
         File expectedTemplateFolder = new File(source, "templates");
@@ -330,7 +326,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldUseUtf8EncodingAsDefault() throws Exception{
+    void shouldUseUtf8EncodingAsDefault() throws Exception {
         String unicodeString = "中文属性使用默认Properties编码";
         JBakeConfiguration config = util.loadConfig(TestUtils.getTestResourcesAsSourceFolder());
 
@@ -340,7 +336,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldBePossibleToSetCustomEncoding() throws Exception {
+    void shouldBePossibleToSetCustomEncoding() throws Exception {
         String expected = "Latin1 encoded file äöü";
         JBakeConfiguration config = util.setEncoding("ISO8859_1").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"));
 
@@ -349,7 +345,7 @@ public class ConfigUtilTest extends LoggingTest {
     }
 
     @Test
-    public void shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() throws Exception {
+    void shouldLogAWarningAndFallbackToUTF8IfEncodingIsNotSupported() throws Exception {
         JBakeConfiguration config = util.setEncoding("UNSUPPORTED_ENCODING").loadConfig(TestUtils.getTestResourcesAsSourceFolder("/fixtureLatin1"));
         verify(mockAppender, times(1)).doAppend(captorLoggingEvent.capture());
 
@@ -361,7 +357,7 @@ public class ConfigUtilTest extends LoggingTest {
 
 
     @Test
-    public void shouldReturnIgnoreFileFromConfiguration() throws Exception {
+    void shouldReturnIgnoreFileFromConfiguration() throws Exception {
         File sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
         JBakeConfiguration config = util.loadConfig(sourceFolder);
 
@@ -370,12 +366,9 @@ public class ConfigUtilTest extends LoggingTest {
 
     private void assertDefaultPropertiesPresent(JBakeConfiguration config) throws IllegalAccessException {
         for (Field field : JBakeConfiguration.class.getFields()) {
-
-            if (field.isAccessible()) {
-                String key = (String) field.get("");
-                System.out.println("Key: " + key);
-                assertThat(config.get(key)).isNotNull();
-            }
+            String key = (String) field.get("");
+            System.out.println("Key: " + key);
+            assertThat(config.get(key)).isNotNull();
         }
     }
 

@@ -1,25 +1,22 @@
 package org.jbake.app.template;
 
-import org.apache.commons.io.FileUtils;
-import org.jbake.app.Crawler;
-import org.jbake.app.DBUtil;
-import org.jbake.app.Parser;
-import org.jbake.app.Renderer;
-import org.jbake.model.DocumentModel;
-import org.jbake.model.DocumentTypes;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
+import org.jbake.app.Crawler;
+import org.jbake.app.Parser;
+import org.jbake.app.Renderer;
+import org.jbake.model.DocumentModel;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
+class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
 
-    public GroovyMarkupTemplateEngineRenderingTest() {
+    GroovyMarkupTemplateEngineRenderingTest() {
         super("groovyMarkupTemplates", "tpl");
 
         outputStrings.put("post", Arrays.asList("<h2>Second Post</h2>",
@@ -54,7 +51,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
     }
 
     @Test
-    public void renderCustomTypePaper() throws Exception {
+    void renderCustomTypePaper() throws Exception {
         // setup
 
 
@@ -69,7 +66,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
         content.setUri("/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
-        Assert.assertTrue(outputFile.exists());
+        assertTrue(outputFile.exists());
 
         // verify
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());

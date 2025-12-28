@@ -1,5 +1,8 @@
 package org.jbake.render;
 
+import java.io.File;
+import java.nio.file.Path;
+
 import org.jbake.TestUtils;
 import org.jbake.app.ContentStore;
 import org.jbake.app.Renderer;
@@ -7,25 +10,22 @@ import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentModel;
 import org.jbake.template.DelegatingTemplateEngine;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.File;
-import java.net.URL;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
-public class RendererTest {
+@ExtendWith(MockitoExtension.class)
+class RendererTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    private Path folder;
     private DefaultJBakeConfiguration config;
     private File outputPath;
 
@@ -35,14 +35,14 @@ public class RendererTest {
     @Mock
     private DelegatingTemplateEngine renderingEngine;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    void setup() throws Exception {
 
         File sourcePath = TestUtils.getTestResourcesAsSourceFolder();
         if (!sourcePath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
-        outputPath = folder.newFolder("output");
+        outputPath = folder.resolve("output").toFile();
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourcePath);
         config.setDestinationFolder(outputPath);
     }
@@ -53,14 +53,13 @@ public class RendererTest {
      * @throws Exception
      */
     @Test
-    public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
-
-        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows());
+    @DisabledOnOs(OS.WINDOWS)
+    void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
         String FOLDER = "real.path";
 
         final String FILENAME = "about";
         config.setOutputExtension("");
-        config.setTemplateFolder(folder.newFolder("templates"));
+        config.setTemplateFolder(folder.resolve("templates").toFile());
         Renderer renderer = new Renderer(db, config, renderingEngine);
 
         DocumentModel content = new DocumentModel();

@@ -1,64 +1,66 @@
 package org.jbake.app;
 
-import org.apache.commons.vfs2.util.Os;
+import java.io.File;
+import java.nio.file.Path;
+
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class ContentStoreIntegrationTest {
 
-    @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    protected static Path folder;
     protected static ContentStore db;
     protected static DefaultJBakeConfiguration config;
     protected static StorageType storageType = StorageType.MEMORY;
     protected static File sourceFolder;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+    @BeforeAll
+    static void setUpClass() throws Exception {
 
         sourceFolder = TestUtils.getTestResourcesAsSourceFolder();
-        Assert.assertTrue("Cannot find sample data structure!", sourceFolder.exists());
+        assertTrue(sourceFolder.exists(), "Cannot find sample data structure!");
 
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourceFolder);
         config.setSourceFolder(sourceFolder);
 
-        Assert.assertEquals(".html", config.getOutputExtension());
+        assertEquals(".html", config.getOutputExtension());
         config.setDatabaseStore(storageType.toString());
         // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
-        String dbPath = folder.newFolder("documents" + System.currentTimeMillis()).getName();
+        String dbPath = folder.resolve("documents" + System.currentTimeMillis()).toFile().getName();
 
         // setting the database path with a colon creates an invalid url for OrientDB.
         // only one colon is expected. there is no documentation about proper url path for windows available :(
-        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            dbPath = dbPath.replace(":","");
+        if (OS.current() == OS.WINDOWS) {
+            dbPath = dbPath.replace(":", "");
         }
         config.setDatabasePath(dbPath);
         db = DBUtil.createDataStore(config);
     }
 
-    @AfterClass
-    public static void cleanUpClass() {
+    @AfterAll
+    static void cleanUpClass() {
         db.close();
         db.shutdown();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         db.startup();
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         db.drop();
     }
 

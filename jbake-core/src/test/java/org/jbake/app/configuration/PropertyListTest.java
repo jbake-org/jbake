@@ -1,20 +1,20 @@
 package org.jbake.app.configuration;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PropertyListTest {
+class PropertyListTest {
 
     @Test
-    public void getPropertyByKey() {
+    void getPropertyByKey() {
         Property property = PropertyList.getPropertyByKey("archive.file");
 
         assertThat(property).isEqualTo(PropertyList.ARCHIVE_FILE);
     }
 
     @Test
-    public void getCustomProperty() {
+    void getCustomProperty() {
         Property property = PropertyList.getPropertyByKey("unknown.option");
 
         assertThat(property.getKey()).isEqualTo("unknown.option");
