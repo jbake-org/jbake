@@ -1,0 +1,132 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2014-2022 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins {
+    id 'java-library'
+    id 'groovy'
+    id 'org.kordamp.gradle.groovy-project'
+    id 'org.kordamp.gradle.plugin'
+    id 'org.kordamp.gradle.coveralls'
+}
+
+config {
+    info {
+        name          = rootProject.name
+        vendor        = 'JBake'
+        description   = 'Run JBake inside a Gradle build'
+        inceptionYear = '2014'
+        tags          = ['jbake', 'site-generator']
+
+        specification { enabled = false }
+
+        links {
+            website      = "https://github.com/jbake-org/${project.rootProject.name}"
+            issueTracker = "https://github.com/jbake-org/${project.rootProject.name}/issues"
+            scm          = "https://github.com/jbake-org/${project.rootProject.name}.git"
+        }
+
+        scm {
+            url                 = "https://github.com/jbake-org/${project.rootProject.name}"
+            connection          = "scm:git:https://github.com/jbake-org/${project.rootProject.name}.git"
+            developerConnection = "scm:git:git@github.com:jbake-org/${project.rootProject.name}.git"
+        }
+
+        people {
+            person {
+                id    = 'melix'
+                name  = 'Cedric Champeau'
+                roles = ['developer']
+            }
+        }
+    }
+
+    docs {
+        groovydoc {
+            replaceJavadoc = true
+            options {
+                link 'https://docs.gradle.org/5.0/javadoc/', 'org.gradle.'
+            }
+        }
+    }
+
+    plugins {
+        plugin {
+            name                = 'jbake'
+            id                  = 'org.jbake.site'
+            implementationClass = 'org.jbake.gradle.JBakePlugin'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly gradleApi()
+    api "com.github.zafarkhaja:java-semver:$semverVersion"
+    compileOnly "org.eclipse.jetty:jetty-server:$jettyVersion"
+    compileOnly("org.jbake:jbake-core:$jbakeVersion") {
+        exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'commons-io', module: 'commons-io'
+        exclude group: 'org.apache.commons', module: 'commons-lang3'
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'com.vladsch.flexmark', module: 'flexmark'
+    }
+    testImplementation("org.spockframework:spock-core:$spockVersion") {
+        exclude group: 'org.codehaus.groovy'
+    }
+    testImplementation "commons-io:commons-io:$commonsIoVersion"
+}
+
+project.tasks.withType(Test) {
+    def args = ['-Xms512m', '-Xmx3g', '-Dorientdb.installCustomFormatter=false=false']
+
+    /**
+     * AppVeyor breaks with mockito throwing a java.lang.OutOfMemoryError: PermGen space
+     */
+    if (JavaVersion.current().java7) {
+        args << '-XX:MaxPermSize=2g'
+    }
+
+    /**
+     * jdk9 build is unable to determine the amount of MaxDirectMemorySize
+     * See https://pastebin.com/ECvQeHx0
+     */
+    if (JavaVersion.current().java9Compatible) {
+        args << '-XX:MaxDirectMemorySize=2g'
+    }
+    jvmArgs args
+}
+
+license {
+    exclude '**/*.woff'
+    exclude '**/*.eot'
+    exclude '**/*.ttf'
+    exclude '**/*.md'
+    exclude '**/*.adoc'
+    exclude '**/*.svg'
+    exclude '**/*.ico'
+}
+
+licenseTest {
+    source -= sourceSets.test.resources
+}
+
+test {
+    useJUnitPlatform()
+}
