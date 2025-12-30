@@ -48,6 +48,14 @@ tasks.withType(Test) {
     jvmArgs args
 }
 
+if (JavaVersion.current().isJava8Compatible()) {
+    tasks.withType(Javadoc) {
+        // disable the crazy super-strict doclint tool in Java 8
+        //noinspection SpellCheckingInspection
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
 task javadocJar(type: Jar) {
     archiveClassifier.set('javadoc')
     from javadoc
