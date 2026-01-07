@@ -326,6 +326,29 @@ public class DefaultJBakeConfiguration implements JBakeConfiguration {
     public void setMarkdownExtensions(String... extensions) {
         setProperty(MARKDOWN_EXTENSIONS.getKey(), StringUtils.join(extensions, ","));
     }
+    
+    @Override
+    public Map<String, String> getMarkdownOptions() {
+    	Map<String, String> options = new HashMap<String, String>();
+        List<String>  optionsList = getAsList(MARKDOWN_OPTIONS.getKey());
+        
+        if(null != optionsList) {
+	        for (String optionAndValue : optionsList) {
+	        	String[] splited = optionAndValue.split("=(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+	        	if(splited.length == 2) {
+	        		options.put(splited[0], splited[1]);
+	        	}else {
+	        		logger.warn("Not valid MarkDown Option '{}' no '=' String to delimit name and value", optionAndValue);
+	        	}
+	        }
+        }
+        
+        return options;
+    }
+    
+    public void setMarkdownOptions(String... extensions) {
+        setProperty(MARKDOWN_OPTIONS.getKey(), StringUtils.join(extensions, ","));
+    }
 
     @Override
     public String getOutputExtension() {

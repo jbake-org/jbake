@@ -39,6 +39,7 @@ dependencies {
         exclude group: "junit", module: "junit"
     }
     implementation "com.orientechnologies:orientdb-core:$orientDbVersion"
+    implementation "org.reflections:reflections:$reflectionsVersion"
     api "org.asciidoctor:asciidoctorj:$asciidoctorjVersion", optional
     api "org.codehaus.groovy:groovy:$groovyVersion", optional
     api "org.codehaus.groovy:groovy-templates:$groovyVersion", optional
@@ -47,6 +48,16 @@ dependencies {
     api "org.thymeleaf:thymeleaf:$thymeleafVersion", optional
     api "de.neuland-bfi:jade4j:$jade4jVersion", optional
     api "com.vladsch.flexmark:flexmark:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-admonition:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-aside:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-enumerated-reference:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-gfm-issues:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough", optional
+    api "com.vladsch.flexmark:flexmark-ext-gfm-tasklist", optional
+    api "com.vladsch.flexmark:flexmark-ext-gfm-users:$flexmarkVersion", optional
+    api "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion", optional
     api "com.vladsch.flexmark:flexmark-profile-pegdown:$flexmarkVersion", optional
     api "io.pebbletemplates:pebble:$pebbleVersion", optional
     implementation "org.jsoup:jsoup:$jsoupVersion"
