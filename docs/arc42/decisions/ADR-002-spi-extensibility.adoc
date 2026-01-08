@@ -1,0 +1,205 @@
+= ADR-002: Java SPI for Extensibility
+
+Status: ✅ **Accepted**
+
+Date: 2012-10-20 (Estimated - early extensibility phase)
+
+== Problem Statement
+
+How should JBake allow users to add support for new markup languages, template engines, and other pluggable components without modifying core code?
+
+== Context
+
+JBake needs to support multiple:
+
+* **Markup engines**: Markdown, AsciiDoc, HTML, etc.
+* **Template engines**: Freemarker, Groovy, Thymeleaf, Jade, Pebble, etc.
+* **Model extractors**: Custom data extraction for templates
+
+Requirements for extensibility:
+
+* **No core modification**: Users add new engines via dependencies only
+* **Classpath discovery**: Automatic detection of available engines
+* **Clear contracts**: Well-defined interfaces for extensions
+* **Optional dependencies**: Core doesn't depend on all possible engines
+* **Convention over configuration**: Minimal setup required
+
+The Java ecosystem provides several plugin mechanisms:
+
+* Java SPI (Service Provider Interface) - built into JDK
+* OSGi - complex, heavyweight
+* Custom plugin frameworks - reinventing the wheel
+* Dependency injection frameworks - adds complexity
+
+== Decision
+
+**Use Java's Service Provider Interface (SPI) mechanism for all extensibility points.**
+
+**Key extension points:**
+
+1. **MarkupEngines** (`org.jbake.parser.MarkupEngines`)
+   - Discovers parsers via `META-INF/services/org.jbake.parser.MarkupEngines.properties`
+   - Properties format: `ClassName=ext1,ext2,ext3`
+   - Example: `org.jbake.parser.MarkdownEngine=md,markdown`
+
+2. **TemplateEngines** (`org.jbake.template.TemplateEngines`)
+   - Discovers renderers via `META-INF/services/org.jbake.template.TemplateEngines.properties`
+   - Same properties format
+
+3. **ModelExtractors** (`org.jbake.template.ModelExtractors`)
+   - Discovers data extractors via `META-INF/services/org.jbake.template.ModelExtractors.properties`
+
+**Implementation pattern:**
+
+```java
+// 1. Core defines interface
+public abstract class MarkupEngine { ... }
+
+// 2. Engine implementation
+public class MarkdownEngine extends MarkupEngine { ... }
+
+// 3. Provider file: META-INF/services/org.jbake.parser.MarkupEngines.properties
+org.jbake.parser.MarkdownEngine=md,markdown
+
+// 4. Core discovers at runtime
+Enumeration<URL> resources = cl.getResources(PROPERTIES);
+// ... load and register engines
+```
+
+**Engine loading strategy:**
+
+* Engines loaded lazily (on first use)
+* Missing optional engines silently skipped (enables embedding)
+* Explicit error if required engine not on classpath
+
+== Consequences
+
+=== Positive
+
+* ✅ **Zero configuration**: Drop JAR in classpath, it works
+* ✅ **Standard mechanism**: Java developers familiar with SPI
+* ✅ **Clean separation**: Core never imports optional engine classes directly
+* ✅ **Testability**: Mock engines easily by providing test implementations
+* ✅ **Embeddability**: Minimal dependencies, only include what you need
+* ✅ **Multiple implementations**: Different markdown parsers can coexist
+
+=== Negative
+
+* ❌ **Discovery overhead**: Classpath scanning at startup (mitigated by caching)
+* ❌ **No versioning**: SPI doesn't handle API version compatibility
+* ❌ **Silent failures**: Misconfigured provider file fails at runtime, not compile time
+* ❌ **Properties format**: Not type-safe, errors only caught at runtime
+
+=== Neutral
+
+* ℹ️ Properties format chosen over pure Java SPI `ServiceLoader` for flexibility (map extensions to classes)
+* ℹ️ Could migrate to Java 9 module system in future without API changes
+
+== Alternatives Considered
+
+=== Alternative 1: OSGi Plugin System
+
+**Description**: Use OSGi bundles for hot-swappable plugins with versioning and dependency management.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | SPI (Baseline) | OSGi |
+|--------------------|----------------|------|
+| Simplicity         | 0              | -3   |
+| Setup Overhead     | 0              | -3   |
+| Runtime Complexity | 0              | -2   |
+| Versioning         | 0              | +2   |
+| Hot Reload         | 0              | +2   |
+| **Total Score**    | **0**          | **-4** |
+
+**Rejection rationale**: Massive overkill. OSGi designed for long-running servers with hot deployment. JBake runs batch-style, exits after generation. OSGi's complexity (ClassLoaders, bundle lifecycle) not justified. Users don't need hot reload.
+
+=== Alternative 2: Dependency Injection Framework (Spring/Guice)
+
+**Description**: Use DI framework to wire components, discover plugins via component scanning.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | SPI (Baseline) | DI Framework |
+|--------------------|----------------|--------------|
+| Core Dependency    | 0              | -2           |
+| Configuration      | 0              | -1           |
+| Learning Curve     | 0              | -2           |
+| Testability        | 0              | +1           |
+| **Total Score**    | **0**          | **-4**       |
+
+**Rejection rationale**: Adds heavyweight dependency to core. Spring/Guice designed for complex enterprise apps. JBake's needs are simple: "find classes on classpath, instantiate them". SPI does this without extra dependencies.
+
+=== Alternative 3: Custom Plugin Framework
+
+**Description**: Build custom plugin discovery with XML/JSON config files.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | SPI (Baseline) | Custom Framework |
+|--------------------|----------------|------------------|
+| Maintenance        | 0              | -3               |
+| Flexibility        | 0              | +1               |
+| Familiarity        | 0              | -2               |
+| Bugs/Edge Cases    | 0              | -2               |
+| **Total Score**    | **0**          | **-6**           |
+
+**Rejection rationale**: Reinventing the wheel. SPI already solves this problem, tested in JDK for years. Custom framework would need documentation, edge case handling, bug fixes. Not worth it.
+
+== Implementation Notes
+
+**Engines class pattern** (example from `MarkupEngines`):
+
+```java
+public class Engines {
+    private static final Engines INSTANCE;
+    private final Map<String, ParserEngine> parsers;
+    
+    static {
+        INSTANCE = new Engines();
+        loadEngines();
+    }
+    
+    private static void loadEngines() {
+        ClassLoader cl = Engines.class.getClassLoader();
+        Enumeration<URL> resources = cl.getResources(PROPERTIES);
+        while (resources.hasMoreElements()) {
+            URL url = resources.nextElement();
+            Properties props = new Properties();
+            props.load(url.openStream());
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
+                String className = (String) entry.getKey();
+                String[] extensions = ((String) entry.getValue()).split(",");
+                registerEngine(className, extensions);
+            }
+        }
+    }
+}
+```
+
+**Provider file example** (`META-INF/services/org.jbake.parser.MarkupEngines.properties`):
+
+```properties
+org.jbake.parser.MarkdownEngine=md,markdown
+org.jbake.parser.AsciidoctorEngine=ad,adoc,asciidoc
+org.jbake.parser.HtmlEngine=html,htm
+```
+
+**Key design decisions:**
+
+* Singleton pattern for Engines registry (one instance per JVM)
+* Static initialization ensures engines loaded before first use
+* Graceful degradation: missing engines logged as warnings, not errors
+* Extensions case-insensitive for user convenience
+
+== Related Decisions
+
+* link:ADR-001-pipeline-architecture.adoc[ADR-001]: Pipeline Architecture - SPI plugins integrate into pipeline stages
+* link:ADR-004-delegating-template-engine.adoc[ADR-004]: Delegating Template Engine - Uses SPI to discover template engines
+
+== References
+
+* Java SPI Documentation: https://docs.oracle.com/javase/tutorial/sound/SPI-intro.html
+* MarkupEngines implementation: `jbake-core/src/main/java/org/jbake/parser/Engines.java`
+* TemplateEngines implementation: `jbake-core/src/main/java/org/jbake/template/TemplateEngines.java`
+* ServiceLoader test: `jbake-core/src/test/java/org/jbake/render/ServiceLoaderTest.java`

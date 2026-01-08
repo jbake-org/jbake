@@ -1,0 +1,269 @@
+:jbake-title: Risks and Technical Debts
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 11
+:filename: /chapters/11_technical_risks.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+
+
+[[section-technical-risks]]
+== Risks and Technical Debts
+
+=== High Priority Risks
+
+==== RISK-001: OrientDB Platform Dependency (Apple Silicon Incompatibility)
+
+**Status:** 🔴 Critical | **Probability:** High | **Impact:** High
+
+**Description:**
+
+OrientDB 3.x uses native libraries (via JNA - Java Native Access) for performance optimization, particularly for memory management and low-level database operations. These native components are platform-specific and compiled for different architectures:
+
+* x86_64 (Intel/AMD) - ✅ Well supported
+* ARM64/aarch64 (Apple Silicon M1/M2/M3) - ❌ **Limited/No Support**
+
+**Manifestation:**
+
+On Apple Silicon Macs (M1, M2, M3 chips), JBake may:
+
+* Fail to start with `UnsatisfiedLinkError` when loading native libraries
+* Require Rosetta 2 translation layer (performance penalty)
+* Experience crashes during database operations
+* Show JNA-related warnings: `JNA library 'jnidispatch' not found`
+
+**Impact:**
+
+* **Developer Experience:** New contributors on Apple Silicon cannot run JBake without workarounds
+* **Build Environments:** CI/CD on ARM-based systems (e.g., GitHub Actions ARM runners) may fail
+* **Production:** Cloud environments moving to ARM instances (AWS Graviton, Azure Ampere) affected
+* **Adoption:** Barrier for modern Mac users (Apple Silicon adoption >80% of new Macs since 2021)
+
+**Current Situation (2025):**
+
+* OrientDB version: `3.1.20` (see `gradle.properties`)
+* OrientDB 3.2.x series has improved ARM64 support, but issues remain
+* OrientDB development has slowed (company pivot, reduced maintenance)
+* Native library bundled in `orientdb-core` may not include ARM64 binaries
+
+**Workarounds (Temporary):**
+
+1. **Rosetta 2 Emulation:** Run JBake under x86_64 emulation
++
+[source,bash]
+----
+arch -x86_64 java -jar jbake.jar
+----
++
+_Drawback: ~30-40% performance penalty_
+
+2. **JVM Architecture Flag:** Force x86_64 JVM
++
+[source,bash]
+----
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11-x64.jdk/Contents/Home
+----
++
+_Drawback: Requires separate x86 JDK installation_
+
+3. **Docker with x86 Platform:**
++
+[source,bash]
+----
+docker run --platform linux/amd64 jbake/jbake
+----
++
+_Drawback: Docker overhead, emulation layer_
+
+**Recommended Solutions:**
+
+===== Short-term (Mitigation):
+
+* ✅ Document the issue prominently in README and installation docs
+* ✅ Provide tested workaround instructions for Apple Silicon
+* ✅ Add runtime detection and warning message for ARM64 platforms
+* ✅ Test with latest OrientDB 3.2.x versions (improved ARM support)
+* ✅ Configure JNA system property: `-Djna.nosys=true` (already in build.gradle)
+
+===== Long-term (Resolution):
+
+* 🎯 **Replace OrientDB** with platform-independent alternative (see link:../decisions/ADR-003-orientdb-cache.adoc[ADR-003] alternatives)
+  - **Option 1:** Pure Java collections (Java 8+ Streams API)
+  - **Option 2:** H2 Database (pure Java, embedded)
+  - **Option 3:** Apache Derby (pure Java, embedded)
+  - **Option 4:** SQLite via JDBC (better platform support than OrientDB)
+
+* 🎯 **Incremental Migration:** Introduce abstraction layer
++
+[source,java]
+----
+interface ContentRepository {
+    void store(DocumentModel doc);
+    List<DocumentModel> query(String type, Predicate<DocumentModel> filter);
+}
+
+// Implementations:
+// - OrientDBRepository (current, deprecated)
+// - JavaCollectionsRepository (new default)
+// - H2Repository (future)
+----
+
+**Tracking:**
+
+* Related: link:../decisions/ADR-003-orientdb-cache.adoc[ADR-003: OrientDB Embedded Database]
+* GitHub Issues: 
+  - https://github.com/jbake-org/jbake/issues/218 (OrientDB replacement discussion)
+  - https://github.com/orientechnologies/orientdb/issues (upstream ARM64 issues)
+
+**Decision Required:**
+
+Project maintainers should decide on migration timeline:
+
+* JBake 2.8.0: Add deprecation warning for OrientDB
+* JBake 3.0.0: Switch to pure Java implementation (breaking change)
+
+---
+
+=== Medium Priority Risks
+
+==== RISK-002: OrientDB Maintenance and Security
+
+**Status:** 🟡 Medium | **Probability:** Medium | **Impact:** High
+
+**Description:**
+
+OrientDB development has slowed significantly since OrientDB Ltd's business pivot in 2020-2021. The open-source project receives limited maintenance:
+
+* Infrequent security updates
+* Slow response to critical bugs
+* Uncertain long-term viability
+
+**Impact:**
+
+* **Security:** Unpatched vulnerabilities may emerge
+* **Compatibility:** May not support future Java versions (Java 17+, 21)
+* **Technical Debt:** Dependency on unmaintained library
+
+**Mitigation:**
+
+* Monitor OrientDB security advisories
+* Consider migration timeline (see RISK-001)
+* Test JBake with newer Java versions regularly
+
+---
+
+==== RISK-003: Heavy Dependency Footprint
+
+**Status:** 🟡 Medium | **Probability:** High | **Impact:** Medium
+
+**Description:**
+
+OrientDB adds significant dependency weight:
+
+* OrientDB core: ~5MB
+* Transitive dependencies: ~15MB total
+* Includes unused features (graph database, distributed mode)
+
+**Impact:**
+
+* **Startup Time:** Slower initialization
+* **Memory:** Higher baseline memory usage (~100MB overhead)
+* **Embedded Use:** Maven/Gradle plugins pull large dependency tree
+* **Distribution Size:** Larger JBake standalone package
+
+**Mitigation:**
+
+* Use dependency exclusions where possible
+* Consider migration to lighter alternative (pure Java collections ~0 dependencies)
+
+---
+
+=== Low Priority Technical Debts
+
+==== DEBT-001: Thread Safety Complexity
+
+**Status:** 🟢 Low | **Impact:** Low
+
+**Description:**
+
+OrientDB instances are thread-local, requiring `activateOnCurrentThread()` calls. This complicates multi-threaded rendering and increases risk of threading bugs.
+
+**Mitigation:**
+
+* Well-documented in code
+* Consider migration to thread-safe alternative
+
+---
+
+==== DEBT-002: Test Coverage for ContentStore
+
+**Status:** 🟢 Low | **Impact:** Low
+
+**Description:**
+
+ContentStore tests require OrientDB, making them slower and harder to mock.
+
+**Mitigation:**
+
+* Introduce repository abstraction (see RISK-001)
+* Write tests against interface, not OrientDB directly
+
+---
+
+=== Risk Matrix Summary
+
+[cols="3,1,1,1", options="header"]
+|===
+|Risk/Debt |Probability |Impact |Priority
+
+|RISK-001: Apple Silicon Incompatibility
+|High
+|High
+|🔴 Critical
+
+|RISK-002: OrientDB Maintenance
+|Medium
+|High
+|🟡 Medium
+
+|RISK-003: Heavy Dependencies
+|High
+|Medium
+|🟡 Medium
+
+|DEBT-001: Thread Safety
+|Low
+|Low
+|🟢 Low
+
+|DEBT-002: Test Coverage
+|Low
+|Low
+|🟢 Low
+|===
+
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+.Contents
+A list of identified technical risks or technical debts, ordered by priority
+
+.Motivation
+“Risk management is project management for grown-ups” (Tim Lister, Atlantic Systems Guild.) 
+
+This should be your motto for systematic detection and evaluation of risks and technical debts in the architecture, which will be needed by management stakeholders (e.g. project managers, product owners) as part of the overall risk analysis and measurement planning.
+
+.Form
+List of risks and/or technical debts, probably including suggested measures to minimize, mitigate or avoid risks or reduce technical debts.
+
+
+.Further Information
+
+See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 documentation.
+
+****
+endif::arc42help[]

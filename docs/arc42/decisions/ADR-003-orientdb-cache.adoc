@@ -1,0 +1,225 @@
+= ADR-003: OrientDB Embedded Database
+
+Status: ✅ **Accepted** (with considerations for future evolution)
+
+Date: 2012-11-05 (Estimated - ContentStore implementation)
+
+== Problem Statement
+
+How should JBake store and query parsed content between pipeline stages? The system needs to:
+
+* Cache parsed documents (with metadata + HTML)
+* Query documents by type, tags, date ranges
+* Support pagination (skip/limit)
+* Enable incremental builds (check if document changed)
+* Provide fast lookups by URI
+* Handle thousands of documents efficiently
+
+== Context
+
+Requirements for content storage:
+
+* **In-process**: No external database server (simple deployment)
+* **Fast queries**: Tags page needs "all posts with tag X"
+* **Schema flexibility**: Content metadata varies by document type
+* **Embeddable**: Must work in Maven plugin, Gradle, standalone
+* **Minimal setup**: No installation or configuration
+* **Temporary storage**: Data discarded after generation (not persistent across runs)
+
+Alternatives available in 2012:
+
+* **In-memory collections** (List/Map): Simple but limited querying
+* **H2 Database**: SQL, but requires schema definition
+* **OrientDB**: Document database, schemaless, embeddable
+* **MapDB**: Fast key-value store, limited query capabilities
+
+JBake's data is document-oriented (JSON-like metadata + body), making SQL databases awkward fit.
+
+== Decision
+
+**Use OrientDB as an embedded, in-memory document database for the ContentStore.**
+
+**Key characteristics:**
+
+* **Embedded mode**: Runs in-process, no server
+* **Document model**: Stores content as JSON-like documents
+* **SQL-like queries**: Familiar syntax for filtering/sorting
+* **Schema-less**: No upfront schema definition needed
+* **Indexes**: Automatic indexing for common queries
+* **Graph capabilities**: (not used initially, but available)
+
+**ContentStore API:**
+
+```java
+public class ContentStore {
+    private ODatabaseDocumentTx db;
+    
+    // Store parsed document
+    public void addDocument(Map<String, Object> doc);
+    
+    // Query by document type
+    public DocumentList<DocumentModel> getAllContent(String docType);
+    
+    // Query by tag
+    public DocumentList<DocumentModel> getPublishedContentByTag(String tag);
+    
+    // Pagination support
+    public void setLimit(int limit);
+    public void setStart(int start);
+    
+    // Incremental builds
+    public DocumentList<DocumentModel> getDocumentStatus(String uri);
+}
+```
+
+**Data lifecycle:**
+
+1. **Startup**: Create in-memory OrientDB instance
+2. **Crawl stage**: Store parsed documents
+3. **Render stage**: Query documents for template data
+4. **Shutdown**: Drop database (ephemeral)
+
+== Consequences
+
+=== Positive
+
+* ✅ **Rich querying**: SQL-like syntax for complex filters
+* ✅ **No schema**: Flexible metadata (different per document type)
+* ✅ **Fast**: In-memory, indexed lookups
+* ✅ **Familiar**: SQL syntax developers already know
+* ✅ **Pagination**: Built-in skip/limit support
+* ✅ **Sorting**: ORDER BY for date-based archives
+
+=== Negative
+
+* ❌ **Heavy dependency**: OrientDB ~5MB, pulls in many transitive dependencies
+* ❌ **API complexity**: Learning curve for OrientDB API
+* ❌ **Lifecycle management**: Must carefully startup/shutdown database
+* ❌ **Thread safety**: Requires `activateOnCurrentThread()` calls
+* ❌ **Embedded only**: Can't easily inspect data during generation (no external tool)
+* ❌ **Performance**: Overhead for small sites (< 100 pages)
+* ❌ **Platform dependency**: Native libraries (JNA) cause issues on Apple Silicon (ARM64/M1/M2/M3), requires Rosetta 2 emulation or workarounds (see link:../chapters/11_technical_risks.adoc#RISK-001[RISK-001])
+
+=== Neutral
+
+* ℹ️ In-memory only - data not persisted (by design)
+* ℹ️ Graph features unused (document store sufficient)
+* ℹ️ OrientDB's multi-model capabilities (graph/object) not exploited
+
+== Alternatives Considered
+
+=== Alternative 1: In-Memory Collections (List<Map>)
+
+**Description**: Store documents in `List<Map<String, Object>>`, filter with Java streams.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | OrientDB (Baseline) | Collections |
+|--------------------|---------------------|-------------|
+| Simplicity         | 0                   | +3          |
+| Dependencies       | 0                   | +3          |
+| Query Complexity   | 0                   | -2          |
+| Performance        | 0                   | -1          |
+| Pagination         | 0                   | -2          |
+| **Total Score**    | **0**               | **+1**      |
+
+**Rejection rationale**: Close call. Collections simpler but querying becomes painful. Example: "Get published posts with tag 'java', sorted by date, limit 10" requires complex stream logic. No built-in pagination. Performance degrades with > 1000 documents (full scans).
+
+*Note: This alternative becomes more attractive in modern Java (8+) with streams. May revisit in ADR-007.*
+
+=== Alternative 2: H2 Embedded SQL Database
+
+**Description**: Use H2 with predefined schema, SQL queries.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | OrientDB (Baseline) | H2 SQL |
+|--------------------|---------------------|--------|
+| Schema Flexibility | 0                   | -3     |
+| Query Power        | 0                   | +1     |
+| Setup              | 0                   | -2     |
+| Dependencies       | 0                   | +1     |
+| **Total Score**    | **0**               | **-3** |
+
+**Rejection rationale**: SQL databases require rigid schema. JBake's content metadata varies: blog posts have tags/categories, pages don't. Storing as JSON text loses query capabilities. Creating tables per document type is over-engineering.
+
+=== Alternative 3: MapDB (Key-Value Store)
+
+**Description**: Fast on-disk/memory key-value store with collections support.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | OrientDB (Baseline) | MapDB |
+|--------------------|---------------------|-------|
+| Simplicity         | 0                   | +2    |
+| Query Capability   | 0                   | -3    |
+| Dependencies       | 0                   | +2    |
+| Sorted Collections | 0                   | +1    |
+| **Total Score**    | **0**               | **+2** |
+
+**Rejection rationale**: MapDB excellent for key-value, weak for queries. No built-in "find all documents with tag X". Would need to maintain separate indexes manually. OrientDB handles indexing automatically.
+
+== Implementation Notes
+
+**Database initialization:**
+
+```java
+public ContentStore(final String type, String name) {
+    db = new ODatabaseDocumentTx(type + ":" + name);
+    if (!db.exists()) {
+        db.create();
+    }
+    updateSchema(); // Create document classes
+}
+```
+
+**Schema setup** (flexible document types):
+
+```java
+public void updateSchema() {
+    for (String docType : DocumentTypes.getDocumentTypes()) {
+        OClass oClass = db.getMetadata().getSchema().getOrCreateClass(docType);
+        // OrientDB auto-creates fields on first insert
+    }
+}
+```
+
+**Thread safety pattern:**
+
+```java
+private void activateOnCurrentThread() {
+    if (!db.isActiveOnCurrentThread()) {
+        db.activateOnCurrentThread();
+    }
+}
+```
+
+**Critical**: OrientDB instances thread-local. Multi-threaded rendering requires `activateOnCurrentThread()` before each query.
+
+**Query examples:**
+
+```java
+// Get all published posts
+db.query(new OSQLSynchQuery<ODocument>(
+    "select * from post where status='published' order by date desc"
+));
+
+// Pagination
+db.query(new OSQLSynchQuery<ODocument>(
+    "select * from post where status='published' limit 10 skip 20"
+));
+```
+
+== Related Decisions
+
+* link:ADR-001-pipeline-architecture.adoc[ADR-001]: Pipeline Architecture - ContentStore sits between pipeline stages
+* link:ADR-006-incremental-builds.adoc[ADR-006]: Incremental Builds - Uses ContentStore to check document hashes
+
+== References
+
+* OrientDB Documentation: https://orientdb.com/docs/2.2.x/
+* ContentStore implementation: `jbake-core/src/main/java/org/jbake/app/ContentStore.java`
+* Thread safety issues: Various GitHub issues around multi-threaded rendering
+* Alternative discussion: https://github.com/jbake-org/jbake/issues/218 (consideration to replace OrientDB)
+* Platform compatibility issues: Apple Silicon (ARM64) native library problems, documented in link:../chapters/11_technical_risks.adoc#RISK-001[Technical Risks - RISK-001]
+* JNA (Java Native Access) dependency: Required for OrientDB native optimizations, source of platform issues

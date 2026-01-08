@@ -1,0 +1,703 @@
+= JBake Anti-Patterns: What NOT to Do
+
+This document catalogs common mistakes, anti-patterns, and pitfalls when working with or extending JBake.
+
+== Architecture Anti-Patterns
+
+=== ❌ Antipattern: Exposing OrientDB Directly to Templates
+
+**Why wrong:**
+
+* Tight coupling between templates and database implementation
+* OrientDB API changes break templates (v2 → v3 migration)
+* Template authors must learn OrientDB query syntax
+* Hard to migrate to different database
+
+**✅ Correct approach:**
+
+* Wrap queries in ContentStore methods
+* Expose Java API: `getPublishedPosts()`, `getPostsByTag(tag)`
+* Template uses simple calls: `${db.published_posts}`
+
+**Code example:**
+
+```freemarker
+❌ Wrong:
+<#-- Direct OrientDB query in template -->
+<#assign posts = db.query("select * from Documents where status='published'")>
+
+✅ Correct:
+<#-- Use ContentStore wrapper -->
+<#assign posts = db.published_posts>
+```
+
+**Related:** ADR-003-orientdb-cache.adoc
+
+---
+
+=== ❌ Antipattern: Mutable Global State
+
+**Why wrong:**
+
+* `DocumentTypes` and `ModelExtractors` use singletons with mutable state
+* Thread-safety issues
+* Unexpected behavior when running multiple bakes
+* Hard to test (state leaks between tests)
+
+**✅ Correct approach:**
+
+* Pass configuration explicitly
+* Use immutable objects where possible
+* Reset global state carefully (see `resetDocumentTypesAndExtractors()`)
+
+**Code example:**
+
+```java
+❌ Wrong:
+// Mutating global singleton
+DocumentTypes.addDocumentType("tutorial");
+// Another part of code affected
+
+✅ Correct:
+// Configuration-based, explicit
+config.setDocumentTypes(Arrays.asList("post", "page", "tutorial"));
+// Or: Pass DocumentTypes instance to components
+```
+
+**Current status:** Technical debt; refactoring candidate for future versions.
+
+**Related:** Issues #123 (DocumentTypes refactoring)
+
+---
+
+=== ❌ Antipattern: Breaking API Changes Without Deprecation
+
+**Why wrong:**
+
+* Breaks existing projects
+* No migration path for users
+* Violates semantic versioning
+
+**✅ Correct approach:**
+
+* Deprecate old API first
+* Provide new API alongside
+* Document migration in release notes
+* Remove deprecated API only in major version
+
+**Code example:**
+
+```java
+❌ Wrong:
+// Remove old constructor immediately
+public class Oven {
+  // Old constructor removed - breaks code
+  public Oven(JBakeConfiguration config) { /* ... */ }
+}
+
+✅ Correct:
+// Deprecate, then remove
+public class Oven {
+  @Deprecated
+  public Oven(File source, File dest, boolean clearCache) {
+    this(new JBakeConfigurationFactory().create(...));
+  }
+  
+  public Oven(JBakeConfiguration config) { /* ... */ }
+}
+```
+
+**Related:** ADR-007-deprecation-strategy.adoc
+
+---
+
+== Configuration Anti-Patterns
+
+=== ❌ Antipattern: Hardcoding Configuration Values
+
+**Why wrong:**
+
+* Not user-configurable
+* Breaks customization
+* Forces code changes for simple tweaks
+
+**✅ Correct approach:**
+
+* Define in `default.properties` with sensible default
+* Allow override in user's `jbake.properties`
+* Access via `JBakeConfiguration` interface
+
+**Code example:**
+
+```java
+❌ Wrong:
+// Hardcoded value
+String dateFormat = "yyyy-MM-dd";
+
+✅ Correct:
+// From configuration
+String dateFormat = config.getDateFormat();
+
+// In default.properties:
+// date.format=yyyy-MM-dd
+```
+
+---
+
+=== ❌ Antipattern: Using CompositeConfiguration Directly
+
+**Why wrong:**
+
+* Deprecated pattern
+* Tight coupling to Commons Configuration library
+* Hard to change configuration source
+* No type safety
+
+**✅ Correct approach:**
+
+* Use `JBakeConfiguration` interface
+* Access via typed methods
+* Configuration abstraction enables future changes
+
+**Code example:**
+
+```java
+❌ Wrong:
+CompositeConfiguration config = ...;
+String value = config.getString("some.property");
+
+✅ Correct:
+JBakeConfiguration config = ...;
+String value = config.getSomeProperty();
+```
+
+**Related:** ADR-005-configuration-abstraction.adoc
+
+---
+
+== Template Development Anti-Patterns
+
+=== ❌ Antipattern: Assuming Template File Extension = Engine
+
+**Why wrong:**
+
+* `.html` maps to RawMarkupEngine (passthrough), not Thymeleaf
+* Confusion when template not processed
+* Silent failures
+
+**✅ Correct approach:**
+
+* Use engine-specific extensions:
+  - Freemarker: `.ftl`, `.ftlh`
+  - Groovy: `.groovy`, `.gsp`
+  - Thymeleaf: `.thymeleaf`
+  - Pebble: `.pebble`
+* Or configure extension mapping explicitly
+
+**Code example:**
+
+```
+❌ Wrong:
+templates/
+  post.html  → Treated as raw HTML, not processed!
+
+✅ Correct:
+templates/
+  post.ftl       → Freemarker
+  post.groovy    → Groovy
+  post.thymeleaf → Thymeleaf
+```
+
+**Related:** `TemplateEngines.properties` mapping
+
+---
+
+=== ❌ Antipattern: Mutating Content in Templates
+
+**Why wrong:**
+
+* DocumentModel is cached, mutations affect cache
+* Side effects hard to track
+* Breaks functional programming principles
+
+**✅ Correct approach:**
+
+* Treat content as immutable in templates
+* Create new variables for transformations
+* Use template helpers for complex logic
+
+**Code example:**
+
+```freemarker
+❌ Wrong:
+<#-- Mutating content -->
+<#assign content.processedTitle = content.title?upper_case>
+
+✅ Correct:
+<#-- Create new variable -->
+<#assign processedTitle = content.title?upper_case>
+<h1>${processedTitle}</h1>
+```
+
+---
+
+=== ❌ Antipattern: Complex Logic in Templates
+
+**Why wrong:**
+
+* Templates become hard to read
+* Logic duplicated across templates
+* Testing difficult
+
+**✅ Correct approach:**
+
+* Extract complex logic to Java code
+* Use ModelExtractors for data transformation
+* Create template helpers
+* Keep templates focused on presentation
+
+**Code example:**
+
+```freemarker
+❌ Wrong:
+<#-- Complex date formatting logic in template -->
+<#assign year = content.date?string("yyyy")>
+<#assign month = content.date?string("MM")>
+<#assign day = content.date?string("dd")>
+<#assign formatted = "${year}-${month}-${day}">
+
+✅ Correct:
+<#-- Use pre-formatted date from model -->
+${content.formattedDate}
+
+// In Java (ModelExtractor or custom field):
+doc.put("formattedDate", dateFormat.format(doc.getDate()));
+```
+
+---
+
+== Parser Development Anti-Patterns
+
+=== ❌ Antipattern: Returning null on Parse Errors
+
+**Why wrong:**
+
+* Silent failures
+* Content mysteriously missing from output
+* Hard to debug
+
+**Current behavior:** Parser returns null on failure (logged but not thrown)
+
+**✅ Better approach (future):**
+
+* Throw `ParsingException` with details
+* Oven collects errors for summary
+* User gets clear error message
+
+**Code example:**
+
+```java
+❌ Current (anti-pattern):
+public DocumentModel processFile(File file) {
+  try {
+    // ... parsing
+  } catch (Exception e) {
+    LOGGER.error("Failed to parse", e);
+    return null;  // Silent failure!
+  }
+}
+
+✅ Better:
+public DocumentModel processFile(File file) throws ParsingException {
+  try {
+    // ... parsing
+  } catch (Exception e) {
+    throw new ParsingException(file, e);  // Explicit failure
+  }
+}
+```
+
+**Status:** Technical debt; discussed in Issue #234
+
+---
+
+=== ❌ Antipattern: Overriding parse() Instead of Hooks
+
+**Why wrong:**
+
+* `parse()` is template method, controls flow
+* Overriding breaks header/body separation
+* Duplicates base class logic
+
+**✅ Correct approach:**
+
+* Override `processHeader()` and `processBody()` hooks
+* Let base class handle flow control
+
+**Code example:**
+
+```java
+❌ Wrong:
+public class MyEngine extends MarkupEngine {
+  @Override
+  public DocumentModel parse(JBakeConfiguration config, File file) {
+    // Reimplements entire flow - bad!
+    // ... duplicate logic
+  }
+}
+
+✅ Correct:
+public class MyEngine extends MarkupEngine {
+  @Override
+  protected void processHeader(ParserContext context) {
+    // Just handle header extraction
+  }
+  
+  @Override
+  protected void processBody(ParserContext context) {
+    // Just handle body conversion
+  }
+}
+```
+
+**Related:** `MarkupEngine.java` template method pattern
+
+---
+
+== Content Authoring Anti-Patterns
+
+=== ❌ Antipattern: Omitting Required Metadata
+
+**Why wrong:**
+
+* Content won't render (missing type or status)
+* Default status is "draft" (not rendered)
+* Confusing "where's my content?" issues
+
+**✅ Correct approach:**
+
+* Always specify `type` and `status` in header
+* Or configure defaults in `jbake.properties`
+
+**Code example:**
+
+```markdown
+❌ Wrong:
+title=My Post
+date=2025-11-22
+~~~~~~
+Content here...
+# Missing type and status!
+
+✅ Correct:
+title=My Post
+date=2025-11-22
+type=post
+status=published
+~~~~~~
+Content here...
+
+# Or configure defaults:
+# default.type=post
+# default.status=published
+```
+
+---
+
+=== ❌ Antipattern: Inconsistent Date Formats
+
+**Why wrong:**
+
+* Parsing errors
+* Dates not sortable
+* Archive generation fails
+
+**✅ Correct approach:**
+
+* Use consistent format matching `date.format` config
+* Default: `yyyy-MM-dd`
+* Stick to ISO 8601 formats
+
+**Code example:**
+
+```markdown
+❌ Wrong:
+date=November 22, 2025  # Doesn't match default format!
+date=22/11/2025         # Ambiguous!
+
+✅ Correct:
+date=2025-11-22         # ISO 8601, matches default
+
+# Or configure format:
+# date.format=dd-MM-yyyy
+```
+
+---
+
+== Extension Development Anti-Patterns
+
+=== ❌ Antipattern: Missing META-INF/services File
+
+**Why wrong:**
+
+* ServiceLoader can't discover plugin
+* Silent failure (plugin not loaded)
+* No error message
+
+**✅ Correct approach:**
+
+* Always create META-INF/services file
+* Use fully-qualified class names
+* Test plugin loading
+
+**Code example:**
+
+```
+❌ Wrong:
+src/
+  main/
+    java/
+      com/example/MyTool.java  # Implements RenderingTool
+    # Missing META-INF/services!
+
+✅ Correct:
+src/
+  main/
+    java/
+      com/example/MyTool.java
+    resources/
+      META-INF/
+        services/
+          org.jbake.render.RenderingTool  # Contains: com.example.MyTool
+```
+
+---
+
+=== ❌ Antipattern: Assuming ServiceLoader Order
+
+**Why wrong:**
+
+* ServiceLoader iteration order is undefined
+* Behavior differs across JVMs
+* Tests pass locally, fail in CI
+
+**✅ Correct approach:**
+
+* Don't depend on load order
+* Use explicit priority mechanism if order matters
+* Make tools independent
+
+**Code example:**
+
+```java
+❌ Wrong:
+// Assuming Tool A runs before Tool B
+for (RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
+  tool.render(...);  // Order matters but not guaranteed!
+}
+
+✅ Correct:
+// Tools are independent, order doesn't matter
+// Or: Implement Priority interface and sort explicitly
+List<RenderingTool> tools = ...;
+tools.sort(Comparator.comparing(RenderingTool::getPriority));
+```
+
+**Status:** Future enhancement; see Issue #345
+
+---
+
+== Performance Anti-Patterns
+
+=== ❌ Antipattern: Disabling Cache for Every Bake
+
+**Why wrong:**
+
+* Defeats incremental build purpose
+* Slow rebuilds on large sites
+* Unnecessary re-parsing
+
+**✅ Correct approach:**
+
+* Use `-clearCache` only when needed:
+  - After template changes
+  - After config changes
+  - After JBake upgrade
+* Normal bakes use cache automatically
+
+**Code example:**
+
+```bash
+❌ Wrong:
+# Always clearing cache
+jbake -b -clearCache  # Slow!
+
+✅ Correct:
+# Normal incremental bake
+jbake -b  # Fast, uses cache
+
+# Clear only when needed
+jbake -b -clearCache  # After template/config change
+```
+
+---
+
+=== ❌ Antipattern: Loading All Content into Memory at Once
+
+**Why wrong:**
+
+* Out of memory on large sites
+* Slow startup
+* Thymeleaf limitation (loads full model)
+
+**✅ Correct approach:**
+
+* Use lazy loading (ModelExtractors)
+* Query ContentStore on-demand
+* Prefer Freemarker/Groovy over Thymeleaf for large sites
+
+**Code example:**
+
+```java
+❌ Wrong:
+// Load everything upfront
+List<DocumentModel> allPosts = db.getAllContent("post");
+model.put("posts", allPosts);  // Entire list in memory!
+
+✅ Correct:
+// Lazy load via ModelExtractor
+model.put("posts", () -> db.getPublishedPosts());  // Evaluated when accessed
+```
+
+**Note:** See Thymeleaf warning in `ThymeleafTemplateEngine.java`
+
+---
+
+== Testing Anti-Patterns
+
+=== ❌ Antipattern: Not Using Test Fixtures
+
+**Why wrong:**
+
+* Tests create one-off structures
+* Inconsistent test data
+* Hard to reproduce issues
+
+**✅ Correct approach:**
+
+* Use canonical fixtures: `src/test/resources/fixture/`
+* Extend `ContentStoreIntegrationTest` for DB tests
+* Reuse `TestUtils.getTestResourcesAsSourceFolder()`
+
+**Code example:**
+
+```java
+❌ Wrong:
+@Test
+public void testParser() {
+  File file = createTempFile();  // One-off structure
+  // ...
+}
+
+✅ Correct:
+@Test
+public void testParser() {
+  File fixture = TestUtils.getTestResourcesAsSourceFolder();
+  File file = new File(fixture, "content/blog/2013/first-post.md");
+  // Uses canonical fixture structure
+}
+```
+
+---
+
+=== ❌ Antipattern: State Leakage Between Tests
+
+**Why wrong:**
+
+* Tests pass individually, fail in suite
+* Order-dependent tests
+* Flaky CI builds
+
+**✅ Correct approach:**
+
+* Reset global state in `@Before` or `@After`
+* Use `@Rule TemporaryFolder` for file tests
+* Call `db.drop()` in teardown
+
+**Code example:**
+
+```java
+❌ Wrong:
+public class MyTest {
+  @Test
+  public void test1() {
+    DocumentTypes.addDocumentType("tutorial");  # Global mutation!
+  }
+  
+  @Test
+  public void test2() {
+    // Affected by test1!
+  }
+}
+
+✅ Correct:
+public class MyTest extends ContentStoreIntegrationTest {
+  @Before
+  public void setUp() {
+    db.startup();
+    DocumentTypes.resetDocumentTypes();  // Clean state
+  }
+  
+  @After
+  public void tearDown() {
+    db.drop();  // Clean DB
+  }
+}
+```
+
+---
+
+## Summary: Key Principles
+
+**DO:**
+
+* ✅ Use abstraction layers (JBakeConfiguration, ContentStore)
+* ✅ Deprecate before removing
+* ✅ Wrap third-party APIs
+* ✅ Keep templates simple
+* ✅ Follow SPI patterns correctly
+* ✅ Use configuration for customization
+* ✅ Write tests with fixtures
+
+**DON'T:**
+
+* ❌ Expose implementation details to users
+* ❌ Break APIs without deprecation
+* ❌ Hardcode values
+* ❌ Mutate shared state
+* ❌ Put logic in templates
+* ❌ Assume ServiceLoader order
+* ❌ Skip META-INF/services
+
+---
+
+## Quick Reference: "I want to..." → "Do this, not that"
+
+| Goal | ❌ Anti-Pattern | ✅ Correct Approach |
+|------|----------------|-------------------|
+| Add custom field | Modify DocumentModel class | Add field in content header |
+| Query content | OrientDB SQL in template | ContentStore methods |
+| Add template engine | Modify TemplateEngines | Implement SPI + META-INF |
+| Change config | Hardcode value | Add to properties file |
+| Handle parse error | Return null | Throw exception (future) |
+| Support new format | Add to Parser | Extend MarkupEngine |
+| Optimize performance | Always clearCache | Use incremental builds |
+| Test components | Create temp structure | Use fixtures |
+
+---
+
+**See also:**
+
+* `docs/arc42/decisions/` - Architecture Decision Records
+* `docs/arc42/chapters/08_concepts.adoc` - Mental Model Concepts
+* `docs/onboarding/common-issues.adoc` - Troubleshooting Guide

@@ -1,0 +1,199 @@
+:jbake-title: Architecture Decisions
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 9
+:filename: /chapters/09_architecture_decisions.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+
+
+[[section-design-decisions]]
+== Architecture Decisions
+
+JBake's architecture has evolved through several phases, with key decisions documented as Architecture Decision Records (ADRs). These decisions capture the context, rationale, alternatives considered, and consequences of significant architectural choices.
+
+For detailed ADR documentation including full context, alternatives analysis, and implementation notes, see the link:../decisions/README.adoc[Architecture Decision Records directory].
+
+=== Overview of Key Decisions
+
+==== Phase 1: Foundation (2012-2014) - "Get it Working"
+
+===== link:../decisions/ADR-001-pipeline-architecture.adoc[ADR-001: Pipeline Architecture]
+
+**Status:** ✅ Accepted | **Date:** 2012-09-15
+
+**Decision:** Adopt a linear pipeline architecture with four distinct stages (Crawl → Parse → Render → Copy).
+
+**Rationale:** Provides a simple, understandable mental model. Each stage has clear inputs/outputs and can be tested independently. Alternative event-driven and monolithic approaches were rejected for unnecessary complexity.
+
+**Consequences:** 
+* ✅ Easy to explain and maintain
+* ✅ Good testability and debuggability
+* ❌ Sequential execution limits parallelization
+
+===== link:../decisions/ADR-002-spi-extensibility.adoc[ADR-002: Java SPI for Extensibility]
+
+**Status:** ✅ Accepted | **Date:** 2012-10-20
+
+**Decision:** Use Java's Service Provider Interface (SPI) mechanism for all extensibility points (markup engines, template engines, model extractors).
+
+**Rationale:** Zero-configuration plugin discovery. Drop a JAR in classpath and it works. Standard Java mechanism familiar to developers.
+
+**Consequences:**
+* ✅ Clean separation between core and extensions
+* ✅ Embeddability (only include what you need)
+* ❌ Discovery overhead at startup
+* ❌ No API version compatibility handling
+
+===== link:../decisions/ADR-003-orientdb-cache.adoc[ADR-003: OrientDB Embedded Database]
+
+**Status:** ✅ Accepted (with considerations) | **Date:** 2012-11-05
+
+**Decision:** Use OrientDB as an embedded, in-memory document database for the ContentStore.
+
+**Rationale:** Rich SQL-like querying capabilities, schemaless document model fits content metadata, no external database server needed.
+
+**Consequences:**
+* ✅ Fast queries with pagination support
+* ✅ Flexible schema (metadata varies by document type)
+* ❌ Heavy dependency (~5MB + transitive dependencies)
+* ❌ Thread safety requires careful lifecycle management
+
+==== Phase 2: Maturity (2015-2017) - "Make it Extensible"
+
+===== link:../decisions/ADR-004-delegating-template-engine.adoc[ADR-004: Delegating Template Engine Pattern]
+
+**Status:** ✅ Accepted | **Date:** 2013-04-10
+
+**Decision:** Implement Delegating Template Engine pattern with SPI-based engine discovery to support multiple template engines (Freemarker, Groovy, Thymeleaf, Jade, Pebble).
+
+**Rationale:** Allows users to choose their preferred template engine. File extension determines which engine to use. Core rendering pipeline decoupled from specific implementations.
+
+**Consequences:**
+* ✅ Easy to add new template engines
+* ✅ Users can mix engines in one project
+* ❌ Extra indirection layer
+* ❌ Deeper stack traces for errors
+
+===== link:../decisions/ADR-005-configuration-abstraction.adoc[ADR-005: Configuration Abstraction Layer]
+
+**Status:** ✅ Accepted | **Date:** 2016-03-15
+
+**Decision:** Introduce `JBakeConfiguration` interface with `DefaultJBakeConfiguration` implementation, hiding Apache Commons Configuration behind abstraction.
+
+**Rationale:** Decouples core from configuration library, enables type safety, improves testability with mockable interface, allows future evolution.
+
+**Consequences:**
+* ✅ Type-safe accessors (e.g., `getDestinationFolder()` returns `File`)
+* ✅ Easy to mock for testing
+* ❌ Verbosity (50+ getter methods)
+* ❌ Maintenance overhead (adding property requires multiple updates)
+
+===== link:../decisions/ADR-006-incremental-builds.adoc[ADR-006: SHA1-based Incremental Builds]
+
+**Status:** ✅ Accepted | **Date:** 2013-08-20
+
+**Decision:** Implement SHA1-based incremental builds at the Crawler stage with template and configuration change detection.
+
+**Rationale:** Massive performance improvement for large sites. SHA1 hashing detects actual content changes (more reliable than timestamps). Most builds process < 5% changed files.
+
+**Consequences:**
+* ✅ 30s → 2s for single-file changes
+* ✅ Fast developer feedback during writing
+* ❌ First build still slow (no cache)
+* ❌ Cross-dependencies (tags, archives) always regenerate
+
+==== Phase 3: Modernization (2018-Present) - "Reduce Tech Debt"
+
+===== link:../decisions/ADR-007-deprecation-strategy.adoc[ADR-007: Backwards Compatibility via Deprecation]
+
+**Status:** ✅ Accepted | **Date:** 2017-06-10
+
+**Decision:** Adopt deprecation-first strategy with semantic versioning and multi-version deprecation cycles (2 major versions minimum).
+
+**Rationale:** Balances innovation with stability. Users need time to migrate. Ecosystem (themes, plugins) requires predictability.
+
+**Consequences:**
+* ✅ User confidence (projects continue working)
+* ✅ Clear expectations via semantic versioning
+* ❌ Maintenance burden (support old + new APIs)
+* ❌ Slower evolution (can't remove bad decisions quickly)
+
+===== link:../decisions/ADR-008-java-version-policy.adoc[ADR-008: Java Version Support Policy]
+
+**Status:** ✅ Accepted | **Date:** 2019-09-20
+
+**Decision:** Adopt "Current LTS + Previous LTS" policy. Minimum Java 8 (as of JBake 2.6.0+), plan to require Java 11 in JBake 3.0.
+
+**Rationale:** Access modern language features (lambdas, streams, Optional), library compatibility, 70%+ users already on Java 8+. Java 7 EOL since 2015.
+
+**Consequences:**
+* ✅ Modern code with Java 8+ features
+* ✅ Access to modern dependencies
+* ❌ 20% on Java 7 must upgrade or stay on old JBake
+* ❌ Enterprise friction (some organizations slow to upgrade)
+
+=== Decision Dependencies
+
+The ADRs are interconnected, building on each other:
+
+* **ADR-002 (SPI)** enables **ADR-004 (Delegating Template Engine)** through plugin discovery
+* **ADR-003 (OrientDB)** supports **ADR-006 (Incremental Builds)** via SHA1 storage
+* **ADR-001 (Pipeline)** provides structure where **ADR-006 (Incremental Builds)** optimizes Crawler stage
+* **ADR-005 (Configuration Abstraction)** demonstrates **ADR-007 (Deprecation Strategy)** through gradual API migration
+* **ADR-008 (Java Version)** balances compatibility concerns from **ADR-007 (Deprecation Strategy)**
+
+=== Current Architecture State (2025)
+
+The combination of these decisions has produced:
+
+* **Mature extensibility**: SPI-based plugins for markup and templates
+* **Good performance**: Incremental builds for large sites
+* **Stable API**: Clear deprecation policy maintains ecosystem
+* **Modern foundation**: Java 8+ enables clean, maintainable code
+* **Known trade-offs**: OrientDB dependency, sequential pipeline, limited parallelization
+
+=== Future Considerations
+
+Areas under consideration for future ADRs:
+
+* **Persistent caching**: Cross-build ContentStore persistence
+* **Parallel processing**: Multi-threaded rendering
+* **Storage alternatives**: Lighter alternatives to OrientDB
+* **Dependency graph**: Smart rebuild based on content relationships
+* **Module system**: Java 9+ module adoption
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+.Contents
+Important, expensive, large scale or risky architecture decisions including rationales.
+With "decisions" we mean selecting one alternative based on given criteria.
+
+Please use your judgement to decide whether an architectural decision should be documented
+here in this central section or whether you better document it locally
+(e.g. within the white box template of one building block).
+
+Avoid redundancy. 
+Refer to section 4, where you already captured the most important decisions of your architecture.
+
+.Motivation
+Stakeholders of your system should be able to comprehend and retrace your decisions.
+
+.Form
+Various options:
+
+* ADR (https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions[Documenting Architecture Decisions]) for every important decision
+* List or table, ordered by importance and consequences or:
+* more detailed in form of separate sections per decision
+
+.Further Information
+
+See https://docs.arc42.org/section-9/[Architecture Decisions] in the arc42 documentation.
+There you will find links and examples about ADR.
+
+****
+endif::arc42help[]

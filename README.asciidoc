@@ -19,6 +19,13 @@ image:https://badges.gitter.im/jbake-org/jbake.svg["Gitter Chat", link="https://
 
 Full documentation is available on http://jbake.org/docs/[jbake.org].
 
+Architecture documentation (AI generated) is available in `/docs` and can be rendered as site using `./dtcw generateSite` command. 
+https://doctoolchain.org/[DocToolchain] is used to build the documentation site, which uses JBake under the hood.
+
+Rendered site is available at build/microsite/output/index.html after running the command.
+
+Another AI generated documentation is available at https://deepwiki.com/jbake-org/jbake
+
 == Contributing
 
 We welcome all contributions to the project both big and small. From new features, bug reports to even spelling mistake corrections in

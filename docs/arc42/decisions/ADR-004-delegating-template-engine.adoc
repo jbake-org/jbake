@@ -1,0 +1,258 @@
+= ADR-004: Delegating Template Engine Pattern
+
+Status: ✅ **Accepted**
+
+Date: 2013-04-10 (Estimated - multi-template support phase)
+
+== Problem Statement
+
+How should JBake support multiple template engines (Freemarker, Groovy, Thymeleaf, Jade, Pebble) without coupling the rendering pipeline to specific engine implementations?
+
+Users want to:
+
+* Choose their preferred template engine
+* Use different engines for different templates
+* Add new template engines without modifying core
+
+== Context
+
+Template rendering requirements:
+
+* **Multiple engines**: Support 5+ different template engines
+* **File-based selection**: Template chosen by file extension (`.ftl`, `.groovy`, `.html`)
+* **Consistent API**: Renderer doesn't care which engine used
+* **Engine-specific features**: Each engine has unique capabilities (Groovy's GString, Thymeleaf's modes)
+* **Error handling**: Template errors reported consistently
+
+Initial implementation (2012):
+
+* Only Freemarker supported
+* `Renderer` class directly called Freemarker API
+* Adding new engine required changing `Renderer` core logic
+
+Community requests (2013-2014):
+
+* Issue #42: Add Groovy template support
+* Issue #89: Thymeleaf integration
+* Issue #124: Jade templates
+
+Design patterns available:
+
+* **Strategy Pattern**: Different algorithms, same interface
+* **Factory Pattern**: Create engine instances
+* **Template Method**: Define skeleton, subclasses fill in
+* **Delegation**: Forward requests to appropriate handler
+
+== Decision
+
+**Implement Delegating Template Engine pattern with SPI-based engine discovery.**
+
+**Architecture:**
+
+```
+┌──────────────────────────────────────┐
+│         Renderer (Pipeline)          │
+└─────────────────┬────────────────────┘
+                  │
+                  ▼
+┌──────────────────────────────────────┐
+│   DelegatingTemplateEngine           │
+│   - getEngine(fileExtension)         │
+│   - renderDocument(template, model)  │
+└─────────────────┬────────────────────┘
+                  │
+                  ▼
+┌──────────────────────────────────────┐
+│        TemplateEngines               │
+│   Map<extension, engine>             │
+│   - ftl  → FreemarkerEngine          │
+│   - groovy → GroovyEngine            │
+│   - html → ThymeleafEngine           │
+└─────────────────┬────────────────────┘
+                  │
+                  ▼
+    ┌─────────────┴─────────────┬───────────────┐
+    ▼                           ▼               ▼
+┌───────────┐         ┌──────────────┐   ┌──────────────┐
+│ Freemarker│         │ GroovyEngine │   │ Thymeleaf    │
+│ Engine    │         │              │   │ Engine       │
+└───────────┘         └──────────────┘   └──────────────┘
+```
+
+**Key classes:**
+
+1. **DelegatingTemplateEngine**: Facade for all engines
+   ```java
+   public class DelegatingTemplateEngine extends AbstractTemplateEngine {
+       private final TemplateEngines renderers;
+       
+       public void renderDocument(...) {
+           String ext = FileUtil.fileExt(templateFile);
+           AbstractTemplateEngine engine = renderers.getEngine(ext);
+           engine.renderDocument(...);
+       }
+   }
+   ```
+
+2. **AbstractTemplateEngine**: Base class for all engines
+   ```java
+   public abstract class AbstractTemplateEngine {
+       protected final JBakeConfiguration config;
+       protected final ContentStore db;
+       
+       public abstract void renderDocument(Map<String, Object> model, 
+                                           String templateName, 
+                                           Writer writer);
+   }
+   ```
+
+3. **TemplateEngines**: Registry (uses SPI from ADR-002)
+   ```java
+   public class TemplateEngines {
+       private final Map<String, AbstractTemplateEngine> engines;
+       
+       public AbstractTemplateEngine getEngine(String extension) {
+           return engines.get(extension);
+       }
+   }
+   ```
+
+**Engine selection logic:**
+
+* Template file: `post.ftl` → Freemarker engine
+* Template file: `page.groovy` → Groovy engine
+* Template file: `index.html` → Thymeleaf engine (configurable)
+
+== Consequences
+
+=== Positive
+
+* ✅ **Extensibility**: Add new engines without touching core
+* ✅ **Flexibility**: Mix template engines in one project
+* ✅ **Isolation**: Engine-specific code contained in engine class
+* ✅ **Testability**: Mock engines for testing pipeline
+* ✅ **SPI integration**: Leverages ADR-002 for discovery
+* ✅ **Clear contracts**: `AbstractTemplateEngine` defines interface
+
+=== Negative
+
+* ❌ **Indirection**: Extra layer between Renderer and actual engine
+* ❌ **Error context**: Stack traces deeper (delegating → engine → library)
+* ❌ **Performance**: Small overhead from delegation (negligible in practice)
+* ❌ **Mixed engines**: Sharing data between different engine types can be tricky
+
+=== Neutral
+
+* ℹ️ Each template file tied to one engine (can't mix in single file)
+* ℹ️ Engine initialization happens once at startup (lazy loading possible)
+
+== Alternatives Considered
+
+=== Alternative 1: Direct Engine Integration
+
+**Description**: `Renderer` directly instantiates and calls each engine with if/else logic.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Delegating (Baseline) | Direct Integration |
+|--------------------|----------------------|--------------------|
+| Extensibility      | 0                    | -3                 |
+| Maintainability    | 0                    | -3                 |
+| Simplicity         | 0                    | +1                 |
+| Coupling           | 0                    | -3                 |
+| **Total Score**    | **0**                | **-8**             |
+
+**Rejection rationale**: Violates Open/Closed Principle. Adding engine requires modifying `Renderer`. Core code imports all engine libraries (heavy dependencies). if/else chain grows with each engine. Not scalable.
+
+=== Alternative 2: Template Method Pattern
+
+**Description**: `AbstractRenderer` with `abstract renderTemplate()`, subclasses for each engine.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Delegating (Baseline) | Template Method |
+|--------------------|----------------------|-----------------|
+| Flexibility        | 0                    | -2              |
+| Engine Reuse       | 0                    | -1              |
+| Clear Hierarchy    | 0                    | +1              |
+| Selection Logic    | 0                    | -2              |
+| **Total Score**    | **0**                | **-4**          |
+
+**Rejection rationale**: Requires separate Renderer subclass per engine (FreemarkerRenderer, GroovyRenderer, etc.). Complicates engine selection (factory needed). Engines can't be easily reused in other contexts. Delegation simpler.
+
+=== Alternative 3: Engine as Configuration
+
+**Description**: Users specify engine in `jbake.properties`, all templates use that engine.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Delegating (Baseline) | Single Engine |
+|--------------------|----------------------|---------------|
+| Simplicity         | 0                    | +3            |
+| Flexibility        | 0                    | -3            |
+| User Experience    | 0                    | -2            |
+| **Total Score**    | **0**                | **-2**        |
+
+**Rejection rationale**: Too restrictive. Users can't mix engines. Migrating templates (Freemarker → Thymeleaf) requires converting all files at once. Existing themes tied to specific engine. Delegating pattern allows gradual migration.
+
+== Implementation Notes
+
+**Engine loading** (via SPI):
+
+Provider file: `META-INF/services/org.jbake.template.TemplateEngines.properties`
+```properties
+org.jbake.template.FreemarkerTemplateEngine=ftl
+org.jbake.template.GroovyTemplateEngine=groovy,gsp,tpl
+org.jbake.template.ThymeleafTemplateEngine=html
+org.jbake.template.JadeTemplateEngine=jade
+org.jbake.template.PebbleTemplateEngine=peb
+```
+
+**Graceful degradation:**
+
+```java
+private static AbstractTemplateEngine tryLoadEngine(..., String engineClassName) {
+    try {
+        Class<?> engineClass = Class.forName(engineClassName);
+        // Instantiate engine
+    } catch (ClassNotFoundException e) {
+        LOGGER.debug("Template engine {} not available on classpath", engineClassName);
+        return null; // Skip this engine
+    }
+}
+```
+
+**Key design:**
+
+* Engines registered at startup
+* Missing engines logged as debug (not error)
+* Renderer fails only if selected engine not available
+* Each engine is singleton (initialized once)
+
+**Model preparation:**
+
+`DelegatingTemplateEngine` prepares model data (adds config, db access) before delegating:
+
+```java
+public void renderDocument(Map<String, Object> model, ...) {
+    // Extract model data
+    TemplateModel templateModel = new TemplateModel();
+    templateModel.setContent(model);
+    
+    // Delegate to specific engine
+    AbstractTemplateEngine engine = renderers.getEngine(ext);
+    engine.renderDocument(templateModel.getModel(), ...);
+}
+```
+
+== Related Decisions
+
+* link:ADR-002-spi-extensibility.adoc[ADR-002]: Java SPI - Used for engine discovery
+* link:ADR-001-pipeline-architecture.adoc[ADR-001]: Pipeline Architecture - Delegating engine used in Render stage
+
+== References
+
+* DelegatingTemplateEngine: `jbake-core/src/main/java/org/jbake/template/DelegatingTemplateEngine.java`
+* TemplateEngines registry: `jbake-core/src/main/java/org/jbake/template/TemplateEngines.java`
+* Gang of Four Design Patterns: Strategy and Delegation patterns
+* Issue #42: https://github.com/jbake-org/jbake/issues/42 (Groovy template support)

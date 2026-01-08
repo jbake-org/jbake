@@ -1,0 +1,122 @@
+= Architecture Decision Records
+
+This directory contains Architecture Decision Records (ADRs) documenting significant architectural decisions in JBake.
+
+== ADR Timeline & Evolution Phases
+
+=== Phase 1: Foundation (2012-2014) - "Get it Working"
+
+* link:ADR-001-pipeline-architecture.adoc[ADR-001]: Pipeline Architecture
+* link:ADR-002-spi-extensibility.adoc[ADR-002]: Java SPI for Extensibility 
+* link:ADR-003-orientdb-cache.adoc[ADR-003]: OrientDB Embedded Database
+
+**Context:** Initial design focused on proving the concept of a Java-based static site generator. Primary concerns were simplicity and getting core features working.
+
+=== Phase 2: Maturity (2015-2017) - "Make it Extensible"
+
+* link:ADR-004-delegating-template-engine.adoc[ADR-004]: Delegating Template Engine Pattern
+* link:ADR-005-configuration-abstraction.adoc[ADR-005]: Configuration Abstraction Layer
+* link:ADR-006-incremental-builds.adoc[ADR-006]: SHA1-based Incremental Builds
+
+**Context:** User base growing, requests for multiple template engines and better performance. Focus shifted to extensibility without sacrificing simplicity.
+
+=== Phase 3: Modernization (2018-Present) - "Reduce Tech Debt"
+
+* link:ADR-007-deprecation-strategy.adoc[ADR-007]: Backwards Compatibility via Deprecation
+* link:ADR-008-java-version-policy.adoc[ADR-008]: Java Version Support Policy
+
+**Context:** Balance between innovation and stability. Support legacy projects while modernizing codebase for future enhancements.
+
+== Decision Status Legend
+
+* ✅ **Accepted**: Active and implemented
+* 🔄 **Superseded**: Replaced by newer decision (see "Superseded by" section)
+* ❌ **Deprecated**: Being phased out
+* 🤔 **Proposed**: Under discussion
+
+== Quick Reference by Topic
+
+=== Architecture & Design
+
+* Pipeline Architecture (ADR-001)
+* Delegating Template Engine (ADR-004)
+
+=== Extensibility
+
+* Java SPI for Plugins (ADR-002)
+* Configuration Abstraction (ADR-005)
+
+=== Performance
+
+* OrientDB Caching (ADR-003)
+* Incremental Builds (ADR-006)
+
+=== Compatibility
+
+* Deprecation Strategy (ADR-007)
+* Java Version Policy (ADR-008)
+
+== Template for New ADRs
+
+When adding new ADRs, use this format (see individual ADRs for examples):
+
+```adoc
+= ADR-XXX: [Title]
+
+Status: [Accepted|Proposed|Deprecated|Superseded]
+
+Date: YYYY-MM-DD
+
+== Problem Statement
+
+What problem are we solving?
+
+== Context
+
+Background, constraints, and forces at play.
+
+== Decision
+
+What we decided to do.
+
+== Consequences
+
+=== Positive
+
+* Benefits and advantages
+
+=== Negative
+
+* Drawbacks and limitations
+
+=== Neutral
+
+* Other impacts
+
+== Alternatives Considered
+
+=== Pugh Matrix
+
+| Criterion        | Baseline | Alt 1 | Alt 2 |
+|-----------------|----------|-------|-------|
+| Criterion 1     | 0        | +1    | -1    |
+| Total Score     | 0        | X     | Y     |
+
+== Related Decisions
+
+* Links to related ADRs
+
+== References
+
+* External resources, discussions, issues
+```
+
+== Contributing ADRs
+
+When making significant architectural decisions:
+
+1. Create new ADR file with next number
+2. Fill in all sections (Problem, Context, Decision, Consequences, Alternatives)
+3. Include Pugh Matrix for alternatives evaluation
+4. Update this README with timeline entry and topic links
+5. Reference ADR in related code documentation

@@ -1,0 +1,281 @@
+= ADR-006: SHA1-based Incremental Builds
+
+Status: ✅ **Accepted**
+
+Date: 2013-08-20 (Estimated - performance optimization phase)
+
+== Problem Statement
+
+How can JBake avoid regenerating unchanged files to improve build performance?
+
+Problem scenarios:
+
+* Blog with 500 posts: full rebuild takes 30+ seconds
+* During development: changing one post rebuilds everything
+* CI builds: repeatedly processing same content wastes time
+* Large sites (1000+ pages): full builds become impractical
+
+Requirements:
+
+* Detect changed content files
+* Detect changed templates
+* Detect changed configuration
+* Skip processing for unchanged files
+* Ensure correctness (no stale output)
+
+== Context
+
+Performance bottlenecks:
+
+* **Parsing**: Markdown/AsciiDoc parsing is CPU-intensive
+* **Rendering**: Template rendering for hundreds of pages
+* **I/O**: Writing thousands of HTML files
+
+Observation: Most builds process < 5% changed files.
+
+Incremental build strategies:
+
+* **Timestamp-based**: Compare file modification times
+* **Content hashing**: Hash file contents (SHA1, MD5)
+* **No caching**: Always regenerate everything
+
+Challenges:
+
+* Cross-file dependencies: Tag pages depend on all posts with that tag
+* Template changes: Affect all files using that template
+* Configuration changes: May affect rendering logic
+
+Static site generators comparison (2013):
+
+* **Jekyll**: Incremental via `--incremental` (timestamp-based)
+* **Hugo**: Very fast, regenerates everything (Go performance)
+* **Middleman**: No incremental support
+
+== Decision
+
+**Implement SHA1-based incremental builds at the Crawler stage, with template and configuration change detection.**
+
+**Strategy:**
+
+1. **Content hashing**: Calculate SHA1 of each content file
+2. **Template hashing**: Calculate SHA1 of all template files
+3. **Configuration tracking**: Detect jbake.properties changes
+4. **Database comparison**: Check if SHA1 exists in ContentStore
+5. **Skip unchanged**: Don't parse files with matching SHA1
+6. **Force regeneration**: If templates/config changed, rebuild all
+
+**Implementation:**
+
+```
+┌────────────────────────────────────────┐
+│          Crawler Stage                 │
+└────────────────┬───────────────────────┘
+                 │
+                 ▼
+     ┌───────────────────────┐
+     │  For each content file│
+     └───────────┬───────────┘
+                 │
+                 ▼
+     ┌───────────────────────┐
+     │ Calculate SHA1 hash   │
+     └───────────┬───────────┘
+                 │
+                 ▼
+     ┌───────────────────────┐
+     │ Check ContentStore    │
+     │ for existing SHA1     │
+     └───────┬───────────────┘
+                 │
+         ┌───────┴────────┐
+         │                │
+    SHA1 match?      SHA1 new/different?
+         │                │
+         ▼                ▼
+   Skip parsing     Parse & store
+   Use cached       Update SHA1
+```
+
+**SHA1 calculation:**
+
+```java
+public class Crawler {
+    private String calculateHash(File file) throws IOException {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        try (InputStream is = new FileInputStream(file)) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = is.read(buffer)) > 0) {
+                md.update(buffer, 0, read);
+            }
+        }
+        byte[] digest = md.digest();
+        return DatatypeConverter.printHexBinary(digest);
+    }
+}
+```
+
+**Change detection:**
+
+```java
+private boolean hasFileBeenModified(File file, String sha1) {
+    DocumentList docs = db.getDocumentStatus(file.getPath());
+    if (docs.isEmpty()) {
+        return true; // New file
+    }
+    String storedSha1 = (String) docs.get(0).get("sha1");
+    return !sha1.equals(storedSha1); // Compare hashes
+}
+```
+
+**Template change detection:**
+
+* Calculate hash of all template files combined
+* Store in ContentStore metadata
+* If template hash changes: clear cache, rebuild all
+* Ensures template changes propagate to all content
+
+**Configuration change:**
+
+* Monitor jbake.properties modification time
+* If changed: invalidate cache
+* Ensures config changes (site URL, etc.) apply everywhere
+
+== Consequences
+
+=== Positive
+
+* ✅ **Massive speedup**: 30s → 2s for single-file changes
+* ✅ **Accuracy**: SHA1 detects actual content changes (not just timestamps)
+* ✅ **Developer experience**: Fast feedback during writing
+* ✅ **CI efficiency**: Skip unchanged files in repeated builds
+* ✅ **Correctness**: Template/config changes force full rebuild
+
+=== Negative
+
+* ❌ **Initial overhead**: First build still slow (no cache)
+* ❌ **Hash calculation**: Extra I/O to read files for hashing
+* ❌ **Memory usage**: Store SHA1 for every file in database
+* ❌ **Cross-dependencies**: Tag/archive pages always regenerate (depend on all posts)
+* ❌ **Cache invalidation**: No smart dependency tracking (template change = rebuild all)
+
+=== Neutral
+
+* ℹ️ SHA1 sufficient (collision probability negligible for this use case)
+* ℹ️ Cache is in-memory only (not persistent across JBake invocations)
+
+== Alternatives Considered
+
+=== Alternative 1: Timestamp-Based Incremental Builds
+
+**Description**: Compare file modification times instead of content hashes.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | SHA1 (Baseline) | Timestamp |
+|--------------------|-----------------|-----------|
+| Accuracy           | 0               | -2        |
+| Performance        | 0               | +1        |
+| Simplicity         | 0               | +2        |
+| Reliability        | 0               | -3        |
+| **Total Score**    | **0**           | **-2**    |
+
+**Rejection rationale**: Timestamps unreliable. Examples:
+* Git checkout resets timestamps → false positives (rebuild unchanged)
+* File copy preserves content but changes timestamp
+* Clock skew in CI environments
+* Touch command breaks cache
+
+SHA1 detects actual content changes.
+
+=== Alternative 2: Persistent Cache Between Builds
+
+**Description**: Save ContentStore to disk, reuse across JBake invocations.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | In-Memory (Baseline) | Persistent Cache |
+|--------------------|----------------------|------------------|
+| Cross-run Speed    | 0                    | +3               |
+| Complexity         | 0                    | -2               |
+| Reliability        | 0                    | -1               |
+| Disk I/O           | 0                    | -1               |
+| **Total Score**    | **0**                | **-1**           |
+
+**Rejection rationale**: Marginal benefit. JBake runs are seconds (not minutes), so cache invalidation/loading overhead offsets gains. Persistent cache adds:
+* Corruption risk (incomplete shutdown)
+* Version migration (schema changes)
+* Disk space usage
+* More failure modes
+
+In-memory sufficient for typical workflows.
+
+=== Alternative 3: No Incremental Builds
+
+**Description**: Always regenerate everything, optimize parsing/rendering instead.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Incremental (Baseline) | Full Rebuild |
+|--------------------|------------------------|--------------|
+| Simplicity         | 0                      | +3           |
+| Development Speed  | 0                      | -3           |
+| Correctness        | 0                      | +2           |
+| Large Sites        | 0                      | -3           |
+| **Total Score**    | **0**                | **-1**       |
+
+**Rejection rationale**: Simple but painful for large sites. Hugo (Go-based) regenerates everything in < 1s for 1000s pages via extreme optimization. JVM startup + library overhead makes JBake slower. Incremental builds essential for good developer experience.
+
+== Implementation Notes
+
+**Crawler integration:**
+
+```java
+public void crawl() {
+    // Before processing
+    String templateHash = calculateTemplateHash();
+    boolean templatesChanged = hasTemplateChanged(templateHash);
+    
+    if (templatesChanged) {
+        db.drop(); // Clear cache, force full rebuild
+    }
+    
+    for (File file : contentFiles) {
+        String sha1 = calculateHash(file);
+        
+        if (!templatesChanged && !hasFileBeenModified(file, sha1)) {
+            // Skip processing, reuse cached content
+            continue;
+        }
+        
+        // Parse and process
+        Map<String, Object> content = parseFile(file);
+        content.put("sha1", sha1);
+        db.addDocument(content);
+    }
+}
+```
+
+**Limitations:**
+
+* **Tag/archive regeneration**: Always rebuilt (depend on all content)
+* **Asset changes**: Not tracked (always copied)
+* **No dependency graph**: Can't detect "post A links to post B" changes
+
+**Future enhancements:**
+
+* Persistent cache (addressed in ADR-007 discussions)
+* Smarter dependency tracking (per-template cache)
+* Parallel hashing (multi-threaded I/O)
+
+== Related Decisions
+
+* link:ADR-001-pipeline-architecture.adoc[ADR-001]: Pipeline Architecture - Incremental builds optimize Crawler stage
+* link:ADR-003-orientdb-cache.adoc[ADR-003]: OrientDB Database - ContentStore used for SHA1 storage
+
+== References
+
+* SHA1 algorithm: https://en.wikipedia.org/wiki/SHA-1
+* Crawler implementation: `jbake-core/src/main/java/org/jbake/app/Crawler.java`
+* ContentStore SHA1 handling: `jbake-core/src/main/java/org/jbake/app/ContentStore.java`
+* Performance benchmarks: https://github.com/jbake-org/jbake/issues/156

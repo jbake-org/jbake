@@ -1,0 +1,320 @@
+:jbake-title: Building Block View
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 5
+:filename: /chapters/05_building_block_view.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+
+
+[[section-building-block-view]]
+
+
+== Building Block View
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+.Content
+The building block view shows the static decomposition of the system into building blocks (modules, components, subsystems, classes, interfaces, packages, libraries, frameworks, layers, partitions, tiers, functions, macros, operations, data structures, ...) as well as their dependencies (relationships, associations, ...)
+
+This view is mandatory for every architecture documentation.
+In analogy to a house this is the _floor plan_.
+
+.Motivation
+Maintain an overview of your source code by making its structure understandable through
+abstraction.
+
+This allows you to communicate with your stakeholder on an abstract level without disclosing implementation details.
+
+.Form
+The building block view is a hierarchical collection of black boxes and white boxes
+(see figure below) and their descriptions.
+
+image::05_building_blocks-EN.png["Hierarchy of building blocks"]
+
+*Level 1* is the white box description of the overall system together with black
+box descriptions of all contained building blocks.
+
+*Level 2* zooms into some building blocks of level 1.
+Thus it contains the white box description of selected building blocks of level 1, together with black box descriptions of their internal building blocks.
+
+*Level 3* zooms into selected building blocks of level 2, and so on.
+
+
+.Further Information
+
+See https://docs.arc42.org/section-5/[Building Block View] in the arc42 documentation.
+
+****
+endif::arc42help[]
+
+=== Whitebox Overall System
+
+[plantuml, jbake-level1, svg]
+----
+@startuml
+!include <C4/C4_Component>
+
+title JBake Level 1 - Component Landscape
+
+Container_Boundary(jbake, "JBake") {
+    Component(cli, "Launcher/CLI", "Main, Baker, LaunchOptions", "Entry point, parses commands")
+    Component(oven, "Oven", "Orchestrator", "Coordinates baking process")
+    Component(utensils, "Utensils", "Factory", "Creates and provides components")
+    
+    Component(crawler, "Crawler", "Content Discovery", "Finds files to process")
+    Component(parser, "Parser", "Content Parsing", "Delegates to markup engines")
+    Component(renderer, "Renderer", "HTML Generation", "Applies templates")
+    Component(asset, "Asset", "File Copier", "Copies static files")
+    
+    Component(contentstore, "ContentStore", "Cache & Queries", "OrientDB wrapper")
+    Component(engines, "Engine Plugins", "SPI Implementations", "Markup & Template engines")
+    Component(config, "JBakeConfiguration", "Settings", "Configuration access")
+}
+
+Rel(cli, oven, "Creates & calls bake()")
+Rel(oven, utensils, "Gets components")
+Rel(oven, crawler, "Crawls content")
+Rel(oven, renderer, "Renders documents")
+Rel(oven, asset, "Copies assets")
+
+Rel(crawler, parser, "Parses files")
+Rel(parser, engines, "Uses markup engines")
+Rel(renderer, engines, "Uses template engines")
+
+Rel(crawler, contentstore, "Stores documents")
+Rel(renderer, contentstore, "Queries documents")
+
+Rel_U(utensils, config, "Provides config to all")
+
+@enduml
+----
+
+**Motivation:**
+
+The system is decomposed into distinct layers following a *pipeline architecture* combined with a *factory pattern*:
+
+1. **Entry Layer (CLI/Launcher)**: Handles user interaction and command parsing
+2. **Orchestration Layer (Oven)**: Coordinates the baking workflow
+3. **Processing Layer (Crawler, Parser, Renderer, Asset)**: Performs core transformations
+4. **Extension Layer (Engines)**: Pluggable parsers and renderers
+5. **Infrastructure Layer (ContentStore, Configuration)**: Provides caching and settings
+
+**Key Design Principles:**
+
+* *Separation of Concerns*: Each component has a single responsibility
+* *Dependency Injection*: Utensils factory creates configured instances
+* *Plugin Architecture*: Engines loaded via ServiceLoader SPI
+* *Abstraction*: Interfaces hide implementation details (JBakeConfiguration, AbstractTemplateEngine)
+
+**Contained Building Blocks:**
+
+[options="header",cols="2,3,3"]
+|===
+|Component |Responsibility |Key Constraint
+
+|**Launcher/CLI** 
+(`Main`, `Baker`, `LaunchOptions`)
+|Parse command-line arguments, validate options, initiate baking process
+|Must remain backwards compatible for script users; uses picocli for arg parsing
+
+|**Oven** 
+(`Oven`)
+|Orchestrate baking: initialize DB, run crawler, render content, copy assets, handle errors
+|Central coordinator; owns the lifecycle; delegates actual work to specialists
+
+|**Utensils** 
+(`Utensils`, `UtensilsFactory`)
+|Factory for creating and wiring components (Crawler, Parser, Renderer, ContentStore)
+|Ensures all components use same configuration instance
+
+|**Crawler** 
+(`Crawler`)
+|Recursively scan content folder, detect changed files (SHA1), pass files to Parser
+|Must respect `.jbakeignore` files; handles both content and data files
+
+|**Parser** 
+(`Parser`, `ParserEngine` implementations)
+|Delegate to appropriate markup engine based on file extension, extract metadata & body
+|File extension determines parser; engines are optional dependencies
+
+|**Renderer** 
+(`Renderer`, `RenderingTool` implementations)
+|Apply templates to content, generate HTML, handle pagination, create feeds/sitemap
+|Uses ServiceLoader to find RenderingTool implementations; each tool renders specific content types
+
+|**Asset** 
+(`Asset`)
+|Copy static files (CSS, JS, images) from asset folder and content folder to destination
+|Preserves folder structure; supports asset ignore patterns
+
+|**ContentStore** 
+(`ContentStore`)
+|Wrapper around OrientDB; cache parsed content, query by type/tag/status; change detection
+|Embedded database (memory or plocal); stores DocumentModel instances; SQL-like query interface
+
+|**Engine Plugins** 
+(Markup & Template)
+|Parse markup formats (Markdown, AsciiDoc); render templates (Freemarker, Groovy, Thymeleaf)
+|Loaded via Java SPI; optional dependencies; must extend AbstractTemplateEngine or implement MarkupEngine
+
+|**JBakeConfiguration** 
+(`JBakeConfiguration`)
+|Provide access to all configuration properties with type-safe methods
+|Abstracts underlying Commons Configuration2; immutable after creation
+|===
+
+**Important Interfaces:**
+
+* `JBakeConfiguration`: Primary configuration contract
+* `ParserEngine`: Contract for markup parsers (`parse(config, file) → DocumentModel`)
+* `AbstractTemplateEngine`: Base for template renderers (`renderDocument(model, template, writer)`)
+* `RenderingTool`: SPI for custom renderers (`render(renderer, contentStore, config) → int`)
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+Insert your explanations of black boxes from level 1:
+
+If you use tabular form you will only describe your black boxes with name and
+responsibility according to the following schema:
+
+[cols="1,2" options="header"]
+|===
+| **Name** | **Responsibility**
+| _<black box 1>_ | _<Text>_
+| _<black box 2>_ | _<Text>_
+|===
+
+
+
+If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
+Its headline is the name of the black box.
+****
+endif::arc42help[]
+
+==== <Name black box 1>
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+Here you describe <black box 1>
+according the the following black box template:
+
+* Purpose/Responsibility
+* Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.
+* (Optional) Quality-/Performance characteristics of the black box, e.g.availability, run time behavior, ....
+* (Optional) directory/file location
+* (Optional) Fulfilled requirements (if you need traceability to requirements).
+* (Optional) Open issues/problems/risks
+
+****
+endif::arc42help[]
+
+_<Purpose/Responsibility>_
+
+_<Interface(s)>_
+
+_<(Optional) Quality/Performance Characteristics>_
+
+_<(Optional) Directory/File Location>_
+
+_<(Optional) Fulfilled Requirements>_
+
+_<(optional) Open Issues/Problems/Risks>_
+
+
+
+
+==== <Name black box 2>
+
+_<black box template>_
+
+==== <Name black box n>
+
+_<black box template>_
+
+
+==== <Name interface 1>
+
+...
+
+==== <Name interface m>
+
+
+
+=== Level 2
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+Here you can specify the inner structure of (some) building blocks from level 1 as white boxes.
+
+You have to decide which building blocks of your system are important enough to justify such a detailed description.
+Please prefer relevance over completeness. Specify important, surprising, risky, complex or volatile building blocks.
+Leave out normal, simple, boring or standardized parts of your system
+****
+endif::arc42help[]
+
+==== White Box _<building block 1>_
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+...describes the internal structure of _building block 1_.
+****
+endif::arc42help[]
+
+_<white box template>_
+
+==== White Box _<building block 2>_
+
+
+_<white box template>_
+
+...
+
+==== White Box _<building block m>_
+
+
+_<white box template>_
+
+
+
+=== Level 3
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+Here you can specify the inner structure of (some) building blocks from level 2 as white boxes.
+
+When you need more detailed levels of your architecture please copy this
+part of arc42 for additional levels.
+****
+endif::arc42help[]
+
+==== White Box <_building block x.1_>
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+Specifies the internal structure of _building block x.1_.
+****
+endif::arc42help[]
+
+_<white box template>_
+
+
+==== White Box <_building block x.2_>
+
+_<white box template>_
+
+
+
+==== White Box <_building block y.1_>
+
+_<white box template>_

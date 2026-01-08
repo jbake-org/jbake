@@ -1,0 +1,267 @@
+:jbake-title: Cross-cutting Concepts
+:jbake-type: page_toc
+:jbake-status: published
+:jbake-menu: arc42
+:jbake-order: 8
+:filename: /chapters/08_concepts.adoc
+ifndef::imagesdir[:imagesdir: ../../images]
+
+:toc:
+
+
+
+[[section-concepts]]
+== Cross-cutting Concepts
+
+=== Mental Model Map
+
+==== Core Metaphor: The Bakery
+
+Think of JBake as a *bakery that transforms raw ingredients into finished baked goods*:
+
+* **Content files** (Markdown/AsciiDoc) = Raw ingredients (flour, eggs, sugar)
+* **Templates** (Freemarker/Groovy/etc.) = Recipes
+* **Parser** = Preparation (mixing, measuring)
+* **Oven** = Baking process (transformation)
+* **Output HTML** = Finished products ready to serve
+* **ContentStore (OrientDB)** = Pantry/inventory (caching what's already prepared)
+* **Crawler** = Ingredient sourcing (finding what needs to be baked)
+
+This metaphor guides the entire architecture and naming conventions.
+
+==== Must-Understand Concepts
+
+===== 1. Document Model as Universal Data Structure
+
+**What it is:** `DocumentModel` is a map-based structure representing parsed content with metadata.
+
+**Why it matters:** Every content file becomes a DocumentModel, which flows through the entire pipeline. Understanding this structure is key to:
+
+* Writing templates (accessing `content.title`, `content.body`, `content.tags`)
+* Creating custom parsers
+* Querying ContentStore
+* Debugging rendering issues
+
+**Impact on development:**
+
+* Add custom metadata by prefixing keys in content headers
+* Template engines receive DocumentModel as `content` variable
+* Database queries return `List<DocumentModel>`
+
+**Common newcomer mistakes:**
+
+* ❌ Assuming DocumentModel is strongly typed → it's a Map, keys are strings
+* ❌ Mutating DocumentModel after parsing → mutations affect cached version
+* ❌ Forgetting required fields (type, status) → content won't render
+
+**Validation:** Can you explain how a custom field `myCustomField: value` in a Markdown header becomes accessible in templates as `${content.myCustomField}`?
+
+===== 2. The Dual Nature of Status & Type
+
+**What it is:** Every document has `status` (published/draft) and `type` (post/page/custom).
+
+**Why it matters:**
+
+* `status` controls rendering: only `published` appears in output
+* `type` determines template used (`post.ftl`, `page.ftl`, `mytype.ftl`)
+* Database queries filter by both (`getPublishedPosts()`)
+
+**Impact on development:**
+
+* Creating custom document types requires:
+  1. Defining `template.<type>.file` in config
+  2. Creating corresponding template file
+  3. Registering type in DocumentTypes
+* Default status/type in config affects files without headers
+
+**Common newcomer mistakes:**
+
+* ❌ Creating content without status → defaults to `draft`, won't render
+* ❌ Assuming type affects URL structure → type is for templates only
+* ❌ Hardcoding types in queries → use DocumentTypes.getDocumentTypes()
+
+**Validation:** Why would a file with `type: tutorial` and `status: published` not appear on the site? (Answer: Missing `template.tutorial.file` configuration or template file)
+
+===== 3. SHA1-based Change Detection
+
+**What it is:** JBake computes SHA1 hash of each file; reprocesses only if hash changed.
+
+**Why it matters:** Enables incremental builds on large sites (1000+ pages).
+
+**How it works:**
+
+1. Crawler computes SHA1 of file content
+2. Queries ContentStore for existing document with same sourceUri
+3. Compares SHA1 hashes
+4. If identical → `IDENTICAL` status (skip)
+5. If different → `UPDATED` status (delete old, reparse)
+6. If not found → `NEW` status (parse)
+
+**Impact on development:**
+
+* Template changes don't trigger content re-parsing (separate signature)
+* Renaming a file creates new document (different URI)
+* Binary files copied based on file-level change, not SHA1
+
+**Common newcomer mistakes:**
+
+* ❌ Expecting template changes to re-render without `-clearCache` → templates have separate signature
+* ❌ Editing file, bake shows old content → check file encoding, line endings
+* ❌ Wondering why assets always copy → assets aren't SHA1-checked (performance)
+
+**Validation:** If you change a single word in one Markdown file in a 500-file site, how many files does JBake re-parse?  (Answer: 1)
+
+===== 4. Template Engine Discovery & Delegation
+
+**What it is:** `DelegatingTemplateEngine` routes to specific engines based on file extension.
+
+**Why it matters:**
+
+* Multiple template engines can coexist in one project
+* Extension determines engine: `.ftl` → Freemarker, `.groovy` → Groovy
+* Fallback mechanism if default template missing
+
+**How it works:**
+
+1. `TemplateEngines` registry loads engines via SPI (META-INF/services)
+2. Each engine registers file extensions it handles
+3. `DelegatingTemplateEngine.renderDocument()` looks up extension
+4. Calls specific engine's `renderDocument()`
+5. If template not found, tries other extensions
+
+**Impact on development:**
+
+* Adding template engine: implement `AbstractTemplateEngine`, add to META-INF/services, add extension to properties file
+* Mixing engines: `index.ftl` (Freemarker), `post.groovy` (Groovy) in same project
+* Template not found: JBake tries alternative extensions automatically
+
+**Common newcomer mistakes:**
+
+* ❌ Creating `post.html` expecting Thymeleaf → `.html` goes to raw passthrough; use `.thymeleaf` or configure extension mapping
+* ❌ Engine on classpath but not loaded → missing META-INF/services entry
+* ❌ Template errors don't show engine name → check engine-specific logs
+
+**Validation:** If you have Freemarker and Groovy on classpath, and create `index.ftl` and `index.groovy`, which one is used? (Answer: Depends on `template.masterindex.file` config; default is `.ftl`)
+
+===== 5. ServiceLoader SPI Extension Pattern
+
+**What it is:** Java's `ServiceLoader` mechanism for discovering plugins at runtime.
+
+**Why it matters:** Core extensibility mechanism for:
+
+* `RenderingTool` → Custom renderers (feed, sitemap, archives)
+* `MarkupEngine` → Custom parsers (Textile, Org-mode)
+* `TemplateEngine` → Custom template languages
+
+**How to extend:**
+
+1. Implement interface (e.g., `RenderingTool`)
+2. Create `META-INF/services/org.jbake.render.RenderingTool` file
+3. Add fully-qualified class name to file
+4. Add JAR to classpath
+5. JBake auto-discovers via `ServiceLoader.load(RenderingTool.class)`
+
+**Impact on development:**
+
+* No core modification needed for plugins
+* Plugins deployed as separate JARs
+* Load order non-deterministic (use Priority pattern if needed)
+
+**Common newcomer mistakes:**
+
+* ❌ Forgetting META-INF/services file → plugin not loaded, no error
+* ❌ Typo in service file → ClassNotFoundException
+* ❌ Expecting plugins to replace core components → SPI is additive, not replacement
+
+**Validation:** Name the 3 places where ServiceLoader is used in JBake. (Answer: RenderingTool, MarkupEngine registration, TemplateEngine registration)
+
+=== Cross-Cutting Concerns
+
+==== Error Handling Strategy
+
+**Philosophy:** Collect errors, don't fail fast.
+
+**Implementation:**
+
+* `Oven` aggregates errors from all stages in `List<Throwable>`
+* Rendering errors caught per-tool, don't halt other tools
+* Asset copy errors logged but don't stop bake
+* Parser returns `null` on failure (logged, not thrown)
+* Final check: if `errors.size() > 0` → throw `JBakeException` with summary
+
+**Rationale:** Large sites may have many files; one bad file shouldn't block 99 good files from rendering.
+
+==== Logging Conventions
+
+* `SLF4J` facade, delegate to user's choice (Logback in tests)
+* **INFO**: Progress ("Baking has started", "Parsed 50 files")
+* **DEBUG**: Detailed operations ("Create document class", SQL queries)
+* **WARN**: Recoverable issues (template not found, using fallback)
+* **ERROR**: Unrecoverable failures (no template engine for extension)
+
+==== Configuration Hierarchy
+
+1. **Built-in defaults**: `default.properties` resource
+2. **User project**: `jbake.properties` file
+3. **Custom config**: Can pass custom properties programmatically
+
+**Layering:** CompositeConfiguration merges in order; later sources override earlier.
+
+**Access Pattern:** Always use `JBakeConfiguration` interface, not direct Commons Configuration.
+
+==== Security Considerations
+
+* **No authentication**: Static site generator, no server-side auth
+* **Path traversal**: Validate source folder, no `..` traversal in content paths
+* **Template injection**: User controls templates; not a sandbox (trust your templates)
+* **AsciidoctorJ**: `SafeMode.UNSAFE` for full feature access (user content trusted)
+
+==== Performance Patterns
+
+1. **Caching**: OrientDB stores parsed content; SHA1 avoids re-parse
+2. **Lazy loading**: Template engines initialized on first use
+3. **Batch operations**: OrientDB bulk inserts for documents
+4. **Optional dependencies**: Engines loaded only if on classpath
+5. **Incremental builds**: Single-file bake for watch mode
+
+=== Unwritten Rules & Team Conventions
+
+These conventions are followed but not always documented:
+
+1. **Deprecation over breaking changes**: Old APIs marked @Deprecated, not removed
+2. **File over API**: Prefer file-based config/content over programmatic for user simplicity
+3. **Fail gracefully**: Return null/empty rather than throw exceptions in core path
+4. **Test with fixtures**: `src/test/resources/fixture/` contains canonical test data structure
+5. **Example projects**: Every template engine has example ZIP for `-init` command
+6. **No global mutable state**: Except DocumentTypes, ModelExtractors (historical; refactor candidate)
+
+=== Failed Experiments & Lessons Learned
+
+==== Attempt: Direct OrientDB Query Language Exposure
+
+**What was tried:** Expose OrientDB SQL directly to templates for custom queries.
+
+**Why it didn't work:**
+
+* OrientDB SQL dialect changed between versions (v2 → v3)
+* Tight coupling to database implementation
+* Template authors needed to learn OrientDB specifics
+
+**Current approach:** ContentStore wraps queries with Java methods (`getPublishedPosts()`, `getTaggedPosts()`). Stable API despite OrientDB changes.
+
+**Lesson:** Abstract external dependencies; don't leak third-party APIs into user-facing interfaces.
+
+==== Attempt: Multiple Configuration File Formats
+
+**What was tried:** Support YAML, JSON, Properties for `jbake.properties`.
+
+**Why abandoned:**
+
+* Commons Configuration2 supports multiple formats, but:
+* Each format has subtle parsing differences (YAML indentation, JSON strict quotes)
+* Support burden for troubleshooting configurations
+* Properties file well-understood by Java community
+
+**Current approach:** Properties file only; use data files (YAML/JSON) for content data, not config.
+
+**Lesson:** Flexibility has costs; sometimes one well-supported format beats many partially-supported formats.

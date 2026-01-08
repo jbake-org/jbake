@@ -1,0 +1,274 @@
+= ADR-007: Backwards Compatibility via Deprecation
+
+Status: ✅ **Accepted**
+
+Date: 2017-06-10 (Estimated - major refactoring period)
+
+== Problem Statement
+
+How should JBake evolve its API and features while maintaining compatibility with existing projects, themes, and plugins?
+
+Tensions:
+
+* **Innovation**: Need to modernize codebase, fix design issues
+* **Stability**: Users expect projects to work across JBake versions
+* **Ecosystem**: Themes and plugins depend on current API
+* **Technical debt**: Some early decisions need revision (e.g., OrientDB, direct CompositeConfiguration)
+
+Examples requiring evolution:
+
+* Replace OrientDB with lighter storage (ADR-003)
+* Hide Apache Commons Configuration (ADR-005)
+* Modernize for Java 8+ features (lambdas, streams)
+* Deprecated Freemarker methods
+* Old configuration keys
+
+Failure scenarios:
+
+* Breaking changes without notice → angry users
+* No deprecation warnings → surprise breakage
+* Keeping technical debt forever → unmaintainable
+
+== Context
+
+JBake's user base (2017):
+
+* Hundreds of sites in production
+* Dozens of community themes
+* Multiple plugins (Maven, Gradle)
+* Documentation/tutorials across the web
+
+Compatibility spectrum:
+
+```
+API Stability Level:
+├── Public API (contracts): Must maintain
+├── Extension Points (SPI): Careful evolution
+├── Internal Classes: Can change
+└── Private Methods: Free to change
+```
+
+Industry practices:
+
+* **Semantic Versioning**: MAJOR.MINOR.PATCH (break.feature.fix)
+* **Deprecation cycles**: Mark → Warn → Remove
+* **Java's approach**: Deprecate for years before removal
+* **Spring Framework**: Deprecate for 2+ major versions
+
+JBake challenges:
+
+* No clear "public API" definition initially
+* Users import internal classes
+* Themes rely on model structure
+* Configuration keys as contract
+
+== Decision
+
+**Adopt a deprecation-first strategy with semantic versioning and multi-version deprecation cycles.**
+
+**Policy:**
+
+1. **Semantic versioning**: MAJOR.MINOR.PATCH
+   - **MAJOR**: Breaking changes (only after deprecation)
+   - **MINOR**: New features, deprecations
+   - **PATCH**: Bug fixes
+
+2. **Deprecation cycle**: 2 major versions minimum
+   ```
+   v2.5: Introduce new API, deprecate old
+   v2.6-2.9: Both APIs work, warnings issued
+   v3.0: Remove deprecated API
+   ```
+
+3. **Documentation requirements**:
+   - `@Deprecated` annotation with Javadoc
+   - Migration guide in CHANGELOG
+   - Replacement clearly documented
+
+4. **Gradual migration**:
+   - Old and new APIs coexist
+   - Adapter pattern for compatibility
+   - Clear migration paths
+
+**Classification:**
+
+| Component | Stability | Evolution Strategy |
+|-----------|-----------|-------------------|
+| Configuration keys | Stable | Alias old → new |
+| JBakeConfiguration interface | Stable | Add methods, deprecate old |
+| ContentStore methods | Internal | Can change with deprecation |
+| Template model structure | Stable | Extend, don't break |
+| SPI interfaces | Stable | Version-aware loading |
+
+**Deprecation examples:**
+
+```java
+// Old method (deprecated)
+/**
+ * @deprecated Use {@link #DelegatingTemplateEngine(ContentStore, JBakeConfiguration)} instead.
+ * Will be removed in JBake 3.0.
+ */
+@Deprecated
+public DelegatingTemplateEngine(CompositeConfiguration config, 
+                                 ContentStore db, 
+                                 File destination, 
+                                 File templatesPath) {
+    // Implementation using adapter to new constructor
+}
+
+// New method
+public DelegatingTemplateEngine(ContentStore db, JBakeConfiguration config) {
+    // Modern API
+}
+```
+
+**Configuration aliasing:**
+
+```properties
+# Old key (still works)
+destination.folder=/output
+
+# New key (preferred)
+jbake.destination.folder=/output
+
+# Internally: old → new mapping maintained
+```
+
+== Consequences
+
+=== Positive
+
+* ✅ **User confidence**: Projects continue working
+* ✅ **Ecosystem stability**: Themes/plugins have time to update
+* ✅ **Clear expectations**: Semantic versioning communicates risk
+* ✅ **Gradual migration**: No forced big-bang upgrades
+* ✅ **Innovation enabled**: Can evolve without fear
+* ✅ **Warning visibility**: Users know what to fix
+
+=== Negative
+
+* ❌ **Maintenance burden**: Support old + new APIs simultaneously
+* ❌ **Code bloat**: Adapter code for compatibility
+* ❌ **Testing overhead**: Test both old and new paths
+* ❌ **Slower evolution**: Can't remove bad decisions quickly
+* ❌ **User confusion**: Multiple ways to do same thing
+
+=== Neutral
+
+* ℹ️ Major versions rare (years between)
+* ℹ️ Some users never see deprecation warnings (ignore logs)
+
+== Alternatives Considered
+
+=== Alternative 1: Breaking Changes Without Deprecation
+
+**Description**: Make breaking changes immediately, bump major version, document in CHANGELOG.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Deprecation (Baseline) | Immediate Break |
+|--------------------|------------------------|-----------------|
+| Innovation Speed   | 0                      | +3              |
+| User Experience    | 0                      | -3              |
+| Maintenance        | 0                      | +2              |
+| Ecosystem Health   | 0                      | -3              |
+| **Total Score**    | **0**                  | **-1**          |
+
+**Rejection rationale**: Fast evolution but painful upgrades. Example: JBake 2.5 → 2.6 breaks all projects. Users stuck on old versions. Themes abandoned. Community fragments. Not worth speed gain.
+
+=== Alternative 2: Freeze API Forever
+
+**Description**: Declare current API stable, never break compatibility.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Deprecation (Baseline) | API Freeze |
+|--------------------|------------------------|------------|
+| Stability          | 0                      | +3         |
+| Technical Debt     | 0                      | -3         |
+| Innovation         | 0                      | -3         |
+| Code Quality       | 0                      | -2         |
+| **Total Score**    | **0**                  | **-5**     |
+
+**Rejection rationale**: Stability at cost of progress. Early mistakes (OrientDB dependency, mutable config) become permanent. Can't adopt new Java features. Codebase ossifies. Eventually abandoned for modern alternatives.
+
+=== Alternative 3: Parallel Versioning (v2 & v3 simultaneously)
+
+**Description**: Maintain two separate codebases: stable v2 branch, experimental v3.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Deprecation (Baseline) | Parallel Versions |
+|--------------------|------------------------|-------------------|
+| User Choice        | 0                      | +2                |
+| Maintenance Burden | 0                      | -3                |
+| Bug Fixes          | 0                      | -2                |
+| Resource Cost      | 0                      | -3                |
+| **Total Score**    | **0**                  | **-6**            |
+
+**Rejection rationale**: Double the maintenance. Bug fixes need backporting. Security patches to multiple versions. Small team can't sustain. Confuses users ("which version?"). Deprecation achieves same goal with single codebase.
+
+== Implementation Notes
+
+**Deprecation checklist:**
+
+1. ✅ Add `@Deprecated` annotation
+2. ✅ Write Javadoc with:
+   - Reason for deprecation
+   - Replacement API
+   - Target removal version
+3. ✅ Add entry to CHANGELOG
+4. ✅ Update documentation/examples
+5. ✅ Create migration guide if complex
+6. ✅ Add warning logs (if applicable)
+
+**Example changelog entry:**
+
+```markdown
+## [2.6.0] - 2017-06-15
+
+### Deprecated
+- `DelegatingTemplateEngine(CompositeConfiguration, ContentStore, File, File)` 
+  constructor. Use `DelegatingTemplateEngine(ContentStore, JBakeConfiguration)` 
+  instead. Old constructor will be removed in JBake 3.0.
+  Migration: Replace `new DelegatingTemplateEngine(config, db, dest, templates)` 
+  with `new DelegatingTemplateEngine(db, jbakeConfig)`.
+```
+
+**Adapter pattern example:**
+
+```java
+@Deprecated
+public DelegatingTemplateEngine(CompositeConfiguration config, 
+                                 ContentStore db, 
+                                 File destination, 
+                                 File templatesPath) {
+    // Adapt old parameters to new API
+    JBakeConfiguration jbakeConfig = new DefaultJBakeConfiguration(
+        templatesPath.getParentFile(), destination, config);
+    
+    // Delegate to new constructor
+    this(db, jbakeConfig);
+}
+```
+
+**Version timeline example:**
+
+| Version | Date | Action |
+|---------|------|--------|
+| 2.5.0 | 2016-03 | Introduce JBakeConfiguration interface |
+| 2.6.0 | 2017-06 | Deprecate CompositeConfiguration constructors |
+| 2.7.0-2.9.x | 2017-2019 | Both APIs supported, warnings |
+| 3.0.0 | 2020+ | Remove deprecated CompositeConfiguration usage |
+
+== Related Decisions
+
+* link:ADR-005-configuration-abstraction.adoc[ADR-005]: Configuration Abstraction - Example of gradual migration
+* link:ADR-008-java-version-policy.adoc[ADR-008]: Java Version Policy - Balances compatibility vs modernization
+
+== References
+
+* Semantic Versioning: https://semver.org/
+* Java Deprecation Guide: https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/deprecation/deprecation.html
+* JBake CHANGELOG: `CHANGELOG.md`
+* Effective Java (Joshua Bloch): Chapter on API design and deprecation

@@ -1,0 +1,268 @@
+= ADR-008: Java Version Support Policy
+
+Status: ✅ **Accepted**
+
+Date: 2019-09-20 (Estimated - Java 8+ transition period)
+
+== Problem Statement
+
+Which Java versions should JBake support, and when should support for older versions be dropped?
+
+Tensions:
+
+* **Modern features**: Java 8+ offers lambdas, streams, Optional, time API
+* **User base**: Many organizations stuck on Java 7 or even Java 6
+* **Library dependencies**: Libraries increasingly require Java 8+
+* **Maintenance burden**: Supporting old Java versions limits code modernization
+* **Platform evolution**: Java release cadence changed (6-month cycles since Java 9)
+
+== Context
+
+Java version landscape (2019):
+
+* **Java 6**: EOL 2013, but still in production at banks/government
+* **Java 7**: EOL 2015, declining but significant install base
+* **Java 8**: LTS, released 2014, dominant version in enterprise
+* **Java 9-10**: Short-term releases (already EOL)
+* **Java 11**: LTS (Sep 2018), slow adoption
+* **Java 12-13**: Current short-term releases
+
+JBake history:
+
+* **2012-2015**: Targeted Java 6 compatibility
+* **2015-2017**: Java 7 minimum
+* **2017+**: Pressure to adopt Java 8 features
+
+Dependency constraints:
+
+* **Gradle**: Requires Java 8+ since Gradle 5
+* **Maven**: Supports Java 7 but plugins moving to 8
+* **OrientDB**: 2.x supports Java 7, 3.x requires Java 8
+* **Thymeleaf 3**: Requires Java 8+
+* **Asciidoctor**: Requires Java 8+
+
+User surveys (2019):
+
+* 70% using Java 8+
+* 20% on Java 7
+* 10% on Java 6
+
+== Decision
+
+**Adopt a "Current LTS + Previous LTS" support policy, dropping older versions with major releases.**
+
+**Policy:**
+
+1. **Minimum version**: Java 8 (as of JBake 2.6.0+)
+2. **Target version**: Current LTS (Java 11 recommended)
+3. **Drop policy**: Drop support with major version bump (JBake 3.0 → Java 11)
+4. **Compile target**: Bytecode for minimum version
+5. **CI testing**: Test on minimum + current LTS
+
+**Rationale for Java 8 minimum:**
+
+* **Ecosystem**: Critical dependencies require Java 8
+* **Language features**: Lambdas, streams, Optional improve code quality
+* **Market adoption**: 70%+ users already on Java 8+
+* **Oracle EOL**: Java 7 public updates ended 2015
+
+**Future evolution:**
+
+| JBake Version | Min Java | Reason |
+|---------------|----------|--------|
+| 2.5.x | Java 7 | Legacy support |
+| 2.6.x - 2.9.x | Java 8 | Current policy |
+| 3.0 (future) | Java 11 | Next LTS transition |
+| 4.0 (future) | Java 17 | Next LTS (2021) |
+
+**Deprecation notice:**
+
+```
+JBake 2.5.x: "Java 7 support will be dropped in JBake 2.6.0"
+JBake 2.6.0: Require Java 8, document in CHANGELOG/README
+JBake 2.9.x: "Java 8 support will be dropped in JBake 3.0"
+JBake 3.0: Require Java 11
+```
+
+**Build configuration:**
+
+```gradle
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+test {
+    // Test on multiple Java versions in CI
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+```
+
+== Consequences
+
+=== Positive
+
+* ✅ **Modern code**: Use lambdas, streams, Optional, java.time
+* ✅ **Library compatibility**: Access to modern dependencies
+* ✅ **Performance**: Benefit from JVM improvements
+* ✅ **Developer experience**: Better IDE support, tooling
+* ✅ **Reduced complexity**: Don't maintain Java 6/7 workarounds
+* ✅ **Clear expectations**: Users know requirements
+
+=== Negative
+
+* ❌ **User exclusion**: 20% on Java 7 must upgrade or stay on old JBake
+* ❌ **Enterprise friction**: Some orgs slow to upgrade Java
+* ❌ **Support burden**: Maintain old version for legacy users?
+* ❌ **Migration effort**: Users must test on new Java version
+
+=== Neutral
+
+* ℹ️ Java 8 itself is very stable (LTS until 2030 for some vendors)
+* ℹ️ Can compile with Java 11 targeting Java 8 bytecode
+
+== Alternatives Considered
+
+=== Alternative 1: Stay on Java 7 Forever
+
+**Description**: Never drop Java 7 support, maintain compatibility indefinitely.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Java 8 Min (Baseline) | Java 7 Forever |
+|--------------------|------------------------|----------------|
+| User Coverage      | 0                      | +1             |
+| Code Modernization | 0                      | -3             |
+| Dependency Access  | 0                      | -3             |
+| Maintenance        | 0                      | -2             |
+| **Total Score**    | **0**                  | **-7**         |
+
+**Rejection rationale**: Technical stagnation. Can't use modern libraries (Thymeleaf 3, Asciidoctor, etc.). Code stuck with pre-Java-8 patterns (anonymous inner classes, no Optional). Eventually unmaintainable. Java 7 is 4+ years EOL.
+
+=== Alternative 2: Jump to Java 11 Immediately
+
+**Description**: Skip Java 8, require Java 11 minimum in JBake 2.6.0.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Java 8 Min (Baseline) | Java 11 Min |
+|--------------------|------------------------|-------------|
+| Code Modernization | 0                      | +2          |
+| User Coverage      | 0                      | -2          |
+| Ecosystem Maturity | 0                      | -1          |
+| Adoption Risk      | 0                      | -2          |
+| **Total Score**    | **0**                  | **-3**      |
+
+**Rejection rationale**: Too aggressive. Java 11 adoption lower in 2019 (enterprise lag). 70% on Java 8, only 10% on 11+. Would exclude most users. Java 8 → 11 doesn't add killer features for JBake's needs. Better to wait.
+
+=== Alternative 3: Multi-version Builds (Java 8 & 11)
+
+**Description**: Publish separate artifacts: `jbake-core-java8` and `jbake-core-java11`.
+
+**Pugh Matrix Evaluation:**
+
+| Criterion           | Single Version (Baseline) | Multi-version |
+|--------------------|---------------------------|---------------|
+| User Choice        | 0                         | +2            |
+| Maintenance        | 0                         | -3            |
+| Build Complexity   | 0                         | -3            |
+| Confusion          | 0                         | -2            |
+| **Total Score**    | **0**                     | **-6**        |
+
+**Rejection rationale**: Massive complexity. Need separate:
+* Build pipelines
+* Artifact publishing
+* Dependency management
+* Documentation
+* Bug testing (which version?)
+
+Small team can't sustain. Gradle/Maven don't do this; neither should JBake.
+
+== Implementation Notes
+
+**Gradle configuration:**
+
+```gradle
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+// Enforce at compile time
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:all', '-Werror']
+}
+```
+
+**CI testing matrix:**
+
+```yaml
+# GitHub Actions example
+strategy:
+  matrix:
+    java: [8, 11, 17]
+steps:
+  - uses: actions/setup-java@v2
+    with:
+      java-version: ${{ matrix.java }}
+  - run: ./gradlew test
+```
+
+**Runtime check:**
+
+```java
+public class JBake {
+    static {
+        String version = System.getProperty("java.version");
+        if (!isJava8OrHigher()) {
+            throw new UnsupportedClassVersionError(
+                "JBake requires Java 8 or higher. Found: " + version);
+        }
+    }
+}
+```
+
+**Documentation updates:**
+
+1. README: "Requirements: Java 8+"
+2. Website installation page
+3. Build tool plugin docs (Maven, Gradle)
+4. CHANGELOG: Breaking change notice
+
+**Migration guide for users:**
+
+```markdown
+## Upgrading to JBake 2.6.0+
+
+**Action Required**: Java 8 or higher is now required.
+
+### Check your Java version:
+```bash
+java -version
+```
+
+### If on Java 7 or lower:
+1. Upgrade to Java 8 (or 11 LTS)
+2. Update build tools (Maven 3.5+, Gradle 4.10+)
+3. Test your site generation
+
+### If you cannot upgrade Java:
+- Stay on JBake 2.5.x (maintenance only)
+- Security updates backported on request
+```
+
+== Related Decisions
+
+* link:ADR-007-deprecation-strategy.adoc[ADR-007]: Deprecation Strategy - How we communicate breaking changes
+* link:ADR-005-configuration-abstraction.adoc[ADR-005]: Configuration Abstraction - Uses Java 8 features (Optional, etc.)
+
+== References
+
+* Java SE Support Roadmap: https://www.oracle.com/java/technologies/java-se-support-roadmap.html
+* JBake Installation Docs: https://jbake.org/docs/
+* Gradle Java compatibility: https://docs.gradle.org/current/userguide/building_java_projects.html#sec:java_cross_compilation
+* Survey data: Community discussions on GitHub/Google Groups

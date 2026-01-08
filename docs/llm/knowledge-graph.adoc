@@ -1,0 +1,471 @@
+= JBake Knowledge Graph for LLM Context
+
+This structured knowledge graph is optimized for LLM understanding and code generation tasks.
+
+== Core Concepts Hierarchy
+
+=== Level 0: Fundamental Concepts (Learn First)
+
+==== DocumentModel
+
+```yaml
+name: DocumentModel
+level: 0
+priority: CRITICAL
+description: Map-based structure representing parsed content with metadata
+prerequisites: []
+enables:
+  - Template rendering
+  - ContentStore queries
+  - Custom field support
+learning_time: 1-2 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/model/DocumentModel.java
+  - jbake-core/src/main/java/org/jbake/model/ModelAttributes.java
+common_mistakes:
+  - mistake: "Treating DocumentModel as strongly-typed POJO"
+    why: "It's a Map<String, Object>, keys are strings"
+    correct: "Use get(key) and type-check values, or use typed getters"
+  - mistake: "Mutating DocumentModel after parsing"
+    why: "Mutations affect cached version in OrientDB"
+    correct: "Create new DocumentModel or use immutable patterns"
+  - mistake: "Missing required fields (type, status, sourceUri)"
+    why: "ContentStore expects these for indexing"
+    correct: "Always set via setType(), setStatus(), setSourceUri()"
+validation_question: "How does a custom field 'author: John' in Markdown front-matter become accessible in a Freemarker template?"
+correct_answer: "Parser extracts header, puts 'author'='John' in DocumentModel map, template accesses as ${content.author}"
+code_example: |
+  // Creating DocumentModel
+  DocumentModel doc = new DocumentModel();
+  doc.setTitle("My Post");
+  doc.setType("post");
+  doc.setStatus("published");
+  doc.setDate(new Date());
+  doc.setBody("<p>HTML content</p>");
+  doc.put("customField", "customValue");  // Custom metadata
+  
+  // In Freemarker template
+  <h1>${content.title}</h1>
+  <p>${content.customField}</p>
+```
+
+==== Pipeline Architecture
+
+```yaml
+name: Pipeline Architecture
+level: 0
+priority: CRITICAL
+description: Linear processing stages - Crawl → Parse → Render → Copy
+prerequisites: []
+enables:
+  - Understanding code flow
+  - Debugging
+  - Extending JBake
+learning_time: 2-3 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/app/Oven.java
+common_mistakes:
+  - mistake: "Assuming stages run in parallel"
+    why: "Sequential by design for simplicity"
+    correct: "Stages execute one after another"
+  - mistake: "Modifying files during bake"
+    why: "Crawler has already scanned; changes not seen"
+    correct: "Re-run bake after file modifications"
+validation_question: "If you modify a template file during a bake, will it affect the current bake?"
+correct_answer: "No, templates are loaded at Renderer stage start; mid-bake changes ignored"
+code_example: |
+  // Oven.bake() orchestrates pipeline
+  public void bake() {
+    contentStore.startup();          // 1. Initialize DB
+    updateDocTypesFromConfiguration();
+    crawler.crawl();                 // 2. Find & parse files
+    crawler.crawlDataFiles();
+    renderContent();                 // 3. Apply templates
+    asset.copy();                    // 4. Copy static files
+    contentStore.close();
+  }
+```
+
+==== Configuration System
+
+```yaml
+name: JBakeConfiguration
+level: 0
+priority: HIGH
+description: Abstraction over Commons Configuration2, provides all settings
+prerequisites: []
+enables:
+  - Customizing behavior
+  - Creating projects
+  - Testing with mock configs
+learning_time: 1 hour
+key_files:
+  - jbake-core/src/main/java/org/jbake/app/configuration/JBakeConfiguration.java
+  - jbake-core/src/main/java/org/jbake/app/configuration/DefaultJBakeConfiguration.java
+common_mistakes:
+  - mistake: "Using CompositeConfiguration directly in new code"
+    why: "Deprecated pattern, tight coupling"
+    correct: "Use JBakeConfiguration interface methods"
+  - mistake: "Assuming mutable configuration"
+    why: "Configuration should be immutable after creation"
+    correct: "Create new configuration for changes, don't mutate existing"
+validation_question: "Where does JBake look for configuration and in what order?"
+correct_answer: "1. default.properties (built-in), 2. jbake.properties (project), 3. programmatic overrides"
+code_example: |
+  // Access configuration
+  JBakeConfiguration config = // ... from factory
+  File contentFolder = config.getContentFolder();
+  String dateFormat = config.getDateFormat();
+  List<String> docTypes = config.getDocumentTypes();
+  
+  // Template file for document type
+  String postTemplate = config.getTemplateByDocType("post");  // "post.ftl"
+```
+
+=== Level 1: Architecture Concepts
+
+==== ContentStore (OrientDB Cache)
+
+```yaml
+name: ContentStore
+level: 1
+priority: HIGH
+description: Wrapper around embedded OrientDB for caching and querying content
+prerequisites:
+  - DocumentModel
+  - Pipeline Architecture
+enables:
+  - Incremental builds
+  - Tag queries
+  - Archive generation
+  - Feed creation
+learning_time: 3-4 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/app/ContentStore.java
+  - jbake-core/src/main/java/org/jbake/app/DBUtil.java
+common_mistakes:
+  - mistake: "Exposing OrientDB APIs directly"
+    why: "Creates tight coupling, migration difficult"
+    correct: "Wrap in ContentStore methods"
+  - mistake: "Forgetting to call startup() and close()"
+    why: "OrientDB needs lifecycle management"
+    correct: "Always startup before use, close in finally block"
+  - mistake: "Using SQL strings directly"
+    why: "SQL injection risk, hard to maintain"
+    correct: "Use prepared statement constants"
+validation_question: "How does ContentStore enable incremental builds?"
+correct_answer: "Stores SHA1 hash of each file; on next bake, compares SHA1 to detect changes"
+code_example: |
+  // Querying ContentStore
+  ContentStore db = // ... created by UtensilsFactory
+  db.startup();
+  
+  try {
+    // Get published posts
+    DocumentList<DocumentModel> posts = db.getPublishedPosts();
+    
+    // Get posts by tag
+    DocumentList<DocumentModel> javaPosts = db.getPostsByTag("java");
+    
+    // Get all tags
+    Set<String> tags = db.getAllTags();
+    
+    // Check if content changed
+    DocumentList<DocumentModel> status = db.getDocumentStatus("/path/to/file");
+    
+  } finally {
+    db.close();
+    db.shutdown();
+  }
+```
+
+==== Java SPI Extensibility
+
+```yaml
+name: ServiceLoader Plugin Pattern
+level: 1
+priority: HIGH
+description: Java SPI mechanism for discovering template engines, markup parsers, and rendering tools
+prerequisites:
+  - Pipeline Architecture
+enables:
+  - Adding new template engines
+  - Custom markup parsers
+  - Custom renderers (feeds, sitemaps)
+learning_time: 2-3 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/template/TemplateEngines.java
+  - jbake-core/src/main/java/org/jbake/parser/Engines.java
+  - jbake-core/src/main/resources/META-INF/services/org.jbake.render.RenderingTool
+common_mistakes:
+  - mistake: "Forgetting META-INF/services file"
+    why: "ServiceLoader needs it for discovery"
+    correct: "Create META-INF/services/<interface-name> with implementing class names"
+  - mistake: "Typo in service file"
+    why: "Class not found exception, hard to debug"
+    correct: "Use fully-qualified class names, verify spelling"
+  - mistake: "Assuming load order"
+    why: "ServiceLoader order is non-deterministic"
+    correct: "Don't depend on order; use explicit priority if needed"
+validation_question: "What three steps are required to add a new RenderingTool?"
+correct_answer: "1. Implement RenderingTool interface, 2. Create META-INF/services/org.jbake.render.RenderingTool, 3. Add class name to service file"
+code_example: |
+  // Implementing a custom RenderingTool
+  package com.example.jbake;
+  
+  import org.jbake.render.RenderingTool;
+  import org.jbake.app.Renderer;
+  import org.jbake.app.ContentStore;
+  import org.jbake.app.configuration.JBakeConfiguration;
+  
+  public class CustomRenderer implements RenderingTool {
+    @Override
+    public int render(Renderer renderer, ContentStore db, JBakeConfiguration config) {
+      // Query content
+      DocumentList<DocumentModel> docs = db.getAllContent("custom-type");
+      
+      // Render each document
+      int count = 0;
+      for (DocumentModel doc : docs) {
+        renderer.render(doc);
+        count++;
+      }
+      return count;
+    }
+  }
+  
+  // META-INF/services/org.jbake.render.RenderingTool
+  com.example.jbake.CustomRenderer
+```
+
+==== Template Engine Delegation
+
+```yaml
+name: DelegatingTemplateEngine
+level: 1
+priority: MEDIUM
+description: Routes rendering to specific engines based on file extension
+prerequisites:
+  - Java SPI Extensibility
+enables:
+  - Multiple template engines in one project
+  - Template fallback
+  - Custom template engines
+learning_time: 2 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/template/DelegatingTemplateEngine.java
+  - jbake-core/src/main/java/org/jbake/template/AbstractTemplateEngine.java
+common_mistakes:
+  - mistake: "Creating template with .html extension expecting Thymeleaf"
+    why: ".html maps to RawMarkupEngine (passthrough)"
+    correct: "Use engine-specific extension or configure mapping"
+  - mistake: "Not registering engine extensions"
+    why: "DelegatingTemplateEngine won't route to your engine"
+    correct: "Add extension mapping in META-INF/org.jbake.parser.TemplateEngines.properties"
+validation_question: "How does DelegatingTemplateEngine choose which engine to use?"
+correct_answer: "Looks up file extension in TemplateEngines registry, delegates to matching engine"
+code_example: |
+  // Extension → Engine mapping
+  // META-INF/org.jbake.parser.TemplateEngines.properties
+  org.jbake.template.FreemarkerTemplateEngine=ftl,ftlh
+  org.jbake.template.GroovyTemplateEngine=groovy,gsp
+  org.jbake.template.ThymeleafTemplateEngine=thymeleaf
+  
+  // DelegatingTemplateEngine routing
+  String ext = FileUtil.fileExt("post.ftl");  // "ftl"
+  AbstractTemplateEngine engine = renderers.getEngine(ext);  // FreemarkerTemplateEngine
+  engine.renderDocument(model, "post.ftl", writer);
+```
+
+=== Level 2: Implementation Details
+
+==== Markup Parsing Pipeline
+
+```yaml
+name: MarkupEngine Template Method
+level: 2
+priority: MEDIUM
+description: Base class for parsers with template method pattern
+prerequisites:
+  - DocumentModel
+  - Pipeline Architecture
+enables:
+  - Custom markup parsers
+  - Understanding parsing flow
+learning_time: 2-3 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/parser/MarkupEngine.java
+  - jbake-core/src/main/java/org/jbake/parser/MarkdownEngine.java
+  - jbake-core/src/main/java/org/jbake/parser/AsciidoctorEngine.java
+common_mistakes:
+  - mistake: "Overriding parse() instead of processHeader()/processBody()"
+    why: "parse() is template method, should not be overridden"
+    correct: "Override processHeader() and processBody()"
+  - mistake: "Not handling header separator"
+    why: "MarkupEngine base class expects header/body split"
+    correct: "Use header.separator config (default ~~~~~~) or skip header for headerless formats"
+validation_question: "What's the parsing flow for a Markdown file?"
+correct_answer: "1. MarkupEngine.parse() calls processHeader() → extracts metadata, 2. calls processBody() → Markdown to HTML, 3. returns DocumentModel"
+code_example: |
+  // MarkupEngine template method
+  public DocumentModel parse(JBakeConfiguration config, File file) {
+    // ... read file, detect header
+    processHeader(context);  // Extract metadata to DocumentModel
+    processBody(context);    // Convert markup to HTML
+    return context.getDocumentModel();
+  }
+  
+  // MarkdownEngine implementation
+  @Override
+  public void processBody(ParserContext context) {
+    Parser parser = Parser.builder(options).build();
+    HtmlRenderer renderer = HtmlRenderer.builder(options).build();
+    Document document = parser.parse(context.getBody());
+    context.setBody(renderer.render(document));  // Markdown → HTML
+  }
+```
+
+==== SHA1 Change Detection
+
+```yaml
+name: Incremental Build Mechanism
+level: 2
+priority: MEDIUM
+description: Hash-based change detection to avoid re-parsing unchanged files
+prerequisites:
+  - ContentStore
+  - Pipeline Architecture
+enables:
+  - Fast rebuilds
+  - Large site performance
+learning_time: 1-2 hours
+key_files:
+  - jbake-core/src/main/java/org/jbake/app/Crawler.java (buildHash, findDocumentStatus)
+common_mistakes:
+  - mistake: "Expecting template changes to trigger content re-parse"
+    why: "Templates have separate signature mechanism"
+    correct: "Template changes re-render without re-parsing; use -clearCache to force full rebuild"
+  - mistake: "Assuming binary asset SHA1 checking"
+    why: "Assets copied by file modification time, not SHA1"
+    correct: "Assets always copied; use asset.ignore for exclusions"
+validation_question: "What triggers content re-parsing?"
+correct_answer: "SHA1 hash change of file content, or -clearCache flag"
+code_example: |
+  // Crawler.crawlFile() change detection
+  String sha1 = buildHash(sourceFile);  // Compute SHA1 of file
+  String uri = buildURI(sourceFile);
+  DocumentStatus status = findDocumentStatus(uri, sha1);
+  
+  if (status == DocumentStatus.UPDATED) {
+    db.deleteContent(uri);  // Remove old version
+    processSourceFile(sourceFile, sha1, uri);  // Re-parse
+  } else if (status == DocumentStatus.IDENTICAL) {
+    // Skip, use cached version
+  } else if (status == DocumentStatus.NEW) {
+    processSourceFile(sourceFile, sha1, uri);
+  }
+```
+
+== Cross-Reference Matrix
+
+**When working on...**
+
+| Task | Key Concepts | Files to Read |
+|------|--------------|---------------|
+| Adding custom document type | DocumentModel, Configuration, Renderer | DocumentTypes.java, Renderer.java, DefaultJBakeConfiguration.java |
+| Creating template engine | SPI, DelegatingTemplateEngine, AbstractTemplateEngine | AbstractTemplateEngine.java, TemplateEngines.java, META-INF/services |
+| Implementing markup parser | MarkupEngine, Parser, Engines | MarkupEngine.java, Engines.java, existing engine implementations |
+| Optimizing performance | ContentStore, SHA1, Pipeline | ContentStore.java, Crawler.java, Oven.java |
+| Debugging rendering | DelegatingTemplateEngine, Renderer, RenderingTool | DelegatingTemplateEngine.java, Renderer.java, specific tool |
+| Writing tests | ContentStoreIntegrationTest, fixtures | test/resources/fixture/, ContentStoreIntegrationTest.java |
+
+== Code Patterns
+
+=== Pattern: Factory Creation (Utensils)
+
+**Use when:** Creating wired components with shared configuration
+
+```java
+// UtensilsFactory creates all components
+Utensils utensils = UtensilsFactory.createDefaultUtensils(config);
+ContentStore db = utensils.getContentStore();
+Crawler crawler = utensils.getCrawler();
+Renderer renderer = utensils.getRenderer();
+// All share same JBakeConfiguration instance
+```
+
+=== Pattern: Service Provider Interface
+
+**Use when:** Extending JBake with plugins
+
+```java
+// 1. Implement interface
+public class MyTool implements RenderingTool {
+  public int render(Renderer r, ContentStore db, JBakeConfiguration config) {
+    // Implementation
+  }
+}
+
+// 2. Register in META-INF/services/org.jbake.render.RenderingTool
+com.example.MyTool
+
+// 3. JBake discovers via ServiceLoader
+for (RenderingTool tool : ServiceLoader.load(RenderingTool.class)) {
+  tool.render(renderer, contentStore, config);
+}
+```
+
+=== Pattern: Template Method (MarkupEngine)
+
+**Use when:** Creating parsers with common structure
+
+```java
+public abstract class MarkupEngine implements ParserEngine {
+  // Template method
+  public final DocumentModel parse(JBakeConfiguration config, File file) {
+    ParserContext context = new ParserContext();
+    // ... setup
+    processHeader(context);  // Hook 1
+    processBody(context);    // Hook 2
+    return context.getDocumentModel();
+  }
+  
+  // Hooks for subclasses
+  protected abstract void processHeader(ParserContext context);
+  protected abstract void processBody(ParserContext context);
+}
+```
+
+=== Pattern: Query Object (DocumentList)
+
+**Use when:** Working with content from database
+
+```java
+// ContentStore returns DocumentList (extends ArrayList<DocumentModel>)
+DocumentList<DocumentModel> posts = db.getPublishedPosts();
+for (DocumentModel post : posts) {
+  String title = post.getTitle();
+  Date date = post.getDate();
+  String body = post.getBody();
+}
+
+// Filter and transform
+DocumentList<DocumentModel> javaPosts = db.getPostsByTag("java");
+```
+
+== Anti-Patterns to Avoid
+
+See: `docs/llm/antipatterns.adoc`
+
+== Glossary
+
+* **Bake**: The process of generating a static site from content and templates
+* **Document Type**: Category of content (post, page, custom) that determines template used
+* **Status**: Published state (draft, published) that determines if content is rendered
+* **Markup Engine**: Parser that converts markup format (Markdown, AsciiDoc) to HTML
+* **Template Engine**: Renderer that applies templates (Freemarker, Groovy) to content
+* **ContentStore**: OrientDB wrapper providing caching and query capabilities
+* **RenderingTool**: SPI plugin for custom renderers (feeds, sitemaps, archives)
+* **Utensils**: Factory-created components used by Oven (Crawler, Parser, Renderer, etc.)
+* **Pipeline**: Sequential processing stages (Crawl, Parse, Render, Copy)
+* **SHA1**: Hash used for change detection to enable incremental builds
