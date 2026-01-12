@@ -1,0 +1,161 @@
+= JBake plugin for Gradle
+:linkattrs:
+:jbake-version:   2.6.7
+:plugin-version:  5.5.0
+:project-group:   org.jbake
+:plugin-id:       org.jbake.site
+:project-name:    jbake-gradle-plugin
+
+image:http://img.shields.io/travis/jbake-org/{project-name}/master.svg["Build Status", link="https://travis-ci.org/jbake-org/{project-name}"]
+image:http://img.shields.io/coveralls/jbake-org/{project-name}/master.svg["Coverage Status", link="https://coveralls.io/r/jbake-org/{project-name}"]
+image:http://img.shields.io/badge/license-ASF2-blue.svg["Apache License 2", link="http://www.apache.org/licenses/LICENSE-2.0.txt"]
+image:https://img.shields.io/maven-metadata/v?label=Plugin%20Portal&metadataUrl=https://plugins.gradle.org/m2/org/jbake/site/{plugin-id}.gradle.plugin/maven-metadata.xml["Gradle Plugin Portal, link="https://plugins.gradle.org/plugin/{plugin-id}"]
+
+---
+
+This plugin allows rendering a site using http://www.jbake.org[JBake] directly from http://www.gradle.org[Gradle].
+
+== Requirements
+
+ * Java 8
+ * Gradle 6+
+
+== Examples
+
+A few of the sites that use the plugin and serve as a good example are:
+
+* https://github.com/melix/blog
+* https://github.com/danhyun/blog
+* https://github.com/msgilligan/msgilligan.github.io
+
+== Usage
+
+*This is work in progress*
+
+[source,groovy]
+[subs="attributes"]
+----
+plugins {
+    id 'org.jbake.site' version '{plugin-version}'
+}
+----
+
+This will add a `bake` task to your build, which will search for a standard http://www.jbake.org[JBake] source tree in
+`src/jbake` and generate content into `$buildDir/jbake` (typically `build/jbake`).
+
+WARNING: versions prior to `1.0.0` had a task named `jbake`. This task has been renamed to `bake` since `1.0.0`.
+
+=== Init
+
+You can initialise the project structure by running the following command:
+
+----
+gradle bakeInit
+----
+
+The default template is set to `groovy`. You may change this setting by updating the `template` property of the `jbake`
+configuration. Accepted values are `freemarker`, `groovy`, `groovy-mte`, thymeleaf`, `jade`.
+
+Alternatively you may define a value for `templateUrl` that points to a custom template, for example
+
+[source,groovy]
+----
+bakeInit {
+    templateUrl = 'http://server.acme.com/path/to/template.zip'
+}
+----
+
+=== Previewing
+
+You can preview your content by running the following command:
+
+----
+gradle bake bakePreview
+----
+
+This will start up a jetty container and serve your baked site on http://localhost:8080 by default.  You can change the
+port by adding this to your build file.
+
+[source,groovy]
+----
+bakePreview {
+    port = '8090'
+}
+----
+
+The `bakePreview` task is configured to server the output of the `bake` task. Should you need to render a different set
+of files then specify a value for the `input` property, like so
+
+[source,groovy]
+----
+bakePreview {
+    input = project.file('path/to/content')
+}
+----
+
+== Configuration
+=== Plugin configuration
+
+The default input and output directories can be changed using the `jbake` configuration block:
+
+[source,groovy]
+----
+jbake {
+    srcDirName  = 'jbake-sources'
+    destDirName = 'output'
+}
+----
+The generated output can then be found at `$buildDir/output`.
+
+The Version could be changed too:
+
+[source,groovy]
+----
+jbake {
+    version  = '2.6.5'
+}
+----
+
+The default is {jbake-version}.
+
+=== Render Engine configuration
+
+Jbake uses several engines. The library versions could be changed too:
+
+[source,groovy]
+----
+jbake {
+    pegdownVersion = '1.6.0'
+    flexmarkVersion = '0.62.2' // since jbake 2.6.0
+    freemarkerVersion = '2.3.31'
+    groovyTemplatesVersion = '3.0.7'
+    jade4jVersion = '1.2.7'
+    thymeleafVersion = '3.0.12.RELEASE'
+    pebbleVersion = '3.1.5' // since jbake 2.6.5
+    asciidoctorJavaIntegrationVersion = '0.1.4' //pre jbake 2.3.1
+    asciidoctorjVersion = '2.4.3' //since jbake 2.3.1
+    jettyVersion = '9.4.36.v20210114'
+}
+----
+
+Notice the `asciidoctorJavaIntegrationVersion` and `asciidoctorjVersion`. Since Version 2.3.1 jbake has changed
+to the asciidoctorj library.
+
+This plugin handles this change internally. If you use a Version > 2.3.0 of jbake, the dependency switch to the new one.
+
+Since Version 2.6.0 jbake uses https://github.com/vsch/flexmark-java[flexmark] as replacement for https://github.com/sirthias/pegdown[pegdown].
+
+=== JBake configuration
+
+There are several options to configure http://www.jbake.org[JBake]. One is to have the regular `jbake.properties` file
+into the source directory. The other is to use the plugin configuration block:
+
+[source,groovy]
+----
+jbake {
+   configuration['template.post.file'] = 'mypost.ftl'
+}
+----
+
+
+

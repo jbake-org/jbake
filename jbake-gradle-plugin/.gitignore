@@ -1,0 +1,12 @@
+target
+build
+out
+*~
+.gradle
+*.iml
+*.ipr
+*.iws
+.idea
+.settings
+*.classpath
+*.project
