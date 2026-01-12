@@ -16,6 +16,7 @@ package org.jbake.maven;
  * limitations under the License.
  */
 
+import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -30,6 +31,7 @@ import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfigurationFactory;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Runs jbake on a folder
@@ -66,6 +68,12 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(property = "jbake.isClearCache", defaultValue = "false", required = true)
     protected boolean isClearCache;
 
+    /**
+     * Properties that are passed to JBake which override the jbake.properties.
+     */
+    @Parameter
+    protected Map<String, String> properties;
+
     public final void execute() throws MojoExecutionException {
         executeInternal();
     }
@@ -91,7 +99,10 @@ public class GenerateMojo extends AbstractMojo {
 
     protected JBakeConfiguration createConfiguration() throws JBakeException {
         DefaultJBakeConfiguration jBakeConfiguration = new JBakeConfigurationFactory().createDefaultJbakeConfiguration(inputDirectory, outputDirectory, isClearCache);
-        jBakeConfiguration.addConfiguration(this.project.getProperties());
+        jBakeConfiguration.getCompositeConfiguration().addConfigurationFirst(new MapConfiguration(project.getProperties()));
+        if (properties != null) {
+            jBakeConfiguration.getCompositeConfiguration().addConfigurationFirst(new MapConfiguration(properties));
+        }
         return jBakeConfiguration;
     }
 
