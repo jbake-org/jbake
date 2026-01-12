@@ -328,6 +328,6 @@ public class FileUtil {
         return (file.exists()
              && !file.isHidden()
              && directory.isDirectory()
-             && file.getCanonicalPath().startsWith(directory.getCanonicalPath()));
+             && file.getCanonicalFile().toPath().startsWith(directory.getCanonicalFile().toPath()));
     }
 }
