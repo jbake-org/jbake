@@ -1,0 +1,12 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/jbake-core"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: gradle
+  directory: "/jbake-dist"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
