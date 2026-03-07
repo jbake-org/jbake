@@ -62,7 +62,7 @@ public class PaginationTest extends ContentStoreIntegrationTest {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         for (int i = 1; i <= TOTAL_POSTS; i++) {
             cal.add(Calendar.SECOND, 5);
-            FakeDocumentBuilder builder = new FakeDocumentBuilder("post");
+            FakeDocumentBuilder builder = new FakeDocumentBuilder("post", db);
             builder.withCached(true)
                     .withStatus("published")
                     .withDate(cal.getTime())

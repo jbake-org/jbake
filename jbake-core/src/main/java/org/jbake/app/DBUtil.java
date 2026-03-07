@@ -1,8 +1,5 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.record.OTrackedList;
-import com.orientechnologies.orient.core.record.OElement;
-import com.orientechnologies.orient.core.sql.executor.OResult;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.model.DocumentModel;
 
@@ -14,19 +11,19 @@ public class DBUtil {
     @Deprecated
     public static ContentStore createDataStore(final String type, String name) {
         if (contentStore == null) {
-            contentStore = new ContentStore(type, name);
+            contentStore = new ContentStore();
         }
         return contentStore;
     }
 
     @Deprecated
     public static void updateSchema(final ContentStore db) {
-        db.updateSchema();
+        // no-op
     }
 
     public static ContentStore createDataStore(JBakeConfiguration configuration) {
         if (contentStore == null) {
-            contentStore = new ContentStore(configuration.getDatabaseStore(), configuration.getDatabasePath());
+            contentStore = new ContentStore();
         }
 
         return contentStore;
@@ -36,17 +33,8 @@ public class DBUtil {
         contentStore = null;
     }
 
-    public static DocumentModel documentToModel(OResult doc) {
-        DocumentModel result = new DocumentModel();
-
-        for (String key : doc.getPropertyNames()) {
-            result.put(key, doc.getProperty(key));
-        }
-        return result;
-    }
-
     /**
-     * Converts a DB list into a String array
+     * Converts a list entry into a String array.
      *
      * @param entry Entry input to be converted
      * @return input entry as String[]
@@ -55,12 +43,9 @@ public class DBUtil {
     public static String[] toStringArray(Object entry) {
         if (entry instanceof String[]) {
             return (String[]) entry;
-        } else if (entry instanceof OTrackedList) {
-            OTrackedList<String> list = (OTrackedList<String>) entry;
-            return list.toArray(new String[list.size()]);
         } else if (entry instanceof ArrayList) {
             ArrayList<String> list = (ArrayList<String>) entry;
-            return list.toArray(new String[list.size()]);
+            return list.toArray(new String[0]);
         }
         return new String[0];
     }

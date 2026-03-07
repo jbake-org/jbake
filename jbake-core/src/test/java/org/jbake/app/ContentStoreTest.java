@@ -21,13 +21,13 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
     public void shouldGetCountForPublishedDocuments() throws Exception {
 
         for (int i = 0; i < 5; i++) {
-            FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
+            FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST, db);
             builder.withStatus("published")
                     .withRandomSha1()
                     .build();
         }
 
-        FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST);
+        FakeDocumentBuilder builder = new FakeDocumentBuilder(DOC_TYPE_POST, db);
         builder.withStatus("draft")
                 .withRandomSha1()
                 .build();

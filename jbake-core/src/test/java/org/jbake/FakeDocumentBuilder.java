@@ -1,6 +1,6 @@
 package org.jbake;
 
-import com.orientechnologies.orient.core.record.impl.ODocument;
+import org.jbake.app.ContentStore;
 import org.jbake.model.DocumentModel;
 
 import java.math.BigInteger;
@@ -12,6 +12,7 @@ import java.util.Random;
 public class FakeDocumentBuilder {
 
     private DocumentModel fileModel = new DocumentModel();
+    private ContentStore db;
     private String type;
     private boolean hasSourceUri = false;
     private boolean hasSha1 = false;
@@ -20,6 +21,11 @@ public class FakeDocumentBuilder {
     public FakeDocumentBuilder(String type) {
         this.type = type;
         fileModel.setType(type);
+    }
+
+    public FakeDocumentBuilder(String type, ContentStore db) {
+        this(type);
+        this.db = db;
     }
 
     public FakeDocumentBuilder withStatus(String status) {
@@ -67,8 +73,9 @@ public class FakeDocumentBuilder {
             if (!hasDate()) {
                 this.withCurrentDate();
             }
-            ODocument document = new ODocument("Documents").fromMap(fileModel);
-            document.save();
+            if (db != null) {
+                db.addDocument(fileModel);
+            }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
