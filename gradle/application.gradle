@@ -21,6 +21,7 @@ exampleRepositories.each { name, repository ->
         def repositoryName = "$examplesBase/$name"
 
         outputs.dir repositoryName
+        onlyIf { !file(repositoryName).exists() }
 
         doLast {
             grgit.clone(dir: repositoryName, uri: repository)
