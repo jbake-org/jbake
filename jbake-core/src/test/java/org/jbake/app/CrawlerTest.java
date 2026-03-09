@@ -1,6 +1,6 @@
 package org.jbake.app;
 
-import com.orientechnologies.orient.core.db.record.OTrackedMap;
+
 import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -60,7 +60,6 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Crawler crawler = new Crawler(db, config);
         // manually register data doctype
         DocumentTypes.addDocumentType(config.getDataFileDocType());
-        db.updateSchema();
         crawler.crawlDataFiles();
         Assert.assertEquals(2, db.getDocumentCount("data"));
 
@@ -73,7 +72,6 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Map<String, Object> authorsFileContents = dataFileUtil.get("authors.yaml");
         Assert.assertFalse(authorsFileContents.isEmpty());
         Object authorsList = authorsFileContents.get("authors");
-        assertThat(authorsList).isNotInstanceOf(OTrackedMap.class);
         assertThat(authorsList).isInstanceOf(HashMap.class);
         HashMap<String, Map<String, Object>> authors = (HashMap<String, Map<String, Object>>) authorsList;
         assertThat(authors.get("Joe Bloggs").get("last_name")).isEqualTo("Bloggs");

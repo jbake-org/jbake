@@ -1,6 +1,5 @@
 package org.jbake.app;
 
-import org.apache.commons.vfs2.util.Os;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
@@ -20,7 +19,6 @@ public abstract class ContentStoreIntegrationTest {
     public static TemporaryFolder folder = new TemporaryFolder();
     protected static ContentStore db;
     protected static DefaultJBakeConfiguration config;
-    protected static StorageType storageType = StorageType.MEMORY;
     protected static File sourceFolder;
 
     @BeforeClass
@@ -33,42 +31,21 @@ public abstract class ContentStoreIntegrationTest {
         config.setSourceFolder(sourceFolder);
 
         Assert.assertEquals(".html", config.getOutputExtension());
-        config.setDatabaseStore(storageType.toString());
-        // OrientDB v3.1.x doesn't allow DB name to be a path even though docs say it's allowed
-        String dbPath = folder.newFolder("documents" + System.currentTimeMillis()).getName();
-
-        // setting the database path with a colon creates an invalid url for OrientDB.
-        // only one colon is expected. there is no documentation about proper url path for windows available :(
-        if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
-            dbPath = dbPath.replace(":","");
-        }
-        config.setDatabasePath(dbPath);
-        db = DBUtil.createDataStore(config);
+        db = new ContentStore();
     }
 
     @AfterClass
     public static void cleanUpClass() {
-        db.close();
-        db.shutdown();
+        // no-op
     }
 
     @Before
     public void setUp() {
-        db.startup();
+        // no-op: in-memory store is always ready
     }
 
     @After
     public void tearDown() {
         db.drop();
     }
-
-    protected enum StorageType {
-        MEMORY, PLOCAL;
-
-        @Override
-        public String toString() {
-            return this.name().toLowerCase();
-        }
-    }
-
 }

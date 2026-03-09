@@ -159,7 +159,6 @@ public class Oven {
             LOGGER.info("Baking has started...");
             contentStore.startup();
             updateDocTypesFromConfiguration();
-            contentStore.updateSchema();
             contentStore.updateAndClearCacheIfNeeded(config.getClearCache(), config.getTemplateFolder());
 
             // process source content

@@ -1,7 +1,7 @@
-mainClassName = "org.jbake.launcher.Main"
-applicationName = "jbake"
+application.mainClass.set("org.jbake.launcher.Main")
+application.applicationName = "jbake"
 
-def examplesBase = "$project.buildDir/examples"
+def examplesBase = "${project.layout.buildDirectory.get()}/examples"
 
 def exampleRepositories = [
     "example_project_freemarker": "https://github.com/jbake-org/jbake-example-project-freemarker.git",
@@ -21,6 +21,7 @@ exampleRepositories.each { name, repository ->
         def repositoryName = "$examplesBase/$name"
 
         outputs.dir repositoryName
+        onlyIf { !file(repositoryName).exists() }
 
         doLast {
             grgit.clone(dir: repositoryName, uri: repository)
