@@ -59,11 +59,8 @@ public class AsciidoctorEngine extends MarkupEngine {
                         }
 
                         if (options.map().containsKey(OPT_REQUIRES)) {
-                            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
-                            if (requires.length != 0) {
-                                for (String require : requires) {
-                                    engine.requireLibrary(require);
-                                }
+                            for (String require : parseRequires(options.map().get(OPT_REQUIRES))) {
+                                engine.requireLibrary(require);
                             }
                         }
 
@@ -193,6 +190,42 @@ public class AsciidoctorEngine extends MarkupEngine {
         options.setBaseDir(context.getFile().getParentFile().getAbsolutePath());
         options.setSafe(UNSAFE);
         return options;
+    }
+
+    /**
+     * Parses the value of the {@code asciidoctor.option.requires} configuration entry into
+     * a list of library names suitable for {@link Asciidoctor#requireLibrary(String)}.
+     *
+     * <p>Historically this option was documented as a comma-separated {@code String}, but
+     * {@code DefaultJBakeConfiguration.getAsciidoctorOption()} returns it as a {@code List<String>}.
+     * The previous implementation used {@code String.valueOf(list).split(",")}, which produced
+     * values like {@code "[asciidoctor-diagram]"} (with literal brackets) and made the
+     * JRuby {@code require} fail silently. Both {@code Collection} and comma-separated
+     * {@code String} forms are accepted here; {@code null} and empty entries are filtered out.
+     */
+    static List<String> parseRequires(Object raw) {
+        List<String> result = new ArrayList<>();
+        if (raw == null) {
+            return result;
+        }
+        if (raw instanceof Collection) {
+            for (Object r : (Collection<?>) raw) {
+                if (r != null) {
+                    String trimmed = String.valueOf(r).trim();
+                    if (!trimmed.isEmpty()) {
+                        result.add(trimmed);
+                    }
+                }
+            }
+        } else {
+            for (String r : String.valueOf(raw).split(",")) {
+                String trimmed = r.trim();
+                if (!trimmed.isEmpty()) {
+                    result.add(trimmed);
+                }
+            }
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")

@@ -52,6 +52,10 @@ dependencies {
     implementation "org.jsoup:jsoup:$jsoupVersion"
     implementation "org.yaml:snakeyaml:$snakeYamlVersion", optional
 
+    testImplementation("org.asciidoctor:asciidoctorj-diagram:$asciidoctorjDiagramVersion") {
+        exclude group: 'org.asciidoctor', module: 'asciidoctorj'
+    }
+
     // cli specific dependencies
     implementation "org.eclipse.jetty:jetty-server:$jettyServerVersion", optional
     implementation "info.picocli:picocli:$picocli", optional
