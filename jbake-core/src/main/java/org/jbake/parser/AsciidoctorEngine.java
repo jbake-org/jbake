@@ -38,6 +38,9 @@ public class AsciidoctorEngine extends MarkupEngine {
     /* comma separated gem names */
     private static final String OPT_REQUIRES = "requires";
 
+    /**
+     * Constructs a new {@code AsciidoctorEngine}.
+     */
     public AsciidoctorEngine() {
         Class engineClass = Asciidoctor.class;
         assert engineClass != null;
@@ -91,37 +94,64 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
-            String key = attribute.getKey();
-            Object value = attribute.getValue();
+            processAttribute(attribute.getKey(), attribute.getValue(), context, documentModel);
+        }
+    }
 
-            if (hasJBakePrefix(key)) {
-                String pKey = key.substring(6);
-                if(canCastToString(value)) {
-                    storeHeaderValue(pKey, (String) value, documentModel);
-                } else {
-                    documentModel.put(pKey, value);
-                }
-            }
-            if (hasRevdate(key) && canCastToString(value)) {
+    /**
+     * Evaluates attribute keys and directs them to their corresponding processing logic.
+     */
+    private void processAttribute(String key, Object value, ParserContext context, DocumentModel documentModel) {
+        if (hasJbakePrefix(key)) {
+            processJbakeAttribute(key, value, documentModel);
+        }
 
-                String dateFormat = context.getConfig().getDateFormat();
-                DateFormat df = new SimpleDateFormat(dateFormat);
-                try {
-                    Date date = df.parse((String) value);
-                    context.setDate(date);
-                } catch (ParseException e) {
-                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
-                }
-            }
-            if (key.equals("jbake-tags")) {
-                if (canCastToString(value)) {
-                    context.setTags(((String) value).split(","));
-                } else {
-                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
-                }
-            } else {
-                documentModel.put(key, attributes.get(key));
-            }
+        if (hasRevdate(key) && canCastToString(value)) {
+            processRevdate((String) value, context);
+        }
+
+        if ("jbake-tags".equals(key)) {
+            processTags(value, context);
+        } else {
+            // Directly saves the attribute if it does not require any special handling
+            documentModel.put(key, value);
+        }
+    }
+
+    /**
+     * Extracts and stores internal configuration properties specific to JBake.
+     */
+    private void processJbakeAttribute(String key, Object value, DocumentModel documentModel) {
+        String pKey = key.substring(6);
+        if (canCastToString(value)) {
+            storeHeaderValue(pKey, (String) value, documentModel);
+        } else {
+            documentModel.put(pKey, value);
+        }
+    }
+
+    /**
+     * Parses and assigns the document revision date based on the expected system format.
+     */
+    private void processRevdate(String value, ParserContext context) {
+        String dateFormat = context.getConfig().getDateFormat();
+        DateFormat df = new SimpleDateFormat(dateFormat);
+        try {
+            Date date = df.parse(value);
+            context.setDate(date);
+        } catch (ParseException e) {
+            LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
+        }
+    }
+
+    /**
+     * Validates the data type and extracts the tag collection associated with the document.
+     */
+    private void processTags(Object value, ParserContext context) {
+        if (canCastToString(value)) {
+            context.setTags(((String) value).split(","));
+        } else {
+            LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
         }
     }
 
@@ -137,7 +167,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         return key.equals(REVDATE_KEY);
     }
 
-    private boolean hasJBakePrefix(String key) {
+    private boolean hasJbakePrefix(String key) {
         return key.startsWith(JBAKE_PREFIX);
     }
 
@@ -180,7 +210,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         for (final String optionKey : optionsSubset) {
 
             Object optionValue = config.getAsciidoctorOption(optionKey);
-            if (optionKey.equals(Options.TEMPLATE_DIRS)) {
+            if (Options.TEMPLATE_DIRS.equals(optionKey)) {
                 List<String> dirs = getAsList(optionValue);
                 if (!dirs.isEmpty()) {
                     options.setTemplateDirs(String.valueOf(dirs));

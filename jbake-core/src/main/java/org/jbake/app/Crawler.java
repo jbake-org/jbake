@@ -140,7 +140,6 @@ public class Crawler {
                     sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
                     String sha1 = buildHash(sourceFile);
                     String uri = buildDataFileURI(sourceFile);
-                    boolean process = true;
                     DocumentStatus status = DocumentStatus.NEW;
                     String docType = config.getDataFileDocType();
                     status = findDocumentStatus(uri, sha1);
@@ -149,17 +148,12 @@ public class Crawler {
                         db.deleteContent(uri);
                     } else if (status == DocumentStatus.IDENTICAL) {
                         sb.append(" : same ");
-                        process = false;
-                    }
-                    if (!process) {
                         break;
                     }
                     if (DocumentStatus.NEW == status) {
                         sb.append(" : new ");
                     }
-                    if (process) { // new or updated
-                        crawlDataFile(sourceFile, sha1, uri, docType);
-                    }
+                    crawlDataFile(sourceFile, sha1, uri, docType);
                     logger.info("{}", sb);
                 }
                 if (sourceFile.isDirectory()) {
