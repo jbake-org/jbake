@@ -97,10 +97,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             processAttribute(attribute.getKey(), attribute.getValue(), context, documentModel);
         }
     }
-
-    /**
-     * Evaluates attribute keys and directs them to their corresponding processing logic.
-     */
+    
     private void processAttribute(String key, Object value, ParserContext context, DocumentModel documentModel) {
         if (hasJbakePrefix(key)) {
             processJbakeAttribute(key, value, documentModel);
@@ -113,14 +110,10 @@ public class AsciidoctorEngine extends MarkupEngine {
         if ("jbake-tags".equals(key)) {
             processTags(value, context);
         } else {
-            // Directly saves the attribute if it does not require any special handling
             documentModel.put(key, value);
         }
     }
 
-    /**
-     * Extracts and stores internal configuration properties specific to JBake.
-     */
     private void processJbakeAttribute(String key, Object value, DocumentModel documentModel) {
         String pKey = key.substring(6);
         if (canCastToString(value)) {
@@ -130,9 +123,6 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
     }
 
-    /**
-     * Parses and assigns the document revision date based on the expected system format.
-     */
     private void processRevdate(String value, ParserContext context) {
         String dateFormat = context.getConfig().getDateFormat();
         DateFormat df = new SimpleDateFormat(dateFormat);
