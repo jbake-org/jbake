@@ -210,7 +210,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         for (final String optionKey : optionsSubset) {
 
             Object optionValue = config.getAsciidoctorOption(optionKey);
-            if (Options.TEMPLATE_DIRS.equals(optionKey)) {
+            if (optionKey.equals(Options.TEMPLATE_DIRS)) {
                 List<String> dirs = getAsList(optionValue);
                 if (!dirs.isEmpty()) {
                     options.setTemplateDirs(String.valueOf(dirs));
