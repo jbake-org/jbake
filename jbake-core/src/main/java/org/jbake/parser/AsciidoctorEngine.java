@@ -97,7 +97,7 @@ public class AsciidoctorEngine extends MarkupEngine {
             processAttribute(attribute.getKey(), attribute.getValue(), context, documentModel);
         }
     }
-    
+
     private void processAttribute(String key, Object value, ParserContext context, DocumentModel documentModel) {
         if (hasJbakePrefix(key)) {
             processJbakeAttribute(key, value, documentModel);
@@ -134,9 +134,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
     }
 
-    /**
-     * Validates the data type and extracts the tag collection associated with the document.
-     */
+
     private void processTags(Object value, ParserContext context) {
         if (canCastToString(value)) {
             context.setTags(((String) value).split(","));
