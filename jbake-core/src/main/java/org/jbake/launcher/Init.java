@@ -57,9 +57,7 @@ public class Init {
         ZipUtil.extract(new FileInputStream(templateFile), outputFolder);
     }
 
-    /**
-     * Checks if the output folder already contains JBake standard folders.
-     */
+
     private boolean hasExistingStructure(File outputFolder) {
         File[] contents = outputFolder.listFiles();
         if (contents == null) {
@@ -73,9 +71,7 @@ public class Init {
         }
         return false;
     }
-    /**
-     * Compares a folder name against configured JBake folder names.
-     */
+
     private boolean isJBakeFolder(String name) {
         return name.equalsIgnoreCase(config.getTemplateFolderName())
             || name.equalsIgnoreCase(config.getContentFolderName())
