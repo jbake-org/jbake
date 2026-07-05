@@ -125,41 +125,38 @@ public class Crawler {
         }
     }
 
-    /**
-     * Crawl all files and folders looking for data files.
-     *
-     * @param path Folder to start from
-     */
     private void crawlDataFiles(File path) {
         File[] contents = path.listFiles(FileUtil.getDataFileFilter());
-        if (contents != null) {
-            Arrays.sort(contents);
-            for (File sourceFile : contents) {
-                if (sourceFile.isFile()) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
-                    String sha1 = buildHash(sourceFile);
-                    String uri = buildDataFileURI(sourceFile);
-                    DocumentStatus status = DocumentStatus.NEW;
-                    String docType = config.getDataFileDocType();
-                    status = findDocumentStatus(uri, sha1);
-                    if (status == DocumentStatus.UPDATED) {
-                        sb.append(" : modified ");
-                        db.deleteContent(uri);
-                    } else if (status == DocumentStatus.IDENTICAL) {
-                        sb.append(" : same ");
-                        break;
-                    }
-                    if (DocumentStatus.NEW == status) {
-                        sb.append(" : new ");
-                    }
-                    crawlDataFile(sourceFile, sha1, uri, docType);
-                    logger.info("{}", sb);
-                }
-                if (sourceFile.isDirectory()) {
-                    crawlDataFiles(sourceFile);
-                }
+        if (contents == null) {
+            return;
+        }
+        Arrays.sort(contents);
+        for (File sourceFile : contents) {
+            if (sourceFile.isDirectory()) {
+                crawlDataFiles(sourceFile);
+                continue;
             }
+            if (!sourceFile.isFile()) {
+                continue;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("Processing [").append(sourceFile.getPath()).append("]... ");
+            String sha1 = buildHash(sourceFile);
+            String uri = buildDataFileURI(sourceFile);
+            String docType = config.getDataFileDocType();
+            DocumentStatus status = findDocumentStatus(uri, sha1);
+            if (status == DocumentStatus.UPDATED) {
+                sb.append(" : modified ");
+                db.deleteContent(uri);
+            } else if (status == DocumentStatus.IDENTICAL) {
+                sb.append(" : same ");
+                break;
+            }
+            if (status == DocumentStatus.NEW) {
+                sb.append(" : new ");
+            }
+            crawlDataFile(sourceFile, sha1, uri, docType);
+            logger.info("{}", sb);
         }
     }
 
