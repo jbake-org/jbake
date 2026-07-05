@@ -54,23 +54,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                 try {
                     lock.writeLock().lock();
                     if (engine == null) {
-                        LOGGER.info("Initializing Asciidoctor engine...");
-                        if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = AsciidoctorJRuby.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
-                        } else {
-                            engine = Asciidoctor.Factory.create();
-                        }
-
-                        if (options.map().containsKey(OPT_REQUIRES)) {
-                            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
-                            if (requires.length != 0) {
-                                for (String require : requires) {
-                                    engine.requireLibrary(require);
-                                }
-                            }
-                        }
-
-                        LOGGER.info("Asciidoctor engine initialized.");
+                        initializeEngine(options);
                     }
                 } finally {
                     lock.readLock().lock();
@@ -81,6 +65,28 @@ public class AsciidoctorEngine extends MarkupEngine {
             lock.readLock().unlock();
         }
         return engine;
+    }
+
+    private void initializeEngine(Options options) {
+        LOGGER.info("Initializing Asciidoctor engine...");
+
+        if (options.map().containsKey(OPT_GEM_PATH)) {
+            engine = AsciidoctorJRuby.Factory.create(
+                String.valueOf(options.map().get(OPT_GEM_PATH)));
+        } else {
+            engine = Asciidoctor.Factory.create();
+        }
+
+        if (options.map().containsKey(OPT_REQUIRES)) {
+            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
+            if (requires.length != 0) {
+                for (String require : requires) {
+                    engine.requireLibrary(require);
+                }
+            }
+        }
+
+        LOGGER.info("Asciidoctor engine initialized.");
     }
 
     @Override
