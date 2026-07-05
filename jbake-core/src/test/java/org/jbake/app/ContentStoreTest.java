@@ -122,7 +122,7 @@ public class ContentStoreTest extends ContentStoreIntegrationTest {
         long documentCount4 = db.getDocumentCount(typeWithHyphen);
         assertEquals(1, documentCount4);
 
-        db.deleteAllByDocType(typeWithHyphen);
+        db.getSchemaManager().deleteAllByDocType(typeWithHyphen);
     }
 
 }

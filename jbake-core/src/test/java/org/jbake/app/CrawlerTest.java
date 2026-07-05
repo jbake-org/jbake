@@ -60,7 +60,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Crawler crawler = new Crawler(db, config);
         // manually register data doctype
         DocumentTypes.addDocumentType(config.getDataFileDocType());
-        db.updateSchema();
+        db.getSchemaManager().updateSchema();
         crawler.crawlDataFiles();
         Assert.assertEquals(2, db.getDocumentCount("data"));
 

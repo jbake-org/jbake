@@ -71,7 +71,7 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         config.setPaginateIndex(true);
         config.setPostsPerPage(1);
 
-        db.deleteAllByDocType("post");
+        db.getSchemaManager().deleteAllByDocType("post");
 
         renderer.renderIndexPaging("index.html");
 

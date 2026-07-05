@@ -29,16 +29,12 @@ import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.ODatabaseType;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
-import org.jbake.model.ModelAttributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.io.File;
 import java.util.Collections;
@@ -46,28 +42,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author jdlee
- */
+ * @author jdlee */
 public class ContentStore {
-
+    private SchemaManager schemaManager;
     private static final String STATEMENT_GET_PUBLISHED_POST_BY_TYPE_AND_TAG = "select * from Documents where status='published' and type='%s' and ? in tags order by date desc";
     private static final String STATEMENT_GET_DOCUMENT_STATUS_BY_DOCTYPE_AND_URI = "select sha1,rendered from Documents where sourceuri=?";
     private static final String STATEMENT_GET_PUBLISHED_COUNT = "select count(*) as count from Documents where status='published' and type='%s'";
     private static final String STATEMENT_MARK_CONTENT_AS_RENDERD = "update Documents set rendered=true where rendered=false and type='%s' and sourceuri='%s' and cached=true";
     private static final String STATEMENT_DELETE_DOCTYPE_BY_SOURCEURI = "delete from Documents where sourceuri=?";
     private static final String STATEMENT_GET_UNDRENDERED_CONTENT = "select * from Documents where rendered=false order by date desc";
-    private static final String STATEMENT_GET_SIGNATURE_FOR_TEMPLATES = "select sha1 from Signatures where key='templates'";
     private static final String STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS = "select tags from Documents where status='published' and type='post'";
     private static final String STATEMENT_GET_ALL_CONTENT_BY_DOCTYPE = "select * from Documents where type='%s' order by date desc";
     private static final String STATEMENT_GET_PUBLISHED_CONTENT_BY_DOCTYPE = "select * from Documents where status='published' and type='%s' order by date desc";
     private static final String STATEMENT_GET_PUBLISHED_POSTS_BY_TAG = "select * from Documents where status='published' and type='post' and ? in tags order by date desc";
     private static final String STATEMENT_GET_TAGS_BY_DOCTYPE = "select tags from Documents where status='published' and type='%s'";
-    private static final String STATEMENT_INSERT_TEMPLATES_SIGNATURE = "insert into Signatures(key,sha1) values('templates',?)";
-    private static final String STATEMENT_DELETE_ALL = "delete from Documents where type='%s'";
-    private static final String STATEMENT_UPDATE_TEMPLATE_SIGNATURE = "update Signatures set sha1=? where key='templates'";
     private static final String STATEMENT_GET_DOCUMENT_COUNT_BY_TYPE = "select count(*) as count from Documents where type='%s'";
-
-    private final Logger logger = LoggerFactory.getLogger(ContentStore.class);
     private final String type;
     private final String name;
 
@@ -95,10 +84,9 @@ public class ContentStore {
         orient.createIfNotExists(name, ODatabaseType.valueOf(type.toUpperCase()));
 
         db = orient.open(name, "admin", "admin");
-
+        schemaManager = new SchemaManager(db);
         activateOnCurrentThread();
-
-        updateSchema();
+        schemaManager.updateSchema();
     }
 
     public long getStart() {
@@ -120,18 +108,6 @@ public class ContentStore {
     public void resetPagination() {
         this.start = -1;
         this.limit = -1;
-    }
-
-    public final void updateSchema() {
-
-        OSchema schema = db.getMetadata().getSchema();
-
-        if (!schema.existsClass(Schema.DOCUMENTS)) {
-            createDocType(schema);
-        }
-        if (!schema.existsClass(Schema.SIGNATURES)) {
-            createSignatureType(schema);
-        }
     }
 
     public void close() {
@@ -258,10 +234,6 @@ public class ContentStore {
         return query(STATEMENT_GET_TAGS_FROM_PUBLISHED_POSTS);
     }
 
-    private DocumentList<DocumentModel> getSignaturesForTemplates() {
-        return query(STATEMENT_GET_SIGNATURE_FOR_TEMPLATES);
-    }
-
     public DocumentList<DocumentModel> getUnrenderedContent() {
         return query(STATEMENT_GET_UNDRENDERED_CONTENT);
     }
@@ -273,19 +245,6 @@ public class ContentStore {
     public void markContentAsRendered(DocumentModel document) {
         String statement = String.format(STATEMENT_MARK_CONTENT_AS_RENDERD, document.getType(), document.getSourceuri());
         executeCommand(statement);
-    }
-
-    private void updateSignatures(String currentTemplatesSignature) {
-        executeCommand(STATEMENT_UPDATE_TEMPLATE_SIGNATURE, currentTemplatesSignature);
-    }
-
-    public void deleteAllByDocType(String docType) {
-        String statement = String.format(STATEMENT_DELETE_ALL, docType);
-        executeCommand(statement);
-    }
-
-    private void insertTemplatesSignature(String currentTemplatesSignature) {
-        executeCommand(STATEMENT_INSERT_TEMPLATES_SIGNATURE, currentTemplatesSignature);
     }
 
     private DocumentList<DocumentModel> query(String sql) {
@@ -315,6 +274,10 @@ public class ContentStore {
         return result;
     }
 
+    public SchemaManager getSchemaManager() {
+        return schemaManager;
+    }
+
     public Set<String> getAllTags() {
         Set<String> result = new HashSet<>();
         for (String docType : DocumentTypes.getDocumentTypes()) {
@@ -328,78 +291,20 @@ public class ContentStore {
         return result;
     }
 
-    private void createDocType(final OSchema schema) {
-        logger.debug("Create document class");
-
-        OClass page = schema.createClass(Schema.DOCUMENTS);
-        page.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "sha1Index", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.SHA1);
-        page.createProperty(ModelAttributes.SOURCE_URI, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "sourceUriIndex", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SOURCE_URI);
-        page.createProperty(ModelAttributes.CACHED, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "cachedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.CACHED);
-        page.createProperty(ModelAttributes.RENDERED, OType.BOOLEAN).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "renderedIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.RENDERED);
-        page.createProperty(ModelAttributes.STATUS, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "statusIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.STATUS);
-        page.createProperty(ModelAttributes.TYPE, OType.STRING).setNotNull(true);
-        page.createIndex(Schema.DOCUMENTS + "typeIndex", OClass.INDEX_TYPE.NOTUNIQUE, ModelAttributes.TYPE);
-
-    }
-
-    private void createSignatureType(OSchema schema) {
-        OClass signatures = schema.createClass(Schema.SIGNATURES);
-        signatures.createProperty(ModelAttributes.SHA1, OType.STRING).setNotNull(true);
-        signatures.createIndex("sha1Idx", OClass.INDEX_TYPE.UNIQUE, ModelAttributes.SHA1);
-    }
-
     public void updateAndClearCacheIfNeeded(boolean needed, File templateFolder) {
 
         boolean clearCache = needed;
 
         if (!needed) {
-            clearCache = updateTemplateSignatureIfChanged(templateFolder);
+            clearCache = this.schemaManager.updateTemplateSignatureIfChanged(templateFolder);
         }
 
         if (clearCache) {
-            deleteAllDocumentTypes();
-            this.updateSchema();
+           schemaManager.deleteAllDocumentTypes();            schemaManager.updateSchema();
         }
     }
 
-    private boolean updateTemplateSignatureIfChanged(File templateFolder) {
-        boolean templateSignatureChanged = false;
 
-        DocumentList<DocumentModel> docs = this.getSignaturesForTemplates();
-        String currentTemplatesSignature;
-        try {
-            currentTemplatesSignature = FileUtil.sha1(templateFolder);
-        } catch (Exception e) {
-            currentTemplatesSignature = "";
-        }
-        if (!docs.isEmpty()) {
-            String sha1 = docs.get(0).getSha1();
-            if (!sha1.equals(currentTemplatesSignature)) {
-                this.updateSignatures(currentTemplatesSignature);
-                templateSignatureChanged = true;
-            }
-        } else {
-            // first computation of templates signature
-            this.insertTemplatesSignature(currentTemplatesSignature);
-            templateSignatureChanged = true;
-        }
-        return templateSignatureChanged;
-    }
-
-    private void deleteAllDocumentTypes() {
-        for (String docType : DocumentTypes.getDocumentTypes()) {
-            try {
-                this.deleteAllByDocType(docType);
-            } catch (Exception e) {
-                // maybe a non existing document type
-            }
-        }
-    }
 
     public boolean isActive() {
         return db.isActiveOnCurrentThread();
