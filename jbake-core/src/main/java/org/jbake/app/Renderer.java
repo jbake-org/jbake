@@ -185,7 +185,6 @@ public class Renderer {
         int postsPerPage = config.getPostsPerPage();
 
         if (totalPosts == 0) {
-            //paging makes no sense. render single index file instead
             renderIndex(indexFile);
         } else {
             PagingHelper pagingHelper = new PagingHelper(totalPosts, postsPerPage);
@@ -196,26 +195,23 @@ public class Renderer {
 
             try {
                 db.setLimit(postsPerPage);
-                for (int pageStart = 0, page = 1; pageStart < totalPosts; pageStart += postsPerPage, page++) {
+                for (int page = 1; page <= pagingHelper.getNumberOfPages(); page++) {
+                    int pageStart = (page - 1) * postsPerPage;
                     String fileName = indexFile;
-
                     db.setStart(pageStart);
                     model.setCurrentPageNuber(page);
                     String previous = pagingHelper.getPreviousFileName(page);
                     model.setPreviousFilename(previous);
                     String nextFileName = pagingHelper.getNextFileName(page);
                     model.setNextFileName(nextFileName);
-
                     DocumentModel contentModel = buildSimpleModel(MASTERINDEX_TEMPLATE_NAME);
-
                     if (page > 1) {
                         contentModel.setRootPath("../");
                     }
                     model.setContent(contentModel);
-
-                    // Add page number to file name
                     fileName = pagingHelper.getCurrentFileName(page, fileName);
-                    ModelRenderingConfig renderConfig = new ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME);
+                    ModelRenderingConfig renderConfig =
+                        new ModelRenderingConfig(fileName, model, MASTERINDEX_TEMPLATE_NAME);
                     render(renderConfig);
                 }
                 db.resetPagination();

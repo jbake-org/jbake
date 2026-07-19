@@ -43,37 +43,38 @@ public class Init {
         if (!outputFolder.canWrite()) {
             throw new Exception("Output folder is not writeable!");
         }
-
-        File[] contents = outputFolder.listFiles();
-        boolean safe = true;
-        if (contents != null) {
-            for (File content : contents) {
-                if (content.isDirectory()) {
-                    if (content.getName().equalsIgnoreCase(config.getTemplateFolderName())) {
-                        safe = false;
-                    }
-                    if (content.getName().equalsIgnoreCase(config.getContentFolderName())) {
-                        safe = false;
-                    }
-                    if (content.getName().equalsIgnoreCase(config.getAssetFolderName())) {
-                        safe = false;
-                    }
-                }
-            }
+        if (hasExistingStructure(outputFolder)) {
+            throw new Exception(String.format("Output folder '%s' already contains structure!", outputFolder.getAbsolutePath()));
         }
-
-        if (!safe) {
-            throw new Exception(String.format("Output folder '%s' already contains structure!",
-                    outputFolder.getAbsolutePath()));
-        }
-        if (config.getExampleProjectByType(templateType) != null) {
-            File templateFile = new File(templateLocationFolder, config.getExampleProjectByType(templateType));
-            if (!templateFile.exists()) {
-                throw new Exception("Cannot find example project file: " + templateFile.getPath());
-            }
-            ZipUtil.extract(new FileInputStream(templateFile), outputFolder);
-        } else {
+        String exampleProject = config.getExampleProjectByType(templateType);
+        if (exampleProject == null) {
             throw new Exception("Cannot locate example project type: " + templateType);
         }
+        File templateFile = new File(templateLocationFolder, exampleProject);
+        if (!templateFile.exists()) {
+            throw new Exception("Cannot find example project file: " + templateFile.getPath());
+        }
+        ZipUtil.extract(new FileInputStream(templateFile), outputFolder);
+    }
+
+
+    private boolean hasExistingStructure(File outputFolder) {
+        File[] contents = outputFolder.listFiles();
+        if (contents == null) {
+            return false;
+        }
+
+        for (File content : contents) {
+            if (content.isDirectory() && isJBakeFolder(content.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isJBakeFolder(String name) {
+        return name.equalsIgnoreCase(config.getTemplateFolderName())
+            || name.equalsIgnoreCase(config.getContentFolderName())
+            || name.equalsIgnoreCase(config.getAssetFolderName());
     }
 }

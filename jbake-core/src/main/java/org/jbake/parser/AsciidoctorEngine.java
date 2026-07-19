@@ -38,6 +38,9 @@ public class AsciidoctorEngine extends MarkupEngine {
     /* comma separated gem names */
     private static final String OPT_REQUIRES = "requires";
 
+    /**
+     * Constructs a new {@code AsciidoctorEngine}.
+     */
     public AsciidoctorEngine() {
         Class engineClass = Asciidoctor.class;
         assert engineClass != null;
@@ -51,23 +54,7 @@ public class AsciidoctorEngine extends MarkupEngine {
                 try {
                     lock.writeLock().lock();
                     if (engine == null) {
-                        LOGGER.info("Initializing Asciidoctor engine...");
-                        if (options.map().containsKey(OPT_GEM_PATH)) {
-                            engine = AsciidoctorJRuby.Factory.create(String.valueOf(options.map().get(OPT_GEM_PATH)));
-                        } else {
-                            engine = Asciidoctor.Factory.create();
-                        }
-
-                        if (options.map().containsKey(OPT_REQUIRES)) {
-                            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
-                            if (requires.length != 0) {
-                                for (String require : requires) {
-                                    engine.requireLibrary(require);
-                                }
-                            }
-                        }
-
-                        LOGGER.info("Asciidoctor engine initialized.");
+                        initializeEngine(options);
                     }
                 } finally {
                     lock.readLock().lock();
@@ -78,6 +65,28 @@ public class AsciidoctorEngine extends MarkupEngine {
             lock.readLock().unlock();
         }
         return engine;
+    }
+
+    private void initializeEngine(Options options) {
+        LOGGER.info("Initializing Asciidoctor engine...");
+
+        if (options.map().containsKey(OPT_GEM_PATH)) {
+            engine = AsciidoctorJRuby.Factory.create(
+                String.valueOf(options.map().get(OPT_GEM_PATH)));
+        } else {
+            engine = Asciidoctor.Factory.create();
+        }
+
+        if (options.map().containsKey(OPT_REQUIRES)) {
+            String[] requires = String.valueOf(options.map().get(OPT_REQUIRES)).split(",");
+            if (requires.length != 0) {
+                for (String require : requires) {
+                    engine.requireLibrary(require);
+                }
+            }
+        }
+
+        LOGGER.info("Asciidoctor engine initialized.");
     }
 
     @Override
@@ -91,37 +100,52 @@ public class AsciidoctorEngine extends MarkupEngine {
         }
         Map<String, Object> attributes = header.getAttributes();
         for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
-            String key = attribute.getKey();
-            Object value = attribute.getValue();
+            processAttribute(attribute.getKey(), attribute.getValue(), context, documentModel);
+        }
+    }
 
-            if (hasJBakePrefix(key)) {
-                String pKey = key.substring(6);
-                if(canCastToString(value)) {
-                    storeHeaderValue(pKey, (String) value, documentModel);
-                } else {
-                    documentModel.put(pKey, value);
-                }
-            }
-            if (hasRevdate(key) && canCastToString(value)) {
+    private void processAttribute(String key, Object value, ParserContext context, DocumentModel documentModel) {
+        if (hasJbakePrefix(key)) {
+            processJbakeAttribute(key, value, documentModel);
+        }
 
-                String dateFormat = context.getConfig().getDateFormat();
-                DateFormat df = new SimpleDateFormat(dateFormat);
-                try {
-                    Date date = df.parse((String) value);
-                    context.setDate(date);
-                } catch (ParseException e) {
-                    LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
-                }
-            }
-            if (key.equals("jbake-tags")) {
-                if (canCastToString(value)) {
-                    context.setTags(((String) value).split(","));
-                } else {
-                    LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
-                }
-            } else {
-                documentModel.put(key, attributes.get(key));
-            }
+        if (hasRevdate(key) && canCastToString(value)) {
+            processRevdate((String) value, context);
+        }
+
+        if ("jbake-tags".equals(key)) {
+            processTags(value, context);
+        } else {
+            documentModel.put(key, value);
+        }
+    }
+
+    private void processJbakeAttribute(String key, Object value, DocumentModel documentModel) {
+        String pKey = key.substring(6);
+        if (canCastToString(value)) {
+            storeHeaderValue(pKey, (String) value, documentModel);
+        } else {
+            documentModel.put(pKey, value);
+        }
+    }
+
+    private void processRevdate(String value, ParserContext context) {
+        String dateFormat = context.getConfig().getDateFormat();
+        DateFormat df = new SimpleDateFormat(dateFormat);
+        try {
+            Date date = df.parse(value);
+            context.setDate(date);
+        } catch (ParseException e) {
+            LOGGER.error("Unable to parse revdate. Expected {}", dateFormat, e);
+        }
+    }
+
+
+    private void processTags(Object value, ParserContext context) {
+        if (canCastToString(value)) {
+            context.setTags(((String) value).split(","));
+        } else {
+            LOGGER.error("Wrong value of 'jbake-tags'. Expected a String got '{}'", getValueClassName(value));
         }
     }
 
@@ -137,7 +161,7 @@ public class AsciidoctorEngine extends MarkupEngine {
         return key.equals(REVDATE_KEY);
     }
 
-    private boolean hasJBakePrefix(String key) {
+    private boolean hasJbakePrefix(String key) {
         return key.startsWith(JBAKE_PREFIX);
     }
 

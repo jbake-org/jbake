@@ -21,7 +21,7 @@ public class DBUtil {
 
     @Deprecated
     public static void updateSchema(final ContentStore db) {
-        db.updateSchema();
+        db.getSchemaManager().updateSchema();
     }
 
     public static ContentStore createDataStore(JBakeConfiguration configuration) {

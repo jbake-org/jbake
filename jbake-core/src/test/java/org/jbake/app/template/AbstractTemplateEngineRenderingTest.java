@@ -95,7 +95,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
 
         config.setTemplateFileNameForDocType("paper", "paper." + templateExtension);
         DocumentTypes.addDocumentType("paper");
-        db.updateSchema();
+        db.getSchemaManager().updateSchema();
 
         Assert.assertEquals(".html", config.getOutputExtension());
 
@@ -268,7 +268,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
     @Test
     public void renderSitemap() throws Exception {
         DocumentTypes.addDocumentType("paper");
-        db.updateSchema();
+        db.getSchemaManager().updateSchema();
 
         renderer.renderSitemap("sitemap.xml");
         File outputFile = new File(destinationFolder, "sitemap.xml");
@@ -295,7 +295,7 @@ public abstract class AbstractTemplateEngineRenderingTest extends ContentStoreIn
 
         outputStrings.put("dbSpan", Arrays.asList("<span>3</span>"));
 
-        db.deleteAllByDocType("post");
+        db.getSchemaManager().deleteAllByDocType("post");
 
         renderer.renderIndexPaging("index.html");
 
